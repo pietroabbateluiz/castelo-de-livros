@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="O mundo da Odisseia: 13 paragens do poema de Homero, 91 cenas que abrem conforme os cantos sao lidos.">
-<title>A Odisseia — o mundo do poema</title>
+<title>Mundo de Luiz</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@400;500;600&family=Karla:wght@400;500;700&display=swap">
@@ -78,21 +78,21 @@
 </head>
 <body>
 <div id="game">
-  <canvas id="c" aria-label="Mapa do mundo da Odisseia: Ítaca, o Olimpo, a ilha de Circe, o país dos mortos, Troia e o mar da volta."></canvas>
+  <canvas id="c" aria-label="Mapa noturno de um mundo de leitura: bosque, vila, charneca, lago com farol e um observatório no alto de um promontório."></canvas>
   <div class="sr" id="sr" aria-label="Lugares do mundo"></div>
 
   <aside class="hud panel hud-tl">
     <div class="crest">
       <svg viewBox="0 0 30 34" aria-hidden="true"><path d="M15 1 L28 6 V17 C28 25 22 30 15 33 C8 30 2 25 2 17 V6 Z" fill="#1B1522" stroke="#D4AC35" stroke-width="1.4"/><path d="M9 11 h12 v3 h-12 z M10 15 h10 v9 h-10 z" fill="#D4AC35"/><path d="M13 17 h4 v7 h-4 z" fill="#1B1522"/></svg>
       <div>
-        <h1>A Odisseia</h1>
+        <h1>Mundo de Luiz</h1>
         <div class="who" id="who">Mês 3 · 84 livros</div>
       </div>
     </div>
     <div class="stats">
       <div class="stat"><b id="sOpen">7</b><span>abertos</span></div>
-      <div class="stat"><b id="sNear">24</b><span>cantos</span></div>
-      <div class="stat"><b id="sSeal">78</b><span>por ler</span></div>
+      <div class="stat"><b id="sNear">13</b><span>gêneros</span></div>
+      <div class="stat"><b id="sSeal">78</b><span>trancados</span></div>
     </div>
   </aside>
 
@@ -100,9 +100,8 @@
 
   <div class="hud hud-tr">
     <div class="seg panel" role="group" aria-label="Momento">
-      <button type="button" data-canto="1" aria-pressed="false">Canto I</button>
-      <button type="button" data-canto="12" aria-pressed="true">Canto XII</button>
-      <button type="button" data-canto="24" aria-pressed="false">Canto XXIV</button>
+      <button type="button" data-preset="inicio" aria-pressed="true">Início</button>
+      <button type="button" data-preset="lendo" aria-pressed="false">Lendo</button>
     </div>
     <div class="zoom panel" role="group" aria-label="Zoom">
       <button type="button" id="zin" aria-label="Aproximar">+</button>
@@ -114,14 +113,14 @@
       <button type="button" data-gfx="1" aria-pressed="false">Alto</button>
       <button type="button" data-gfx="0" aria-pressed="false">Clássico</button>
     </div>
-    <div class="hint panel">arraste · role para aproximar · clique numa cena lida para entrar · Shift = placas</div>
+    <div class="hint panel">arraste · role para aproximar · clique numa sala aberta para entrar · Shift = placas</div>
   </div>
 
   <div class="hud panel hud-b" id="card"></div>
 
   <div class="hud panel hud-br">
-    <span><i style="background:#D4AC35"></i>Cena lida</span>
-    <span><i style="background:#C24B35"></i>Cena por ler</span>
+    <span><i style="background:#D4AC35"></i>Sala aberta</span>
+    <span><i style="background:#C24B35"></i>Trancada · 1 livro 🔑</span>
   </div>
 </div>
 
@@ -141,7 +140,7 @@ let cam=null; // alvo de tween {Z,panX,panY}
 let GFX=2; // 2 = Ultra (sombras, texturas, pós-processamento) · 1 = Alto (sem pós) · 0 = Clássico (visual original)
 const LIGHT={x:0.35,y:-0.94};      // de onde vem a luz da lua (alto-direita da tela)
 const SHADOW_DIR={x:-0.18,y:0.98}; // para onde as sombras se estendem, por unidade de altura
-const BBOX={xmin:-25,xmax:49,ymin:-16,ymax:36,zmin:-3,zmax:10.6};
+const BBOX={xmin:-25,xmax:42,ymin:-16,ymax:36,zmin:-3,zmax:10.6};
 function P(x,y,z){ return [(OX0+(x-y)*TW0)*Z+panX, (OY0+(x+y)*TH0-(z||0)*ZH0)*Z+panY]; }
 function fit(){
   DPR=Math.min(2,window.devicePixelRatio||1); W=Math.max(1,cv.clientWidth); H=Math.max(1,cv.clientHeight);
@@ -367,7 +366,7 @@ const REGIONS=[
    {id:'cemiterio',name:'Cemitério dos Esquecidos',x:32.6,y:1.0,st:{d1:'sealed',m3:'open'},opened:'Aberto por 5 livros de horror sobrenatural',need:{d1:[0,5,'de horror sobrenatural'],m3:[5,5,'de horror sobrenatural']},sign:[36.6,4.6,0]} ]},
  {id:'ilha',name:'Ilha do Farol',tab:'Ilha',genre:'Mistério',cx:26.5,cy:26,cz:0,r:5.5,sign:[19.0,27.9,0],tint:'40,80,90',
   places:[
-   {id:'farol',name:'Farol',h:6.5,x:47.0,y:10.0,st:{d1:'sealed',m3:'open'},opened:'Aberto por 8 livros de mistério',need:{d1:[0,8,'de mistério'],m3:[8,8,'de mistério']},sign:[27.6,28.4,0]},
+   {id:'farol',name:'Farol',h:6.5,x:26.9,y:25.0,st:{d1:'sealed',m3:'open'},opened:'Aberto por 8 livros de mistério',need:{d1:[0,8,'de mistério'],m3:[8,8,'de mistério']},sign:[27.6,28.4,0]},
    {id:'guarda',name:'Casa do Guarda',x:24.5,y:26.6,w:1.7,d:1.4,st:{d1:'sealed',m3:'sealed'},opened:'',need:{d1:[0,4,'de romance policial'],m3:[2,4,'de romance policial']},sign:[24.4,29.2,0]},
    {id:'barracao',name:'Barracão dos Barcos',x:22.2,y:20.6,w:2.2,d:1.6,st:{d1:'sealed',m3:'near'},opened:'',need:{d1:[0,3,'de suspense'],m3:[2,3,'de suspense']},sign:[21.2,20.4,0]},
    {id:'cais',name:'Cais do Naufrágio',x:28.8,y:25.4,st:{d1:'sealed',m3:'sealed'},opened:'',need:{d1:[0,3,'de true crime'],m3:[0,3,'de true crime']},sign:[31.8,27.6,-0.5]} ]},
@@ -444,7 +443,7 @@ const SUBS={
   {id:'scriptorium',sub:'Teologia'},
   {id:'mesquita',  sub:'Tradição islâmica'},
   {id:'budista',   sub:'Tradições orientais'},
-  {id:'peregrinos',sub:'História das religiões', name:'A Estrada de Esparta', x:-0.79, y:4.23, style:'stoa'}],
+  {id:'peregrinos',sub:'História das religiões', name:'Casa dos Peregrinos', x:-0.79, y:4.23, style:'capela'}],
  castelo:[
   {id:'sotao',     sub:'Clássicos brasileiros'},
   {id:'salao',     sub:'Romance do século XIX'},
@@ -498,17 +497,17 @@ const SUBS={
   {id:'antena',    sub:'Primeiro contato'},
   {id:'pad',       sub:'Viagem no tempo'},
   {id:'hangar',    sub:'Hard sci-fi'},
-  {id:'cyber',     sub:'Cyberpunk',        name:'A Vinha da Ninfa', x:16.52, y:5.98,  style:'gruta'},
-  {id:'distopia',  sub:'Distopia',         name:'As Quatro Fontes', x:14.62, y:-0.43, style:'gruta'},
-  {id:'ruina',     sub:'Pós-apocalíptico', name:'O Rochedo',        x:13.07, y:6.33,  style:'gruta'}],
+  {id:'cyber',     sub:'Cyberpunk',        name:'Módulo Neon',    x:16.52, y:5.98,  style:'domo'},
+  {id:'distopia',  sub:'Distopia',         name:'Bloco Cinza',    x:14.62, y:-0.43, style:'domo'},
+  {id:'ruina',     sub:'Pós-apocalíptico', name:'Cúpula Rachada', x:13.07, y:6.33,  style:'domo'}],
  guerra:[
   {id:'acampamento',sub:'Memórias de combate'},
   {id:'catapulta', sub:'Guerras antigas'},
   {id:'muralha',   sub:'Estratégia militar'},
   {id:'torrecerco',sub:'Cerco e resistência'},
-  {id:'trincheira',sub:'Primeira Guerra', name:'A Praia das Naus', x:-12.0,  y:5.54, style:'tenda'},
-  {id:'bunker',    sub:'Segunda Guerra',  name:'O Acampamento',    x:-22.07, y:3.1,  style:'tenda'},
-  {id:'memorial',  sub:'Pós-guerra',      name:'O Túmulo',         x:-18.31, y:7.93, style:'gruta'}],
+  {id:'trincheira',sub:'Primeira Guerra', name:'Trincheira',      x:-12.0,  y:5.54, style:'bunker'},
+  {id:'bunker',    sub:'Segunda Guerra',  name:'Bunker',          x:-22.07, y:3.1,  style:'bunker'},
+  {id:'memorial',  sub:'Pós-guerra',      name:'Memorial',        x:-18.31, y:7.93, style:'bunker'}],
  outono:[
   {id:'clareira',  sub:'Mitologia grega'},
   {id:'gruta',     sub:'Mitologia nórdica'},
@@ -542,7 +541,7 @@ function openCount(){ return OPENN[preset]||1; }
 function subState(id){ const e=SUBIDX[id]; if(!e) return null; return e.idx<openCount()?'open':'sealed'; }
 function subOf(id){ const e=SUBIDX[id]; return e?e.sub:null; }
 
-const st=(p)=>{ if(CANTO[p.id]!=null) return abertoNoCanto(p.id)?'open':'sealed'; return subState(p.id)||'open'; };
+const st=(p)=>{ const k=subState(p.id); if(k) return k; return (p.st&&(p.st[preset]||p.st.m3))||'open'; };
 REGIONS.push({id:'navegacoes',name:'Porto das Navegações',tab:'Porto',genre:'Navegações',cx:0.2,cy:28.9,cz:0,r:5.4,sign:[0.2,33.6,0],tint:'50,110,140',places:[]});
 /* cada gênero passa a ter exatamente 7 edificações — uma por subgênero */
 for(const rid in SUBS){ const R=REGIONS.find(r=>r.id===rid); if(!R) continue;
@@ -551,146 +550,6 @@ for(const rid in SUBS){ const R=REGIONS.find(r=>r.id===rid); if(!R) continue;
       st:{inicio:'sealed',lendo:'sealed'},opened:'Aberta com 1 livro de '+sgen.sub.toLowerCase(),
       need:{inicio:[0,1,'do subgênero'],lendo:[0,1,'do subgênero']},
       sign:[sgen.x,sgen.y+1.5,(R.cz||0)]}); } }
-/* ===================== v10 · A Odisseia =====================
-   O mundo deixa de ser gêneros literários e passa a ser o poema de Homero.
-   Cada lugar é uma cena, e abre no canto em que a cena acontece.          */
-const ROMAN=['','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX','XXI','XXII','XXIII','XXIV'];
-/* renomeia as regiões herdadas do Mundo de Luiz */
-const RENAME={
- castelo:   {name:'Ítaca',                 tab:'Ítaca',    genre:'O palácio de Odisseu'},
- acropole:  {name:'O Olimpo',              tab:'Olimpo',   genre:'A casa dos deuses'},
- fazenda:   {name:'A Granja de Eumeu',     tab:'Granja',   genre:'O porqueiro fiel'},
- vila:      {name:'Esquéria',              tab:'Esquéria', genre:'A cidade dos feácios'},
- bosque:    {name:'Eeia',                  tab:'Eeia',     genre:'A ilha de Circe'},
- charneca:  {name:'O País dos Cimérios',   tab:'Hades',    genre:'A casa dos mortos'},
- arena:     {name:'A Prova do Arco',       tab:'O Arco',   genre:'O certame dos pretendentes'},
- guerra:    {name:'Troia',                 tab:'Troia',    genre:'A guerra que ficou para trás'},
- outono:    {name:'A Ilha dos Ciclopes',   tab:'Ciclopes', genre:'A caverna de Polifemo'},
- catedral:  {name:'Pilos e Esparta',       tab:'Pilos',    genre:'A viagem de Telêmaco'},
- mesa:      {name:'Ogígia',                tab:'Ogígia',   genre:'A ilha de Calipso'},
- ilha:      {name:'O Rochedo das Sereias', tab:'Sereias',  genre:'O estreito e o canto'},
- navegacoes:{name:'O Mar e a Nau',         tab:'O Mar',    genre:'A viagem de volta'}
-};
-/* cada cena: id herdado, nome novo, canto em que abre, e a linha do poema que a explica */
-const CENAS={
- castelo:[
-  ['salao','O Salão dos Pretendentes',1,'Cento e oito homens comem os bens de uma casa cujo dono ninguém sabe se vive.'],
-  ['poesia','A Teia de Penélope',2,'De dia ela tece o sudário de Laertes; de noite desfaz o que teceu. Três anos assim.'],
-  ['gabinete','A Câmara das Armas',22,'Telêmaco retira as lanças e os escudos do salão. Os pretendentes só percebem quando já é tarde.'],
-  ['cripta','A Gruta do Tesouro',13,'Os feácios deixam Odisseu dormindo na praia da própria terra, e escondem os presentes numa gruta.'],
-  ['dragao','A Torre da Espera',16,'Do alto se vê o mar por onde ninguém volta há vinte anos.'],
-  ['inverno','O Pátio de Argos',17,'O cão reconhece o dono ao fim de vinte anos, abana a cauda e morre ali mesmo.'],
-  ['sotao','O Tálamo de Oliveira',23,'A cama foi lavrada num tronco de oliveira vivo, e não se move do lugar. É o segredo que só os dois sabem.']],
- acropole:[
-  ['templo','O Trono de Zeus',1,'É no conselho dos deuses que a volta de Odisseu é finalmente decidida.'],
-  ['pergaminhos','A Casa de Atena',1,'A deusa de olhos glaucos toma partido e desce a Ítaca disfarçada de estrangeiro.'],
-  ['stoa','O Segundo Conselho',5,'Os deuses tornam a se reunir, e Hermes é enviado a Ogígia com a ordem de soltar o náufrago.'],
-  ['existencia','O Salão de Hermes',5,'Calça as sandálias de ouro que o levam sobre o mar como sobre a terra.'],
-  ['logica','A Forja de Hefesto',8,'A rede invisível, mais fina que fio de aranha, que o ferreiro arma sobre o próprio leito.'],
-  ['mente','O Bosque de Ártemis',6,'Nausícaa entre as servas é como a deusa entre as ninfas: reconhece-se de longe pela cabeça mais alta.'],
-  ['agora','O Palácio de Posídon',13,'O deus do mar cobra a conta: a nau dos feácios volta e vira pedra à vista do porto.']],
- fazenda:[
-  ['celeiro','O Curral dos Porcos',14,'Doze chiqueiros, cinquenta porcas em cada um. É a maior riqueza que restou da casa.'],
-  ['galpao','A Cabana de Eumeu',14,'O porqueiro recebe o mendigo com o que tem, sem saber que serve o próprio rei.'],
-  ['milharal','O Trigal da Granja',14,'A terra continua dando, ainda que o dono não esteja para colher.'],
-  ['aboboras','A Horta do Porqueiro',15,'Comida simples e vinho aguado: a hospitalidade que os pretendentes nunca souberam oferecer.'],
-  ['cordel','A Fogueira da Noite',15,'Eumeu conta a própria história: foi filho de rei antes de ser escravo.'],
-  ['moinho','O Moinho da Granja',20,'Doze mulheres moem o grão. A última, exausta, pede em voz alta que aquele seja o último dia deles — e Zeus troveja.'],
-  ['seringal','O Pomar de Laerte',24,'O velho pai cava a terra sozinho. Odisseu o reconhece pelas árvores que lhe deu quando menino.']],
- vila:[
-  ['cafe','A Praia de Nausícaa',6,'A princesa vai lavar roupa no rio e encontra um náufrago coberto de sal e folhas.'],
-  ['rosa','O Palácio de Alcínoo',7,'Muros de bronze, portas de ouro, cães de prata que não morrem nem envelhecem.'],
-  ['flor','O Pomar Sempre Verde',7,'Pera sobre pera, figo sobre figo: ali a fruta não acaba, nem no inverno nem no verão.'],
-  ['jardim','Os Jardins de Alcínoo',7,'Quatro jeiras de horta e duas fontes, uma para o jardim, outra para a cidade.'],
-  ['sobrado','A Sala de Areté',7,'É à rainha que o suplicante se dirige primeiro, abraçado aos joelhos dela junto à lareira.'],
-  ['arquivo','A Canção de Demódoco',8,'O aedo cego canta a queda de Troia, e o estrangeiro à mesa começa a chorar sem que ninguém entenda.'],
-  ['correio','O Porto dos Feácios',8,'Cinquenta e dois rapazes arrastam a nau negra para o mar salgado.']],
- bosque:[
-  ['casa','O Palácio de Circe',10,'No meio da mata, um palácio de pedra polida, e em volta lobos e leões que não atacam: são homens.'],
-  ['toca','A Pocilga dos Companheiros',10,'Beberam o vinho com o queijo e a farinha, e ganharam focinho, cerdas e voz de porco — só a memória ficou humana.'],
-  ['ninho','A Erva Moly',10,'Raiz negra, flor de leite. Hermes a arranca para Odisseu: é o que anula a droga da feiticeira.'],
-  ['varanda','A Clareira das Feras',10,'Os animais mansos rodeiam o visitante abanando o rabo, como cães em volta do dono.'],
-  ['sombria','O Bosque de Amieiros',10,'Da fumaça que sobe entre as árvores é que se descobre que a ilha não está deserta.'],
-  ['bardos','A Fonte de Circe',10,'Um ano inteiro se passa ali, entre carne e vinho doce, até os companheiros lembrarem da casa.'],
-  ['fabulas','O Conselho da Feiticeira',12,'É ela quem ensina o caminho: as Sereias, Cila, Caríbdis e o rebanho que não se toca.']],
- charneca:[
-  ['mansao','A Casa de Hades',11,'A terra dos cimérios, onde o sol nunca aparece e a noite não sai de cima dos homens.'],
-  ['poco','A Fossa das Libações',11,'Um côvado de cada lado: mel, vinho, água e farinha, e depois o sangue negro das ovelhas.'],
-  ['cemiterio','As Sombras dos Heróis',11,'Aquiles diz que preferia ser servo de um lavrador pobre a reinar sobre todos os mortos.'],
-  ['sanatorio','A Profecia de Tirésias',11,'O adivinho cego bebe o sangue e fala: o rebanho do Sol, a casa cheia de inimigos, o remo confundido com uma pá.'],
-  ['mausoleu','A Sombra de Elpenor',11,'Morreu caindo do telhado de Circe e ainda estava insepulto. Pede um túmulo e o remo fincado por cima.'],
-  ['fogueira','A Sombra de Anticleia',11,'A mãe morreu de saudade. Ele tenta abraçá-la três vezes, e três vezes ela escapa como sombra ou sonho.'],
-  ['capela','O Altar do Sangue',11,'Ali se promete à volta um sacrifício, e é essa promessa que abre a boca dos mortos.']],
- arena:[
-  ['campo','Os Doze Machados',21,'Enfileirados como estacas de nau. A flecha tem de passar pelo furo de todos.'],
-  ['anel','O Arco de Ífito',21,'Ficou vinte anos guardado na despensa. Nenhum dos pretendentes consegue sequer vergá-lo.'],
-  ['tenda','A Tenda do Certame',21,'Pretendente após pretendente amolece o arco no fogo e passa banha — e ainda assim não consegue.'],
-  ['expedicao','O Pátio do Certame',21,'Eumeu leva o arco ao mendigo entre os gritos dos que não querem que ele tente.'],
-  ['abrigo','A Corda Retesada',21,'Ele o verga sem esforço, como um cantor que muda a corda da lira, e a corda canta como andorinha.'],
-  ['saloon','O Sinal de Zeus',21,'Troveja de céu limpo assim que a flecha atravessa os doze ferros.'],
-  ['refugio','A Primeira Flecha',22,'Ele salta para a soleira, despeja as flechas aos pés e deixa de ser mendigo.']],
- guerra:[
-  ['trincheira','A Praia das Naus',3,'Nove anos rolando a pedra da guerra, e nada de tomar a cidade.'],
-  ['torrecerco','A Torre de Príamo',4,'Helena conta como reconheceu Odisseu disfarçado de mendigo dentro da própria Troia.'],
-  ['muralha','As Muralhas de Ílion',8,'Só caíram porque os próprios troianos abriram um buraco nelas.'],
-  ['catapulta','O Cavalo de Madeira',8,'A armadilha de Epeu, feita com a ajuda de Atena, parada no meio da praça como oferenda.'],
-  ['bunker','O Ventre do Cavalo',11,'Lá dentro, Odisseu segura a boca dos que quase responderam quando Helena imitou a voz das mulheres deles.'],
-  ['acampamento','O Acampamento Aqueu',24,'Dezessete dias e dezessete noites de choro pelo corpo de Aquiles.'],
-  ['memorial','O Túmulo de Aquiles',24,'Sobre um promontório junto ao Helesponto, para ser visto do mar por quem vier depois.']],
- outono:[
-  ['saci','A Ilha das Cabras',9,'Deserta e fértil, nunca lavrada: os ciclopes não têm naus e por isso não a conhecem.'],
-  ['clareira','O Rebanho de Polifemo',9,'Ovelhas e cabras separadas por idade, e queijos secando nos cestos.'],
-  ['gruta','A Caverna do Ciclope',9,'A porta é uma pedra que vinte e dois carros não moveriam.'],
-  ['oriente','O Vinho de Máron',9,'Doze ânforas de vinho tão forte que se bebia com vinte partes de água. Não misturado, derruba um gigante.'],
-  ['fonte','A Estaca em Brasa',9,'Verde de oliveira, afiada e queimada na ponta, girada como verruma no olho único.'],
-  ['circulo','O Carneiro da Fuga',9,'Amarrados de três em três sob a barriga dos carneiros, saem pela mesma porta que o cego apalpa.'],
-  ['bestiario','A Maldição de Posídon',9,'Ao gritar o próprio nome do alto da nau, Odisseu entrega o pai da vingança à vingança do pai.']],
- catedral:[
-  ['nave','O Altar de Posídon',3,'Nove bancadas, quinhentos homens em cada uma, nove touros para cada bancada, na areia de Pilos.'],
-  ['sinos','O Palácio de Nestor',3,'O mais velho dos que voltaram de Troia recebe o filho do que não voltou.'],
-  ['claustro','A Praia dos Sacrifícios',3,'A novilha vem com os chifres dourados para que a deusa se agrade da oferta.'],
-  ['scriptorium','O Banho de Telêmaco',3,'Policasta, a filha mais nova, banha o hóspede e o unge com azeite — é assim que se honra quem chega.'],
-  ['peregrinos','A Estrada para Esparta',3,'Dois dias de carro puxado por potros pela planície de trigo.'],
-  ['mesquita','O Palácio de Menelau',4,'Brilho de bronze, ouro, âmbar, prata e marfim: parece o pátio de Zeus lá dentro.'],
-  ['budista','O Salão de Helena',4,'Ela deita na taça a droga que faz esquecer toda dor, e só então se pode falar de Troia sem chorar.']],
- mesa:[
-  ['distopia','A Praia de Ogígia',1,'Sete anos chorando de frente para o mar, sentado nas pedras da praia da ninfa.'],
-  ['torre','A Gruta de Calipso',5,'Fogo de cedro perfumando a ilha inteira, e uma videira carregada em volta da boca da caverna.'],
-  ['antena','A Vinha da Ninfa',5,'A imortalidade oferecida, e recusada, em troca de uma mulher que envelhece.'],
-  ['hangar','As Quatro Fontes',5,'Quatro nascentes lado a lado, correndo cada uma para o seu lado, entre prados de violeta e aipo.'],
-  ['ruina','A Ordem de Hermes',5,'Nem a deusa contraria Zeus: a ninfa obedece e ensina o náufrago a construir a jangada.'],
-  ['pad','A Balsa de Odisseu',5,'Vinte árvores derrubadas, aparelhadas com trado e cavilha, larga como fundo de nau de carga.'],
-  ['cyber','O Rochedo do Pranto',5,'Dezoito dias de navegação e, à vista da terra, Posídon manda a onda que desfaz tudo.']],
- ilha:[
-  ['barracao','O Mastro e as Cordas',12,'Amarrado ao mastro, pés e mãos, com ordem expressa de que o apertem mais se pedir para soltar.'],
-  ['guarda','A Cera nos Ouvidos',12,'Cera de favo amassada na mão até amolecer, tapando o ouvido de cada remador.'],
-  ['farol','O Fogo do Rochedo',12,'O prado das Sereias é branco de ossos de homens que pararam para ouvir.'],
-  ['cais','Cila, a Rocha',12,'Seis pescoços, seis cabeças, e em cada boca três fileiras de dentes. Leva seis homens e não devolve nenhum.'],
-  ['noir','Caríbdis, o Sorvedouro',12,'Três vezes ao dia engole a água negra e três vezes a devolve. Passar perto dela é escolher a outra morte.'],
-  ['quarto','A Ilha Trinácia',12,'Sete rebanhos de cinquenta bois, que não nascem nem morrem, e são do Sol.'],
-  ['cifra','O Rebanho do Sol',12,'Um mês de vento contrário, a comida no fim, e a única promessa que não podiam quebrar, quebrada.']],
- navegacoes:[
-  ['piratas','Os Cícones de Ísmaro',9,'A primeira parada depois de Troia acaba em saque, bebedeira e setenta e dois mortos.'],
-  ['ilhas','A Terra dos Lotófagos',9,'Quem come a flor não quer mais voltar. Foi preciso arrastá-los chorando para debaixo dos bancos.'],
-  ['capitania','A Nau de Odisseu',9,'Doze naus saíram de Troia. Uma só chega perto de casa, e nem essa inteira.'],
-  ['bordo','O Odre dos Ventos',10,'Éolo prende todos os ventos num odre de couro de boi. A tripulação o abre a nove dias de casa, achando que é ouro.'],
-  ['mar','A Ilha de Éolo',10,'Flutua sobre o mar, cercada de muro de bronze e rocha lisa que não se escala.'],
-  ['baleeiros','Os Lestrigões',10,'O porto perfeito, fechado por penhascos — e por isso mesmo uma ratoeira: onze naus afundadas a pedradas.'],
-  ['naufragio','O Último Naufrágio',12,'O raio parte a nau, os companheiros boiam como gaivotas, e ele fica sozinho agarrado à quilha.']]
-};
-/* aplica: renomeia regiões, renomeia cenas, guarda o canto de cada uma */
-const CANTO={}, CENA={};
-for(const rid in RENAME){ const R=REGIONS.find(r=>r.id===rid); if(!R) continue; Object.assign(R,RENAME[rid]); }
-for(const rid in CENAS){ const R=REGIONS.find(r=>r.id===rid); if(!R) continue;
-  CENAS[rid].forEach(([pid,nome,canto,linha],i)=>{
-    const p=R.places.find(q=>q.id===pid); if(!p) return;
-    p.name=nome; p.opened=linha; CANTO[pid]=canto; CENA[pid]={nome,canto,linha,ordem:i}; }); }
-/* progresso: onde o leitor está no poema */
-const CANTOS=[{n:1,label:'Canto I'},{n:12,label:'Canto XII'},{n:24,label:'Canto XXIV'}];
-let cantoAtual=12;
-function cantoDe(id){ return CANTO[id]||99; }
-function abertoNoCanto(id){ const c=CANTO[id]; return c!=null && c<=cantoAtual; }
-
 const allPlaces=()=>REGIONS.flatMap(r=>r.places.map(p=>({...p,region:r})));
 const regionOpen=(r)=>r.places.some(p=>st(p)==='open');
 const pulse=(now,ph)=>reduce?0.6:(0.5+0.5*Math.sin(now*1.4+(ph||0)));
@@ -938,22 +797,11 @@ function ilha(now,R){
   // píer do continente até a ilha
   push((22+.5)+(26),()=>{ for(let i=0;i<7;i++) drawBox(20.4+i*.5,25.6,0.05,.46,.9,.1,[70,56,44],{ft:1.1}); for(const px of [20.6,21.9,23.2]) for(const py of [25.6,26.4]) drawBox(px,py,-.9,.14,.14,1.0,[52,42,34]); });
   const of=st(farol)==='open';
-  push((farol.x+1)+(farol.y+1)-0.1,()=>{
-    const r=rng(777), pts=[]; for(let i=0;i<9;i++){ const a=i/9*Math.PI*2, rr=2.2*(.72+r()*.5);
-      pts.push([farol.x+Math.cos(a)*rr, farol.y+Math.sin(a)*rr*.86]); }
-    const top=pts.map(q=>P(q[0],q[1],0.3)), bot=pts.map(q=>P(q[0],q[1],-1.5));
-    for(let i=0;i<9;i++){ const j=(i+1)%9; if((pts[i][0]+pts[i][1]+pts[j][0]+pts[j][1])/2 < farol.x+farol.y-.05) continue;
-      quad([top[i],top[j],bot[j],bot[i]],col([96,90,86],.7)); }
-    quad(top,col([116,110,102],1.12));
-    const w=P(farol.x,farol.y+2.3,-0.9); ctx.strokeStyle='rgba(236,248,255,.4)'; ctx.lineWidth=Math.max(1.3,TH*.4);
-    ctx.beginPath(); ctx.ellipse(w[0],w[1]-TH*.4,TW*2.5,TH*1.5,0,0,Math.PI*2); ctx.stroke();
-    for(let i=0;i<7;i++){ const a=P(farol.x-1.6+i*.55, farol.y+2.0, 0.32);
-      ctx.fillStyle='rgba(228,222,206,.75)'; ctx.beginPath(); ctx.ellipse(a[0],a[1],TW*.07,TH*.16,0,0,Math.PI*2); ctx.fill(); } });
   push((farol.x+1)+(farol.y+1),()=>{ drawPrism(farol.x,farol.y,.9,.66,.3,4.6,14,[226,220,208],{bands:6,band2:[150,54,54],top:false}); drawPrism(farol.x,farol.y,.86,.86,4.9,.12,14,[60,58,66]);
     quad([P(farol.x-.48,farol.y+.48,5.02),P(farol.x+.48,farol.y+.48,5.02),P(farol.x+.48,farol.y+.48,5.8),P(farol.x-.48,farol.y+.48,5.8)],of?'rgba(255,214,130,.85)':'rgba(30,34,40,.9)','rgba(20,20,26,.7)'); quad([P(farol.x+.48,farol.y-.48,5.02),P(farol.x+.48,farol.y+.48,5.02),P(farol.x+.48,farol.y+.48,5.8),P(farol.x+.48,farol.y-.48,5.8)],of?'rgba(255,200,110,.75)':'rgba(30,34,40,.9)','rgba(20,20,26,.7)');
     drawBox(farol.x-.54,farol.y-.54,5.8,1.08,1.08,.1,[60,58,66]); drawCone(farol.x,farol.y,.66,5.9,.7,10,[70,30,34]); if(of){ const c=P(farol.x,farol.y,5.4); halo(c[0],c[1],TH*3,'255,214,130',.55); } });
   if(of) push(9002,()=>{ const a=reduce?0.9:now*0.55, L=8, c=P(farol.x,farol.y,5.4); for(const s of [0,Math.PI]){ const a1=a+s-.1,a2=a+s+.1; const p1=P(farol.x+Math.cos(a1)*L,farol.y+Math.sin(a1)*L,5.2),p2=P(farol.x+Math.cos(a2)*L,farol.y+Math.sin(a2)*L,5.2); const g=ctx.createLinearGradient(c[0],c[1],(p1[0]+p2[0])/2,(p1[1]+p2[1])/2); g.addColorStop(0,'rgba(255,224,150,.4)'); g.addColorStop(1,'rgba(255,224,150,0)'); ctx.globalCompositeOperation='lighter'; ctx.fillStyle=g; ctx.beginPath(); ctx.moveTo(c[0],c[1]); ctx.lineTo(p1[0],p1[1]); ctx.lineTo(p2[0],p2[1]); ctx.closePath(); ctx.fill(); ctx.globalCompositeOperation='source-over'; } });
-  
+  else seal(farol.x,farol.y,7.0);
   const og=st(guarda)==='open';
   house({x:guarda.x,y:guarda.y,z:.3,w:guarda.w,d:guarda.d,h:1.3,wall:[112,108,124],roof:[54,58,74],rh:.8,door:.4,lit:og?1:0,win:[{f:'S',u:1.0,z:.45,w:.36},{f:'E',u:.4,z:.45,w:.36}]});
   if(!og) seal(guarda.x+guarda.w/2,guarda.y+guarda.d/2,3.5);
@@ -1277,8 +1125,7 @@ function colossus(now){ const x=17.5, y=28.6; push((x+1.6)+(y+1.6),()=>{ const M
 /* ---- mesquita e templo budista (vale dos templos) ---- */
 function drawDome(cx,cy,z,r,c1,c2,squash){ const c=P(cx,cy,z), rx=r*TW, ryb=r*TH, ryv=r*ZH*(squash||0.95); const g=ctx.createRadialGradient(c[0]-rx*.35,c[1]-ryv*.55,rx*.1,c[0],c[1]-ryv*.2,rx*1.2); g.addColorStop(0,c1); g.addColorStop(.6,c2); g.addColorStop(1,'#1E2E30'); ctx.fillStyle=g; ctx.beginPath(); ctx.ellipse(c[0],c[1],rx,ryv,0,Math.PI,Math.PI*2); ctx.ellipse(c[0],c[1],rx,ryb,0,0,Math.PI); ctx.fill(); ctx.strokeStyle='rgba(20,24,30,.35)'; ctx.lineWidth=1; ctx.beginPath(); ctx.ellipse(c[0],c[1],rx,ryv,0,Math.PI,Math.PI*2); ctx.stroke(); return [c[0],c[1]-ryv]; }
 function crescent(x,y,s){ ctx.strokeStyle='#D4AC35'; ctx.lineWidth=Math.max(1,s*.28); ctx.beginPath(); ctx.moveTo(x,y+s*1.2); ctx.lineTo(x,y); ctx.stroke(); ctx.fillStyle='#D4AC35'; ctx.beginPath(); ctx.arc(x,y-s*.5,s*.55,0,Math.PI*2); ctx.fill(); ctx.fillStyle='#07060B'; ctx.beginPath(); ctx.arc(x+s*.22,y-s*.58,s*.48,0,Math.PI*2); ctx.fill(); }
-function mesquita(now,R){ return pilos_mesquita(now,R); }
-function mesquita_antiga(now,R){
+function mesquita(now,R){
   const mq=R.places.find(q=>q.id==='mesquita'), om=st(mq)==='open', CW=[228,220,202], TQ1='#7FD3CF', TQ2='#3E9C99';
   const X=-5.2, Y=-2.2, Wm=2.8, Dm=2.2, Hm=1.6;
   push((X+Wm)+(Y+Dm)+0.03,()=>{
@@ -1300,8 +1147,7 @@ function mesquita_antiga(now,R){
   });
   if(!om) seal(X+Wm/2,Y+Dm/2,Hm+2.6);
 }
-function pagode(now,R){ return pilos_pagode(now,R); }
-function pagode_antiga(now,R){
+function pagode(now,R){
   const bd=R.places.find(q=>q.id==='budista'), ob=st(bd)==='open', RED=[150,52,44], DK=[56,40,40], GOLD='#D4AC35';
   const cx=6.1, cy=-9.4;
   push((cx+1.7)+(cy+1.7)+0.03,()=>{
@@ -1474,7 +1320,7 @@ function fazenda(now,R){ const [mil,abo,cel,moi]=R.places, om=st(mil)==='open', 
   seal(moi.x+.8,moi.y+.8,5.6);
   if(om||oa){ push((-17.4)+(24.6)+0.05,()=>{ const t=reduce?.5:(0.5+0.5*Math.sin(now*.4)), x=lerp(-18.6,-15.4,t), y=24.6, face=Math.cos(now*.4)>=0?1:-1; drawPerson(x,y,0,face,reduce?0:now*8,[110,80,50],0,{skin:'#E8C9A8',hair:'#6A4A2A'}); const p=P(x,y,0), s=ZH*.34; ctx.strokeStyle='#8A6E4E'; ctx.lineWidth=Math.max(1,s*.1); ctx.beginPath(); ctx.moveTo(p[0]+face*s*.45,p[1]-s*.1); ctx.lineTo(p[0]+face*s*.45,p[1]-s*2.9); ctx.stroke(); ctx.beginPath(); for(const k of [-.15,0,.15]){ ctx.moveTo(p[0]+face*s*.45+k*s,p[1]-s*2.9); ctx.lineTo(p[0]+face*s*.45+k*s,p[1]-s*3.3); } ctx.stroke(); }); }
 }
-const BUILD={bosque,vila,castelo,arena,charneca,ilha,mesa:ogigia,catedral,acropole,guerra,outono,fazenda,navegacoes:porto};
+const BUILD={bosque,vila,castelo,arena,charneca,ilha,mesa,catedral,acropole,guerra,outono,fazenda,navegacoes:porto};
 
 
 /* ===================== v8 · HD-2D: texturas, faíscas, sombras de nuvens, névoa de distância, pós-processamento ===================== */
@@ -1739,19 +1585,21 @@ function satellites(now,R){
   }
 }
 /* ---- névoa + chave sobre tudo que está trancado (por cima das construções) ---- */
-function regionBadge(r,n,prox){
+function regionBadge(r,n){
   const c=P(r.cx,r.cy,(r.cz||0)); const y=c[1]-ZH*1.5;
-  const w=Math.max(92,TW*5.0), h=Math.max(21,TH*2.1);
+  const w=Math.max(40,TW*2.4), h=Math.max(20,TH*2.0);
   ctx.fillStyle='rgba(14,11,20,.80)'; ctx.strokeStyle='rgba(201,162,39,.42)'; ctx.lineWidth=1;
   ctx.beginPath(); ctx.roundRect(c[0]-w/2,y-h/2,w,h,h/2); ctx.fill(); ctx.stroke();
-  const kx=c[0]-w*0.30, ky=y, R2=h*0.36;
-  ctx.fillStyle='#7E2A20'; ctx.beginPath(); ctx.ellipse(kx,ky,R2,R2*.9,0,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle='#F4DCA8'; ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.font=`600 ${Math.max(8,R2*1.05)}px "Grenze Gotisch", Georgia, serif`;
-  ctx.fillText(ROMAN[prox]||'?',kx,ky+1);
-  ctx.fillStyle='#D8CBAE'; ctx.font=`700 ${Math.max(9,h*0.34)}px Karla, sans-serif`; ctx.textAlign='left';
-  ctx.fillText('canto '+(ROMAN[prox]||'?'),c[0]-w*0.14,y+1);
-  ctx.textBaseline='alphabetic'; ctx.textAlign='left';
+  drawKey(r.cx,r.cy,0,0); // nada: só para manter a assinatura
+  const kx=c[0]-w*0.20, ky=y;
+  const R2=h*0.34; const g=ctx.createLinearGradient(kx-R2,ky-R2,kx+R2,ky+R2);
+  g.addColorStop(0,'#8A671F'); g.addColorStop(.45,'#F1D27A'); g.addColorStop(1,'#9A7526');
+  ctx.strokeStyle=g; ctx.lineWidth=Math.max(1.4,R2*0.42); ctx.lineCap='round';
+  ctx.beginPath(); ctx.arc(kx,ky-R2*0.45,R2*0.42,0,Math.PI*2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(kx,ky); ctx.lineTo(kx,ky+R2*0.95); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(kx,ky+R2*0.62); ctx.lineTo(kx+R2*0.42,ky+R2*0.62); ctx.stroke(); ctx.lineCap='butt';
+  ctx.fillStyle='#F2E8D2'; ctx.font=`700 ${Math.max(10,h*0.44)}px Karla, sans-serif`;
+  ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillText(String(n),c[0]-w*0.02,y+1); ctx.textBaseline='alphabetic'; ctx.textAlign='left';
 }
 function locks(now){
   const near=Z>=1.32;
@@ -1762,11 +1610,9 @@ function locks(now){
       const big=!p.sat, rr=big?(Math.max(p.w||2.2,p.d||2.2)*0.44+0.55):0.9;
       const cx=p.x+((p.w||0)/2), cy=p.y+((p.d||0)/2);
       lockFog(cx, cy, zb, rr, now);
-      drawCanto(cx, cy, zb+(big?(p.h||2.6)*0.5+0.9:1.35), cantoDe(p.id), 1);
+      drawKey(cx, cy, zb+(big?(p.h||2.6)*0.5+0.9:1.35), 1);
     }
-    if(!near&&n){ lockFog(r.cx,r.cy,zb,r.r*0.55,now);
-      let prox=99; for(const q of r.places){ if(st(q)==='sealed'){ const c=cantoDe(q.id); if(c<prox) prox=c; } }
-      regionBadge(r,n,prox); }
+    if(!near&&n) { lockFog(r.cx,r.cy,zb,r.r*0.55,now); regionBadge(r,n); }
   }
 }
 
@@ -1810,7 +1656,7 @@ function drawRoom(now){
   ctx.save(); ctx.fillStyle=`rgba(6,5,11,${0.86*e})`; ctx.fillRect(0,0,W,H);
   ctx.translate(OX+RW*S/2,OY+RH*S/2); ctx.scale(S*(0.96+0.04*e),S*(0.96+0.04*e)); ctx.translate(-RW/2,-RH/2); ctx.globalAlpha=e;
   const R=(x,y,w,h,f)=>{ ctx.fillStyle=f; ctx.fillRect(x,y,w,h); };
-  const sub=(CANTO[room.id]!=null?('canto '+ROMAN[CANTO[room.id]]):subOf(room.id))||room.region.genre, rr=rng((room.id.length*97+room.id.charCodeAt(0)*13)|0);
+  const sub=subOf(room.id)||room.region.genre, rr=rng((room.id.length*97+room.id.charCodeAt(0)*13)|0);
   // parede
   R(0,0,RW,RH,'#2A2129');
   const wg=ctx.createLinearGradient(0,0,0,RH*0.72); wg.addColorStop(0,'#3A2E38'); wg.addColorStop(1,'#241C24'); R(0,0,RW,RH*0.72,wg);
@@ -1928,134 +1774,6 @@ function drawRoom(now){
   ctx.fillText('ESC OU CLIQUE PARA VOLTAR AO MAPA',W-20,Math.max(30,H*0.049)); ctx.textAlign='left'; ctx.restore();
 }
 
-/* ===================== v10 · construções novas do mundo grego ===================== */
-/* Ogígia: a gruta de Calipso no promontório — substitui o observatório */
-function ogigia(now,R){
-  const [tor,ant,pad,hang]=R.places;
-  for(const [x,y,s] of [[12.2,2.0,.6],[22.6,3.8,.7],[15.4,5.6,.5],[13.6,3.2,.5]]) rock(x,y,s,[104,96,84],MZ);
-  for(const [x,y,s,h] of [[13.2,1.2,.9,3.2],[21.6,2.4,.8,2.8],[19.6,6.2,.85,3.0],[11.6,4.4,.75,2.6]])
-    push((x+.6)+(y+.6),()=>{ // ciprestes
-      const b=P(x,y,MZ); drawBox(x-.1,y-.1,MZ,.2,.2,.5,[74,58,42]);
-      const c=[36,66,48], t=P(x,y,MZ+h);
-      const g=ctx.createLinearGradient(b[0]-TW*.3,0,b[0]+TW*.3,0);
-      g.addColorStop(0,col(c,.55)); g.addColorStop(.55,col(c,1.05)); g.addColorStop(1,col(c,.68));
-      ctx.fillStyle=g; ctx.beginPath(); ctx.moveTo(b[0]-TW*.30,b[1]-ZH*.5);
-      ctx.quadraticCurveTo(b[0]-TW*.26,(b[1]+t[1])/2,t[0],t[1]);
-      ctx.quadraticCurveTo(b[0]+TW*.26,(b[1]+t[1])/2,b[0]+TW*.30,b[1]-ZH*.5); ctx.closePath(); ctx.fill(); });
-  // a gruta: parede de rocha com a boca aberta e fogo de cedro dentro
-  const gx=tor.x, gy=tor.y, og=st(tor)==='open';
-  push((gx+2.2)+(gy+2.0),()=>{
-    for(const [dx,dy,s] of [[-1.5,-.3,1.5],[1.5,-.2,1.5],[0,-1.4,1.7],[-.9,.9,1.0],[1.0,.8,1.0]]) {
-      const r=rng(((gx+dx)*31+(gy+dy)*17)|0), pts=[];
-      for(let i=0;i<8;i++){ const a=i/8*Math.PI*2, rr=s*(.7+r()*.5); pts.push([gx+dx+Math.cos(a)*rr, gy+dy+Math.sin(a)*rr*.85]); }
-      const hh=1.6+s*.9, top=pts.map(p=>P(p[0],p[1],MZ+hh)), bot=pts.map(p=>P(p[0],p[1],MZ));
-      for(let i=0;i<8;i++){ const j=(i+1)%8; if((pts[i][0]+pts[i][1]+pts[j][0]+pts[j][1])/2 < gx+dx+gy+dy-.05) continue;
-        quad([top[i],top[j],bot[j],bot[i]],col([116,106,92],.72)); }
-      quad(top,col([128,118,102],1.12)); }
-    const m=P(gx,gy+1.5,MZ);
-    ctx.fillStyle='#0C0A0E'; ctx.beginPath(); ctx.moveTo(m[0]-TW*.85,m[1]);
-    ctx.quadraticCurveTo(m[0],m[1]-ZH*2.5,m[0]+TW*.85,m[1]); ctx.closePath(); ctx.fill();
-    if(og){ halo(m[0],m[1]-ZH*.7,TW*2.4,'255,186,110',.6);
-      ctx.fillStyle='rgba(255,196,120,.5)'; ctx.beginPath(); ctx.moveTo(m[0]-TW*.5,m[1]);
-      ctx.quadraticCurveTo(m[0],m[1]-ZH*1.5,m[0]+TW*.5,m[1]); ctx.closePath(); ctx.fill(); }
-    // videira sobre a boca da caverna
-    ctx.strokeStyle='#3E5E38'; ctx.lineWidth=Math.max(1.2,TH*.16);
-    for(let i=0;i<5;i++){ const a=P(gx-1.2+i*.6,gy+1.5,MZ+2.0), b=P(gx-1.0+i*.6,gy+1.5,MZ+1.0);
-      ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.quadraticCurveTo(a[0]+TW*.2,(a[1]+b[1])/2,b[0],b[1]); ctx.stroke(); }
-    for(let i=0;i<12;i++){ const q=P(gx-1.3+i*.24,gy+1.5,MZ+1.2+((i*7)%5)*.16);
-      ctx.fillStyle='#6E3A72'; ctx.beginPath(); ctx.arc(q[0],q[1],Math.max(1.2,TH*.16),0,Math.PI*2); ctx.fill(); } });
-  if(og) fire(gx,gy+1.3,MZ+.05,.8,(gx+2.2)+(gy+2.0)+0.01);
-  // as quatro fontes
-  const fx=hang.x, fy=hang.y;
-  push((fx+1.4)+(fy+1.4),()=>{ for(let i=0;i<4;i++){ const a=i/4*Math.PI*2+.5, sx=fx+Math.cos(a)*.9, sy=fy+Math.sin(a)*.9;
-      const c=P(sx,sy,MZ+.02); ctx.fillStyle='#2A5A62'; ctx.beginPath(); ctx.ellipse(c[0],c[1],TW*.34,TH*.34,0,0,Math.PI*2); ctx.fill();
-      ctx.strokeStyle='rgba(180,225,235,.55)'; ctx.lineWidth=1.4;
-      const e=P(sx+Math.cos(a)*1.5, sy+Math.sin(a)*1.5, MZ+.02);
-      ctx.beginPath(); ctx.moveTo(c[0],c[1]); ctx.lineTo(e[0],e[1]); ctx.stroke(); }
-    const c0=P(fx,fy,MZ+.02); ctx.fillStyle='#2A5A62'; ctx.beginPath(); ctx.ellipse(c0[0],c0[1],TW*.5,TH*.5,0,0,Math.PI*2); ctx.fill(); });
-  // prado de violetas e aipo
-  push((ant.x+1)+(ant.y+1)-0.4,()=>{ const r=rng(51);
-    for(let i=0;i<110;i++){ const x=ant.x-2.4+r()*4.8, y=ant.y-2.0+r()*4.0; if(!inPoly([x,y],MESA)) continue;
-      const p=P(x,y,MZ+.02); ctx.fillStyle=r()>.5?'rgba(110,70,150,.6)':'rgba(120,160,90,.55)';
-      ctx.beginPath(); ctx.ellipse(p[0],p[1],TW*.09,TH*.09,0,0,Math.PI*2); ctx.fill(); } });
-  // a balsa em construção, na borda do promontório
-  const bx=pad.x, by=pad.y;
-  push((bx+1.6)+(by+1.4),()=>{
-    for(let i=0;i<9;i++) drawBox(bx-1.1+i*.24,by-.9,MZ,.22,1.8,.12,M.wood2,{ft:1.12});
-    drawBox(bx-1.2,by-1.0,MZ+.12,2.4,.16,.1,[92,72,52]); drawBox(bx-1.2,by+.82,MZ+.12,2.4,.16,.1,[92,72,52]);
-    drawBox(bx-.1,by-.2,MZ+.12,.18,.18,2.2,[86,66,46]);
-    const t=P(bx,by-.1,MZ+2.34), b2=P(bx,by-.1,MZ+.9);
-    ctx.fillStyle='rgba(236,226,200,.92)'; ctx.beginPath(); ctx.moveTo(t[0],t[1]);
-    ctx.quadraticCurveTo(t[0]+TW*1.1,(t[1]+b2[1])/2,b2[0]+TW*.15,b2[1]); ctx.lineTo(t[0],t[1]); ctx.closePath(); ctx.fill();
-    for(const [ax,ay] of [[bx-1.5,by+1.2],[bx+1.4,by+1.1]]) drawBox(ax,ay,MZ,.5,.5,.34,[110,84,58],{ft:1.15}); });
-  satellites(now,R);
-}
-/* Pilos e Esparta: templos gregos no lugar da mesquita e do pagode */
-function tholos(cx,cy,z,r,h,cW,cR){
-  drawPrism(cx,cy,r*1.22,r*1.18,z,.34,20,[206,198,178],{topF:1.2});
-  const N=12; for(let i=0;i<N;i++){ const a=i/N*Math.PI*2, x=cx+Math.cos(a)*r, y=cy+Math.sin(a)*r;
-    drawPrism(x,y,.15,.13,z+.34,h,8,cW||[224,216,198],{top:false});
-    drawBox(x-.2,y-.2,z+.34+h,.4,.4,.12,[230,222,204],{ft:1.2}); }
-  drawPrism(cx,cy,r*1.16,r*1.16,z+.46+h,.26,20,[218,210,192],{topF:1.16});
-  drawCone(cx,cy,r*1.12,z+.72+h,r*.95,20,cR||[150,84,58]);
-}
-function templo(x,y,z,w,d,h,cols,cW,cR){
-  drawBox(x-.3,y-.3,z,w+.6,d+.6,.22,[198,190,170],{ft:1.18});
-  drawBox(x-.15,y-.15,z+.22,w+.3,d+.3,.2,[210,202,182],{ft:1.2});
-  const zb=z+.42;
-  drawBox(x+.5,y+.5,zb,w-1.0,d-1.0,h*.78,cW||[216,208,190],{ft:1.06});
-  for(let i=0;i<cols;i++){ const u=x+.25+i*((w-.5)/(cols-1));
-    drawPrism(u,y+.25,.15,.13,zb,h,8,[228,220,202],{top:false});
-    drawPrism(u,y+d-.25,.15,.13,zb,h,8,[222,214,196],{top:false}); }
-  for(let i=0;i<Math.max(2,Math.round(d/1.1));i++){ const v=y+.25+i*((d-.5)/Math.max(1,Math.round(d/1.1)-1));
-    drawPrism(x+.25,v,.15,.13,zb,h,8,[224,216,198],{top:false}); }
-  drawBox(x-.1,y-.1,zb+h,w+.2,d+.2,.34,[230,222,204],{ft:1.2});
-  const zt=zb+h+.34, xm=x+w/2;
-  quad([P(x-.2,y-.2,zt),P(xm,y-.2,zt+d*.42),P(xm,y+d+.2,zt+d*.42),P(x-.2,y+d+.2,zt)],col(cR||[168,96,66],.82));
-  quad([P(xm,y-.2,zt+d*.42),P(x+w+.2,y-.2,zt),P(x+w+.2,y+d+.2,zt),P(xm,y+d+.2,zt+d*.42)],col(cR||[168,96,66],1.16));
-  quad([P(x-.2,y+d+.2,zt),P(xm,y+d+.2,zt+d*.42),P(x+w+.2,y+d+.2,zt)],col([236,228,210],1.04));
-  const c=P(xm,y+d+.19,zt+d*.2); halo(c[0],c[1],TH*1.4,'240,214,150',.22);
-}
-function pilos_mesquita(now,R){
-  const q=R.places.find(p=>p.id==='mesquita'), o=st(q)==='open';
-  const X=-6.0, Y=-3.0;
-  push((X+3.6)+(Y+3.0)+0.03,()=>{ templo(X,Y,0,3.4,2.8,1.9,5,[218,210,192],[164,92,62]); });
-  for(const [lx,ly] of [[X-.5,Y+3.1],[X+3.9,Y+3.1]]) lantern(lx,ly,.7,'255,206,140',o?.95:.25,1,(lx+.4)+(ly+.4)+.05);
-  if(o) fire(X+1.7,Y+3.3,0.02,.55,(X+1.7)+(Y+3.3)+.04);
-}
-function pilos_pagode(now,R){
-  const q=R.places.find(p=>p.id==='budista'), o=st(q)==='open';
-  const X=3.0, Y=-8.4;
-  push((X+2.2)+(Y+2.2)+0.03,()=>{ tholos(X+1.1,Y+1.1,0,1.35,2.0,[224,216,198],[152,86,58]); });
-  push((X+2.6)+(Y+3.4)+0.02,()=>{ // altar de sacrifício em frente
-    drawBox(X+.4,Y+2.6,0,1.5,.9,.5,[204,196,176],{ft:1.16});
-    drawBox(X+.25,Y+2.45,.5,1.8,1.2,.14,[216,208,188],{ft:1.2}); });
-  if(o) fire(X+1.15,Y+3.0,.66,.62,(X+2.6)+(Y+3.4)+.05);
-  for(const [lx,ly] of [[X-.2,Y+3.6],[X+2.6,Y+3.6]]) lantern(lx,ly,.7,'255,206,140',o?.9:.22,1,(lx+.4)+(ly+.4)+.05);
-}
-/* selo de cera com o número do canto — no lugar da chave */
-function drawCanto(x,y,z,n,k){
-  const bob=reduce?0:Math.sin(T*1.4+x*.6)*2.5, c=P(x,y,z); c[1]+=bob;
-  const R=Math.max(7,TH*0.86)*(k||1);
-  const sh=P(x,y,z-1.4); ctx.fillStyle='rgba(0,0,0,.30)';
-  ctx.beginPath(); ctx.ellipse(sh[0],sh[1],R*.95,R*.42,0,0,Math.PI*2); ctx.fill();
-  halo(c[0],c[1],R*3.0,'196,80,60',.30);
-  ctx.fillStyle='#5E1F18'; ctx.beginPath();
-  for(let i=0;i<13;i++){ const a=i/13*Math.PI*2, rr=R*(i%2?1.16:1.0);
-    const qx=c[0]+Math.cos(a)*rr, qy=c[1]+Math.sin(a)*rr*.92; i?ctx.lineTo(qx,qy):ctx.moveTo(qx,qy); }
-  ctx.closePath(); ctx.fill();
-  const g=ctx.createRadialGradient(c[0]-R*.3,c[1]-R*.32,R*.08,c[0],c[1],R);
-  g.addColorStop(0,'#C8533C'); g.addColorStop(1,'#7E2A20');
-  ctx.fillStyle=g; ctx.beginPath(); ctx.ellipse(c[0],c[1],R*.9,R*.83,0,0,Math.PI*2); ctx.fill();
-  ctx.strokeStyle='rgba(60,14,10,.55)'; ctx.lineWidth=1;
-  ctx.beginPath(); ctx.ellipse(c[0],c[1],R*.68,R*.62,0,0,Math.PI*2); ctx.stroke();
-  const t=ROMAN[n]||'?';
-  ctx.fillStyle='#F4DCA8'; ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.font=`600 ${Math.max(8,R*0.92)}px "Grenze Gotisch", Georgia, serif`;
-  ctx.fillText(t,c[0],c[1]+R*.04);
-  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
-}
-
 /* ===================== placas ===================== */
 let signHits=[];
 function fontReady(){ if(document.fonts&&document.fonts.load){ document.fonts.load('600 14px "Grenze Gotisch"'); document.fonts.load('700 10px Karla'); } }
@@ -2077,9 +1795,7 @@ function drawSign(wx,wy,wz,name,sub,subColor,hotness,big){
   if(sub){ ctx.font=`700 ${8.5*sc}px Karla, sans-serif`; ctx.fillStyle=subColor; ctx.fillText(sub.toUpperCase(),p[0],by+25*sc); }
   return [bx,by,bw,bh];
 }
-function subFor(p){ if(p.sub) return [p.sub,'#F1D27A']; const cn=CANTO[p.id];
-  if(cn!=null) return st(p)==='open'?['canto '+ROMAN[cn],'#F1D27A']:['canto '+ROMAN[cn]+' · por ler','#E28A76'];
-  const sg=subOf(p.id);
+function subFor(p){ if(p.sub) return [p.sub,'#F1D27A']; const sg=subOf(p.id);
   if(sg) return st(p)==='open'?[sg,'#F1D27A']:[sg+' · trancado','#E28A76'];
   const k=st(p), nd=p.need&&p.need[preset]; if(!nd) return ['aberto','#F1D27A'];
   return k==='open'?[`${nd[0]} livros`,'#F1D27A']:[`leia ${nd[1]-nd[0]} ${nd[2]}`,'#E28A76']; }
@@ -2103,19 +1819,14 @@ function vignette(){ const vg=ctx.createRadialGradient(W/2,H*0.45,Math.min(W,H)*
 
 /* ===================== HUD ===================== */
 function falta(nd){ const n=nd[1]-nd[0], u=nd[2]; if(u==='livros') return n===1?'Falta 1 livro':`Faltam ${n} livros`; return n===1?`Falta 1 livro ${u}`:`Faltam ${n} livros ${u}`; }
-function updateStats(){ let o=0,s=0; for(const p of allPlaces()){ if(CANTO[p.id]==null) continue; if(st(p)==='open')o++; else s++; }
-  document.getElementById('sOpen').textContent=o; document.getElementById('sNear').textContent='24'; document.getElementById('sSeal').textContent=s;
-  document.getElementById('who').textContent='Canto '+(ROMAN[cantoAtual]||'?')+' · '+o+' cenas abertas'; }
+function updateStats(){ let o=0,s=0; for(const p of allPlaces()){ if(!subOf(p.id)) continue; if(st(p)==='open')o++; else s++; }
+  document.getElementById('sOpen').textContent=o; document.getElementById('sNear').textContent=REGIONS.length; document.getElementById('sSeal').textContent=s;
+  document.getElementById('who').textContent=preset==='lendo'?'Lendo · '+o+' salas abertas':'Início · 1 sala por gênero'; }
 function findAny(id){ for(const r of REGIONS){ if(r.id===id) return {region:r}; for(const p of r.places) if(p.id===id) return {place:p,region:r}; } return null; }
 function renderCard(){
   const id=hot||sel; const f=id?findAny(id):null; let k,cls,h,n,p,pct,barCls='';
-  if(f&&f.region&&!f.place){ const r=f.region, o=r.places.filter(q=>st(q)==='open').length; k=r.genre; cls=o?'open':'sealed'; h=r.name; n=`${o}<small>de ${r.places.length}</small>`; pct=o/r.places.length*100; p=o?`${o===r.places.length?'Todas as cenas lidas':'Paragem do poema'} — ${r.places.length} cenas, ${o} já reveladas pela leitura.`:'Paragem ainda na névoa: a viagem não chegou aqui.'; }
+  if(f&&f.region&&!f.place){ const r=f.region, o=r.places.filter(q=>st(q)==='open').length; k=r.genre; cls=o?'open':'sealed'; h=r.name; n=`${o}<small>de ${r.places.length}</small>`; pct=o/r.places.length*100; p=o?`${o===r.places.length?'Região completa':'Região aberta'} — ${r.places.length} lugares, cada um com endereço próprio: castelo.com.br/luiz/${r.id}/…`:'Região ainda na névoa. Abre no primeiro lugar conquistado aqui.'; }
   else if(f&&f.place&&f.place.card){ const q=f.place; k=q.card.k; cls='open'; h=q.name; n=q.card.n; pct=100; p=q.card.p; }
-  else if(f&&f.place&&CANTO[f.place.id]!=null){ const q=f.place, cn=CANTO[q.id], aberto=st(q)==='open';
-    k=`Canto ${ROMAN[cn]} · ${f.region.name}`; cls=aberto?'open':'sealed'; h=q.name;
-    n=`${ROMAN[cn]}<small>canto</small>`; pct=aberto?100:0; barCls=aberto?'':'sealed';
-    p=aberto?`${q.opened||''}`
-          :`Esta cena acontece no <b>canto ${ROMAN[cn]}</b>. A névoa sai quando a leitura chega nele.`; }
   else if(f&&f.place&&subOf(f.place.id)){ const q=f.place, sg=subOf(q.id), open=st(q)==='open';
     k=`${open?'Aberta':'Trancada'} · ${f.region.genre}`; cls=open?'open':'sealed'; h=q.name;
     n=open?'1<small>sala</small>':'🔑<small>1 livro</small>'; pct=open?100:0; barCls=open?'':'sealed';
@@ -2125,11 +1836,10 @@ function renderCard(){
     if(k2==='open'){ k=`Aberto · ${f.region.name}`; cls='open'; h=q.name; n=`${nd[0]}<small>${nd[2]}</small>`; pct=100; p=q.opened+'. Entre para decorar — cada objeto novo vem de um livro terminado.'; }
     else if(k2==='near'){ k=`Quase lá · ${f.region.name}`; cls='near'; h=q.name; n=`${nd[0]}<small>de ${nd[1]}</small>`; pct=nd[0]/nd[1]*100; barCls='near'; p=`${falta(nd)}. As luzes já acenderam.`; }
     else { k=`Trancado · ${f.region.name}`; cls='sealed'; h=q.name; n=`${nd[0]}<small>de ${nd[1]}</small>`; pct=nd[0]/nd[1]*100; p=`${falta(nd)} para a chave girar.`; } } }
-  else { const q=allPlaces().filter(z=>CANTO[z.id]!=null&&st(z)!=='open').sort((a,b)=>CANTO[a.id]-CANTO[b.id])[0];
-    if(q){ const cn=CANTO[q.id]; k='Próxima cena'; cls='sealed'; h=q.name; n=`${ROMAN[cn]}<small>canto</small>`; pct=0; barCls='sealed';
-      p=`${q.region.name}. A cena acontece no <b>canto ${ROMAN[cn]}</b> — a névoa sai quando a leitura chega lá.`; }
-    else { k='Poema inteiro'; cls='open'; h='A Odisseia'; n='24<small>cantos</small>'; pct=100;
-      p='Todas as cenas abertas: as treze paragens do poema, do conselho dos deuses ao pomar de Laerte.'; } }
+  else { const q=allPlaces().find(z=>subOf(z.id)&&st(z)!=='open');
+    if(q){ const sg=subOf(q.id); k='Próxima sala'; cls='sealed'; h=q.name; n='🔑<small>1 livro</small>'; pct=0; barCls='sealed';
+      p=`Cada gênero tem 7 salas, uma por subgênero. Esta abre com <b>1 livro de ${sg.toLowerCase()}</b> — e ganha endereço próprio: castelo.com.br/luiz/${q.region.id}/${q.id}.`; }
+    else { k='Reino completo'; cls='open'; h='Mundo de Luiz'; n='91<small>salas</small>'; pct=100; p='Todas as salas abertas. 13 gêneros, 7 subgêneros cada.'; } }
   cardEl.innerHTML=`<div class="card"><div class="k ${cls}">${k}</div><h2>${h}</h2><div class="n">${n}</div><p>${p}</p><div class="bar ${barCls}"><i style="width:${pct}%"></i></div></div>`;
 }
 function buildRegionChips(){ const el=document.getElementById('regions'); el.innerHTML=''; for(const r of REGIONS){ const b=document.createElement('button'); b.type='button'; b.dataset.id=r.id; b.setAttribute('aria-pressed','false'); b.innerHTML=`${r.tab||r.name}<small>${r.genre}</small>`; b.addEventListener('click',()=>{ focused=focused===r.id?null:r.id; for(const o of el.children) o.setAttribute('aria-pressed',o.dataset.id===focused?'true':'false'); if(focused){ focusWorld(r.cx,r.cy,r.cz,2.1); sel=r.id; } else { cam={Z:1,panX:0,panY:0}; sel=null; } renderCard(); }); el.appendChild(b); } }
@@ -2187,7 +1897,7 @@ cv.addEventListener('touchend',e=>{ for(const t of e.changedTouches) touches.del
 document.getElementById('zin').addEventListener('click',()=>zoomAt(W/2,H/2,1.35));
 document.getElementById('zout').addEventListener('click',()=>zoomAt(W/2,H/2,1/1.35));
 document.getElementById('zall').addEventListener('click',()=>{ cam={Z:1,panX:0,panY:0}; focused=null; sel=null; for(const o of document.getElementById('regions').children) o.setAttribute('aria-pressed','false'); renderCard(); });
-for(const b of document.querySelectorAll('.seg button[data-canto]')){ b.addEventListener('click',()=>{ cantoAtual=+b.dataset.canto; for(const o of document.querySelectorAll('.seg button[data-canto]')) o.setAttribute('aria-pressed',o===b?'true':'false'); sel=null; updateStats(); renderCard(); if(reduce) frame(T); }); }
+for(const b of document.querySelectorAll('.seg button[data-preset]')){ b.addEventListener('click',()=>{ preset=b.dataset.preset; for(const o of document.querySelectorAll('.seg button[data-preset]')) o.setAttribute('aria-pressed',o===b?'true':'false'); sel=null; updateStats(); renderCard(); if(reduce) frame(T); }); }
 window.addEventListener('resize',()=>{ fit(); if(reduce) frame(T); });
 for(const b of document.querySelectorAll('#gfx button')) b.addEventListener('click',()=>{ autoDone=true; setGFX(+b.dataset.gfx); });
 if(window.innerWidth<720||(navigator.hardwareConcurrency||8)<=2) setGFX(1);
