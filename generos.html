@@ -320,10 +320,10 @@ function drawStringLights(ax,ay,az,bx,by,bz,sag,rgb){ const pts=rope(ax,ay,az,bx
 function smoke(now,x,y,z,tint){ const c=P(x,y,z); for(let i=0;i<10;i++){ const age=reduce?(i/10):((now*0.16+i/10)%1), rad=TH*(0.25+age*0.9), a=(1-age)*0.22, sx=c[0]+Math.sin(age*5+i)*TH*0.5+age*TH*1.1, sy=c[1]-age*ZH*2.6; ctx.fillStyle=`rgba(${tint||'190,180,200'},${a})`; ctx.beginPath(); ctx.arc(sx,sy,rad,0,Math.PI*2); ctx.fill(); } }
 
 /* ===================== o mundo ===================== */
-let LAND=[[-98,-10],[-94,-38],[-78,-54],[-46,-62],[0,-64],[46,-62],[78,-54],[94,-38],[98,-10],[98,10],[94,38],[78,54],[46,62],[0,64],[-46,62],[-78,54],[-94,38],[-98,10]];
+let LAND=(()=>{ const o=[]; const r2=Math.SQRT1_2; for(let i=0;i<28;i++){ const a=i/28*Math.PI*2, u=50*Math.cos(a), v=31*Math.sin(a)+2*Math.sin(a*3); o.push([(u+v)*r2,(-u+v)*r2]); } return o; })();
 let MESA=[[11,1.2],[14.5,-1.2],[21,-1.6],[24,1.0],[23.2,5.4],[19,7],[13.2,6.6],[10.2,4]], MZ=3.6;
 let HILL=[[33.6,24.0],[37.0,23.2],[39.6,25.4],[39.4,29.4],[36.6,31.6],[33.0,30.8],[31.6,28.2]], AZ=2.4;
-let LAKE=[[70,28],[76,26],[82,28],[84,33],[80,38],[75,40],[70,38],[67,33]];
+let LAKE=[[3.2,4.6],[7.0,3.2],[10.6,4.8],[11.6,8.0],[9.6,11.0],[6.4,12.2],[3.0,10.8],[2.0,7.6]];
 let ISLE=[[41.89,28.39],[44.79,27.23],[47.55,28.53],[48.56,31.29],[47.11,33.90],[44.21,34.92],[41.60,33.61],[40.59,31.00]];
 
 const REGIONS=[
@@ -537,6 +537,10 @@ REGIONS.push({id:'navegacoes',name:'Porto das Navegações',tab:'Porto',genre:'A
 REGIONS.push({id:'quadrinhos',name:'Banca da Praça',tab:'Banca',genre:'Quadrinhos e mangás',cx:6.5,cy:-9.6,cz:0,r:4.2,sign:[6.5,-6.4,0],tint:'170,90,120',places:[],statue:[6.4,-6.9,0],sk:'balao'});
 REGIONS.push({id:'digital',name:'Torre do Sinal',tab:'Sinal',genre:'Ficção digital',cx:-9.5,cy:-6.0,cz:0,r:4.2,sign:[-9.5,-2.8,0],tint:'80,160,190',places:[],statue:[-9.6,-2.9,0],sk:'tela'});
 
+/* v14: só dois gêneros no mapa — Fantasia (castelo) e Romance (vila) */
+const KEEP=new Set(['castelo','vila']);
+for(let i=REGIONS.length-1;i>=0;i--) if(!KEEP.has(REGIONS[i].id)) REGIONS.splice(i,1);
+const HAS=id=>REGIONS.some(r=>r.id===id);
 /* cada gênero passa a ter exatamente 7 edificações — uma por subgênero */
 for(const rid in SUBS){ const R=REGIONS.find(r=>r.id===rid); if(!R) continue;
   for(const sgen of SUBS[rid]){ if(sgen.x==null) continue; if(R.places.some(q=>q.id===sgen.id)) continue;
@@ -557,12 +561,7 @@ const pulse=(now,ph)=>reduce?0.6:(0.5+0.5*Math.sin(now*1.4+(ph||0)));
    girando em volta (esquerda, topo, direita, base), um por subgênero.                */
 const S_C=14, PW=6, HC=S_C/2, HB=HC+PW;   // HB = meia-largura do bloco
 const BLOCK=2*HB;
-const GRID={
-  mesa:[-76,-34], digital:[-40,-34], quadrinhos:[0,-34], arena:[40,-34],  guerra:[76,-34],
-  bosque:[-76,0], outono:[-40,0],    castelo:[0,0],      acropole:[40,0],  charneca:[76,0],
-  navegacoes:[-76,34], fazenda:[-40,34], catedral:[0,34], vila:[40,34],
-  ilha:[122,26]
-};
+const GRID={ castelo:[-21,21], vila:[21,-21] };
 /* retângulos dos 4 subgêneros, relativos ao centro do bloco: [x0,y0,w,d] */
 const SLOTS=[
   [-HB,-HB, PW, S_C+PW],   // 0 esquerda (amarelo)
@@ -593,13 +592,12 @@ for(const r of REGIONS){ const g=GRID[r.id]; if(!g) continue;
   const off=id=>{ const r=REGIONS.find(q=>q.id===id); return r?[r.ox||0,r.oy||0]:[0,0]; };
   const mv=(poly,o)=>poly.map(q=>[q[0]+o[0],q[1]+o[1]]);
   MESA=mv(MESA,off('mesa')); HILL=mv(HILL,off('acropole')); ISLE=mv(ISLE,off('ilha'));
-  const ROWS=[['mesa','digital','quadrinhos','arena','guerra'],['bosque','outono','castelo','acropole','charneca'],['navegacoes','fazenda','catedral','vila',null]];
+  const ROWS=[['castelo','vila']];
   const C=id=>id?GRID[id]:null;
   const link=(a,b)=>{ const p=C(a), q=C(b); if(!p||!q) return null; const dx=q[0]-p[0], dy=q[1]-p[1], L=Math.hypot(dx,dy)||1, ux=dx/L, uy=dy/L, m=HB+0.8;
     return [[p[0]+ux*m,p[1]+uy*m,0],[(p[0]+q[0])/2,(p[1]+q[1])/2,0],[q[0]-ux*m,q[1]-uy*m,0]]; };
   const NP=[];
   for(const row of ROWS) for(let i=0;i<row.length-1;i++){ const l=link(row[i],row[i+1]); if(l) NP.push(l); }
-  for(let c=0;c<5;c++){ for(let rI=0;rI<2;rI++){ const l=link(ROWS[rI][c],ROWS[rI+1][c]); if(l) NP.push(l); } }
   PATHS=NP;
 })();
 function rectPts(x0,y0,w,d){ return [[x0,y0],[x0+w,y0],[x0+w,y0+d],[x0,y0+d]]; }
@@ -767,25 +765,26 @@ function terrain(now){
   ROFF(null);
   fillPat(LAND,0,'grass',0.95);
   // pontilhado de vegetação
-  const rr=rng(3); ctx.fillStyle='rgba(110,150,110,.13)'; for(let i=0;i<3200;i++){ const x=-100+rr()*200, y=-66+rr()*132; if(!inPoly([x,y],LAND)||inPoly([x,y],LAKE)||inPoly([x,y],MESA)||inPoly([x,y],HILL)) continue; const p=P(x,y,0.01); ctx.beginPath(); ctx.ellipse(p[0],p[1],TW*.11,TH*.11,0,0,Math.PI*2); ctx.fill(); }
+  const rr=rng(3); ctx.fillStyle='rgba(110,150,110,.13)'; for(let i=0;i<1400;i++){ const x=-60+rr()*120, y=-60+rr()*120; if(!inPoly([x,y],LAND)||inPoly([x,y],LAKE)||inPoly([x,y],MESA)||inPoly([x,y],HILL)) continue; const p=P(x,y,0.01); ctx.beginPath(); ctx.ellipse(p[0],p[1],TW*.11,TH*.11,0,0,Math.PI*2); ctx.fill(); }
   // lago
-  const lp=LAKE.map(p=>P(p[0],p[1],-0.02)); const lc=P(76,33,0); const wg=ctx.createRadialGradient(lc[0]+TW*4,lc[1]-TH*6,0,lc[0],lc[1],TW*9); wg.addColorStop(0,'#24404A'); wg.addColorStop(.45,'#132630'); wg.addColorStop(.8,'#0A1A22'); wg.addColorStop(1,'#0B171D');
+  const lp=LAKE.map(p=>P(p[0],p[1],-0.02)); const lc=P(7,7.6,0); const wg=ctx.createRadialGradient(lc[0]+TW*4,lc[1]-TH*6,0,lc[0],lc[1],TW*9); wg.addColorStop(0,'#24404A'); wg.addColorStop(.45,'#132630'); wg.addColorStop(.8,'#0A1A22'); wg.addColorStop(1,'#0B171D');
   quad(lp,wg,'rgba(8,6,12,.5)');
   // brilho e ondulação no lago (recortado)
   ctx.save(); ctx.beginPath(); ctx.moveTo(lp[0][0],lp[0][1]); for(let i=1;i<lp.length;i++) ctx.lineTo(lp[i][0],lp[i][1]); ctx.closePath(); ctx.clip();
   ctx.globalCompositeOperation='lighter'; for(let i=0;i<14;i++){ const y=lc[1]-TH*7+i*TH*1.1, wob=reduce?0:Math.sin(now*1.4+i)*TW*.6; ctx.fillStyle=`rgba(200,220,230,${.05+.03*Math.sin(i*1.7+now*2)})`; ctx.fillRect(lc[0]+TW*2+wob-TW*(1+i*.25),y,TW*(2+i*.5),1.2); }
-  ctx.globalCompositeOperation='source-over'; ctx.strokeStyle='rgba(200,215,220,.10)'; ctx.lineWidth=1; const ic=P(76,33,-0.02); for(let i=0;i<3;i++){ const t=reduce?i/3:((now*0.12+i/3)%1); ctx.globalAlpha=(1-t)*.9; ctx.beginPath(); ctx.ellipse(ic[0],ic[1],TW*(3.2+t*2.4),TH*(3.2+t*2.4),0,0,Math.PI*2); ctx.stroke(); } ctx.globalAlpha=1; ctx.restore();
+  ctx.globalCompositeOperation='source-over'; ctx.strokeStyle='rgba(200,215,220,.10)'; ctx.lineWidth=1; const ic=P(7,7.6,-0.02); for(let i=0;i<3;i++){ const t=reduce?i/3:((now*0.12+i/3)%1); ctx.globalAlpha=(1-t)*.9; ctx.beginPath(); ctx.ellipse(ic[0],ic[1],TW*(3.2+t*2.4),TH*(3.2+t*2.4),0,0,Math.PI*2); ctx.stroke(); } ctx.globalAlpha=1; ctx.restore();
   if(GFX>=1){ // reflexo do céu/lua e faíscas na água
     ctx.save(); ctx.beginPath(); ctx.moveTo(lp[0][0],lp[0][1]); for(let i=1;i<lp.length;i++) ctx.lineTo(lp[i][0],lp[i][1]); ctx.closePath(); ctx.clip(); ctx.globalCompositeOperation='lighter';
     const ly0=Math.min(...lp.map(p=>p[1])), ly1=Math.max(...lp.map(p=>p[1])); const fz=ctx.createLinearGradient(0,ly0,0,ly1); fz.addColorStop(0,'rgba(130,175,210,.26)'); fz.addColorStop(.45,'rgba(130,175,210,.06)'); fz.addColorStop(1,'rgba(130,175,210,0)'); ctx.fillStyle=fz; ctx.fillRect(0,ly0,W,ly1-ly0);
     const mp=P(31.5,20.5,0), mg3=ctx.createRadialGradient(mp[0],mp[1],0,mp[0],mp[1],TW*7); mg3.addColorStop(0,'rgba(240,226,180,.20)'); mg3.addColorStop(1,'rgba(240,226,180,0)'); ctx.fillStyle=mg3; ctx.beginPath(); ctx.ellipse(mp[0],mp[1],TW*7,TH*7,0,0,Math.PI*2); ctx.fill();
     ctx.restore(); sparkles(now,0); }
   // ilha do farol (agora no mar aberto)
+  if(HAS('ilha')){
   const ibe=inflate(ISLE,1.30); const ibt=ibe.map(p=>P(p[0],p[1],0.04));
   const bgd=ctx.createLinearGradient(0,Math.min(...ibt.map(p=>p[1])),0,Math.max(...ibt.map(p=>p[1]))); bgd.addColorStop(0,col([176,164,138],0.95)); bgd.addColorStop(1,col([198,186,156],1));
   extrude(ibe,0.04,-1.5,bgd,[146,136,112],[112,104,86]);
   const it=ISLE.map(p=>P(p[0],p[1],0.42)); const ig=ctx.createLinearGradient(0,Math.min(...it.map(p=>p[1])),0,Math.max(...it.map(p=>p[1]))); ig.addColorStop(0,col([40,58,52],0.9)); ig.addColorStop(1,col([56,78,68],1));
-  extrude(ISLE,0.42,0.02,ig,[104,98,88],[76,72,64]); fillPat(ISLE,0.42,'grass',0.8);
+  extrude(ISLE,0.42,0.02,ig,[104,98,88],[76,72,64]); fillPat(ISLE,0.42,'grass',0.8); }
   // praça de paralelepípedos (vila)
   ROFF(REGIONS.find(q=>q.id==='vila'));
   const pr=rng(17); for(let i=0;i<260;i++){ const x=14.6+pr()*7.6, y=12.8+pr()*7.4; const p=P(x,y,0.01); ctx.fillStyle=`rgba(${120+pr()*30|0},${100+pr()*26|0},${92+pr()*20|0},.5)`; ctx.beginPath(); ctx.ellipse(p[0],p[1],TW*.16,TH*.16,0,0,Math.PI*2); ctx.fill(); }
@@ -800,11 +799,13 @@ function terrain(now){
   ctx.fillStyle='rgba(150,140,125,.28)'; const tr=rng(5);
   for(const path of PATHS){ for(let s=0;s<path.length-1;s++){ const a=path[s], b=path[s+1]; const n=Math.max(2,Math.round(Math.hypot(b[0]-a[0],b[1]-a[1])*2.2)); for(let i=0;i<=n;i++){ const t=i/n; const p=P(lerp(a[0],b[0],t)+(tr()-.5)*.35,lerp(a[1],b[1],t)+(tr()-.5)*.35,lerp(a[2],b[2],t)+0.01); ctx.beginPath(); ctx.ellipse(p[0],p[1],TW*.16,TH*.16,0,0,Math.PI*2); ctx.fill(); } } }
   // colina da acrópole (calcário) e escada até o lago
+  if(HAS('acropole')){
   const ht=HILL.map(p=>P(p[0],p[1],AZ)); const hg=ctx.createLinearGradient(0,Math.min(...ht.map(p=>p[1])),0,Math.max(...ht.map(p=>p[1]))); hg.addColorStop(0,col([88,104,70],0.9)); hg.addColorStop(1,col([104,120,80],1));
   extrude(HILL,AZ,0,hg,[120,110,96],[86,78,68]); fillPat(HILL,AZ,'grass',0.7);
   ROFF(REGIONS.find(q=>q.id==='acropole'));
   for(let i=0;i<10;i++){ const z=i*(AZ/10), x=31.4+i*.15; drawBox(x,29.0,z,.16,.8,AZ/10,[190,182,166],{ft:1.25}); }
-  ROFF(REGIONS.find(q=>q.id==='mesa'));
+  }
+  if(HAS('mesa')){ ROFF(REGIONS.find(q=>q.id==='mesa'));
   mountain(now);
   // promontório do observatório
   const mt=MESA.map(p=>P(p[0],p[1],MZ)); const mg=ctx.createLinearGradient(0,Math.min(...mt.map(p=>p[1])),0,Math.max(...mt.map(p=>p[1]))); mg.addColorStop(0,col([68,88,70],0.92)); mg.addColorStop(1,col([88,110,86],1));
@@ -814,7 +815,7 @@ function terrain(now){
   // escada no penhasco (offset de mesa já ativo)
   for(let i=0;i<12;i++){ const z=i*(MZ/12), y=7.4-i*(1.7/12); drawBox(16.6,y-.14,z,.8,.14,MZ/12,[156,148,132],{ft:1.25}); }
   const mr2=rng(9); ctx.fillStyle='rgba(120,132,108,.12)'; for(let i=0;i<80;i++){ const x=10+mr2()*14, y=-1.5+mr2()*8.5; if(!inPoly([x+OFX,y+OFY],MESA)) continue; const p=P(x,y,MZ+0.01); ctx.beginPath(); ctx.ellipse(p[0],p[1],TW*.1,TH*.1,0,0,Math.PI*2); ctx.fill(); }
-  ROFF(null);
+  ROFF(null); }
 }
 
 /* ===================== bonequinhos ===================== */
@@ -1077,10 +1078,10 @@ function drawVampire(x,y,z,now){ const p=P(x,y,z), s=ZH*.38, t=reduce?0:now, fl=
   const pulse2=reduce?1:(0.6+0.4*Math.sin(t*3)); halo(p[0],p[1]-s*2.3,s*.9,'255,60,60',.35*pulse2);
   ctx.fillStyle='#FF3B3B'; ctx.beginPath(); ctx.arc(p[0]-s*.11,p[1]-s*2.3,Math.max(1,s*.06),0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(p[0]+s*.11,p[1]-s*2.3,Math.max(1,s*.06),0,Math.PI*2); ctx.fill();
   ctx.fillStyle='#F6F2F6'; ctx.fillRect(p[0]-s*.09,p[1]-s*2.1,Math.max(.8,s*.04),Math.max(1,s*.09)); ctx.fillRect(p[0]+s*.05,p[1]-s*2.1,Math.max(.8,s*.04),Math.max(1,s*.09)); }
-function bats(now){ if(reduce) return; const c=P(31.5,3,5.5); ctx.fillStyle='#0A080C';
+function bats(now){ if(!HAS('charneca')) return; if(reduce) return; const c=P(31.5,3,5.5); ctx.fillStyle='#0A080C';
   for(let i=0;i<6;i++){ const t=((now*0.07+i*0.17)%1), x=c[0]-TW*9+t*TW*18, y=c[1]-TH*6+TH*3*Math.sin(t*6+i), fl=Math.sin(now*14+i)*3*Math.min(1.4,Z), w=6*Math.min(1.4,Z);
     ctx.beginPath(); ctx.moveTo(x-w,y-fl); ctx.quadraticCurveTo(x-w*.45,y-2-fl,x,y); ctx.quadraticCurveTo(x+w*.45,y-2-fl,x+w,y-fl); ctx.quadraticCurveTo(x+w*.45,y+1,x,y+2); ctx.quadraticCurveTo(x-w*.45,y+1,x-w,y-fl); ctx.fill(); } }
-function graveMist(now){ for(const [gx,gy,ph] of [[30,1,0],[34,.4,1.3],[32,2.6,2.2],[35.6,2.2,3.1],[28.8,3.4,4]]){ const p=P(gx+(reduce?0:Math.sin(now*.3+ph)*.6),gy,0.3); const g=ctx.createRadialGradient(p[0],p[1],0,p[0],p[1],TW*2.4); g.addColorStop(0,'rgba(150,170,150,.2)'); g.addColorStop(1,'rgba(150,170,150,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.ellipse(p[0],p[1],TW*2.4,TH*1.3,0,0,Math.PI*2); ctx.fill(); } }
+function graveMist(now){ if(!HAS('charneca')) return; for(const [gx,gy,ph] of [[30,1,0],[34,.4,1.3],[32,2.6,2.2],[35.6,2.2,3.1],[28.8,3.4,4]]){ const p=P(gx+(reduce?0:Math.sin(now*.3+ph)*.6),gy,0.3); const g=ctx.createRadialGradient(p[0],p[1],0,p[0],p[1],TW*2.4); g.addColorStop(0,'rgba(150,170,150,.2)'); g.addColorStop(1,'rgba(150,170,150,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.ellipse(p[0],p[1],TW*2.4,TH*1.3,0,0,Math.PI*2); ctx.fill(); } }
 function drawMausoleum2(x,y,w,d){ drawBox(x,y,0,w,d,1.7,[104,100,108],{ft:1.1}); drawBox(x-.15,y-.15,1.7,w+.3,d+.3,.18,[92,88,96]);
   quad([P(x-.15,y-.15,1.88),P(x+w/2,y-.15,2.55),P(x+w/2,y+d+.15,2.55),P(x-.15,y+d+.15,1.88)],col([84,80,90],.8),'rgba(8,6,12,.4)'); quad([P(x+w/2,y-.15,2.55),P(x+w+.15,y-.15,1.88),P(x+w+.15,y+d+.15,1.88),P(x+w/2,y+d+.15,2.55)],col([84,80,90],1.15),'rgba(8,6,12,.4)');
   quad([P(x-.15,y+d+.15,1.88),P(x+w+.15,y+d+.15,1.88),P(x+w/2,y+d+.15,2.55)],col([84,80,90],1.0),'rgba(8,6,12,.4)');
@@ -1440,7 +1441,7 @@ function mesaStream(now){ waterway([[19.4,0.05,MZ],[19.7,1.6,MZ],[20.2,3.6,MZ],[
 const BOSQUE_POLY=[[-8,6],[3,3.2],[13.5,6],[15.2,13],[13.6,21.5],[4,24],[-8,22]];
 const FLY_COLORS=['210,240,150','120,230,255','255,150,220','200,160,255','255,225,120'];
 const FAIRIES=[]; { const r=rng(23); const cols=['255,150,220','120,230,255','200,160,255','255,225,120','170,255,190','255,180,140','160,220,255']; for(let i=0;i<7;i++) FAIRIES.push({bx:-3+r()*13,by:8+r()*11,rx:1.2+r()*1.8,ry:.8+r()*1.2,z:1.6+r()*3.0,sp:.3+r()*.4,ph:r()*6.28,c:cols[i]}); }
-function fairies(now){ const t0=reduce?0:now;
+function fairies(now){ if(!HAS('bosque')) return; const t0=reduce?0:now;
   for(const f of FAIRIES){ const t=t0*f.sp+f.ph, x=f.bx+Math.cos(t)*f.rx, y=f.by+Math.sin(t)*f.ry, z=f.z+Math.sin(t*2.3)*.5, p=P(x,y,z), s=Math.max(2.2,TH*.34);
     ctx.globalCompositeOperation='lighter'; for(let k=1;k<=6;k++){ const tt=t-k*.1; const q=P(f.bx+Math.cos(tt)*f.rx,f.by+Math.sin(tt)*f.ry,f.z+Math.sin(tt*2.3)*.5); const g=ctx.createRadialGradient(q[0],q[1],0,q[0],q[1],s*.55); g.addColorStop(0,`rgba(${f.c},${.4*(1-k/7)})`); g.addColorStop(1,`rgba(${f.c},0)`); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(q[0],q[1],s*.55,0,Math.PI*2); ctx.fill(); } ctx.globalCompositeOperation='source-over';
     halo(p[0],p[1],s*2.4,f.c,.55); const flap=reduce?.7:Math.abs(Math.sin(now*18+f.ph)); ctx.fillStyle='rgba(255,255,255,.6)'; ctx.beginPath(); ctx.ellipse(p[0]-s*.12-s*.42*flap,p[1]-s*.12,s*.42*flap+.6,s*.28,0,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.ellipse(p[0]+s*.12+s*.42*flap,p[1]-s*.12,s*.42*flap+.6,s*.28,0,0,Math.PI*2); ctx.fill();
@@ -1571,7 +1572,7 @@ function fillPat(poly,z,name,alpha){ if(GFX<1) return; const tile=TILES[name]; i
   const sc=Z*TW0/11; if(pat.setTransform&&typeof DOMMatrix!=='undefined'){ try{ pat.setTransform(new DOMMatrix([sc,0,0,sc,panX,panY])); }catch(e){} }
   ctx.globalAlpha=alpha; ctx.fillStyle=pat; ctx.fillRect(x0,y0,x1-x0,y1-y0); ctx.restore(); }
 /* faíscas na água (lago = grupo 0, rios = grupo 1) */
-const SPARKS=[]; { const r=rng(55); let tries=0; while(SPARKS.length<64&&tries<5000){ tries++; const x=66+r()*20, y=25+r()*16; if(inPoly([x,y],LAKE)) SPARKS.push([x,y,r()*6.28,1.2+r()*2.2,0,0]); }
+const SPARKS=[]; { const r=rng(55); let tries=0; while(SPARKS.length<64&&tries<5000){ tries++; const x=1+r()*12, y=2+r()*12; if(inPoly([x,y],LAKE)) SPARKS.push([x,y,r()*6.28,1.2+r()*2.2,0,0]); }
   const along=(pts,hw,count)=>{ for(let i=0;i<count;i++){ const si=r()*(pts.length-1), k=Math.min(pts.length-2,Math.floor(si)), u=si-k; const a=pts[k], b=pts[k+1]; const dx=b[0]-a[0], dy=b[1]-a[1], L=Math.hypot(dx,dy)||1; const off=(r()-.5)*hw*1.5; SPARKS.push([lerp(a[0],b[0],u)-dy/L*off, lerp(a[1],b[1],u)+dx/L*off, r()*6.28, 1.2+r()*2.2, lerp(a[2]||0,b[2]||0,u), 1]); } };
   along(RIVER_W,1.5,44); along(RIVER,.75,20); along(OUTFLOW,.6,4); }
 function sparkles(now,group){ if(GFX<1) return; ctx.globalCompositeOperation='lighter'; const rr=Math.max(.9,TW*.08);
