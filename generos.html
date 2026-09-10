@@ -148,7 +148,7 @@ let OFX=0,OFY=0,OFK=0;
 function P(x,y,z){ x+=OFX; y+=OFY; return [(OX0+(x-y)*TW0)*Z+panX, (OY0+(x+y)*TH0-(z||0)*ZH0)*Z+panY]; }
 function ROFF(r){ OFX=(r&&r.ox)||0; OFY=(r&&r.oy)||0; OFK=OFX+OFY; }
 function OFF(dx,dy){ OFX=dx||0; OFY=dy||0; OFK=OFX+OFY; }
-const ISLE_U=72, ISLE_V=38; /* semi-eixos da ilha em (u,v) */
+const ISLE_U=72, ISLE_V=40; /* semi-eixos da ilha em (u,v) */
 function fit(){
   DPR=Math.min(2,window.devicePixelRatio||1); W=Math.max(1,cv.clientWidth); H=Math.max(1,cv.clientHeight);
   cv.width=Math.round(W*DPR); cv.height=Math.round(H*DPR); ctx.setTransform(DPR,0,0,DPR,0,0);
@@ -325,7 +325,7 @@ function drawStringLights(ax,ay,az,bx,by,bz,sag,rgb){ const pts=rope(ax,ay,az,bx
 function smoke(now,x,y,z,tint){ const c=P(x,y,z); for(let i=0;i<10;i++){ const age=reduce?(i/10):((now*0.16+i/10)%1), rad=TH*(0.25+age*0.9), a=(1-age)*0.22, sx=c[0]+Math.sin(age*5+i)*TH*0.5+age*TH*1.1, sy=c[1]-age*ZH*2.6; ctx.fillStyle=`rgba(${tint||'190,180,200'},${a})`; ctx.beginPath(); ctx.arc(sx,sy,rad,0,Math.PI*2); ctx.fill(); } }
 
 /* ===================== o mundo ===================== */
-let LAND=(()=>{ const o=[]; const r2=Math.SQRT1_2; for(let i=0;i<40;i++){ const a=i/40*Math.PI*2, u=72*Math.cos(a)+1.6*Math.sin(a*3), v=38*Math.sin(a)+1.2*Math.cos(a*2); o.push([(u+v)*r2,(-u+v)*r2]); } return o; })();
+let LAND=(()=>{ const o=[]; const r2=Math.SQRT1_2; for(let i=0;i<40;i++){ const a=i/40*Math.PI*2, u=72*Math.cos(a)+1.6*Math.sin(a*3), v=40*Math.sin(a)+1.2*Math.cos(a*2); o.push([(u+v)*r2,(-u+v)*r2]); } return o; })();
 let MESA=[[11,1.2],[14.5,-1.2],[21,-1.6],[24,1.0],[23.2,5.4],[19,7],[13.2,6.6],[10.2,4]], MZ=3.6;
 let HILL=[[33.6,24.0],[37.0,23.2],[39.6,25.4],[39.4,29.4],[36.6,31.6],[33.0,30.8],[31.6,28.2]], AZ=2.4;
 let VEG=null; let LAKE=[[3.2,4.6],[7.0,3.2],[10.6,4.8],[11.6,8.0],[9.6,11.0],[6.4,12.2],[3.0,10.8],[2.0,7.6]];
@@ -566,17 +566,17 @@ const pulse=(now,ph)=>reduce?0.6:(0.5+0.5*Math.sin(now*1.4+(ph||0)));
 /* ===================== v13 · layout em cata-vento (quadrado + 4 retângulos) ===================== */
 /* Cada gênero: quadrado central S×S com o cenário; quatro retângulos iguais PW×(S+PW)
    girando em volta (esquerda, topo, direita, base), um por subgênero.                */
-const S_C=14, PW=6, HC=S_C/2, HB=HC+PW;   // HB = meia-largura do bloco
+const S_C=10, GAP=0.8, PW=S_C, HC=S_C/2, HB=HC+GAP+S_C;   // todos os quadrados tem o MESMO tamanho (S_C); GAP = vao entre eles
 const BLOCK=2*HB;
-const GRID={ castelo:[-29,29], vila:[29,-29] };
-/* retângulos dos 4 subgêneros, relativos ao centro do bloco: [x0,y0,w,d] */
+const GRID={ castelo:[-27,27], vila:[27,-27] };
+/* quadrados dos subgeneros, relativos ao centro do bloco: [x0,y0,w,d] (grade invisivel de posicionamento) */
 const SLOTS=[
-  [-HB,-HB, PW, S_C+PW],   // 0 esquerda (amarelo)
-  [-HC,-HB, S_C+PW, PW],   // 1 topo (azul)
-  [ HC,-HC, PW, S_C+PW],   // 2 direita (verde)
-  [-HB, HC, S_C+PW, PW],   // 3 base (rosa)
-  [-HB-PW-1.4,-HC, PW, S_C],  // 4 ponta esquerda (trancado)
-  [ HB+1.4,-HC, PW, S_C]      // 5 ponta direita (trancado)
+  [-HC-GAP-S_C, -HC, S_C, S_C],      // 0 esquerda (amarelo)
+  [-HC, -HC-GAP-S_C, S_C, S_C],      // 1 topo (azul)
+  [ HC+GAP, -HC, S_C, S_C],          // 2 direita (verde)
+  [-HC, HC+GAP, S_C, S_C],           // 3 base (rosa)
+  [-HC-2*GAP-2*S_C, -HC, S_C, S_C],  // 4 ponta esquerda (trancado)
+  [ HC+2*GAP+S_C, -HC, S_C, S_C]     // 5 ponta direita (trancado)
 ];
 const SLOT_TINT=['232,196,60','60,150,230','70,190,90','255,150,190','150,120,200','150,120,200'];
 const isRep=q=>{ const e=SUBIDX[q.id]; return !!e && e.idx===0; };
@@ -593,7 +593,7 @@ for(const r of REGIONS){ const g=GRID[r.id]; if(!g) continue;
     q.rect=[ax+x0,ay+y0,w,d]; q.slot=sl; q.lot=true;
     q.x=ax+x0+w/2; q.y=ay+y0+d/2; q.w=w; q.d=d;
     q.sign=[q.x,ay+y0+d+0.4,(r.cz||0)]; });
-  r.sign=[ax,ay+HB+1.2,(r.cz||0)];
+  r.sign=[ax,ay+HC+GAP+S_C+1.2,(r.cz||0)];
 }
 (function relocateTerrain(){
   const off=id=>{ const r=REGIONS.find(q=>q.id===id); return r?[r.ox||0,r.oy||0]:[0,0]; };
@@ -610,7 +610,7 @@ for(const r of REGIONS){ const g=GRID[r.id]; if(!g) continue;
 /* ===================== v16 · rio, lagos, floresta, montanhas, ponte ===================== */
 /* Coordenadas (u,v): u corre na horizontal da tela, v na vertical. Conversão para o mundo isométrico (x,y). */
 const R2_=Math.SQRT1_2, UV=(u,v)=>[(u+v)*R2_,(-u+v)*R2_], XY2UV=(x,y)=>[(x-y)*R2_,(x+y)*R2_];
-const KX=HB+PW+1.4, KY=HB;   // meia-largura / meia-profundidade do bloco de um reino (grade invisível)
+const KX=2.5*S_C+2*GAP, KY=1.5*S_C+GAP;   // meia-largura / meia-profundidade do bloco de um reino (grade invisível)
 const KING={ castelo:{style:'pedra', title:'Fantasia', reino:'Reino da Fantasia'}, vila:{style:'rosa', title:'Romance', reino:'Reino do Romance'} };
 function inKingdom(x,y,m){ m=m||0; for(const id in KING){ const g=GRID[id]; if(!g) continue; if(Math.abs(x-g[0])<KX+m&&Math.abs(y-g[1])<KY+m) return id; } return null; }
 
@@ -704,8 +704,8 @@ function drawPond(now){ const pp=POND.map(p=>P(p[0],p[1],-0.02)); fillWorld(POND
 function reeds(){ push(POND_C[0]+POND_C[1]+3,()=>{ const r=rng(55); for(let i=0;i<14;i++){ const a=r()*6.28, rr=2.4+r()*0.9; const x=POND_C[0]+Math.cos(a)*rr, y=POND_C[1]+Math.sin(a)*rr*0.85; const p=P(x,y,0); ctx.strokeStyle='#4C6A3A'; ctx.lineWidth=Math.max(1,TW*.06); ctx.beginPath(); ctx.moveTo(p[0],p[1]); ctx.lineTo(p[0]+TW*.08,p[1]-ZH*(0.7+r()*.5)); ctx.stroke(); } }); }
 
 /* ---------- clareira de cada reino: um círculo aberto no pinheiral, com o nome do gênero escrito no chão ---------- */
-const CLEAR_R=5.6, CLEAR_PTS=[], CLEAR_TREES=[];
-function clearingSpot(id){ const s=(id==='castelo')?1:-1; return UV(s>0?-12.5:12.5, s>0?-2.5:2.5); }
+const CLEAR_R=5.0, CLEAR_PTS=[], CLEAR_TREES=[];
+function clearingSpot(id){ const s=(id==='castelo')?1:-1; return UV(s>0?-14:14, s>0?-6:6); }
 for(const id in KING){ if(!GRID[id]) continue; const c=clearingSpot(id); CLEAR_PTS.push([c[0],c[1],CLEAR_R]); }
 function growClearingRings(){ const r=rng(777); for(const id in KING){ if(!GRID[id]) continue; const c=clearingSpot(id); const pedra=KING[id].style!=='rosa'; let n=0,tries=0;
   while(n<64&&tries<900){ tries++; const a=r()*Math.PI*2, d=CLEAR_R+0.7+r()*4.6; const x=c[0]+Math.cos(a)*d, y=c[1]+Math.sin(a)*d;
@@ -751,7 +751,7 @@ function tierFromBooks(r){ const n=lidosGen(r.id); let t=0; for(const th of TIER
 function zoomCapAt(mx,my){ const a=((mx-panX)/Z-OX0)/TW0, b2=((my-panY)/Z-OY0)/TH0; const wx=(a+b2)/2, wy=(b2-a)/2; const id=inKingdom(wx,wy,5); if(!id) return 6.5; const r=REGIONS.find(q=>q.id===id); const t=r?tier(r):1; return t>=4?9.5:t>=3?8.0:6.5; }
 
 /* trilha entre os reinos: da ponta leste da Fantasia à ponta oeste do Romance, cruzando a ponte */
-PATHS=[[[-19,5.2],[-9,3.4],[-2.9,0],[2.9,0],[9,-3.4],[19,-5.2]].map(q=>{ const p=UV(q[0],q[1]); return [p[0],p[1],0]; })];
+PATHS=[[[-10,7.2],[-6,4.6],[-2.9,0],[2.9,0],[6,-4.6],[10,-7.2]].map(q=>{ const p=UV(q[0],q[1]); return [p[0],p[1],0]; })];
 samplePaths(); growForest(); growClearingRings();
 
 function rectPts(x0,y0,w,d){ return [[x0,y0],[x0+w,y0],[x0+w,y0+d],[x0,y0+d]]; }
@@ -771,12 +771,10 @@ function plots(){
        quatro retângulos q.rect (slots 0-3) e duas pontas (slots 4-5). Todo item novo deve ser
        colocado DENTRO do seu quadrado, sem invadir o vizinho. Só o chão (cor) é pintado. */
     // quadrado central
-    plotRect(cx-HC,cy-HC,S_C,S_C,z,col([92,106,80],1),null);
-    fillPat(rectPts(cx-HC,cy-HC,S_C,S_C),z,'grass',0.55);
+    /* v17: quadrado central sem pintura (grade invisível) */ void [cx,cy,z];
     // quatro retângulos + pontas
     for(const q of r.places){ if(!q.lot) continue; const [x0,y0,w,d]=q.rect; const open=st(q)==='open';
-      if(open){ plotRect(x0,y0,w,d,z,col([88,104,78],1),null); fillPat(rectPts(x0,y0,w,d),z,'grass',0.5); const t=SLOT_TINT[q.slot]; plotRect(x0,y0,w,d,z+0.005,`rgba(${t},.26)`,null); }
-      else { plotRect(x0,y0,w,d,z,col([62,78,56],1),null); fillPat(rectPts(x0,y0,w,d),z,'grass',0.35); } }
+      /* v17: chão sem pintura — os retângulos são só a grade invisível de posicionamento */ void [x0,y0,w,d,open]; }
   }
   ROFF(null);
 }
@@ -798,17 +796,17 @@ const SCENES={
   /* -------- ALTA FANTASIA: cidade medieval com três luas -------- */
   alta(p,zb,now){ const [x0,y0,w,d]=p.rect; const cy=y0+d/2;
     fillPat(rectPts(x0+0.6,y0+0.6,w-1.2,d-1.2),zb,'cobble',0.45);
-    const H=[[x0+0.8,y0+0.6,2.2,1.8,1.5,[224,206,176],[150,72,54],'x'],[x0+3.6,y0+0.5,2.0,1.7,1.7,[214,196,166],[92,66,88],'y'],[x0+6.2,y0+0.6,2.4,1.8,1.4,[230,214,184],[140,84,50],'x'],
-             [x0+9.4,y0+0.5,2.0,1.7,1.9,[206,188,160],[70,60,90],'y'],[x0+12.0,y0+0.6,2.4,1.8,1.5,[228,210,180],[150,72,54],'x'],[x0+15.0,y0+0.5,2.2,1.8,1.6,[216,198,168],[96,70,92],'x'],
-             [x0+1.4,y0+3.6,2.2,1.7,1.4,[222,204,174],[124,78,52],'x'],[x0+5.0,y0+3.7,2.4,1.7,1.3,[230,214,184],[84,64,96],'x'],[x0+9.0,y0+3.6,2.2,1.7,1.5,[214,196,166],[150,72,54],'y'],[x0+12.6,y0+3.7,2.4,1.7,1.4,[224,206,176],[70,60,90],'x']];
+    const H=[[x0+0.6,y0+0.6,2.2,1.8,1.5,[224,206,176],[150,72,54],'x'],[x0+3.9,y0+0.5,2.0,1.7,1.7,[214,196,166],[92,66,88],'y'],[x0+7.0,y0+0.6,2.4,1.8,1.4,[230,214,184],[140,84,50],'x'],
+             [x0+0.6,y0+4.0,2.2,1.7,1.4,[222,204,174],[124,78,52],'x'],[x0+7.2,y0+4.1,2.2,1.7,1.9,[206,188,160],[70,60,90],'y'],
+             [x0+0.8,y0+7.4,2.2,1.7,1.5,[228,210,180],[150,72,54],'x'],[x0+3.9,y0+7.5,2.4,1.7,1.3,[230,214,184],[84,64,96],'x'],[x0+7.0,y0+7.4,2.2,1.7,1.6,[216,198,168],[96,70,92],'x']];
     for(const [hx,hy,hw,hd,hh,wall,roof,ridge] of H) house({x:hx,y:hy,z:zb,w:hw,d:hd,h:hh,wall,roof,rh:.95,ridge,door:.5,lit:1,win:[{f:'S',u:.35,z:.5,w:.4},{f:'S',u:hw-.75,z:.5,w:.4},{f:'E',u:.5,z:.5,w:.4}]});
-    push((x0+w-1.2)+(y0+3.4)+zb*0.01,()=>{ drawPrism(x0+w-1.5,y0+2.9,.6,.55,zb,3.4,8,[190,178,160],{top:false}); drawCone(x0+w-1.5,y0+2.9,.72,zb+3.4,1.5,8,[92,66,88]); const c=P(x0+w-1.5,y0+2.9,zb+2.4); halo(c[0],c[1],TH*1.6,'255,206,120',.5); });
-    push((x0+w/2)+(cy)+zb*0.01+0.02,()=>{ drawPrism(x0+w/2-0.2,cy+0.2,.42,.4,zb,.55,10,[112,106,124]); for(const ox of [-.4,.4]) drawBox(x0+w/2-0.2+ox-.05,cy+0.15,zb+.55,.1,.1,.8,M.wood); });
-    for(const lx of [x0+3.2,x0+8.6,x0+14.2]) push((lx+.1)+(y0+3.0)+zb*0.01+0.04,()=>{ drawBox(lx-.05,y0+2.95,zb,.1,.1,1.6,[52,44,40]); drawLantern(lx,y0+3.0,zb+1.65,'255,200,110',.8,.7); });
+    push((x0+5.4)+(y0+5.4)+zb*0.01,()=>{ drawPrism(x0+4.8,y0+4.9,.6,.55,zb,3.4,8,[190,178,160],{top:false}); drawCone(x0+4.8,y0+4.9,.72,zb+3.4,1.5,8,[92,66,88]); const c=P(x0+4.8,y0+4.9,zb+2.4); halo(c[0],c[1],TH*1.6,'255,206,120',.5); });
+    push((x0+3.6)+(cy+0.4)+zb*0.01+0.02,()=>{ drawPrism(x0+3.4,cy+0.2,.42,.4,zb,.55,10,[112,106,124]); for(const ox of [-.4,.4]) drawBox(x0+3.4+ox-.05,cy+0.15,zb+.55,.1,.1,.8,M.wood); });
+    for(const [lx,ly] of [[x0+3.2,y0+3.1],[x0+6.4,y0+6.6],[x0+9.4,y0+3.2]]) push((lx+.1)+(ly+.1)+zb*0.01+0.04,()=>{ drawBox(lx-.05,ly-.05,zb,.1,.1,1.6,[52,44,40]); drawLantern(lx,ly,zb+1.65,'255,200,110',.8,.7); });
     if(!MOONS.some(m=>m[6]===p.id)){ const mx=x0+w/2+OFX, my=y0+OFY-1.0; MOONS.push([mx-5.0,my+2.5,7.2,1.15,'#E9E4D6','235,230,215',p.id],[mx,my+2.5,8.8,1.5,'#9EC3FF','150,190,255',p.id],[mx+5.0,my+2.5,7.2,1.15,'#FF9A7A','255,150,110',p.id]); } },
   /* -------- FANTASIA HISTÓRICA: palácio grego e arena de gladiadores -------- */
   historica(p,zb,now){ const [x0,y0,w,d]=p.rect; const MB=[224,216,198], MD=[196,188,170];
-    const px=x0+0.6, py=y0+0.7, pw=w-1.2, pd=7.2;
+    const px=x0+0.6, py=y0+0.6, pw=w-1.2, pd=4.2;
     push((px+pw)+(py+pd)+zb*0.01,()=>{ drawBox(px,py,zb,pw,pd,.32,MD,{ft:1.15}); drawBox(px+.25,py+.25,zb+.32,pw-.5,pd-.5,.3,MB,{ft:1.15});
       for(let i=0;i<4;i++){ drawPrism(px+.7+i*(pw-1.4)/3,py+pd-.6,.19,.17,zb+.62,2.2,8,MB,{top:false}); drawPrism(px+.7+i*(pw-1.4)/3,py+.7,.19,.17,zb+.62,2.2,8,MB,{top:false}); }
       for(let j=1;j<4;j++){ drawPrism(px+.7,py+.7+j*(pd-1.4)/4,.19,.17,zb+.62,2.2,8,MB,{top:false}); drawPrism(px+pw-.7,py+.7+j*(pd-1.4)/4,.19,.17,zb+.62,2.2,8,MB,{top:false}); }
@@ -817,8 +815,8 @@ const SCENES={
       quad([P(px+.2,py+pd+.02,zb+3.14),P(px+pw/2,py+pd+.02,zb+4.1),P(px+pw/2,py-.02,zb+4.1),P(px+.2,py-.02,zb+3.14)],col(MB,.9));
       quad([P(px+pw-.2,py+pd+.02,zb+3.14),P(px+pw/2,py+pd+.02,zb+4.1),P(px+pw/2,py-.02,zb+4.1),P(px+pw-.2,py-.02,zb+3.14)],col(MB,.78));
       const g=P(px+pw/2,py+pd,zb+1.4); halo(g[0],g[1],TH*3,'255,214,150',.35); });
-    const ax=x0+w/2, ay=y0+d-5.2;
-    push((ax+3)+(ay+3)+zb*0.01,()=>{ drawPrism(ax,ay,2.7,2.5,zb,.5,18,[186,176,158],{top:true}); drawPrism(ax,ay,2.25,2.05,zb+.5,.5,18,[196,186,166],{top:true}); drawPrism(ax,ay,1.8,1.6,zb+1.0,.45,18,[206,196,176],{top:true});
+    const ax=x0+w/2, ay=y0+d-2.6;
+    push((ax+3)+(ay+3)+zb*0.01,()=>{ drawPrism(ax,ay,2.3,2.1,zb,.5,18,[186,176,158],{top:true}); drawPrism(ax,ay,1.95,1.78,zb+.5,.5,18,[196,186,166],{top:true}); drawPrism(ax,ay,1.6,1.42,zb+1.0,.45,18,[206,196,176],{top:true});
       const c=P(ax,ay,zb+1.46); ctx.fillStyle='#C9A96E'; ctx.beginPath(); ctx.ellipse(c[0],c[1],1.35*TW,1.2*TH,0,0,Math.PI*2); ctx.fill();
       const r2=rng(77); for(let i=0;i<26;i++){ const a=r2()*6.28, rr=2.0+r2()*.5; const q=P(ax+Math.cos(a)*rr,ay+Math.sin(a)*rr*.92,zb+1.0+ (rr>2.3?0.0:0.45)); ctx.fillStyle=['#C8443E','#3E6FB0','#F1E6D2','#5A3E2C'][i%4]; ctx.beginPath(); ctx.arc(q[0],q[1]-TH*.4,Math.max(1.2,TH*.22),0,6.28); ctx.fill(); }
       drawPerson(ax-.55,ay+.1,zb+1.46,1,reduce?0:now*6,[150,60,50],0,{skin:'#D9A47A',hair:'#2E2A26'}); drawPerson(ax+.55,ay-.1,zb+1.46,-1,reduce?0:now*6+2,[60,70,120],0,{skin:'#C48A62',hair:'#1E1A18'});
@@ -826,7 +824,7 @@ const SCENES={
       for(const [bx,by,bc] of [[ax-2.4,ay-1.6,'#8E2A24'],[ax+2.4,ay-1.6,'#8E2A24'],[ax,ay-2.6,'#C9A227']]){ drawBox(bx-.05,by-.05,zb+1.5,.1,.1,1.6,[60,54,50]); const bp=P(bx,by,zb+3.1); ctx.fillStyle=bc; ctx.beginPath(); ctx.moveTo(bp[0],bp[1]); ctx.lineTo(bp[0]+TW*.6,bp[1]+TH*.25); ctx.lineTo(bp[0],bp[1]+TH*.7); ctx.closePath(); ctx.fill(); } }); },
   /* -------- COZY: tenda de poções e livros, moça tomando chá -------- */
   cozy(p,zb,now){ const [x0,y0,w,d]=p.rect; const cy=y0+d/2; const t=reduce?0:now;
-    const tx=x0+4.2, ty=cy;
+    const tx=x0+3.4, ty=cy;
     push((tx+2.6)+(ty+2.6)+zb*0.01,()=>{ drawPrism(tx,ty,2.5,2.3,zb,.25,8,[150,120,100],{top:false}); drawPrism(tx,ty,2.45,2.25,zb+.25,1.5,8,[244,208,222],{top:false});
       drawCone(tx,ty,2.7,zb+1.75,2.2,8,[236,150,190]);
       for(let i=0;i<8;i+=2){ const a0=i/8*6.28, a1=(i+1)/8*6.28; quad([P(tx+Math.cos(a0)*2.7,ty+Math.sin(a0)*2.5,zb+1.75),P(tx+Math.cos(a1)*2.7,ty+Math.sin(a1)*2.5,zb+1.75),P(tx,ty,zb+3.95)],'rgba(255,244,236,.55)',false); }
@@ -2376,7 +2374,7 @@ function hitAt(mx,my){
   let best=null,bd=1e9; for(const r of REGIONS) for(const p of r.places){ if(p.scenery) continue; const [x,y,w,h]=placeBox(p,r); if(mx>=x&&mx<=x+w&&my>=y&&my<=y+h){ const d=Math.hypot(mx-(x+w/2),my-(y+h*.7)); if(d<bd){bd=d;best=p.id;} } } if(best) return best;
   // bloco do gênero (cata-vento): teste retangular no mundo, sem tocar nos offsets globais
   const a=((mx-panX)/Z-OX0)/TW0, b2=((my-panY)/Z-OY0)/TH0; const wx=(a+b2)/2, wy=(b2-a)/2;
-  for(const r of REGIONS){ if(!r.plot) continue; const x=wx-(r.ox||0), y=wy-(r.oy||0); const [cx,cy]=r.plot; const ex=HB+PW+1.4, ey=HB;
+  for(const r of REGIONS){ if(!r.plot) continue; const x=wx-(r.ox||0), y=wy-(r.oy||0); const [cx,cy]=r.plot; const ex=KX, ey=KY;
     if(x>=cx-ex&&x<=cx+ex&&y>=cy-ey&&y<=cy+ey) return r.id; }
   return null; }
 cv.addEventListener('pointerdown',e=>{ cv.setPointerCapture(e.pointerId); drag={x:e.clientX,y:e.clientY,px:panX,py:panY,moved:false,id:e.pointerId}; cam=null; });
