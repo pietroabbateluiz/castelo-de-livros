@@ -109,8 +109,7 @@
       <button type="button" id="zall" aria-label="Ver tudo" style="width:auto;padding:0 10px;font-size:.8rem;font-family:Karla,sans-serif;letter-spacing:.1em;">TUDO</button>
     </div>
     <div class="seg panel" role="group" aria-label="Qualidade gráfica" id="gfx" title="Qualidade gráfica">
-      <button type="button" data-gfx="2" aria-pressed="true">Ultra</button>
-      <button type="button" data-gfx="1" aria-pressed="false">Alto</button>
+      <button type="button" data-gfx="1" aria-pressed="true">Alto</button>
       <button type="button" data-gfx="0" aria-pressed="false">Clássico</button>
     </div>
     <div class="hint panel">arraste · role para aproximar · clique numa sala aberta para entrar · Shift = placas</div>
@@ -137,7 +136,7 @@ let TW0=16,TH0=8,ZH0=13.6,OX0=0,OY0=0, Z=1,panX=0,panY=0, TW=16,TH=8,ZH=13.6, W=
 let cam=null; // alvo de tween {Z,panX,panY}
 
 /* ===================== v8 · luz e qualidade gráfica (estilo HD-2D) ===================== */
-let GFX=2; // 2 = Ultra (sombras, texturas, pós-processamento) · 1 = Alto (sem pós) · 0 = Clássico (visual original)
+let GFX=1; // (Ultra removido) 2 = Ultra (sombras, texturas, pós-processamento) · 1 = Alto (sem pós) · 0 = Clássico (visual original)
 const LIGHT={x:0.35,y:-0.94};      // de onde vem a luz da lua (alto-direita da tela)
 const SHADOW_DIR={x:-0.18,y:0.98}; // para onde as sombras se estendem, por unidade de altura
 const BBOX={xmin:-25,xmax:42,ymin:-16,ymax:36,zmin:-3,zmax:10.6};
@@ -546,7 +545,8 @@ for(const rid in SUBS){ const R=REGIONS.find(r=>r.id===rid); if(!R) continue;
       need:{inicio:[0,1,'do subgênero'],lendo:[0,1,'do subgênero']},
       sign:[sgen.x,sgen.y+1.5,(R.cz||0)]}); } }
 /* nomes: só o nome do estilo literário (gênero / subgênero) */
-for(const r of REGIONS){ if(r.genre){ r.name=r.genre; r.tab=r.genre; } for(const p of r.places){ const e=SUBIDX[p.id]; if(e) p.name=e.sub; } }
+for(const r of REGIONS){ if(r.genre){ r.name=r.genre; r.tab=r.genre; } for(const p of r.places){ const e=SUBIDX[p.id]; if(e) p.name=e.sub; else p.scenery=true; } }
+const roomsOf=r=>r.places.filter(p=>!p.scenery);
 const allPlaces=()=>REGIONS.flatMap(r=>r.places.map(p=>({...p,region:r})));
 const regionOpen=(r)=>r.places.some(p=>st(p)==='open');
 const pulse=(now,ph)=>reduce?0.6:(0.5+0.5*Math.sin(now*1.4+(ph||0)));
@@ -1194,7 +1194,7 @@ function castelo(now,R){
   house({x:4.9,y:26.7,z:0.14,w:2.7,d:2.3,h:1.9,wall:[118,110,132],roof:ROOF2,rh:1.0,door:.52,lit:open?1:0,
     win:[{f:'S',u:.5,z:.7,w:.42},{f:'S',u:1.7,z:.7,w:.42},{f:'E',u:.6,z:.7,w:.42}]});
   push((4.9+2.7)+(26.7+2.3)+0.05,()=>{ drawBox(6.9,26.5,2.04,.5,.5,1.5,[96,88,104],{ft:1.1}); });
-  if(open) push(9001,()=>smoke(now,7.15,26.75,3.6,2.2));
+  if(open) push(9001,()=>smoke(now,7.15,26.75,3.6));
   /* --- capela a leste --- */
   house({x:10.0,y:26.4,z:0.14,w:1.9,d:2.4,h:1.7,wall:[126,118,140],roof:ROOF,rh:.95,ridge:'y',door:.5,lit:open?1:0,
     win:[{f:'S',u:.5,z:.65,w:.36},{f:'E',u:.6,z:.65,w:.36},{f:'E',u:1.5,z:.65,w:.36}]});
@@ -2151,7 +2151,7 @@ function drawSign(wx,wy,wz,name,sub,subColor,hotness,big){
   return [bx,by,bw,bh];
 }
 function subFor(p){ if(p.sub) return [p.sub,'#F1D27A']; const sg=subOf(p.id);
-  if(sg) return st(p)==='open'?[sg,'#F1D27A']:[sg+' · trancado','#E28A76'];
+  if(sg) return st(p)==='open'?['aberta','#F1D27A']:['trancada · 1 livro','#E28A76'];
   const k=st(p), nd=p.need&&p.need[preset]; if(!nd) return ['aberto','#F1D27A'];
   return k==='open'?[`${nd[0]} livros`,'#F1D27A']:[`leia ${nd[1]-nd[0]} ${nd[2]}`,'#E28A76']; }
 function nearestRegion(){ let best=null,bd=1e9; for(const r of REGIONS){ const p=P(r.cx+(r.ox||0),r.cy+(r.oy||0),r.cz); const d=Math.hypot(p[0]-W/2,p[1]-H*0.47); if(d<bd){bd=d;best=r;} } return best; }
@@ -2159,9 +2159,9 @@ function signs(){
   signHits=[];
   /* placas escondidas: aparecem no hover, na seleção, ou com Shift pressionado */
   const list=[];
-  for(const r of REGIONS){ const o=r.places.filter(p=>st(p)==='open').length;
-    list.push({kind:'region',id:r.id,x:r.sign[0],y:r.sign[1],z:r.sign[2],ox:r.ox||0,oy:r.oy||0,name:r.name,sub:`${r.genre} · ${o} de ${r.places.length}`,subC:o?'#F1D27A':'#B0A08C',big:true});
-    for(const p of r.places){ const s2=subFor(p); list.push({kind:'place',id:p.id,x:p.sign[0],y:p.sign[1],z:p.sign[2],ox:r.ox||0,oy:r.oy||0,name:p.name,sub:s2[0],subC:s2[1],big:false}); } }
+  for(const r of REGIONS){ const rooms=roomsOf(r), o=rooms.filter(p=>st(p)==='open').length;
+    list.push({kind:'region',id:r.id,x:r.sign[0],y:r.sign[1],z:r.sign[2],ox:r.ox||0,oy:r.oy||0,name:r.name,sub:`${o} de ${rooms.length} salas`,subC:o?'#F1D27A':'#B0A08C',big:true});
+    for(const p of rooms){ const s2=subFor(p); list.push({kind:'place',id:p.id,x:p.sign[0],y:p.sign[1],z:p.sign[2],ox:r.ox||0,oy:r.oy||0,name:p.name,sub:s2[0],subC:s2[1],big:false}); } }
   list.sort((a,b)=>(a.x+a.oy+a.y+a.ox)-(b.x+b.oy+b.y+b.ox));
   for(const s of list){ const isHot=(hot===s.id||sel===s.id); if(!(showAll||isHot)) continue; OFF(s.ox,s.oy); const rect=drawSign(s.x,s.y,s.z,s.name,s.sub,s.subC,isHot,s.big); signHits.push({id:s.id,kind:s.kind,rect}); }
 }
@@ -2177,10 +2177,10 @@ function falta(nd){ const n=nd[1]-nd[0], u=nd[2]; if(u==='livros') return n===1?
 function updateStats(){ let o=0,s=0; for(const p of allPlaces()){ if(!subOf(p.id)) continue; if(st(p)==='open')o++; else s++; }
   document.getElementById('sOpen').textContent=o; document.getElementById('sNear').textContent=REGIONS.filter(r=>!r.landmark).length; document.getElementById('sSeal').textContent=s;
   document.getElementById('who').textContent=preset==='lendo'?'Lendo · '+o+' salas abertas':'Início · 1 sala por gênero'; }
-function findAny(id){ for(const r of REGIONS){ if(r.id===id) return {region:r}; for(const p of r.places) if(p.id===id) return {place:p,region:r}; } return null; }
+function findAny(id){ for(const r of REGIONS){ if(r.id===id) return {region:r}; for(const p of r.places) if(p.id===id&&!p.scenery) return {place:p,region:r}; } return null; }
 function renderCard(){
   const id=hot||sel; const f=id?findAny(id):null; let k,cls,h,n,p,pct,barCls='';
-  if(f&&f.region&&!f.place){ const r=f.region, o=r.places.filter(q=>st(q)==='open').length; k=r.genre; cls=o?'open':'sealed'; h=r.name; n=`${o}<small>de ${r.places.length}</small>`; pct=o/r.places.length*100; p=o?`${o===r.places.length?'Região completa':'Região aberta'} — ${r.places.length} lugares, cada um com endereço próprio: castelo.com.br/luiz/${r.id}/…`:'Região ainda na névoa. Abre no primeiro lugar conquistado aqui.'; }
+  if(f&&f.region&&!f.place){ const r=f.region, rooms=roomsOf(r), o=rooms.filter(q=>st(q)==='open').length; k='Gênero'; cls=o?'open':'sealed'; h=r.genre; n=`${o}<small>de ${rooms.length}</small>`; pct=o/rooms.length*100; p=o?`${o===rooms.length?'Gênero completo':'Gênero aberto'} — ${rooms.length} salas, cada uma com endereço próprio: castelo.com.br/luiz/${r.id}/…`:'Gênero ainda na névoa. Abre na primeira sala conquistada aqui.'; }
   else if(f&&f.place&&f.place.card){ const q=f.place; k=q.card.k; cls='open'; h=q.name; n=q.card.n; pct=100; p=q.card.p; }
   else if(f&&f.place&&subOf(f.place.id)){ const q=f.place, sg=subOf(q.id), open=st(q)==='open';
     k=`${open?'Aberta':'Trancada'} · ${f.region.genre}`; cls=open?'open':'sealed'; h=q.name;
@@ -2193,12 +2193,12 @@ function renderCard(){
     else { k=`Trancado · ${f.region.name}`; cls='sealed'; h=q.name; n=`${nd[0]}<small>de ${nd[1]}</small>`; pct=nd[0]/nd[1]*100; p=`${falta(nd)} para a chave girar.`; } } }
   else { const q=allPlaces().find(z=>subOf(z.id)&&st(z)!=='open');
     if(q){ const sg=subOf(q.id); k='Próxima sala'; cls='sealed'; h=q.name; n='🔑<small>1 livro</small>'; pct=0; barCls='sealed';
-      p=`Cada gênero tem 5 salas, uma por subgênero. Esta abre com <b>1 livro de ${sg.toLowerCase()}</b> — e ganha endereço próprio: castelo.com.br/luiz/${q.region.id}/${q.id}.`; }
-    else { k='Reino completo'; cls='open'; h='Mundo de Luiz'; n='91<small>salas</small>'; pct=100; p='Todas as salas abertas. 13 gêneros, 7 subgêneros cada.'; } }
+      p=`Cada gênero tem uma sala por subgênero. Esta abre com <b>1 livro de ${sg.toLowerCase()}</b> — e ganha endereço próprio: castelo.com.br/luiz/${q.region.id}/${q.id}.`; }
+    else { const tot=REGIONS.reduce((t,r)=>t+roomsOf(r).length,0); k='Mundo completo'; cls='open'; h='Mundo de Luiz'; n=tot+'<small>salas</small>'; pct=100; p=`Todas as salas abertas. ${REGIONS.length} gêneros.`; } }
   cardEl.innerHTML=`<div class="card"><div class="k ${cls}">${k}</div><h2>${h}</h2><div class="n">${n}</div><p>${p}</p><div class="bar ${barCls}"><i style="width:${pct}%"></i></div></div>`;
 }
 function buildRegionChips(){ const el=document.getElementById('regions'); el.innerHTML=''; for(const r of REGIONS){ const b=document.createElement('button'); b.type='button'; b.dataset.id=r.id; b.setAttribute('aria-pressed','false'); b.innerHTML=(r.tab===r.genre)?`${r.genre}`:`${r.tab||r.name}<small>${r.genre}</small>`; b.addEventListener('click',()=>{ focused=focused===r.id?null:r.id; for(const o of el.children) o.setAttribute('aria-pressed',o.dataset.id===focused?'true':'false'); if(focused){ focusWorld(r.cx+(r.ox||0),r.cy+(r.oy||0),r.cz,1.9); sel=r.id; } else { cam={Z:1,panX:0,panY:0}; sel=null; } renderCard(); }); el.appendChild(b); } }
-function buildSr(){ srEl.innerHTML=''; for(const r of REGIONS){ for(const p of r.places){ const b=document.createElement('button'); b.type='button'; b.textContent=`${p.name} — ${r.name}`; b.addEventListener('focus',()=>{ hot=p.id; focusWorld(p.x+(r.ox||0),p.y+(r.oy||0),(p.sign[2]||0),2.1); renderCard(); }); b.addEventListener('blur',()=>{ hot=null; renderCard(); }); b.addEventListener('click',()=>{ if(st(p)==='open'&&subOf(p.id)){ sel=p.id; roomOpen(p.id); } else { sel=sel===p.id?null:p.id; renderCard(); } }); srEl.appendChild(b); } } }
+function buildSr(){ srEl.innerHTML=''; for(const r of REGIONS){ for(const p of roomsOf(r)){ const b=document.createElement('button'); b.type='button'; b.textContent=`${p.name} — ${r.name}`; b.addEventListener('focus',()=>{ hot=p.id; focusWorld(p.x+(r.ox||0),p.y+(r.oy||0),(p.sign[2]||0),2.1); renderCard(); }); b.addEventListener('blur',()=>{ hot=null; renderCard(); }); b.addEventListener('click',()=>{ if(st(p)==='open'&&subOf(p.id)){ sel=p.id; roomOpen(p.id); } else { sel=sel===p.id?null:p.id; renderCard(); } }); srEl.appendChild(b); } } }
 
 /* ===================== laço ===================== */
 function frame(now){
@@ -2206,7 +2206,7 @@ function frame(now){
   sky(now); terrain(now); drawMoons(now);
   for(const r of REGIONS){ ROFF(r); const f=BUILD[r.id]; if(f) f(now,r); }
   for(const r of REGIONS){ ROFF(r); satellites(now,r); }
-  ROFF(null);
+  ROFF(REGIONS.find(q=>q.id==='vila')); colossus(now); ROFF(null);
   people(now);
   prims.sort((a,b)=>a.k-b.k); for(const p of prims) p.f();
   cloudShadows(now); depthHaze();
@@ -2228,7 +2228,7 @@ window.addEventListener('keydown',e=>{ if(e.key==='Shift') showAll=true; if(e.ke
 function placeBox(p,r){ const _x=OFX,_y=OFY; ROFF(r); const zb=(r.cz||0), w=p.w||2.4, d=p.d||2.4, h=p.h||3.0, cx=p.x+(p.w?w/2:0), cy=p.y+(p.d?d/2:0), c=P(cx,cy,zb); const sw=(w+d)*TW*0.5+TW*0.7, top=c[1]-h*ZH-TH*0.5, bot=c[1]+d*TH*0.5+TH*0.5; OFF(_x,_y); return [c[0]-sw/2,top,sw,bot-top]; }
 function hitAt(mx,my){
   for(let i=signHits.length-1;i>=0;i--){ const [x,y,w,h]=signHits[i].rect; if(mx>=x-4&&mx<=x+w+4&&my>=y-4&&my<=y+h+22) return signHits[i].id; }
-  let best=null,bd=1e9; for(const r of REGIONS) for(const p of r.places){ const [x,y,w,h]=placeBox(p,r); if(mx>=x&&mx<=x+w&&my>=y&&my<=y+h){ const d=Math.hypot(mx-(x+w/2),my-(y+h*.7)); if(d<bd){bd=d;best=p.id;} } } if(best) return best;
+  let best=null,bd=1e9; for(const r of REGIONS) for(const p of r.places){ if(p.scenery) continue; const [x,y,w,h]=placeBox(p,r); if(mx>=x&&mx<=x+w&&my>=y&&my<=y+h){ const d=Math.hypot(mx-(x+w/2),my-(y+h*.7)); if(d<bd){bd=d;best=p.id;} } } if(best) return best;
   for(const r of REGIONS){ ROFF(r); const c=P(r.cx,r.cy,r.cz||0); const rx=(RMAIN+DSAT*0.2)*TW*1.05, ry=(RMAIN+DSAT*0.2)*TH*1.05+ZH*1.2; const dx=(mx-c[0])/rx, dy=(my-(c[1]-ZH*.6))/ry; if(dx*dx+dy*dy<=1){ ROFF(null); return r.id; } }
   ROFF(null); return null; }
 cv.addEventListener('pointerdown',e=>{ cv.setPointerCapture(e.pointerId); drag={x:e.clientX,y:e.clientY,px:panX,py:panY,moved:false,id:e.pointerId}; cam=null; });
