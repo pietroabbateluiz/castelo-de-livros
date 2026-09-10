@@ -704,7 +704,7 @@ function drawPond(now){ const pp=POND.map(p=>P(p[0],p[1],-0.02)); fillWorld(POND
 function reeds(){ push(POND_C[0]+POND_C[1]+3,()=>{ const r=rng(55); for(let i=0;i<14;i++){ const a=r()*6.28, rr=2.4+r()*0.9; const x=POND_C[0]+Math.cos(a)*rr, y=POND_C[1]+Math.sin(a)*rr*0.85; const p=P(x,y,0); ctx.strokeStyle='#4C6A3A'; ctx.lineWidth=Math.max(1,TW*.06); ctx.beginPath(); ctx.moveTo(p[0],p[1]); ctx.lineTo(p[0]+TW*.08,p[1]-ZH*(0.7+r()*.5)); ctx.stroke(); } }); }
 
 /* ---------- clareira de cada reino: um círculo aberto no pinheiral, com o nome do gênero escrito no chão ---------- */
-const CLEAR_R=5.0, CLEAR_PTS=[], CLEAR_TREES=[];
+const CLEAR_R=5.8, CLEAR_PTS=[], CLEAR_TREES=[];
 function clearingSpot(id){ const s=(id==='castelo')?1:-1; return UV(s>0?-14:14, s>0?-6:6); }
 for(const id in KING){ if(!GRID[id]) continue; const c=clearingSpot(id); CLEAR_PTS.push([c[0],c[1],CLEAR_R]); }
 function growClearingRings(){ const r=rng(777); for(const id in KING){ if(!GRID[id]) continue; const c=clearingSpot(id); const pedra=KING[id].style!=='rosa'; let n=0,tries=0;
@@ -1870,7 +1870,7 @@ function drawKey(x,y,z,k){
   ctx.beginPath(); ctx.moveTo(c[0],c[1]+R*.92); ctx.lineTo(c[0]+R*.30,c[1]+R*.92); ctx.stroke();
   ctx.lineCap='butt';
 }
-function keyLabel(x,y,z,txt){ const c=P(x,y,z); const sc=Math.max(.8,Math.min(1.3,Z*.6)); ctx.font=`700 ${9.5*sc}px Karla, sans-serif`; const w=ctx.measureText(txt).width+14*sc, h=16*sc; const bx=c[0]-w/2, by=c[1]+TH*1.1;
+function keyLabel(x,y,z,txt,k){ const c=P(x,y,z); const sc=Math.max(.8,Math.min(1.3,Z*.6))*(k||1); ctx.font=`700 ${9.5*sc}px Karla, sans-serif`; const w=ctx.measureText(txt).width+14*sc, h=16*sc; const bx=c[0]-w/2, by=c[1]+TH*1.1;
   ctx.fillStyle='rgba(20,14,26,.82)'; ctx.beginPath(); ctx.roundRect?ctx.roundRect(bx,by,w,h,4):ctx.rect(bx,by,w,h); ctx.fill(); ctx.strokeStyle='rgba(241,210,122,.55)'; ctx.lineWidth=1; ctx.stroke();
   ctx.fillStyle='#F1D27A'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(txt,c[0],by+h/2); ctx.textAlign='left'; ctx.textBaseline='alphabetic'; }
 /* ---- névoa sobre uma edificação trancada ---- */
@@ -2095,19 +2095,17 @@ function regionBadge(r,n){
   ctx.fillStyle='#F2E8D2'; ctx.font=`700 ${Math.max(10,h*0.44)}px Karla, sans-serif`;
   ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillText(String(n),c[0]-w*0.02,y+1); ctx.textBaseline='alphabetic'; ctx.textAlign='left';
 }
+let keyHits=[];
 function locks(now){
-  const near=Z>=1.32;
-  for(const r of REGIONS){ ROFF(r); const zb=r.cz||0; let n=0;
-    for(const p of r.places){
-      if(st(p)!=='sealed') continue; n++;
-      if(!near) continue;
-      const big=!p.sat, rr=big?(Math.max(p.w||2.2,p.d||2.2)*0.44+0.55):0.9;
+  keyHits=[]; const near=Z>=1.6;
+  for(const r of REGIONS){ ROFF(r); const zb=r.cz||0; const sealed=[];
+    for(const p of r.places){ if(st(p)!=='sealed') continue; sealed.push(p);
       const cx=p.x+((p.w||0)/2), cy=p.y+((p.d||0)/2);
-      lockFog(cx, cy, zb, rr, now);
-      drawKey(cx, cy, zb+(big?(p.h||2.6)*0.5+0.9:1.35), p.sat?1.4:1);
-      if(p.sat&&Z>=1.05) keyLabel(cx, cy, zb, p.name);
-    }
-    if(!near&&n) { lockFog(r.cx,r.cy,zb,r.r*0.55,now); regionBadge(r,n); }
+      if(near) lockFog(cx,cy,zb,0.9,now); else drawKey(cx,cy,zb+1.35,1.0); }
+    if(near&&sealed.length&&KING[r.id]){ OFF(0,0); const c=clearingSpot(r.id), n=sealed.length;
+      const nt=Math.floor(n/2), nb=n-nt; sealed.forEach((p,i)=>{ const top=i<nt; const j=top?i:i-nt, m=top?nt:nb; const du=(m===1?0:(j/(m-1)-0.5)*9.4), dv=top?-3.9:3.1; const o=UV(du,dv); const x=c[0]+o[0], y=c[1]+o[1];
+        drawKey(x,y,1.35,1.4); keyLabel(x,y,0,p.name,0.85); const sp=P(x,y,1.35); keyHits.push({id:p.id,rect:[sp[0]-16,sp[1]-26,32,64]}); });
+      ROFF(r); }
   }
   ROFF(null);
 }
@@ -2370,6 +2368,7 @@ let drag=null, showAll=false;
 window.addEventListener('keydown',e=>{ if(e.key==='Shift') showAll=true; if(e.key==='Escape'&&room) roomClose(); }); window.addEventListener('keyup',e=>{ if(e.key==='Shift') showAll=false; }); window.addEventListener('blur',()=>{ showAll=false; });
 function placeBox(p,r){ const _x=OFX,_y=OFY; ROFF(r); const zb=(r.cz||0), w=p.w||2.4, d=p.d||2.4, h=p.h||3.0, cx=p.x+(p.w?w/2:0), cy=p.y+(p.d?d/2:0), c=P(cx,cy,zb); const sw=(w+d)*TW*0.5+TW*0.7, top=c[1]-h*ZH-TH*0.5, bot=c[1]+d*TH*0.5+TH*0.5; OFF(_x,_y); return [c[0]-sw/2,top,sw,bot-top]; }
 function hitAt(mx,my){
+  for(const k of keyHits){ const [x,y,w,h]=k.rect; if(mx>=x&&mx<=x+w&&my>=y&&my<=y+h) return k.id; }
   for(let i=signHits.length-1;i>=0;i--){ const [x,y,w,h]=signHits[i].rect; if(mx>=x-4&&mx<=x+w+4&&my>=y-4&&my<=y+h+22) return signHits[i].id; }
   let best=null,bd=1e9; for(const r of REGIONS) for(const p of r.places){ if(p.scenery) continue; const [x,y,w,h]=placeBox(p,r); if(mx>=x&&mx<=x+w&&my>=y&&my<=y+h){ const d=Math.hypot(mx-(x+w/2),my-(y+h*.7)); if(d<bd){bd=d;best=p.id;} } } if(best) return best;
   // bloco do gênero (cata-vento): teste retangular no mundo, sem tocar nos offsets globais
