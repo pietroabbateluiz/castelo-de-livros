@@ -896,7 +896,7 @@ function terrain(now){
   const tops=LAND.map(p=>P(p[0],p[1],0)); const gg=ctx.createLinearGradient(0,Math.min(...tops.map(p=>p[1])),0,Math.max(...tops.map(p=>p[1]))); gg.addColorStop(0,col([44,68,58],0.85)); gg.addColorStop(1,col([62,88,66],1));
   extrude(LAND,0,-1.02,gg,[92,80,72],[64,54,52]);
   // tinta de cada região no chão
-  for(const r of REGIONS){ if(r.id==='mesa'||r.cz) continue; ROFF(r); const p=P(r.cx,r.cy,0); const g=ctx.createRadialGradient(p[0],p[1],0,p[0],p[1],r.r*TW*1.15); g.addColorStop(0,`rgba(${r.tint},.28)`); g.addColorStop(1,`rgba(${r.tint},0)`); ctx.fillStyle=g; ctx.beginPath(); ctx.ellipse(p[0],p[1],r.r*TW*1.15,r.r*TH*1.15,0,0,Math.PI*2); ctx.fill(); }
+  for(const r of []){ /* v21: sem a mancha de cor no chão de cada reino */ ROFF(r); const p=P(r.cx,r.cy,0); const g=ctx.createRadialGradient(p[0],p[1],0,p[0],p[1],r.r*TW*1.15); g.addColorStop(0,`rgba(${r.tint},.28)`); g.addColorStop(1,`rgba(${r.tint},0)`); ctx.fillStyle=g; ctx.beginPath(); ctx.ellipse(p[0],p[1],r.r*TW*1.15,r.r*TH*1.15,0,0,Math.PI*2); ctx.fill(); }
   ROFF(null);
   fillPat(LAND,0,'grass',0.95);
   // pontilhado de vegetação
@@ -1712,7 +1712,7 @@ function landClip(lift){ ctx.beginPath();
   ctx.clip(); }
 /* sombras de nuvens passando pelo reino */
 const CLOUDS=[[.10,.40,.24,.09,.011,0],[.56,.60,.30,.11,.008,2],[.84,.34,.20,.08,.013,4],[.34,.78,.22,.08,.009,1]];
-function cloudShadows(now){ if(GFX<1) return; const t=reduce?0:now; ctx.save(); landClip(6);
+function cloudShadows(now){ return; /* v21: sombras de nuvens removidas (manchas escuras deslizando pelo mapa) */ const t=reduce?0:now; ctx.save(); landClip(6);
   for(const [cx0,cy0,rx,ry,sp,ph] of CLOUDS){ const x=((((cx0+t*sp)%1.4)+1.4)%1.4-0.2)*W, y=cy0*H+Math.sin(t*.05+ph)*H*.03; const g=ctx.createRadialGradient(x,y,0,x,y,rx*W); g.addColorStop(0,'rgba(2,4,18,.22)'); g.addColorStop(.55,'rgba(2,4,18,.13)'); g.addColorStop(1,'rgba(2,4,18,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.ellipse(x,y,rx*W,ry*H,0,0,Math.PI*2); ctx.fill(); }
   ctx.restore(); }
 /* névoa de distância (perspectiva atmosférica): o fundo fica mais azulado e claro */
