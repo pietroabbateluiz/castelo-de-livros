@@ -346,7 +346,7 @@ const REGIONS=[
    {id:'scriptorium',name:'Scriptorium',x:8.4,y:1.8,w:1.5,d:1.2,st:{d1:'sealed',m3:'sealed'},opened:'',need:{d1:[0,3,'de textos sagrados'],m3:[0,3,'de textos sagrados']},sign:[9.8,3.1,0]},
    {id:'mesquita',name:'Mesquita',x:-5.4,y:-2.4,w:3.4,d:2.8,h:5.2,st:{d1:'sealed',m3:'open'},opened:'Aberta por 4 livros do islã',need:{d1:[0,4,'do islã'],m3:[4,4,'do islã']},sign:[-1.8,4.4,0]},
    {id:'budista',name:'Templo Budista',x:4.0,y:-7.4,w:3.4,d:3.4,h:5.2,st:{d1:'sealed',m3:'open'},opened:'Aberto por 4 livros de budismo',need:{d1:[0,4,'de budismo'],m3:[4,4,'de budismo']},sign:[6.1,-2.4,0]} ]},
- {id:'castelo',name:'Castelo de Fantasia',tab:'Castelo',genre:'Fantasia',cx:8.4,cy:26.4,cz:0,r:5.2,sign:[9.0,33.0,0],tint:'110,90,70',statue:[8.5,31.7,0],sk:'cavaleiro',
+ {id:'castelo',name:'Castelo de Fantasia',tab:'Castelo',genre:'Fantasia',demo:5,cx:8.4,cy:26.4,cz:0,r:5.2,sign:[9.0,33.0,0],tint:'110,90,70',statue:[8.5,31.7,0],sk:'cavaleiro',
   places:[
    {id:'sotao',name:'Sótão',x:7.2,y:24.4,w:2.4,d:2.4,st:{d1:'sealed',m3:'open'},opened:'Aberto por 6 livros',need:{d1:[2,6,'livros'],m3:[6,6,'livros']},sign:[8.4,27.3,0]},
    {id:'salao',name:'Salão da Lareira',x:4.6,y:26.8,w:3.0,d:3.0,st:{d1:'sealed',m3:'open'},opened:'Aberto por 8 clássicos',need:{d1:[0,8,'clássicos'],m3:[8,8,'clássicos']},sign:[3.2,29.0,0]},
@@ -536,7 +536,7 @@ const SUBIDX={}; for(const rid in SUBS) SUBS[rid].forEach((s,i)=>{ SUBIDX[s.id]=
 /* quantas edificações estão abertas por gênero em cada momento */
 const OPENN={inicio:1, lendo:5}; /* 5 subgêneros por gênero: 1 aberto no início */
 function openCount(){ return OPENN[preset]||1; }
-function subState(id){ const e=SUBIDX[id]; if(!e) return null; if(preset==='estante'){ if(e.idx===0) return lidosGen(e.rid)>=1?'open':'sealed'; return (LIDOS_SUB[id]||0)>=1?'open':'sealed'; } return e.idx<openCount()?'open':'sealed'; }
+function subState(id){ const e=SUBIDX[id]; if(!e) return null; if(preset==='estante'){ if(e.idx===0) return lidosGen(e.rid)>=1?'open':'sealed'; return (LIDOS_SUB[id]||0)>=1?'open':'sealed'; } const R=REGIONS.find(r=>r.id===e.rid); if(R&&R.demo&&preset==='inicio') return e.idx<R.demo?'open':'sealed'; return e.idx<openCount()?'open':'sealed'; }
 function subOf(id){ const e=SUBIDX[id]; return e?e.sub:null; }
 
 const st=(p)=>{ const k=subState(p.id); if(k) return k; return 'open'; };
