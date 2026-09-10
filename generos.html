@@ -2202,7 +2202,7 @@ function buildSr(){ srEl.innerHTML=''; for(const r of REGIONS){ for(const p of r
 
 /* ===================== laço ===================== */
 function frame(now){
-  T=now; prims=[]; tickCam();
+  T=now; prims=[]; tickCam(); ROFF(null);
   sky(now); terrain(now); drawMoons(now);
   for(const r of REGIONS){ ROFF(r); const f=BUILD[r.id]; if(f) f(now,r); }
   for(const r of REGIONS){ ROFF(r); satellites(now,r); }
@@ -2229,8 +2229,11 @@ function placeBox(p,r){ const _x=OFX,_y=OFY; ROFF(r); const zb=(r.cz||0), w=p.w|
 function hitAt(mx,my){
   for(let i=signHits.length-1;i>=0;i--){ const [x,y,w,h]=signHits[i].rect; if(mx>=x-4&&mx<=x+w+4&&my>=y-4&&my<=y+h+22) return signHits[i].id; }
   let best=null,bd=1e9; for(const r of REGIONS) for(const p of r.places){ if(p.scenery) continue; const [x,y,w,h]=placeBox(p,r); if(mx>=x&&mx<=x+w&&my>=y&&my<=y+h){ const d=Math.hypot(mx-(x+w/2),my-(y+h*.7)); if(d<bd){bd=d;best=p.id;} } } if(best) return best;
-  for(const r of REGIONS){ ROFF(r); const c=P(r.cx,r.cy,r.cz||0); const rx=(RMAIN+DSAT*0.2)*TW*1.05, ry=(RMAIN+DSAT*0.2)*TH*1.05+ZH*1.2; const dx=(mx-c[0])/rx, dy=(my-(c[1]-ZH*.6))/ry; if(dx*dx+dy*dy<=1){ ROFF(null); return r.id; } }
-  ROFF(null); return null; }
+  // bloco do gênero (cata-vento): teste retangular no mundo, sem tocar nos offsets globais
+  const a=((mx-panX)/Z-OX0)/TW0, b2=((my-panY)/Z-OY0)/TH0; const wx=(a+b2)/2, wy=(b2-a)/2;
+  for(const r of REGIONS){ if(!r.plot) continue; const x=wx-(r.ox||0), y=wy-(r.oy||0); const [cx,cy]=r.plot; const ex=HB+PW+1.4, ey=HB;
+    if(x>=cx-ex&&x<=cx+ex&&y>=cy-ey&&y<=cy+ey) return r.id; }
+  return null; }
 cv.addEventListener('pointerdown',e=>{ cv.setPointerCapture(e.pointerId); drag={x:e.clientX,y:e.clientY,px:panX,py:panY,moved:false,id:e.pointerId}; cam=null; });
 cv.addEventListener('pointermove',e=>{ if(room) return; const rc=cv.getBoundingClientRect(), mx=e.clientX-rc.left, my=e.clientY-rc.top;
   if(drag&&drag.id===e.pointerId){ const dx=e.clientX-drag.x, dy=e.clientY-drag.y; if(Math.abs(dx)+Math.abs(dy)>4){ drag.moved=true; cv.classList.add('drag'); } if(drag.moved){ panX=drag.px+dx; panY=drag.py+dy; clampPan(); } return; }
