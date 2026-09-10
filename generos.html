@@ -1691,7 +1691,7 @@ function seaBoat(b,now){
   const x=lerp(pts[i][0],pts[i+1][0],u), y=lerp(pts[i][1],pts[i+1][1],u);
   const face=((pts[i+1][0]-pts[i+1][1])-(pts[i][0]-pts[i][1]))*b.dir>=0?1:-1;
   const bob=reduce?0:Math.sin(now*1.6+b.t*9)*TH*0.14;
-  const p=P(x,y,SEAZ+0.12); p[1]+=bob; const s=Math.max(5,TH*1.5*b.s);
+  const p=P(x,y,SEAZ+0.12); p[1]+=bob; const s=Math.max(9,TH*1.7*b.s);
   // rastro
   ctx.save(); ctx.globalCompositeOperation='lighter';
   const wg=ctx.createLinearGradient(p[0]-face*s*3.4,p[1],p[0],p[1]);
@@ -1712,8 +1712,7 @@ function seaBoat(b,now){
   ctx.beginPath(); ctx.moveTo(p[0]+face*s*.02,p[1]-s*1.75); ctx.quadraticCurveTo(p[0]-face*s*(.78+bl*.1),p[1]-s*1.2,p[0]+face*s*.02,p[1]-s*.62); ctx.closePath(); ctx.fill();
   // bandeirinha e lanterna de proa
   ctx.fillStyle='#C24B35'; ctx.beginPath(); ctx.moveTo(p[0]+face*s*.12,p[1]-s*2.3); ctx.lineTo(p[0]+face*s*.72,p[1]-s*2.14); ctx.lineTo(p[0]+face*s*.12,p[1]-s*1.98); ctx.closePath(); ctx.fill();
-  halo(p[0]+face*s*.95,p[1]-s*.34,s*1.5,'255,200,120',.5);
-  ctx.fillStyle='#FFD98A'; ctx.beginPath(); ctx.arc(p[0]+face*s*.95,p[1]-s*.34,Math.max(1,s*.12),0,Math.PI*2); ctx.fill();
+  /* (sem lanterna de proa — de longe só o brilho aparecia, parecendo um círculo solto se mexendo) */
 }
 function seaBoats(now){ for(const b of SEABOATS){ if(!reduce){ b.t+=b.dir*b.sp*(1/30); if(b.t>1){b.t=1;b.dir=-1;} if(b.t<0){b.t=0;b.dir=1;} } seaBoat(b,now); } }
 
