@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Estante de leitura no modelo do Skoob: lidos, lendo, quero ler, relendo, abandonei, favoritos. Cada livro lido abre uma área do Mundo de Luiz.">
+<title>Estante de Luiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@400;500;600&family=Karla:wght@400;500;700&display=swap">
+<style>
+  :root{ --void:#08070D; --bg:#0E0B14; --panel:rgba(20,16,28,.92); --panel2:rgba(30,24,40,.85); --line:rgba(201,162,39,.28); --line2:rgba(255,255,255,.08);
+    --parch:#EFE6D2; --dust:#A2937F; --dust2:#6E6357; --gold:#D4AC35; --gold-hi:#F1D27A; --moss:#8CA063; --verm:#C24B35; --rose:#E2547A; --sky:#6FA8DC; }
+  *{box-sizing:border-box}
+  html{color-scheme:dark}
+  body{margin:0;background:radial-gradient(1200px 600px at 50% -10%,#1A1426 0%,var(--bg) 55%,var(--void) 100%);color:var(--parch);font-family:Karla,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;min-height:100vh;}
+  a{color:var(--gold-hi)}
+  .wrap{max-width:1180px;margin:0 auto;padding:18px 16px 80px;}
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand h1{font:500 1.9rem/1 "Grenze Gotisch",Georgia,serif;margin:0;letter-spacing:.01em;}
+  .brand small{display:block;font:700 .68rem/1 Karla,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-top:4px;}
+  .btn{appearance:none;border:1px solid var(--line);background:var(--panel);color:var(--parch);font:700 .74rem/1 Karla,sans-serif;letter-spacing:.12em;text-transform:uppercase;padding:10px 14px;border-radius:6px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
+  .btn:hover{background:rgba(212,172,53,.14);color:var(--gold-hi);}
+  .btn.primary{background:linear-gradient(180deg,#E7C463,#C29B2C);color:#1B1522;border-color:transparent;}
+  .btn.primary:hover{filter:brightness(1.06);color:#1B1522;}
+  .btn.danger{border-color:rgba(194,75,53,.5);color:#E38A76;}
+  .btn.small{padding:7px 10px;font-size:.66rem;}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.45);}
+  /* perfil */
+  .perfil{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;padding:16px 18px;margin-bottom:14px;}
+  .avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#3A2E52,#1B1522);border:2px solid var(--gold);display:grid;place-items:center;font:500 1.9rem/1 "Grenze Gotisch",Georgia,serif;color:var(--gold-hi);}
+  .perfil .nome{font:500 1.5rem/1.1 "Grenze Gotisch",Georgia,serif;margin:0;display:flex;align-items:center;gap:10px;}
+  .perfil .nome button{background:none;border:0;color:var(--dust);cursor:pointer;font-size:.9rem;}
+  .stats{display:flex;gap:18px;flex-wrap:wrap;margin-top:6px;}
+  .stat b{display:block;font:500 1.35rem/1 "Grenze Gotisch",Georgia,serif;color:var(--gold-hi);}
+  .stat span{font:700 .62rem/1 Karla,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--dust);}
+  /* chaves do mundo */
+  .reinos{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:14px;}
+  .reino{padding:14px 16px;}
+  .reino h3{margin:0 0 4px;font:500 1.25rem/1 "Grenze Gotisch",Georgia,serif;display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+  .reino h3 small{font:700 .64rem/1 Karla,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);}
+  .barra{height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin:8px 0 10px;}
+  .barra i{display:block;height:100%;background:linear-gradient(90deg,#8C6A1A,#F1D27A);}
+  .chaves{display:flex;flex-wrap:wrap;gap:6px;}
+  .chave{font:700 .66rem/1 Karla,sans-serif;letter-spacing:.06em;padding:6px 8px;border-radius:4px;border:1px solid var(--line2);color:var(--dust);background:rgba(255,255,255,.03);}
+  .chave.aberta{border-color:rgba(212,172,53,.5);color:var(--gold-hi);background:rgba(212,172,53,.1);}
+  .nivel{font-size:.8rem;color:var(--dust);margin-top:8px;}
+  /* prateleiras */
+  .shelf{display:flex;gap:4px;flex-wrap:wrap;padding:6px;margin-bottom:10px;}
+  .shelf button{appearance:none;border:0;background:transparent;color:var(--dust);font:700 .72rem/1 Karla,sans-serif;letter-spacing:.1em;text-transform:uppercase;padding:9px 12px;border-radius:5px;cursor:pointer;display:inline-flex;gap:6px;align-items:center;}
+  .shelf button b{font:500 .9rem/1 "Grenze Gotisch",Georgia,serif;color:var(--gold-hi);}
+  .shelf button[aria-pressed="true"]{background:rgba(212,172,53,.16);color:var(--gold-hi);box-shadow:inset 0 0 0 1px rgba(212,172,53,.45);}
+  .toolbar{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;}
+  .chip{appearance:none;border:1px solid var(--line2);background:transparent;color:var(--dust);font:700 .66rem/1 Karla,sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:7px 10px;border-radius:20px;cursor:pointer;}
+  .chip[aria-pressed="true"]{border-color:var(--rose);color:#F6A8C0;background:rgba(226,84,122,.12);}
+  select,input,textarea{font:inherit;color:var(--parch);background:rgba(255,255,255,.05);border:1px solid var(--line2);border-radius:6px;padding:9px 10px;width:100%;}
+  select:focus,input:focus,textarea:focus{outline:2px solid rgba(241,210,122,.45);outline-offset:1px;border-color:var(--line);}
+  .toolbar select{width:auto;}
+  .busca{position:relative;flex:1;min-width:200px;max-width:380px;}
+  .busca input{padding-left:34px;}
+  .busca svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);opacity:.6;}
+  /* grade de livros */
+  .grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;}
+  .livro{padding:10px;cursor:pointer;transition:transform .12s ease,border-color .12s ease;position:relative;}
+  .livro:hover{transform:translateY(-2px);border-color:rgba(212,172,53,.55);}
+  .capa{aspect-ratio:2/3;width:100%;border-radius:4px;overflow:hidden;background:#241C30;box-shadow:0 8px 18px rgba(0,0,0,.5);position:relative;display:grid;place-items:center;}
+  .capa img{width:100%;height:100%;object-fit:cover;display:block;}
+  .capa .gerada{position:absolute;inset:0;padding:34px 10px 12px;display:flex;flex-direction:column;justify-content:space-between;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6);}
+  .capa .gerada b{font:500 1rem/1.15 "Grenze Gotisch",Georgia,serif;}
+  .capa .gerada i{font:500 .68rem/1.2 Karla,sans-serif;opacity:.85;font-style:normal;}
+  .capa .status{position:absolute;left:6px;top:6px;font:700 .58rem/1 Karla,sans-serif;letter-spacing:.1em;text-transform:uppercase;padding:5px 7px;border-radius:3px;background:rgba(10,8,14,.85);color:var(--gold-hi);border:1px solid rgba(241,210,122,.35);}
+  .capa .status.lendo{color:#9FD0FF;border-color:rgba(111,168,220,.5);} .capa .status.quero{color:#D8CDB8;} .capa .status.abandonei{color:#E38A76;border-color:rgba(194,75,53,.5);} .capa .status.relendo{color:#B9E39C;}
+  .capa .fav{position:absolute;right:6px;top:6px;font-size:.95rem;filter:drop-shadow(0 1px 2px rgba(0,0,0,.8));}
+  .capa .prog{position:absolute;left:0;right:0;bottom:0;height:4px;background:rgba(0,0,0,.5);} .capa .prog i{display:block;height:100%;background:var(--sky);}
+  .livro h4{margin:9px 0 2px;font:500 1rem/1.15 "Grenze Gotisch",Georgia,serif;color:var(--parch);}
+  .livro .autor{font-size:.78rem;color:var(--dust);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .livro .sub{font:700 .6rem/1 Karla,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-top:6px;}
+  .estrelas{color:var(--gold-hi);font-size:.8rem;letter-spacing:.05em;margin-top:4px;} .estrelas.vazia{color:var(--dust2);}
+  .vazio{padding:40px 20px;text-align:center;color:var(--dust);}
+  .vazio b{display:block;font:500 1.4rem/1.2 "Grenze Gotisch",Georgia,serif;color:var(--parch);margin-bottom:6px;}
+  /* modal */
+  .modal{position:fixed;inset:0;background:rgba(4,3,8,.7);backdrop-filter:blur(4px);display:none;align-items:flex-start;justify-content:center;padding:24px 12px;overflow:auto;z-index:20;}
+  .modal.on{display:flex;}
+  .form{width:min(760px,100%);padding:20px 20px 16px;}
+  .form h2{margin:0 0 12px;font:500 1.6rem/1.1 "Grenze Gotisch",Georgia,serif;display:flex;justify-content:space-between;align-items:center;}
+  .form h2 button{background:none;border:0;color:var(--dust);font-size:1.4rem;cursor:pointer;}
+  .campos{display:grid;grid-template-columns:repeat(12,1fr);gap:10px 12px;}
+  .campo{display:flex;flex-direction:column;gap:5px;}
+  .campo label{font:700 .62rem/1 Karla,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--dust);}
+  .c12{grid-column:span 12}.c8{grid-column:span 8}.c6{grid-column:span 6}.c4{grid-column:span 4}.c3{grid-column:span 3}
+  @media (max-width:640px){.c8,.c6,.c4,.c3{grid-column:span 12} .perfil{grid-template-columns:auto 1fr} .perfil .acoes{grid-column:1/-1}}
+  .marcadores{display:flex;gap:8px;flex-wrap:wrap;}
+  .marcadores label{display:inline-flex;gap:6px;align-items:center;font-size:.85rem;color:var(--parch);border:1px solid var(--line2);padding:8px 10px;border-radius:20px;cursor:pointer;}
+  .marcadores input{width:auto;}
+  .nota{display:flex;gap:4px;font-size:1.5rem;cursor:pointer;color:var(--dust2);user-select:none;}
+  .nota span.on{color:var(--gold-hi);}
+  .acoes{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;margin-top:14px;}
+  .acoes div{display:flex;gap:8px;flex-wrap:wrap;}
+  .previa{display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:start;}
+  .previa .capa{width:96px;}
+  .gb{margin-top:6px;display:flex;flex-direction:column;gap:6px;}
+  .gb button{appearance:none;text-align:left;border:1px solid var(--line2);background:rgba(255,255,255,.03);color:var(--parch);padding:8px 10px;border-radius:6px;cursor:pointer;display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:center;font-size:.85rem;}
+  .gb button:hover{border-color:var(--line);}
+  .gb img{width:34px;height:50px;object-fit:cover;border-radius:2px;}
+  .gb small{color:var(--dust);display:block;}
+  .aviso{font-size:.8rem;color:var(--dust);}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--panel);border:1px solid var(--line);color:var(--gold-hi);padding:10px 16px;border-radius:6px;font-size:.85rem;opacity:0;transition:opacity .2s;pointer-events:none;z-index:30;}
+  .toast.on{opacity:1;}
+  footer{margin-top:26px;color:var(--dust2);font-size:.78rem;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg width="34" height="38" viewBox="0 0 30 34" aria-hidden="true"><path d="M15 1 L28 6 V17 C28 25 22 30 15 33 C8 30 2 25 2 17 V6 Z" fill="#1B1522" stroke="#D4AC35" stroke-width="1.4"/><path d="M9 11 h12 v3 h-12 z M10 15 h10 v9 h-10 z" fill="#D4AC35"/></svg>
+      <div><h1>Estante de <span id="nomeTitulo">Luiz</span></h1><small>Cada livro lido abre uma área do mundo</small></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <a class="btn" href="generos.html">🗺️ Ver no mundo</a>
+      <button class="btn primary" id="btnNovo">+ Adicionar livro</button>
+    </div>
+  </header>
+
+  <section class="panel perfil">
+    <div class="avatar" id="avatar">L</div>
+    <div>
+      <h2 class="nome"><span id="nomePerfil">Luiz</span> <button id="btnNome" title="Mudar o nome" aria-label="Mudar o nome">✎</button></h2>
+      <div class="stats">
+        <div class="stat"><b id="stLivros">0</b><span>livros</span></div>
+        <div class="stat"><b id="stLidos">0</b><span>lidos</span></div>
+        <div class="stat"><b id="stPaginas">0</b><span>páginas lidas</span></div>
+        <div class="stat"><b id="stLendo">0</b><span>lendo agora</span></div>
+        <div class="stat"><b id="stDesde">—</b><span>na estante desde</span></div>
+      </div>
+    </div>
+    <div class="acoes" style="margin:0">
+      <div>
+        <button class="btn small" id="btnExportar" title="Baixa um arquivo JSON com toda a estante">⤓ Exportar</button>
+        <button class="btn small" id="btnImportar" title="Carrega um JSON exportado antes">⤒ Importar</button>
+        <input type="file" id="arqImportar" accept="application/json,.json" hidden>
+      </div>
+    </div>
+  </section>
+
+  <section class="reinos" id="reinos"></section>
+
+  <nav class="panel shelf" id="prateleiras" aria-label="Prateleiras"></nav>
+
+  <div class="toolbar">
+    <div class="chips" id="marcadores"></div>
+    <div class="busca"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EFE6D2" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="busca" type="search" placeholder="Buscar por título ou autor"></div>
+    <select id="ordem" aria-label="Ordenar">
+      <option value="recentes">Mais recentes</option>
+      <option value="titulo">Título A–Z</option>
+      <option value="autor">Autor A–Z</option>
+      <option value="nota">Maior nota</option>
+      <option value="fim">Terminados por último</option>
+    </select>
+  </div>
+
+  <section class="grade" id="grade" aria-live="polite"></section>
+
+  <footer>
+    <span>Os livros ficam salvos neste navegador (e no arquivo que você exportar). O mundo lê a mesma estante.</span>
+    <span id="rodapeContagem"></span>
+  </footer>
+</div>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="tituloForm">
+  <form class="panel form" id="form" autocomplete="off">
+    <h2 id="tituloForm">Adicionar livro <button type="button" id="btnFechar" aria-label="Fechar">×</button></h2>
+    <div class="previa">
+      <div class="capa" id="previaCapa"></div>
+      <div>
+        <div class="campos">
+          <div class="campo c8"><label for="fTitulo">Título *</label><input id="fTitulo" required placeholder="Ex.: A Guerra dos Tronos"></div>
+          <div class="campo c4"><label>&nbsp;</label><button type="button" class="btn" id="btnGB" title="Preenche capa, autor, páginas e ano pelo Google Books">🔎 Buscar dados</button></div>
+          <div class="campo c12"><label for="fAutor">Autor</label><input id="fAutor" placeholder="Nome do autor"></div>
+        </div>
+        <div class="gb" id="gbResultados"></div>
+      </div>
+    </div>
+    <div class="campos" style="margin-top:12px">
+      <div class="campo c6"><label for="fGenero">Gênero (reino) *</label><select id="fGenero" required></select></div>
+      <div class="campo c6"><label for="fSub">Subgênero (chave) *</label><select id="fSub" required></select></div>
+      <div class="campo c4"><label for="fStatus">Prateleira *</label><select id="fStatus">
+        <option value="lido">Lido</option><option value="lendo">Lendo</option><option value="quero">Quero ler</option><option value="relendo">Relendo</option><option value="abandonei">Abandonei</option></select></div>
+      <div class="campo c4"><label>Nota</label><div class="nota" id="fNota" role="radiogroup" aria-label="Nota"></div></div>
+      <div class="campo c4"><label for="fProgresso">Progresso (%)</label><input id="fProgresso" type="number" min="0" max="100" placeholder="só para 'lendo'"></div>
+      <div class="campo c4"><label for="fEditora">Editora</label><input id="fEditora"></div>
+      <div class="campo c4"><label for="fAno">Ano</label><input id="fAno" type="number" min="0" max="2100"></div>
+      <div class="campo c4"><label for="fPaginas">Páginas</label><input id="fPaginas" type="number" min="0"></div>
+      <div class="campo c6"><label for="fInicio">Comecei em</label><input id="fInicio" type="date"></div>
+      <div class="campo c6"><label for="fFim">Terminei em</label><input id="fFim" type="date"></div>
+      <div class="campo c8"><label for="fCapa">Capa (URL da imagem)</label><input id="fCapa" placeholder="https://…"></div>
+      <div class="campo c4"><label for="fIsbn">ISBN</label><input id="fIsbn"></div>
+      <div class="campo c12"><label>Marcadores</label><div class="marcadores">
+        <label><input type="checkbox" id="fFavorito"> ⭐ Favorito</label>
+        <label><input type="checkbox" id="fTenho"> 📚 Tenho</label>
+        <label><input type="checkbox" id="fDesejado"> 🎁 Desejado</label>
+        <label><input type="checkbox" id="fEmprestado"> 🤝 Emprestei</label></div></div>
+      <div class="campo c12"><label for="fResenha">Resenha / anotações</label><textarea id="fResenha" rows="3"></textarea></div>
+    </div>
+    <div class="acoes">
+      <div><button type="button" class="btn danger" id="btnExcluir" hidden>Excluir</button><span class="aviso" id="avisoExcluir" hidden>Clique de novo para confirmar.</span></div>
+      <div><button type="button" class="btn" id="btnCancelar">Cancelar</button><button type="submit" class="btn primary" id="btnSalvar">Salvar</button></div>
+    </div>
+  </form>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===================== dados compartilhados com o mundo (generos.html) ===================== */
+const KEY='mundo.estante.v1';
+const GENEROS={
+  castelo:{nome:'Fantasia', subs:[['salao','Fantasia (geral)'],['urbana','Fantasia urbana'],['alta','Alta fantasia'],['historica','Fantasia histórica'],['cozy','Cozy fantasy'],['sombriaF','Dark fantasy'],['epica','Fantasia épica']]},
+  vila:{nome:'Romance', subs:[['cafe','Romance adolescente'],['inimigos','Enemies-to-lovers'],['epoca','Romance de época'],['dramarom','Drama romântico'],['comedia','Comédia romântica'],['historicoR','Romance histórico'],['paranormal','Romance paranormal']]}
+};
+const STATUS={lido:'Lido',lendo:'Lendo',quero:'Quero ler',relendo:'Relendo',abandonei:'Abandonei'};
+const TIERS=[1,3,6,10], NIVEIS=['—','base','detalhes','expansão','zoom máximo'];
+let DB=carregar();
+function carregar(){ try{ const raw=localStorage.getItem(KEY); if(raw){ const d=JSON.parse(raw); if(d&&Array.isArray(d.livros)){ d.perfil=d.perfil||{}; return d; } } }catch(e){} return {perfil:{nome:'Luiz',desde:new Date().toISOString().slice(0,10)},livros:[]}; }
+function salvar(){ try{ localStorage.setItem(KEY,JSON.stringify(DB)); }catch(e){ toast('Não consegui salvar: '+e.message); } render(); }
+const $=id=>document.getElementById(id);
+const subNome=id=>{ for(const g in GENEROS){ const s=GENEROS[g].subs.find(q=>q[0]===id); if(s) return s[1]; } return id; };
+const lido=b=>b.status==='lido'||b.status==='relendo';
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('on'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('on'),2600); }
+
+/* ===================== estado da tela ===================== */
+let prateleira='todos', marcas=new Set(), ordem='recentes', busca='', editando=null, notaAtual=0;
+
+function render(){
+  const L=DB.livros;
+  // perfil
+  $('nomePerfil').textContent=DB.perfil.nome||'Luiz'; $('nomeTitulo').textContent=DB.perfil.nome||'Luiz'; $('avatar').textContent=(DB.perfil.nome||'L').trim()[0].toUpperCase();
+  const lidos=L.filter(lido); $('stLivros').textContent=L.length; $('stLidos').textContent=lidos.length;
+  $('stPaginas').textContent=lidos.reduce((t,b)=>t+(+b.paginas||0),0).toLocaleString('pt-BR'); $('stLendo').textContent=L.filter(b=>b.status==='lendo').length;
+  const desde=DB.perfil.desde||(L.length?L.map(b=>b.criadoEm).sort()[0]:null); $('stDesde').textContent=desde?new Date(desde+'T12:00:00').toLocaleDateString('pt-BR',{month:'short',year:'numeric'}):'—';
+  // reinos e chaves
+  const R=$('reinos'); R.innerHTML='';
+  for(const g in GENEROS){ const G=GENEROS[g]; const n=lidos.filter(b=>b.genero===g).length; let t=0; for(const th of TIERS) if(n>=th) t++; const nx=TIERS.find(th=>n<th);
+    const abertas=G.subs.filter(s=>lidos.some(b=>b.subgenero===s[0])); const centro=n>=1;
+    const el=document.createElement('div'); el.className='panel reino';
+    el.innerHTML=`<h3>Reino ${g==='castelo'?'da':'do'} ${G.nome} <small>nível ${t} · ${n} ${n===1?'lido':'lidos'}</small></h3>
+      <div class="barra"><i style="width:${Math.min(100,(n/TIERS[3])*100)}%"></i></div>
+      <div class="chaves">${G.subs.map((s,i)=>`<span class="chave ${(i===0?centro:abertas.includes(s))?'aberta':''}" title="${(i===0?centro:abertas.includes(s))?'Área aberta':'Leia 1 livro deste subgênero para abrir'}">${(i===0?centro:abertas.includes(s))?'✓':'🔑'} ${s[1]}</span>`).join('')}</div>
+      <div class="nivel">${t?`Nível ${t} (${NIVEIS[t]}). `:''}${nx?`Próximo nível com <b>${nx}</b> livros lidos: ${NIVEIS[Math.min(4,TIERS.indexOf(nx)+1)]}.`:'Nível máximo alcançado.'}</div>`;
+    R.appendChild(el); }
+  // prateleiras
+  const P=$('prateleiras'); P.innerHTML='';
+  const cont=k=>k==='todos'?L.length:L.filter(b=>b.status===k).length;
+  for(const [k,nome] of [['todos','Todos'],['lido','Lidos'],['lendo','Lendo'],['quero','Quero ler'],['relendo','Relendo'],['abandonei','Abandonei']]){ const b=document.createElement('button'); b.type='button'; b.setAttribute('aria-pressed',prateleira===k?'true':'false'); b.innerHTML=`${nome} <b>${cont(k)}</b>`; b.addEventListener('click',()=>{ prateleira=k; render(); }); P.appendChild(b); }
+  const Mk=$('marcadores'); Mk.innerHTML='';
+  for(const [k,nome] of [['favorito','⭐ Favoritos'],['tenho','📚 Tenho'],['desejado','🎁 Desejados'],['emprestado','🤝 Emprestados']]){ const c=document.createElement('button'); c.type='button'; c.className='chip'; c.setAttribute('aria-pressed',marcas.has(k)?'true':'false'); c.textContent=`${nome} (${L.filter(b=>b[k]).length})`; c.addEventListener('click',()=>{ marcas.has(k)?marcas.delete(k):marcas.add(k); render(); }); Mk.appendChild(c); }
+  // grade
+  let lista=L.filter(b=>prateleira==='todos'||b.status===prateleira);
+  for(const m of marcas) lista=lista.filter(b=>b[m]);
+  if(busca){ const q=busca.toLowerCase(); lista=lista.filter(b=>(b.titulo||'').toLowerCase().includes(q)||(b.autor||'').toLowerCase().includes(q)); }
+  const cmp={recentes:(a,b)=>(b.atualizadoEm||'').localeCompare(a.atualizadoEm||''),titulo:(a,b)=>(a.titulo||'').localeCompare(b.titulo||'','pt'),autor:(a,b)=>(a.autor||'').localeCompare(b.autor||'','pt'),nota:(a,b)=>(b.nota||0)-(a.nota||0),fim:(a,b)=>(b.fim||'').localeCompare(a.fim||'')}[ordem];
+  lista.sort(cmp);
+  const G=$('grade'); G.innerHTML='';
+  if(!lista.length){ G.innerHTML=`<div class="vazio panel" style="grid-column:1/-1"><b>${L.length?'Nada nesta prateleira':'Sua estante está vazia'}</b>${L.length?'Troque de prateleira ou limpe os filtros.':'Clique em “Adicionar livro” e cadastre o primeiro. Cada livro lido abre uma área do mundo.'}</div>`; }
+  for(const b of lista){ const el=document.createElement('article'); el.className='panel livro'; el.tabIndex=0; el.setAttribute('role','button'); el.setAttribute('aria-label',`${b.titulo} — ${STATUS[b.status]||''}`);
+    el.innerHTML=`<div class="capa">${capaHTML(b)}<span class="status ${b.status}">${STATUS[b.status]||b.status}</span>${b.favorito?'<span class="fav">⭐</span>':''}${b.status==='lendo'&&b.progresso?`<div class="prog"><i style="width:${b.progresso}%"></i></div>`:''}</div>
+      <h4>${esc(b.titulo)}</h4><div class="autor">${esc(b.autor||'—')}</div>
+      <div class="sub">${esc(GENEROS[b.genero]?GENEROS[b.genero].nome:'')} · ${esc(subNome(b.subgenero))}</div>
+      <div class="estrelas ${b.nota?'':'vazia'}">${'★'.repeat(b.nota||0)}${'☆'.repeat(5-(b.nota||0))}</div>`;
+    el.addEventListener('click',()=>abrirForm(b)); el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); abrirForm(b); } });
+    G.appendChild(el); }
+  $('rodapeContagem').textContent=`${lista.length} de ${L.length} ${L.length===1?'livro':'livros'}`;
+}
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function corCapa(t){ let h=0; for(const c of (t||'')) h=(h*31+c.charCodeAt(0))>>>0; const a=Math.floor(((h*0.6180339887)%1)*360), b=(a+40)%360; return `linear-gradient(160deg,hsl(${a} 42% 32%),hsl(${b} 48% 18%))`; }
+function capaHTML(b){ if(b.capa) return `<img src="${esc(b.capa)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'gerada',innerHTML:'<b>${esc(b.titulo).replace(/'/g,'&#39;')}</b><i>${esc(b.autor||'')}</i>'}));this.parentNode&&(this.parentNode.style.background='${corCapa(b.titulo)}')">`;
+  return `<div class="gerada" style="background:${corCapa(b.titulo)}"><b>${esc(b.titulo)}</b><i>${esc(b.autor||'')}</i></div>`; }
+
+/* ===================== formulário ===================== */
+function preencherGeneros(){ const g=$('fGenero'); g.innerHTML=''; for(const k in GENEROS){ const o=document.createElement('option'); o.value=k; o.textContent=GENEROS[k].nome; g.appendChild(o); } preencherSubs(); }
+function preencherSubs(){ const k=$('fGenero').value; const s=$('fSub'); const atual=s.value; s.innerHTML=''; for(const [id,nome] of GENEROS[k].subs){ const o=document.createElement('option'); o.value=id; o.textContent=nome; s.appendChild(o); } if([...s.options].some(o=>o.value===atual)) s.value=atual; }
+function desenharNota(){ const n=$('fNota'); n.innerHTML=''; for(let i=1;i<=5;i++){ const s=document.createElement('span'); s.textContent='★'; s.className=i<=notaAtual?'on':''; s.setAttribute('role','radio'); s.setAttribute('aria-checked',i===notaAtual?'true':'false'); s.title=i+' estrela'+(i>1?'s':''); s.tabIndex=0; s.addEventListener('click',()=>{ notaAtual=(notaAtual===i)?0:i; desenharNota(); }); s.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); notaAtual=(notaAtual===i)?0:i; desenharNota(); } }); n.appendChild(s); } }
+function previa(){ const b={titulo:$('fTitulo').value||'Título',autor:$('fAutor').value,capa:$('fCapa').value.trim()}; $('previaCapa').innerHTML=capaHTML(b); }
+function abrirForm(b){ editando=b||null; $('tituloForm').firstChild.textContent=b?'Editar livro ':'Adicionar livro '; $('form').reset(); $('gbResultados').innerHTML=''; $('avisoExcluir').hidden=true; $('btnExcluir').hidden=!b; $('btnExcluir').dataset.confirma='';
+  preencherGeneros(); if(b){ $('fGenero').value=b.genero||'castelo'; preencherSubs(); $('fSub').value=b.subgenero||''; }
+  const set=(id,v)=>{ $(id).value=v==null?'':v; };
+  set('fTitulo',b?b.titulo:''); set('fAutor',b?b.autor:''); set('fEditora',b?b.editora:''); set('fAno',b?b.ano:''); set('fPaginas',b?b.paginas:''); set('fIsbn',b?b.isbn:''); set('fCapa',b?b.capa:''); set('fInicio',b?b.inicio:''); set('fFim',b?b.fim:''); set('fResenha',b?b.resenha:''); set('fProgresso',b?b.progresso:'');
+  $('fStatus').value=b?b.status:'lido'; for(const k of ['favorito','tenho','desejado','emprestado']) $('f'+k[0].toUpperCase()+k.slice(1)).checked=!!(b&&b[k]);
+  notaAtual=b?(b.nota||0):0; desenharNota(); previa();
+  $('modal').classList.add('on'); setTimeout(()=>$('fTitulo').focus(),50); }
+function fecharForm(){ $('modal').classList.remove('on'); editando=null; }
+$('form').addEventListener('submit',e=>{ e.preventDefault(); const t=$('fTitulo').value.trim(); if(!t){ $('fTitulo').focus(); return; }
+  const hoje=new Date().toISOString().slice(0,10); const b=editando||{id:uid(),criadoEm:hoje};
+  Object.assign(b,{titulo:t,autor:$('fAutor').value.trim(),editora:$('fEditora').value.trim(),ano:$('fAno').value?+$('fAno').value:null,paginas:$('fPaginas').value?+$('fPaginas').value:null,isbn:$('fIsbn').value.trim(),capa:$('fCapa').value.trim(),
+    genero:$('fGenero').value,subgenero:$('fSub').value,status:$('fStatus').value,nota:notaAtual,progresso:$('fProgresso').value?Math.max(0,Math.min(100,+$('fProgresso').value)):null,
+    inicio:$('fInicio').value||null,fim:$('fFim').value||null,resenha:$('fResenha').value.trim(),favorito:$('fFavorito').checked,tenho:$('fTenho').checked,desejado:$('fDesejado').checked,emprestado:$('fEmprestado').checked,atualizadoEm:new Date().toISOString()});
+  if(b.status==='lido'&&!b.fim) b.fim=hoje;
+  if(!editando) DB.livros.push(b);
+  const eraLido=editando?editando._eraLido:false; salvar(); fecharForm();
+  toast(lido(b)?`“${b.titulo}” salvo — ${subNome(b.subgenero)} aberto no mundo 🔑`:`“${b.titulo}” salvo na prateleira ${STATUS[b.status]}`); });
+$('btnExcluir').addEventListener('click',()=>{ const btn=$('btnExcluir'); if(!btn.dataset.confirma){ btn.dataset.confirma='1'; $('avisoExcluir').hidden=false; return; } DB.livros=DB.livros.filter(q=>q!==editando); salvar(); fecharForm(); toast('Livro excluído'); });
+$('btnCancelar').addEventListener('click',fecharForm); $('btnFechar').addEventListener('click',fecharForm);
+$('modal').addEventListener('click',e=>{ if(e.target===$('modal')) fecharForm(); });
+window.addEventListener('keydown',e=>{ if(e.key==='Escape'&&$('modal').classList.contains('on')) fecharForm(); });
+$('btnNovo').addEventListener('click',()=>abrirForm(null));
+$('fGenero').addEventListener('change',preencherSubs);
+for(const id of ['fTitulo','fAutor','fCapa']) $(id).addEventListener('input',previa);
+$('fStatus').addEventListener('change',()=>{ if($('fStatus').value==='lido'&&!$('fFim').value) $('fFim').value=new Date().toISOString().slice(0,10); });
+
+/* Google Books: preenche capa, autor, editora, ano, páginas e ISBN (sem chave de API; uso leve) */
+$('btnGB').addEventListener('click',async()=>{ const t=$('fTitulo').value.trim(), a=$('fAutor').value.trim(); const box=$('gbResultados'); if(!t){ $('fTitulo').focus(); return; }
+  box.innerHTML='<span class="aviso">Buscando…</span>';
+  try{ const q=encodeURIComponent(`intitle:${t}`+(a?`+inauthor:${a}`:'')); const r=await fetch(`https://www.googleapis.com/books/v1/volumes?q=${q}&maxResults=6&printType=books`); const d=await r.json();
+    const its=(d.items||[]).map(i=>i.volumeInfo||{}); if(!its.length){ box.innerHTML='<span class="aviso">Nada encontrado — preencha à mão.</span>'; return; }
+    box.innerHTML=''; for(const v of its){ const b=document.createElement('button'); b.type='button'; const img=(v.imageLinks&&(v.imageLinks.thumbnail||v.imageLinks.smallThumbnail)||'').replace(/^http:/,'https:').replace('&edge=curl','');
+      b.innerHTML=`${img?`<img src="${esc(img)}" alt="">`:'<span></span>'}<span><b>${esc(v.title||'')}</b>${v.subtitle?': '+esc(v.subtitle):''}<small>${esc((v.authors||[]).join(', '))} · ${esc(v.publisher||'')} ${esc((v.publishedDate||'').slice(0,4))} · ${v.pageCount||'?'} págs.</small></span>`;
+      b.addEventListener('click',()=>{ $('fTitulo').value=v.title||t; if(v.authors) $('fAutor').value=v.authors.join(', '); if(v.publisher) $('fEditora').value=v.publisher; if(v.publishedDate) $('fAno').value=(v.publishedDate||'').slice(0,4); if(v.pageCount) $('fPaginas').value=v.pageCount; if(img) $('fCapa').value=img;
+        const isbn=(v.industryIdentifiers||[]).find(x=>x.type==='ISBN_13')||(v.industryIdentifiers||[])[0]; if(isbn) $('fIsbn').value=isbn.identifier; previa(); box.innerHTML=''; });
+      box.appendChild(b); } }
+  catch(e){ box.innerHTML='<span class="aviso">A busca falhou (sem internet ou bloqueio). Preencha à mão.</span>'; } });
+
+/* ===================== perfil, exportar, importar, busca, ordem ===================== */
+$('btnNome').addEventListener('click',()=>{ const n=prompt('Seu nome na estante:',DB.perfil.nome||'Luiz'); if(n&&n.trim()){ DB.perfil.nome=n.trim(); salvar(); } });
+$('btnExportar').addEventListener('click',()=>{ const blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`estante-${(DB.perfil.nome||'luiz').toLowerCase()}-${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); a.remove(); toast('Estante exportada'); });
+$('btnImportar').addEventListener('click',()=>$('arqImportar').click());
+$('arqImportar').addEventListener('change',async e=>{ const f=e.target.files[0]; if(!f) return; try{ const d=JSON.parse(await f.text()); if(!d||!Array.isArray(d.livros)) throw new Error('arquivo sem lista de livros');
+    const ids=new Set(DB.livros.map(b=>b.id)); let novos=0; for(const b of d.livros){ if(!b.id||!ids.has(b.id)){ DB.livros.push(Object.assign({id:uid()},b)); novos++; } } if(d.perfil&&d.perfil.nome) DB.perfil.nome=d.perfil.nome; salvar(); toast(`${novos} ${novos===1?'livro importado':'livros importados'}`); }
+  catch(err){ toast('Não deu para importar: '+err.message); } e.target.value=''; });
+$('busca').addEventListener('input',e=>{ busca=e.target.value.trim(); render(); });
+$('ordem').addEventListener('change',e=>{ ordem=e.target.value; render(); });
+window.addEventListener('storage',e=>{ if(e.key===KEY){ DB=carregar(); render(); } });
+render();
+</script>
+</body>
+</html>
