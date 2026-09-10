@@ -729,9 +729,9 @@ function lotForest(p,zb,R){ if(!p.rect) return; const [x0,y0,w,d]=p.rect; const 
   const n=Math.round((w*d)/5.2); let placed=0, tries=0; const pts=[];
   while(placed<n&&tries<200){ tries++; const x=x0+0.7+r()*(w-1.4), y=y0+0.7+r()*(d-1.4); if(Math.hypot(x-cx,y-cy)<1.9) continue; if(pts.some(q=>Math.hypot(x-q[0],y-q[1])<1.1)) continue; pts.push([x,y,0.6+r()*0.5,r()]); placed++; }
   for(const [x,y,s,q] of pts){ if(pedra) pine(x,y,s,(x+.4)+(y+.4)+zb*0.01); else tree(x,y,s*0.85,q<0.5?[126,64,92]:[96,72,60],q<0.5?[232,150,184]:[236,196,214],zb); } }
-/* nível 2+: bandeiras nos cantos do bloco · nível 3+: pomar / roseiral em volta do bloco (expansão) */
+/* nível 3+: pomar / roseiral em volta do bloco (expansão) */
 function kingDetails(){ for(const r of REGIONS){ const K=KING[r.id]; if(!K||!GRID[r.id]) continue; const lv=tier(r), g=GRID[r.id]; const pedra=K.style==='pedra';
-    if(lv>=2){ for(const [sx,sy] of [[-1,-1],[1,-1],[-1,1],[1,1]]){ const x=g[0]+sx*(KX+0.9), y=g[1]+sy*(KY+0.9); push(x+y+0.3,()=>{ drawBox(x-.07,y-.07,0,.14,.14,3.2,[70,58,48]); const f=P(x,y,3.2); ctx.fillStyle=pedra?'#B8323C':'#E2547A'; ctx.beginPath(); ctx.moveTo(f[0],f[1]); ctx.lineTo(f[0]+TW*0.8,f[1]+ZH*0.25); ctx.lineTo(f[0],f[1]+ZH*0.5); ctx.closePath(); ctx.fill(); }); } }
+    /* (v18: sem bandeiras nos cantos — a clareira já sinaliza o gênero) */
     if(lv>=3){ const rr=rng(pedra?501:502); for(let i=0;i<26;i++){ const side=i%2?1:-1; const along=(rr()-0.5)*2; let x,y; if(i<14){ x=g[0]+along*(KX-1); y=g[1]+side*(KY+2.4+rr()*1.8); } else { x=g[0]+side*(KX+2.4+rr()*1.8); y=g[1]+along*(KY-1); }
         if(!inPoly([x,y],LAND)||distRio(x,y)<1.5||PATH_PTS.some(q=>Math.hypot(x-q[0],y-q[1])<1.6)||CLEAR_PTS.some(q=>Math.hypot(x-q[0],y-q[1])<q[2]+5.4)) continue;
         if(pedra) tree(x,y,0.7+rr()*0.3,[52,84,40],[72,112,52],0,null,true); else tree(x,y,0.5+rr()*0.25,[44,92,60],[62,118,74],0,null,false); } } } }
@@ -821,7 +821,7 @@ const SCENES={
       const r2=rng(77); for(let i=0;i<26;i++){ const a=r2()*6.28, rr=2.0+r2()*.5; const q=P(ax+Math.cos(a)*rr,ay+Math.sin(a)*rr*.92,zb+1.0+ (rr>2.3?0.0:0.45)); ctx.fillStyle=['#C8443E','#3E6FB0','#F1E6D2','#5A3E2C'][i%4]; ctx.beginPath(); ctx.arc(q[0],q[1]-TH*.4,Math.max(1.2,TH*.22),0,6.28); ctx.fill(); }
       drawPerson(ax-.55,ay+.1,zb+1.46,1,reduce?0:now*6,[150,60,50],0,{skin:'#D9A47A',hair:'#2E2A26'}); drawPerson(ax+.55,ay-.1,zb+1.46,-1,reduce?0:now*6+2,[60,70,120],0,{skin:'#C48A62',hair:'#1E1A18'});
       const s1=P(ax-.55,ay+.1,zb+2.0), s2=P(ax+.55,ay-.1,zb+2.0); ctx.strokeStyle='#E8E4DC'; ctx.lineWidth=1.6; ctx.beginPath(); ctx.moveTo(s1[0],s1[1]); ctx.lineTo(s1[0]+TW*.5,s1[1]-TH*.9); ctx.moveTo(s2[0],s2[1]); ctx.lineTo(s2[0]-TW*.5,s2[1]-TH*.9); ctx.stroke();
-      for(const [bx,by,bc] of [[ax-2.4,ay-1.6,'#8E2A24'],[ax+2.4,ay-1.6,'#8E2A24'],[ax,ay-2.6,'#C9A227']]){ drawBox(bx-.05,by-.05,zb+1.5,.1,.1,1.6,[60,54,50]); const bp=P(bx,by,zb+3.1); ctx.fillStyle=bc; ctx.beginPath(); ctx.moveTo(bp[0],bp[1]); ctx.lineTo(bp[0]+TW*.6,bp[1]+TH*.25); ctx.lineTo(bp[0],bp[1]+TH*.7); ctx.closePath(); ctx.fill(); } }); },
+      for(const [bx,by,bc] of []){ drawBox(bx-.05,by-.05,zb+1.5,.1,.1,1.6,[60,54,50]); const bp=P(bx,by,zb+3.1); ctx.fillStyle=bc; ctx.beginPath(); ctx.moveTo(bp[0],bp[1]); ctx.lineTo(bp[0]+TW*.6,bp[1]+TH*.25); ctx.lineTo(bp[0],bp[1]+TH*.7); ctx.closePath(); ctx.fill(); } }); },
   /* -------- COZY: tenda de poções e livros, moça tomando chá -------- */
   cozy(p,zb,now){ const [x0,y0,w,d]=p.rect; const cy=y0+d/2; const t=reduce?0:now;
     const tx=x0+3.4, ty=cy;
