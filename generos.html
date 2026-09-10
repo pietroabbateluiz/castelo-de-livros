@@ -934,8 +934,8 @@ function terrain(now){
   if(HAS('mesa')){ ROFF(REGIONS.find(q=>q.id==='mesa'));
   mountain(now);
   // promontório do observatório
-  const mt=MESA.map(p=>P(p[0],p[1],MZ)); const mg=ctx.createLinearGradient(0,Math.min(...mt.map(p=>p[1])),0,Math.max(...mt.map(p=>p[1]))); mg.addColorStop(0,col([68,88,70],0.92)); mg.addColorStop(1,col([88,110,86],1));
-  extrude(MESA,MZ,0,mg,[122,116,104],[88,84,78]); fillPat(MESA,MZ,'grass',0.75);
+  ROFF(null); const mt=MESA.map(p=>P(p[0],p[1],MZ)); const mg=ctx.createLinearGradient(0,Math.min(...mt.map(p=>p[1])),0,Math.max(...mt.map(p=>p[1]))); mg.addColorStop(0,col([68,88,70],0.92)); mg.addColorStop(1,col([88,110,86],1));
+  extrude(MESA,MZ,0,mg,[122,116,104],[88,84,78]); fillPat(MESA,MZ,'grass',0.75); ROFF(REGIONS.find(q=>q.id==='mesa'));
   for(const [x,y,sz] of [[11.6,3.2,.6],[13.0,5.4,.55],[22.6,3.6,.6],[21.4,5.8,.5],[12.4,1.0,.5],[23.0,1.6,.55]]) tree(x,y,sz,[36,58,48],[52,80,62],MZ);
   for(const [x,y,sz] of [[10.9,2.2,.5],[23.0,4.8,.45],[15.0,6.2,.4],[19.6,6.3,.42]]) rock(x,y,sz,[132,126,112],MZ);
   // escada no penhasco (offset de mesa já ativo)
@@ -1771,7 +1771,7 @@ function seaFill(now){
     ctx.beginPath(); ctx.moveTo(p0[0],p0[1]); ctx.lineTo(p1[0],p1[1]); ctx.stroke();
   }
   // reflexo da lua no mar
-  const mp=P(UV(60,-150)[0],UV(60,-150)[1],SEAZ), rr=TW*10;
+  const mp=P(UV(60,-150)[0],UV(60,-150)[1],SEAZ), rr=TW*5;
   const mg=ctx.createRadialGradient(mp[0],mp[1],0,mp[0],mp[1],rr);
   mg.addColorStop(0,'rgba(240,226,180,.16)'); mg.addColorStop(1,'rgba(240,226,180,0)');
   ctx.fillStyle=mg; ctx.beginPath(); ctx.ellipse(mp[0],mp[1],rr,rr*.42,0,0,Math.PI*2); ctx.fill();
@@ -1786,7 +1786,7 @@ function seaFill(now){
 const SEASPARK=[]; { const r=rng(303); for(let i=0;i<400;i++){ const x=-330+r()*660, y=-330+r()*660; if(inPoly([x,y],SHELF)) continue; SEASPARK.push([x,y,1.0+r()*2.4,r()*6.28]); } }
 function shallows(now){
   // banco de areia submerso + praia + espuma na linha d'água
-  for(let i=3;i>=1;i--){ const k=1.30-(3-i)*0.075; fillWorld(inflate(LAND,k),`rgba(74,138,152,${0.07+ (3-i)*0.05})`,SEAZ+0.4+i*0.06); }
+  /* v21: sem os anéis de banco de areia em volta da ilha (pareciam manchas se movendo no mar) */
   const bt=BEACH.map(p=>P(p[0],p[1],-0.14));
   const ys=bt.map(p=>p[1]); const g=ctx.createLinearGradient(0,Math.min(...ys),0,Math.max(...ys));
   g.addColorStop(0,'#8E8468'); g.addColorStop(.5,'#C4B48C'); g.addColorStop(1,'#D8C79C');
@@ -2291,7 +2291,7 @@ function fogOfWar(){ return; /* v20: o centro trancado já sinaliza */
   for(const r of REGIONS){ if(regionOpen(r)) continue; const p=P(r.cx,r.cy,r.cz); const rx=r.r*TW*1.25, ry=r.r*TH*1.25+ZH*1.5;
     const g=ctx.createRadialGradient(p[0],p[1]-ZH,0,p[0],p[1]-ZH,rx); g.addColorStop(0,'rgba(60,66,90,.62)'); g.addColorStop(.7,'rgba(60,66,90,.5)'); g.addColorStop(1,'rgba(60,66,90,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.ellipse(p[0],p[1]-ZH,rx,ry,0,0,Math.PI*2); ctx.fill(); }
 }
-function mist(now){ for(const [fx,fy,fr,sp,a] of [[.62,.28,.16,.2,.10],[.72,.36,.2,.15,.09],[.48,.86,.18,.25,.08]]){ const x=((fx*W+(reduce?0:now*sp*10))%(W*1.3))-W*0.15, y=fy*H, rx=W*fr; const g=ctx.createRadialGradient(x,y,0,x,y,rx); g.addColorStop(0,`rgba(160,175,160,${a})`); g.addColorStop(1,'rgba(160,175,160,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.ellipse(x,y,rx,rx*.22,0,0,Math.PI*2); ctx.fill(); } }
+function mist(now){ return; /* v21: névoa de tela removida (manchas que pareciam seguir o cursor) */ for(const [fx,fy,fr,sp,a] of [[.62,.28,.16,.2,.10],[.72,.36,.2,.15,.09],[.48,.86,.18,.25,.08]]){ const x=((fx*W+(reduce?0:now*sp*10))%(W*1.3))-W*0.15, y=fy*H, rx=W*fr; const g=ctx.createRadialGradient(x,y,0,x,y,rx); g.addColorStop(0,`rgba(160,175,160,${a})`); g.addColorStop(1,'rgba(160,175,160,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.ellipse(x,y,rx,rx*.22,0,0,Math.PI*2); ctx.fill(); } }
 function vignette(){ const vg=ctx.createRadialGradient(W/2,H*0.45,Math.min(W,H)*0.35,W/2,H*0.5,Math.max(W,H)*0.78); vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,.55)'); ctx.fillStyle=vg; ctx.fillRect(0,0,W,H); }
 
 /* ===================== HUD ===================== */
