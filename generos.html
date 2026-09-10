@@ -612,17 +612,18 @@ function plots(){
       extrude(ib,0.02,-1.5,bg,[146,136,112],[112,104,86]);
       const gp=rectPts(cx-HB-0.8,cy-HB-0.8,BLOCK+1.6,BLOCK+1.6); const gt=gp.map(q=>P(q[0],q[1],0.05));
       quad(gt,col([62,88,66],1),false); fillPat(gp,0.05,'grass',0.8); }
-    // moldura clara do bloco inteiro
-    plotRect(cx-HB-0.6,cy-HB-0.6,BLOCK+1.2,BLOCK+1.2,z,'rgba(150,140,116,.55)',null);
-    for(const q of r.places){ if(q.lot&&q.slot>=4){ const [x0,y0,w,d]=q.rect; plotRect(x0-0.6,y0-0.6,w+1.2,d+1.2,z,'rgba(150,140,116,.55)',null); } }
+    /* GRADE INVISÍVEL (regra do Luiz, set/2026): as linhas e a moldura dos quadrados não são
+       desenhadas, mas a geometria continua valendo — quadrado central [cx-HC,cy-HC,S_C,S_C],
+       quatro retângulos q.rect (slots 0-3) e duas pontas (slots 4-5). Todo item novo deve ser
+       colocado DENTRO do seu quadrado, sem invadir o vizinho. Só o chão (cor) é pintado. */
     // quadrado central
-    plotRect(cx-HC,cy-HC,S_C,S_C,z,col([92,106,80],1),'rgba(236,222,186,.35)');
+    plotRect(cx-HC,cy-HC,S_C,S_C,z,col([92,106,80],1),null);
     fillPat(rectPts(cx-HC,cy-HC,S_C,S_C),z,'grass',0.55);
-    // quatro retângulos
+    // quatro retângulos + pontas
     for(const q of r.places){ if(!q.lot) continue; const [x0,y0,w,d]=q.rect; const open=st(q)==='open';
-      plotRect(x0,y0,w,d,z,open?col([88,104,78],1):col([76,74,62],1),'rgba(236,222,186,.35)');
+      plotRect(x0,y0,w,d,z,open?col([88,104,78],1):col([76,74,62],1),null);
       if(open) fillPat(rectPts(x0,y0,w,d),z,'grass',0.5);
-      const t=SLOT_TINT[q.slot]; plotRect(x0+0.12,y0+0.12,w-0.24,d-0.24,z+0.005,`rgba(${t},${open?.26:.10})`,null); }
+      const t=SLOT_TINT[q.slot]; plotRect(x0,y0,w,d,z+0.005,`rgba(${t},${open?.26:.10})`,null); }
   }
   ROFF(null);
 }
@@ -639,26 +640,8 @@ function winGrid(x,y,z,w,h,face,cols,rows,lit,rgb){ /* janelas na face sul (face
     const q=face==='S'?[P(x+u0,y,z0),P(x+u1,y,z0),P(x+u1,y,z1),P(x+u0,y,z1)]:[P(x,y+u0,z0),P(x,y+u1,z0),P(x,y+u1,z1),P(x,y+u0,z1)];
     quad(q,on?`rgba(${rgb},.9)`:'rgba(14,14,20,.85)',false); } }
 const SCENES={
-  /* -------- FANTASIA URBANA: cidade com prédios e carros -------- */
-  urbana(p,zb,now){ const [x0,y0,w,d]=p.rect; const sx=x0+w/2; const t=reduce?0:now;
-    push((x0+w)+(y0+d)+zb*0.01-0.02,()=>{ asphalt(sx-1.1,y0+0.3,2.2,d-0.6,zb);
-      ctx.fillStyle='rgba(240,220,120,.75)'; for(let yy=y0+0.8;yy<y0+d-0.6;yy+=1.2){ const a=P(sx-.06,yy,zb+.012),b=P(sx+.06,yy,zb+.012),c=P(sx+.06,yy+.6,zb+.012),e=P(sx-.06,yy+.6,zb+.012); quad([a,b,c,e],'rgba(240,220,120,.75)',false); } });
-    const B=[[x0+0.5,y0+0.6,1.7,2.2,6.2,[92,98,118],'255,214,120'],[x0+0.5,y0+3.4,1.7,2.6,4.2,[118,104,96],'160,220,255'],[x0+0.5,y0+6.6,1.7,2.2,7.4,[70,78,100],'255,190,120'],
-             [x0+0.5,y0+9.4,1.7,2.4,3.4,[130,118,110],'255,214,120'],[x0+0.5,y0+12.4,1.7,2.6,5.6,[84,92,112],'180,240,255'],[x0+0.5,y0+15.6,1.7,2.4,4.6,[112,96,92],'255,200,130'],
-             [x0+w-2.2,y0+0.6,1.7,2.4,4.8,[124,112,104],'255,214,120'],[x0+w-2.2,y0+3.6,1.7,2.2,8.2,[74,84,108],'150,225,255'],[x0+w-2.2,y0+6.4,1.7,2.6,3.6,[132,120,112],'255,190,120'],
-             [x0+w-2.2,y0+9.6,1.7,2.2,5.2,[88,96,116],'255,214,120'],[x0+w-2.2,y0+12.4,1.7,2.6,6.8,[70,76,96],'180,240,255'],[x0+w-2.2,y0+15.6,1.7,2.4,4.0,[120,108,100],'255,200,130']];
-    B.forEach(([bx,by,bw,bd,bh,c,rgb],i)=>push((bx+bw)+(by+bd)+zb*0.01,()=>{ drawBox(bx,by,zb,bw,bd,bh,c,{ft:1.18,fr:1.0,fl:.7});
-      const lit=[1,0,1,1,0,1,1,1,0,1]; winGrid(bx,by+bd+0.01,zb+0.5,bw,bh-0.9,'S',3,Math.max(2,Math.round(bh/1.1)),lit,rgb);
-      winGrid(bx+bw+0.01,by,zb+0.5,bd,bh-0.9,'E',3,Math.max(2,Math.round(bh/1.1)),lit,rgb);
-      const c2=P(bx+bw/2,by+bd,zb+bh*.55); halo(c2[0],c2[1],TH*2.4,rgb,.10);
-      if(i%3===0) drawBox(bx+bw*.55,by+bd*.3,zb+bh,.4,.4,.5,[70,72,80]);
-      if(i%3===1){ const a=P(bx+bw*.5,by+bd*.5,zb+bh), b=P(bx+bw*.5,by+bd*.5,zb+bh+1.4); ctx.strokeStyle='#9AA0AA'; ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke(); const bl=(Math.sin(t*3+i)>0); if(bl){ ctx.fillStyle='#FF5A5A'; ctx.beginPath(); ctx.arc(b[0],b[1],2,0,6.28); ctx.fill(); } }
-      if(i===2||i===7){ const c3=P(bx+bw/2,by+bd+0.02,zb+bh-0.7); halo(c3[0],c3[1],TH*3,i===2?'255,80,160':'80,220,255',.45); ctx.fillStyle=i===2?'#FF66C4':'#5AE0FF'; ctx.fillRect(c3[0]-TW*.5,c3[1]-3,TW,6); } }));
-    const CARS=[[y0+2.0,1,'#D8433A'],[y0+7.5,-1,'#3A6FD8'],[y0+12.6,1,'#E8D24A'],[y0+16.4,-1,'#EEEEEE']];
-    CARS.forEach(([cy0,dir,cc],i)=>{ const cy=cy0+(reduce?0:((t*1.6*dir+i*5)%(d-2)+ (dir<0?0:0))); const yy=y0+1+((cy-y0+ (d-2))%(d-2)); const cx=sx+dir*0.5;
-      push((cx+.5)+(yy+1)+zb*0.01+0.05,()=>{ drawBox(cx-.32,yy-.55,zb+.05,.64,1.1,.32,[40,40,46]); drawBox(cx-.34,yy-.5,zb+.35,.68,1.0,.26,hexRGB(cc),{ft:1.2}); drawBox(cx-.26,yy-.2,zb+.61,.52,.5,.22,[60,70,90],{ft:1.4});
-        const fy=dir>0?yy+.5:yy-.5; const f=P(cx,fy,zb+.4); halo(f[0],f[1],TH*1.6,'255,240,200',.5); const bk=P(cx,dir>0?yy-.5:yy+.5,zb+.4); halo(bk[0],bk[1],TH*.9,'255,60,60',.45); }); });
-    for(const yy of [y0+3,y0+8,y0+13,y0+18]) for(const side of [-1,1]){ const lx=sx+side*1.35; push((lx+.1)+(yy+.1)+zb*0.01+0.04,()=>{ drawBox(lx-.05,yy-.05,zb,.1,.1,2.2,[70,72,80]); drawLantern(lx,yy,zb+2.25,'220,235,255',.7,.7); }); } },
+  /* -------- FANTASIA URBANA: área vazia por enquanto (cidade e rua removidas a pedido do Luiz, set/2026) -------- */
+  urbana(p,zb,now){ /* nada desenhado — o retângulo fica só com o chão amarelo, aguardando novo conteúdo */ },
   /* -------- ALTA FANTASIA: cidade medieval com três luas -------- */
   alta(p,zb,now){ const [x0,y0,w,d]=p.rect; const cy=y0+d/2;
     fillPat(rectPts(x0+0.6,y0+0.6,w-1.2,d-1.2),zb,'cobble',0.45);
