@@ -321,20 +321,20 @@ function drawStringLights(ax,ay,az,bx,by,bz,sag,rgb){ const pts=rope(ax,ay,az,bx
 function smoke(now,x,y,z,tint){ const c=P(x,y,z); for(let i=0;i<10;i++){ const age=reduce?(i/10):((now*0.16+i/10)%1), rad=TH*(0.25+age*0.9), a=(1-age)*0.22, sx=c[0]+Math.sin(age*5+i)*TH*0.5+age*TH*1.1, sy=c[1]-age*ZH*2.6; ctx.fillStyle=`rgba(${tint||'190,180,200'},${a})`; ctx.beginPath(); ctx.arc(sx,sy,rad,0,Math.PI*2); ctx.fill(); } }
 
 /* ===================== o mundo ===================== */
-let LAND=[[-74,0],[-70,-22],[-56,-38],[-32,-46],[0,-49],[32,-46],[56,-38],[70,-22],[74,0],[70,22],[56,38],[32,46],[0,49],[-32,46],[-56,38],[-70,22]];
+let LAND=[[-98,-10],[-94,-38],[-78,-54],[-46,-62],[0,-64],[46,-62],[78,-54],[94,-38],[98,-10],[98,10],[94,38],[78,54],[46,62],[0,64],[-46,62],[-78,54],[-94,38],[-98,10]];
 let MESA=[[11,1.2],[14.5,-1.2],[21,-1.6],[24,1.0],[23.2,5.4],[19,7],[13.2,6.6],[10.2,4]], MZ=3.6;
 let HILL=[[33.6,24.0],[37.0,23.2],[39.6,25.4],[39.4,29.4],[36.6,31.6],[33.0,30.8],[31.6,28.2]], AZ=2.4;
-let LAKE=[[9.5,9.6],[13.0,8.4],[16.4,9.6],[17.6,12.2],[15.2,15.0],[12.6,16.0],[9.4,15.1],[8.4,12.5]];
+let LAKE=[[70,28],[76,26],[82,28],[84,33],[80,38],[75,40],[70,38],[67,33]];
 let ISLE=[[41.89,28.39],[44.79,27.23],[47.55,28.53],[48.56,31.29],[47.11,33.90],[44.21,34.92],[41.60,33.61],[40.59,31.00]];
 
 const REGIONS=[
- {id:'bosque',name:'Bosque das Fadas',tab:'Bosque',genre:'Fantasia',cx:4,cy:13,cz:0,r:9,sign:[11.2,15.4,0],tint:'40,80,110',statue:[4.2,16.6,0],sk:'criatura',
+ {id:'bosque',name:'Bosque dos Contos',tab:'Bosque',genre:'Contos',cx:4,cy:13,cz:0,r:9,sign:[11.2,15.4,0],tint:'40,80,110',statue:[4.2,16.6,0],sk:'criatura',
   places:[
    {id:'casa',name:'Casa da Árvore',h:8.5,x:7,y:12.5,st:{d1:'sealed',m3:'open'},opened:'Aberta por 5 livros de fantasia',need:{d1:[2,5,'de fantasia'],m3:[5,5,'de fantasia']},sign:[8.4,15.6,0]},
    {id:'varanda',name:'Varanda dos Dragões',h:6.5,x:3.6,y:16.2,st:{d1:'sealed',m3:'open'},opened:'Aberta por 3 livros de fantasia épica',need:{d1:[0,3,'de fantasia épica'],m3:[3,3,'de fantasia épica']},sign:[4.6,18.4,0]},
    {id:'ninho',name:'Ninho da Coruja',h:6.5,x:11.2,y:9.2,st:{d1:'sealed',m3:'near'},opened:'',need:{d1:[0,4,'de fantasia urbana'],m3:[3,4,'de fantasia urbana']},sign:[12.6,11.2,0]},
    {id:'toca',name:'Toca das Raízes',x:10.4,y:17.6,st:{d1:'sealed',m3:'sealed'},opened:'',need:{d1:[0,3,'de contos de fadas'],m3:[1,3,'de contos de fadas']},sign:[10.4,19.9,0]} ]},
- {id:'catedral',name:'Vale dos Templos',tab:'Templos',genre:'Marco do mundo',landmark:true,cx:2.4,cy:-3.4,cz:0,r:9.6,sign:[5.6,5.3,0],tint:'120,100,80',
+ {id:'catedral',name:'Vale dos Templos',tab:'Templos',genre:'Histórica',cx:2.4,cy:-3.4,cz:0,r:9.6,sign:[5.6,5.3,0],tint:'120,100,80',
   places:[
    {id:'nave',name:'Grande Catedral',h:9.5,x:1.4,y:-0.6,w:6.0,d:4.0,st:{d1:'sealed',m3:'open'},opened:'Aberta por 6 livros religiosos',need:{d1:[1,6,'religiosos'],m3:[6,6,'religiosos']},sign:[3.6,4.3,0]},
    {id:'sinos',name:'Torre dos Sinos',h:9.5,x:6.7,y:1.7,st:{d1:'sealed',m3:'near'},opened:'',need:{d1:[0,4,'de espiritualidade'],m3:[3,4,'de espiritualidade']},sign:[7.9,3.7,0]},
@@ -342,7 +342,7 @@ const REGIONS=[
    {id:'scriptorium',name:'Scriptorium',x:8.4,y:1.8,w:1.5,d:1.2,st:{d1:'sealed',m3:'sealed'},opened:'',need:{d1:[0,3,'de textos sagrados'],m3:[0,3,'de textos sagrados']},sign:[9.8,3.1,0]},
    {id:'mesquita',name:'Mesquita',x:-5.4,y:-2.4,w:3.4,d:2.8,h:5.2,st:{d1:'sealed',m3:'open'},opened:'Aberta por 4 livros do islã',need:{d1:[0,4,'do islã'],m3:[4,4,'do islã']},sign:[-1.8,4.4,0]},
    {id:'budista',name:'Templo Budista',x:4.0,y:-7.4,w:3.4,d:3.4,h:5.2,st:{d1:'sealed',m3:'open'},opened:'Aberto por 4 livros de budismo',need:{d1:[0,4,'de budismo'],m3:[4,4,'de budismo']},sign:[6.1,-2.4,0]} ]},
- {id:'castelo',name:'Castelo dos Reinos',tab:'Castelo',genre:'Histórica',cx:8.4,cy:26.4,cz:0,r:5.2,sign:[9.0,33.0,0],tint:'110,90,70',statue:[8.5,31.7,0],sk:'cavaleiro',
+ {id:'castelo',name:'Castelo de Fantasia',tab:'Castelo',genre:'Fantasia',demo:5,cx:8.4,cy:26.4,cz:0,r:5.2,sign:[9.0,33.0,0],tint:'110,90,70',statue:[8.5,31.7,0],sk:'cavaleiro',
   places:[
    {id:'sotao',name:'Sótão',x:7.2,y:24.4,w:2.4,d:2.4,st:{d1:'sealed',m3:'open'},opened:'Aberto por 6 livros',need:{d1:[2,6,'livros'],m3:[6,6,'livros']},sign:[8.4,27.3,0]},
    {id:'salao',name:'Salão da Lareira',x:4.6,y:26.8,w:3.0,d:3.0,st:{d1:'sealed',m3:'open'},opened:'Aberto por 8 clássicos',need:{d1:[0,8,'clássicos'],m3:[8,8,'clássicos']},sign:[3.2,29.0,0]},
@@ -433,11 +433,17 @@ let preset='inicio', hot=null, sel=null, focused=null;
    ficam sob névoa com uma chave — abrem lendo 1 livro daquele subgênero.            */
 const SUBS={
  bosque:[
-  {id:'casa',      sub:'Alta fantasia'},
-  {id:'sombria',   sub:'Dark fantasy',      name:'Clareira Sombria',   x:1.56,  y:9.87,  style:'cabana'},
-  {id:'urbana',    sub:'Fantasia urbana',   name:'Casa do Beco',       x:-1.67, y:11.8,  style:'cabana'},
-  {id:'fadas',     sub:'Contos de fadas',   name:'Toca das Fadas',     x:10.03, y:14.33, style:'cabana'},
-  {id:'magico',    sub:'Realismo mágico',   name:'Cabana do Espelho',  x:-4.6,  y:8.6,   style:'cabana'}],
+  {id:'casa',      sub:'Contos de fadas'},
+  {id:'sombria',   sub:'Contos de terror',   name:'Clareira Sombria',   x:1.56,  y:9.87,  style:'cabana'},
+  {id:'urbanaC',   sub:'Contos de ficção científica', name:'Casa do Beco', x:-1.67, y:11.8, style:'cabana'},
+  {id:'fadas',     sub:'Microcontos',        name:'Toca das Fadas',     x:10.03, y:14.33, style:'cabana'},
+  {id:'magico',    sub:'Crônicas curtas',    name:'Cabana do Espelho',  x:-4.6,  y:8.6,   style:'cabana'}],
+ catedral:[
+  {id:'nave',      sub:'Impérios'},
+  {id:'guerrasH',  sub:'Guerras',            name:'Sala de Armas',      x:-0.79, y:4.23,  style:'capela'},
+  {id:'medieval',  sub:'Idade Média',        name:'Torre de Inverno',   x:9.0,   y:-7.0,  style:'torre'},
+  {id:'corsarios', sub:'Piratas históricos', name:'Casa do Corsário',   x:-6.0,  y:2.0,   style:'torre'},
+  {id:'biografias',sub:'Biografias',         name:'Sala dos Retratos',  x:10.0,  y:3.0,   style:'torre'}],
  charneca:[
   {id:'mansao',    sub:'Terror gótico'},
   {id:'sobrenatural',sub:'Sobrenatural',    name:'Sanatório',          x:27.38, y:-0.29, style:'cripta'},
@@ -481,11 +487,13 @@ const SUBS={
   {id:'viloes',    sub:'Vilões',            name:'Covil dos Vilões',   x:30.67, y:16.39, style:'tenda'},
   {id:'equipes',   sub:'Equipes',           name:'Quartel das Equipes',x:34.22, y:22.38, style:'tenda'}],
  castelo:[
-  {id:'salao',     sub:'Impérios'},
-  {id:'guerras',   sub:'Guerras',           name:'Sala de Armas',      x:10.6,  y:23.6,  style:'torre'},
-  {id:'medieval',  sub:'Idade Média',       name:'Torre de Inverno',   x:13.34, y:27.13, style:'torre'},
-  {id:'corsarios', sub:'Piratas históricos',name:'Casa do Corsário',   x:11.6,  y:25.4,  style:'torre'},
-  {id:'biografias',sub:'Biografias históricas', name:'Sala dos Retratos', x:9.0, y:28.6, style:'torre'}],
+  {id:'salao',     sub:'Fantasia'},
+  {id:'urbana',    sub:'Fantasia urbana',    name:'Cidade de Néon',       x:0, y:0, style:'casa',   scene:'urbana', slot:0},
+  {id:'alta',      sub:'Alta fantasia',      name:'Vila das Três Luas',   x:0, y:0, style:'casa',   scene:'alta',   slot:1},
+  {id:'historica', sub:'Fantasia histórica', name:'Palácio e Arena',      x:0, y:0, style:'stoa',   scene:'historica', slot:2},
+  {id:'cozy',      sub:'Cozy fantasy',       name:'Tenda das Poções',     x:0, y:0, style:'tenda',  scene:'cozy',   slot:3},
+  {id:'sombriaF',  sub:'Dark fantasy',       name:'Fortaleza Negra',      x:0, y:0, style:'torre',  slot:4},
+  {id:'epica',     sub:'Fantasia épica',     name:'Salão dos Heróis',     x:0, y:0, style:'torre',  slot:5}],
  fazenda:[
   {id:'aboboras',  sub:'Humor cotidiano'},
   {id:'satira',    sub:'Sátira',            name:'Galpão da Sátira',   x:-10.27,y:29.6,  style:'celeiro'},
@@ -515,50 +523,56 @@ const SUBS={
   {id:'seriadas',  sub:'Histórias seriadas',name:'Sala das Séries',    x:-11.6, y:-7.0,  style:'domo'},
   {id:'fanfic',    sub:'Fanfics',           name:'Oficina das Fanfics',x:-7.6,  y:-7.2,  style:'domo'},
   {id:'appconto',  sub:'Contos por app',    name:'Quiosque do Conto',  x:-11.2, y:-4.8,  style:'domo'},
-  {id:'interativo',sub:'Roteiros interativos', name:'Sala Interativa', x:-7.4,  y:-4.6,  style:'domo'}],
- contos:[
-  {id:'fogueira',  sub:'Contos de fantasia',name:'Casa dos Contos',    x:21.8,  y:31.4,  style:'cabana'},
-  {id:'contoterror',sub:'Contos de terror', name:'Roda do Medo',       x:19.9,  y:30.8,  style:'cabana'},
-  {id:'contofc',   sub:'Contos de ficção científica', name:'Cabana das Estrelas', x:23.6, y:31.0, style:'cabana'},
-  {id:'micro',     sub:'Microcontos',       name:'Abrigo dos Microcontos', x:20.4, y:32.8, style:'cabana'},
-  {id:'cronicacurta',sub:'Crônicas curtas', name:'Varanda das Crônicas',x:23.4, y:32.8,  style:'cabana'}]
+  {id:'interativo',sub:'Roteiros interativos', name:'Sala Interativa', x:-7.4,  y:-4.6,  style:'domo'}]
 };
 /* índice: id do lugar -> {rid, idx, sub} */
 const SUBIDX={}; for(const rid in SUBS) SUBS[rid].forEach((s,i)=>{ SUBIDX[s.id]={rid,idx:i,sub:s.sub,slot:s}; });
 /* quantas edificações estão abertas por gênero em cada momento */
 const OPENN={inicio:1, lendo:3}; /* 5 subgêneros por gênero: 1 aberto no início */
 function openCount(){ return OPENN[preset]||1; }
-function subState(id){ const e=SUBIDX[id]; if(!e) return null; return e.idx<openCount()?'open':'sealed'; }
+function subState(id){ const e=SUBIDX[id]; if(!e) return null; const R=REGIONS.find(r=>r.id===e.rid); if(R&&R.demo) return e.idx<R.demo?'open':'sealed'; return e.idx<openCount()?'open':'sealed'; }
 function subOf(id){ const e=SUBIDX[id]; return e?e.sub:null; }
 
 const st=(p)=>{ const k=subState(p.id); if(k) return k; return 'open'; };
 REGIONS.push({id:'navegacoes',name:'Porto das Navegações',tab:'Porto',genre:'Aventura',cx:0.2,cy:28.9,cz:0,r:5.4,sign:[0.2,33.6,0],tint:'50,110,140',places:[],statue:[1.4,25.0,0],sk:'explorador'});
 REGIONS.push({id:'quadrinhos',name:'Banca da Praça',tab:'Banca',genre:'Quadrinhos e mangás',cx:6.5,cy:-9.6,cz:0,r:4.2,sign:[6.5,-6.4,0],tint:'170,90,120',places:[],statue:[6.4,-6.9,0],sk:'balao'});
 REGIONS.push({id:'digital',name:'Torre do Sinal',tab:'Sinal',genre:'Ficção digital',cx:-9.5,cy:-6.0,cz:0,r:4.2,sign:[-9.5,-2.8,0],tint:'80,160,190',places:[],statue:[-9.6,-2.9,0],sk:'tela'});
-REGIONS.push({id:'contos',name:'Casa dos Contos',tab:'Contos',genre:'Contos',cx:21.8,cy:31.8,cz:0,r:4.0,sign:[21.8,34.2,0],tint:'190,140,70',places:[],statue:[18.6,32.4,0],sk:'contador'});
+
 /* cada gênero passa a ter exatamente 7 edificações — uma por subgênero */
 for(const rid in SUBS){ const R=REGIONS.find(r=>r.id===rid); if(!R) continue;
   for(const sgen of SUBS[rid]){ if(sgen.x==null) continue; if(R.places.some(q=>q.id===sgen.id)) continue;
-    R.places.push({id:sgen.id,name:sgen.name,x:sgen.x,y:sgen.y,w:1.6,d:1.4,h:2.0,sat:sgen.style,
+    R.places.push({id:sgen.id,name:sgen.name,x:sgen.x,y:sgen.y,w:1.6,d:1.4,h:2.0,sat:sgen.style,scene:sgen.scene,slot:sgen.slot,
       st:{inicio:'sealed',lendo:'sealed'},opened:'Aberta com 1 livro de '+sgen.sub.toLowerCase(),
       need:{inicio:[0,1,'do subgênero'],lendo:[0,1,'do subgênero']},
       sign:[sgen.x,sgen.y+1.5,(R.cz||0)]}); } }
+/* nomes: só o nome do estilo literário (gênero / subgênero) */
+for(const r of REGIONS){ if(r.genre){ r.name=r.genre; r.tab=r.genre; } for(const p of r.places){ const e=SUBIDX[p.id]; if(e) p.name=e.sub; } }
 const allPlaces=()=>REGIONS.flatMap(r=>r.places.map(p=>({...p,region:r})));
 const regionOpen=(r)=>r.places.some(p=>st(p)==='open');
 const pulse=(now,ph)=>reduce?0.6:(0.5+0.5*Math.sin(now*1.4+(ph||0)));
 
 
-/* ===================== v12 · layout em quadrantes circulares ===================== */
-/* Cada gênero ocupa um círculo grande; quatro círculos iguais em volta guardam os
-   subgêneros trancados. As regiões são deslocadas em bloco (ox,oy) para o novo grid. */
+/* ===================== v13 · layout em cata-vento (quadrado + 4 retângulos) ===================== */
+/* Cada gênero: quadrado central S×S com o cenário; quatro retângulos iguais PW×(S+PW)
+   girando em volta (esquerda, topo, direita, base), um por subgênero.                */
+const S_C=14, PW=6, HC=S_C/2, HB=HC+PW;   // HB = meia-largura do bloco
+const BLOCK=2*HB;
 const GRID={
-  mesa:[-52,-24], digital:[-26,-24], quadrinhos:[0,-24], arena:[26,-24], guerra:[52,-24],
-  bosque:[-52,0],  outono:[-26,0],   catedral:[0,0],     acropole:[26,0],  charneca:[52,0],
-  navegacoes:[-52,24], fazenda:[-26,24], vila:[0,24],    contos:[26,24],   castelo:[52,24],
-  ilha:[88,16]
+  mesa:[-76,-34], digital:[-40,-34], quadrinhos:[0,-34], arena:[40,-34],  guerra:[76,-34],
+  bosque:[-76,0], outono:[-40,0],    castelo:[0,0],      acropole:[40,0],  charneca:[76,0],
+  navegacoes:[-76,34], fazenda:[-40,34], catedral:[0,34], vila:[40,34],
+  ilha:[122,26]
 };
-const RMAIN=6.4, RSAT=2.4, DSAT=9.2;
-const SATA=[Math.PI*0.25,Math.PI*0.75,Math.PI*1.25,Math.PI*1.75];
+/* retângulos dos 4 subgêneros, relativos ao centro do bloco: [x0,y0,w,d] */
+const SLOTS=[
+  [-HB,-HB, PW, S_C+PW],   // 0 esquerda (amarelo)
+  [-HC,-HB, S_C+PW, PW],   // 1 topo (azul)
+  [ HC,-HC, PW, S_C+PW],   // 2 direita (verde)
+  [-HB, HC, S_C+PW, PW],   // 3 base (rosa)
+  [-HB-PW-1.4,-HC, PW, S_C],  // 4 ponta esquerda (trancado)
+  [ HB+1.4,-HC, PW, S_C]      // 5 ponta direita (trancado)
+];
+const SLOT_TINT=['232,196,60','60,150,230','70,190,90','255,150,190','150,120,200','150,120,200'];
 const isRep=q=>{ const e=SUBIDX[q.id]; return !!e && e.idx===0; };
 for(const r of REGIONS){ const g=GRID[r.id]; if(!g) continue;
   const legacy=r.places.filter(q=>!q.sat);
@@ -566,56 +580,150 @@ for(const r of REGIONS){ const g=GRID[r.id]; if(!g) continue;
   if(legacy.length){ ax=legacy.reduce((t,q)=>t+q.x+((q.w||0)/2),0)/legacy.length;
                      ay=legacy.reduce((t,q)=>t+q.y+((q.d||0)/2),0)/legacy.length; }
   else { const rp=r.places.find(isRep); ax=rp?rp.x:r.cx; ay=rp?rp.y:r.cy; }
+  if(r.id==='castelo'){ ax=8.2; ay=26.3; }
   r.ox=g[0]-ax; r.oy=g[1]-ay; r.plot=[ax,ay,(r.cz||0)]; r.cx=ax; r.cy=ay;
   const lots=r.places.filter(q=>q.sat&&!isRep(q));
-  lots.forEach((q,i)=>{ const a=SATA[i%4];
-    q.x=ax+Math.cos(a)*DSAT; q.y=ay+Math.sin(a)*DSAT; q.lot=true;
-    q.sign=[q.x,q.y+RSAT+0.4,(r.cz||0)]; });
-  r.sign=[ax,ay+RMAIN+1.4,(r.cz||0)];
+  lots.forEach((q,i)=>{ const sl=(q.slot!=null)?q.slot:(i%4); const [x0,y0,w,d]=SLOTS[sl];
+    q.rect=[ax+x0,ay+y0,w,d]; q.slot=sl; q.lot=true;
+    q.x=ax+x0+w/2; q.y=ay+y0+d/2; q.w=w; q.d=d;
+    q.sign=[q.x,ay+y0+d+0.4,(r.cz||0)]; });
+  r.sign=[ax,ay+HB+1.2,(r.cz||0)];
 }
 (function relocateTerrain(){
   const off=id=>{ const r=REGIONS.find(q=>q.id===id); return r?[r.ox||0,r.oy||0]:[0,0]; };
   const mv=(poly,o)=>poly.map(q=>[q[0]+o[0],q[1]+o[1]]);
   MESA=mv(MESA,off('mesa')); HILL=mv(HILL,off('acropole')); ISLE=mv(ISLE,off('ilha'));
-  const ROWS=[['mesa','digital','quadrinhos','arena','guerra'],['bosque','outono','catedral','acropole','charneca'],['navegacoes','fazenda','vila','contos','castelo']];
-  const C=id=>GRID[id];
-  const link=(a,b)=>{ const p=C(a), q=C(b); if(!p||!q) return null; const dx=q[0]-p[0], dy=q[1]-p[1], L=Math.hypot(dx,dy)||1, ux=dx/L, uy=dy/L, m=RMAIN+1.0;
+  const ROWS=[['mesa','digital','quadrinhos','arena','guerra'],['bosque','outono','castelo','acropole','charneca'],['navegacoes','fazenda','catedral','vila',null]];
+  const C=id=>id?GRID[id]:null;
+  const link=(a,b)=>{ const p=C(a), q=C(b); if(!p||!q) return null; const dx=q[0]-p[0], dy=q[1]-p[1], L=Math.hypot(dx,dy)||1, ux=dx/L, uy=dy/L, m=HB+0.8;
     return [[p[0]+ux*m,p[1]+uy*m,0],[(p[0]+q[0])/2,(p[1]+q[1])/2,0],[q[0]-ux*m,q[1]-uy*m,0]]; };
   const NP=[];
   for(const row of ROWS) for(let i=0;i<row.length-1;i++){ const l=link(row[i],row[i+1]); if(l) NP.push(l); }
   for(let c=0;c<5;c++){ for(let rI=0;rI<2;rI++){ const l=link(ROWS[rI][c],ROWS[rI+1][c]); if(l) NP.push(l); } }
   PATHS=NP;
 })();
-function circlePts(cx,cy,rr,n){ const o=[]; for(let i=0;i<n;i++){ const a=i/n*Math.PI*2; o.push([cx+Math.cos(a)*rr,cy+Math.sin(a)*rr]); } return o; }
-function plotDisc(cx,cy,z,rr,tone,rim){
-  const pts=circlePts(cx,cy,rr,40), sp=pts.map(q=>P(q[0],q[1],z));
-  const g=ctx.createLinearGradient(0,Math.min(...sp.map(q=>q[1])),0,Math.max(...sp.map(q=>q[1])));
-  g.addColorStop(0,col(tone,0.94)); g.addColorStop(1,col(tone,1.12));
-  ctx.fillStyle=g; ctx.beginPath(); sp.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1])); ctx.closePath(); ctx.fill();
-  if(rim!==false){ const rp=circlePts(cx,cy,rr,44).map(q=>P(q[0],q[1],z));
-    ctx.strokeStyle='rgba(226,212,176,.30)'; ctx.lineWidth=Math.max(1.4,TH*.34);
-    ctx.beginPath(); rp.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1])); ctx.closePath(); ctx.stroke(); }
-}
-/* trilha ligando o círculo grande aos quatro pequenos */
-function plotSpokes(cx,cy,z){
-  ctx.strokeStyle='rgba(178,166,140,.18)'; ctx.lineWidth=Math.max(2,TH*.62); ctx.lineCap='round';
-  for(const a of SATA){ const a1=P(cx+Math.cos(a)*(RMAIN-0.3),cy+Math.sin(a)*(RMAIN-0.3),z), b1=P(cx+Math.cos(a)*(DSAT-RSAT+0.3),cy+Math.sin(a)*(DSAT-RSAT+0.3),z);
-    ctx.beginPath(); ctx.moveTo(a1[0],a1[1]); ctx.lineTo(b1[0],b1[1]); ctx.stroke(); }
-  ctx.lineCap='butt';
-}
+function rectPts(x0,y0,w,d){ return [[x0,y0],[x0+w,y0],[x0+w,y0+d],[x0,y0+d]]; }
+function plotRect(x0,y0,w,d,z,fill,stroke){ const sp=rectPts(x0,y0,w,d).map(q=>P(q[0],q[1],z));
+  ctx.fillStyle=fill; ctx.beginPath(); sp.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1])); ctx.closePath(); ctx.fill();
+  if(stroke){ ctx.strokeStyle=stroke; ctx.lineWidth=Math.max(1.2,TH*.28); ctx.stroke(); } }
 function plots(){
   for(const r of REGIONS){ if(!r.plot) continue; ROFF(r);
     const [cx,cy,z]=r.plot;
-    plotDisc(cx,cy,z,RMAIN+0.9,[150,140,116],false);
-    plotDisc(cx,cy,z,RMAIN,[86,102,74]);
-    fillPat(circlePts(cx,cy,RMAIN,30),z,'grass',0.55);
-    plotSpokes(cx,cy,z);
-    for(const q of r.places){ if(!q.lot) continue;
-      plotDisc(q.x,q.y,z,RSAT+0.5,[150,140,116],false);
-      plotDisc(q.x,q.y,z,RSAT,st(q)==='open'?[86,102,74]:[78,74,60]); }
+    if(r.id==='ilha'){ const ib=inflate(rectPts(cx-HB-1.2,cy-HB-1.2,BLOCK+2.4,BLOCK+2.4),1.12); const ibt=ib.map(q=>P(q[0],q[1],0.02));
+      const bg=ctx.createLinearGradient(0,Math.min(...ibt.map(q=>q[1])),0,Math.max(...ibt.map(q=>q[1]))); bg.addColorStop(0,col([176,164,138],.95)); bg.addColorStop(1,col([198,186,156],1));
+      extrude(ib,0.02,-1.5,bg,[146,136,112],[112,104,86]);
+      const gp=rectPts(cx-HB-0.8,cy-HB-0.8,BLOCK+1.6,BLOCK+1.6); const gt=gp.map(q=>P(q[0],q[1],0.05));
+      quad(gt,col([62,88,66],1),false); fillPat(gp,0.05,'grass',0.8); }
+    // moldura clara do bloco inteiro
+    plotRect(cx-HB-0.6,cy-HB-0.6,BLOCK+1.2,BLOCK+1.2,z,'rgba(150,140,116,.55)',null);
+    for(const q of r.places){ if(q.lot&&q.slot>=4){ const [x0,y0,w,d]=q.rect; plotRect(x0-0.6,y0-0.6,w+1.2,d+1.2,z,'rgba(150,140,116,.55)',null); } }
+    // quadrado central
+    plotRect(cx-HC,cy-HC,S_C,S_C,z,col([92,106,80],1),'rgba(236,222,186,.35)');
+    fillPat(rectPts(cx-HC,cy-HC,S_C,S_C),z,'grass',0.55);
+    // quatro retângulos
+    for(const q of r.places){ if(!q.lot) continue; const [x0,y0,w,d]=q.rect; const open=st(q)==='open';
+      plotRect(x0,y0,w,d,z,open?col([88,104,78],1):col([76,74,62],1),'rgba(236,222,186,.35)');
+      if(open) fillPat(rectPts(x0,y0,w,d),z,'grass',0.5);
+      const t=SLOT_TINT[q.slot]; plotRect(x0+0.12,y0+0.12,w-0.24,d-0.24,z+0.005,`rgba(${t},${open?.26:.10})`,null); }
   }
   ROFF(null);
 }
+
+/* ===================== v13 · cenas dos subgêneros de Fantasia ===================== */
+const MOONS=[]; /* [x,y,z,raio,cor,glow] em coordenadas de mundo absolutas */
+function drawMoons(now){ for(const m of MOONS){ const c=P(m[0],m[1],m[2]); const r=Math.max(4,m[3]*TW);
+  halo(c[0],c[1],r*3.2,m[5],.32); ctx.fillStyle=m[4]; ctx.beginPath(); ctx.arc(c[0],c[1],r,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='rgba(0,0,0,.10)'; ctx.beginPath(); ctx.arc(c[0]-r*.28,c[1]-r*.22,r*.28,0,Math.PI*2); ctx.arc(c[0]+r*.3,c[1]+r*.25,r*.2,0,Math.PI*2); ctx.fill(); } }
+function asphalt(x0,y0,w,d,z){ plotRect(x0,y0,w,d,z+0.01,'rgba(38,38,46,.92)',null); }
+function winGrid(x,y,z,w,h,face,cols,rows,lit,rgb){ /* janelas na face sul (face='S') ou leste ('E') */
+  const cw=w/cols, ch=h/rows;
+  for(let i=0;i<cols;i++) for(let j=0;j<rows;j++){ const on=lit[(i*7+j*3)%lit.length]; const u0=i*cw+cw*.22, u1=(i+1)*cw-cw*.22, z0=z+j*ch+ch*.22, z1=z+(j+1)*ch-ch*.22;
+    const q=face==='S'?[P(x+u0,y,z0),P(x+u1,y,z0),P(x+u1,y,z1),P(x+u0,y,z1)]:[P(x,y+u0,z0),P(x,y+u1,z0),P(x,y+u1,z1),P(x,y+u0,z1)];
+    quad(q,on?`rgba(${rgb},.9)`:'rgba(14,14,20,.85)',false); } }
+const SCENES={
+  /* -------- FANTASIA URBANA: cidade com prédios e carros -------- */
+  urbana(p,zb,now){ const [x0,y0,w,d]=p.rect; const sx=x0+w/2; const t=reduce?0:now;
+    push((x0+w)+(y0+d)+zb*0.01-0.02,()=>{ asphalt(sx-1.1,y0+0.3,2.2,d-0.6,zb);
+      ctx.fillStyle='rgba(240,220,120,.75)'; for(let yy=y0+0.8;yy<y0+d-0.6;yy+=1.2){ const a=P(sx-.06,yy,zb+.012),b=P(sx+.06,yy,zb+.012),c=P(sx+.06,yy+.6,zb+.012),e=P(sx-.06,yy+.6,zb+.012); quad([a,b,c,e],'rgba(240,220,120,.75)',false); } });
+    const B=[[x0+0.5,y0+0.6,1.7,2.2,6.2,[92,98,118],'255,214,120'],[x0+0.5,y0+3.4,1.7,2.6,4.2,[118,104,96],'160,220,255'],[x0+0.5,y0+6.6,1.7,2.2,7.4,[70,78,100],'255,190,120'],
+             [x0+0.5,y0+9.4,1.7,2.4,3.4,[130,118,110],'255,214,120'],[x0+0.5,y0+12.4,1.7,2.6,5.6,[84,92,112],'180,240,255'],[x0+0.5,y0+15.6,1.7,2.4,4.6,[112,96,92],'255,200,130'],
+             [x0+w-2.2,y0+0.6,1.7,2.4,4.8,[124,112,104],'255,214,120'],[x0+w-2.2,y0+3.6,1.7,2.2,8.2,[74,84,108],'150,225,255'],[x0+w-2.2,y0+6.4,1.7,2.6,3.6,[132,120,112],'255,190,120'],
+             [x0+w-2.2,y0+9.6,1.7,2.2,5.2,[88,96,116],'255,214,120'],[x0+w-2.2,y0+12.4,1.7,2.6,6.8,[70,76,96],'180,240,255'],[x0+w-2.2,y0+15.6,1.7,2.4,4.0,[120,108,100],'255,200,130']];
+    B.forEach(([bx,by,bw,bd,bh,c,rgb],i)=>push((bx+bw)+(by+bd)+zb*0.01,()=>{ drawBox(bx,by,zb,bw,bd,bh,c,{ft:1.18,fr:1.0,fl:.7});
+      const lit=[1,0,1,1,0,1,1,1,0,1]; winGrid(bx,by+bd+0.01,zb+0.5,bw,bh-0.9,'S',3,Math.max(2,Math.round(bh/1.1)),lit,rgb);
+      winGrid(bx+bw+0.01,by,zb+0.5,bd,bh-0.9,'E',3,Math.max(2,Math.round(bh/1.1)),lit,rgb);
+      const c2=P(bx+bw/2,by+bd,zb+bh*.55); halo(c2[0],c2[1],TH*2.4,rgb,.10);
+      if(i%3===0) drawBox(bx+bw*.55,by+bd*.3,zb+bh,.4,.4,.5,[70,72,80]);
+      if(i%3===1){ const a=P(bx+bw*.5,by+bd*.5,zb+bh), b=P(bx+bw*.5,by+bd*.5,zb+bh+1.4); ctx.strokeStyle='#9AA0AA'; ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke(); const bl=(Math.sin(t*3+i)>0); if(bl){ ctx.fillStyle='#FF5A5A'; ctx.beginPath(); ctx.arc(b[0],b[1],2,0,6.28); ctx.fill(); } }
+      if(i===2||i===7){ const c3=P(bx+bw/2,by+bd+0.02,zb+bh-0.7); halo(c3[0],c3[1],TH*3,i===2?'255,80,160':'80,220,255',.45); ctx.fillStyle=i===2?'#FF66C4':'#5AE0FF'; ctx.fillRect(c3[0]-TW*.5,c3[1]-3,TW,6); } }));
+    const CARS=[[y0+2.0,1,'#D8433A'],[y0+7.5,-1,'#3A6FD8'],[y0+12.6,1,'#E8D24A'],[y0+16.4,-1,'#EEEEEE']];
+    CARS.forEach(([cy0,dir,cc],i)=>{ const cy=cy0+(reduce?0:((t*1.6*dir+i*5)%(d-2)+ (dir<0?0:0))); const yy=y0+1+((cy-y0+ (d-2))%(d-2)); const cx=sx+dir*0.5;
+      push((cx+.5)+(yy+1)+zb*0.01+0.05,()=>{ drawBox(cx-.32,yy-.55,zb+.05,.64,1.1,.32,[40,40,46]); drawBox(cx-.34,yy-.5,zb+.35,.68,1.0,.26,hexRGB(cc),{ft:1.2}); drawBox(cx-.26,yy-.2,zb+.61,.52,.5,.22,[60,70,90],{ft:1.4});
+        const fy=dir>0?yy+.5:yy-.5; const f=P(cx,fy,zb+.4); halo(f[0],f[1],TH*1.6,'255,240,200',.5); const bk=P(cx,dir>0?yy-.5:yy+.5,zb+.4); halo(bk[0],bk[1],TH*.9,'255,60,60',.45); }); });
+    for(const yy of [y0+3,y0+8,y0+13,y0+18]) for(const side of [-1,1]){ const lx=sx+side*1.35; push((lx+.1)+(yy+.1)+zb*0.01+0.04,()=>{ drawBox(lx-.05,yy-.05,zb,.1,.1,2.2,[70,72,80]); drawLantern(lx,yy,zb+2.25,'220,235,255',.7,.7); }); } },
+  /* -------- ALTA FANTASIA: cidade medieval com três luas -------- */
+  alta(p,zb,now){ const [x0,y0,w,d]=p.rect; const cy=y0+d/2;
+    fillPat(rectPts(x0+0.6,y0+0.6,w-1.2,d-1.2),zb,'cobble',0.45);
+    const H=[[x0+0.8,y0+0.6,2.2,1.8,1.5,[224,206,176],[150,72,54],'x'],[x0+3.6,y0+0.5,2.0,1.7,1.7,[214,196,166],[92,66,88],'y'],[x0+6.2,y0+0.6,2.4,1.8,1.4,[230,214,184],[140,84,50],'x'],
+             [x0+9.4,y0+0.5,2.0,1.7,1.9,[206,188,160],[70,60,90],'y'],[x0+12.0,y0+0.6,2.4,1.8,1.5,[228,210,180],[150,72,54],'x'],[x0+15.0,y0+0.5,2.2,1.8,1.6,[216,198,168],[96,70,92],'x'],
+             [x0+1.4,y0+3.6,2.2,1.7,1.4,[222,204,174],[124,78,52],'x'],[x0+5.0,y0+3.7,2.4,1.7,1.3,[230,214,184],[84,64,96],'x'],[x0+9.0,y0+3.6,2.2,1.7,1.5,[214,196,166],[150,72,54],'y'],[x0+12.6,y0+3.7,2.4,1.7,1.4,[224,206,176],[70,60,90],'x']];
+    for(const [hx,hy,hw,hd,hh,wall,roof,ridge] of H) house({x:hx,y:hy,z:zb,w:hw,d:hd,h:hh,wall,roof,rh:.95,ridge,door:.5,lit:1,win:[{f:'S',u:.35,z:.5,w:.4},{f:'S',u:hw-.75,z:.5,w:.4},{f:'E',u:.5,z:.5,w:.4}]});
+    push((x0+w-1.2)+(y0+3.4)+zb*0.01,()=>{ drawPrism(x0+w-1.5,y0+2.9,.6,.55,zb,3.4,8,[190,178,160],{top:false}); drawCone(x0+w-1.5,y0+2.9,.72,zb+3.4,1.5,8,[92,66,88]); const c=P(x0+w-1.5,y0+2.9,zb+2.4); halo(c[0],c[1],TH*1.6,'255,206,120',.5); });
+    push((x0+w/2)+(cy)+zb*0.01+0.02,()=>{ drawPrism(x0+w/2-0.2,cy+0.2,.42,.4,zb,.55,10,[112,106,124]); for(const ox of [-.4,.4]) drawBox(x0+w/2-0.2+ox-.05,cy+0.15,zb+.55,.1,.1,.8,M.wood); });
+    for(const lx of [x0+3.2,x0+8.6,x0+14.2]) push((lx+.1)+(y0+3.0)+zb*0.01+0.04,()=>{ drawBox(lx-.05,y0+2.95,zb,.1,.1,1.6,[52,44,40]); drawLantern(lx,y0+3.0,zb+1.65,'255,200,110',.8,.7); });
+    if(!MOONS.some(m=>m[6]===p.id)){ const mx=x0+w/2+OFX, my=y0+OFY-1.0; MOONS.push([mx-5.0,my+2.5,7.2,1.15,'#E9E4D6','235,230,215',p.id],[mx,my+2.5,8.8,1.5,'#9EC3FF','150,190,255',p.id],[mx+5.0,my+2.5,7.2,1.15,'#FF9A7A','255,150,110',p.id]); } },
+  /* -------- FANTASIA HISTÓRICA: palácio grego e arena de gladiadores -------- */
+  historica(p,zb,now){ const [x0,y0,w,d]=p.rect; const MB=[224,216,198], MD=[196,188,170];
+    const px=x0+0.6, py=y0+0.7, pw=w-1.2, pd=7.2;
+    push((px+pw)+(py+pd)+zb*0.01,()=>{ drawBox(px,py,zb,pw,pd,.32,MD,{ft:1.15}); drawBox(px+.25,py+.25,zb+.32,pw-.5,pd-.5,.3,MB,{ft:1.15});
+      for(let i=0;i<4;i++){ drawPrism(px+.7+i*(pw-1.4)/3,py+pd-.6,.19,.17,zb+.62,2.2,8,MB,{top:false}); drawPrism(px+.7+i*(pw-1.4)/3,py+.7,.19,.17,zb+.62,2.2,8,MB,{top:false}); }
+      for(let j=1;j<4;j++){ drawPrism(px+.7,py+.7+j*(pd-1.4)/4,.19,.17,zb+.62,2.2,8,MB,{top:false}); drawPrism(px+pw-.7,py+.7+j*(pd-1.4)/4,.19,.17,zb+.62,2.2,8,MB,{top:false}); }
+      drawBox(px+.3,py+.3,zb+2.82,pw-.6,pd-.6,.32,MD,{ft:1.16});
+      quad([P(px+.2,py+pd+.02,zb+3.14),P(px+pw-.2,py+pd+.02,zb+3.14),P(px+pw/2,py+pd+.02,zb+4.1)],col(MB,1.0),'rgba(90,80,60,.4)');
+      quad([P(px+.2,py+pd+.02,zb+3.14),P(px+pw/2,py+pd+.02,zb+4.1),P(px+pw/2,py-.02,zb+4.1),P(px+.2,py-.02,zb+3.14)],col(MB,.9));
+      quad([P(px+pw-.2,py+pd+.02,zb+3.14),P(px+pw/2,py+pd+.02,zb+4.1),P(px+pw/2,py-.02,zb+4.1),P(px+pw-.2,py-.02,zb+3.14)],col(MB,.78));
+      const g=P(px+pw/2,py+pd,zb+1.4); halo(g[0],g[1],TH*3,'255,214,150',.35); });
+    const ax=x0+w/2, ay=y0+d-5.2;
+    push((ax+3)+(ay+3)+zb*0.01,()=>{ drawPrism(ax,ay,2.7,2.5,zb,.5,18,[186,176,158],{top:true}); drawPrism(ax,ay,2.25,2.05,zb+.5,.5,18,[196,186,166],{top:true}); drawPrism(ax,ay,1.8,1.6,zb+1.0,.45,18,[206,196,176],{top:true});
+      const c=P(ax,ay,zb+1.46); ctx.fillStyle='#C9A96E'; ctx.beginPath(); ctx.ellipse(c[0],c[1],1.35*TW,1.2*TH,0,0,Math.PI*2); ctx.fill();
+      const r2=rng(77); for(let i=0;i<26;i++){ const a=r2()*6.28, rr=2.0+r2()*.5; const q=P(ax+Math.cos(a)*rr,ay+Math.sin(a)*rr*.92,zb+1.0+ (rr>2.3?0.0:0.45)); ctx.fillStyle=['#C8443E','#3E6FB0','#F1E6D2','#5A3E2C'][i%4]; ctx.beginPath(); ctx.arc(q[0],q[1]-TH*.4,Math.max(1.2,TH*.22),0,6.28); ctx.fill(); }
+      drawPerson(ax-.55,ay+.1,zb+1.46,1,reduce?0:now*6,[150,60,50],0,{skin:'#D9A47A',hair:'#2E2A26'}); drawPerson(ax+.55,ay-.1,zb+1.46,-1,reduce?0:now*6+2,[60,70,120],0,{skin:'#C48A62',hair:'#1E1A18'});
+      const s1=P(ax-.55,ay+.1,zb+2.0), s2=P(ax+.55,ay-.1,zb+2.0); ctx.strokeStyle='#E8E4DC'; ctx.lineWidth=1.6; ctx.beginPath(); ctx.moveTo(s1[0],s1[1]); ctx.lineTo(s1[0]+TW*.5,s1[1]-TH*.9); ctx.moveTo(s2[0],s2[1]); ctx.lineTo(s2[0]-TW*.5,s2[1]-TH*.9); ctx.stroke();
+      for(const [bx,by,bc] of [[ax-2.4,ay-1.6,'#8E2A24'],[ax+2.4,ay-1.6,'#8E2A24'],[ax,ay-2.6,'#C9A227']]){ drawBox(bx-.05,by-.05,zb+1.5,.1,.1,1.6,[60,54,50]); const bp=P(bx,by,zb+3.1); ctx.fillStyle=bc; ctx.beginPath(); ctx.moveTo(bp[0],bp[1]); ctx.lineTo(bp[0]+TW*.6,bp[1]+TH*.25); ctx.lineTo(bp[0],bp[1]+TH*.7); ctx.closePath(); ctx.fill(); } }); },
+  /* -------- COZY: tenda de poções e livros, moça tomando chá -------- */
+  cozy(p,zb,now){ const [x0,y0,w,d]=p.rect; const cy=y0+d/2; const t=reduce?0:now;
+    const tx=x0+4.2, ty=cy;
+    push((tx+2.6)+(ty+2.6)+zb*0.01,()=>{ drawPrism(tx,ty,2.5,2.3,zb,.25,8,[150,120,100],{top:false}); drawPrism(tx,ty,2.45,2.25,zb+.25,1.5,8,[244,208,222],{top:false});
+      drawCone(tx,ty,2.7,zb+1.75,2.2,8,[236,150,190]);
+      for(let i=0;i<8;i+=2){ const a0=i/8*6.28, a1=(i+1)/8*6.28; quad([P(tx+Math.cos(a0)*2.7,ty+Math.sin(a0)*2.5,zb+1.75),P(tx+Math.cos(a1)*2.7,ty+Math.sin(a1)*2.5,zb+1.75),P(tx,ty,zb+3.95)],'rgba(255,244,236,.55)',false); }
+      quad([P(tx+.55,ty+2.28,zb+1.7),P(tx-.55,ty+2.28,zb+1.7),P(tx-.55,ty+2.28,zb+.25),P(tx+.55,ty+2.28,zb+.25)],'#3A2430',false);
+      const ap=P(tx,ty,zb+4.0); ctx.strokeStyle='#5A4634'; ctx.lineWidth=1.3; ctx.beginPath(); ctx.moveTo(ap[0],ap[1]); ctx.lineTo(ap[0],ap[1]-TH*1.2); ctx.stroke(); ctx.fillStyle='#F1C232'; ctx.beginPath(); ctx.moveTo(ap[0],ap[1]-TH*1.2); ctx.lineTo(ap[0]+TW*.5,ap[1]-TH*1.0); ctx.lineTo(ap[0],ap[1]-TH*.8); ctx.closePath(); ctx.fill();
+      const g=P(tx,ty+2.3,zb+.9); halo(g[0],g[1],TH*3.2,'255,200,140',.4); });
+    // estante de poções
+    const sx=tx+3.4, sy=cy-2.0;
+    push((sx+1.6)+(sy+.6)+zb*0.01+0.02,()=>{ drawBox(sx,sy,zb,1.6,.5,1.5,M.wood2,{ft:1.15}); for(const z of [.45,.95]) drawBox(sx,sy,zb+z,1.6,.5,.06,M.wood);
+      const cols=['255,80,140','80,220,140','120,140,255','255,200,60','255,120,60','160,80,255']; for(let i=0;i<6;i++){ const bx=sx+.18+i*.24, bz=zb+(i%2?.5:1.0)+.06; drawBox(bx-.07,sy+.15,bz,.14,.14,.3,[240,240,250],{ft:1.3}); const c=P(bx,sy+.22,bz+.15); halo(c[0],c[1],TH*.9,cols[i],.7); ctx.fillStyle=`rgba(${cols[i]},.85)`; ctx.fillRect(c[0]-2,c[1]-3,4,5); } });
+    // pilhas de livros
+    for(const [bx,by,n] of [[sx+2.0,cy-1.9,4],[sx+2.5,cy-1.2,3],[x0+1.4,cy+1.4,5]]) push((bx+.5)+(by+.5)+zb*0.01+0.03,()=>{ for(let i=0;i<n;i++) drawBox(bx-.25+(i%2)*.06,by-.18,zb+i*.14,.5,.36,.14,BOOKS[(i*5+n)%BOOKS.length],{ft:1.2}); });
+    // mesa de chá e a moça de vestido
+    const mx=tx+4.6, my=cy+1.6;
+    push((mx+.6)+(my+.6)+zb*0.01+0.04,()=>{ drawPrism(mx,my,.6,.55,zb,.55,10,[214,196,166],{top:true}); drawPrism(mx,my,.65,.6,zb+.55,.06,10,[244,236,222]);
+      drawPrism(mx-.15,my-.1,.14,.13,zb+.61,.28,8,[240,240,246],{top:false}); const sp=P(mx+.05,my-.1,zb+.78); ctx.strokeStyle='#E8E8EE'; ctx.lineWidth=1.4; ctx.beginPath(); ctx.moveTo(sp[0],sp[1]); ctx.lineTo(sp[0]+TW*.16,sp[1]-TH*.25); ctx.stroke();
+      drawPrism(mx+.25,my+.15,.08,.08,zb+.61,.12,8,[250,250,255],{top:false});
+      const st=P(mx-.15,my-.1,zb+.95); for(let i=0;i<3;i++){ const a=(t*.6+i*2.1)%6.28; halo(st[0]+Math.sin(a)*2,st[1]-i*4-((t*8)%12),3,'255,255,255',.25*(1-i*.3)); } });
+    push((mx+1.4)+(my+.9)+zb*0.01+0.05,()=>{ const lx=mx+.95, ly=my+.35; drawBox(lx-.28,ly-.24,zb,.56,.48,.4,M.wood2,{ft:1.15});
+      drawCone(lx,ly,.42,zb+.35,.95,10,[160,110,190]); drawBox(lx-.16,ly-.13,zb+1.28,.32,.26,.42,[176,126,200],{ft:1.2});
+      const hd=P(lx,ly,zb+1.9); ctx.fillStyle='#E8C9A8'; ctx.beginPath(); ctx.arc(hd[0],hd[1],Math.max(2,ZH*.15),0,6.28); ctx.fill();
+      ctx.fillStyle='#7A4A2E'; ctx.beginPath(); ctx.arc(hd[0],hd[1]-ZH*.05,Math.max(2,ZH*.16),Math.PI,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#E6A0C8'; ctx.beginPath(); ctx.ellipse(hd[0],hd[1]-ZH*.16,ZH*.28,ZH*.08,0,0,6.28); ctx.fill(); ctx.beginPath(); ctx.arc(hd[0],hd[1]-ZH*.2,ZH*.12,Math.PI,Math.PI*2); ctx.fill();
+      const arm=P(lx-.3,ly-.05,zb+1.45), cup=P(lx-.42,ly-.1,zb+1.62); ctx.strokeStyle='#E8C9A8'; ctx.lineWidth=Math.max(1.4,ZH*.06); ctx.beginPath(); ctx.moveTo(arm[0]+ZH*.1,arm[1]); ctx.lineTo(cup[0],cup[1]); ctx.stroke();
+      ctx.fillStyle='#FFFFFF'; ctx.fillRect(cup[0]-3,cup[1]-4,6,5); ctx.fillStyle='#C9A96E'; ctx.fillRect(cup[0]-2,cup[1]-3,4,1.5); });
+    // flores e lanternas
+    const fr=rng(31); push((x0+w)+(y0+d)+zb*0.01-0.01,()=>{ for(let i=0;i<60;i++){ const fx=x0+.6+fr()*(w-1.2), fy=y0+.5+fr()*(d-1.0); if(Math.hypot(fx-tx,fy-ty)<3.0||Math.hypot(fx-mx,fy-my)<1.6) continue; const q=P(fx,fy,zb+.03); ctx.fillStyle=['#F7A8C8','#FFE07A','#FFFFFF','#C9A0F0'][i%4]; ctx.beginPath(); ctx.arc(q[0],q[1],Math.max(1,TH*.14),0,6.28); ctx.fill(); } });
+    for(const lx of [x0+1.2,x0+w-1.2]) push((lx+.1)+(cy-2.2)+zb*0.01+0.04,()=>{ drawBox(lx-.05,cy-2.25,zb,.1,.1,1.5,[92,72,52]); drawLantern(lx,cy-2.2,zb+1.55,'255,190,130',.85,.8); });
+  }
+};
+function hexRGB(h){ return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]; }
 /* ===================== céu / terreno ===================== */
 const stars=[]; { const r=rng(99); for(let i=0;i<190;i++) stars.push([r(),r()*0.6,0.4+r()*1.2,r()*6.28,0.6+r()*2]); }
 function sky(now){
@@ -659,14 +767,14 @@ function terrain(now){
   ROFF(null);
   fillPat(LAND,0,'grass',0.95);
   // pontilhado de vegetação
-  const rr=rng(3); ctx.fillStyle='rgba(110,150,110,.13)'; for(let i=0;i<2200;i++){ const x=-76+rr()*152, y=-52+rr()*104; if(!inPoly([x,y],LAND)||inPoly([x,y],LAKE)||inPoly([x,y],MESA)||inPoly([x,y],HILL)) continue; const p=P(x,y,0.01); ctx.beginPath(); ctx.ellipse(p[0],p[1],TW*.11,TH*.11,0,0,Math.PI*2); ctx.fill(); }
+  const rr=rng(3); ctx.fillStyle='rgba(110,150,110,.13)'; for(let i=0;i<3200;i++){ const x=-100+rr()*200, y=-66+rr()*132; if(!inPoly([x,y],LAND)||inPoly([x,y],LAKE)||inPoly([x,y],MESA)||inPoly([x,y],HILL)) continue; const p=P(x,y,0.01); ctx.beginPath(); ctx.ellipse(p[0],p[1],TW*.11,TH*.11,0,0,Math.PI*2); ctx.fill(); }
   // lago
-  const lp=LAKE.map(p=>P(p[0],p[1],-0.02)); const lc=P(13,12,0); const wg=ctx.createRadialGradient(lc[0]+TW*4,lc[1]-TH*6,0,lc[0],lc[1],TW*9); wg.addColorStop(0,'#24404A'); wg.addColorStop(.45,'#132630'); wg.addColorStop(.8,'#0A1A22'); wg.addColorStop(1,'#0B171D');
+  const lp=LAKE.map(p=>P(p[0],p[1],-0.02)); const lc=P(76,33,0); const wg=ctx.createRadialGradient(lc[0]+TW*4,lc[1]-TH*6,0,lc[0],lc[1],TW*9); wg.addColorStop(0,'#24404A'); wg.addColorStop(.45,'#132630'); wg.addColorStop(.8,'#0A1A22'); wg.addColorStop(1,'#0B171D');
   quad(lp,wg,'rgba(8,6,12,.5)');
   // brilho e ondulação no lago (recortado)
   ctx.save(); ctx.beginPath(); ctx.moveTo(lp[0][0],lp[0][1]); for(let i=1;i<lp.length;i++) ctx.lineTo(lp[i][0],lp[i][1]); ctx.closePath(); ctx.clip();
   ctx.globalCompositeOperation='lighter'; for(let i=0;i<14;i++){ const y=lc[1]-TH*7+i*TH*1.1, wob=reduce?0:Math.sin(now*1.4+i)*TW*.6; ctx.fillStyle=`rgba(200,220,230,${.05+.03*Math.sin(i*1.7+now*2)})`; ctx.fillRect(lc[0]+TW*2+wob-TW*(1+i*.25),y,TW*(2+i*.5),1.2); }
-  ctx.globalCompositeOperation='source-over'; ctx.strokeStyle='rgba(200,215,220,.10)'; ctx.lineWidth=1; const ic=P(13,12,-0.02); for(let i=0;i<3;i++){ const t=reduce?i/3:((now*0.12+i/3)%1); ctx.globalAlpha=(1-t)*.9; ctx.beginPath(); ctx.ellipse(ic[0],ic[1],TW*(3.2+t*2.4),TH*(3.2+t*2.4),0,0,Math.PI*2); ctx.stroke(); } ctx.globalAlpha=1; ctx.restore();
+  ctx.globalCompositeOperation='source-over'; ctx.strokeStyle='rgba(200,215,220,.10)'; ctx.lineWidth=1; const ic=P(76,33,-0.02); for(let i=0;i<3;i++){ const t=reduce?i/3:((now*0.12+i/3)%1); ctx.globalAlpha=(1-t)*.9; ctx.beginPath(); ctx.ellipse(ic[0],ic[1],TW*(3.2+t*2.4),TH*(3.2+t*2.4),0,0,Math.PI*2); ctx.stroke(); } ctx.globalAlpha=1; ctx.restore();
   if(GFX>=1){ // reflexo do céu/lua e faíscas na água
     ctx.save(); ctx.beginPath(); ctx.moveTo(lp[0][0],lp[0][1]); for(let i=1;i<lp.length;i++) ctx.lineTo(lp[i][0],lp[i][1]); ctx.closePath(); ctx.clip(); ctx.globalCompositeOperation='lighter';
     const ly0=Math.min(...lp.map(p=>p[1])), ly1=Math.max(...lp.map(p=>p[1])); const fz=ctx.createLinearGradient(0,ly0,0,ly1); fz.addColorStop(0,'rgba(130,175,210,.26)'); fz.addColorStop(.45,'rgba(130,175,210,.06)'); fz.addColorStop(1,'rgba(130,175,210,0)'); ctx.fillStyle=fz; ctx.fillRect(0,ly0,W,ly1-ly0);
@@ -1463,7 +1571,7 @@ function fillPat(poly,z,name,alpha){ if(GFX<1) return; const tile=TILES[name]; i
   const sc=Z*TW0/11; if(pat.setTransform&&typeof DOMMatrix!=='undefined'){ try{ pat.setTransform(new DOMMatrix([sc,0,0,sc,panX,panY])); }catch(e){} }
   ctx.globalAlpha=alpha; ctx.fillStyle=pat; ctx.fillRect(x0,y0,x1-x0,y1-y0); ctx.restore(); }
 /* faíscas na água (lago = grupo 0, rios = grupo 1) */
-const SPARKS=[]; { const r=rng(55); let tries=0; while(SPARKS.length<64&&tries<5000){ tries++; const x=8+r()*10, y=8+r()*8; if(inPoly([x,y],LAKE)) SPARKS.push([x,y,r()*6.28,1.2+r()*2.2,0,0]); }
+const SPARKS=[]; { const r=rng(55); let tries=0; while(SPARKS.length<64&&tries<5000){ tries++; const x=66+r()*20, y=25+r()*16; if(inPoly([x,y],LAKE)) SPARKS.push([x,y,r()*6.28,1.2+r()*2.2,0,0]); }
   const along=(pts,hw,count)=>{ for(let i=0;i<count;i++){ const si=r()*(pts.length-1), k=Math.min(pts.length-2,Math.floor(si)), u=si-k; const a=pts[k], b=pts[k+1]; const dx=b[0]-a[0], dy=b[1]-a[1], L=Math.hypot(dx,dy)||1; const off=(r()-.5)*hw*1.5; SPARKS.push([lerp(a[0],b[0],u)-dy/L*off, lerp(a[1],b[1],u)+dx/L*off, r()*6.28, 1.2+r()*2.2, lerp(a[2]||0,b[2]||0,u), 1]); } };
   along(RIVER_W,1.5,44); along(RIVER,.75,20); along(OUTFLOW,.6,4); }
 function sparkles(now,group){ if(GFX<1) return; ctx.globalCompositeOperation='lighter'; const rr=Math.max(.9,TW*.08);
@@ -1698,29 +1806,25 @@ function satellites(now,R){
   for(const p of R.places){
     if(!p.sat) continue;
     const zb=R.cz||0;
-    if(st(p)==='open') outpost(p,zb,now); else emptyLot(p,zb,now);
+    if(st(p)==='open'){ if(p.scene&&SCENES[p.scene]) SCENES[p.scene](p,zb,now); else outpost(p,zb,now); } else emptyLot(p,zb,now);
   }
 }
 
 /* ---- terreno vazio (subgênero trancado): só a cerca ---- */
 function emptyLot(p,zb,now){
-  const near=Z>=0.85, lbl=Z>=2.0, rr=RSAT*0.74, N=10, GAP=2; /* GAP: poste do portão (frente) */
-  const pt=(i)=>{ const a=(i/N)*Math.PI*2+Math.PI*0.1; return [p.x+Math.cos(a)*rr, p.y+Math.sin(a)*rr]; };
-  push((p.x+rr)+(p.y+rr)+zb*0.01-0.04,()=>{
-    const sp=[]; for(let i=0;i<28;i++){ const a=i/28*Math.PI*2; sp.push(P(p.x+Math.cos(a)*rr,p.y+Math.sin(a)*rr,zb+0.02)); }
-    ctx.fillStyle='rgba(52,46,36,.42)'; ctx.beginPath(); sp.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1])); ctx.closePath(); ctx.fill(); });
-  if(!near) return;
-  const WD=[126,100,70];
-  for(let i=0;i<N;i++){
-    const [x0,y0]=pt(i), [x1,y1]=pt((i+1)%N);
-    const isGate=(i===GAP);
-    if(!isGate) push(((x0+x1)/2+.24)+((y0+y1)/2+.24)+zb*0.01+0.02,()=>{
-      for(const z of [zb+.30,zb+.52]){ const a=P(x0,y0,z), b=P(x1,y1,z);
-        ctx.strokeStyle=col(WD,1.0); ctx.lineWidth=Math.max(1.1,TH*.15); ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke(); } });
-    push((x0+.1)+(y0+.1)+zb*0.01+0.03,()=>drawBox(x0-.06,y0-.06,zb,.12,.12,.64,WD,{ft:1.16}));
-  }
-  if(lbl) push((p.x)+(p.y+rr)+zb*0.01+0.05,()=>{ const c=P(p.x,p.y+rr+0.3,zb+0.85);
-    ctx.fillStyle='rgba(228,216,186,.24)'; ctx.font=`600 ${Math.max(8,TH*0.38)}px Karla, sans-serif`; ctx.textAlign='center';
+  const near=Z>=0.8, lbl=Z>=1.6; if(!near||!p.rect) return;
+  const [x0,y0,w,d]=p.rect, ins=0.7, x=x0+ins, y=y0+ins, W2=w-2*ins, D2=d-2*ins, WD=[126,100,70];
+  const step=1.9;
+  const post=(px,py)=>push((px+.1)+(py+.1)+zb*0.01+0.03,()=>drawBox(px-.06,py-.06,zb,.12,.12,.66,WD,{ft:1.16}));
+  const rail=(ax,ay,bx,by)=>push(((ax+bx)/2+.2)+((ay+by)/2+.2)+zb*0.01+0.02,()=>{ for(const z of [zb+.30,zb+.52]){ const A=P(ax,ay,z), B=P(bx,by,z);
+      ctx.strokeStyle=col(WD,1.0); ctx.lineWidth=Math.max(1.1,TH*.15); ctx.beginPath(); ctx.moveTo(A[0],A[1]); ctx.lineTo(B[0],B[1]); ctx.stroke(); } });
+  const side=(ax,ay,bx,by,gate)=>{ const L=Math.hypot(bx-ax,by-ay), n=Math.max(1,Math.round(L/step));
+    for(let i=0;i<=n;i++){ const t=i/n; post(ax+(bx-ax)*t, ay+(by-ay)*t); }
+    for(let i=0;i<n;i++){ if(gate&&i===Math.floor(n/2)) continue; const t0=i/n, t1=(i+1)/n; rail(ax+(bx-ax)*t0,ay+(by-ay)*t0,ax+(bx-ax)*t1,ay+(by-ay)*t1); } };
+  /* portão no lado voltado para o centro do bloco */
+  side(x,y,x+W2,y,p.slot===3); side(x+W2,y,x+W2,y+D2,p.slot===0); side(x+W2,y+D2,x,y+D2,p.slot===1); side(x,y+D2,x,y,p.slot===2);
+  if(lbl) push((x+W2/2)+(y+D2)+zb*0.01+0.05,()=>{ const c=P(x+W2/2,y+D2/2,zb+0.9);
+    ctx.fillStyle='rgba(228,216,186,.26)'; ctx.font=`600 ${Math.max(8,TH*0.42)}px Karla, sans-serif`; ctx.textAlign='center';
     ctx.fillText('terreno vazio',c[0],c[1]); ctx.textAlign='left'; });
 }
 /* ---- estátua do gênero: personagem de pedra segurando um livro ---- */
@@ -2093,13 +2197,13 @@ function renderCard(){
     else { k='Reino completo'; cls='open'; h='Mundo de Luiz'; n='91<small>salas</small>'; pct=100; p='Todas as salas abertas. 13 gêneros, 7 subgêneros cada.'; } }
   cardEl.innerHTML=`<div class="card"><div class="k ${cls}">${k}</div><h2>${h}</h2><div class="n">${n}</div><p>${p}</p><div class="bar ${barCls}"><i style="width:${pct}%"></i></div></div>`;
 }
-function buildRegionChips(){ const el=document.getElementById('regions'); el.innerHTML=''; for(const r of REGIONS){ const b=document.createElement('button'); b.type='button'; b.dataset.id=r.id; b.setAttribute('aria-pressed','false'); b.innerHTML=`${r.tab||r.name}<small>${r.genre}</small>`; b.addEventListener('click',()=>{ focused=focused===r.id?null:r.id; for(const o of el.children) o.setAttribute('aria-pressed',o.dataset.id===focused?'true':'false'); if(focused){ focusWorld(r.cx+(r.ox||0),r.cy+(r.oy||0),r.cz,1.9); sel=r.id; } else { cam={Z:1,panX:0,panY:0}; sel=null; } renderCard(); }); el.appendChild(b); } }
+function buildRegionChips(){ const el=document.getElementById('regions'); el.innerHTML=''; for(const r of REGIONS){ const b=document.createElement('button'); b.type='button'; b.dataset.id=r.id; b.setAttribute('aria-pressed','false'); b.innerHTML=(r.tab===r.genre)?`${r.genre}`:`${r.tab||r.name}<small>${r.genre}</small>`; b.addEventListener('click',()=>{ focused=focused===r.id?null:r.id; for(const o of el.children) o.setAttribute('aria-pressed',o.dataset.id===focused?'true':'false'); if(focused){ focusWorld(r.cx+(r.ox||0),r.cy+(r.oy||0),r.cz,1.9); sel=r.id; } else { cam={Z:1,panX:0,panY:0}; sel=null; } renderCard(); }); el.appendChild(b); } }
 function buildSr(){ srEl.innerHTML=''; for(const r of REGIONS){ for(const p of r.places){ const b=document.createElement('button'); b.type='button'; b.textContent=`${p.name} — ${r.name}`; b.addEventListener('focus',()=>{ hot=p.id; focusWorld(p.x+(r.ox||0),p.y+(r.oy||0),(p.sign[2]||0),2.1); renderCard(); }); b.addEventListener('blur',()=>{ hot=null; renderCard(); }); b.addEventListener('click',()=>{ if(st(p)==='open'&&subOf(p.id)){ sel=p.id; roomOpen(p.id); } else { sel=sel===p.id?null:p.id; renderCard(); } }); srEl.appendChild(b); } } }
 
 /* ===================== laço ===================== */
 function frame(now){
   T=now; prims=[]; tickCam();
-  sky(now); terrain(now);
+  sky(now); terrain(now); drawMoons(now);
   for(const r of REGIONS){ ROFF(r); const f=BUILD[r.id]; if(f) f(now,r); }
   for(const r of REGIONS){ ROFF(r); satellites(now,r); }
   ROFF(null);
