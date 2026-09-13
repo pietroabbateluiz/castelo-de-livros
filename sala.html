@@ -192,7 +192,7 @@
   </form>
   <p class="rodape">Na sala: seus livros ficam na estante “Minha Estante” (à esquerda da lareira), com o título na lombada; os que estão em <b>Lendo</b> ficam empilhados na mesa. Clique num livro na sala (ou mire nele e aperte E) para abri-lo aqui. Tecla B abre e fecha este painel.</p>
 </aside>
-<div class="load" id="load">acendendo a lareira…</div>
+<div class="load" id="load"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 ( function () {
@@ -4346,7 +4346,7 @@ function ovalGlassTex(){const Wc=256,Hc=384,c=can(Wc,Hc),x=c.getContext('2d'),r=
   for(let ring=0;ring<4;ring++){const r0=ring*0.25,r1=r0+0.25;const seg=6+ring*4;for(let k=0;k<seg;k++){const a0=k/seg*Math.PI*2,a1=(k+1)/seg*Math.PI*2;x.beginPath();x.moveTo(cx+Math.cos(a0)*r0*Wc*0.5,cy+Math.sin(a0)*r0*Hc*0.5);for(let t=0;t<=6;t++){const a=a0+(a1-a0)*t/6;x.lineTo(cx+Math.cos(a)*r1*Wc*0.5,cy+Math.sin(a)*r1*Hc*0.5);}for(let t=6;t>=0;t--){const a=a0+(a1-a0)*t/6;x.lineTo(cx+Math.cos(a)*r0*Wc*0.5,cy+Math.sin(a)*r0*Hc*0.5);}x.closePath();x.fillStyle='hsl('+hues[(k+ring)%hues.length]+','+(70+r()*20)+'%,'+(45+r()*25)+'%)';x.fill();x.strokeStyle='rgba(8,6,10,.95)';x.lineWidth=4;x.stroke();}}
   x.restore();x.strokeStyle='#3a3238';x.lineWidth=14;x.beginPath();x.ellipse(Wc/2,Hc/2,Wc*0.46,Hc*0.47,0,0,7);x.stroke();return new THREE.CanvasTexture(c);}
 
-loadEl.textContent='entalhando a madeira…';
+
 const WOOD=woodSet(512,[74,44,26],64,11,[3,3],1.4);
 const WOOD2=woodSet(512,[52,30,18],52,19,[2,2],1.2);
 const PARQ=parquetSet(512,[7,7.5]);
@@ -4723,7 +4723,7 @@ logLoad();
 /* ================= HALL DOS GÊNEROS (cena-hub: rotunda com uma porta por gênero) ================= */
 const HR=7.4,HH=8.2; // rotunda de 5 arcos
 const hallScene=new THREE.Scene();hallScene.fog=new THREE.FogExp2(0x0e0906,0.028);
-const HALL_DOORS=[],HOBST=[[0,0,1.2],[-6.3,0,1.3],[-6.2,1.0,1.0],[-6.2,-1.0,1.0],[-6.5,1.6,0.6],[-6.5,-1.6,0.6],[-5.3,-1.85,0.5]];
+const HALL_DOORS=[],HOBST=[[-6.3,0,1.3],[-6.2,1.0,1.0],[-6.2,-1.0,1.0],[-6.5,1.6,0.6],[-6.5,-1.6,0.6],[-5.3,-1.85,0.5]];
 const GEN_KEYS=Object.keys(EST.GENEROS);
 const GENRE_ROOM={catedral:'cat',charneca:'lib',mesa:'sci',castelo:'fant',navegacoes:'adv'}; // gênero → sala (os cinco gêneros do Mundo); sem entrada = porta trancada
 const HALLX={shop:null,owl:null,anim:[],atril:null};
@@ -4836,14 +4836,16 @@ function hcandle(x,y,z,h,r,parent){const p=parent||hallScene;const c=new THREE.M
       hbox(VW+0.7,0.16,0.36,HM.stoneF,0,VY-0.1,0.12,wg,{nocast:true}); // peitoril
       for(const s of [-1,1]){const lx=s*(VW/2+0.62);hbox(0.08,0.08,0.34,M.iron,lx,1.9,0.14,wg);const lg=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.28,0.16),HM.glass);lg.position.set(lx,1.76,0.34);wg.add(lg);hbox(0.22,0.05,0.22,M.iron,lx,1.92,0.34,wg,{nocast:true});hbox(0.22,0.05,0.22,M.iron,lx,1.6,0.34,wg,{nocast:true});
         const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,color:0xffb060,blending:THREE.AdditiveBlending,depthWrite:false,opacity:0.5}));sp.position.set(lx,1.76,0.42);sp.scale.set(0.8,0.8,1);wg.add(sp);} }});
-  // centro: estante-atril com livro aberto e 4 castiçais altos
-  { const g=new THREE.Group();hallScene.add(g);HALLX.atril=g;const ped=new THREE.Mesh(new THREE.LatheGeometry([[0.5,0],[0.5,0.08],[0.22,0.16],[0.16,0.9],[0.24,1.0],[0.34,1.08]].map(p=>new THREE.Vector2(p[0],p[1])),24),M.shelf);ped.castShadow=true;g.add(ped);
-    const top=hbox(0.9,0.06,0.7,M.shelf,0,1.14,0,g,{r:0.01});top.rotation.x=-0.35;
-    for(const sx of [-1,1]){const pg=hbox(0.36,0.035,0.5,M.pages,sx*0.19,1.2,0.02,g,{nocast:true});pg.rotation.x=-0.35;pg.rotation.y=sx*0.05;}
-    const cover=hbox(0.8,0.02,0.56,new THREE.MeshStandardMaterial({color:0x5a1622,roughness:.8}),0,1.17,0.0,g);cover.rotation.x=-0.35;
-    hcandle(0.55,1.25,-0.15,0.22,0.028,g);
-    hcandle(-0.5,1.27,-0.12,0.18,0.026,g); // sem castiçais de chão em volta (atrapalhavam a passagem): só as velas do próprio atril e uma luz quente sobre ele
-    const AL=new THREE.PointLight(0xffb060,0.9,7,2);AL.position.set(0,2.3,0);hallScene.add(AL); }
+  // centro: o Livro dos Contos flutuando acima da cabeça (sem pedestal nem obstáculo: dá para andar por baixo; clique em qualquer ponto dele ou E de perto)
+  { const g=new THREE.Group();g.position.set(0,2.05,0);hallScene.add(g);HALLX.atril=g;HALLX.livroY=2.05;
+    const cov=new THREE.MeshStandardMaterial({color:0x5a1622,roughness:.75});
+    for(const sx of [-1,1]){const half=new THREE.Group();half.position.set(sx*0.02,0,0);half.rotation.z=sx*0.22;g.add(half); // duas metades abertas em V suave
+      const c=hbox(0.62,0.03,0.82,cov,sx*0.31,-0.03,0,half);const pg=hbox(0.56,0.05,0.76,M.pages,sx*0.30,0.01,0,half,{nocast:true});
+      for(let k=0;k<3;k++){const ln=hbox(0.36,0.004,0.03,new THREE.MeshStandardMaterial({color:0x6a5a48,roughness:1}),sx*0.30,0.037,-0.22+k*0.2,half,{nocast:true});}}
+    hbox(0.08,0.05,0.82,cov,0,-0.02,0,g); // lombada
+    const halo=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,color:0xffd28a,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:0.55}));halo.scale.set(2.6,2.6,1);halo.position.y=0.1;g.add(halo);HALLX.livroHalo=halo;
+    const hit=new THREE.Mesh(new THREE.SphereGeometry(0.85,12,10),new THREE.MeshBasicMaterial({visible:false}));g.add(hit); // alvo generoso para o clique e a mira
+    const AL=new THREE.PointLight(0xffb060,1.0,7,2);AL.position.set(0,2.5,0);hallScene.add(AL); }
   // lojinha da Coruja: tenda de madeira com toldo listrado, prateleiras, jarro de moedas e a coruja no balcão (troca de moedas por itens)
   { const g=new THREE.Group();g.position.set(-6.0,0,0);g.rotation.y=Math.PI/2;hallScene.add(g);HALLX.shop=g;
     const canvasT=(()=>{const c=can(512,128),x=c.getContext('2d');for(let i=0;i<16;i++){x.fillStyle=i%2?'#7a2028':'#efe2c8';x.fillRect(i*32,0,32,128);}const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(2,1);return t;})();
@@ -5050,7 +5052,7 @@ function nebulaTex(){const S=512,c=can(S,S),x=c.getContext('2d'),r=rnd(621);x.cl
   for(let i=0;i<26;i++){const px=S*0.2+r()*S*0.6,py=S*0.2+r()*S*0.6,rad=40+r()*120;const g=x.createRadialGradient(px,py,0,px,py,rad);const col=cols[(r()*cols.length)|0];g.addColorStop(0,col+(0.10+r()*0.12)+')');g.addColorStop(1,col+'0)');x.fillStyle=g;x.fillRect(px-rad,py-rad,rad*2,rad*2);}
   const t=new THREE.CanvasTexture(c);return t;}
 function labelTex(text,w,h,fg,bg,fs){const c=can(w,h),x=c.getContext('2d');x.fillStyle=bg||'#0a1420';x.fillRect(0,0,w,h);x.strokeStyle=fg||'#5fe0ff';x.lineWidth=3;x.strokeRect(6,6,w-12,h-12);x.fillStyle=fg||'#5fe0ff';x.font='bold '+(fs||44)+'px "Segoe UI",Arial,sans-serif';x.textAlign='center';x.textBaseline='middle';try{x.letterSpacing='6px';}catch(e){}x.fillText(text,w/2,h/2+2);const t=new THREE.CanvasTexture(c);t.anisotropy=8;return t;}
-loadEl.textContent='pressurizando o deck…';
+
 const HULL=hullSet(512),DECK=deckSet(512);
 const SM={
   hull:new THREE.MeshStandardMaterial({map:clonedTex(HULL.map,4,2),normalMap:clonedTex(HULL.normalMap,4,2),roughnessMap:clonedTex(HULL.roughnessMap,4,2),color:0xc6ced8,roughness:0.7,metalness:0.5,normalScale:new THREE.Vector2(0.7,0.7)}),
@@ -5284,7 +5286,7 @@ function bannerTex(seed){const W=256,H=512,c=can(W,H),x=c.getContext('2d'),r=rnd
   else{x.beginPath();x.arc(0,-40,34,0,7);x.fill();x.fillRect(-9,-10,18,110);x.fillRect(-9,70,50,14);x.fillRect(-9,40,36,14);x.fillStyle=base[0];x.beginPath();x.arc(0,-40,16,0,7);x.fill();}
   x.restore();x.beginPath();x.moveTo(0,H-1);x.lineTo(W/2,H-70);x.lineTo(W,H-1);x.closePath();x.fillStyle=base[0];x.fill();x.strokeStyle=base[1];x.lineWidth=6;x.beginPath();x.moveTo(0,H-1);x.lineTo(W/2,H-70);x.lineTo(W,H-1);x.stroke();
   x.globalAlpha=0.1;for(let i=0;i<3000;i++){x.fillStyle=(i%2)?'#000':'#fff';x.fillRect(r()*W,r()*H,2,2);}x.globalAlpha=1;const t=new THREE.CanvasTexture(c);t.anisotropy=4;return t;}
-loadEl.textContent='montando os vitrais…';
+
 const CM={
   wall:new THREE.MeshStandardMaterial({map:clonedTex(STONE.map,6,3),normalMap:clonedTex(STONE.normalMap,6,3),color:0xa39ca0,roughness:0.95,normalScale:new THREE.Vector2(0.8,0.8)}),
   wall2:new THREE.MeshStandardMaterial({map:clonedTex(STONE.map,1,1),normalMap:clonedTex(STONE.normalMap,1,1),color:0xa39ca0,roughness:0.95,side:THREE.DoubleSide}),
@@ -5447,7 +5449,7 @@ function tuftTex(){const c=can(64,64),x=c.getContext('2d');x.clearRect(0,0,64,64
 function runeTex(){const c=can(512,128),x=c.getContext('2d');x.clearRect(0,0,512,128);x.strokeStyle='#8fd0ff';x.lineWidth=5;x.lineCap='round';const r=rnd(731);for(let i=0;i<10;i++){const px=30+i*48;for(let k=0;k<3;k++){x.beginPath();x.moveTo(px+(r()-0.5)*24,30+r()*20);x.lineTo(px+(r()-0.5)*24,70+r()*30);x.stroke();}x.beginPath();x.moveTo(px-12,64);x.lineTo(px+12,64+(r()-0.5)*30);x.stroke();}return new THREE.CanvasTexture(c);}
 function waterNormalTex(){const S=256,fbm=mkNoise(741);const Hc=can(S,S),h=Hc.getContext('2d');const hd=h.createImageData(S,S);for(let i=0;i<S*S;i++){const v=fbm((i%S)*0.05,(i/S|0)*0.05,3);hd.data[i*4]=hd.data[i*4+1]=hd.data[i*4+2]=v*255;hd.data[i*4+3]=255;}h.putImageData(hd,0,0);return tex(normalFrom(Hc,1.5),[3,3]);}
 function lilyTex(){const c=can(64,64),x=c.getContext('2d');x.clearRect(0,0,64,64);x.fillStyle='#2f7a3a';x.beginPath();x.moveTo(32,32);x.arc(32,32,30,0.35,Math.PI*2-0.35);x.closePath();x.fill();x.strokeStyle='rgba(20,60,25,.6)';x.lineWidth=1.5;for(let k=0;k<8;k++){const a=0.5+k*0.65;x.beginPath();x.moveTo(32,32);x.lineTo(32+Math.cos(a)*29,32+Math.sin(a)*29);x.stroke();}return new THREE.CanvasTexture(c);}
-loadEl.textContent='acendendo os vaga-lumes…';
+
 const GRASS=grassSet(512),BARK=barkSet(512),LEAFN=leafSet(256),WATERN=waterNormalTex();
 const FM={
   grass:new THREE.MeshStandardMaterial({map:GRASS.map,normalMap:GRASS.normalMap,color:0x8eac7a,roughness:1,normalScale:new THREE.Vector2(0.6,0.6)}),
@@ -5641,7 +5643,7 @@ function flagTex(){const c=can(512,320),x=c.getContext('2d');x.fillStyle='#8a1e2
 function cloudTex(seed){const S=256,c=can(S,S/2),x=c.getContext('2d'),r=rnd(seed);x.clearRect(0,0,S,S/2);for(let i=0;i<26;i++){const px=40+r()*(S-80),py=40+r()*(S/2-60)*(1-i/40),rad=18+r()*38;const g=x.createRadialGradient(px,py,0,px,py,rad);const l=235+r()*20;g.addColorStop(0,'rgba('+l+','+l+','+(l+5)+',.55)');g.addColorStop(0.6,'rgba('+(l-10)+','+(l-8)+','+l+',.22)');g.addColorStop(1,'rgba(220,225,235,0)');x.fillStyle=g;x.fillRect(px-rad,py-rad,rad*2,rad*2);}return new THREE.CanvasTexture(c);}
 function daySkyTex(){const c=can(64,512),x=c.getContext('2d');const g=x.createLinearGradient(0,0,0,512);g.addColorStop(0,'#2c6cc4');g.addColorStop(0.28,'#4d90dc');g.addColorStop(0.44,'#84b8e8');g.addColorStop(0.5,'#cfdfe8');g.addColorStop(0.53,'#c4d6e0');g.addColorStop(1,'#b8cbd6');x.fillStyle=g;x.fillRect(0,0,64,512);return new THREE.CanvasTexture(c);}
 function nameTex(){const c=can(1024,224),x=c.getContext('2d');x.fillStyle='#4a1418';x.fillRect(0,0,1024,224);x.strokeStyle='#d9b45a';x.lineWidth=8;x.strokeRect(14,14,996,196);x.fillStyle='#e9c86a';x.font='bold 120px Georgia,serif';x.textAlign='center';x.textBaseline='middle';try{x.letterSpacing='10px';}catch(e){}x.fillText('BOA VENTURA',512,112);const t=new THREE.CanvasTexture(c);t.anisotropy=8;return t;}
-loadEl.textContent='içando as velas…';
+
 const DECKP=plankSet(512,[178,146,102],921,14),DARKP=plankSet(512,[92,62,38],923,10),HULLT=hullTex(1024),CANV=canvasSet(256);
 const AM={
   deck:new THREE.MeshStandardMaterial({map:clonedTex(DECKP.map,4,3),normalMap:clonedTex(DECKP.normalMap,4,3),roughnessMap:clonedTex(DECKP.roughnessMap,4,3),color:0xc8b08a,roughness:0.9,normalScale:new THREE.Vector2(0.6,0.6)}),
@@ -6057,7 +6059,7 @@ window.__coins={get saldo(){return COINS.saldo;},ganhar(n){COINS.saldo+=n|0;COIN
 /* ================= CHAVES (escondidas pelo mundo; cada uma abre o baú trancado da sua sala — as portas ficam todas abertas) ================= */
 const KEY_STORE='mundo.chaves.v1',KEY_VER=4;const KEYS={tem:{},baus:{},ver:0,items:{},scene:null,active:[],anim:[]};
 // gênero da chave → [cena onde está escondida, x, y, z]: uma caça em cadeia (a do Hall abre o baú de Fantasia, que esconde a chave de Terror, e assim por diante)
-const KEY_SPOTS={castelo:['hall',0,1.5,0],charneca:['fant',-0.35,3.98,-7.0],catedral:['lib',3.3,1.2,-0.4],mesa:['cat',2.8,2.6,-7.1],navegacoes:['sci',5.8,1.15,1.0]}; // cadeia: atril do Hall → Fantasia → Terror → Histórica → Ficção científica → Aventura
+const KEY_SPOTS={castelo:['hall',0,1.45,0],charneca:['fant',-0.35,3.98,-7.0],catedral:['lib',3.3,1.2,-0.4],mesa:['cat',2.8,2.6,-7.1],navegacoes:['sci',5.8,1.15,1.0]}; // cadeia: atril do Hall → Fantasia → Terror → Histórica → Ficção científica → Aventura
 function keyLoad(){try{const d=JSON.parse(localStorage.getItem(KEY_STORE)||'null');if(d&&d.tem){KEYS.tem=d.tem;KEYS.baus=d.baus||{};KEYS.ver=d.ver|0;}}catch(e){}}
 function keySave(){try{localStorage.setItem(KEY_STORE,JSON.stringify({tem:KEYS.tem,baus:KEYS.baus,ver:KEY_VER}));}catch(e){}}
 function hasKey(genre){return !!KEYS.tem[genre];}
@@ -6083,7 +6085,7 @@ function keyTick(dt){if(ACTIVE!==KEYS.scene)keyActivate();const px=MODE==='fp'?P
   for(let i=KEYS.anim.length-1;i>=0;i--){const it=KEYS.anim[i];it.t+=dt;const k=Math.min(1,it.t/0.7);it.g.position.y=it.y+k*1.4;it.g.rotation.y+=dt*14;const sc=Math.max(0.001,1-k)*(it.g.userData.s0||1);it.g.scale.setScalar(sc);it.g.userData.sp.scale.setScalar(1+k*2.2);it.g.userData.sp.material.opacity=0.6*(1-k);it.g.userData.L.intensity=0.8*(1-k);if(k>=1){it.g.visible=false;KEYS.anim.splice(i,1);}}}
 keyLoad();if(KEYS.ver!==KEY_VER){const had=KEYS.ver>0;KEYS.tem={};KEYS.baus={};keySave();if(had)setTimeout(()=>showToast('Mundo atualizado: as salas estão todas abertas e as chaves agora abrem os baús trancados — chaves e baús recomeçaram; a primeira chave brilha no atril do Hall',{queue:true,big:true}),1800);}
 // dica de rumo ao começar: onde está a próxima chave ou o baú que ela abre
-function nextStep(){const built=Object.keys(GENRE_ROOM);const nome=k=>EST.GENEROS[k]?EST.GENEROS[k].nome:k;if(!Object.keys(KEYS.tem).length)return 'Uma chave brilha no atril, no centro do Hall — pegue-a: ela abre o Baú do Castelo, na sala de Fantasia';const pend=built.find(k=>hasKey(k)&&!KEYS.baus[k]);if(pend)return 'Você tem a chave de '+nome(pend)+' — o '+CHEST_NAME[GENRE_ROOM[pend]]+' espera por você na sala de '+nome(pend);const falta=built.filter(k=>!hasKey(k));if(falta.length)return 'Faltam '+falta.length+' chave'+(falta.length>1?'s':'')+' — cada uma está escondida numa das salas; a de '+nome(falta[0])+' vem primeiro';return 'Todos os baús abertos e as '+relicGoal()+' relíquias reunidas — a Coroa do Leitor é sua na Lojinha da Coruja';}
+function nextStep(){const built=Object.keys(GENRE_ROOM);const nome=k=>EST.GENEROS[k]?EST.GENEROS[k].nome:k;if(!Object.keys(KEYS.tem).length)return 'Uma chave brilha sob o Livro dos Contos, no centro do Hall — pegue-a: ela abre o Baú do Castelo, na sala de Fantasia';const pend=built.find(k=>hasKey(k)&&!KEYS.baus[k]);if(pend)return 'Você tem a chave de '+nome(pend)+' — o '+CHEST_NAME[GENRE_ROOM[pend]]+' espera por você na sala de '+nome(pend);const falta=built.filter(k=>!hasKey(k));if(falta.length)return 'Faltam '+falta.length+' chave'+(falta.length>1?'s':'')+' — cada uma está escondida numa das salas; a de '+nome(falta[0])+' vem primeiro';return 'Todos os baús abertos e as '+relicGoal()+' relíquias reunidas — a Coroa do Leitor é sua na Lojinha da Coruja';}
 function keyHint(){showToast(nextStep(),{queue:true,big:true});}
 if(keyBtn)keyBtn.addEventListener('click',()=>{const built=Object.keys(GENRE_ROOM);const nome=k=>EST.GENEROS[k]?EST.GENEROS[k].nome:k;const tem=built.filter(hasKey).map(nome),falta=built.filter(k=>!hasKey(k)).map(nome),nb=built.filter(k=>KEYS.baus[k]).length;showToast((tem.length?'Chaves: '+tem.join(', '):'Você ainda não tem chaves — a primeira está no atril do Hall')+(falta.length?' · faltam: '+falta.join(', '):'')+' · baús abertos: '+nb+' de '+built.length+' — cada chave abre o baú trancado da sua sala');});
 window.__chaves={tem:KEYS.tem,dar:g=>keyGrant(g,'achada'),estado:KEYS,items:KEYS.items,baus:KEYS.baus,spots:KEY_SPOTS};
@@ -6226,7 +6228,7 @@ function gearTick(dt){const P=GEAR.pet;if(P){const id=P.userData.pet;if(id==='va
   if(GEAR.lanternL&&GEAR.lanternL.visible)GEAR.lanternL.intensity=1.1*(1+0.06*Math.sin(t*11)+0.04*Math.sin(t*23));}
 // ---- a Coruja e a tenda ganham vida no Hall ----
 const owlV=new THREE.Vector3();
-function hallTick(dt){const O=HALLX.owl;if(!O)return;O.t+=dt;const px=MODE==='fp'?P.x:CH.x,pz=MODE==='fp'?P.z:CH.z;O.g.getWorldPosition(owlV);const dx=px-owlV.x,dz=pz-owlV.z,d=Math.hypot(dx,dz);
+function hallTick(dt){if(HALLX.atril){HALLX.atril.position.y=HALLX.livroY+Math.sin(t*1.1)*0.09;HALLX.atril.rotation.y=t*0.3;if(HALLX.livroHalo)HALLX.livroHalo.material.opacity=0.45+0.15*Math.sin(t*2.3);}const O=HALLX.owl;if(!O)return;O.t+=dt;const px=MODE==='fp'?P.x:CH.x,pz=MODE==='fp'?P.z:CH.z;O.g.getWorldPosition(owlV);const dx=px-owlV.x,dz=pz-owlV.z,d=Math.hypot(dx,dz);
   let want=0;if(d<7){let rel=Math.atan2(dx,dz)-Math.PI/2;rel=Math.atan2(Math.sin(rel),Math.cos(rel));want=Math.max(-1.1,Math.min(1.1,rel));}
   O.head.rotation.y+=(want-O.head.rotation.y)*Math.min(1,dt*3);O.head.rotation.z=Math.sin(O.t*0.7)*0.06;
   O.blink-=dt;if(O.blink<=0){O.blink=2+Math.random()*4;O.blinkT=0.18;}if(O.blinkT>0){O.blinkT-=dt;const k=O.blinkT>0.09?1-(O.blinkT-0.09)/0.09:O.blinkT/0.09;for(const e of O.eyes)e.scale.y=Math.max(0.08,1-k*0.95);}else for(const e of O.eyes)e.scale.y=1;
@@ -6381,7 +6383,7 @@ function resolveAt(px,py,center){if(center)ndc.set(0,0);else ndc.set((px/innerWi
 function act(tg){if(!tg)return;
   if(tg.kind==='hdoor'){const g=tg.g;const [tx,tz]=doorFront(g,1.35);walkTo(tx,tz,()=>{CH.dir=Math.atan2(g.position.x-CH.x,g.position.z-CH.z);if(g.userData.locked){g.userData.shake=0.6;showToast('Sala em construção — em breve');return;}openDoor(g,()=>enterRoom(g.userData.genre));});return;}
   if(tg.kind==='shop'){walkTo(-4.55,0,()=>{CH.dir=Math.atan2(-6-CH.x,0-CH.z);unlock();openShop();});return;}
-  if(tg.kind==='hlivro'){const d=Math.hypot(CH.x,CH.z)||1;walkTo(CH.x/d*2.1,CH.z/d*2.1,()=>{CH.dir=Math.atan2(-CH.x,-CH.z);unlock();openLivro();});return;}
+  if(tg.kind==='hlivro'){const d=Math.hypot(CH.x,CH.z)||1;if(d<2.6){unlock();openLivro();return;}walkTo(CH.x/d*1.6,CH.z/d*1.6,()=>{CH.dir=Math.atan2(-CH.x,-CH.z);unlock();openLivro();});return;}
   if(tg.kind==='chest'){const C=tg.chest;walkTo(C.ax,C.az,()=>{CH.dir=Math.atan2(C.x-CH.x,C.z-CH.z);chestTry(C);});return;}
   if(tg.kind==='story'){const S=tg.story;walkTo(S.ax,S.az,()=>{CH.dir=Math.atan2(S.x-CH.x,S.z-CH.z);unlock();openStory(S.genre);});return;}
   if(tg.kind==='door'){const [dx,dz]=ROOM.doorFront;walkTo(dx,dz,()=>{CH.dir=0;goHall();});return;}
@@ -6410,10 +6412,10 @@ function clickTP(px,py){act(resolveAt(px,py,false));}
 const promptEl=document.getElementById('prompt'),promptKey=document.getElementById('promptKey'),promptTxt=document.getElementById('promptTxt'),retEl=document.getElementById('ret');
 const MARK=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,color:0xffd070,transparent:true,depthWrite:false,depthTest:false,opacity:0.9}));MARK.scale.set(0.34,0.34,1);MARK.visible=false;MARK.layers.set(1);MARK.renderOrder=999;
 const mbox=new THREE.Box3(),mctr=new THREE.Vector3();
-function anchorOf(tg){if(!tg||!tg.obj)return null;mbox.setFromObject(tg.obj);if(mbox.isEmpty())return null;mbox.getCenter(mctr);let y=mbox.max.y+0.12;if(tg.kind==='hdoor'||tg.kind==='door')y=Math.min(mbox.max.y,mbox.min.y+2.3);else if(tg.kind==='shop'){y=1.75;mctr.x=-5.5;mctr.z=0;}else if(tg.kind==='chair')y=mbox.max.y+0.3;else if(tg.kind==='book')y=mbox.max.y+0.08;return mctr.set(mctr.x,y,mctr.z);}
+function anchorOf(tg){if(!tg||!tg.obj)return null;mbox.setFromObject(tg.obj);if(mbox.isEmpty())return null;mbox.getCenter(mctr);let y=mbox.max.y+0.12;if(tg.kind==='hdoor'||tg.kind==='door')y=Math.min(mbox.max.y,mbox.min.y+2.3);else if(tg.kind==='shop'){y=1.75;mctr.x=-5.5;mctr.z=0;}else if(tg.kind==='hlivro'){y=HALLX.livroY+0.75;mctr.x=0;mctr.z=0;}else if(tg.kind==='chair')y=mbox.max.y+0.3;else if(tg.kind==='book')y=mbox.max.y+0.08;return mctr.set(mctr.x,y,mctr.z);}
 function reachOK(tg){if(!tg||tg.kind==='floor')return false;const a=anchorOf(tg);if(!a)return false;return Math.hypot(a.x-CH.x,a.z-CH.z)<=(REACH[tg.kind]||3.5);}
 function nearBy(){for(const it of KEYS.active){if(Math.hypot(it.x-CH.x,it.z-CH.z)<2.7){const nome=EST.GENEROS[it.genre]?EST.GENEROS[it.genre].nome:it.genre;return {kind:'key',obj:it.g,item:it,label:'Pegar a chave de '+nome};}}
-  if(CUR==='hall'){if(HALLX.shop&&Math.hypot(-5.0-CH.x,CH.z)<2.6)return {kind:'shop',obj:HALLX.shop,label:'Abrir a Lojinha da Coruja'};if(HALLX.atril&&Math.hypot(CH.x,CH.z)<2.5)return {kind:'hlivro',obj:HALLX.atril,label:'Abrir o Livro dos Contos'};let best=null,bd=2.0;for(const g of HALL_DOORS){const [fx,fz]=doorFront(g,0.4);const d=Math.hypot(fx-CH.x,fz-CH.z);if(d<bd){bd=d;best=g;}}if(!best)return null;const G=EST.GENEROS[best.userData.genre];const nome=G?G.nome:best.userData.genre;return {kind:'hdoor',obj:best,g:best,dist:bd,label:best.userData.locked?nome+' · em construção':'Entrar: '+nome};}
+  if(CUR==='hall'){if(HALLX.shop&&Math.hypot(-5.0-CH.x,CH.z)<2.6)return {kind:'shop',obj:HALLX.shop,label:'Abrir a Lojinha da Coruja'};if(HALLX.atril&&Math.hypot(CH.x,CH.z)<2.8)return {kind:'hlivro',obj:HALLX.atril,label:'Abrir o Livro dos Contos'};let best=null,bd=2.0;for(const g of HALL_DOORS){const [fx,fz]=doorFront(g,0.4);const d=Math.hypot(fx-CH.x,fz-CH.z);if(d<bd){bd=d;best=g;}}if(!best)return null;const G=EST.GENEROS[best.userData.genre];const nome=G?G.nome:best.userData.genre;return {kind:'hdoor',obj:best,g:best,dist:bd,label:best.userData.locked?nome+' · em construção':'Entrar: '+nome};}
   const c=[];if(ROOM.door){const [dx,dz]=ROOM.doorFront;c.push([Math.hypot(dx-CH.x,dz-CH.z),{kind:'door',obj:ROOM.door,label:'Voltar ao Hall dos Gêneros'}]);}
   if(ROOM.chair&&ROOM.chairMeshes.length){const C=ROOM.chair;c.push([Math.hypot(C.x-CH.x,C.z-CH.z),{kind:'chair',obj:ROOM.chairMeshes[0],label:'Sentar '+(ROOM.seat||'na poltrona')}]);}
   if(ROOM.altarBook){const w=ROOM.altarBook.getWorldPosition(new THREE.Vector3());c.push([Math.hypot(w.x-CH.x,w.z-CH.z),{kind:'altar',obj:ROOM.altarBook,label:ROOM.altarLabel||'O Grande Livro · abrir a Estante'}]);}
@@ -6500,8 +6502,8 @@ function initCtrl(){const sl=document.getElementById('setSens'),sv=document.getE
   const snd=document.getElementById('setSom');if(snd){snd.checked=SET.sound;snd.addEventListener('change',()=>{SET.sound=snd.checked;try{localStorage.setItem('bibsom',SET.sound?'1':'0');}catch(e){}});}
   document.querySelectorAll('#ctrl .modes button').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.m)));
   const cx=document.getElementById('ctrlFechar');if(cx)cx.addEventListener('click',()=>showCtrl(false));if(bh)bh.addEventListener('click',()=>showCtrl(!ctrlOpen));
-  let seen=false;try{seen=localStorage.getItem('bibctrl')==='1';localStorage.setItem('bibctrl','1');}catch(e){}
-  if(!seen){showCtrl(true);ctrlTimer=setTimeout(()=>{if(ctrlOpen)showCtrl(false);},9000);}}
+  // a janela de controles não abre sozinha: começa direto no jogo (H ou o botão ❔ abrem quando quiser)
+  }
 // ---- controle (gamepad) ----
 let padOK=true;
 function pollPad(dt){if(!padOK)return;let gps=null;try{gps=navigator.getGamepads?navigator.getGamepads():null;}catch(e){padOK=false;return;}let gp=null;if(gps)for(const g of gps){if(g&&g.connected){gp=g;break;}}
@@ -6710,20 +6712,22 @@ function sugerirGenero(cats,titulo,sinopse){const txt=(cats||[]).join(' | ')+' |
   if(!genero)return null;const G=EST.GENEROS[genero];let sub=null;const txt2=txt+' | '+(sinopse||'').slice(0,600);for(const [re,sid] of SUB_MAP){if(G.subs.some(q=>q[0]===sid)&&re.test(txt2)){sub=sid;break;}}return {genero,sub:sub||G.subs[0][0],motivo};}
 const LANG_PT=l=>/^(pt|por)/i.test(l||'');
 const langTag=l=>{l=(l||'').toLowerCase();return l.startsWith('pt')||l==='por'?'PT':l.startsWith('en')||l==='eng'?'EN':l.startsWith('es')||l==='spa'?'ES':l.startsWith('fr')||l==='fre'||l==='fra'?'FR':l.startsWith('it')||l==='ita'?'IT':l.startsWith('de')||l==='ger'||l==='deu'?'DE':l.startsWith('ja')||l==='jpn'?'JA':l?l.slice(0,2).toUpperCase():'';};
+const GBOOKS_KEY=(window.MUNDO_GBOOKS_KEY||''); // opcional: uma chave própria da API do Google Books (Console do Google Cloud) tira o limite diário anônimo
+async function fetchT(u,ms){const c=new AbortController();const id=setTimeout(()=>c.abort(),ms||12000);try{return await fetch(u,{signal:c.signal});}finally{clearTimeout(id);}}
 const API={
-  async google(q,lang,n){const u='https://www.googleapis.com/books/v1/volumes?q='+encodeURIComponent(q)+'&maxResults='+(n||20)+'&printType=books'+(lang?'&langRestrict='+lang:'');const r=await fetch(u);if(!r.ok)throw new Error('Google Books '+r.status);const d=await r.json();
+  async google(q,lang,n){const u='https://www.googleapis.com/books/v1/volumes?q='+encodeURIComponent(q)+'&maxResults='+(n||20)+'&printType=books'+(lang?'&langRestrict='+lang:'')+(GBOOKS_KEY?'&key='+encodeURIComponent(GBOOKS_KEY):'');const r=await fetchT(u);if(!r.ok){const e=new Error('Google Books '+r.status);e.status=r.status;e.fonte='google';throw e;}const d=await r.json();
     return (d.items||[]).map(it=>{const v=it.volumeInfo||{};const ids=v.industryIdentifiers||[];const isbn=(ids.find(i=>i.type==='ISBN_13')||ids.find(i=>i.type==='ISBN_10')||{}).identifier||'';const cap=v.imageLinks?(v.imageLinks.thumbnail||v.imageLinks.smallThumbnail||''):'';
       return {fonte:'Google Books',titulo:v.title||'',subtitulo:v.subtitle||'',autor:(v.authors||[]).join(', '),paginas:v.pageCount||null,ano:(v.publishedDate||'').slice(0,4),editora:v.publisher||'',capa:cap.replace('http://','https://').replace('&edge=curl',''),isbn,cats:(v.categories||[]).concat(v.mainCategory?[v.mainCategory]:[]),sinopse:(v.description||'').replace(/<[^>]+>/g,''),lang:v.language||'',pop:(v.ratingsCount||0)*3+(v.averageRating?4:0)};});},
   // Open Library devolve OBRAS (com contagem de edições e popularidade) e, com lang=pt, a melhor edição em português de cada obra
   async openlib(t,a,n){const F='key,title,author_name,first_publish_year,edition_count,ratings_count,readinglog_count,want_to_read_count,already_read_count,number_of_pages_median,cover_i,isbn,subject,language,publisher,editions,editions.key,editions.title,editions.subtitle,editions.language,editions.publisher,editions.number_of_pages,editions.isbn,editions.cover_i,editions.publish_date';
-    const u='https://openlibrary.org/search.json?'+(a?'title='+encodeURIComponent(t)+'&author='+encodeURIComponent(a):'q='+encodeURIComponent(t))+'&lang=pt&limit='+(n||20)+'&fields='+F;const r=await fetch(u);if(!r.ok)throw new Error('Open Library '+r.status);const d=await r.json();
+    const u='https://openlibrary.org/search.json?'+(a?'title='+encodeURIComponent(t)+'&author='+encodeURIComponent(a):'q='+encodeURIComponent(t))+'&lang=pt&limit='+(n||20)+'&fields='+F;const r=await fetchT(u,15000);if(!r.ok){const e=new Error('Open Library '+r.status);e.status=r.status;e.fonte='openlib';throw e;}const d=await r.json();
     const out=[];for(const x of (d.docs||[])){const pop=(x.readinglog_count||0)+(x.want_to_read_count||0)+(x.already_read_count||0)+(x.ratings_count||0)*3;const base={fonte:'Open Library',autor:(x.author_name||[]).join(', '),ano:x.first_publish_year?String(x.first_publish_year):'',cats:(x.subject||[]).slice(0,14),sinopse:'',pop,edicoes:x.edition_count||0,obra:x.key||''};
       const ed=(x.editions&&x.editions.docs&&x.editions.docs[0])||null;const edPt=!!(ed&&ed.title&&LANG_PT((ed.language||[])[0]));const langs=x.language||[];
       const langObra=edPt&&norm(ed.title)===norm(x.title)?'por':(langs.includes('eng')?'eng':(langs.length===1?langs[0]:(langs.includes('por')&&!edPt?'por':(langs[0]||''))));
       out.push(Object.assign({},base,{titulo:x.title||'',paginas:x.number_of_pages_median||null,editora:(x.publisher||[])[0]||'',capa:x.cover_i?'https://covers.openlibrary.org/b/id/'+x.cover_i+'-M.jpg':'',isbn:(x.isbn||[])[0]||'',lang:langObra}));
       if(ed&&ed.title&&LANG_PT((ed.language||[])[0])&&norm(ed.title)!==norm(x.title)){out.push(Object.assign({},base,{titulo:ed.title+(ed.subtitle?': '+ed.subtitle:''),paginas:ed.number_of_pages||x.number_of_pages_median||null,editora:(ed.publisher||[])[0]||'',capa:ed.cover_i?'https://covers.openlibrary.org/b/id/'+ed.cover_i+'-M.jpg':(x.cover_i?'https://covers.openlibrary.org/b/id/'+x.cover_i+'-M.jpg':''),isbn:(ed.isbn||[])[0]||'',lang:'por',ano:(ed.publish_date||'').match(/\d{4}/)?ed.publish_date.match(/\d{4}/)[0]:base.ano,original:x.title}));}}
     return out;},
-  async openlibIsbn(n){const r=await fetch('https://openlibrary.org/api/books?bibkeys=ISBN:'+n+'&format=json&jscmd=data');if(!r.ok)throw new Error('Open Library '+r.status);const d=await r.json();const x=d['ISBN:'+n];if(!x)return [];
+  async openlibIsbn(n){const r=await fetchT('https://openlibrary.org/api/books?bibkeys=ISBN:'+n+'&format=json&jscmd=data');if(!r.ok){const e=new Error('Open Library '+r.status);e.status=r.status;e.fonte='openlib';throw e;}const d=await r.json();const x=d['ISBN:'+n];if(!x)return [];
     return [{fonte:'Open Library',titulo:x.title||'',autor:(x.authors||[]).map(q=>q.name).join(', '),paginas:x.number_of_pages||null,ano:(x.publish_date||'').match(/\d{4}/)?x.publish_date.match(/\d{4}/)[0]:'',editora:(x.publishers||[]).map(q=>q.name)[0]||'',capa:x.cover?(x.cover.medium||x.cover.large||''):'',isbn:n,cats:(x.subjects||[]).map(q=>q.name||q).slice(0,14),sinopse:'',lang:'',pop:0}];}
 };
 const isIsbn=s=>{const d=String(s||'').replace(/[-\s]/g,'');return /^(\d{9}[\dXx]|\d{13})$/.test(d)?d:null;};
@@ -6740,10 +6744,15 @@ function juntar(listas,q){const out=[],idx=new Map();for(const L of listas)for(c
     if(!it.lang){if(idx.has(base+'|pt'+d))k=base+'|pt'+d;else if(idx.has(base+'|x'+d))k=base+'|x'+d;}const o=idx.get(k);if(o){if(!o.capa&&it.capa)o.capa=it.capa;if(!o.paginas&&it.paginas)o.paginas=it.paginas;if(!o.ano&&it.ano)o.ano=it.ano;if(!o.sinopse&&it.sinopse)o.sinopse=it.sinopse;if(!o.isbn&&it.isbn)o.isbn=it.isbn;if(!o.editora&&it.editora)o.editora=it.editora;if(!o.original&&it.original)o.original=it.original;if(!o.lang&&it.lang)o.lang=it.lang;o.pop=Math.max(o.pop||0,it.pop||0);o.edicoes=Math.max(o.edicoes||0,it.edicoes||0);{const cabI=String(it.titulo).split(/\s[-–—:(]\s?|:\s/)[0],cabO=String(o.titulo).split(/\s[-–—:(]\s?|:\s/)[0];const caps=z=>(z.match(/[A-ZÁÉÍÓÚÂÊÔÃÕÇ]/g)||[]).length;if(norm(cabI)===norm(cabO)){if(caps(cabI)>caps(cabO))o.titulo=cabI+o.titulo.slice(cabO.length);if(it.titulo.length<o.titulo.length&&caps(cabI)>=caps(cabO)&&!DERIV.test(it.titulo)&&DERIV.test(o.titulo))o.titulo=it.titulo;}else if(it.titulo.length<o.titulo.length&&!DERIV.test(it.titulo))o.titulo=it.titulo;}o.cats=[...new Set((o.cats||[]).concat(it.cats||[]))];if(!o.fonte.includes(it.fonte))o.fonte+=' + '+it.fonte;continue;}
     const c=Object.assign({},it);idx.set(k,c);out.push(c);}
   for(const c of out)c._s=pontuar(c,q);out.sort((a,b)=>b._s-a._s);return out.slice(0,10);}
-async function buscarLivro(t,a){const n=isIsbn(t)||isIsbn(a);
-  if(n){const res=await Promise.allSettled([API.google('isbn:'+n),API.openlibIsbn(n)]);const ok=res.filter(r=>r.status==='fulfilled').map(r=>r.value);if(!ok.length)throw res[0].reason;return juntar(ok,t);}
-  const frase='intitle:"'+t.replace(/"/g,'')+'"'+(a?'+inauthor:"'+a.replace(/"/g,'')+'"':'');const solto='"'+t.replace(/"/g,'')+'"'+(a?' '+a:'');
-  const res=await Promise.allSettled([API.google(frase,null,20),API.google(frase,'pt',20),API.google(solto,'pt',20),API.openlib(t,a,20)]);const ok=res.filter(r=>r.status==='fulfilled').map(r=>r.value);if(!ok.length)throw res[0].reason;return juntar(ok,t);}
+const BUSCA_CACHE=new Map();let ultimoAviso='';
+function avisoFontes(falhas){if(!falhas.length)return '';return falhas.map(e=>{const nome=e.fonte==='google'?'Google Books':'Open Library';if(e.status===429)return nome+' atingiu o limite de consultas por hoje';if(e.name==='AbortError')return nome+' demorou demais';return nome+' não respondeu ('+(e.status||e.message)+')';}).join(' · ');}
+async function buscarLivro(t,a){const n=isIsbn(t)||isIsbn(a);const ck=(n||t)+'|'+(a||'');if(BUSCA_CACHE.has(ck)){const c=BUSCA_CACHE.get(ck);ultimoAviso=c.aviso;return c.lista;}
+  let pedidos;
+  if(n)pedidos=[API.google('isbn:'+n),API.openlibIsbn(n)];
+  else{const frase='intitle:"'+t.replace(/"/g,'')+'"'+(a?'+inauthor:"'+a.replace(/"/g,'')+'"':'');pedidos=[API.google(frase,null,20),API.openlib(t,a,20)];} // uma consulta por fonte: o Google Books sem chave tem cota diária pequena
+  const res=await Promise.allSettled(pedidos);const ok=res.filter(r=>r.status==='fulfilled').map(r=>r.value);const falhas=res.filter(r=>r.status==='rejected').map(r=>r.reason);
+  if(!ok.length){const e=new Error(avisoFontes(falhas));e.todas=true;e.falhas=falhas;throw e;}
+  const lista=juntar(ok,n?t:t);ultimoAviso=avisoFontes(falhas);if(lista.length)BUSCA_CACHE.set(ck,{lista,aviso:ultimoAviso});return lista;}
 let sugExtra=null,generoTocado=false,buscaTimer=null,ultimaBusca='',buscaN=0;
 function mostrarSugestoes(lista,box){box.innerHTML='';if(!lista.length){box.innerHTML='<p class="vazio">nada encontrado — confira a grafia ou tente pelo ISBN</p>';return;}
   const cab=document.createElement('p');cab.className='sugCab';cab.textContent='Clique no livro certo para preencher a ficha (edições em português primeiro):';box.appendChild(cab);
@@ -6758,12 +6767,13 @@ function aplicarSugestao(it,sg,box){const preench=[];const set=(id,v,nome)=>{if(
 function previewCapa(){const img=$('capaPrev');if(!img)return;const u=$('fCapa').value.trim();if(!u){img.hidden=true;img.removeAttribute('src');return;}img.src=u;img.hidden=false;}
 async function buscar(auto){const t=$('fTitulo').value.trim(),a=$('fAutor').value.trim(),isbn=$('fIsbn')?$('fIsbn').value.trim():'';const chave=(isbn||t)+'|'+a;if(!t&&!isbn){if(!auto)toast('Digite o título (ou o ISBN) antes de buscar');return;}if(auto&&chave===ultimaBusca)return;ultimaBusca=chave;
   const box=$('sug');const meu=++buscaN;box.innerHTML='<p class="vazio">buscando no Google Books e na Open Library…</p>';
-  try{const lista=await buscarLivro(isbn||t,isbn?'':a);if(meu!==buscaN)return;mostrarSugestoes(lista,box);}
-  catch(err){if(meu!==buscaN)return;box.innerHTML='';const bloq=err&&(err.name==='TypeError'||/Failed to fetch|NetworkError|blocked|CSP/i.test(String(err)));
-    box.innerHTML='<p class="vazio">'+(bloq?'A busca online está bloqueada nesta página de prévia — no site publicado (GitHub Pages) ela funciona. Por aqui, preencha à mão.':'A busca falhou ('+esc(err.message||err)+'). Tente de novo ou preencha à mão.')+'</p>';if(!auto)toast(bloq?'Busca bloqueada nesta prévia — funciona no site publicado':'A busca falhou');}}
+  try{const lista=await buscarLivro(isbn||t,isbn?'':a);if(meu!==buscaN)return;mostrarSugestoes(lista,box);if(ultimoAviso){const p=document.createElement('p');p.className='vazio';p.textContent='Obs.: '+ultimoAviso+' — mostrando o que a outra fonte encontrou.';box.appendChild(p);}}
+  catch(err){if(meu!==buscaN)return;box.innerHTML='';const falhas=(err&&err.falhas)||[err];const netlike=e=>e&&(e.name==='TypeError'||e.name==='AbortError'||/Failed to fetch|NetworkError|blocked|CSP/i.test(String(e&&e.message||e)));const bloq=falhas.every(netlike)&&falhas.some(e=>e&&e.name==='TypeError');
+    box.innerHTML='<p class="vazio">'+(bloq?'A busca online está bloqueada nesta página de prévia — no site publicado (GitHub Pages) ela funciona. Por aqui, preencha à mão.':'As fontes de busca não responderam agora ('+esc(err.message||err)+'). Você pode tentar de novo em instantes ou preencher a ficha à mão — o cadastro funciona do mesmo jeito.')+'</p>';
+    if(!bloq){const b=document.createElement('button');b.type='button';b.className='btn';b.textContent='Tentar de novo';b.addEventListener('click',()=>{ultimaBusca='';buscar(false);});box.appendChild(b);}if(!auto)toast(bloq?'Busca bloqueada nesta prévia — funciona no site publicado':'A busca não respondeu — dá para preencher à mão');}}
 $('btnBuscar').addEventListener('click',()=>buscar(false));
 for(const id of ['fTitulo','fAutor','fIsbn']){const el=$(id);if(!el)continue;el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();buscar(false);}});
-  el.addEventListener('input',()=>{clearTimeout(buscaTimer);const t=$('fTitulo').value.trim(),isbn=$('fIsbn')?$('fIsbn').value.trim():'';if((t.length>=4||isIsbn(isbn))&&!(editing&&editing.id&&!editing.exemplo&&id!=='fIsbn'))buscaTimer=setTimeout(()=>buscar(true),850);});}
+  el.addEventListener('input',()=>{clearTimeout(buscaTimer);const t=$('fTitulo').value.trim(),isbn=$('fIsbn')?$('fIsbn').value.trim():'';if((t.length>=4||isIsbn(isbn))&&!(editing&&editing.id&&!editing.exemplo&&id!=='fIsbn'))buscaTimer=setTimeout(()=>buscar(true),1000);});}
 $('fGenero').addEventListener('change',()=>{generoTocado=true;});
 $('fCapa').addEventListener('input',previewCapa);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!est.hidden){if(!$('editor').hidden)fecharEditor();else show(false);}});
