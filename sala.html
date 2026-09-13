@@ -135,6 +135,17 @@
   .leiBtn{background:rgba(42,28,16,.08);border:1px solid rgba(42,28,16,.3);color:#2a1c10;font:inherit;font-size:13px;padding:9px 16px;cursor:pointer;border-radius:3px;letter-spacing:.04em;flex:none} .leiBtn:disabled{opacity:.55;cursor:default} .leiBtn.pri{background:#7a2028;border-color:#a03040;color:#f3e6c8}
   @media (max-width:600px){.leiTexto{padding:18px 16px 30px}.leiHead{padding:12px 14px 8px}.leiFoot{padding:10px 14px}.leiTit h3{font-size:18px}}
   @media (max-width:600px){.hint{font-size:10px;letter-spacing:.14em}.q{right:10px;top:10px}.q.mode{top:40px}.q.help{top:70px}.q button{padding:5px 7px;font-size:10px}.prompt{font-size:12px;bottom:18%}.t{font-size:12px}.est-btn{top:40px;left:12px}.est-btn.hall{top:70px}.est-btn.coins{top:100px}.est-btn.keys{top:130px}.est-btn.rooms{top:160px}.est-btn.diario{top:190px}.est-btn.nivel{top:220px}.coinPlus{left:120px;top:100px}.editor{grid-template-columns:1fr}}
+  /* ---- barra "Ir para": destinos da cena a um toque (anda sozinho até lá) ---- */
+  .goBar{position:fixed;left:50%;bottom:40px;transform:translateX(-50%);display:flex;align-items:center;gap:6px;max-width:min(96vw,900px);z-index:4;pointer-events:none}
+  .goT{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink3);white-space:nowrap;padding-right:4px}
+  .goList{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;pointer-events:auto;padding:2px;min-width:0;-webkit-overflow-scrolling:touch}
+  .goList::-webkit-scrollbar{display:none}
+  .goList button{background:rgba(20,12,6,.72);border:1px solid rgba(233,220,196,.28);color:#f3e6c8;font:inherit;font-size:12px;letter-spacing:.04em;padding:7px 11px;border-radius:14px;cursor:pointer;white-space:nowrap;backdrop-filter:blur(3px);-webkit-tap-highlight-color:transparent}
+  .goList button:hover,.goList button:active{border-color:var(--gold);background:rgba(60,36,14,.85)}
+  .goList button.here{opacity:.45}
+  body.touch .goBar{bottom:30px;left:0;right:0;transform:none;max-width:none;padding:0 10px;justify-content:center}
+  body.touch .prompt{bottom:74px;font-size:12px;max-width:min(62vw,max(240px,calc(100vw - 400px)))}
+  @media (max-width:600px){.goBar{bottom:34px}.goList button{font-size:11px;padding:6px 9px}}
   /* ---- controles de toque (celular/tablet) ---- */
   .vjBase{position:fixed;left:-999px;top:-999px;width:140px;height:140px;border-radius:50%;border:2px solid rgba(233,220,196,.35);background:rgba(20,12,6,.35);backdrop-filter:blur(2px);pointer-events:none;z-index:5;opacity:0;transition:opacity .15s}
   .vjBase.on{opacity:1}
@@ -158,7 +169,7 @@
 <button class="est-btn nivel" id="nivelBtn" type="button" title="Seu nível de leitor: leia o conto de cada sala (no atril iluminado) até o fim para subir de nível">⭐ <b id="nivelN">Nível 1</b><small id="nivelT"></small></button>
 <div id="fade"></div>
 <button class="est-btn" id="btnEstante" type="button" aria-expanded="false" aria-controls="est">📚 Estante <b id="estCount">0</b></button>
-<div class="q" role="group" aria-label="Qualidade gráfica"><button id="q1" type="button">Clássico</button><button id="q2" type="button">Alto</button><button id="q3" type="button">Ultra</button></div>
+<div class="q" role="group" aria-label="Qualidade gráfica"><button id="q0" type="button" title="Sem sombras nem pós-processamento: o mais leve para celular e computadores simples">Leve</button><button id="q1" type="button">Clássico</button><button id="q2" type="button">Alto</button><button id="q3" type="button">Ultra</button></div>
 <div class="q mode" role="group" aria-label="Modo de exploração"><button id="m0" type="button" title="Mouse livre + WASD + E — tecla V alterna">🎮 Gamer</button><button id="m1" type="button" title="Aponte e clique — tecla V alterna">🖱 Clique</button><button id="m2" type="button" title="Câmera na altura dos olhos — tecla V alterna">👁 1ª pessoa</button></div>
 <div class="q help"><button id="btnHelp" type="button" title="Controles e ajustes (tecla H)">❔ Controles</button></div>
 <div class="ret" id="ret" hidden></div>
@@ -172,6 +183,7 @@
 <div class="diarioOv" id="livro" hidden><div class="lojaIn"><button class="x" id="livroFechar" type="button" aria-label="Fechar">×</button><h3>📖 Livro dos Contos</h3><p class="lojaSub" id="livroSub"></p><div class="lojaLista" id="livroLista"></div><p class="small">Cada sala guarda o seu conto num atril; aqui, no livro aberto do Hall, os cinco ficam à mão. Ler até o fim sobe o seu nível — de qualquer sala.</p></div></div>
 <div class="leitura" id="leitura" hidden><div class="leituraIn"><header class="leiHead"><div class="leiTit"><h3 id="leiTitulo"></h3><p class="leiMeta" id="leiMeta"></p></div><div class="leiTools"><button type="button" id="leiMenos" title="letra menor">A−</button><button type="button" id="leiMais" title="letra maior">A+</button><button type="button" class="x" id="leiFechar" aria-label="Fechar">×</button></div></header><div class="leiBar"><i id="leiProg"></i><span id="leiPct">0%</span></div><article class="leiTexto" id="leiTexto"></article><footer class="leiFoot"><p class="leiNota" id="leiNota"></p><button type="button" class="leiBtn" id="leiFim" disabled>Leia até o fim para concluir</button></footer></div></div>
 <div class="vjHint" id="vjHint" hidden>anda<br>aqui</div><div class="vjBase" id="vjBase"><div class="vjKnob" id="vjKnob"></div></div><button class="vjRun" id="vjRun" type="button" hidden>correr</button><button class="vjAct" id="vjAct" type="button" hidden><b>E</b><span id="vjActTxt">interagir</span></button>
+<div class="goBar" id="goBar" hidden><span class="goT">Ir para</span><div class="goList" id="goList"></div></div>
 <div class="hint" id="hint"></div>
 <div class="toast" id="toast"></div>
 <div class="toast" id="estToast"></div>
@@ -4705,18 +4717,24 @@ const smaa=new THREE.SMAAPass(innerWidth*PR,innerHeight*PR);composer.addPass(sma
 
 /* ================= QUALIDADE ================= */
 const Q={sao:true,bokeh:true,refl:true,slices:22,name:'ultra'};let PORTAL_ON=false; // true enquanto uma cena é desenhada para um portal (os refletores pulam a vez)
-const qb={classico:document.getElementById('q1'),alto:document.getElementById('q2'),ultra:document.getElementById('q3')};
-function setQuality(n){Q.name=n;
+const qb={leve:document.getElementById('q0'),classico:document.getElementById('q1'),alto:document.getElementById('q2'),ultra:document.getElementById('q3')};
+function allScenes(){const L=[];const add=x=>{if(x&&x.isScene&&!L.includes(x))L.push(x);};try{add(scene);}catch(e){}try{add(hallScene);}catch(e){}try{for(const k in ROOMS)add(ROOMS[k].scene);}catch(e){}return L;}
+function remakeMaterials(){for(const sc of allScenes())sc.traverse(o=>{if(o.material){(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{m.needsUpdate=true;});}});}
+function setQuality(n){if(!qb[n])n='leve';Q.name=n;const wasLite=!!Q.lite;Q.lite=(n==='leve');
   if(n==='ultra'){Q.sao=true;Q.bokeh=true;Q.refl=true;Q.slices=22;}
   else if(n==='alto'){Q.sao=true;Q.bokeh=false;Q.refl=true;Q.slices=12;}
-  else{Q.sao=false;Q.bokeh=false;Q.refl=false;Q.slices=8;}
-  if(window.__FIRE){const v=window.__FIRE.vol;v.visible=n!=='classico';const st=n==='ultra'?36:22;if(v.material.defines.STEPS!==st){v.material.defines.STEPS=st;v.material.needsUpdate=true;}}
+  else if(n==='classico'){Q.sao=false;Q.bokeh=false;Q.refl=false;Q.slices=8;}
+  else{Q.sao=false;Q.bokeh=false;Q.refl=false;Q.slices=4;} // Leve: sem sombras, sem pós-processamento, 1 pixel por pixel, portais quase estáticos
+  // Leve desenha direto na tela (sem composer): sombras desligadas e mesma codificação de cor do caminho com composer, para o visual não mudar
+  const shadowsOn=!Q.lite;if(renderer.shadowMap.enabled!==shadowsOn){renderer.shadowMap.enabled=shadowsOn;remakeMaterials();}
+  renderer.outputEncoding=Q.lite?THREE.LinearEncoding:THREE.sRGBEncoding;renderer.setPixelRatio(Q.lite?1:PR);if(!Q.lite&&wasLite){composer.setPixelRatio(PR);composer.setSize(innerWidth,innerHeight);}
+  if(window.__FIRE){const v=window.__FIRE.vol;v.visible=!(n==='classico'||n==='leve');const st=n==='ultra'?36:22;if(v.material.defines.STEPS!==st){v.material.defines.STEPS=st;v.material.needsUpdate=true;}}
   sao.enabled=Q.sao;bokeh.enabled=Q.bokeh;refl.visible=Q.refl;M.floor.opacity=Q.refl?0.82:1.0;M.floor.transparent=Q.refl;M.floor.needsUpdate=true;if(window.__hrefl){window.__hrefl.visible=Q.refl;}if(window.__srefl){window.__srefl.visible=Q.refl;}if(window.__krefl){window.__krefl.visible=Q.refl;}if(window.__frefl){window.__frefl.visible=Q.refl;}if(window.__yrefl){window.__yrefl.visible=Q.refl;}if(window.__MY){window.__MY.floor.opacity=Q.refl?0.86:1.0;window.__MY.floor.transparent=Q.refl;window.__MY.floor.needsUpdate=true;}if(window.__CM){window.__CM.floor.opacity=Q.refl?0.86:1.0;window.__CM.floor.transparent=Q.refl;window.__CM.floor.needsUpdate=true;}if(window.__CATSHAFTS){const nn=n==='ultra'?4:(n==='alto'?2:1);for(const s of window.__CATSHAFTS)s.visible=s.userData.idx<nn;}if(window.__SM){window.__SM.floor.opacity=Q.refl?0.8:1.0;window.__SM.floor.transparent=Q.refl;window.__SM.floor.needsUpdate=true;}if(window.__HM){window.__HM.floor.opacity=Q.refl?0.8:1.0;window.__HM.floor.transparent=Q.refl;window.__HM.floor.needsUpdate=true;}
   SLICES.forEach((s,i)=>{s.visible=i<Q.slices;s.material.uniforms.op.value=(0.055*22/Q.slices)*(1-i/Q.slices*0.85);});
   for(const k in qb)qb[k].classList.toggle('on',k===n);
-  try{localStorage.setItem('bibq',n);}catch(e){}}
+  try{localStorage.setItem('bibq2',n);}catch(e){}}
 for(const k in qb)qb[k].addEventListener('click',()=>setQuality(k));
-setQuality('classico'); // começa sempre no Clássico (o Ultra pode engasgar o andar); os botões trocam durante a sessão
+{let q0=null;try{q0=localStorage.getItem('bibq2');}catch(e){}setQuality(qb[q0]?q0:'leve');} // padrão: Leve (o mais modesto); a escolha fica guardada
 // avisos na tela: cada mensagem fica o tempo de ler (pela extensão), os importantes não são atropelados pelos seguintes (que esperam na fila) e tudo fica registrado no Diário (tecla J)
 const LOG=[];let diaryOpen=false;let toastQ=[],toastUntil=0,toastBig=false,toastTimer=null,toastHold=false;
 function logLoad(){try{const d=JSON.parse(localStorage.getItem('mundo.diario.v1')||'[]');if(Array.isArray(d))LOG.push(...d.slice(-40));}catch(e){}}
@@ -5980,7 +5998,7 @@ function portalBBox(p){const o=p.quad.userData.op;const q=p.quad;q.updateMatrixW
   const Wd=innerWidth,Hd=innerHeight;const x0=Math.max(0,(minx+1)/2*Wd-5),x1=Math.min(Wd,(maxx+1)/2*Wd+5),y0=Math.max(0,(1-maxy)/2*Hd-5),y1=Math.min(Hd,(1-miny)/2*Hd+5);
   if(x1-x0<3||y1-y0<3)return null;const area=(x1-x0)*(y1-y0);return {x:x0,y:y0,w:x1-x0,h:y1-y0,area,frac:area/(Wd*Hd)};}
 function pow2(x){return Math.pow(2,Math.ceil(Math.log2(Math.max(1,x))));}
-function rtSize(bb){const cap=Q.name==='classico'?512:1024,ss=Q.name==='classico'?1.0:1.3;return [Math.min(cap,Math.max(64,pow2(bb.w*PR*ss))),Math.min(cap,Math.max(64,pow2(bb.h*PR*ss)))];} // um pouco acima do tamanho na tela: suaviza as bordas
+function rtSize(bb){const cap=Q.lite?256:(Q.name==='classico'?512:1024),ss=(Q.lite||Q.name==='classico')?1.0:1.3;return [Math.min(cap,Math.max(64,pow2(bb.w*PR*ss))),Math.min(cap,Math.max(64,pow2(bb.h*PR*ss)))];} // um pouco acima do tamanho na tela: suaviza as bordas
 function portalRT(p,bb){const [pw,ph]=rtSize(bb);
   if(p.rt&&((p.rt.width<pw||p.rt.width>pw*2)||(p.rt.height<ph||p.rt.height>ph*2))){p.rt.dispose();p.rt=null;} // histerese: cresce na hora, encolhe só quando sobra 2×
   if(!p.rt){p.rt=new THREE.WebGLRenderTarget(pw,ph,{minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter,format:THREE.RGBAFormat,stencilBuffer:false});p.mat.uniforms.tex.value=p.rt.texture;}
@@ -6003,7 +6021,8 @@ function renderPortals(){if(!PORTALS.length||fadeOnAt)return;frameN++;camera.upd
   for(const p of PORTALS){if(p.rt&&frameN-p.seen>900){p.rt.dispose();p.rt=null;p.mat.uniforms.tex.value=null;p.mat.uniforms.ready.value=0;}}
   if(!list.length)return;
   // orçamento por qualidade: os maiores vãos todo quadro (parados, a cada 4 quadros), os pequenos em rodízio, e um teto de pixels por quadro
-  const K=Q.name==='classico'?{full:1,slow:1,minFrac:0.02,px:0.8e6}:(Q.name==='alto'?{full:2,slow:1,minFrac:0.01,px:1.6e6}:{full:3,slow:2,minFrac:0.006,px:2.6e6});
+  if(Q.lite&&frameN%4)return; // Leve: um portal a cada 4 quadros (os vãos viram quadros quase estáticos)
+  const K=Q.lite?{full:0,slow:1,minFrac:0,px:0.14e6}:(Q.name==='classico'?{full:1,slow:1,minFrac:0.02,px:0.8e6}:(Q.name==='alto'?{full:2,slow:1,minFrac:0.01,px:1.6e6}:{full:3,slow:2,minFrac:0.006,px:2.6e6}));
   list.sort((a,b)=>b.bb.area-a.bb.area);const todo=[],rest=[];let nf=0;
   for(const p of list){if(nf<K.full&&p.bb.frac>=K.minFrac){nf++;if(!(frameN-p.last<4&&portalStill(p)))todo.push(p);}else rest.push(p);}
   rest.sort((a,b)=>b.bb.area*(1+Math.min(30,frameN-b.last))-a.bb.area*(1+Math.min(30,frameN-a.last)));let ns=0;for(const p of rest){if(ns>=K.slow)break;if(frameN-p.last<4&&portalStill(p))continue;todo.push(p);ns++;}
@@ -6128,7 +6147,7 @@ function lockedChest(hue,opt){opt=opt||{};const g=new THREE.Group();const col=ne
 function chestGenre(room){for(const g in GENRE_ROOM)if(GENRE_ROOM[g]===room)return g;return null;}
 for(const room in CHEST_SPOTS){const [x,z,rot]=CHEST_SPOTS[room];const genre=chestGenre(room);const R=ROOMS[room];const g=lockedChest(GEN_HUES[genre]||40,{iron:room==='adv'});g.position.set(x,R.floorY?R.floorY(x,z):0,z);g.rotation.y=rot;R.scene.add(g);
   CHESTS[room]={g,genre,x,z,rot,open:false,t:0,shake:0,ax:x+Math.sin(rot)*1.15,az:z+Math.cos(rot)*1.15,parts:g.userData.chest};}
-function chestSetOpen(C){C.open=true;C.t=0;const P=C.parts;if(C.safe)P.lid.rotation.y=1.6;else{P.lid.rotation.x=-1.9;if(P.gold)P.gold.visible=true;if(P.lock)P.lock.visible=false;}P.L.intensity=1.5;P.sp.material.color.set(0xffc060);P.sp.material.opacity=0.28;}
+function chestSetOpen(C){C.open=true;C.t=0;const P=C.parts;if(C.safe)P.lid.rotation.y=1.6;else{P.lid.rotation.x=-1.9;if(P.gold)P.gold.visible=true;if(P.lock)P.lock.visible=false;}P.L.intensity=1.5;P.sp.material.color.set(0xffc060);P.sp.material.opacity=0.28;try{if(typeof renderGoBar==='function')renderGoBar();}catch(e){}}
 for(const room in CHESTS){if(KEYS.baus[CHESTS[room].genre])chestSetOpen(CHESTS[room]);}
 function chestFor(){if(CUR!=='room')return null;return CHESTS[GENRE_ROOM[CUR_GENRE]]||null;}
 function chestLabel(C){const nome=EST.GENEROS[C.genre]?EST.GENEROS[C.genre].nome:C.genre;const nm=CHEST_NAME[GENRE_ROOM[C.genre]];const ab=(GENRE_ROOM[C.genre]==='cat'||GENRE_ROOM[C.genre]==='sci')?'aberta':'aberto';return C.open?nm+' · já '+ab:(hasKey(C.genre)?'Abrir '+chestNm(GENRE_ROOM[C.genre])+' (chave de '+nome+')':nm+' · trancad'+ab.slice(-1)+' — chave de '+nome);}
@@ -6308,7 +6327,7 @@ function finishStory(){if(!leituraOpen)return;const genre=leiGenre;if(LEITOR.lid
   const S=Object.values(STANDS).find(s=>s.genre===genre);if(S)standRefresh(S);keyChime();
   try{const id='conto:'+genre;if(!EST.DB.livros.some(b=>b.id===id))EST.upsert({id,titulo:c.titulo,autor:c.autor,genero:genre,subgenero:c.sub||'',status:'lido',paginas:Math.max(4,Math.round(palavras(c.texto)/280)),nota:0,favorito:false,resenha:'Conto da sala de '+(EST.GENEROS[genre]?EST.GENEROS[genre].nome:genre)+' no Mundo de Luiz — lido em '+new Date().toLocaleDateString('pt-BR')+'.',criadoEm:new Date().toISOString()});}catch(e){}
   showToast('⭐ Você leu «'+c.titulo+'» e subiu para o Nível '+n+' — '+nivelNome(n)+'! +'+NIVEL_MOEDAS+' moedas · o conto entrou na sua Estante como lido'+(n>=NIVEIS.length?' · você leu todos os contos das salas!':''),{big:true,ms:9500});
-  if(mapOpen)refreshMap();}
+  if(mapOpen)refreshMap();try{renderGoBar();}catch(e){}}
 if(leiEl){leiEl.addEventListener('click',e=>{if(e.target===leiEl)closeStory();});const x=document.getElementById('leiFechar');if(x)x.addEventListener('click',closeStory);if(leiFim)leiFim.addEventListener('click',finishStory);leiTexto.addEventListener('scroll',leiUpdate,{passive:true});
   const fs=d=>{leiFonte=Math.max(14,Math.min(26,leiFonte+d));leiTexto.style.fontSize=leiFonte+'px';try{localStorage.setItem('bibfonte',String(leiFonte));}catch(e){}leiUpdate();};const bm=document.getElementById('leiMenos'),bp=document.getElementById('leiMais');if(bm)bm.addEventListener('click',()=>fs(-2));if(bp)bp.addEventListener('click',()=>fs(2));}
 if(nivelBtn)nivelBtn.addEventListener('click',()=>{if(typeof openDiary==='function')openDiary();});
@@ -6330,8 +6349,8 @@ window.__livro={abrir:openLivro,fechar:closeLivro,aberto:()=>livroOpen,render:re
 const lerp=(a,b,k)=>a+(b-a)*k;const lerpAng=(a,b,k)=>{let d=((b-a+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;return a+d*k;};
 function setHint(t){hint.textContent=t;}
 function hintFor(){let h;
-  if(VJ.touch)h=MODE==='fp'?'polegar esquerdo anda · arraste à direita para olhar · botão E interage':'polegar esquerdo anda · arraste à direita para girar a câmera · toque nos objetos ou no botão E';
-  else if(MODE==='gm')h=locked?'Esc solta o mouse · WASD anda · Shift corre · E interage · Tab salas · B estante · H ajuda':(lockOK?'clique na tela para prender o mouse · WASD anda · Shift corre · E interage · Tab salas · H ajuda':'arraste para olhar · WASD anda · Shift corre · E interage · Tab salas · H ajuda');
+  if(VJ.touch)h=MODE==='fp'?'polegar esquerdo anda · arraste à direita para olhar · botão E interage':'toque em «Ir para» ou no chão e o leitor vai sozinho · polegar esquerdo anda · arraste à direita para girar a câmera';
+  else if(MODE==='gm')h=locked?'Esc solta o mouse · WASD anda · Shift corre · E interage · Tab salas · B estante · H ajuda':(lockOK?'«Ir para» leva você até lá · clique na tela para prender o mouse · WASD anda · Shift corre · E interage · H ajuda':'«Ir para» leva você até lá · arraste para olhar · WASD anda · Shift corre · E interage · H ajuda');
   else if(MODE==='tp')h=CUR==='hall'?'clique numa porta para entrar · clique no chão para andar · arraste para girar · rolagem aproxima · Tab salas':'clique no chão para andar · arraste para girar a câmera · clique '+((typeof ROOM!=='undefined'&&ROOM.seat)||'na poltrona')+' para sentar · clique num livro para pegá-lo · clique na porta para voltar ao hall';
   else h=locked?'Esc solta o mouse · WASD anda · Shift corre · E interage · Tab salas · H ajuda':'clique na tela para prender o mouse · arraste para olhar · WASD anda · E interage · Tab salas';
   setHint(h);}
@@ -6346,7 +6365,7 @@ function setMode(m){const was=MODE;MODE=m;
   for(const [id,mm] of [['m0','gm'],['m1','tp'],['m2','fp']]){const b=document.getElementById(id);if(b)b.classList.toggle('on',mm===m);}
   document.querySelectorAll('#ctrl .modes button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
   cv.style.cursor=m==='tp'?'default':'crosshair';setFocus(null);fillCtrl();hintFor();try{localStorage.setItem('bibmode2',m);}catch(e){}}
-function standUp(){CH.sitting=false;}
+function standUp(){if(CH.sitting){CH.sitting=false;try{renderGoBar();}catch(e){}}else CH.sitting=false;}
 function walkTo(x,z,cb){[x,z]=WORLD.clamp(x,z,1.0);
   for(const [ox,oz,orr] of WORLD.obst){let dx=x-ox,dz=z-oz,d=Math.hypot(dx,dz);if(d<orr+0.05){if(d<0.01){dx=CH.x-ox;dz=CH.z-oz;d=Math.hypot(dx,dz)||1;}x=ox+dx/d*(orr+0.05);z=oz+dz/d*(orr+0.05);}}
   const wasSit=CH.sitting;standUp();let pre=[];
@@ -6371,7 +6390,7 @@ function findPath(x0,z0,x1,z1){const nv=navFor(WORLD);const {S,N,H,walk}=nv;cons
   const out=[];let cur=[x0,z0],k=0;while(k<cells.length){let far=k;for(let m=cells.length-1;m>k;m--){if(los(cur,pt(cells[m]))){far=m;break;}}const p=pt(cells[far]);out.push(p);cur=p;k=far+1;}
   if(out.length&&los(out.length>1?out[out.length-2]:[x0,z0],[x1,z1]))out[out.length-1]=[x1,z1];else out.push([x1,z1]);return out;}
 const floorPlane=new THREE.Plane(new THREE.Vector3(0,1,0),0);const hitP=new THREE.Vector3();
-function sitDown(){const C=ROOM.chair;CH.sitting=true;CH.sitT=0;CH.target=null;CH.dir=(C.dir!==undefined)?C.dir:Math.atan2(C.fx,C.fz);CH.x=C.x+C.fx*0.02;CH.z=C.z+C.fz*0.02;CH.vx=CH.vz=0;}
+function sitDown(){const C=ROOM.chair;CH.sitting=true;CH.sitT=0;CH.target=null;CH.dir=(C.dir!==undefined)?C.dir:Math.atan2(C.fx,C.fz);CH.x=C.x+C.fx*0.02;CH.z=C.z+C.fz*0.02;CH.vx=CH.vz=0;try{renderGoBar();}catch(e){}}
 function doorFront(g,dist){const th=g.userData.angle;const r=HR-dist;return [Math.cos(th)*r,Math.sin(th)*r];}
 const REACH={hdoor:4.4,door:4.4,book:3.2,altar:3.8,chair:3.8,coin:4.5,key:3.2,chest:3.8,shop:4.4,story:3.8};const toC=new THREE.Vector3();
 function behindPlayer(h){if(MODE==='fp')return false;toC.set(CH.x,1.15+CH.fy,CH.z).sub(camera.position);const dC=toC.length();if(dC<0.3)return false;toC.divideScalar(dC);return h.distance<dC-0.3&&ray.ray.direction.dot(toC)>0.88;}
@@ -6459,12 +6478,22 @@ addEventListener('pointermove',e=>{if(e.pointerId!==VJ.id)return;vjSet(e.clientX
 addEventListener('pointerup',vjEnd,{capture:true});addEventListener('pointercancel',vjEnd,{capture:true});
 if(vjAct){vjAct.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(FOCUS&&!FOCUS.far)doInteract();else if(FOCUS&&FOCUS.far&&FOCUS.kind==='hdoor')act(FOCUS);},{capture:true});}
 if(vjRun){vjRun.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();VJ.run=!VJ.run;vjRun.classList.toggle('on',VJ.run);PAD.run=VJ.run||(VJ.active&&Math.hypot(PAD.mx,PAD.mz)>0.96);},{capture:true});}
+const goBar=document.getElementById('goBar'),goList=document.getElementById('goList');
+function goTo(kind,ref){if(MODE==='fp')setMode('gm');if(CH.sitting&&kind!=='chair')standUp();if(mapOpen)closeMap();
+  if(kind==='hdoor')act({kind:'hdoor',g:ref});else if(kind==='shop')act({kind:'shop'});else if(kind==='hlivro')act({kind:'hlivro'});
+  else if(kind==='story')act({kind:'story',story:ref});else if(kind==='chest')act({kind:'chest',chest:ref});else if(kind==='chair')act({kind:'chair'});else if(kind==='stand')act({kind:'stand'});else if(kind==='door')act({kind:'door'});
+  else if(kind==='shelf'){const sh=ROOM.shelf;if(!sh)return;const w=sh.g.getWorldPosition(new THREE.Vector3());const [nx,nz]=sh.normal||[0,1];walkTo(w.x+nx*1.4,w.z+nz*1.4,()=>{CH.dir=Math.atan2(w.x-CH.x,w.z-CH.z);unlock();if(window.__panel)window.__panel.show(true);});}}
+function renderGoBar(){if(!goBar||!goList)return;const items=[];
+  if(CUR==='hall'){for(const g of HALL_DOORS){if(g.userData.locked)continue;const G=EST.GENEROS[g.userData.genre];items.push(['→ '+(G?G.nome:g.userData.genre),'hdoor',g]);}items.push(['🦉 Lojinha','shop',null],['📖 Livro dos Contos','hlivro',null]);}
+  else if(ROOM){const S=(typeof storyFor==='function')?storyFor():null;const C=(typeof chestFor==='function')?chestFor():null;if(S)items.push([LEITOR.lidos[S.genre]?'📖 Conto ✓':'📖 Conto','story',S]);if(C)items.push([C.open?'📦 Baú ✓':'📦 Baú','chest',C]);if(ROOM.shelf)items.push(['📚 Estante','shelf',null]);if(ROOM.chair)items.push(CH.sitting?['🧍 Levantar','stand',null]:['🪑 Sentar','chair',null]);items.push(['← Hall','door',null]);}
+  goList.innerHTML='';for(const [lab,kind,ref] of items){const b=document.createElement('button');b.type='button';b.textContent=lab;b.addEventListener('click',e=>{e.stopPropagation();goTo(kind,ref);});goList.appendChild(b);}
+  goBar.hidden=!items.length;}
 function vjFocus(tg){if(!vjAct||!VJ.touch)return;if(tg){vjActTxt.textContent=tg.far?'aproxime-se':tg.label.replace(/^(Entrar|Pegar|Abrir|Ler|Reler|Voltar ao)[: ]*/,'').slice(0,26)||tg.label.slice(0,26);vjAct.classList.toggle('off',!!tg.far);}else{vjActTxt.textContent='interagir';vjAct.classList.add('off');}}
 cv.addEventListener('pointerdown',e=>{dragging=true;mouseDown=true;lx=sx=e.clientX;ly=sy=e.clientY;cv.setPointerCapture&&cv.setPointerCapture(e.pointerId);if(mapOpen)closeMap();});
 addEventListener('pointerup',e=>{const click=dragging&&e.target===cv&&Math.hypot(e.clientX-sx,e.clientY-sy)<6;
   if(click){if(ctrlOpen)showCtrl(false);
     if(MODE==='tp')clickTP(e.clientX,e.clientY);
-    else if(MODE==='gm'){if(locked)act(resolveAt(0,0,true));else{const tg=resolveAt(e.clientX,e.clientY,false);if(!(tg&&tg.kind==='floor'&&lockOK))act(tg);tryLock();}}
+    else if(MODE==='gm'){if(locked)act(resolveAt(0,0,true));else{const tg=resolveAt(e.clientX,e.clientY,false);if(!(tg&&tg.kind==='floor'&&lockOK&&!VJ.touch))act(tg);if(!VJ.touch)tryLock();}}
     else{if(locked)actFP(resolveAt(0,0,true));else{actFP(resolveAt(e.clientX,e.clientY,false));tryLock();}}}
   dragging=false;mouseDown=false;});
 cv.addEventListener('pointermove',e=>{mx=e.clientX;my=e.clientY;mouseIn=true;const iy=SET.invY?-1:1;
@@ -6476,7 +6505,7 @@ cv.addEventListener('pointerleave',()=>{mouseIn=false;});
 cv.addEventListener('dblclick',()=>{if(MODE!=='tp'&&!locked)tryLock();});
 document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===cv;if(retEl)retEl.hidden=!locked;hintFor();});
 document.addEventListener('pointerlockerror',()=>lockFail());
-const inUI=e=>!!(e.target&&e.target.closest&&e.target.closest('#est,.q,.est-btn,#map,#ctrl,#loja,#diario,#toast,#leitura,#vjAct,#vjRun,#livro'));
+const inUI=e=>!!(e.target&&e.target.closest&&e.target.closest('#est,.q,.est-btn,#map,#ctrl,#loja,#diario,#toast,#leitura,#vjAct,#vjRun,#livro,#goBar'));
 const typing=e=>!!(e.target&&/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName));
 addEventListener('wheel',e=>{if(inUI(e))return;if(MODE!=='fp'){CAM.dist=Math.max(1.6,Math.min(9,CAM.dist*(1+Math.sign(e.deltaY)*0.12)));}else wheelV+=-Math.sign(e.deltaY)*1.6;},{passive:true});
 addEventListener('keydown',e=>{if(typing(e))return;const k=e.key.toLowerCase();keys[k]=true;const estOpen=!document.getElementById('est').hidden;
@@ -6537,7 +6566,7 @@ function pollPad(dt){if(!padOK)return;let gps=null;try{gps=navigator.getGamepads
   const edge=(i,fn)=>{const now=b(i);if(now&&!PAD.prev[i])fn();PAD.prev[i]=now;};
   edge(0,()=>doInteract());edge(1,()=>{if(leituraOpen)closeStory();else if(lojaOpen)closeShop();else if(diaryOpen)closeDiary();else if(livroOpen)closeLivro();else if(mapOpen)closeMap();else if(ctrlOpen)showCtrl(false);else if(CH.sitting)act({kind:'stand'});else if(CUR==='room')goHall();});edge(9,()=>toggleMap());edge(3,()=>{if(window.__panel)window.__panel.toggle();});edge(8,()=>showCtrl(!ctrlOpen));
   const iy=SET.invY?-1:1;if(MODE==='fp'){P.yaw-=PAD.cx*dt*2.6*SET.sens;P.pitch=Math.max(-1.25,Math.min(1.25,P.pitch-PAD.cy*dt*1.8*SET.sens*iy));}else{CAM.yaw-=PAD.cx*dt*2.6*SET.sens;CAM.pitch=Math.max(MODE==='gm'?-0.45:0.12,Math.min(1.35,CAM.pitch+PAD.cy*dt*1.8*SET.sens*iy));}}
-addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();fxCam.aspect=camera.aspect;fxCam.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);composer.setSize(innerWidth,innerHeight);grade.uniforms.res.value.set(innerWidth,innerHeight);sao.params.saoKernelRadius=Math.round(innerHeight*0.038);});
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();fxCam.aspect=camera.aspect;fxCam.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);if(!Q.lite)composer.setSize(innerWidth,innerHeight);grade.uniforms.res.value.set(innerWidth,innerHeight);sao.params.saoKernelRadius=Math.round(innerHeight*0.038);});
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 let vx=0,vz=0;
 function move(dt){let f=0,s=0;if(keys['w']||keys['arrowup'])f+=1;if(keys['s']||keys['arrowdown'])f-=1;if(keys['a']||keys['arrowleft'])s-=1;if(keys['d']||keys['arrowright'])s+=1;f-=PAD.mz;s+=PAD.mx;
@@ -6566,7 +6595,7 @@ function moveTP(dt){let f=0,s=0;if(keys['w']||keys['arrowup'])f+=1;if(keys['s']|
     for(const [ox,oz,orr] of WORLD.obst){const dx=nx-ox,dz=nz-oz,d=Math.hypot(dx,dz);if(d<orr){const ux=dx/(d||1e-6),uz=dz/(d||1e-6);nx=ox+ux*orr;nz=oz+uz*orr;const into=-(CH.vx*ux+CH.vz*uz);if(into>0.3*Math.max(0.2,Math.hypot(CH.vx,CH.vz))){const cr=CH.vx*uz-CH.vz*ux;if(Math.abs(cr)>0.05)CH.slide=cr>0?1:-1;const sg=CH.slide||1;nx+=-uz*sg*into*dt*0.9;nz+=ux*sg*into*dt*0.9;}}}CH.x=nx;CH.z=nz;
     const moved=Math.hypot(nx-ox0,nz-oz0);if(want&&CH.target&&moved<0.004){CH.stuckT+=dt;if(CH.stuckT>0.8){CH.target=null;CH.onArrive=null;CH.stuckT=0;}}else CH.stuckT=0;}
   const spd=Math.hypot(CH.vx,CH.vz);if(spd>0.2&&!CH.sitting)CH.dir=lerpAng(CH.dir,Math.atan2(CH.vx,CH.vz),Math.min(1,dt*12));
-  if(VJ.active&&manual&&!dragging&&spd>0.4&&MODE!=='fp'){const fwd=-(PAD.mz);if(fwd>-0.2)CAM.yaw=lerpAng(CAM.yaw,CH.dir+Math.PI,Math.min(1,dt*(1.4+1.6*Math.abs(PAD.mx))));}}
+  if(spd>0.4&&!dragging&&MODE!=='fp'){const auto=CH.target&&!manual;const byStick=VJ.active&&manual;const byKeys=manual&&!VJ.active&&!locked;if((auto||((byStick||byKeys)&&f>-0.2)))CAM.yaw=lerpAng(CAM.yaw,CH.dir+Math.PI,Math.min(1,dt*(auto?1.1:1.4+1.6*Math.abs(s))));}}
 function poseReader(dt){const R=READER;const spd=Math.hypot(CH.vx,CH.vz);const walking=Math.min(1,spd/1.4);const runK=Math.max(0,Math.min(1,(spd-2.6)/2.0));if(walking>0.05)CH.walkT+=dt*(5.5+spd*1.9);if(CH.sitting)CH.sitT=Math.min(1,CH.sitT+dt*2.2);const sit=CH.sitting?CH.sitT:0;
   const sw=Math.sin(CH.walkT)*(0.6+0.35*runK)*walking;
   R.legs[0].hip.rotation.x=lerp(sw,-1.5,sit);R.legs[1].hip.rotation.x=lerp(-sw,-1.5,sit);
@@ -6579,7 +6608,7 @@ function setReaderOpacity(op){if(Math.abs(op-readerOp)<0.01&&(op>0.99)===(reader
 const camPos=new THREE.Vector3(),camLook=new THREE.Vector3(),camDes=new THREE.Vector3(),lookDes=new THREE.Vector3();let camInit=false;
 /* ---- troca de cena (hall ↔ sala) ---- */
 const fadeEl=document.getElementById('fade'),titleEl=document.getElementById('title'),btnHall=document.getElementById('btnHall');
-function setActive(sc){ACTIVE=sc;renderPass.scene=sc;sao.scene=sc;bokeh.scene=sc;sc.add(READER.g);sc.add(MARK);renderer.toneMappingExposure=(sc!==hallScene&&ROOM&&ROOM.scene===sc&&ROOM.exposure)||1.08;}
+function setActive(sc){ACTIVE=sc;renderPass.scene=sc;sao.scene=sc;bokeh.scene=sc;sc.add(READER.g);sc.add(MARK);renderer.toneMappingExposure=(sc!==hallScene&&ROOM&&ROOM.scene===sc&&ROOM.exposure)||1.08;setTimeout(()=>{try{renderGoBar();}catch(e){}},0);}
 let fadeOnAt=0;
 function fadeTo(fn){if(!fadeEl){fn();return;}fadeEl.classList.add('on');fadeOnAt=performance.now();setTimeout(()=>{try{fn();}finally{setTimeout(()=>{fadeEl.classList.remove('on');fadeOnAt=0;},150);}},480);}
 function openDoor(g,cb){g.userData.open=1;setTimeout(cb,120);} // arco aberto: só um passo e a travessia começa
@@ -6665,12 +6694,12 @@ function tick(dt){t+=dt;
   // haze de calor: projeta o fogo na tela
   tmpV.copy(FIREPOS).project(camera);grade.uniforms.fire.value.set(tmpV.x*0.5+0.5,tmpV.y*0.5+0.5);grade.uniforms.fireOn.value=(CUR==='room'&&ROOM===ROOMS.lib&&tmpV.z<1&&tmpV.z>-1)?1:0;grade.uniforms.t.value=t;
 }
-function draw(dt){lastDt=dt;renderPortals();composer.render();
+function draw(dt){lastDt=dt;renderPortals();if(Q.lite){renderer.setRenderTarget(null);renderer.render(ACTIVE,camera);}else composer.render();
   // auto-ajuste de qualidade
-  if(!fpsChecked&&t>4){fpsAcc+=dt;fpsN++;if(fpsAcc>2.5){const fps=fpsN/fpsAcc;fpsChecked=true;if(fps<22&&Q.name==='ultra'){setQuality('alto');showToast('qualidade ajustada para Alto pelo desempenho (tecla 3 volta ao Ultra)');}else if(fps<16&&Q.name==='alto'){setQuality('classico');showToast('qualidade ajustada para Clássico pelo desempenho');}}}
+  if(!fpsChecked&&t>4){fpsAcc+=dt;fpsN++;if(fpsAcc>2.5){const fps=fpsN/fpsAcc;fpsChecked=true;if(fps<22&&Q.name==='ultra'){setQuality('alto');showToast('qualidade ajustada para Alto pelo desempenho (tecla 3 volta ao Ultra)');}else if(fps<16&&Q.name==='alto'){setQuality('classico');showToast('qualidade ajustada para Clássico pelo desempenho');}else if(fps<18&&Q.name==='classico'){setQuality('leve');showToast('qualidade ajustada para Leve pelo desempenho');}}}
 }
 requestAnimationFrame(frame);
-window.__ready=true;window.__P=P;window.__CH=CH;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__sit=sitDown;window.__setQ=setQuality;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__diario={log:LOG,abrir:openDiary,fechar:closeDiary,proximo:nextStep};
+window.__ready=true;window.__P=P;window.__CH=CH;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__sit=sitDown;window.__setQ=setQuality;window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__diario={log:LOG,abrir:openDiary,fechar:closeDiary,proximo:nextStep};
 })();
 
 </script>
