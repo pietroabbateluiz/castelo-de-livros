@@ -135,6 +135,16 @@
   .leiBtn{background:rgba(42,28,16,.08);border:1px solid rgba(42,28,16,.3);color:#2a1c10;font:inherit;font-size:13px;padding:9px 16px;cursor:pointer;border-radius:3px;letter-spacing:.04em;flex:none} .leiBtn:disabled{opacity:.55;cursor:default} .leiBtn.pri{background:#7a2028;border-color:#a03040;color:#f3e6c8}
   @media (max-width:600px){.leiTexto{padding:18px 16px 30px}.leiHead{padding:12px 14px 8px}.leiFoot{padding:10px 14px}.leiTit h3{font-size:18px}}
   @media (max-width:600px){.hint{font-size:10px;letter-spacing:.14em}.q{right:10px;top:10px}.q.mode{top:40px}.q.help{top:70px}.q button{padding:5px 7px;font-size:10px}.prompt{font-size:12px;bottom:18%}.t{font-size:12px}.est-btn{top:40px;left:12px}.est-btn.hall{top:70px}.est-btn.coins{top:100px}.est-btn.keys{top:130px}.est-btn.rooms{top:160px}.est-btn.diario{top:190px}.est-btn.nivel{top:220px}.coinPlus{left:120px;top:100px}.editor{grid-template-columns:1fr}}
+  /* ---- controles de toque (celular/tablet) ---- */
+  .vjBase{position:fixed;left:-999px;top:-999px;width:140px;height:140px;border-radius:50%;border:2px solid rgba(233,220,196,.35);background:rgba(20,12,6,.35);backdrop-filter:blur(2px);pointer-events:none;z-index:5;opacity:0;transition:opacity .15s}
+  .vjBase.on{opacity:1}
+  .vjKnob{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;background:rgba(233,220,196,.55);box-shadow:0 2px 10px rgba(0,0,0,.4);pointer-events:none}
+  .vjHint{position:fixed;left:24px;bottom:110px;width:108px;height:108px;border-radius:50%;border:2px dashed rgba(233,220,196,.25);pointer-events:none;z-index:4;display:flex;align-items:center;justify-content:center;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(233,220,196,.45);text-align:center}
+  .vjAct{position:fixed;right:22px;bottom:96px;width:78px;height:78px;border-radius:50%;border:2px solid var(--gold);background:rgba(60,36,14,.78);color:#f3e6c8;font:inherit;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;touch-action:none;box-shadow:0 4px 18px rgba(0,0,0,.45);-webkit-tap-highlight-color:transparent}
+  .vjAct b{font-size:26px;line-height:1;color:var(--gold2)} .vjAct span{font-size:9px;letter-spacing:.08em;text-transform:uppercase;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink2)}
+  .vjAct.off{opacity:.38} .vjAct:active{background:rgba(120,70,22,.9)}
+  .vjRun{position:fixed;right:118px;bottom:112px;width:52px;height:52px;border-radius:50%;border:1px solid var(--line2);background:rgba(20,12,6,.6);color:var(--ink2);font:inherit;font-size:10px;letter-spacing:.1em;text-transform:uppercase;z-index:5;touch-action:none;-webkit-tap-highlight-color:transparent} .vjRun.on{color:var(--gold2);border-color:var(--gold)}
+  body.touch .hint{bottom:8px;font-size:10px} body.touch .ret{display:none}
   @media (prefers-reduced-motion:reduce){.toast{transition:none}}
 </style>
 <canvas id="c"></canvas>
@@ -161,6 +171,7 @@
 <div class="diarioOv" id="diario" hidden><div class="diarioIn"><button class="x" id="diarioFechar" type="button" aria-label="Fechar">×</button><h3>📜 Diário do Leitor</h3><h4>Agora</h4><dl id="diarioAgora"></dl><h4>Últimas mensagens</h4><ul id="diarioLista"></ul><p class="small"><span>J abre e fecha · clicar num aviso no topo da tela também abre · as mensagens ficam salvas neste navegador</span><button type="button" id="diarioLimpar">limpar mensagens</button></p></div></div>
 <div class="diarioOv" id="livro" hidden><div class="lojaIn"><button class="x" id="livroFechar" type="button" aria-label="Fechar">×</button><h3>📖 Livro dos Contos</h3><p class="lojaSub" id="livroSub"></p><div class="lojaLista" id="livroLista"></div><p class="small">Cada sala guarda o seu conto num atril; aqui, no livro aberto do Hall, os cinco ficam à mão. Ler até o fim sobe o seu nível — de qualquer sala.</p></div></div>
 <div class="leitura" id="leitura" hidden><div class="leituraIn"><header class="leiHead"><div class="leiTit"><h3 id="leiTitulo"></h3><p class="leiMeta" id="leiMeta"></p></div><div class="leiTools"><button type="button" id="leiMenos" title="letra menor">A−</button><button type="button" id="leiMais" title="letra maior">A+</button><button type="button" class="x" id="leiFechar" aria-label="Fechar">×</button></div></header><div class="leiBar"><i id="leiProg"></i><span id="leiPct">0%</span></div><article class="leiTexto" id="leiTexto"></article><footer class="leiFoot"><p class="leiNota" id="leiNota"></p><button type="button" class="leiBtn" id="leiFim" disabled>Leia até o fim para concluir</button></footer></div></div>
+<div class="vjHint" id="vjHint" hidden>anda<br>aqui</div><div class="vjBase" id="vjBase"><div class="vjKnob" id="vjKnob"></div></div><button class="vjRun" id="vjRun" type="button" hidden>correr</button><button class="vjAct" id="vjAct" type="button" hidden><b>E</b><span id="vjActTxt">interagir</span></button>
 <div class="hint" id="hint"></div>
 <div class="toast" id="toast"></div>
 <div class="toast" id="estToast"></div>
@@ -4240,7 +4251,7 @@ if(!window.THREE||!THREE.EffectComposer||!THREE.SAOPass||!THREE.SMAAPass||!THREE
 THREE.RectAreaLightUniformsLib.init();
 
 const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:false,powerPreference:'high-performance'});
-const PR=Math.min(2,devicePixelRatio||1);renderer.setPixelRatio(PR);
+const TOUCHDEV=!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches);const PR=Math.min(TOUCHDEV?1.5:2,devicePixelRatio||1);renderer.setPixelRatio(PR);
 renderer.setSize(innerWidth,innerHeight);
 renderer.outputEncoding=THREE.sRGBEncoding;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
@@ -4837,7 +4848,7 @@ function hcandle(x,y,z,h,r,parent){const p=parent||hallScene;const c=new THREE.M
       for(const s of [-1,1]){const lx=s*(VW/2+0.62);hbox(0.08,0.08,0.34,M.iron,lx,1.9,0.14,wg);const lg=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.28,0.16),HM.glass);lg.position.set(lx,1.76,0.34);wg.add(lg);hbox(0.22,0.05,0.22,M.iron,lx,1.92,0.34,wg,{nocast:true});hbox(0.22,0.05,0.22,M.iron,lx,1.6,0.34,wg,{nocast:true});
         const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,color:0xffb060,blending:THREE.AdditiveBlending,depthWrite:false,opacity:0.5}));sp.position.set(lx,1.76,0.42);sp.scale.set(0.8,0.8,1);wg.add(sp);} }});
   // centro: o Livro dos Contos flutuando acima da cabeça (sem pedestal nem obstáculo: dá para andar por baixo; clique em qualquer ponto dele ou E de perto)
-  { const g=new THREE.Group();g.position.set(0,2.05,0);hallScene.add(g);HALLX.atril=g;HALLX.livroY=2.05;
+  { const g=new THREE.Group();g.position.set(0,1.55,0);hallScene.add(g);HALLX.atril=g;HALLX.livroY=1.55;
     const cov=new THREE.MeshStandardMaterial({color:0x5a1622,roughness:.75});
     for(const sx of [-1,1]){const half=new THREE.Group();half.position.set(sx*0.02,0,0);half.rotation.z=sx*0.22;g.add(half); // duas metades abertas em V suave
       const c=hbox(0.62,0.03,0.82,cov,sx*0.31,-0.03,0,half);const pg=hbox(0.56,0.05,0.76,M.pages,sx*0.30,0.01,0,half,{nocast:true});
@@ -5891,7 +5902,7 @@ const CH={x:2.0,z:4.2,dir:Math.PI,vx:0,vz:0,target:null,onArrive:null,sitting:fa
 const PAD={on:false,mx:0,mz:0,cx:0,cy:0,run:false,prev:{}};
 let FOCUS=null,focusKey=null,mapOpen=false,ctrlOpen=false;
 function floorAt(x,z){return (CUR==='room'&&ROOM&&ROOM.floorY)?ROOM.floorY(x,z):0;}
-const OBST=[[-0.4,1.7,1.05],[-2.7,0.6,0.78],[-3.9,2.3,0.6],[-5.0,0.5,0.7],[FX,FZ+0.9,2.7],[W/2-1.2,3.4,0.6],[-2.55,D/2,1.2],[4.6,-1.1,1.6],[2.7,-0.45,0.5],[W/2-0.75,0,0.75],[-0.55,D/2-0.4,0.55],[1.6,-3.9,0.4],[-5.3,-2.3,0.55],[4.0,4.8,0.6],[-0.9,3.6,0.45]];
+const OBST=[[-0.4,1.7,1.05],[-2.7,0.6,0.78],[-3.9,2.3,0.6],[-5.0,0.5,0.7],[FX,FZ+0.9,2.7],[W/2-1.2,3.4,0.6],[-2.55,D/2,1.2],[4.6,-1.1,1.6],[2.7,-0.45,0.5],[W/2-0.75,0,0.75],[-0.55,D/2-0.4,0.55],[1.6,-3.9,0.4],[-5.3,-2.3,0.55],[4.0,4.8,0.6],];
 const ROOM_WORLD={clamp:(x,z,m)=>[Math.max(-W/2+m,Math.min(W/2-m,x)),Math.max(-D/2+m,Math.min(D/2-m,z))],obst:OBST,
   camT:(ox,oy,oz,dx,dy,dz,dist)=>{const m=0.55;let t=dist;if(dx>1e-6)t=Math.min(t,((W/2-m)-ox)/dx);else if(dx<-1e-6)t=Math.min(t,((-W/2+m)-ox)/dx);if(dz>1e-6)t=Math.min(t,((D/2-m)-oz)/dz);else if(dz<-1e-6)t=Math.min(t,((-D/2+m)-oz)/dz);if(dy>1e-6)t=Math.min(t,((H-0.6)-oy)/dy);return t;}};
 const HALL_WORLD={clamp:(x,z,m)=>{const r=Math.hypot(x,z),rm=HR-m;if(r>rm){x*=rm/r;z*=rm/r;}return [x,z];},obst:HOBST,
@@ -5906,9 +5917,9 @@ function placeTableFant(meshes,group,books){let yy=0.87;for(const m of meshes){c
 function placeTableAdv(meshes,group,books){let yy=0.815;for(const m of meshes){const [bw]=m.userData.dims;m.rotation.z=-Math.PI/2;m.rotation.y=(m.userData.hue%20-10)*0.02;m.position.set(0.32,yy+bw/2,0.02);group.add(m);books.push(m);yy+=bw;}}
 function placeTableMys(meshes,group,books){let yy=0.8;for(const m of meshes){const [bw]=m.userData.dims;m.rotation.z=-Math.PI/2;m.rotation.y=(m.userData.hue%20-10)*0.02;m.position.set(-0.5,yy+bw/2,0.28);group.add(m);books.push(m);yy+=bw;}}
 function placeTableSci(meshes,group,books){const N=meshes.length;meshes.forEach((m,i)=>{const a=i/N*Math.PI*2;m.position.set(Math.cos(a)*0.55,0.1,Math.sin(a)*0.55);m.rotation.y=Math.PI/2-a;group.add(m);books.push(m);});}
-const SCI_OBST=[[-0.4,1.7,1.0],[-2.7,0.6,0.85],[-5.6,-5.4,0.8],[5.6,-5.4,0.8],[6.2,-0.6,0.9],[6.2,1.0,0.9],[6.2,2.6,0.9],[-2.55,SD/2,1.2],[2.6,-5.8,0.6],[-0.9,3.5,0.45]];
-const CAT_OBST=(()=>{const o=[];for(const sx of [-1,1])for(const z of [-12,-8,-4,0,4,8,12])o.push([sx*3.8,z,0.8]);for(const sx of [-1,1])for(let z=1.2;z<=8.5;z+=1.75){o.push([sx*1.6,z,0.75]);o.push([sx*2.9,z,0.75]);}o.push([0,-KD/2+2.2,1.3]);for(let x=-6.6;x<=6.6;x+=1.1)o.push([x,-KD/2+5.45,0.75]);for(const q of CAT.pileObst)o.push(q);o.push([2.8,-6.8,0.9],[-5.4,-2.6,1.0],[-6.6,0,0.8],[-6.6,2,0.8],[-6.6,4,0.8],[0,KD/2,1.2],[5.6,-3.0,0.6],[3.1,10.2,0.45]);return o;})();
-const FANT_OBST=[[5.4,2.2,3.5],[-3.0,-4.6,0.72],[-1.1,-3.5,1.0],[-2.6,-2.8,0.25],[-6.2,3.4,0.7],[6.8,-3.6,0.7],[-7.4,-2.0,0.7],[5.6,-6.0,0.7],[-3.8,6.8,0.7],[7.0,6.6,0.7],[-1.35,9.6,0.6],[1.35,9.6,0.6],[-7.4,0.6,0.6],[1.8,5.6,0.45]].concat(FANT.stoneObst,FANT.trunkObst);
+const SCI_OBST=[[-0.4,1.7,1.0],[-2.7,0.6,0.85],[-5.6,-5.4,0.8],[5.6,-5.4,0.8],[6.2,-0.6,0.9],[6.2,1.0,0.9],[6.2,2.6,0.9],[-2.55,SD/2,1.2],[2.6,-5.8,0.6],];
+const CAT_OBST=(()=>{const o=[];for(const sx of [-1,1])for(const z of [-12,-8,-4,0,4,8,12])o.push([sx*3.8,z,0.8]);for(const sx of [-1,1])for(let z=1.2;z<=8.5;z+=1.75){o.push([sx*1.6,z,0.75]);o.push([sx*2.9,z,0.75]);}o.push([0,-KD/2+2.2,1.3]);for(let x=-6.6;x<=6.6;x+=1.1)o.push([x,-KD/2+5.45,0.75]);for(const q of CAT.pileObst)o.push(q);o.push([2.8,-6.8,0.9],[-5.4,-2.6,1.0],[-6.6,0,0.8],[-6.6,2,0.8],[-6.6,4,0.8],[0,KD/2,1.2],[5.6,-3.0,0.6],);return o;})();
+const FANT_OBST=[[5.4,2.2,3.5],[-3.0,-4.6,0.72],[-1.1,-3.5,1.0],[-2.6,-2.8,0.25],[-6.2,3.4,0.7],[6.8,-3.6,0.7],[-7.4,-2.0,0.7],[5.6,-6.0,0.7],[-3.8,6.8,0.7],[7.0,6.6,0.7],[-1.35,9.6,0.6],[1.35,9.6,0.6],[-7.4,0.6,0.6],].concat(FANT.stoneObst,FANT.trunkObst);
 const FANT_WORLD={clamp:(x,z,m)=>{const r=Math.hypot(x,z),rm=FR-m;if(r>rm){x*=rm/r;z*=rm/r;}return [x,z];},obst:FANT_OBST,
   camT:(ox,oy,oz,dx,dy,dz,dist)=>{const Rc=FR-0.6;const a=dx*dx+dz*dz,b=2*(ox*dx+oz*dz),c=ox*ox+oz*oz-Rc*Rc;let t=dist;if(a>1e-6){const disc=b*b-4*a*c;if(disc>0){const tt=(-b+Math.sqrt(disc))/(2*a);if(tt>0)t=Math.min(t,tt);}}
     if(dz>1e-6){const tw=(9.4-oz)/dz;if(tw>0&&tw<t){const xw=ox+dx*tw,yw=oy+dy*tw;if(Math.abs(xw)<2.8&&yw<4.4)t=tw;}} // portal de volta ao hall: a câmera fica na frente dele
@@ -5916,7 +5927,7 @@ const FANT_WORLD={clamp:(x,z,m)=>{const r=Math.hypot(x,z),rm=FR-m;if(r>rm){x*=rm
     if(dy>1e-6)t=Math.min(t,(30-oy)/dy);return t;}};
 const ADV_OBST=[[0,-0.6,0.85],[0,-6.2,0.55],[0,2.6,1.0],[2.7,-5.0,0.75],[2.7,-2.2,0.75],[2.7,0.9,0.75],[2.7,3.8,0.75],[-2.7,-5.0,0.75],[-2.7,-2.2,0.75],[-2.6,0.6,0.62],[-3.0,-3.6,0.5],[-3.05,2.8,0.45],[-2.35,-3.75,0.4],[3.0,5.6,0.45],[2.3,5.75,0.4],[-2.6,-6.6,0.6],[2.5,-6.7,0.5],[2.6,-6.5,0.3],
   [-2.05,4.7,0.3],[-2.05,5.2,0.3],[-2.05,5.7,0.3],[-2.05,6.2,0.3],[-1.5,6.3,0.7],[-0.7,6.3,0.7],[0.1,6.3,0.7],[0.9,6.3,0.7],[1.7,6.3,0.7],[2.5,6.3,0.7],[3.2,6.3,0.7],
-  [0,7.6,0.42],[0,8.4,0.42],[0,9.3,0.6],[-2.1,9.7,0.78],[2.1,9.7,0.6],[-2.55,10.65,0.35],[2.55,10.65,0.35],[0,10.8,0.3],[1.5,-5.9,0.6],[1.4,1.2,0.45]];
+  [0,7.6,0.42],[0,8.4,0.42],[0,9.3,0.6],[-2.1,9.7,0.78],[2.1,9.7,0.6],[-2.55,10.65,0.35],[2.55,10.65,0.35],[0,10.8,0.3],[1.5,-5.9,0.6]];
 const ADV_WORLD={clamp:(x,z,m)=>[Math.max(-3.05,Math.min(3.05,x)),Math.max(-6.8,Math.min(10.2,z))],obst:ADV_OBST,
   camT:(ox,oy,oz,dx,dy,dz,dist)=>{let t=dist;
     if(dz>1e-6){const tw=((ZQ-0.35)-oz)/dz;if(tw<t&&tw>0&&oy+dy*tw<QH+0.5&&ox+dx*tw>-2.2)t=tw;} // antepara da popa (a câmera passa por cima do tombadilho)
@@ -6059,7 +6070,7 @@ window.__coins={get saldo(){return COINS.saldo;},ganhar(n){COINS.saldo+=n|0;COIN
 /* ================= CHAVES (escondidas pelo mundo; cada uma abre o baú trancado da sua sala — as portas ficam todas abertas) ================= */
 const KEY_STORE='mundo.chaves.v1',KEY_VER=4;const KEYS={tem:{},baus:{},ver:0,items:{},scene:null,active:[],anim:[]};
 // gênero da chave → [cena onde está escondida, x, y, z]: uma caça em cadeia (a do Hall abre o baú de Fantasia, que esconde a chave de Terror, e assim por diante)
-const KEY_SPOTS={castelo:['hall',0,1.45,0],charneca:['fant',-0.35,3.98,-7.0],catedral:['lib',3.3,1.2,-0.4],mesa:['cat',2.8,2.6,-7.1],navegacoes:['sci',5.8,1.15,1.0]}; // cadeia: atril do Hall → Fantasia → Terror → Histórica → Ficção científica → Aventura
+const KEY_SPOTS={castelo:['hall',0,1.0,0],charneca:['fant',-0.35,3.98,-7.0],catedral:['lib',3.3,1.2,-0.4],mesa:['cat',2.8,2.6,-7.1],navegacoes:['sci',5.8,1.15,1.0]}; // cadeia: atril do Hall → Fantasia → Terror → Histórica → Ficção científica → Aventura
 function keyLoad(){try{const d=JSON.parse(localStorage.getItem(KEY_STORE)||'null');if(d&&d.tem){KEYS.tem=d.tem;KEYS.baus=d.baus||{};KEYS.ver=d.ver|0;}}catch(e){}}
 function keySave(){try{localStorage.setItem(KEY_STORE,JSON.stringify({tem:KEYS.tem,baus:KEYS.baus,ver:KEY_VER}));}catch(e){}}
 function hasKey(genre){return !!KEYS.tem[genre];}
@@ -6228,7 +6239,8 @@ function gearTick(dt){const P=GEAR.pet;if(P){const id=P.userData.pet;if(id==='va
   if(GEAR.lanternL&&GEAR.lanternL.visible)GEAR.lanternL.intensity=1.1*(1+0.06*Math.sin(t*11)+0.04*Math.sin(t*23));}
 // ---- a Coruja e a tenda ganham vida no Hall ----
 const owlV=new THREE.Vector3();
-function hallTick(dt){if(HALLX.atril){HALLX.atril.position.y=HALLX.livroY+Math.sin(t*1.1)*0.09;HALLX.atril.rotation.y=t*0.3;if(HALLX.livroHalo)HALLX.livroHalo.material.opacity=0.45+0.15*Math.sin(t*2.3);}const O=HALLX.owl;if(!O)return;O.t+=dt;const px=MODE==='fp'?P.x:CH.x,pz=MODE==='fp'?P.z:CH.z;O.g.getWorldPosition(owlV);const dx=px-owlV.x,dz=pz-owlV.z,d=Math.hypot(dx,dz);
+function storyFloat(){const S=storyFor();if(S&&S.g.userData.top){S.g.userData.top.position.y=1.3+Math.sin(t*1.2+S.x)*0.05;S.g.rotation.y=S.rot+Math.sin(t*0.5)*0.35;}}
+function hallTick(dt){if(HALLX.atril){HALLX.atril.position.y=HALLX.livroY+Math.sin(t*1.1)*0.06;HALLX.atril.rotation.y=t*0.3;if(HALLX.livroHalo)HALLX.livroHalo.material.opacity=0.45+0.15*Math.sin(t*2.3);}const O=HALLX.owl;if(!O)return;O.t+=dt;const px=MODE==='fp'?P.x:CH.x,pz=MODE==='fp'?P.z:CH.z;O.g.getWorldPosition(owlV);const dx=px-owlV.x,dz=pz-owlV.z,d=Math.hypot(dx,dz);
   let want=0;if(d<7){let rel=Math.atan2(dx,dz)-Math.PI/2;rel=Math.atan2(Math.sin(rel),Math.cos(rel));want=Math.max(-1.1,Math.min(1.1,rel));}
   O.head.rotation.y+=(want-O.head.rotation.y)*Math.min(1,dt*3);O.head.rotation.z=Math.sin(O.t*0.7)*0.06;
   O.blink-=dt;if(O.blink<=0){O.blink=2+Math.random()*4;O.blinkT=0.18;}if(O.blinkT>0){O.blinkT-=dt;const k=O.blinkT>0.09?1-(O.blinkT-0.09)/0.09:O.blinkT/0.09;for(const e of O.eyes)e.scale.y=Math.max(0.08,1-k*0.95);}else for(const e of O.eyes)e.scale.y=1;
@@ -6253,19 +6265,16 @@ function palavras(txt){return (txt.match(/\S+/g)||[]).length;}
 const CONTO_SPOTS={lib:[-0.9,3.6],cat:[3.1,10.2],fant:[1.8,5.6],sci:[-0.9,3.5],adv:[1.4,1.2]};
 const STANDS={};
 function storyStand(hue){const g=new THREE.Group();const col=new THREE.Color().setHSL(hue/360,0.8,0.55);
-  const wood=new THREE.MeshStandardMaterial({map:clonedTex(WOOD2.map,1,1),normalMap:clonedTex(WOOD2.normalMap,1,1),color:0x8a5a34,roughness:0.8});
-  const base=new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.38,0.06,18),wood);base.position.y=0.03;base.receiveShadow=true;g.add(base);
-  const post=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.09,0.95,12),wood);post.position.y=0.5;post.castShadow=true;g.add(post);
-  const knot=new THREE.Mesh(new THREE.TorusGeometry(0.09,0.02,8,16),wood);knot.rotation.x=Math.PI/2;knot.position.y=0.55;g.add(knot);
-  const top=new THREE.Group();top.position.set(0,1.0,0);top.rotation.x=0.5;g.add(top);
-  const board=new THREE.Mesh(new THREE.BoxGeometry(0.64,0.04,0.48),wood);board.castShadow=true;top.add(board);
-  const lip=new THREE.Mesh(new THREE.BoxGeometry(0.64,0.05,0.04),wood);lip.position.set(0,0.035,0.24);top.add(lip);
+  // livro aberto flutuando na altura do peito (sem pedestal nem obstáculo): fácil de ver, de clicar e de contornar
+  const top=new THREE.Group();top.position.set(0,1.3,0);top.rotation.x=0.42;g.add(top);g.userData.top=top;
   const pages=new THREE.MeshStandardMaterial({color:0xf3e9d2,roughness:0.92}),cover=new THREE.MeshStandardMaterial({color:col.clone().multiplyScalar(0.55),roughness:0.7});
-  for(const sx of [-1,1]){const c=new THREE.Mesh(new THREE.BoxGeometry(0.25,0.02,0.36),cover);c.position.set(sx*0.13,0.03,-0.01);c.rotation.z=sx*0.07;c.castShadow=true;top.add(c);const p=new THREE.Mesh(new THREE.BoxGeometry(0.23,0.04,0.34),pages);p.position.set(sx*0.13,0.06,-0.01);p.rotation.z=sx*0.07;top.add(p);}
-  const ribbon=new THREE.Mesh(new THREE.BoxGeometry(0.04,0.006,0.52),new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:0.8,roughness:0.6}));ribbon.position.set(0.02,0.085,0.06);top.add(ribbon);
-  hcandle(0.28,0.02,-0.16,0.13,0.018,top);
-  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,color:col,transparent:true,opacity:0.35,blending:THREE.AdditiveBlending,depthWrite:false}));sp.scale.set(1.3,1.3,1);sp.position.y=1.3;sp.layers.set(1);g.add(sp);
-  const L=new THREE.PointLight(col,0.9,3.5,2);L.position.y=1.45;g.add(L);
+  for(const sx of [-1,1]){const c=new THREE.Mesh(new THREE.BoxGeometry(0.34,0.025,0.46),cover);c.position.set(sx*0.175,0.0,-0.01);c.rotation.z=sx*0.16;c.castShadow=true;top.add(c);const p=new THREE.Mesh(new THREE.BoxGeometry(0.31,0.05,0.43),pages);p.position.set(sx*0.175,0.035,-0.01);p.rotation.z=sx*0.16;top.add(p);
+    for(let k=0;k<3;k++){const ln=new THREE.Mesh(new THREE.BoxGeometry(0.2,0.004,0.02),new THREE.MeshStandardMaterial({color:0x7a6a52,roughness:1}));ln.position.set(sx*0.175,0.062,-0.14+k*0.12);ln.rotation.z=sx*0.16;top.add(ln);}}
+  const spine=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.03,0.46),cover);spine.position.set(0,-0.01,-0.01);top.add(spine);
+  const ribbon=new THREE.Mesh(new THREE.BoxGeometry(0.04,0.006,0.6),new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:0.8,roughness:0.6}));ribbon.position.set(0.02,0.07,0.08);top.add(ribbon);
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,color:col,transparent:true,opacity:0.35,blending:THREE.AdditiveBlending,depthWrite:false}));sp.scale.set(1.6,1.6,1);sp.position.y=1.32;sp.layers.set(1);g.add(sp);
+  const L=new THREE.PointLight(col,0.9,3.5,2);L.position.y=1.6;g.add(L);
+  const hit=new THREE.Mesh(new THREE.SphereGeometry(0.62,10,8),new THREE.MeshBasicMaterial({visible:false}));hit.position.y=1.3;g.add(hit); // alvo generoso
   g.traverse(o=>{if(o.isSprite)o.layers.set(1);});g.userData.stand={ribbon,sp,L,col};return g;}
 for(const room in CONTO_SPOTS){const genre=chestGenre(room);if(!genre||!CONTOS[genre])continue;const [x,z]=CONTO_SPOTS[room];const R=ROOMS[room];const g=storyStand(GEN_HUES[genre]||40);const rot=Math.atan2(R.spawn.x-x,R.spawn.z-z);g.position.set(x,R.floorY?R.floorY(x,z):0,z);g.rotation.y=rot;R.scene.add(g);
   STANDS[room]={g,genre,x,z,rot,ax:x+Math.sin(rot)*1.15,az:z+Math.cos(rot)*1.15,parts:g.userData.stand};}
@@ -6321,7 +6330,8 @@ window.__livro={abrir:openLivro,fechar:closeLivro,aberto:()=>livroOpen,render:re
 const lerp=(a,b,k)=>a+(b-a)*k;const lerpAng=(a,b,k)=>{let d=((b-a+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;return a+d*k;};
 function setHint(t){hint.textContent=t;}
 function hintFor(){let h;
-  if(MODE==='gm')h=locked?'Esc solta o mouse · WASD anda · Shift corre · E interage · Tab salas · B estante · H ajuda':(lockOK?'clique na tela para prender o mouse · WASD anda · Shift corre · E interage · Tab salas · H ajuda':'arraste para olhar · WASD anda · Shift corre · E interage · Tab salas · H ajuda');
+  if(VJ.touch)h=MODE==='fp'?'polegar esquerdo anda · arraste à direita para olhar · botão E interage':'polegar esquerdo anda · arraste à direita para girar a câmera · toque nos objetos ou no botão E';
+  else if(MODE==='gm')h=locked?'Esc solta o mouse · WASD anda · Shift corre · E interage · Tab salas · B estante · H ajuda':(lockOK?'clique na tela para prender o mouse · WASD anda · Shift corre · E interage · Tab salas · H ajuda':'arraste para olhar · WASD anda · Shift corre · E interage · Tab salas · H ajuda');
   else if(MODE==='tp')h=CUR==='hall'?'clique numa porta para entrar · clique no chão para andar · arraste para girar · rolagem aproxima · Tab salas':'clique no chão para andar · arraste para girar a câmera · clique '+((typeof ROOM!=='undefined'&&ROOM.seat)||'na poltrona')+' para sentar · clique num livro para pegá-lo · clique na porta para voltar ao hall';
   else h=locked?'Esc solta o mouse · WASD anda · Shift corre · E interage · Tab salas · H ajuda':'clique na tela para prender o mouse · arraste para olhar · WASD anda · E interage · Tab salas';
   setHint(h);}
@@ -6412,7 +6422,7 @@ function clickTP(px,py){act(resolveAt(px,py,false));}
 const promptEl=document.getElementById('prompt'),promptKey=document.getElementById('promptKey'),promptTxt=document.getElementById('promptTxt'),retEl=document.getElementById('ret');
 const MARK=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,color:0xffd070,transparent:true,depthWrite:false,depthTest:false,opacity:0.9}));MARK.scale.set(0.34,0.34,1);MARK.visible=false;MARK.layers.set(1);MARK.renderOrder=999;
 const mbox=new THREE.Box3(),mctr=new THREE.Vector3();
-function anchorOf(tg){if(!tg||!tg.obj)return null;mbox.setFromObject(tg.obj);if(mbox.isEmpty())return null;mbox.getCenter(mctr);let y=mbox.max.y+0.12;if(tg.kind==='hdoor'||tg.kind==='door')y=Math.min(mbox.max.y,mbox.min.y+2.3);else if(tg.kind==='shop'){y=1.75;mctr.x=-5.5;mctr.z=0;}else if(tg.kind==='hlivro'){y=HALLX.livroY+0.75;mctr.x=0;mctr.z=0;}else if(tg.kind==='chair')y=mbox.max.y+0.3;else if(tg.kind==='book')y=mbox.max.y+0.08;return mctr.set(mctr.x,y,mctr.z);}
+function anchorOf(tg){if(!tg||!tg.obj)return null;mbox.setFromObject(tg.obj);if(mbox.isEmpty())return null;mbox.getCenter(mctr);let y=mbox.max.y+0.12;if(tg.kind==='hdoor'||tg.kind==='door')y=Math.min(mbox.max.y,mbox.min.y+2.3);else if(tg.kind==='shop'){y=1.75;mctr.x=-5.5;mctr.z=0;}else if(tg.kind==='hlivro'){y=HALLX.livroY+0.6;mctr.x=0;mctr.z=0;}else if(tg.kind==='chair')y=mbox.max.y+0.3;else if(tg.kind==='book')y=mbox.max.y+0.08;return mctr.set(mctr.x,y,mctr.z);}
 function reachOK(tg){if(!tg||tg.kind==='floor')return false;const a=anchorOf(tg);if(!a)return false;return Math.hypot(a.x-CH.x,a.z-CH.z)<=(REACH[tg.kind]||3.5);}
 function nearBy(){for(const it of KEYS.active){if(Math.hypot(it.x-CH.x,it.z-CH.z)<2.7){const nome=EST.GENEROS[it.genre]?EST.GENEROS[it.genre].nome:it.genre;return {kind:'key',obj:it.g,item:it,label:'Pegar a chave de '+nome};}}
   if(CUR==='hall'){if(HALLX.shop&&Math.hypot(-5.0-CH.x,CH.z)<2.6)return {kind:'shop',obj:HALLX.shop,label:'Abrir a Lojinha da Coruja'};if(HALLX.atril&&Math.hypot(CH.x,CH.z)<2.8)return {kind:'hlivro',obj:HALLX.atril,label:'Abrir o Livro dos Contos'};let best=null,bd=2.0;for(const g of HALL_DOORS){const [fx,fz]=doorFront(g,0.4);const d=Math.hypot(fx-CH.x,fz-CH.z);if(d<bd){bd=d;best=g;}}if(!best)return null;const G=EST.GENEROS[best.userData.genre];const nome=G?G.nome:best.userData.genre;return {kind:'hdoor',obj:best,g:best,dist:bd,label:best.userData.locked?nome+' · em construção':'Entrar: '+nome};}
@@ -6423,7 +6433,7 @@ function nearBy(){for(const it of KEYS.active){if(Math.hypot(it.x-CH.x,it.z-CH.z
   { const S=storyFor();if(S)c.push([Math.hypot(S.x-CH.x,S.z-CH.z),{kind:'story',obj:S.g,story:S,label:storyLabel(S)}]); }
   c.sort((a,b)=>a[0]-b[0]);return (c.length&&c[0][0]<2.4)?c[0][1]:null;}
 function setFocus(tg){FOCUS=tg;const key=tg?(tg.kind+':'+(tg.label||'')+(tg.far?':far':'')):null;
-  if(key!==focusKey){focusKey=key;if(promptEl){if(tg){promptEl.hidden=false;promptTxt.textContent=tg.far?tg.label.replace('Entrar: ','')+' · aproxime-se':tg.label;const noKey=!!tg.far||(tg.kind==='hdoor'&&tg.g&&tg.g.userData.locked);promptKey.hidden=noKey;promptKey.textContent=PAD.on?'A':'E';}else promptEl.hidden=true;}}
+  if(key!==focusKey){focusKey=key;vjFocus(tg);if(promptEl){if(tg){promptEl.hidden=false;promptTxt.textContent=tg.far?tg.label.replace('Entrar: ','')+' · aproxime-se':tg.label;const noKey=!!tg.far||(tg.kind==='hdoor'&&tg.g&&tg.g.userData.locked);promptKey.hidden=noKey;promptKey.textContent=PAD.on?'A':'E';}else promptEl.hidden=true;}}
   MARK.visible=!!(tg&&tg.obj&&!tg.far);}
 function updateFocus(){if(MODE==='tp'||fadeOnAt||mapOpen||ctrlOpen||lojaOpen||diaryOpen||leituraOpen||livroOpen){setFocus(null);return;}
   if(CH.sitting&&MODE!=='fp'){setFocus({kind:'stand',label:'Levantar'});return;}
@@ -6437,6 +6447,19 @@ let sx=0,sy=0,hoverN=0;
 function hover(e){if(e.pointerType==='touch'||(++hoverN%3))return;const tg=resolveAt(e.clientX,e.clientY,false);const key=(tg&&tg.kind!=='floor')?(tg.kind+':'+(tg.tip||'')):null;
   if(key!==hoverId){hoverId=key;if(tip){if(key&&tg.tip&&MODE!=='gm'){tip.textContent=tg.tip;tip.hidden=false;}else tip.hidden=true;}}
   cv.style.cursor=key?'pointer':(MODE==='tp'?'default':'crosshair');if(tip&&key&&!tip.hidden){tip.style.left=(e.clientX+14)+'px';tip.style.top=(e.clientY+16)+'px';}}
+// ---- toque (celular/tablet): joystick virtual na metade esquerda anda, arrastar na direita olha, botão E interage, botão correr ----
+const VJ={touch:false,id:null,active:false,cx:0,cy:0,x:0,y:0,R:52,run:false};
+const vjBase=document.getElementById('vjBase'),vjKnob=document.getElementById('vjKnob'),vjAct=document.getElementById('vjAct'),vjActTxt=document.getElementById('vjActTxt'),vjRun=document.getElementById('vjRun'),vjHint=document.getElementById('vjHint');
+function vjShow(on){if(VJ.touch===on)return;VJ.touch=on;document.body.classList.toggle('touch',on);if(vjAct)vjAct.hidden=!on;if(vjRun)vjRun.hidden=!on;if(vjHint)vjHint.hidden=!on;hintFor();}
+function vjSet(dx,dy){const l=Math.hypot(dx,dy);const k=l>VJ.R?VJ.R/l:1;VJ.x=dx*k/VJ.R;VJ.y=dy*k/VJ.R;const m=Math.hypot(VJ.x,VJ.y),dz=0.14;const g=m<dz?0:Math.min(1,(m-dz)/(1-dz));PAD.mx=m?VJ.x/m*g:0;PAD.mz=m?VJ.y/m*g:0;PAD.run=VJ.run||g>0.96;if(vjKnob)vjKnob.style.transform='translate('+(VJ.x*VJ.R)+'px,'+(VJ.y*VJ.R)+'px)';}
+function vjEnd(e){if(e.pointerId!==VJ.id)return;VJ.id=null;VJ.active=false;PAD.mx=0;PAD.mz=0;PAD.run=VJ.run;if(vjBase)vjBase.classList.remove('on');if(vjKnob)vjKnob.style.transform='';e.stopImmediatePropagation();}
+cv.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch')return;vjShow(true);if(vjHint)vjHint.hidden=true;
+  if(VJ.id===null&&e.clientX<innerWidth*0.5&&e.clientY>innerHeight*0.28){VJ.id=e.pointerId;VJ.active=true;VJ.cx=e.clientX;VJ.cy=e.clientY;if(vjBase){vjBase.style.left=(e.clientX-70)+'px';vjBase.style.top=(e.clientY-70)+'px';vjBase.classList.add('on');}vjSet(0,0);if(CH.sitting)standUp();e.stopImmediatePropagation();e.preventDefault();}},{capture:true});
+addEventListener('pointermove',e=>{if(e.pointerId!==VJ.id)return;vjSet(e.clientX-VJ.cx,e.clientY-VJ.cy);e.stopImmediatePropagation();},{capture:true});
+addEventListener('pointerup',vjEnd,{capture:true});addEventListener('pointercancel',vjEnd,{capture:true});
+if(vjAct){vjAct.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(FOCUS&&!FOCUS.far)doInteract();else if(FOCUS&&FOCUS.far&&FOCUS.kind==='hdoor')act(FOCUS);},{capture:true});}
+if(vjRun){vjRun.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();VJ.run=!VJ.run;vjRun.classList.toggle('on',VJ.run);PAD.run=VJ.run||(VJ.active&&Math.hypot(PAD.mx,PAD.mz)>0.96);},{capture:true});}
+function vjFocus(tg){if(!vjAct||!VJ.touch)return;if(tg){vjActTxt.textContent=tg.far?'aproxime-se':tg.label.replace(/^(Entrar|Pegar|Abrir|Ler|Reler|Voltar ao)[: ]*/,'').slice(0,26)||tg.label.slice(0,26);vjAct.classList.toggle('off',!!tg.far);}else{vjActTxt.textContent='interagir';vjAct.classList.add('off');}}
 cv.addEventListener('pointerdown',e=>{dragging=true;mouseDown=true;lx=sx=e.clientX;ly=sy=e.clientY;cv.setPointerCapture&&cv.setPointerCapture(e.pointerId);if(mapOpen)closeMap();});
 addEventListener('pointerup',e=>{const click=dragging&&e.target===cv&&Math.hypot(e.clientX-sx,e.clientY-sy)<6;
   if(click){if(ctrlOpen)showCtrl(false);
@@ -6453,7 +6476,7 @@ cv.addEventListener('pointerleave',()=>{mouseIn=false;});
 cv.addEventListener('dblclick',()=>{if(MODE!=='tp'&&!locked)tryLock();});
 document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===cv;if(retEl)retEl.hidden=!locked;hintFor();});
 document.addEventListener('pointerlockerror',()=>lockFail());
-const inUI=e=>!!(e.target&&e.target.closest&&e.target.closest('#est,.q,.est-btn,#map,#ctrl,#loja,#diario,#toast,#leitura'));
+const inUI=e=>!!(e.target&&e.target.closest&&e.target.closest('#est,.q,.est-btn,#map,#ctrl,#loja,#diario,#toast,#leitura,#vjAct,#vjRun,#livro'));
 const typing=e=>!!(e.target&&/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName));
 addEventListener('wheel',e=>{if(inUI(e))return;if(MODE!=='fp'){CAM.dist=Math.max(1.6,Math.min(9,CAM.dist*(1+Math.sign(e.deltaY)*0.12)));}else wheelV+=-Math.sign(e.deltaY)*1.6;},{passive:true});
 addEventListener('keydown',e=>{if(typing(e))return;const k=e.key.toLowerCase();keys[k]=true;const estOpen=!document.getElementById('est').hidden;
@@ -6469,7 +6492,7 @@ addEventListener('keydown',e=>{if(typing(e))return;const k=e.key.toLowerCase();k
 addEventListener('keyup',e=>{if(typing(e))return;keys[e.key.toLowerCase()]=false;});
 addEventListener('blur',()=>{for(const k in keys)keys[k]=false;});
 let tdist=null;addEventListener('touchstart',e=>{if(inUI(e))return;if(e.touches.length===2)tdist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);},{passive:true});
-addEventListener('touchmove',e=>{if(inUI(e))return;if(e.touches.length===2&&tdist!==null){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(MODE!=='fp')CAM.dist=Math.max(1.6,Math.min(9,CAM.dist*(tdist/d)));else wheelV+=(d-tdist)*0.02;tdist=d;}},{passive:true});
+addEventListener('touchmove',e=>{if(inUI(e)||VJ.active)return;if(e.touches.length===2&&tdist!==null){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(MODE!=='fp')CAM.dist=Math.max(1.6,Math.min(9,CAM.dist*(tdist/d)));else wheelV+=(d-tdist)*0.02;tdist=d;}},{passive:true});
 addEventListener('touchend',()=>{tdist=null;},{passive:true});
 for(const [id,m] of [['m0','gm'],['m1','tp'],['m2','fp']]){const b=document.getElementById(id);if(b)b.addEventListener('click',()=>setMode(m));}
 // ---- menu de salas (Tab / M / botão 🗺): cartões com o nome de cada gênero na ordem das portas do hall; clique = viagem rápida ----
@@ -6507,7 +6530,7 @@ function initCtrl(){const sl=document.getElementById('setSens'),sv=document.getE
 // ---- controle (gamepad) ----
 let padOK=true;
 function pollPad(dt){if(!padOK)return;let gps=null;try{gps=navigator.getGamepads?navigator.getGamepads():null;}catch(e){padOK=false;return;}let gp=null;if(gps)for(const g of gps){if(g&&g.connected){gp=g;break;}}
-  const wasOn=PAD.on;PAD.on=!!gp;if(!gp){PAD.mx=PAD.mz=PAD.cx=PAD.cy=0;PAD.run=false;if(wasOn)setFocus(null);return;}
+  const wasOn=PAD.on;PAD.on=!!gp;if(!gp){if(!VJ.active){PAD.mx=PAD.mz=0;PAD.run=VJ.run;}PAD.cx=PAD.cy=0;if(wasOn)setFocus(null);return;}
   if(!wasOn)showToast('Controle conectado: analógicos andam e giram · A interage · B volta ao hall',{queue:true});
   const dz=v=>Math.abs(v)<0.16?0:(v-Math.sign(v)*0.16)/0.84;PAD.mx=dz(gp.axes[0]||0);PAD.mz=dz(gp.axes[1]||0);PAD.cx=dz(gp.axes[2]||0);PAD.cy=dz(gp.axes[3]||0);
   const b=i=>!!(gp.buttons[i]&&gp.buttons[i].pressed);PAD.run=b(7)||b(10)||b(4)||b(5);
@@ -6542,7 +6565,8 @@ function moveTP(dt){let f=0,s=0;if(keys['w']||keys['arrowup'])f+=1;if(keys['s']|
   if(!CH.sitting){const ox0=CH.x,oz0=CH.z;let nx=CH.x+CH.vx*dt,nz=CH.z+CH.vz*dt;[nx,nz]=WORLD.clamp(nx,nz,0.9);
     for(const [ox,oz,orr] of WORLD.obst){const dx=nx-ox,dz=nz-oz,d=Math.hypot(dx,dz);if(d<orr){const ux=dx/(d||1e-6),uz=dz/(d||1e-6);nx=ox+ux*orr;nz=oz+uz*orr;const into=-(CH.vx*ux+CH.vz*uz);if(into>0.3*Math.max(0.2,Math.hypot(CH.vx,CH.vz))){const cr=CH.vx*uz-CH.vz*ux;if(Math.abs(cr)>0.05)CH.slide=cr>0?1:-1;const sg=CH.slide||1;nx+=-uz*sg*into*dt*0.9;nz+=ux*sg*into*dt*0.9;}}}CH.x=nx;CH.z=nz;
     const moved=Math.hypot(nx-ox0,nz-oz0);if(want&&CH.target&&moved<0.004){CH.stuckT+=dt;if(CH.stuckT>0.8){CH.target=null;CH.onArrive=null;CH.stuckT=0;}}else CH.stuckT=0;}
-  const spd=Math.hypot(CH.vx,CH.vz);if(spd>0.2&&!CH.sitting)CH.dir=lerpAng(CH.dir,Math.atan2(CH.vx,CH.vz),Math.min(1,dt*12));}
+  const spd=Math.hypot(CH.vx,CH.vz);if(spd>0.2&&!CH.sitting)CH.dir=lerpAng(CH.dir,Math.atan2(CH.vx,CH.vz),Math.min(1,dt*12));
+  if(VJ.active&&manual&&!dragging&&spd>0.4&&MODE!=='fp'){const fwd=-(PAD.mz);if(fwd>-0.2)CAM.yaw=lerpAng(CAM.yaw,CH.dir+Math.PI,Math.min(1,dt*(1.4+1.6*Math.abs(PAD.mx))));}}
 function poseReader(dt){const R=READER;const spd=Math.hypot(CH.vx,CH.vz);const walking=Math.min(1,spd/1.4);const runK=Math.max(0,Math.min(1,(spd-2.6)/2.0));if(walking>0.05)CH.walkT+=dt*(5.5+spd*1.9);if(CH.sitting)CH.sitT=Math.min(1,CH.sitT+dt*2.2);const sit=CH.sitting?CH.sitT:0;
   const sw=Math.sin(CH.walkT)*(0.6+0.35*runK)*walking;
   R.legs[0].hip.rotation.x=lerp(sw,-1.5,sit);R.legs[1].hip.rotation.x=lerp(-sw,-1.5,sit);
@@ -6601,7 +6625,7 @@ function camTP(dt){
   const d=camPos.distanceTo(lookDes);setReaderOpacity(Math.max(0,Math.min(1,(d-0.55)/0.7)));}
 
 /* ================= LAÇO ================= */
-loadEl.style.display='none';let mode0=null;try{mode0=localStorage.getItem('bibmode2');}catch(e){}if(!['gm','tp','fp'].includes(mode0))mode0=(window.matchMedia&&matchMedia('(pointer:fine)').matches)?'gm':'tp';MODE='gm';jump('hall',null);buildMap();initCtrl();setMode(mode0);keyHud();setTimeout(keyHint,5600);
+loadEl.style.display='none';let mode0=null;try{mode0=localStorage.getItem('bibmode2');}catch(e){}if(!['gm','tp','fp'].includes(mode0))mode0='gm';MODE='gm';jump('hall',null);buildMap();initCtrl();setMode(mode0);keyHud();setTimeout(keyHint,5600);
 let last=performance.now(),t=0,fpsAcc=0,fpsN=0,fpsChecked=false;const FIREPOS=new THREE.Vector3(FX,1.5,FZ+0.6),tmpV=new THREE.Vector3();
 function frame(now){const dt=Math.min(0.1,(now-last)/1000);last=now;tick(dt);draw(dt);if(!window.__pause)requestAnimationFrame(frame);}
 function tick(dt){t+=dt;
@@ -6614,7 +6638,7 @@ function tick(dt){t+=dt;
   // atravessar o vão do arco troca de cena (do Hall para a sala e da sala para o Hall)
   if(!fadeOnAt){const px=MODE==='fp'?P.x:CH.x,pz=MODE==='fp'?P.z:CH.z;
     if(CUR==='hall'){const r=Math.hypot(px,pz);if(r>HR-1.2){const a=Math.atan2(pz,px);for(const g of HALL_DOORS){if(g.userData.locked)continue;let d=a-g.userData.angle;d=Math.atan2(Math.sin(d),Math.cos(d));if(Math.abs(d)*HR<1.35){enterRoom(g.userData.genre);break;}}}}
-    else if(ROOM&&ROOM.portalAt&&!CH.sitting){const pa=ROOM.portalAt;if(pz>pa.z-1.2&&Math.abs(px-pa.x)<1.0)goHall();}}
+    else if(ROOM&&ROOM.portalAt&&!CH.sitting){const pa=ROOM.portalAt;if(pz>pa.z-1.5&&Math.abs(px-pa.x)<1.1)goHall();}} // 1,5 m do vão: alcançável mesmo com o obstáculo da porta
   // fogo
   const fl=1+Math.sin(t*13.1)*0.12+Math.sin(t*7.3+1)*0.1+Math.sin(t*23.7)*0.05;fireL.intensity=3.0*fl;fireL.position.x=FX+Math.sin(t*5.2)*0.08;fireFill.intensity=0.9*fl;
   { const F=window.__FIRE;F.volMat.uniforms.t.value=t;F.pmat.uniforms.t.value=t;F.bed.material.emissiveIntensity=1.3+0.35*Math.sin(t*5.3)+0.2*Math.sin(t*11.7);for(const l of F.LOGS)l.material.emissiveIntensity=0.85+0.25*Math.sin(t*4.1+l.position.x); }
@@ -6634,7 +6658,7 @@ function tick(dt){t+=dt;
   chand.rotation.z=Math.sin(t*0.7)*0.018;chand.rotation.x=Math.cos(t*0.53)*0.014;
   for(const g of HALL_DOORS){const tgt=g.userData.open?1.5:0;for(const pv of g.userData.leaves){const want=-pv.userData.sx*tgt;if(g.userData.shake>0){g.userData.shake-=dt;pv.rotation.y=Math.sin(t*45+pv.userData.sx)*0.012*Math.max(0,g.userData.shake);}else pv.rotation.y+=(want-pv.rotation.y)*Math.min(1,dt*5);}}
   for(const s of SLICES)s.material.uniforms.t.value+=dt;
-  if(CUR==='room'&&ROOM.tick)ROOM.tick(dt);else if(CUR==='hall')hallTick(dt);
+  if(CUR==='room'){if(ROOM.tick)ROOM.tick(dt);storyFloat();}else if(CUR==='hall')hallTick(dt);
   coinTick(dt);keyTick(dt);chestTick(dt);gearTick(dt);storyTick(dt);
   // foco da profundidade de campo: no personagem (3ª pessoa) ou a meia distância (1ª pessoa)
   { const want=MODE!=='fp'?Math.max(1.2,camera.position.distanceTo(new THREE.Vector3(CH.x,1.1,CH.z))):3.0;const u=bokeh.uniforms['focus'];u.value+=(want-u.value)*Math.min(1,dt*4); }
