@@ -143,19 +143,28 @@
   .goList button{background:rgba(20,12,6,.72);border:1px solid rgba(233,220,196,.28);color:#f3e6c8;font:inherit;font-size:12px;letter-spacing:.04em;padding:7px 11px;border-radius:14px;cursor:pointer;white-space:nowrap;backdrop-filter:blur(3px);-webkit-tap-highlight-color:transparent}
   .goList button:hover,.goList button:active{border-color:var(--gold);background:rgba(60,36,14,.85)}
   .goList button.here{opacity:.45}
-  body.touch .goBar{bottom:30px;left:0;right:0;transform:none;max-width:none;padding:0 10px;justify-content:center}
-  body.touch .prompt{bottom:74px;font-size:12px;max-width:min(62vw,max(240px,calc(100vw - 400px)))}
+  body.touch .goBar{bottom:34px;left:198px;right:112px;transform:none;max-width:none;padding:0;justify-content:flex-start;align-items:center}
+  body.touch .goList{flex-wrap:wrap;overflow:visible;row-gap:5px}
+  body.touch .goList button{font-size:11px;padding:7px 10px}
+  body.touch .prompt{bottom:118px;font-size:12px;max-width:min(62vw,max(240px,calc(100vw - 400px)))}
   @media (max-width:600px){.goBar{bottom:34px}.goList button{font-size:11px;padding:6px 9px}}
-  /* ---- controles de toque (celular/tablet) ---- */
-  .vjBase{position:fixed;left:-999px;top:-999px;width:140px;height:140px;border-radius:50%;border:2px solid rgba(233,220,196,.35);background:rgba(20,12,6,.35);backdrop-filter:blur(2px);pointer-events:none;z-index:5;opacity:0;transition:opacity .15s}
-  .vjBase.on{opacity:1}
-  .vjKnob{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;background:rgba(233,220,196,.55);box-shadow:0 2px 10px rgba(0,0,0,.4);pointer-events:none}
-  .vjHint{position:fixed;left:24px;bottom:110px;width:108px;height:108px;border-radius:50%;border:2px dashed rgba(233,220,196,.25);pointer-events:none;z-index:4;display:flex;align-items:center;justify-content:center;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(233,220,196,.45);text-align:center}
+  @media (orientation:portrait){body.touch .goBar{left:0;right:0;bottom:228px;padding:0 10px;justify-content:center} body.touch .goList{justify-content:center} body.touch .prompt{bottom:352px} body.touch .toast{top:150px}}
+  /* toque: HUD numa faixa compacta no alto, qualidade dentro de Controles, só o botão ❔ no canto */
+  body.touch .hudRow{position:fixed;left:12px;top:34px;right:150px;display:flex;flex-wrap:wrap;gap:5px;z-index:3;pointer-events:none}
+  body.touch .hudRow .est-btn{position:static;pointer-events:auto;font-size:10px;padding:4px 7px;letter-spacing:.08em;gap:5px}
+  body.touch .hudRow .est-btn b{font-size:11px} body.touch .hudRow .est-btn small{font-size:9px}
+  body.touch .q:not(.help){display:none} body.touch .q.help{top:12px;right:12px} body.touch .t{font-size:12px;top:12px;left:12px} body.touch .toast{top:74px}
+  .ctrlSet .qRow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px} body.touch .ctrlSet .qRow .q{display:flex;position:static}
+  /* ---- controles de toque (celular/tablet): setas fixas (segurar anda na direção da tela) + botão E; sem correr ---- */
+  .dpad{position:fixed;left:14px;bottom:30px;width:178px;height:178px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:4px;z-index:5;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+  .dk{background:rgba(20,12,6,.66);border:1px solid rgba(233,220,196,.4);color:#f3e6c8;font:inherit;font-size:22px;line-height:1;border-radius:12px;display:flex;align-items:center;justify-content:center;pointer-events:none;touch-action:none;backdrop-filter:blur(2px);box-shadow:0 3px 12px rgba(0,0,0,.35);padding:0;margin:0}
+  .dk.up{grid-area:1/2} .dk.left{grid-area:2/1} .dk.right{grid-area:2/3} .dk.down{grid-area:3/2}
+  .dk.on{background:rgba(120,70,22,.94);border-color:var(--gold);color:#fff}
+  .dpad .dc{grid-area:2/2;border-radius:50%;border:1px dashed rgba(233,220,196,.16);pointer-events:none}
   .vjAct{position:fixed;right:22px;bottom:96px;width:78px;height:78px;border-radius:50%;border:2px solid var(--gold);background:rgba(60,36,14,.78);color:#f3e6c8;font:inherit;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;touch-action:none;box-shadow:0 4px 18px rgba(0,0,0,.45);-webkit-tap-highlight-color:transparent}
   .vjAct b{font-size:26px;line-height:1;color:var(--gold2)} .vjAct span{font-size:9px;letter-spacing:.08em;text-transform:uppercase;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink2)}
   .vjAct.off{opacity:.38} .vjAct:active{background:rgba(120,70,22,.9)}
-  .vjRun{position:fixed;right:118px;bottom:112px;width:52px;height:52px;border-radius:50%;border:1px solid var(--line2);background:rgba(20,12,6,.6);color:var(--ink2);font:inherit;font-size:10px;letter-spacing:.1em;text-transform:uppercase;z-index:5;touch-action:none;-webkit-tap-highlight-color:transparent} .vjRun.on{color:var(--gold2);border-color:var(--gold)}
-  body.touch .hint{bottom:8px;font-size:10px} body.touch .ret{display:none}
+  body.touch .hint{display:none} body.touch .ret{display:none}
   @media (prefers-reduced-motion:reduce){.toast{transition:none}}
 </style>
 <canvas id="c"></canvas>
@@ -182,7 +191,7 @@
 <div class="diarioOv" id="diario" hidden><div class="diarioIn"><button class="x" id="diarioFechar" type="button" aria-label="Fechar">×</button><h3>📜 Diário do Leitor</h3><h4>Agora</h4><dl id="diarioAgora"></dl><h4>Últimas mensagens</h4><ul id="diarioLista"></ul><p class="small"><span>J abre e fecha · clicar num aviso no topo da tela também abre · as mensagens ficam salvas neste navegador</span><button type="button" id="diarioLimpar">limpar mensagens</button></p></div></div>
 <div class="diarioOv" id="livro" hidden><div class="lojaIn"><button class="x" id="livroFechar" type="button" aria-label="Fechar">×</button><h3>📖 Livro dos Contos</h3><p class="lojaSub" id="livroSub"></p><div class="lojaLista" id="livroLista"></div><p class="small">Cada sala guarda o seu conto num atril; aqui, no livro aberto do Hall, os cinco ficam à mão. Ler até o fim sobe o seu nível — de qualquer sala.</p></div></div>
 <div class="leitura" id="leitura" hidden><div class="leituraIn"><header class="leiHead"><div class="leiTit"><h3 id="leiTitulo"></h3><p class="leiMeta" id="leiMeta"></p></div><div class="leiTools"><button type="button" id="leiMenos" title="letra menor">A−</button><button type="button" id="leiMais" title="letra maior">A+</button><button type="button" class="x" id="leiFechar" aria-label="Fechar">×</button></div></header><div class="leiBar"><i id="leiProg"></i><span id="leiPct">0%</span></div><article class="leiTexto" id="leiTexto"></article><footer class="leiFoot"><p class="leiNota" id="leiNota"></p><button type="button" class="leiBtn" id="leiFim" disabled>Leia até o fim para concluir</button></footer></div></div>
-<div class="vjHint" id="vjHint" hidden>anda<br>aqui</div><div class="vjBase" id="vjBase"><div class="vjKnob" id="vjKnob"></div></div><button class="vjRun" id="vjRun" type="button" hidden>correr</button><button class="vjAct" id="vjAct" type="button" hidden><b>E</b><span id="vjActTxt">interagir</span></button>
+<div class="dpad" id="dpad" hidden aria-label="Setas para andar"><button class="dk up" type="button" tabindex="-1" aria-hidden="true">▲</button><button class="dk left" type="button" tabindex="-1" aria-hidden="true">◀</button><span class="dc"></span><button class="dk right" type="button" tabindex="-1" aria-hidden="true">▶</button><button class="dk down" type="button" tabindex="-1" aria-hidden="true">▼</button></div><button class="vjAct" id="vjAct" type="button" hidden><b>E</b><span id="vjActTxt">interagir</span></button>
 <div class="goBar" id="goBar" hidden><span class="goT">Ir para</span><div class="goList" id="goList"></div></div>
 <div class="hint" id="hint"></div>
 <div class="toast" id="toast"></div>
@@ -5915,7 +5924,7 @@ let MODE='gm'; // 'gm' = gamer (mouse livre + WASD + E) · 'tp' = apontar e clic
 const SET={sens:1,invY:false,sound:true};try{const sv=parseFloat(localStorage.getItem('bibsens'));if(sv>0)SET.sens=Math.max(0.3,Math.min(2.5,sv));SET.invY=localStorage.getItem('bibinv')==='1';SET.sound=localStorage.getItem('bibsom')!=='0';}catch(e){}
 const P={x:2.6,z:5.4,yaw:0.42,pitch:-0.02};const EYE=1.62;let locked=false,dragging=false,lx=0,ly=0,mouseDown=false,wheelV=0;const keys={};
 let lockOK=!!cv.requestPointerLock,lockWarned=false,mx=innerWidth/2,my=innerHeight/2,mouseIn=false;
-const CAM={yaw:0.3,pitch:0.42,dist:5.2};let camArm=5.2,camLift=0;
+const CAM={yaw:0.3,pitch:0.42,dist:5.2,follow:false};const followV=new THREE.Vector3();let camArm=5.2,camLift=0;const CAMDEF={pitch:TOUCHDEV?0.82:0.5,dist:TOUCHDEV?6.8:6.0}; // câmera mais do alto; no toque fica travada nesse ângulo
 const CH={x:2.0,z:4.2,dir:Math.PI,vx:0,vz:0,target:null,onArrive:null,sitting:false,sitT:0,walkT:0,speed:2.4,stuckT:0,fy:0,run:false,slide:1};
 const PAD={on:false,mx:0,mz:0,cx:0,cy:0,run:false,prev:{}};
 let FOCUS=null,focusKey=null,mapOpen=false,ctrlOpen=false;
@@ -6349,7 +6358,7 @@ window.__livro={abrir:openLivro,fechar:closeLivro,aberto:()=>livroOpen,render:re
 const lerp=(a,b,k)=>a+(b-a)*k;const lerpAng=(a,b,k)=>{let d=((b-a+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;return a+d*k;};
 function setHint(t){hint.textContent=t;}
 function hintFor(){let h;
-  if(VJ.touch)h=MODE==='fp'?'polegar esquerdo anda · arraste à direita para olhar · botão E interage':'toque em «Ir para» ou no chão e o leitor vai sozinho · polegar esquerdo anda · arraste à direita para girar a câmera';
+  if(VJ.touch)h=MODE==='fp'?'setas andam · arraste para olhar · botão E interage':'segure as setas para andar · «Ir para» ou um toque no chão levam você até lá · E age · arraste para girar a câmera';
   else if(MODE==='gm')h=locked?'Esc solta o mouse · WASD anda · Shift corre · E interage · Tab salas · B estante · H ajuda':(lockOK?'«Ir para» leva você até lá · clique na tela para prender o mouse · WASD anda · Shift corre · E interage · H ajuda':'«Ir para» leva você até lá · arraste para olhar · WASD anda · Shift corre · E interage · H ajuda');
   else if(MODE==='tp')h=CUR==='hall'?'clique numa porta para entrar · clique no chão para andar · arraste para girar · rolagem aproxima · Tab salas':'clique no chão para andar · arraste para girar a câmera · clique '+((typeof ROOM!=='undefined'&&ROOM.seat)||'na poltrona')+' para sentar · clique num livro para pegá-lo · clique na porta para voltar ao hall';
   else h=locked?'Esc solta o mouse · WASD anda · Shift corre · E interage · Tab salas · H ajuda':'clique na tela para prender o mouse · arraste para olhar · WASD anda · E interage · Tab salas';
@@ -6466,18 +6475,29 @@ let sx=0,sy=0,hoverN=0;
 function hover(e){if(e.pointerType==='touch'||(++hoverN%3))return;const tg=resolveAt(e.clientX,e.clientY,false);const key=(tg&&tg.kind!=='floor')?(tg.kind+':'+(tg.tip||'')):null;
   if(key!==hoverId){hoverId=key;if(tip){if(key&&tg.tip&&MODE!=='gm'){tip.textContent=tg.tip;tip.hidden=false;}else tip.hidden=true;}}
   cv.style.cursor=key?'pointer':(MODE==='tp'?'default':'crosshair');if(tip&&key&&!tip.hidden){tip.style.left=(e.clientX+14)+'px';tip.style.top=(e.clientY+16)+'px';}}
-// ---- toque (celular/tablet): joystick virtual na metade esquerda anda, arrastar na direita olha, botão E interage, botão correr ----
-const VJ={touch:false,id:null,active:false,cx:0,cy:0,x:0,y:0,R:52,run:false};
-const vjBase=document.getElementById('vjBase'),vjKnob=document.getElementById('vjKnob'),vjAct=document.getElementById('vjAct'),vjActTxt=document.getElementById('vjActTxt'),vjRun=document.getElementById('vjRun'),vjHint=document.getElementById('vjHint');
-function vjShow(on){if(VJ.touch===on)return;VJ.touch=on;document.body.classList.toggle('touch',on);if(vjAct)vjAct.hidden=!on;if(vjRun)vjRun.hidden=!on;if(vjHint)vjHint.hidden=!on;hintFor();}
-function vjSet(dx,dy){const l=Math.hypot(dx,dy);const k=l>VJ.R?VJ.R/l:1;VJ.x=dx*k/VJ.R;VJ.y=dy*k/VJ.R;const m=Math.hypot(VJ.x,VJ.y),dz=0.14;const g=m<dz?0:Math.min(1,(m-dz)/(1-dz));PAD.mx=m?VJ.x/m*g:0;PAD.mz=m?VJ.y/m*g:0;PAD.run=VJ.run||g>0.96;if(vjKnob)vjKnob.style.transform='translate('+(VJ.x*VJ.R)+'px,'+(VJ.y*VJ.R)+'px)';}
-function vjEnd(e){if(e.pointerId!==VJ.id)return;VJ.id=null;VJ.active=false;PAD.mx=0;PAD.mz=0;PAD.run=VJ.run;if(vjBase)vjBase.classList.remove('on');if(vjKnob)vjKnob.style.transform='';e.stopImmediatePropagation();}
-cv.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch')return;vjShow(true);if(vjHint)vjHint.hidden=true;
-  if(VJ.id===null&&e.clientX<innerWidth*0.5&&e.clientY>innerHeight*0.28){VJ.id=e.pointerId;VJ.active=true;VJ.cx=e.clientX;VJ.cy=e.clientY;if(vjBase){vjBase.style.left=(e.clientX-70)+'px';vjBase.style.top=(e.clientY-70)+'px';vjBase.classList.add('on');}vjSet(0,0);if(CH.sitting)standUp();e.stopImmediatePropagation();e.preventDefault();}},{capture:true});
-addEventListener('pointermove',e=>{if(e.pointerId!==VJ.id)return;vjSet(e.clientX-VJ.cx,e.clientY-VJ.cy);e.stopImmediatePropagation();},{capture:true});
-addEventListener('pointerup',vjEnd,{capture:true});addEventListener('pointercancel',vjEnd,{capture:true});
+// ---- toque (celular/tablet): setas fixas no canto esquerdo (segurar anda na direção da tela, sem correr), arrastar gira a câmera, botão E interage ----
+const VJ={touch:false,active:false,run:false};
+const dpadEl=document.getElementById('dpad'),vjAct=document.getElementById('vjAct'),vjActTxt=document.getElementById('vjActTxt');
+const DK=dpadEl?{up:dpadEl.querySelector('.up'),down:dpadEl.querySelector('.down'),left:dpadEl.querySelector('.left'),right:dpadEl.querySelector('.right')}:null;
+const DP=new Map(); // pointerId → [ux,uy] (direção na tela)
+function touchLayout(){if(touchLayout.done)return;touchLayout.done=true; // HUD compacto: botões numa faixa no alto; qualidade gráfica vai para o painel Controles; grupo de modos fica só no painel
+  const row=document.createElement('div');row.className='hudRow';document.body.appendChild(row);
+  for(const id of ['btnEstante','btnHall','coins','keysBtn','btnRooms','btnDiario','nivelBtn']){const el=document.getElementById(id);if(el)row.appendChild(el);}
+  const cp=document.getElementById('coinPlus');if(cp)cp.remove();
+  const qg=document.querySelector('.q:not(.mode):not(.help)'),set=document.querySelector('.ctrlSet');if(qg&&set){const qr=document.createElement('div');qr.className='qRow';const lab=document.createElement('span');lab.textContent='Qualidade gráfica';qr.appendChild(lab);qr.appendChild(qg);set.insertBefore(qr,set.firstChild);}}
+function vjShow(on){if(VJ.touch===on)return;VJ.touch=on;document.body.classList.toggle('touch',on);if(vjAct)vjAct.hidden=!on;if(dpadEl)dpadEl.hidden=!on;if(on)try{touchLayout();}catch(e){}hintFor();}
+function dpDir(e){const r=dpadEl.getBoundingClientRect();const dx=(e.clientX-(r.left+r.width/2))/(r.width/2),dy=(e.clientY-(r.top+r.height/2))/(r.height/2);return [Math.abs(dx)>0.3?Math.sign(dx):0,Math.abs(dy)>0.3?Math.sign(dy):0];}
+function dpApply(){let x=0,y=0;for(const [ux,uy] of DP.values()){x+=ux;y+=uy;}const l=Math.hypot(x,y);VJ.active=DP.size>0&&l>0;PAD.mx=l?x/l:0;PAD.mz=l?y/l:0;PAD.run=false;
+  if(DK){DK.up.classList.toggle('on',y<0);DK.down.classList.toggle('on',y>0);DK.left.classList.toggle('on',x<0);DK.right.classList.toggle('on',x>0);}}
+if(dpadEl){dpadEl.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();vjShow(true);try{dpadEl.setPointerCapture(e.pointerId);}catch(x){}DP.set(e.pointerId,dpDir(e));if(CH.sitting)standUp();CH.target=null;CH.onArrive=null;dpApply();});
+  dpadEl.addEventListener('pointermove',e=>{if(!DP.has(e.pointerId))return;e.preventDefault();DP.set(e.pointerId,dpDir(e));dpApply();});
+  const dpEnd=e=>{if(!DP.has(e.pointerId))return;DP.delete(e.pointerId);dpApply();};
+  dpadEl.addEventListener('pointerup',dpEnd);dpadEl.addEventListener('pointercancel',dpEnd);dpadEl.addEventListener('lostpointercapture',dpEnd);
+  dpadEl.addEventListener('contextmenu',e=>e.preventDefault());}
+addEventListener('blur',()=>{if(DP.size){DP.clear();dpApply();}});
+cv.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')vjShow(true);},{capture:true});
 if(vjAct){vjAct.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(FOCUS&&!FOCUS.far)doInteract();else if(FOCUS&&FOCUS.far&&FOCUS.kind==='hdoor')act(FOCUS);},{capture:true});}
-if(vjRun){vjRun.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();VJ.run=!VJ.run;vjRun.classList.toggle('on',VJ.run);PAD.run=VJ.run||(VJ.active&&Math.hypot(PAD.mx,PAD.mz)>0.96);},{capture:true});}
+if(TOUCHDEV){try{vjShow(true);}catch(e){}setTimeout(()=>{try{showToast('Segure as setas para andar · «Ir para» leva você até o lugar · E age no que estiver perto · arraste a tela para girar a câmera',{ms:8000});}catch(e){}},1200);}
 const goBar=document.getElementById('goBar'),goList=document.getElementById('goList');
 function goTo(kind,ref){if(MODE==='fp')setMode('gm');if(CH.sitting&&kind!=='chair')standUp();if(mapOpen)closeMap();
   if(kind==='hdoor')act({kind:'hdoor',g:ref});else if(kind==='shop')act({kind:'shop'});else if(kind==='hlivro')act({kind:'hlivro'});
@@ -6490,22 +6510,23 @@ function renderGoBar(){if(!goBar||!goList)return;const items=[];
   goBar.hidden=!items.length;}
 function vjFocus(tg){if(!vjAct||!VJ.touch)return;if(tg){vjActTxt.textContent=tg.far?'aproxime-se':tg.label.replace(/^(Entrar|Pegar|Abrir|Ler|Reler|Voltar ao)[: ]*/,'').slice(0,26)||tg.label.slice(0,26);vjAct.classList.toggle('off',!!tg.far);}else{vjActTxt.textContent='interagir';vjAct.classList.add('off');}}
 cv.addEventListener('pointerdown',e=>{dragging=true;mouseDown=true;lx=sx=e.clientX;ly=sy=e.clientY;cv.setPointerCapture&&cv.setPointerCapture(e.pointerId);if(mapOpen)closeMap();});
-addEventListener('pointerup',e=>{const click=dragging&&e.target===cv&&Math.hypot(e.clientX-sx,e.clientY-sy)<6;
+addEventListener('pointerup',e=>{const click=dragging&&e.target===cv&&Math.hypot(e.clientX-sx,e.clientY-sy)<(e.pointerType==='touch'?14:6);
   if(click){if(ctrlOpen)showCtrl(false);
     if(MODE==='tp')clickTP(e.clientX,e.clientY);
     else if(MODE==='gm'){if(locked)act(resolveAt(0,0,true));else{const tg=resolveAt(e.clientX,e.clientY,false);if(!(tg&&tg.kind==='floor'&&lockOK&&!VJ.touch))act(tg);if(!VJ.touch)tryLock();}}
     else{if(locked)actFP(resolveAt(0,0,true));else{actFP(resolveAt(e.clientX,e.clientY,false));tryLock();}}}
   dragging=false;mouseDown=false;});
 cv.addEventListener('pointermove',e=>{mx=e.clientX;my=e.clientY;mouseIn=true;const iy=SET.invY?-1:1;
-  if(MODE==='tp'){if(dragging){CAM.yaw-=(e.clientX-lx)*0.0045*SET.sens;CAM.pitch=Math.max(0.12,Math.min(1.3,CAM.pitch+(e.clientY-ly)*0.003*SET.sens));lx=e.clientX;ly=e.clientY;}else hover(e);return;}
-  if(MODE==='gm'){if(locked){CAM.yaw-=e.movementX*0.0022*SET.sens;CAM.pitch=Math.max(-0.45,Math.min(1.35,CAM.pitch+e.movementY*0.0022*SET.sens*iy));}else if(dragging){CAM.yaw-=(e.clientX-lx)*0.0045*SET.sens;CAM.pitch=Math.max(-0.45,Math.min(1.35,CAM.pitch+(e.clientY-ly)*0.003*SET.sens*iy));lx=e.clientX;ly=e.clientY;}else hover(e);return;}
+  const tch=e.pointerType==='touch';
+  if(MODE==='tp'){if(dragging){CAM.yaw-=(e.clientX-lx)*(tch?0.0032:0.0045)*SET.sens;if(!tch)CAM.pitch=Math.max(0.12,Math.min(1.3,CAM.pitch+(e.clientY-ly)*0.003*SET.sens));lx=e.clientX;ly=e.clientY;}else hover(e);return;}
+  if(MODE==='gm'){if(locked){CAM.yaw-=e.movementX*0.0022*SET.sens;CAM.pitch=Math.max(-0.45,Math.min(1.35,CAM.pitch+e.movementY*0.0022*SET.sens*iy));}else if(dragging){CAM.yaw-=(e.clientX-lx)*(tch?0.0032:0.0045)*SET.sens;if(!tch)CAM.pitch=Math.max(-0.45,Math.min(1.35,CAM.pitch+(e.clientY-ly)*0.003*SET.sens*iy));lx=e.clientX;ly=e.clientY;}else hover(e);return;}
   if(locked){P.yaw-=e.movementX*0.0022*SET.sens;P.pitch-=e.movementY*0.0022*SET.sens*iy;}else if(dragging){P.yaw-=(e.clientX-lx)*0.0045*SET.sens;P.pitch-=(e.clientY-ly)*0.0045*SET.sens*iy;lx=e.clientX;ly=e.clientY;}else hover(e);
   P.pitch=Math.max(-1.25,Math.min(1.25,P.pitch));});
 cv.addEventListener('pointerleave',()=>{mouseIn=false;});
 cv.addEventListener('dblclick',()=>{if(MODE!=='tp'&&!locked)tryLock();});
 document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===cv;if(retEl)retEl.hidden=!locked;hintFor();});
 document.addEventListener('pointerlockerror',()=>lockFail());
-const inUI=e=>!!(e.target&&e.target.closest&&e.target.closest('#est,.q,.est-btn,#map,#ctrl,#loja,#diario,#toast,#leitura,#vjAct,#vjRun,#livro,#goBar'));
+const inUI=e=>!!(e.target&&e.target.closest&&e.target.closest('#est,.q,.est-btn,#map,#ctrl,#loja,#diario,#toast,#leitura,#vjAct,#dpad,#livro,#goBar'));
 const typing=e=>!!(e.target&&/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName));
 addEventListener('wheel',e=>{if(inUI(e))return;if(MODE!=='fp'){CAM.dist=Math.max(1.6,Math.min(9,CAM.dist*(1+Math.sign(e.deltaY)*0.12)));}else wheelV+=-Math.sign(e.deltaY)*1.6;},{passive:true});
 addEventListener('keydown',e=>{if(typing(e))return;const k=e.key.toLowerCase();keys[k]=true;const estOpen=!document.getElementById('est').hidden;
@@ -6545,7 +6566,8 @@ const ctrlEl=document.getElementById('ctrl'),ctrlKeys=document.getElementById('c
 const CTRL_TXT={gm:[['Mouse','olhar — clique na tela para prender o cursor · Esc solta'],['W A S D','andar'],['Shift','correr'],['E · clique','interagir com o que está na mira ou logo ao lado (porta, poltrona, livro, baú…)'],['Rolagem','aproximar / afastar a câmera'],['Tab · M · 🗺','menu das salas — viagem rápida para qualquer sala'],['J · 📜','Diário do Leitor: o que você tem, o próximo passo e as últimas mensagens (clicar num aviso também abre)'],['B','Minha Estante'],['V','trocar o modo: Gamer › Clique › 1ª pessoa'],['1 · 2 · 3','qualidade gráfica'],['Controle','analógicos andam e giram · A interage · B volta ao hall · gatilho corre · Start mapa · Y estante'],['🪙 Moedas','nascem todo dia pelo hall e pelas salas — passe por cima para pegar; a carteira fica salva'],['🔑 Chaves','escondidas pelo mundo (a primeira no atril do Hall): cada uma abre o baú trancado da sua sala — +25 moedas e uma relíquia'],['🦉 Lojinha','a tenda à esquerda do Hall troca moedas por roupas, chapéus, utensílios e companheiros'],['📖 Contos','cada sala tem um conto clássico num atril iluminado — leia até o fim para subir de nível (+50 moedas)']],
   tp:[['Clique no chão','andar até lá'],['Clique nos objetos','porta, poltrona, livro, baú…'],['Arrastar','girar a câmera'],['W A S D','andar (Shift corre)'],['Rolagem','aproximar / afastar'],['Tab · M · 🗺','menu das salas — viagem rápida'],['J · 📜','Diário do Leitor (mensagens e próximo passo)'],['E · B','Minha Estante'],['V','trocar o modo'],['🔑 · 🦉','chaves abrem os baús das salas; a Lojinha do Hall troca moedas por itens']],
   fp:[['Mouse','olhar — clique prende o cursor · Esc solta'],['W A S D','andar (Shift corre)'],['E · clique','portas, livros e objetos'],['Rolagem','andar para a frente'],['Tab · M · 🗺','menu das salas — viagem rápida'],['J · 📜','Diário do Leitor (mensagens e próximo passo)'],['B','Minha Estante'],['V','trocar o modo'],['🔑 · 🦉','chaves abrem os baús das salas; a Lojinha do Hall troca moedas por itens']]};
-function fillCtrl(){if(!ctrlKeys)return;ctrlKeys.innerHTML=CTRL_TXT[MODE].map(([k,v])=>'<dt>'+k+'</dt><dd>'+v+'</dd>').join('');}
+const TOUCH_TXT=[['▲◀▼▶','segurar anda na direção da tela (dois dedos = diagonal)'],['«Ir para»','o leitor vai sozinho até a sala, o conto, o baú, a estante…'],['Toque no chão','anda até o ponto'],['E','age no que estiver perto'],['Arrastar','gira a câmera · pinça aproxima']];
+function fillCtrl(){if(!ctrlKeys)return;const rows=VJ.touch?TOUCH_TXT.concat(CTRL_TXT[MODE].filter(r=>!/Mouse|W A S D|Shift|Rolagem|Controle|Clique no chão|Arrastar/.test(r[0]))):CTRL_TXT[MODE];ctrlKeys.innerHTML=rows.map(([k,v])=>'<dt>'+k+'</dt><dd>'+v+'</dd>').join('');}
 let ctrlTimer=null;
 function showCtrl(on){if(!ctrlEl)return;ctrlOpen=on;ctrlEl.hidden=!on;if(on){unlock();if(lojaOpen)closeShop();if(diaryOpen)closeDiary();if(livroOpen)closeLivro();if(leituraOpen)closeStory();fillCtrl();const sl=document.getElementById('setSens'),sv=document.getElementById('setSensV'),inv=document.getElementById('setInv');if(sl){sl.value=SET.sens;}if(sv)sv.textContent=SET.sens.toFixed(1);if(inv)inv.checked=SET.invY;if(mapOpen)closeMap();}if(ctrlTimer){clearTimeout(ctrlTimer);ctrlTimer=null;}}
 function initCtrl(){const sl=document.getElementById('setSens'),sv=document.getElementById('setSensV'),inv=document.getElementById('setInv'),bh=document.getElementById('btnHelp');
@@ -6595,7 +6617,8 @@ function moveTP(dt){let f=0,s=0;if(keys['w']||keys['arrowup'])f+=1;if(keys['s']|
     for(const [ox,oz,orr] of WORLD.obst){const dx=nx-ox,dz=nz-oz,d=Math.hypot(dx,dz);if(d<orr){const ux=dx/(d||1e-6),uz=dz/(d||1e-6);nx=ox+ux*orr;nz=oz+uz*orr;const into=-(CH.vx*ux+CH.vz*uz);if(into>0.3*Math.max(0.2,Math.hypot(CH.vx,CH.vz))){const cr=CH.vx*uz-CH.vz*ux;if(Math.abs(cr)>0.05)CH.slide=cr>0?1:-1;const sg=CH.slide||1;nx+=-uz*sg*into*dt*0.9;nz+=ux*sg*into*dt*0.9;}}}CH.x=nx;CH.z=nz;
     const moved=Math.hypot(nx-ox0,nz-oz0);if(want&&CH.target&&moved<0.004){CH.stuckT+=dt;if(CH.stuckT>0.8){CH.target=null;CH.onArrive=null;CH.stuckT=0;}}else CH.stuckT=0;}
   const spd=Math.hypot(CH.vx,CH.vz);if(spd>0.2&&!CH.sitting)CH.dir=lerpAng(CH.dir,Math.atan2(CH.vx,CH.vz),Math.min(1,dt*12));
-  if(spd>0.4&&!dragging&&MODE!=='fp'){const auto=CH.target&&!manual;const byStick=VJ.active&&manual;const byKeys=manual&&!VJ.active&&!locked;if((auto||((byStick||byKeys)&&f>-0.2)))CAM.yaw=lerpAng(CAM.yaw,CH.dir+Math.PI,Math.min(1,dt*(auto?1.1:1.4+1.6*Math.abs(s))));}}
+  // câmera travada: com setas, teclado ou analógico ela não gira sozinha (as direções da tela ficam estáveis); num trajeto automático ela só vira quando o destino está atrás dela
+  if(MODE!=='fp'&&!dragging){const auto=!!CH.target&&!manual;if(auto){if(!CAM.follow){const T=CH.target;followV.set(T.x,CH.fy+0.4,T.z).project(camera);if(followV.z>1||Math.abs(followV.x)>1.04||Math.abs(followV.y)>1.04)CAM.follow=true;}if(CAM.follow&&spd>0.2)CAM.yaw=lerpAng(CAM.yaw,CH.dir+Math.PI,Math.min(1,dt*1.5));}else CAM.follow=false;}}
 function poseReader(dt){const R=READER;const spd=Math.hypot(CH.vx,CH.vz);const walking=Math.min(1,spd/1.4);const runK=Math.max(0,Math.min(1,(spd-2.6)/2.0));if(walking>0.05)CH.walkT+=dt*(5.5+spd*1.9);if(CH.sitting)CH.sitT=Math.min(1,CH.sitT+dt*2.2);const sit=CH.sitting?CH.sitT:0;
   const sw=Math.sin(CH.walkT)*(0.6+0.35*runK)*walking;
   R.legs[0].hip.rotation.x=lerp(sw,-1.5,sit);R.legs[1].hip.rotation.x=lerp(-sw,-1.5,sit);
@@ -6613,11 +6636,11 @@ let fadeOnAt=0;
 function fadeTo(fn){if(!fadeEl){fn();return;}fadeEl.classList.add('on');fadeOnAt=performance.now();setTimeout(()=>{try{fn();}finally{setTimeout(()=>{fadeEl.classList.remove('on');fadeOnAt=0;},150);}},480);}
 function openDoor(g,cb){g.userData.open=1;setTimeout(cb,120);} // arco aberto: só um passo e a travessia começa
 function placeHall(genre){const i=Math.max(0,GEN_KEYS.indexOf(genre));const th=i/GEN_KEYS.length*Math.PI*2;const r=genre?HR-3.4:2.6;
-  if(genre){CH.x=Math.cos(th)*r;CH.z=Math.sin(th)*r;CH.dir=Math.atan2(-CH.x,-CH.z);}else{CH.x=0.6;CH.z=-3.4;CH.dir=Math.atan2(0-CH.x,0-CH.z);CAM.pitch=0.3;CAM.dist=6.0;}
+  if(genre){CH.x=Math.cos(th)*r;CH.z=Math.sin(th)*r;CH.dir=Math.atan2(-CH.x,-CH.z);}else{CH.x=0.6;CH.z=-3.4;CH.dir=Math.atan2(0-CH.x,0-CH.z);CAM.pitch=CAMDEF.pitch;CAM.dist=CAMDEF.dist;}if(VJ.touch){CAM.pitch=CAMDEF.pitch;CAM.dist=CAMDEF.dist;}CAM.follow=false;
   CH.target=null;CH.onArrive=null;CH.sitting=false;CH.vx=CH.vz=0;CAM.yaw=CH.dir+Math.PI;camInit=false;syncP();HALL_DOORS.forEach(d=>{d.userData.open=0;d.userData.leaves.forEach(pv=>pv.rotation.y=0);});}
 function goHall(){fadeTo(()=>{CUR='hall';WORLD=HALL_WORLD;setActive(hallScene);placeHall(CUR_GENRE);if(titleEl)titleEl.textContent='Hall dos Gêneros';if(btnHall)btnHall.hidden=true;hintFor();});}
 function syncP(){P.x=CH.x;P.z=CH.z;P.yaw=CH.dir+Math.PI;P.pitch=0;vx=vz=0;}
-function placeRoom(){const sp=ROOM.spawn;CH.x=sp.x;CH.z=sp.z;CH.dir=sp.dir;CH.target=null;CH.onArrive=null;CH.sitting=false;CH.vx=CH.vz=0;CAM.yaw=0.28;CAM.pitch=Math.max(CAM.pitch,0.34);camInit=false;syncP();}
+function placeRoom(){const sp=ROOM.spawn;CH.x=sp.x;CH.z=sp.z;CH.dir=sp.dir;CH.target=null;CH.onArrive=null;CH.sitting=false;CH.vx=CH.vz=0;CAM.yaw=0.28;if(VJ.touch){CAM.pitch=CAMDEF.pitch;CAM.dist=CAMDEF.dist;}else CAM.pitch=Math.max(CAM.pitch,0.42);CAM.follow=false;camInit=false;syncP();}
 function roomTitle(genre){return 'Sala · '+(EST.GENEROS[genre]?EST.GENEROS[genre].nome:'');}
 function enterRoom(genre){if(!roomFor(genre)){showToast('Sala em construção — em breve');return;}fadeTo(()=>{CUR='room';CUR_GENRE=genre;ROOM=roomFor(genre);WORLD=ROOM.world;setActive(ROOM.scene);placeRoom();
   if(titleEl)titleEl.textContent=roomTitle(genre);if(btnHall)btnHall.hidden=false;hintFor();});}
