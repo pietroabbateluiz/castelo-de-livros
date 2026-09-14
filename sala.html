@@ -250,7 +250,10 @@
   <p class="rodape">Na sala: seus livros ficam na estante “Minha Estante” (à esquerda da lareira), com o título na lombada; os que estão em <b>Lendo</b> ficam empilhados na mesa. Clique num livro na sala (ou mire nele e aperte E) para abri-lo aqui. Tecla B abre e fecha este painel.</p>
 </aside>
 <div class="load" id="load" role="status" aria-live="polite"><div class="lbook" aria-hidden="true"><div class="lcov l"></div><div class="lcov r"></div><div class="lstack l"></div><div class="lstack r"></div><div class="lpage p4"></div><div class="lpage p3"></div><div class="lpage p2"></div><div class="lpage p1"></div><div class="lspine"></div></div><div class="ltxt">Carregando<i>.</i><i>.</i><i>.</i></div><div class="lsub" id="loadSub">abrindo a biblioteca…</div><div class="lrot" id="loadRot" hidden><span class="lphone"></span>Melhor na horizontal — vire o celular</div></div>
-<script>try{if((navigator.maxTouchPoints>0||('ontouchstart' in window))&&matchMedia('(orientation:portrait)').matches)document.getElementById('loadRot').hidden=false;}catch(e){}</script>
+<script>try{if((navigator.maxTouchPoints>0||('ontouchstart' in window))&&matchMedia('(orientation:portrait)').matches)document.getElementById('loadRot').hidden=false;}catch(e){}
+// se algo falhar enquanto a tela de carregamento ainda está na frente, o erro aparece nela (em vez de "carregando" para sempre) e um toque recarrega
+window.__loadErr=null;addEventListener('error',function(e){try{var ld=document.getElementById('load');if(!ld||ld.style.display==='none'||window.__ready)return;var m=(e&&e.message)||'erro desconhecido';if(window.__loadErr)return;window.__loadErr=m;var sub=document.getElementById('loadSub');if(sub)sub.textContent='Não deu para abrir o Mundo: '+m+' — toque aqui para tentar de novo';ld.style.cursor='pointer';ld.addEventListener('click',function(){location.reload();});}catch(x){}});
+addEventListener('unhandledrejection',function(e){try{var ld=document.getElementById('load');if(!ld||ld.style.display==='none'||window.__ready||window.__loadErr)return;var r=e&&e.reason;var m=(r&&r.message)||String(r||'erro');window.__loadErr=m;var sub=document.getElementById('loadSub');if(sub)sub.textContent='Não deu para abrir o Mundo: '+m+' — toque aqui para tentar de novo';ld.style.cursor='pointer';ld.addEventListener('click',function(){location.reload();});}catch(x){}});</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 ( function () {
@@ -4887,9 +4890,9 @@ renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.VSMShadowMap;
 
 const scene=new THREE.Scene();
 scene.fog=new THREE.FogExp2(0x100a06,0.038);
-const camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,0.05,40);camera.layers.enable(1);
+const camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,0.05,40);camera.layers.enable(1);camera.layers.enable(2);camera.layers.enable(3); // camadas 2 e 3 = miúdos e médios (malhas pequenas que os portais não desenham — a 3 só no modo Leve)
 // câmera irmã só com a camada 0 (geometria sólida): usada pela oclusão e pela profundidade de campo
-const fxCam=camera.clone();fxCam.layers.set(0);
+const fxCam=camera.clone();fxCam.layers.set(0);fxCam.layers.enable(2);fxCam.layers.enable(3);
 
 const W=28,D=30,H=9.5; // salão de leitura (dobrado em set/2026: 28 × 30 m)
 function rnd(seed){let s=seed>>>0;return function(){s^=s<<13;s^=s>>>17;s^=s<<5;s>>>=0;return s/4294967296;};}
@@ -5391,7 +5394,7 @@ function buildMyShelf(){for(const k in ROOMS)buildBooksFor(ROOMS[k]);
   candle(xR-0.25,r1+0.02,zz,0.16,0.025,MYSHELF.g);
   for(const lx of [-1.3,1.3]){const L2=new THREE.PointLight(0xffc48a,0.6,5,2);L2.position.set(lx,r1+0.55,zz+0.9);MYSHELF.g.add(L2);}}
 // clique / hover nos livros da estante
-const ray=new THREE.Raycaster();ray.layers.enable(1);const ndc=new THREE.Vector2();const tip=document.getElementById('tip');let hoverId=null;
+const ray=new THREE.Raycaster();ray.layers.enableAll();const ndc=new THREE.Vector2();const tip=document.getElementById('tip');let hoverId=null;
 function pickBook(px,py){if(typeof CUR!=='undefined'&&CUR!=='room')return null;ndc.set((px/innerWidth)*2-1,-(py/innerHeight)*2+1);ray.setFromCamera(ndc,camera);const h=ray.intersectObjects(ROOM.books,false);return h.length?h[0].object:null;}
 window.__room={rebuild:buildMyShelf,pickBook,books:MYBOOKS};
 
@@ -5445,7 +5448,6 @@ function setQuality(n){if(!qb[n])n='leve';Q.name=n;const wasLite=!!Q.lite;Q.lite
   sao.enabled=Q.sao;bokeh.enabled=Q.bokeh;refl.visible=Q.refl;M.floor.opacity=Q.refl?0.82:1.0;M.floor.transparent=Q.refl;M.floor.needsUpdate=true;if(window.__hrefl){window.__hrefl.visible=Q.refl;}if(window.__srefl){window.__srefl.visible=Q.refl;}if(window.__krefl){window.__krefl.visible=Q.refl;}if(window.__frefl){window.__frefl.visible=Q.refl;}if(window.__yrefl){window.__yrefl.visible=Q.refl;}if(window.__MY){window.__MY.floor.opacity=Q.refl?0.86:1.0;window.__MY.floor.transparent=Q.refl;window.__MY.floor.needsUpdate=true;}if(window.__CM){window.__CM.floor.opacity=Q.refl?0.86:1.0;window.__CM.floor.transparent=Q.refl;window.__CM.floor.needsUpdate=true;}if(window.__CATSHAFTS){const nn=n==='ultra'?4:(n==='alto'?2:1);for(const s of window.__CATSHAFTS)s.visible=s.userData.idx<nn;}if(window.__SM){window.__SM.floor.opacity=Q.refl?0.8:1.0;window.__SM.floor.transparent=Q.refl;window.__SM.floor.needsUpdate=true;}if(window.__HM){window.__HM.floor.opacity=Q.refl?0.8:1.0;window.__HM.floor.transparent=Q.refl;window.__HM.floor.needsUpdate=true;}
   SLICES.forEach((s,i)=>{s.visible=i<Q.slices;s.material.uniforms.op.value=(0.055*22/Q.slices)*(1-i/Q.slices*0.85);});
   for(const k in qb)qb[k].classList.toggle('on',k===n);for(const sc of allScenes()){lightBudget(sc);sc.traverse(o=>{if(o.userData.lodPages||o.userData.lodLite)o.visible=!Q.lite;});}
-  if(window.__repintarPostais)try{window.__repintarPostais();}catch(e){}
   try{localStorage.setItem('bibq2',n);}catch(e){}}
 for(const k in qb)qb[k].addEventListener('click',()=>setQuality(k));
 {let q0=null;try{q0=localStorage.getItem('bibq2');}catch(e){}setQuality(qb[q0]?q0:'leve');} // padrão: Leve (o mais modesto); a escolha fica guardada
@@ -5623,6 +5625,7 @@ function buildHall(n,keys,opts){opts=opts||{};const sc=new THREE.Scene();sc.fog=
     hbox(0.08,0.05,0.82,cov,0,-0.02,0,g); // lombada
     const halo=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,color:0xffd28a,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:0.55}));halo.scale.set(2.6,2.6,1);halo.position.y=0.1;g.add(halo);X.livroHalo=halo;
     const hit=new THREE.Mesh(new THREE.SphereGeometry(0.85,12,10),new THREE.MeshBasicMaterial({visible:false}));g.add(hit); // alvo generoso para o clique e a mira
+    g.traverse(o=>{o.userData.portalKeep=true;}); // o Livro dos Contos continua visível pelos vãos das salas (não vira miúdo)
     const AL=new THREE.PointLight(0xffb060,1.0,7,2);AL.position.set(0,2.5,0);sc.add(AL); }
   if(opts.shop){
   // lojinha da Coruja: tenda de madeira com toldo listrado, prateleiras, jarro de moedas e a coruja no balcão (troca de moedas por itens)
@@ -7705,21 +7708,6 @@ function portalFrameM(origin,right,fwd){const m=new THREE.Matrix4();m.makeBasis(
 function mkPortal(quad,sceneA,sceneB,M,clipB,exposure,roomKey){
   const mat=new THREE.ShaderMaterial({uniforms:{tex:{value:null},vp:{value:new THREE.Matrix4()},ready:{value:0},fogColor:{value:sceneA.fog?sceneA.fog.color.clone():new THREE.Color(0)},fogDensity:{value:sceneA.fog?sceneA.fog.density:0}},vertexShader:PORTAL_VS,fragmentShader:PORTAL_FS,side:THREE.DoubleSide,toneMapped:false});
   quad.material=mat;const p={quad,sceneA,sceneB,M,clipB,exposure:exposure||1.08,rt:null,mat,cam:new THREE.PerspectiveCamera(70,1,0.05,60),last:-1e9,seen:-1e9,shadow:false,roomKey,bb:null};p.cam.layers.enable(1);p.cam.matrixAutoUpdate=false;PORTALS.push(p);return p;}
-// ---- postais: os arcos do Hall mostram uma IMAGEM ESTÁTICA de cada sala (pintada uma vez, da porta para dentro), não um portal vivo ----
-// (pedido de 14/set: os portais vivos ficavam "bugados, com muita informação"; o postal é calmo, barato e igual em todo aparelho)
-const STILLS=[];const STILL_ASPECT=2.8/3.3;
-function mkStill(quad,R,key,exposure){const mat=new THREE.MeshBasicMaterial({color:0x06040a,toneMapped:false});quad.material=mat;const s={quad,R,key,exposure:exposure||1.08,mat,rt:null,done:false};STILLS.push(s);return s;}
-function renderStill(s){const R=s.R,sp=R.spawn;if(!R||!sp)return;const cam=new THREE.PerspectiveCamera(60,STILL_ASPECT,0.05,140);cam.layers.enable(1);
-  const y=(R.floorY?R.floorY(sp.x,sp.z):0)+1.55,dx=Math.sin(sp.dir),dz=Math.cos(sp.dir);cam.position.set(sp.x-dx*0.6,y,sp.z-dz*0.6);cam.lookAt(sp.x+dx*12,y-0.9,sp.z+dz*12);cam.updateMatrixWorld();
-  const W0=Q.lite?384:640,H0=Math.round(W0/STILL_ASPECT);if(s.rt&&s.rt.width!==W0){s.rt.dispose();s.rt=null;}
-  if(!s.rt)s.rt=new THREE.WebGLRenderTarget(W0,H0,{minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter,format:THREE.RGBAFormat,stencilBuffer:false});
-  const ex=renderer.toneMappingExposure,au=renderer.shadowMap.autoUpdate,rt0=renderer.getRenderTarget(),ac=renderer.autoClear;PORTAL_ON=true;renderer.toneMappingExposure=s.exposure;renderer.shadowMap.autoUpdate=false;renderer.shadowMap.needsUpdate=true;
-  const pq=R.portalQuad;if(pq)pq.visible=false;
-  try{renderer.setRenderTarget(s.rt);renderer.autoClear=true;renderer.setClearColor(0x000000,1);renderer.clear();renderer.render(R.scene,cam);}catch(e){console.error('postal',s.key,e);}
-  renderer.setRenderTarget(rt0);renderer.autoClear=ac;renderer.toneMappingExposure=ex;renderer.shadowMap.autoUpdate=au;PORTAL_ON=false;if(pq)pq.visible=true;
-  const op=s.quad.userData.op,t=s.rt.texture;t.repeat.set(1/(op.x1-op.x0),1/(op.y1-op.y0));t.offset.set(-op.x0/(op.x1-op.x0),-op.y0/(op.y1-op.y0));s.mat.map=t;s.mat.color.set(0xffffff);s.mat.needsUpdate=true;s.done=true;}
-function renderStills(){for(const s of STILLS)renderStill(s);STILLS.inited=true;}
-window.__repintarPostais=()=>{if(STILLS.inited)renderStills();};
 const _pv=new THREE.Vector3(),_pv2=new THREE.Vector3(),_pv4=new THREE.Vector4(),_pplane=new THREE.Plane(),_pq=new THREE.Vector4(),_pcp=new THREE.Vector4(),_pn=new THREE.Vector3();
 const _pool=[];for(let i=0;i<8;i++)_pool.push(new THREE.Vector3());
 function portalBBox(p){const o=p.quad.userData.op;const q=p.quad;q.updateMatrixWorld();
@@ -7737,14 +7725,17 @@ function portalBBox(p){const o=p.quad.userData.op;const q=p.quad;q.updateMatrixW
   minx=Math.max(-1,minx);maxx=Math.min(1,maxx);miny=Math.max(-1,miny);maxy=Math.min(1,maxy);
   const Wd=innerWidth,Hd=innerHeight;const x0=Math.max(0,(minx+1)/2*Wd-5),x1=Math.min(Wd,(maxx+1)/2*Wd+5),y0=Math.max(0,(1-maxy)/2*Hd-5),y1=Math.min(Hd,(1-miny)/2*Hd+5);
   if(x1-x0<3||y1-y0<3)return null;const area=(x1-x0)*(y1-y0);return {x:x0,y:y0,w:x1-x0,h:y1-y0,area,frac:area/(Wd*Hd)};}
-function pow2(x){return Math.pow(2,Math.ceil(Math.log2(Math.max(1,x))));}
-function rtSize(bb){const cap=Q.lite?256:(Q.name==='classico'?512:1024),ss=(Q.lite||Q.name==='classico')?1.0:1.3;return [Math.min(cap,Math.max(64,pow2(bb.w*PR*ss))),Math.min(cap,Math.max(64,pow2(bb.h*PR*ss)))];} // um pouco acima do tamanho na tela: suaviza as bordas
+// alvo do tamanho do vão na tela, em passos de 32 px (não mais potência de 2: um vão de 300 px ganhava um alvo de 512), com teto por qualidade
+function rtDim(x,cap){return Math.min(cap,Math.max(64,Math.ceil(x/32)*32));}
+function rtSize(bb){const cap=Q.lite?256:(Q.name==='classico'?512:(Q.name==='alto'?768:1024)),ss=(Q.lite||Q.name==='classico')?1.0:1.2;return [rtDim(bb.w*PR*ss,cap),rtDim(bb.h*PR*ss,cap)];}
 function portalRT(p,bb){const [pw,ph]=rtSize(bb);
-  if(p.rt&&((p.rt.width<pw||p.rt.width>pw*2)||(p.rt.height<ph||p.rt.height>ph*2))){p.rt.dispose();p.rt=null;} // histerese: cresce na hora, encolhe só quando sobra 2×
+  if(p.rt&&((p.rt.width<pw||p.rt.width>pw*1.7)||(p.rt.height<ph||p.rt.height>ph*1.7))){p.rt.dispose();p.rt=null;} // histerese: cresce na hora, encolhe só quando sobra 1,7×
   if(!p.rt){p.rt=new THREE.WebGLRenderTarget(pw,ph,{minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter,format:THREE.RGBAFormat,stencilBuffer:false});p.mat.uniforms.tex.value=p.rt.texture;}
   return p.rt;}
 function portalStill(p){const l=p.lastPose;if(!l||!p.lastBB)return false;const e=camera.matrixWorld.elements;for(let i=0;i<16;i++)if(Math.abs(e[i]-l[i])>1e-5)return false;const b=p.lastBB,c=p.bb;return Math.abs(b.x-c.x)<0.5&&Math.abs(b.y-c.y)<0.5&&Math.abs(b.w-c.w)<0.5&&Math.abs(b.h-c.h)<0.5;}
-function renderPortal(p,bb){const cam=p.cam;cam.fov=camera.fov;cam.near=camera.near;cam.far=camera.far;cam.aspect=camera.aspect;cam.setViewOffset(innerWidth,innerHeight,bb.x,bb.y,bb.w,bb.h);cam.updateProjectionMatrix();
+function renderPortal(p,bb,slow){const cam=p.cam;cam.fov=camera.fov;cam.near=camera.near;cam.far=camera.far;cam.aspect=camera.aspect;cam.setViewOffset(innerWidth,innerHeight,bb.x,bb.y,bb.w,bb.h);cam.updateProjectionMatrix();
+  cam.layers.mask=Q.lite?3:11; // camadas 0+1 (e a 3, dos médios, fora do Leve); a 2, dos miúdos, nunca
+  const sB=p.sceneB;if(!sB.userData.refls){const L=[];sB.traverse(o=>{if(o.isReflector)L.push(o);});sB.userData.refls=L;}const hideR=slow&&sB.userData.refls.length;if(hideR)for(const o of sB.userData.refls){o.userData.pv=o.visible;o.visible=false;}
   cam.matrixWorld.multiplyMatrices(p.M,camera.matrixWorld);cam.matrixWorldInverse.copy(cam.matrixWorld).invert();
   // plano de recorte oblíquo no vão: nada do que fica entre a câmera espelho e o vão (a parede da outra cena) aparece
   _pplane.copy(p.clipB).applyMatrix4(cam.matrixWorldInverse);const pm=cam.projectionMatrix;
@@ -7752,23 +7743,36 @@ function renderPortal(p,bb){const cam=p.cam;cam.fov=camera.fov;cam.near=camera.n
   _pcp.set(_pplane.normal.x,_pplane.normal.y,_pplane.normal.z,_pplane.constant).multiplyScalar(2.0/_pcp.dot(_pq));pm.elements[2]=_pcp.x;pm.elements[6]=_pcp.y;pm.elements[10]=_pcp.z+1.0;pm.elements[14]=_pcp.w;
   p.mat.uniforms.vp.value.multiplyMatrices(pm,camera.matrixWorldInverse);
   const rt=portalRT(p,bb);if(p.twin)p.twin.visible=false;const ex=renderer.toneMappingExposure,au=renderer.shadowMap.autoUpdate,rt0=renderer.getRenderTarget(),ac=renderer.autoClear;PORTAL_ON=true;renderer.toneMappingExposure=p.exposure;renderer.shadowMap.autoUpdate=false;if(!p.shadow){renderer.shadowMap.needsUpdate=true;p.shadow=true;}
-  renderer.setRenderTarget(rt);renderer.autoClear=true;renderer.setClearColor(0x000000,1);renderer.clear();renderer.render(p.sceneB,cam);renderer.setRenderTarget(rt0);renderer.autoClear=ac;renderer.toneMappingExposure=ex;renderer.shadowMap.autoUpdate=au;PORTAL_ON=false;if(p.twin)p.twin.visible=true;p.mat.uniforms.ready.value=1;p.last=frameN;if(!p.lastPose)p.lastPose=new Float64Array(16);p.lastPose.set(camera.matrixWorld.elements);p.lastBB={x:bb.x,y:bb.y,w:bb.w,h:bb.h};}
-function renderPortals(){if(!PORTALS.length||fadeOnAt)return;frameN++;camera.updateMatrixWorld();camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
+  renderer.setRenderTarget(rt);renderer.autoClear=true;renderer.setClearColor(0x000000,1);renderer.clear();renderer.render(p.sceneB,cam);renderer.setRenderTarget(rt0);renderer.autoClear=ac;renderer.toneMappingExposure=ex;renderer.shadowMap.autoUpdate=au;PORTAL_ON=false;if(p.twin)p.twin.visible=true;if(hideR)for(const o of sB.userData.refls)o.visible=o.userData.pv;p.mat.uniforms.ready.value=1;p.last=frameN;if(!p.lastPose)p.lastPose=new Float64Array(16);p.lastPose.set(camera.matrixWorld.elements);p.lastBB={x:bb.x,y:bb.y,w:bb.w,h:bb.h};}
+let portalEma=0.016; // média móvel do tempo de quadro: com o jogo lento (< 33 fps), os portais passam a atualizar em quadros alternados
+function renderPortals(){if(!PORTALS.length||fadeOnAt)return;frameN++;camera.updateMatrixWorld();camera.matrixWorldInverse.copy(camera.matrixWorld).invert();portalEma+=(lastDt-portalEma)*0.08;
   // aquecimento: compila os shaders das cenas uma por quadro, para os primeiros portais não engasgarem
-  if(portalWarm<PORTALS.length){const p=PORTALS[portalWarm++];try{renderer.compile(p.sceneB,camera);}catch(e){}}
+  if(portalWarm<PORTALS.length){const p=PORTALS[portalWarm++];try{renderer.compile(p.sceneB,p.cam);}catch(e){}}
   const list=[];for(const p of PORTALS){if(p.sceneA!==ACTIVE){p.bb=null;continue;}const bb=portalBBox(p);p.bb=bb;if(!bb)continue;p.seen=frameN;list.push(p);}
   // alvos de portais fora de vista há muito tempo são liberados (voltam a ser criados quando reaparecem)
   for(const p of PORTALS){if(p.rt&&frameN-p.seen>900){p.rt.dispose();p.rt=null;p.mat.uniforms.tex.value=null;p.mat.uniforms.ready.value=0;}}
   if(!list.length)return;
   // orçamento por qualidade: os maiores vãos todo quadro (parados, a cada 4 quadros), os pequenos em rodízio, e um teto de pixels por quadro
-  if(Q.lite&&frameN%4)return; // Leve: um portal a cada 4 quadros (os vãos viram quadros quase estáticos)
+  const slow=portalEma>0.03;
+  if(Q.lite&&frameN%(slow?6:4))return; // Leve: um portal a cada 4 quadros (6 quando o aparelho não acompanha) — os vãos viram quadros quase estáticos
+  if(!Q.lite&&slow&&frameN%2)return; // demais qualidades: com o quadro pesado, portais só em quadros alternados
   const K=Q.lite?{full:0,slow:1,minFrac:0,px:0.14e6}:(Q.name==='classico'?{full:1,slow:1,minFrac:0.02,px:0.8e6}:(Q.name==='alto'?{full:2,slow:1,minFrac:0.01,px:1.6e6}:{full:3,slow:2,minFrac:0.006,px:2.6e6}));
   list.sort((a,b)=>b.bb.area-a.bb.area);const todo=[],rest=[];let nf=0;
   for(const p of list){if(nf<K.full&&p.bb.frac>=K.minFrac){nf++;if(!(frameN-p.last<4&&portalStill(p)))todo.push(p);}else rest.push(p);}
   rest.sort((a,b)=>b.bb.area*(1+Math.min(30,frameN-b.last))-a.bb.area*(1+Math.min(30,frameN-a.last)));let ns=0;for(const p of rest){if(ns>=K.slow)break;if(frameN-p.last<4&&portalStill(p))continue;todo.push(p);ns++;}
   let px=0;const go=[];for(const p of todo){const [w,h]=rtSize(p.bb);if(go.length&&px+w*h>K.px)continue;px+=w*h;go.push(p);}
-  for(const p of go)renderPortal(p,p.bb);
-  for(const p of list){if(p.roomKey&&ROOMS[p.roomKey]&&ROOMS[p.roomKey]!==ROOM&&p.last>=frameN-3){try{ROOMS[p.roomKey].tick(lastDt);}catch(e){}}}}
+  for(const p of go)renderPortal(p,p.bb,slow);
+  // a sala vista pelo vão só anima no quadro em que é desenhada (com o tempo acumulado desde a última vez)
+  for(const p of go){const R=p.roomKey&&ROOMS[p.roomKey];if(R&&R!==ROOM){const n=Math.min(8,frameN-(p.tickF||frameN-1));p.tickF=frameN;try{R.tick(Math.min(0.12,lastDt*n));}catch(e){}}}}
+// ---- miúdos: malhas pequenas (raio < 0,32 m no mundo) vão para a camada 2 e as médias (< 0,55 m) para a camada 3; a câmera principal vê as duas,
+// a câmera dos portais não desenha a 2 e, no modo Leve (alvo de 256 px), também não desenha a 3 — vistas pelo vão, de longe, elas somem sem falta,
+// e o desenho da sala pelo portal cai para cerca da metade dos draw calls (biblioteca 893 → 389; catedral 1145 → 611; Quadrinhos 514 → 187)
+const MIUDO_R=0.32,MEDIO_R=0.55;let miudosN=0,mediosN=0;
+function markMiudos(sc){sc.updateMatrixWorld(true);const skip=new Set();try{READER.g.traverse(o=>skip.add(o));}catch(e){}const s=new THREE.Vector3();
+  sc.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||o.isSprite||o.isSkinnedMesh||o.isReflector||skip.has(o))return;if(o.layers.mask!==1||o.userData.hitProxy||o.userData.camProxy||o.userData.portal||o.userData.portalKeep)return;
+    const g=o.geometry;if(!g||!g.attributes||!g.attributes.position)return;if(!g.boundingSphere)g.computeBoundingSphere();if(!g.boundingSphere||!isFinite(g.boundingSphere.radius))return;o.getWorldScale(s);
+    const r=g.boundingSphere.radius*Math.max(Math.abs(s.x),Math.abs(s.y),Math.abs(s.z));if(r<MIUDO_R){o.layers.set(2);miudosN++;}else if(r<MEDIO_R){o.layers.set(3);mediosN++;}});}
+for(const hn in HALLS)markMiudos(HALLS[hn].scene);for(const k in ROOMS)markMiudos(ROOMS[k].scene);
 // ---- um par de portais por sala: Hall → sala (no arco da rotunda) e sala → Hall (no vão da porta da sala) ----
 for(const hn in HALLS)HALLS[hn].scene.updateMatrixWorld(true);
 for(const genre in GENRE_ROOM){const key=GENRE_ROOM[genre];const R=ROOMS[key];const HHl=HALLS[GENRE_FLOOR(genre)];const hallScene=HHl.scene;const g=HHl.doors.find(d=>d.userData.genre===genre);if(!R||!g||!g.userData.quad||!R.portalQuad)continue;
@@ -7778,10 +7782,10 @@ for(const genre in GENRE_ROOM){const key=GENRE_ROOM[genre];const R=ROOMS[key];co
   const Fh=portalFrameM(ho,new THREE.Vector3(-Math.sin(th),0,Math.cos(th)),new THREE.Vector3(Math.cos(th),0,Math.sin(th)));
   const Fr=portalFrameM(ro,new THREE.Vector3(1,0,0),new THREE.Vector3(0,0,-1));
   const Mhr=new THREE.Matrix4().multiplyMatrices(Fr,Fh.clone().invert()),Mrh=Mhr.clone().invert();
-  mkStill(g.userData.quad,R,key,R.exposure||1.08);
+  const pa=mkPortal(g.userData.quad,hallScene,R.scene,Mhr,new THREE.Plane(new THREE.Vector3(0,0,-1),ro.z-0.01),R.exposure||1.08,key);pa.twin=rq;
   const pb=mkPortal(rq,R.scene,hallScene,Mrh,new THREE.Plane(new THREE.Vector3(-Math.cos(th),0,-Math.sin(th)),hr-0.01),1.08,null);pb.twin=g.userData.quad;
   R.portalAt={x:ro.x,z:ro.z};}
-window.__portais={lista:PORTALS,render:renderPortals,postais:STILLS,pintar:renderStills};
+window.__portais={lista:PORTALS,render:renderPortals,miudos:()=>[miudosN,mediosN]};
 
 /* ================= MOEDAS (nascem todo dia pelo mundo; a carteira fica salva e vai servir para a loja) ================= */
 const COIN_KEY='mundo.moedas.v1',COIN_VER=3;const COINS={saldo:0,total:0,dia:'',ver:0,coletadas:{},sets:{},scene:null,active:[],anim:[],lastCheck:0,doneToast:{}};
@@ -7830,7 +7834,9 @@ window.__coins={get saldo(){return COINS.saldo;},ganhar(n){COINS.saldo+=n|0;COIN
 /* ================= CHAVES (escondidas pelo mundo; cada uma abre o baú trancado da sua sala — as portas ficam todas abertas) ================= */
 const KEY_STORE='mundo.chaves.v1',KEY_VER=5;const KEYS={tem:{},baus:{},ver:0,items:{},scene:null,active:[],anim:[]};
 // gênero da chave → [cena onde está escondida, x, y, z]: uma caça em cadeia (a do Hall abre o baú de Fantasia, que esconde a chave de Terror, e assim por diante)
-const KEY_SPOTS={castelo:['hall',0,1.0,0],charneca:['fant',-0.35,3.98,FTZ+4.5],catedral:['lib',3.3,1.2,-0.4],mesa:['cat',2.8,2.6,-7.1],navegacoes:['sci',5.8,1.15,1.0],ilha:['hall2',0,1.0,0],vila:['mys',-3.95,1.55,-14.1],guerra:['vila',2.4,1.2,-12.85],outono:['guerra',12.55,1.15,8.6],quadrinhos:['outono',-3.8,1.0,-4.6]}; // cadeia: atril do Hall → Fantasia → Terror → Histórica → Ficção científica → Aventura
+// a chave do Hall fica no chão, diante do arco da sala cujo baú ela abre (pedido de 14/set: não mais debaixo do Livro dos Contos) — a mesma cor do vitral do arco
+function hallKeySpot(n,genre){const keys=n===1?GEN_KEYS:GEN_KEYS2;const i=Math.max(0,keys.indexOf(genre));const th=i/keys.length*Math.PI*2,r=HR-2.7;return [Math.cos(th)*r,1.0,Math.sin(th)*r];}
+const KEY_SPOTS={castelo:['hall',...hallKeySpot(1,'castelo')],charneca:['fant',-0.35,3.98,FTZ+4.5],catedral:['lib',3.3,1.2,-0.4],mesa:['cat',2.8,2.6,-7.1],navegacoes:['sci',5.8,1.15,1.0],ilha:['hall2',...hallKeySpot(2,'ilha')],vila:['mys',-3.95,1.55,-14.1],guerra:['vila',2.4,1.2,-12.85],outono:['guerra',12.55,1.15,8.6],quadrinhos:['outono',-3.8,1.0,-4.6]}; // cadeia: atril do Hall → Fantasia → Terror → Histórica → Ficção científica → Aventura
 function keyLoad(){try{const d=JSON.parse(localStorage.getItem(KEY_STORE)||'null');if(d&&d.tem){KEYS.tem=d.tem;KEYS.baus=d.baus||{};KEYS.ver=d.ver|0;}}catch(e){}}
 function keySave(){try{localStorage.setItem(KEY_STORE,JSON.stringify({tem:KEYS.tem,baus:KEYS.baus,ver:KEY_VER}));}catch(e){}}
 function hasKey(genre){return !!KEYS.tem[genre];}
@@ -7854,7 +7860,7 @@ function keyCollect(it){if(it.got)return;keyGrant(it.genre,'achada');}
 function keyTick(dt){if(ACTIVE!==KEYS.scene)keyActivate();const px=MODE==='fp'?P.x:CH.x,pz=MODE==='fp'?P.z:CH.z;
   for(const it of KEYS.active){const g=it.g;g.rotation.y=t*1.3+it.x;g.position.y=it.y+Math.sin(t*1.8+it.z)*0.05;const pu=0.5+0.5*Math.sin(t*4.2+it.x);g.userData.sp.material.opacity=0.3+0.5*pu;if(g.userData.metal)g.userData.metal.emissiveIntensity=0.35+0.9*pu;if(g.userData.gem)g.userData.gem.material.emissiveIntensity=0.8+1.4*pu;g.userData.L.intensity=(g.userData.L0||0.8)*(0.6+0.9*pu);if(Math.hypot(px-it.x,pz-it.z)<1.6&&it.y-CH.fy>-1.5)keyCollect(it);}
   for(let i=KEYS.anim.length-1;i>=0;i--){const it=KEYS.anim[i];it.t+=dt;const k=Math.min(1,it.t/0.7);it.g.position.y=it.y+k*1.4;it.g.rotation.y+=dt*14;const sc=Math.max(0.001,1-k)*(it.g.userData.s0||1);it.g.scale.setScalar(sc);it.g.userData.sp.scale.setScalar(1+k*2.2);it.g.userData.sp.material.opacity=0.6*(1-k);it.g.userData.L.intensity=0.8*(1-k);if(k>=1){it.g.visible=false;KEYS.anim.splice(i,1);}}}
-keyLoad();if(KEYS.ver!==KEY_VER){const had=KEYS.ver>0;KEYS.tem={};KEYS.baus={};keySave();if(had)setTimeout(()=>showToast('Mundo atualizado: chaves e baús recomeçaram do zero — a primeira chave brilha no centro do Hall, debaixo do Livro dos Contos',{queue:true,big:true}),1800);}
+keyLoad();if(KEYS.ver!==KEY_VER){const had=KEYS.ver>0;KEYS.tem={};KEYS.baus={};keySave();if(had)setTimeout(()=>showToast('Mundo atualizado: chaves e baús recomeçaram do zero — a primeira chave brilha no chão do Hall, diante do arco de Fantasia',{queue:true,big:true}),1800);}
 // dica de rumo ao começar: onde está a próxima chave ou o baú que ela abre
 function nextStep(){const built=Object.keys(GENRE_ROOM);const pend=built.filter(k=>hasKey(k)&&!KEYS.baus[k]);if(pend.length)return 'Chave e baú têm a mesma cor: você tem a chave '+pend.map(k=>corNome(k)).join(' e a ')+' — procure o baú dessa cor';const falta=built.filter(k=>!hasKey(k));if(falta.length)return 'Cada chave abre o baú da mesma cor — faltam '+falta.length+' chave'+(falta.length>1?'s':'')+' pelo mundo';return 'Todos os baús abertos e as '+relicGoal()+' relíquias reunidas — a Coroa do Leitor é sua na Lojinha da Coruja';}
 function keyHint(){showToast(nextStep(),{queue:true,big:true});}
@@ -7958,7 +7964,7 @@ function closeShop(){lojaOpen=false;if(lojaEl)lojaEl.hidden=true;}
 function renderShop(){if(!lojaEl)return;const rc=relicCount();lojaSub.innerHTML='Você tem <b>🪙 '+COINS.saldo+'</b> · <b>⭐ Nível '+nivelAtual()+'</b> ('+nivelNome()+') · relíquias dos baús: <b>'+rc+'/'+relicGoal()+'</b>';
   lojaTabs.innerHTML=LOJA_CATS.map(c=>'<button type="button" data-c="'+c+'"'+(c===LOJA.tab?' class="on"':'')+'>'+c+'</button>').join('');
   lojaTabs.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{LOJA.tab=b.dataset.c;renderShop();}));
-  if(LOJA.tab==='Relíquias'){lojaLista.innerHTML=Object.keys(GENRE_ROOM).map(g=>{const have=!!KEYS.baus[g];const nome=EST.GENEROS[g].nome,bau=CHEST_NAME[GENRE_ROOM[g]];return '<div class="lojaItem'+(have?' eq':' off')+'"><span class="sw rel">'+(have?'✦':'?')+'</span><div class="li"><b>'+(have?CHEST_RELIC[g]:'Relíquia de '+nome)+'</b><small>'+(have?'veio do '+bau+' · sala de '+nome:'está no '+bau+', na sala de '+nome+' — precisa da chave de '+nome+(hasKey(g)?' (você já tem!)':''))+'</small></div></div>';}).join('')+'<p class="lojaNota">As chaves estão escondidas pelo mundo (a primeira, no atril do Hall). Reúna as 6 relíquias e a Coroa do Leitor é sua.</p>';return;}
+  if(LOJA.tab==='Relíquias'){lojaLista.innerHTML=Object.keys(GENRE_ROOM).map(g=>{const have=!!KEYS.baus[g];const nome=EST.GENEROS[g].nome,bau=CHEST_NAME[GENRE_ROOM[g]];return '<div class="lojaItem'+(have?' eq':' off')+'"><span class="sw rel">'+(have?'✦':'?')+'</span><div class="li"><b>'+(have?CHEST_RELIC[g]:'Relíquia de '+nome)+'</b><small>'+(have?'veio do '+bau+' · sala de '+nome:'está no '+bau+', na sala de '+nome+' — precisa da chave de '+nome+(hasKey(g)?' (você já tem!)':''))+'</small></div></div>';}).join('')+'<p class="lojaNota">As chaves estão escondidas pelo mundo (a primeira, no chão do Hall, diante do arco de Fantasia). Reúna as 6 relíquias e a Coroa do Leitor é sua.</p>';return;}
   lojaLista.innerHTML=LOJA_ITENS.filter(i=>i.cat===LOJA.tab).map(it=>{const own=lojaOwned(it),eq=lojaEquipped(it);const sw=it.cor!==undefined?'<span class="sw" style="background:#'+it.cor.toString(16).padStart(6,'0')+'"></span>':'<span class="sw ic">'+(LOJA_ICON[it.slot]||'✦')+'</span>';
     let btn;if(!own&&it.nivel&&nivelAtual()<it.nivel)btn='<button type="button" class="lojaBtn poor" data-id="'+it.id+'" title="leia os contos das salas para chegar ao Nível '+it.nivel+'">⭐ nível '+it.nivel+' · 🪙 '+it.preco+'</button>';else if(!own)btn='<button type="button" class="lojaBtn'+(COINS.saldo<it.preco?' poor':'')+'" data-id="'+it.id+'" title="'+(COINS.saldo<it.preco?'faltam '+(it.preco-COINS.saldo)+' moedas':'comprar')+'">🪙 '+it.preco+' · comprar</button>';else if(eq)btn='<button type="button" class="lojaBtn on" data-id="'+it.id+'">em uso'+(LOJA_DEF[it.slot]?'':' · tirar')+'</button>';else btn='<button type="button" class="lojaBtn" data-id="'+it.id+'">usar</button>';
     return '<div class="lojaItem'+(eq?' eq':'')+'">'+sw+'<div class="li"><b>'+it.nome+(it.premio&&!LOJA.itens[it.id]&&relicCount()>=relicGoal()?' <i>prêmio das relíquias</i>':'')+'</b>'+(it.desc?'<small>'+it.desc+'</small>':'')+'</div>'+btn+'</div>';}).join('');
@@ -8430,7 +8436,7 @@ function toggleDiary(){if(diaryOpen)closeDiary();else openDiary();}
 if(diaryEl){diaryEl.addEventListener('click',e=>{if(e.target===diaryEl)closeDiary();});const dx=document.getElementById('diarioFechar');if(dx)dx.addEventListener('click',closeDiary);const dl=document.getElementById('diarioLimpar');if(dl)dl.addEventListener('click',()=>{LOG.length=0;logSave();renderDiary();});}
 const btnDiary=document.getElementById('btnDiario');if(btnDiary)btnDiary.addEventListener('click',()=>toggleDiary());
 // colisão da câmera com a própria cena (colunas, estantes, mastros, copa da árvore): o braço encurta antes de entrar em qualquer malha opaca — evita a "tela toda preta" de uma câmera dentro de um pilar
-const camRay=new THREE.Raycaster(),camOrigV=new THREE.Vector3(),camDirV=new THREE.Vector3();let camBlockers=[],camBlockScene=null,camBlockN=0;
+const camRay=new THREE.Raycaster(),camOrigV=new THREE.Vector3(),camDirV=new THREE.Vector3();camRay.layers.enableAll();let camBlockers=[],camBlockScene=null,camBlockN=0;
 function camBlockList(sc){if(camBlockScene===sc&&(++camBlockN%180))return camBlockers;camBlockScene=sc;camBlockN=1;const L=[];const skip=new Set();READER.g.traverse(o=>skip.add(o));
   sc.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||o.isSprite||skip.has(o)||o.userData.noCam)return;if(o.userData.camProxy){L.push(o);return;}if(!o.visible)return;const m=Array.isArray(o.material)?o.material[0]:o.material;if(!m||m.transparent||m.depthWrite===false||m.isSpriteMaterial||o.userData.fx)return;if(!o.geometry)return;const g=o.geometry;if(!g.boundingSphere)g.computeBoundingSphere();if(!g.boundingSphere||g.boundingSphere.radius*Math.max(o.scale.x,o.scale.y,o.scale.z)<0.35)return;L.push(o);});camBlockers=L;return L;}
 function camHit(ox,oy,oz,dx,dy,dz,dist){const list=camBlockList(ACTIVE);if(!list.length)return dist;camOrigV.set(ox,oy,oz);camDirV.set(dx,dy,dz);camRay.set(camOrigV,camDirV);camRay.near=0.55;camRay.far=dist;let hits;try{hits=camRay.intersectObjects(list,false);}catch(e){return dist;}return hits.length?Math.max(0.42,hits[0].distance-0.18):dist;}
@@ -8452,12 +8458,16 @@ function camTP(dt){
   const d=camPos.distanceTo(lookDes);setReaderOpacity(Math.max(0,Math.min(1,(d-0.55)/0.7)));}
 
 /* ================= LAÇO ================= */
-loadMsg('pintando as portas do Hall…');try{renderStills();}catch(e){console.error(e);}
 loadEl.style.display='none';let mode0=null;try{mode0=localStorage.getItem('bibmode2');}catch(e){}if(!['gm','tp','fp'].includes(mode0))mode0='gm';MODE='gm';for(const sc of allScenes())lightBudget(sc);jump('hall',null);buildMap();initCtrl();setMode(mode0);keyHud();
 try{if((navigator.maxTouchPoints>0||'ontouchstart' in window)&&matchMedia('(orientation:portrait)').matches)setTimeout(()=>showToast('Dica: o Mundo fica melhor na horizontal — vire o celular',{ms:6000,queue:true}),900);}catch(e){}
 let last=performance.now(),t=0,fpsAcc=0,fpsN=0,fpsChecked=false;const FIREPOS=new THREE.Vector3(FX,1.5,FZ+0.6),tmpV=new THREE.Vector3();
 let frameErr=0;function frame(now){const dt=Math.min(0.1,(now-last)/1000);last=now;try{tick(dt);draw(dt);}catch(e){console.error(e);if(frameErr++<1)try{showToast('Erro interno: '+(e&&e.message||e)+' — o jogo continua; se a tela ficar preta, recarregue',{big:true,ms:9000});}catch(x){}}if(!window.__pause)requestAnimationFrame(frame);}
-cv.addEventListener('webglcontextlost',e=>{e.preventDefault();window.__pause=true;let n=0;try{n=+(localStorage.getItem('mundo.gpulost')||0)+1;localStorage.setItem('mundo.gpulost',String(n));localStorage.setItem('bibq2','leve');}catch(x){}try{showToast('O aparelho reiniciou a placa de vídeo (memória) — recarregando em modo Leve…',{big:true,ms:5000});}catch(x){}setTimeout(()=>location.reload(),2200);});
+cv.addEventListener('webglcontextlost',e=>{e.preventDefault();window.__pause=true;let n=0;try{n=+(localStorage.getItem('mundo.gpulost')||0)+1;localStorage.setItem('mundo.gpulost',String(n));localStorage.setItem('bibq2','leve');}catch(x){}
+  if(n>=3){ // três perdas seguidas: para de recarregar sozinho (senão vira um "carregando" sem fim) e espera um toque
+    try{showToast('A placa de vídeo do aparelho reiniciou '+n+' vezes seguidas — o Mundo parou para não ficar recarregando. Feche outras abas ou aplicativos e toque na tela para tentar de novo',{big:true,ms:120000});}catch(x){}
+    const re=()=>{try{localStorage.setItem('mundo.gpulost','0');}catch(x){}location.reload();};cv.addEventListener('pointerdown',re,{once:true});addEventListener('keydown',re,{once:true});return;}
+  try{showToast('O aparelho reiniciou a placa de vídeo (memória) — recarregando em modo Leve…',{big:true,ms:5000});}catch(x){}setTimeout(()=>location.reload(),2200);});
+setTimeout(()=>{if(!window.__pause)try{localStorage.setItem('mundo.gpulost','0');}catch(e){}},90000); // 90 s rodando bem: zera a contagem de perdas
 function tick(dt){t+=dt;
   if(fadeOnAt&&performance.now()-fadeOnAt>2500&&fadeEl){fadeEl.classList.remove('on');fadeOnAt=0;} // segurança: a tela nunca fica presa no preto
   pollPad(dt);
@@ -8498,7 +8508,7 @@ function tick(dt){t+=dt;
 }
 function draw(dt){lastDt=dt;renderPortals();if(Q.lite){renderer.setRenderTarget(null);renderer.render(ACTIVE,camera);}else composer.render();
   // auto-ajuste de qualidade
-  if(!fpsChecked&&t>4){fpsAcc+=dt;fpsN++;if(fpsAcc>2.5){const fps=fpsN/fpsAcc;fpsChecked=true;if(fps<22&&Q.name==='ultra'){setQuality('alto');showToast('qualidade ajustada para Alto pelo desempenho (tecla 3 volta ao Ultra)');}else if(fps<16&&Q.name==='alto'){setQuality('classico');showToast('qualidade ajustada para Clássico pelo desempenho');}else if(fps<18&&Q.name==='classico'){setQuality('leve');showToast('qualidade ajustada para Leve pelo desempenho');}}}
+  if(!fpsChecked&&t>4&&!window.__noAutoQ){fpsAcc+=dt;fpsN++;if(fpsAcc>2.5){const fps=fpsN/fpsAcc;fpsChecked=true;if(fps<22&&Q.name==='ultra'){setQuality('alto');showToast('qualidade ajustada para Alto pelo desempenho (tecla 3 volta ao Ultra)');}else if(fps<16&&Q.name==='alto'){setQuality('classico');showToast('qualidade ajustada para Clássico pelo desempenho');}else if(fps<18&&Q.name==='classico'){setQuality('leve');showToast('qualidade ajustada para Leve pelo desempenho');}}}
 }
 requestAnimationFrame(frame);
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__FANT=FANT;window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__sit=sitDown;window.__setQ=setQuality;window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__diario={log:LOG,abrir:openDiary,fechar:closeDiary,proximo:nextStep};
