@@ -21,7 +21,24 @@
   #fade{position:fixed;inset:0;background:#000;opacity:0;transition:opacity .45s;pointer-events:none;z-index:8}
   #fade.on{opacity:1}
   .hint{position:fixed;left:0;right:0;bottom:16px;text-align:center;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:rgba(233,220,196,.5);pointer-events:none;padding:0 16px}
-  .load{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;color:#8a7a60;letter-spacing:.34em;font-size:12px;text-transform:uppercase}
+  /* ---- tela de carregamento: um livro folheando ---- */
+  .load{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;background:var(--bg);color:#8a7a60;letter-spacing:.34em;font-size:12px;text-transform:uppercase;z-index:20}
+  .lbook{position:relative;width:170px;height:112px;perspective:1000px;filter:drop-shadow(0 14px 22px rgba(0,0,0,.65))}
+  .lbook .lcov{position:absolute;top:0;width:85px;height:112px;background:linear-gradient(90deg,#4e1a22,#7a2028 60%,#6a1c26);box-shadow:inset 0 0 0 2px rgba(201,162,74,.35)}
+  .lbook .lcov.l{right:50%;border-radius:7px 0 0 7px} .lbook .lcov.r{left:50%;border-radius:0 7px 7px 0}
+  .lbook .lstack{position:absolute;top:5px;width:78px;height:102px;background:linear-gradient(90deg,#d9caa6,#efe2c2 40%,#e6d8b8)}
+  .lbook .lstack.l{right:50%;border-radius:4px 0 0 4px;box-shadow:inset -3px 0 6px rgba(0,0,0,.12)} .lbook .lstack.r{left:50%;border-radius:0 4px 4px 0;box-shadow:inset 3px 0 6px rgba(0,0,0,.12)}
+  .lbook .lstack::before{content:'';position:absolute;left:12px;right:12px;top:18px;height:62px;background:repeating-linear-gradient(0deg,rgba(90,70,50,.3) 0 1px,transparent 1px 8px)}
+  .lbook .lpage{position:absolute;left:50%;top:5px;width:78px;height:102px;background:linear-gradient(90deg,#efe2c2,#f6ecd2 40%,#eadcbc);border-radius:0 4px 4px 0;transform-origin:left center;transform:rotateY(0deg);animation:lflip 2.8s cubic-bezier(.45,.05,.3,1) infinite;box-shadow:inset 2px 0 6px rgba(0,0,0,.1);backface-visibility:visible}
+  .lbook .lpage::before{content:'';position:absolute;left:12px;right:12px;top:18px;height:62px;background:repeating-linear-gradient(0deg,rgba(90,70,50,.32) 0 1px,transparent 1px 8px)}
+  .lbook .p2{animation-delay:.7s} .lbook .p3{animation-delay:1.4s} .lbook .p4{animation-delay:2.1s}
+  .lbook .lspine{position:absolute;left:50%;top:0;width:4px;height:112px;margin-left:-2px;background:linear-gradient(180deg,#c9a24a,#8a6a2a);z-index:5;border-radius:2px}
+  @keyframes lflip{0%{transform:rotateY(0deg);opacity:1}42%{transform:rotateY(-180deg);opacity:1}44%{transform:rotateY(-180deg);opacity:0}99%{transform:rotateY(0deg);opacity:0}100%{transform:rotateY(0deg);opacity:1}}
+  .ltxt{font-size:14px;letter-spacing:.38em;color:var(--gold2);text-transform:uppercase;padding-left:.38em}
+  .ltxt i{font-style:normal;display:inline-block;animation:ldot 1.3s infinite;opacity:.2} .ltxt i:nth-child(2){animation-delay:.3s} .ltxt i:nth-child(3){animation-delay:.6s}
+  @keyframes ldot{0%,100%{opacity:.2}50%{opacity:1}}
+  .lsub{font-size:11px;letter-spacing:.2em;color:#8a7a60;text-transform:none;min-height:1.4em}
+  @media (prefers-reduced-motion:reduce){.lbook .lpage,.ltxt i{animation:none}}
   .toast{position:fixed;left:50%;top:60px;transform:translateX(-50%);background:rgba(20,12,6,.88);border:1px solid rgba(233,220,196,.25);color:#f3e6c8;font-size:13px;letter-spacing:.08em;line-height:1.45;padding:9px 16px;border-radius:3px;opacity:0;transition:opacity .4s;pointer-events:none;max-width:min(760px,90vw);text-align:center;z-index:9}
   .toast.show,.toast.on{opacity:1;pointer-events:auto;cursor:pointer}
   #toast.big{border-color:var(--gold);box-shadow:0 0 0 1px rgba(201,162,74,.35),0 8px 30px rgba(0,0,0,.5);font-size:14px;padding:12px 20px;background:rgba(30,18,8,.94)}
@@ -229,7 +246,7 @@
   </form>
   <p class="rodape">Na sala: seus livros ficam na estante “Minha Estante” (à esquerda da lareira), com o título na lombada; os que estão em <b>Lendo</b> ficam empilhados na mesa. Clique num livro na sala (ou mire nele e aperte E) para abri-lo aqui. Tecla B abre e fecha este painel.</p>
 </aside>
-<div class="load" id="load"></div>
+<div class="load" id="load" role="status" aria-live="polite"><div class="lbook" aria-hidden="true"><div class="lcov l"></div><div class="lcov r"></div><div class="lstack l"></div><div class="lstack r"></div><div class="lpage p4"></div><div class="lpage p3"></div><div class="lpage p2"></div><div class="lpage p1"></div><div class="lspine"></div></div><div class="ltxt">Carregando<i>.</i><i>.</i><i>.</i></div><div class="lsub" id="loadSub">abrindo a biblioteca…</div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 ( function () {
@@ -4852,6 +4869,7 @@ LEGENDA: Fim da primeira história. Não da última.`},
 <script>
 (function(){
 const cv=document.getElementById('c'), loadEl=document.getElementById('load'), hint=document.getElementById('hint'), toast=document.getElementById('toast');
+function loadMsg(s){const e=document.getElementById('loadSub');if(e)e.textContent=s;else if(loadEl)loadEl.textContent=s;} // legenda sob o livro que folheia na tela de carregamento
 if(!window.THREE||!THREE.EffectComposer||!THREE.SAOPass||!THREE.SMAAPass||!THREE.Reflector){loadEl.textContent='Não foi possível carregar o Three.js (rede).';return;}
 THREE.RectAreaLightUniformsLib.init();
 
@@ -6774,7 +6792,7 @@ function posterTex(){const c=can(512,720),x=c.getContext('2d'),r=rnd(1601);x.fil
 function silhouetteTex(){const c=can(128,256),x=c.getContext('2d');x.clearRect(0,0,128,256);x.fillStyle='rgba(10,10,14,.92)';x.beginPath();x.ellipse(64,54,22,26,0,0,7);x.fill();x.fillRect(22,30,84,10);x.fillRect(46,10,36,26);x.beginPath();x.moveTo(20,256);x.quadraticCurveTo(22,110,64,86);x.quadraticCurveTo(106,110,108,256);x.fill();return new THREE.CanvasTexture(c);}
 function streakTex(){const c=can(32,32),x=c.getContext('2d');x.clearRect(0,0,32,32);const g=x.createLinearGradient(0,0,0,32);g.addColorStop(0,'rgba(200,220,255,0)');g.addColorStop(0.7,'rgba(200,220,255,.85)');g.addColorStop(1,'rgba(220,235,255,0)');x.fillStyle=g;x.fillRect(15,0,2,32);return new THREE.CanvasTexture(c);}
 function globeTex(){const S=512,c=can(S,S/2),x=c.getContext('2d'),r=rnd(1701),fbm=mkNoise(1702);x.fillStyle='#d9c9a0';x.fillRect(0,0,S,S/2);const d=x.getImageData(0,0,S,S/2);for(let i=0;i<S*S/2;i++){const v=fbm((i%S)*0.02,(i/S|0)*0.04,4);if(v>0.55){d.data[i*4]=120+v*40;d.data[i*4+1]=100+v*30;d.data[i*4+2]=70;}}x.putImageData(d,0,0);x.strokeStyle='rgba(60,40,20,.35)';x.lineWidth=1;for(let k=1;k<12;k++){x.beginPath();x.moveTo(k*S/12,0);x.lineTo(k*S/12,S/2);x.stroke();}for(let k=1;k<6;k++){x.beginPath();x.moveTo(0,k*S/12);x.lineTo(S,k*S/12);x.stroke();}return new THREE.CanvasTexture(c);}
-loadEl.textContent='acendendo o neon…';
+loadMsg('acendendo o neon…');
 const OLIVE=plasterTex([74,84,66],1101),CREAMP=plasterTex([214,204,182],1103);
 const MY={
   floor:new THREE.MeshStandardMaterial({map:clonedTex(DARKP.map,7,3.6),normalMap:clonedTex(DARKP.normalMap,7,3.6),roughnessMap:clonedTex(DARKP.roughnessMap,7,3.6),color:0x6a4a34,roughness:0.85,metalness:0.05,transparent:true,opacity:0.9}),
@@ -6986,7 +7004,7 @@ function mysTick(dt){const Y=MYS;rainGlassMat.uniforms.t.value=t;
   { const m=Y.moth;m.t-=dt;if(m.t<=0){m.t=5+R()*6;m.mode=m.mode?0:1;}const cx=m.mode?0:m.cx,cy=m.mode?YH-2.3:m.cy,cz=m.mode?-9.5:m.cz;m.ph+=dt*(4+Math.sin(t*1.3));const r=0.12+0.06*Math.sin(t*2.7);m.s.position.set(cx+Math.cos(m.ph)*r+Math.sin(t*9)*0.02,cy+Math.sin(m.ph*1.7)*0.08,cz+Math.sin(m.ph)*r);m.s.material.opacity=0.55+0.35*Math.abs(Math.sin(t*30)); }}
 
 /* ================= NOVE SALAS (kit genérico de sala + um tema por gênero) ================= */
-loadEl.textContent='abrindo as outras salas…';
+loadMsg('abrindo as outras salas…');
 let NRT=0; // relógio das salas (o t global ainda não existe na construção)
 const NR={}; // chave → sala construída pelo kit (entra em ROOMS mais abaixo)
 function txtTex(lines,o){o=o||{};const w=o.w||512,h=o.h||256,c=can(w,h),x=c.getContext('2d');if(o.bg!=='none'){x.fillStyle=o.bg||'#2a1810';x.fillRect(0,0,w,h);}else x.clearRect(0,0,w,h);
