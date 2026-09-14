@@ -143,17 +143,21 @@
   .goList button{background:rgba(20,12,6,.72);border:1px solid rgba(233,220,196,.28);color:#f3e6c8;font:inherit;font-size:12px;letter-spacing:.04em;padding:7px 11px;border-radius:14px;cursor:pointer;white-space:nowrap;backdrop-filter:blur(3px);-webkit-tap-highlight-color:transparent}
   .goList button:hover,.goList button:active{border-color:var(--gold);background:rgba(60,36,14,.85)}
   .goList button.here{opacity:.45}
-  body.touch .goBar{bottom:34px;left:198px;right:112px;transform:none;max-width:none;padding:0;justify-content:flex-start;align-items:center}
-  body.touch .goList{flex-wrap:wrap;overflow:visible;row-gap:5px}
-  body.touch .goList button{font-size:11px;padding:7px 10px}
-  body.touch .prompt{bottom:118px;font-size:12px;max-width:min(62vw,max(240px,calc(100vw - 400px)))}
   @media (max-width:600px){.goBar{bottom:34px}.goList button{font-size:11px;padding:6px 9px}}
-  @media (orientation:portrait){body.touch .goBar{left:0;right:0;bottom:228px;padding:0 10px;justify-content:center} body.touch .goList{justify-content:center} body.touch .prompt{bottom:352px} body.touch .toast{top:150px}}
-  /* toque: HUD numa faixa compacta no alto, qualidade dentro de Controles, só o botão ❔ no canto */
-  body.touch .hudRow{position:fixed;left:12px;top:34px;right:150px;display:flex;flex-wrap:wrap;gap:5px;z-index:3;pointer-events:none}
+  /* toque: nada de menu fixo na tela — só o ☰ (menu), os contadores, as setas e o E. O «Ir para» e os botões moram dentro do ☰ */
+  body.touch .goBar,body.touch .prompt,body.touch .hint,body.touch .ret{display:none}
+  body.touch #menuGo .goBar{display:flex;position:static;transform:none;max-width:none;padding:0;flex-direction:column;align-items:flex-start;gap:8px;pointer-events:auto}
+  body.touch #menuGo .goT{font-size:11px;padding:0} body.touch #menuGo .goList{flex-wrap:wrap;overflow:visible;gap:8px;padding:0}
+  body.touch #menuGo .goList button{font-size:14px;padding:11px 15px;border-radius:8px}
+  .menuBtn{position:fixed;left:12px;top:36px;z-index:3;font-size:12px;padding:6px 10px;letter-spacing:.14em}
+  .menuIn{gap:14px}
+  .menuBtns{display:flex;flex-wrap:wrap;gap:8px} .menuBtns .est-btn{position:static;font-size:13px;padding:10px 13px;letter-spacing:.1em}
+  body.touch .menuBtns .q.help{display:flex;position:static} .menuBtns .q.help button{font-size:13px;padding:10px 13px;letter-spacing:.1em}
+  body.touch .hudRow{position:fixed;right:12px;top:12px;left:auto;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px;max-width:62vw;z-index:3;pointer-events:none}
   body.touch .hudRow .est-btn{position:static;pointer-events:auto;font-size:10px;padding:4px 7px;letter-spacing:.08em;gap:5px}
   body.touch .hudRow .est-btn b{font-size:11px} body.touch .hudRow .est-btn small{font-size:9px}
-  body.touch .q:not(.help){display:none} body.touch .q.help{top:12px;right:12px} body.touch .t{font-size:12px;top:12px;left:12px} body.touch .toast{top:74px}
+  body.touch .q:not(.help){display:none} body.touch .q.help{display:none} body.touch .t{font-size:12px;top:12px;left:12px} body.touch .toast{top:74px}
+  @media (orientation:portrait){body.touch .toast{top:150px} body.touch .hudRow{max-width:70vw}}
   .ctrlSet .qRow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px} body.touch .ctrlSet .qRow .q{display:flex;position:static}
   /* ---- controles de toque (celular/tablet): setas fixas (segurar anda na direção da tela) + botão E; sem correr ---- */
   .dpad{position:fixed;left:14px;bottom:30px;width:178px;height:178px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:4px;z-index:5;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
@@ -164,7 +168,6 @@
   .vjAct{position:fixed;right:22px;bottom:96px;width:78px;height:78px;border-radius:50%;border:2px solid var(--gold);background:rgba(60,36,14,.78);color:#f3e6c8;font:inherit;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;touch-action:none;box-shadow:0 4px 18px rgba(0,0,0,.45);-webkit-tap-highlight-color:transparent}
   .vjAct b{font-size:26px;line-height:1;color:var(--gold2)} .vjAct span{font-size:9px;letter-spacing:.08em;text-transform:uppercase;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink2)}
   .vjAct.off{opacity:.38} .vjAct:active{background:rgba(120,70,22,.9)}
-  body.touch .hint{display:none} body.touch .ret{display:none}
   @media (prefers-reduced-motion:reduce){.toast{transition:none}}
 </style>
 <canvas id="c"></canvas>
@@ -193,6 +196,8 @@
 <div class="leitura" id="leitura" hidden><div class="leituraIn"><header class="leiHead"><div class="leiTit"><h3 id="leiTitulo"></h3><p class="leiMeta" id="leiMeta"></p></div><div class="leiTools"><button type="button" id="leiMenos" title="letra menor">A−</button><button type="button" id="leiMais" title="letra maior">A+</button><button type="button" class="x" id="leiFechar" aria-label="Fechar">×</button></div></header><div class="leiBar"><i id="leiProg"></i><span id="leiPct">0%</span></div><article class="leiTexto" id="leiTexto"></article><footer class="leiFoot"><p class="leiNota" id="leiNota"></p><button type="button" class="leiBtn" id="leiFim" disabled>Leia até o fim para concluir</button></footer></div></div>
 <div class="dpad" id="dpad" hidden aria-label="Setas para andar"><button class="dk up" type="button" tabindex="-1" aria-hidden="true">▲</button><button class="dk left" type="button" tabindex="-1" aria-hidden="true">◀</button><span class="dc"></span><button class="dk right" type="button" tabindex="-1" aria-hidden="true">▶</button><button class="dk down" type="button" tabindex="-1" aria-hidden="true">▼</button></div><button class="vjAct" id="vjAct" type="button" hidden><b>E</b><span id="vjActTxt">interagir</span></button>
 <div class="goBar" id="goBar" hidden><span class="goT">Ir para</span><div class="goList" id="goList"></div></div>
+<button class="est-btn menuBtn" id="btnMenu" type="button" hidden>☰ Menu</button>
+<div class="diarioOv" id="menuOv" hidden><div class="lojaIn menuIn"><button class="x" id="menuFechar" type="button" aria-label="Fechar">×</button><h3>☰ Menu</h3><div id="menuGo"></div><div class="menuBtns" id="menuBtns"></div><p class="small">toque fora do painel para fechar</p></div></div>
 <div class="hint" id="hint"></div>
 <div class="toast" id="toast"></div>
 <div class="toast" id="estToast"></div>
@@ -4729,6 +4734,8 @@ const Q={sao:true,bokeh:true,refl:true,slices:22,name:'ultra'};let PORTAL_ON=fal
 const qb={leve:document.getElementById('q0'),classico:document.getElementById('q1'),alto:document.getElementById('q2'),ultra:document.getElementById('q3')};
 function allScenes(){const L=[];const add=x=>{if(x&&x.isScene&&!L.includes(x))L.push(x);};try{add(scene);}catch(e){}try{add(hallScene);}catch(e){}try{for(const k in ROOMS)add(ROOMS[k].scene);}catch(e){}return L;}
 function remakeMaterials(){for(const sc of allScenes())sc.traverse(o=>{if(o.material){(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{m.needsUpdate=true;});}});}
+function lightBudget(sc){if(!sc||!sc.isScene)return;const N=Q.lite?10:999;const pts=[];sc.traverse(o=>{if(o.isPointLight){if(o.userData.i0===undefined)o.userData.i0=o.intensity;if(o.visible||o.userData.liteOff)pts.push(o);}});
+  pts.sort((a,b)=>b.userData.i0*(b.distance||10)-a.userData.i0*(a.distance||10));pts.forEach((L,i)=>{const off=i>=N;if(off){L.visible=false;L.userData.liteOff=true;}else if(L.userData.liteOff){L.visible=true;L.userData.liteOff=false;}});}
 function setQuality(n){if(!qb[n])n='leve';Q.name=n;const wasLite=!!Q.lite;Q.lite=(n==='leve');
   if(n==='ultra'){Q.sao=true;Q.bokeh=true;Q.refl=true;Q.slices=22;}
   else if(n==='alto'){Q.sao=true;Q.bokeh=false;Q.refl=true;Q.slices=12;}
@@ -4740,7 +4747,7 @@ function setQuality(n){if(!qb[n])n='leve';Q.name=n;const wasLite=!!Q.lite;Q.lite
   if(window.__FIRE){const v=window.__FIRE.vol;v.visible=!(n==='classico'||n==='leve');const st=n==='ultra'?36:22;if(v.material.defines.STEPS!==st){v.material.defines.STEPS=st;v.material.needsUpdate=true;}}
   sao.enabled=Q.sao;bokeh.enabled=Q.bokeh;refl.visible=Q.refl;M.floor.opacity=Q.refl?0.82:1.0;M.floor.transparent=Q.refl;M.floor.needsUpdate=true;if(window.__hrefl){window.__hrefl.visible=Q.refl;}if(window.__srefl){window.__srefl.visible=Q.refl;}if(window.__krefl){window.__krefl.visible=Q.refl;}if(window.__frefl){window.__frefl.visible=Q.refl;}if(window.__yrefl){window.__yrefl.visible=Q.refl;}if(window.__MY){window.__MY.floor.opacity=Q.refl?0.86:1.0;window.__MY.floor.transparent=Q.refl;window.__MY.floor.needsUpdate=true;}if(window.__CM){window.__CM.floor.opacity=Q.refl?0.86:1.0;window.__CM.floor.transparent=Q.refl;window.__CM.floor.needsUpdate=true;}if(window.__CATSHAFTS){const nn=n==='ultra'?4:(n==='alto'?2:1);for(const s of window.__CATSHAFTS)s.visible=s.userData.idx<nn;}if(window.__SM){window.__SM.floor.opacity=Q.refl?0.8:1.0;window.__SM.floor.transparent=Q.refl;window.__SM.floor.needsUpdate=true;}if(window.__HM){window.__HM.floor.opacity=Q.refl?0.8:1.0;window.__HM.floor.transparent=Q.refl;window.__HM.floor.needsUpdate=true;}
   SLICES.forEach((s,i)=>{s.visible=i<Q.slices;s.material.uniforms.op.value=(0.055*22/Q.slices)*(1-i/Q.slices*0.85);});
-  for(const k in qb)qb[k].classList.toggle('on',k===n);
+  for(const k in qb)qb[k].classList.toggle('on',k===n);for(const sc of allScenes())lightBudget(sc);
   try{localStorage.setItem('bibq2',n);}catch(e){}}
 for(const k in qb)qb[k].addEventListener('click',()=>setQuality(k));
 {let q0=null;try{q0=localStorage.getItem('bibq2');}catch(e){}setQuality(qb[q0]?q0:'leve');} // padrão: Leve (o mais modesto); a escolha fica guardada
@@ -5927,7 +5934,7 @@ let lockOK=!!cv.requestPointerLock,lockWarned=false,mx=innerWidth/2,my=innerHeig
 const CAM={yaw:0.3,pitch:0.42,dist:5.2,follow:false};const followV=new THREE.Vector3();let camArm=5.2,camLift=0;const CAMDEF={pitch:TOUCHDEV?0.82:0.5,dist:TOUCHDEV?6.8:6.0}; // câmera mais do alto; no toque fica travada nesse ângulo
 const CH={x:2.0,z:4.2,dir:Math.PI,vx:0,vz:0,target:null,onArrive:null,sitting:false,sitT:0,walkT:0,speed:2.4,stuckT:0,fy:0,run:false,slide:1};
 const PAD={on:false,mx:0,mz:0,cx:0,cy:0,run:false,prev:{}};
-let FOCUS=null,focusKey=null,mapOpen=false,ctrlOpen=false;
+let FOCUS=null,focusKey=null,mapOpen=false,ctrlOpen=false,menuOpen=false;
 function floorAt(x,z){return (CUR==='room'&&ROOM&&ROOM.floorY)?ROOM.floorY(x,z):0;}
 const OBST=[[-0.4,1.7,1.05],[-2.7,0.6,0.78],[-3.9,2.3,0.6],[-5.0,0.5,0.7],[FX,FZ+0.9,2.7],[W/2-1.2,3.4,0.6],[-2.55,D/2,1.2],[4.6,-1.1,1.6],[2.7,-0.45,0.5],[W/2-0.75,0,0.75],[-0.55,D/2-0.4,0.55],[1.6,-3.9,0.4],[-5.3,-2.3,0.55],[4.0,4.8,0.6],];
 const ROOM_WORLD={clamp:(x,z,m)=>[Math.max(-W/2+m,Math.min(W/2-m,x)),Math.max(-D/2+m,Math.min(D/2-m,z))],obst:OBST,
@@ -6267,7 +6274,7 @@ function gearTick(dt){const P=GEAR.pet;if(P){const id=P.userData.pet;if(id==='va
   if(GEAR.lanternL&&GEAR.lanternL.visible)GEAR.lanternL.intensity=1.1*(1+0.06*Math.sin(t*11)+0.04*Math.sin(t*23));}
 // ---- a Coruja e a tenda ganham vida no Hall ----
 const owlV=new THREE.Vector3();
-function storyFloat(){const S=storyFor();if(S&&S.g.userData.top){S.g.userData.top.position.y=1.3+Math.sin(t*1.2+S.x)*0.05;S.g.rotation.y=S.rot+Math.sin(t*0.5)*0.35;}}
+function storyFloat(){const S=storyFor();if(S&&S.g.userData.top){S.g.userData.top.position.y=1.02+Math.sin(t*1.2+S.x)*0.05;S.g.rotation.y=S.rot+Math.sin(t*0.5)*0.35;}}
 function hallTick(dt){if(HALLX.atril){HALLX.atril.position.y=HALLX.livroY+Math.sin(t*1.1)*0.06;HALLX.atril.rotation.y=t*0.3;if(HALLX.livroHalo)HALLX.livroHalo.material.opacity=0.45+0.15*Math.sin(t*2.3);}const O=HALLX.owl;if(!O)return;O.t+=dt;const px=MODE==='fp'?P.x:CH.x,pz=MODE==='fp'?P.z:CH.z;O.g.getWorldPosition(owlV);const dx=px-owlV.x,dz=pz-owlV.z,d=Math.hypot(dx,dz);
   let want=0;if(d<7){let rel=Math.atan2(dx,dz)-Math.PI/2;rel=Math.atan2(Math.sin(rel),Math.cos(rel));want=Math.max(-1.1,Math.min(1.1,rel));}
   O.head.rotation.y+=(want-O.head.rotation.y)*Math.min(1,dt*3);O.head.rotation.z=Math.sin(O.t*0.7)*0.06;
@@ -6294,7 +6301,7 @@ const CONTO_SPOTS={lib:[-0.9,3.6],cat:[3.1,10.2],fant:[1.8,5.6],sci:[-0.9,3.5],a
 const STANDS={};
 function storyStand(hue){const g=new THREE.Group();const col=new THREE.Color().setHSL(hue/360,0.8,0.55);
   // livro aberto flutuando na altura do peito (sem pedestal nem obstáculo): fácil de ver, de clicar e de contornar
-  const top=new THREE.Group();top.position.set(0,1.3,0);top.rotation.x=0.42;g.add(top);g.userData.top=top;
+  const top=new THREE.Group();top.position.set(0,1.02,0);top.rotation.x=0.42;g.add(top);g.userData.top=top;
   const pages=new THREE.MeshStandardMaterial({color:0xf3e9d2,roughness:0.92}),cover=new THREE.MeshStandardMaterial({color:col.clone().multiplyScalar(0.55),roughness:0.7});
   for(const sx of [-1,1]){const c=new THREE.Mesh(new THREE.BoxGeometry(0.34,0.025,0.46),cover);c.position.set(sx*0.175,0.0,-0.01);c.rotation.z=sx*0.16;c.castShadow=true;top.add(c);const p=new THREE.Mesh(new THREE.BoxGeometry(0.31,0.05,0.43),pages);p.position.set(sx*0.175,0.035,-0.01);p.rotation.z=sx*0.16;top.add(p);
     for(let k=0;k<3;k++){const ln=new THREE.Mesh(new THREE.BoxGeometry(0.2,0.004,0.02),new THREE.MeshStandardMaterial({color:0x7a6a52,roughness:1}));ln.position.set(sx*0.175,0.062,-0.14+k*0.12);ln.rotation.z=sx*0.16;top.add(ln);}}
@@ -6463,27 +6470,40 @@ function nearBy(){for(const it of KEYS.active){if(Math.hypot(it.x-CH.x,it.z-CH.z
 function setFocus(tg){FOCUS=tg;const key=tg?(tg.kind+':'+(tg.label||'')+(tg.far?':far':'')):null;
   if(key!==focusKey){focusKey=key;vjFocus(tg);if(promptEl){if(tg){promptEl.hidden=false;promptTxt.textContent=tg.far?tg.label.replace('Entrar: ','')+' · aproxime-se':tg.label;const noKey=!!tg.far||(tg.kind==='hdoor'&&tg.g&&tg.g.userData.locked);promptKey.hidden=noKey;promptKey.textContent=PAD.on?'A':'E';}else promptEl.hidden=true;}}
   MARK.visible=!!(tg&&tg.obj&&!tg.far);}
-function updateFocus(){if(MODE==='tp'||fadeOnAt||mapOpen||ctrlOpen||lojaOpen||diaryOpen||leituraOpen||livroOpen){setFocus(null);return;}
+function updateFocus(){if(MODE==='tp'||fadeOnAt||mapOpen||ctrlOpen||lojaOpen||diaryOpen||leituraOpen||livroOpen||menuOpen){setFocus(null);return;}
   if(CH.sitting&&MODE!=='fp'){setFocus({kind:'stand',label:'Levantar'});return;}
   let tg=null;const aim=locked?resolveAt(0,0,true):((mouseIn&&!dragging)?resolveAt(mx,my,false):null);
   if(aim&&aim.kind!=='floor'){if(MODE==='fp'?aim.dist<5:reachOK(aim))tg=aim;else if(aim.kind==='hdoor'||aim.kind==='shop'||aim.kind==='chest'||aim.kind==='story')tg=Object.assign({},aim,{far:true});}
   if(!tg&&MODE!=='fp')tg=nearBy();
   setFocus(tg);
   if(MARK.visible){const a=anchorOf(FOCUS);if(a){MARK.position.copy(a);const sc=0.3+0.06*Math.sin(t*5);MARK.scale.set(sc,sc,1);}else MARK.visible=false;}}
-function doInteract(){if(mapOpen||ctrlOpen||lojaOpen||diaryOpen||leituraOpen||livroOpen)return;const tg=FOCUS;if(!tg||tg.far)return;if(MODE==='fp')actFP(tg);else act(tg);}
+// chegar perto basta: o conto da sala abre ao encostar no livro; no Hall o Livro dos Contos abre quando o leitor para junto dele; a chave é apanhada ao passar por cima
+function autoNear(){if(MODE==='tp'||fadeOnAt||CH.sitting||mapOpen||ctrlOpen||lojaOpen||diaryOpen||leituraOpen||livroOpen||menuOpen)return;const px=MODE==='fp'?P.x:CH.x,pz=MODE==='fp'?P.z:CH.z;
+  for(const it of KEYS.active){if(!it.got&&Math.hypot(it.x-px,it.z-pz)<1.1){keyCollect(it);break;}}
+  if(CUR==='room'){const S=storyFor();if(S){const d=Math.hypot(S.x-px,S.z-pz);if(d<1.3){if(!S.nearLock&&!CH.target){S.nearLock=true;CH.target=null;CH.onArrive=null;CH.vx=CH.vz=0;CH.dir=Math.atan2(S.x-CH.x,S.z-CH.z);try{DP.clear();dpApply();}catch(e){}unlock();openStory(S.genre);}}else if(d>2.1)S.nearLock=false;if(d<1.3&&CH.target)S.nearLock=true;}}
+  else if(CUR==='hall'&&HALLX.atril){const d=Math.hypot(px,pz),spd=MODE==='fp'?Math.hypot(vx,vz):Math.hypot(CH.vx,CH.vz);if(d<1.15&&spd<0.3&&!CH.target){if(!HALLX.nearLock){HALLX.nearLock=true;try{DP.clear();dpApply();}catch(e){}unlock();openLivro();}}else if(d>2.0)HALLX.nearLock=false;}}
+function doInteract(){if(mapOpen||ctrlOpen||lojaOpen||diaryOpen||leituraOpen||livroOpen||menuOpen)return;const tg=FOCUS;if(!tg||tg.far)return;if(MODE==='fp')actFP(tg);else act(tg);}
 let sx=0,sy=0,hoverN=0;
 function hover(e){if(e.pointerType==='touch'||(++hoverN%3))return;const tg=resolveAt(e.clientX,e.clientY,false);const key=(tg&&tg.kind!=='floor')?(tg.kind+':'+(tg.tip||'')):null;
   if(key!==hoverId){hoverId=key;if(tip){if(key&&tg.tip&&MODE!=='gm'){tip.textContent=tg.tip;tip.hidden=false;}else tip.hidden=true;}}
   cv.style.cursor=key?'pointer':(MODE==='tp'?'default':'crosshair');if(tip&&key&&!tip.hidden){tip.style.left=(e.clientX+14)+'px';tip.style.top=(e.clientY+16)+'px';}}
 // ---- toque (celular/tablet): setas fixas no canto esquerdo (segurar anda na direção da tela, sem correr), arrastar gira a câmera, botão E interage ----
+const goBar=document.getElementById('goBar'),goList=document.getElementById('goList');
 const VJ={touch:false,active:false,run:false};
 const dpadEl=document.getElementById('dpad'),vjAct=document.getElementById('vjAct'),vjActTxt=document.getElementById('vjActTxt');
 const DK=dpadEl?{up:dpadEl.querySelector('.up'),down:dpadEl.querySelector('.down'),left:dpadEl.querySelector('.left'),right:dpadEl.querySelector('.right')}:null;
 const DP=new Map(); // pointerId → [ux,uy] (direção na tela)
-function touchLayout(){if(touchLayout.done)return;touchLayout.done=true; // HUD compacto: botões numa faixa no alto; qualidade gráfica vai para o painel Controles; grupo de modos fica só no painel
+const menuOv=document.getElementById('menuOv'),btnMenu=document.getElementById('btnMenu');
+function menuShow(on){if(!menuOv)return;menuOpen=!!on;menuOv.hidden=!menuOpen;if(menuOpen){try{renderGoBar();}catch(e){}if(mapOpen)closeMap();}}
+function touchLayout(){if(touchLayout.done)return;touchLayout.done=true; // no toque nada fica fixo na tela além de ☰, contadores, setas e E: «Ir para» e os botões moram dentro do menu ☰; a qualidade gráfica vai para o painel Controles
   const row=document.createElement('div');row.className='hudRow';document.body.appendChild(row);
-  for(const id of ['btnEstante','btnHall','coins','keysBtn','btnRooms','btnDiario','nivelBtn']){const el=document.getElementById(id);if(el)row.appendChild(el);}
+  for(const id of ['coins','keysBtn','nivelBtn']){const el=document.getElementById(id);if(el)row.appendChild(el);}
   const cp=document.getElementById('coinPlus');if(cp)cp.remove();
+  const mb=document.getElementById('menuBtns'),mg=document.getElementById('menuGo');
+  if(mb){for(const id of ['btnEstante','btnHall','btnRooms','btnDiario']){const el=document.getElementById(id);if(el)mb.appendChild(el);}const hq=document.querySelector('.q.help');if(hq)mb.appendChild(hq);}
+  if(mg&&goBar)mg.appendChild(goBar);
+  if(btnMenu){btnMenu.hidden=false;btnMenu.addEventListener('click',e=>{e.stopPropagation();menuShow(!menuOpen);});}
+  if(menuOv){menuOv.addEventListener('click',e=>{if(e.target===menuOv){menuShow(false);return;}const bt=e.target.closest('button');if(bt&&bt.id!=='menuFechar')setTimeout(()=>menuShow(false),0);},true);const x=document.getElementById('menuFechar');if(x)x.addEventListener('click',()=>menuShow(false));}
   const qg=document.querySelector('.q:not(.mode):not(.help)'),set=document.querySelector('.ctrlSet');if(qg&&set){const qr=document.createElement('div');qr.className='qRow';const lab=document.createElement('span');lab.textContent='Qualidade gráfica';qr.appendChild(lab);qr.appendChild(qg);set.insertBefore(qr,set.firstChild);}}
 function vjShow(on){if(VJ.touch===on)return;VJ.touch=on;document.body.classList.toggle('touch',on);if(vjAct)vjAct.hidden=!on;if(dpadEl)dpadEl.hidden=!on;if(on)try{touchLayout();}catch(e){}hintFor();}
 function dpDir(e){const r=dpadEl.getBoundingClientRect();const dx=(e.clientX-(r.left+r.width/2))/(r.width/2),dy=(e.clientY-(r.top+r.height/2))/(r.height/2);return [Math.abs(dx)>0.3?Math.sign(dx):0,Math.abs(dy)>0.3?Math.sign(dy):0];}
@@ -6497,8 +6517,7 @@ if(dpadEl){dpadEl.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPr
 addEventListener('blur',()=>{if(DP.size){DP.clear();dpApply();}});
 cv.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')vjShow(true);},{capture:true});
 if(vjAct){vjAct.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(FOCUS&&!FOCUS.far)doInteract();else if(FOCUS&&FOCUS.far&&FOCUS.kind==='hdoor')act(FOCUS);},{capture:true});}
-if(TOUCHDEV){try{vjShow(true);}catch(e){}setTimeout(()=>{try{showToast('Segure as setas para andar · «Ir para» leva você até o lugar · E age no que estiver perto · arraste a tela para girar a câmera',{ms:8000});}catch(e){}},1200);}
-const goBar=document.getElementById('goBar'),goList=document.getElementById('goList');
+if(TOUCHDEV){try{vjShow(true);}catch(e){}}
 function goTo(kind,ref){if(MODE==='fp')setMode('gm');if(CH.sitting&&kind!=='chair')standUp();if(mapOpen)closeMap();
   if(kind==='hdoor')act({kind:'hdoor',g:ref});else if(kind==='shop')act({kind:'shop'});else if(kind==='hlivro')act({kind:'hlivro'});
   else if(kind==='story')act({kind:'story',story:ref});else if(kind==='chest')act({kind:'chest',chest:ref});else if(kind==='chair')act({kind:'chair'});else if(kind==='stand')act({kind:'stand'});else if(kind==='door')act({kind:'door'});
@@ -6526,13 +6545,13 @@ cv.addEventListener('pointerleave',()=>{mouseIn=false;});
 cv.addEventListener('dblclick',()=>{if(MODE!=='tp'&&!locked)tryLock();});
 document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===cv;if(retEl)retEl.hidden=!locked;hintFor();});
 document.addEventListener('pointerlockerror',()=>lockFail());
-const inUI=e=>!!(e.target&&e.target.closest&&e.target.closest('#est,.q,.est-btn,#map,#ctrl,#loja,#diario,#toast,#leitura,#vjAct,#dpad,#livro,#goBar'));
+const inUI=e=>!!(e.target&&e.target.closest&&e.target.closest('#est,.q,.est-btn,#map,#ctrl,#loja,#diario,#toast,#leitura,#vjAct,#dpad,#livro,#goBar,#menuOv,#btnMenu'));
 const typing=e=>!!(e.target&&/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName));
 addEventListener('wheel',e=>{if(inUI(e))return;if(MODE!=='fp'){CAM.dist=Math.max(1.6,Math.min(9,CAM.dist*(1+Math.sign(e.deltaY)*0.12)));}else wheelV+=-Math.sign(e.deltaY)*1.6;},{passive:true});
 addEventListener('keydown',e=>{if(typing(e))return;const k=e.key.toLowerCase();keys[k]=true;const estOpen=!document.getElementById('est').hidden;
   if(e.key==='1')setQuality('classico');if(e.key==='2')setQuality('alto');if(e.key==='3')setQuality('ultra');
   if((k==='tab'&&!estOpen)||k==='m'){e.preventDefault();if(lojaOpen)closeShop();if(diaryOpen)closeDiary();if(livroOpen)closeLivro();if(leituraOpen)closeStory();toggleMap();return;}
-  if(k==='escape'){if(mapOpen)closeMap();if(ctrlOpen)showCtrl(false);if(lojaOpen)closeShop();if(diaryOpen)closeDiary();if(livroOpen)closeLivro();if(leituraOpen)closeStory();return;}
+  if(k==='escape'){if(menuOpen)menuShow(false);if(mapOpen)closeMap();if(ctrlOpen)showCtrl(false);if(lojaOpen)closeShop();if(diaryOpen)closeDiary();if(livroOpen)closeLivro();if(leituraOpen)closeStory();return;}
   if((leituraOpen||livroOpen)&&!['tab','m','h','b','j','?'].includes(k)&&e.key!=='F1')return; // lendo: as teclas de andar não valem
   if(k==='j'){e.preventDefault();if(leituraOpen)closeStory();toggleDiary();return;}
   if(k==='h'||k==='?'||e.key==='F1'){e.preventDefault();if(lojaOpen)closeShop();if(diaryOpen)closeDiary();if(livroOpen)closeLivro();if(leituraOpen)closeStory();showCtrl(!ctrlOpen);return;}
@@ -6618,7 +6637,7 @@ function moveTP(dt){let f=0,s=0;if(keys['w']||keys['arrowup'])f+=1;if(keys['s']|
     const moved=Math.hypot(nx-ox0,nz-oz0);if(want&&CH.target&&moved<0.004){CH.stuckT+=dt;if(CH.stuckT>0.8){CH.target=null;CH.onArrive=null;CH.stuckT=0;}}else CH.stuckT=0;}
   const spd=Math.hypot(CH.vx,CH.vz);if(spd>0.2&&!CH.sitting)CH.dir=lerpAng(CH.dir,Math.atan2(CH.vx,CH.vz),Math.min(1,dt*12));
   // câmera travada: com setas, teclado ou analógico ela não gira sozinha (as direções da tela ficam estáveis); num trajeto automático ela só vira quando o destino está atrás dela
-  if(MODE!=='fp'&&!dragging){const auto=!!CH.target&&!manual;if(auto){if(!CAM.follow){const T=CH.target;followV.set(T.x,CH.fy+0.4,T.z).project(camera);if(followV.z>1||Math.abs(followV.x)>1.04||Math.abs(followV.y)>1.04)CAM.follow=true;}if(CAM.follow&&spd>0.2)CAM.yaw=lerpAng(CAM.yaw,CH.dir+Math.PI,Math.min(1,dt*1.5));}else CAM.follow=false;}}
+  if(MODE!=='fp'&&!dragging){const auto=!!CH.target&&!manual;if(auto){if(!CAM.follow){const T=CH.target;followV.set(T.x,CH.fy+0.4,T.z).project(camera);if(followV.z>1||Math.abs(followV.x)>1.04||Math.abs(followV.y)>1.04)CAM.follow=true;}if(CAM.follow&&spd>0.2&&!CAM.blocked)CAM.yaw=lerpAng(CAM.yaw,CH.dir+Math.PI,Math.min(1,dt*1.5));}else CAM.follow=false;}}
 function poseReader(dt){const R=READER;const spd=Math.hypot(CH.vx,CH.vz);const walking=Math.min(1,spd/1.4);const runK=Math.max(0,Math.min(1,(spd-2.6)/2.0));if(walking>0.05)CH.walkT+=dt*(5.5+spd*1.9);if(CH.sitting)CH.sitT=Math.min(1,CH.sitT+dt*2.2);const sit=CH.sitting?CH.sitT:0;
   const sw=Math.sin(CH.walkT)*(0.6+0.35*runK)*walking;
   R.legs[0].hip.rotation.x=lerp(sw,-1.5,sit);R.legs[1].hip.rotation.x=lerp(-sw,-1.5,sit);
@@ -6631,7 +6650,7 @@ function setReaderOpacity(op){if(Math.abs(op-readerOp)<0.01&&(op>0.99)===(reader
 const camPos=new THREE.Vector3(),camLook=new THREE.Vector3(),camDes=new THREE.Vector3(),lookDes=new THREE.Vector3();let camInit=false;
 /* ---- troca de cena (hall ↔ sala) ---- */
 const fadeEl=document.getElementById('fade'),titleEl=document.getElementById('title'),btnHall=document.getElementById('btnHall');
-function setActive(sc){ACTIVE=sc;renderPass.scene=sc;sao.scene=sc;bokeh.scene=sc;sc.add(READER.g);sc.add(MARK);renderer.toneMappingExposure=(sc!==hallScene&&ROOM&&ROOM.scene===sc&&ROOM.exposure)||1.08;setTimeout(()=>{try{renderGoBar();}catch(e){}},0);}
+function setActive(sc){ACTIVE=sc;renderPass.scene=sc;sao.scene=sc;bokeh.scene=sc;sc.add(READER.g);sc.add(MARK);try{lightBudget(sc);}catch(e){}renderer.toneMappingExposure=(sc!==hallScene&&ROOM&&ROOM.scene===sc&&ROOM.exposure)||1.08;setTimeout(()=>{try{renderGoBar();}catch(e){}},0);}
 let fadeOnAt=0;
 function fadeTo(fn){if(!fadeEl){fn();return;}fadeEl.classList.add('on');fadeOnAt=performance.now();setTimeout(()=>{try{fn();}finally{setTimeout(()=>{fadeEl.classList.remove('on');fadeOnAt=0;},150);}},480);}
 function openDoor(g,cb){g.userData.open=1;setTimeout(cb,120);} // arco aberto: só um passo e a travessia começa
@@ -6663,12 +6682,21 @@ function closeDiary(){diaryOpen=false;if(diaryEl)diaryEl.hidden=true;}
 function toggleDiary(){if(diaryOpen)closeDiary();else openDiary();}
 if(diaryEl){diaryEl.addEventListener('click',e=>{if(e.target===diaryEl)closeDiary();});const dx=document.getElementById('diarioFechar');if(dx)dx.addEventListener('click',closeDiary);const dl=document.getElementById('diarioLimpar');if(dl)dl.addEventListener('click',()=>{LOG.length=0;logSave();renderDiary();});}
 const btnDiary=document.getElementById('btnDiario');if(btnDiary)btnDiary.addEventListener('click',()=>toggleDiary());
+// colisão da câmera com a própria cena (colunas, estantes, mastros, copa da árvore): o braço encurta antes de entrar em qualquer malha opaca — evita a "tela toda preta" de uma câmera dentro de um pilar
+const camRay=new THREE.Raycaster(),camOrigV=new THREE.Vector3(),camDirV=new THREE.Vector3();let camBlockers=[],camBlockScene=null,camBlockN=0;
+function camBlockList(sc){if(camBlockScene===sc&&(++camBlockN%180))return camBlockers;camBlockScene=sc;camBlockN=1;const L=[];const skip=new Set();READER.g.traverse(o=>skip.add(o));
+  sc.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||o.isSprite||skip.has(o)||!o.visible)return;const m=Array.isArray(o.material)?o.material[0]:o.material;if(!m||m.transparent||m.depthWrite===false||m.isSpriteMaterial||o.userData.fx||o.userData.noCam)return;if(!o.geometry)return;const g=o.geometry;if(!g.boundingSphere)g.computeBoundingSphere();if(!g.boundingSphere||g.boundingSphere.radius*Math.max(o.scale.x,o.scale.y,o.scale.z)<0.35)return;L.push(o);});camBlockers=L;return L;}
+function camHit(ox,oy,oz,dx,dy,dz,dist){const list=camBlockList(ACTIVE);if(!list.length)return dist;camOrigV.set(ox,oy,oz);camDirV.set(dx,dy,dz);camRay.set(camOrigV,camDirV);camRay.near=0.55;camRay.far=dist;let hits;try{hits=camRay.intersectObjects(list,false);}catch(e){return dist;}return hits.length?Math.max(0.42,hits[0].distance-0.18):dist;}
+function camClear(ox,oy,oz,yaw,pitch,dist){const cp=Math.cos(pitch);const dx=Math.sin(yaw)*cp,dy=Math.sin(pitch),dz=Math.cos(yaw)*cp;return Math.min(WORLD.camT(ox,oy,oz,dx,dy,dz,dist),camHit(ox,oy,oz,dx,dy,dz,dist));}
 function camTP(dt){
   // braço de mola: a câmera fica na direção pedida e ENCURTA quando a parede está no caminho (subindo só um pouco, para não perder o personagem); nunca atravessa a parede
   const ox=CH.x,oy=1.15+CH.fy,oz=CH.z;const dirFor=p=>{const cp=Math.cos(p);return [Math.sin(CAM.yaw)*cp,Math.sin(p),Math.cos(CAM.yaw)*cp];};
-  let [dx,dy,dz]=dirFor(CAM.pitch);let tmax=WORLD.camT(ox,oy,oz,dx,dy,dz,CAM.dist);
+  let [dx,dy,dz]=dirFor(CAM.pitch);let tmax=WORLD.camT(ox,oy,oz,dx,dy,dz,CAM.dist);tmax=Math.min(tmax,camHit(ox,oy,oz,dx,dy,dz,CAM.dist));
+  // encostada num pilar ou parede (braço < 1,9 m), a câmera gira devagar para o lado mais aberto, em vez de ficar colada no personagem
+  CAM.blocked=tmax<1.9;
+  if(CAM.blocked&&!dragging&&!locked&&MODE!=='fp'){let best=null,bs=tmax;for(const off of [0.6,-0.6,1.2,-1.2,1.8,-1.8,2.4,-2.4]){const t2=camClear(ox,oy,oz,CAM.yaw+off,CAM.pitch,CAM.dist);const sc=t2-0.35*Math.abs(off);if(t2>tmax+0.8&&sc>bs){bs=sc;best=CAM.yaw+off;}}if(best!==null){CAM.yaw=lerpAng(CAM.yaw,best,Math.min(1,dt*1.6));[dx,dy,dz]=dirFor(CAM.pitch);tmax=Math.min(WORLD.camT(ox,oy,oz,dx,dy,dz,CAM.dist),camHit(ox,oy,oz,dx,dy,dz,CAM.dist));}}
   const liftWant=0.32*(1-Math.max(0,Math.min(1,(tmax-0.6)/1.4)));camLift+=(liftWant-camLift)*Math.min(1,dt*6);
-  if(camLift>0.005){[dx,dy,dz]=dirFor(Math.min(1.4,CAM.pitch+camLift));tmax=WORLD.camT(ox,oy,oz,dx,dy,dz,CAM.dist);}
+  if(camLift>0.005){[dx,dy,dz]=dirFor(Math.min(1.4,CAM.pitch+camLift));tmax=WORLD.camT(ox,oy,oz,dx,dy,dz,CAM.dist);tmax=Math.min(tmax,camHit(ox,oy,oz,dx,dy,dz,CAM.dist));}
   const armWant=Math.max(0.42,Math.min(CAM.dist,tmax-0.1));camArm+=(armWant<camArm)?(armWant-camArm)*Math.min(1,dt*22):(armWant-camArm)*Math.min(1,dt*3.5);
   camDes.set(ox+dx*camArm,oy+dy*camArm,oz+dz*camArm);const fl=floorAt(camDes.x,camDes.z);if(camDes.y<fl+0.28)camDes.y=fl+0.28;
   lookDes.set(CH.x,1.15+CH.fy+(CH.sitting?-0.1:0),CH.z);
@@ -6677,16 +6705,17 @@ function camTP(dt){
   const d=camPos.distanceTo(lookDes);setReaderOpacity(Math.max(0,Math.min(1,(d-0.55)/0.7)));}
 
 /* ================= LAÇO ================= */
-loadEl.style.display='none';let mode0=null;try{mode0=localStorage.getItem('bibmode2');}catch(e){}if(!['gm','tp','fp'].includes(mode0))mode0='gm';MODE='gm';jump('hall',null);buildMap();initCtrl();setMode(mode0);keyHud();setTimeout(keyHint,5600);
+loadEl.style.display='none';let mode0=null;try{mode0=localStorage.getItem('bibmode2');}catch(e){}if(!['gm','tp','fp'].includes(mode0))mode0='gm';MODE='gm';for(const sc of allScenes())lightBudget(sc);jump('hall',null);buildMap();initCtrl();setMode(mode0);keyHud();setTimeout(keyHint,5600);
 let last=performance.now(),t=0,fpsAcc=0,fpsN=0,fpsChecked=false;const FIREPOS=new THREE.Vector3(FX,1.5,FZ+0.6),tmpV=new THREE.Vector3();
-function frame(now){const dt=Math.min(0.1,(now-last)/1000);last=now;tick(dt);draw(dt);if(!window.__pause)requestAnimationFrame(frame);}
+let frameErr=0;function frame(now){const dt=Math.min(0.1,(now-last)/1000);last=now;try{tick(dt);draw(dt);}catch(e){console.error(e);if(frameErr++<1)try{showToast('Erro interno: '+(e&&e.message||e)+' — o jogo continua; se a tela ficar preta, recarregue',{big:true,ms:9000});}catch(x){}}if(!window.__pause)requestAnimationFrame(frame);}
+cv.addEventListener('webglcontextlost',e=>{e.preventDefault();window.__pause=true;let n=0;try{n=+(localStorage.getItem('mundo.gpulost')||0)+1;localStorage.setItem('mundo.gpulost',String(n));localStorage.setItem('bibq2','leve');}catch(x){}try{showToast('O aparelho reiniciou a placa de vídeo (memória) — recarregando em modo Leve…',{big:true,ms:5000});}catch(x){}setTimeout(()=>location.reload(),2200);});
 function tick(dt){t+=dt;
   if(fadeOnAt&&performance.now()-fadeOnAt>2500&&fadeEl){fadeEl.classList.remove('on');fadeOnAt=0;} // segurança: a tela nunca fica presa no preto
   pollPad(dt);
   if(MODE!=='fp'){moveTP(dt);poseReader(dt);camTP(dt);}else{move(dt);const walking=Math.hypot(vx,vz);const bob=reduce?0:Math.sin(t*9)*0.025*Math.min(1,walking);camera.position.set(P.x,EYE+bob+floorAt(P.x,P.z),P.z);camera.rotation.set(P.pitch,P.yaw,0,'YXZ');}
   camera.updateMatrixWorld();
   fxCam.position.copy(camera.position);fxCam.quaternion.copy(camera.quaternion);fxCam.updateMatrixWorld();
-  updateFocus();
+  updateFocus();autoNear();
   // atravessar o vão do arco troca de cena (do Hall para a sala e da sala para o Hall)
   if(!fadeOnAt){const px=MODE==='fp'?P.x:CH.x,pz=MODE==='fp'?P.z:CH.z;
     if(CUR==='hall'){const r=Math.hypot(px,pz);if(r>HR-1.2){const a=Math.atan2(pz,px);for(const g of HALL_DOORS){if(g.userData.locked)continue;let d=a-g.userData.angle;d=Math.atan2(Math.sin(d),Math.cos(d));if(Math.abs(d)*HR<1.35){enterRoom(g.userData.genre);break;}}}}
