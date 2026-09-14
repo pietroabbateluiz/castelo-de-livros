@@ -5489,7 +5489,7 @@ function setQuality(n){if(!qb[n])n='leve';Q.name=n;const wasLite=!!Q.lite;Q.lite
   const shadowsOn=!Q.lite;if(renderer.shadowMap.enabled!==shadowsOn){renderer.shadowMap.enabled=shadowsOn;remakeMaterials();}
   renderer.outputEncoding=Q.lite?THREE.LinearEncoding:THREE.sRGBEncoding;renderer.setPixelRatio(Q.lite?1:PR);if(!Q.lite&&wasLite){composer.setPixelRatio(PR);composer.setSize(innerWidth,innerHeight);}
   if(window.__FIRE){const v=window.__FIRE.vol;v.visible=!(n==='classico'||n==='leve');const st=n==='ultra'?36:22;if(v.material.defines.STEPS!==st){v.material.defines.STEPS=st;v.material.needsUpdate=true;}}
-  sao.enabled=Q.sao;bokeh.enabled=Q.bokeh;refl.visible=Q.refl;M.floor.opacity=Q.refl?0.82:1.0;M.floor.transparent=Q.refl;M.floor.needsUpdate=true;if(window.__hrefl){window.__hrefl.visible=Q.refl;}if(window.__srefl){window.__srefl.visible=Q.refl;}if(window.__krefl){window.__krefl.visible=Q.refl;}if(window.__frefl){window.__frefl.visible=Q.refl;}if(window.__yrefl){window.__yrefl.visible=Q.refl;}if(window.__MY){window.__MY.floor.opacity=Q.refl?0.86:1.0;window.__MY.floor.transparent=Q.refl;window.__MY.floor.needsUpdate=true;}if(window.__CM){window.__CM.floor.opacity=Q.refl?0.86:1.0;window.__CM.floor.transparent=Q.refl;window.__CM.floor.needsUpdate=true;}if(window.__CATSHAFTS){const nn=n==='ultra'?4:(n==='alto'?2:1);for(const s of window.__CATSHAFTS)s.visible=s.userData.idx<nn;}if(window.__SM){window.__SM.floor.opacity=Q.refl?0.8:1.0;window.__SM.floor.transparent=Q.refl;window.__SM.floor.needsUpdate=true;}if(window.__HM){window.__HM.floor.opacity=Q.refl?0.8:1.0;window.__HM.floor.transparent=Q.refl;window.__HM.floor.needsUpdate=true;}
+  sao.enabled=Q.sao;bokeh.enabled=Q.bokeh;refl.visible=Q.refl;M.floor.opacity=Q.refl?0.82:1.0;M.floor.transparent=Q.refl;M.floor.needsUpdate=true;if(window.__hrefl){window.__hrefl.visible=Q.refl;}if(window.__srefl){window.__srefl.visible=Q.refl;}if(window.__krefl){window.__krefl.visible=Q.refl;}if(window.__frefl){window.__frefl.visible=Q.refl;}if(window.__yrefl){window.__yrefl.visible=Q.refl;}if(window.__MY){window.__MY.floor.opacity=Q.refl?0.86:1.0;window.__MY.floor.transparent=Q.refl;window.__MY.floor.needsUpdate=true;}if(window.__CM){window.__CM.floor.opacity=Q.refl?0.86:1.0;window.__CM.floor.transparent=Q.refl;window.__CM.floor.needsUpdate=true;}if(window.__CATSHAFTS){const nn=n==='ultra'?4:(n==='alto'?2:(n==='classico'?1:2));for(const s of window.__CATSHAFTS)s.visible=s.userData.idx<nn;}if(window.__SM){window.__SM.floor.opacity=Q.refl?0.8:1.0;window.__SM.floor.transparent=Q.refl;window.__SM.floor.needsUpdate=true;}if(window.__HM){window.__HM.floor.opacity=Q.refl?0.8:1.0;window.__HM.floor.transparent=Q.refl;window.__HM.floor.needsUpdate=true;}
   SLICES.forEach((s,i)=>{s.visible=i<Q.slices;s.material.uniforms.op.value=(0.055*22/Q.slices)*(1-i/Q.slices*0.85);});
   for(const k in qb)qb[k].classList.toggle('on',k===n);for(const sc of allScenes()){lightBudget(sc);sc.traverse(o=>{if(o.userData.lodPages||o.userData.lodLite)o.visible=!Q.lite;});}
   try{localStorage.setItem('bibq2',n);}catch(e){}}
@@ -5866,7 +5866,7 @@ scene.traverse(o=>{if(o.isSprite||o.isPoints||o.userData.fx)o.layers.set(1);});
 
 /* ================= MEDIDAS E AJUDANTES COMPARTILHADOS DAS SALAS (as salas em si são montadas sob demanda, mais abaixo) ================= */
 const SW=28,SD=30,SH=6.2; // deck orbital (dobrado: 28 × 30 m)
-const KW=14,KD=56,KH=21.6; // largura, comprimento (dobrado: 13 tramos), altura da nave
+const KW=20,KD=56,KH=21.6; // largura (alargada em set/2026: 14 → 20 m), comprimento (13 tramos), altura da nave
 const FR=21; // raio da clareira andável (dobrado)
 const FTZ=-23; // eixo z da Grande Árvore (a clareira cresceu; a árvore continua no fundo)
 const SEAY=-2.6,QH=2.2,FH=1.4,ZS=22.4,ZB=-24.8,ZQ=12.6,ZF=-15.2; // nível do mar · tombadilho · castelo de proa · popa · proa · anteparas (navio dobrado: 47 m)
@@ -5893,7 +5893,9 @@ function rkFire(sc,parent,x,y,z,s,col){s=s||1;const F={sp:[],em:[],smoke:[],L:nu
   const L=new THREE.PointLight(col||0xff9a40,2.2,9,2);L.position.set(x,y+0.6*s,z);parent.add(L);F.L=L;F.s=s;return F;}
 function rkFireTick(F,dt){const fl=0.85+Math.sin(t*11+F.x)*0.06+Math.sin(t*23.7)*0.05+Math.sin(t*4.3)*0.04;F.L.intensity=2.2*fl;for(const e of F.em)e.m.material.emissiveIntensity=2.0+Math.sin(t*6+e.ph)*0.8;for(const q of F.sp){q.sp.material.opacity=0.6+0.3*Math.sin(t*9+q.ph);const s=(q.ph<1?0.9:0.7)*(0.9+0.15*Math.sin(t*13+q.ph))*F.s;q.sp.scale.set(s*0.8,s*1.3,1);}
   for(const s of F.smoke){s.life+=dt*0.16;if(s.life>1)s.life-=1;const k=s.life;s.sp.position.set(F.x+Math.sin(k*9)*0.08,F.y+0.6*F.s+k*2.0,F.z+Math.cos(k*7)*0.1);const sc=(0.4+k*1.3)*F.s;s.sp.scale.set(sc,sc,1);s.sp.material.opacity=k<0.1?k*3:0.3*(1-k);}}
-function rkBookPile(sc,parent,x,y,z,n,rr){const g=new THREE.Group();g.position.set(x,y,z);parent.add(g);let yy=0;for(let i=0;i<n;i++){const h=0.035+rr()*0.03,w=0.22+rr()*0.1,d=0.16+rr()*0.06;const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color:BOOKC[(rr()*BOOKC.length)|0],roughness:0.85}));b.position.set((rr()-0.5)*0.06,yy+h/2,(rr()-0.5)*0.06);b.rotation.y=(rr()-0.5)*0.5;b.castShadow=true;g.add(b);yy+=h;}return g;}
+function rkBookPile(sc,parent,x,y,z,n,rr){const g=new THREE.Group();g.position.set(x,y,z);parent.add(g);let yy=0;
+  // pedido de 14/set: nada de livros no chão (ficam feios e atrapalham o andar) — pilhas só sobre móveis
+  { const v=new THREE.Vector3();parent.updateWorldMatrix(true,false);g.getWorldPosition(v);if(v.y<0.3){for(let i=0;i<n*7;i++)rr();return g;} }for(let i=0;i<n;i++){const h=0.035+rr()*0.03,w=0.22+rr()*0.1,d=0.16+rr()*0.06;const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color:BOOKC[(rr()*BOOKC.length)|0],roughness:0.85}));b.position.set((rr()-0.5)*0.06,yy+h/2,(rr()-0.5)*0.06);b.rotation.y=(rr()-0.5)*0.5;b.castShadow=true;g.add(b);yy+=h;}return g;}
 const NR_SPOTS={ // sala → baú [x,z,rot], atril do conto [x,z]
   vila:{chest:[-12.6,-12.0,0.8],stand:[1.6,8.6]},guerra:{chest:[-12.4,0.6,0.9],stand:[-0.4,2.6]},outono:{chest:[10.6,-8.6,-0.5],stand:[-6.6,-1.2]},quadrinhos:{chest:[12.4,-1.6,-0.9],stand:[0.6,-4.8]}};
 /* ================= SALA · FICÇÃO CIENTÍFICA (deck de observação orbital) ================= */
@@ -6302,7 +6304,7 @@ function rose(x,y,z,rotY,R,seed,parent){const p=parent||catScene;const g=new THR
   return g;}
 yield;
 {
-  const CZ=[];for(let z=-24;z<=24;z+=4)CZ.push(z);const CX=3.8,COLH=7.0,SPRING=7.6,UPTOP=15.0,VAULT=15.0,WY=5.1,WH=6.4,WW=2.4;CAT.CZ=CZ;
+  const CZ=[];for(let z=-24;z<=24;z+=4)CZ.push(z);const CX=5.4,COLH=7.0,SPRING=7.6,UPTOP=15.0,VAULT=15.0,WY=5.1,WH=6.4,WW=2.4;CAT.CZ=CZ;CAT.cx=CX; // nave central de 10,8 m entre colunas
   // ---- piso (refletor + mármore) e passadeira ----
 yield;
   const krefl=new THREE.Reflector(new THREE.PlaneGeometry(KW,KD),{clipBias:0.003,textureWidth:1024,textureHeight:1024,color:0x777777});krefl.rotation.x=-Math.PI/2;krefl.position.y=-0.003;catScene.add(krefl);
@@ -6311,7 +6313,7 @@ yield;
 yield;
   const fl=new THREE.Mesh(new THREE.PlaneGeometry(KW,KD),CM.floor);fl.rotation.x=-Math.PI/2;fl.position.y=0.004;fl.receiveShadow=true;catScene.add(fl);
 yield;
-  kbox(1.9,0.02,KD-8,CM.clothRed,0,0.012,2,null,{nocast:true});
+  kbox(2.6,0.02,KD-8,CM.clothRed,0,0.012,2,null,{nocast:true});
   // ---- paredes externas: esquerda sólida (vitrais aplicados); direita com vãos reais em ogiva para o sol entrar ----
 yield;
   kbox(0.4,KH,KD,CM.wall,-KW/2-0.2,KH/2,0,null,{nocast:true});
@@ -6354,19 +6356,19 @@ yield;
   // ---- presbitério: degraus, altar com o Grande Livro, castiçais, retábulo com arcos, balaustrada, púlpito; rosácea e lancetas ----
 yield;
   { const AZ=-KD/2;for(let s=0;s<3;s++)kbox(KW-1.2-s*0.6,0.2,5.2-s*0.7,CM.trim,0,0.1+s*0.2,AZ+2.7-s*0.35,null,{r:0.02});
-    CAT.floorY=(x,z)=>{const ax=Math.abs(x);if(z<AZ+3.9&&ax<5.8)return 0.6;if(z<AZ+4.6&&ax<6.1)return 0.4;if(z<AZ+5.3&&ax<6.4)return 0.2;return 0;};
+    CAT.floorY=(x,z)=>{const ax=Math.abs(x);if(z<AZ+3.9&&ax<KW/2-1.2)return 0.6;if(z<AZ+4.6&&ax<KW/2-0.9)return 0.4;if(z<AZ+5.3&&ax<KW/2-0.6)return 0.2;return 0;};
     kbox(3.0,1.05,1.2,CM.trim,0,0.6+1.05/2,AZ+2.2,null,{r:0.02});kbox(3.3,0.08,1.4,CM.cloth,0,1.69,AZ+2.2,null,{nocast:true});kbox(3.3,0.5,0.03,CM.cloth,0,1.42,AZ+2.91,null,{nocast:true});kbox(3.3,0.06,0.03,M.gilt,0,1.2,AZ+2.92,null,{nocast:true});
     const bk=new THREE.Group();bk.position.set(0,1.73,AZ+2.15);catScene.add(bk);CAT.book=bk;kbox(1.1,0.06,0.72,M.leather,0,0.03,0,bk,{r:0.005});for(const sx of [-1,1]){const pg=kbox(0.5,0.05,0.62,M.pages,sx*0.27,0.085,0,bk,{nocast:true});pg.rotation.z=-sx*0.06;}
     for(const sx of [-1,1])for(const dz of [-0.35,0.35]){const cs=new THREE.Mesh(new THREE.LatheGeometry([[0.14,0],[0.14,0.03],[0.05,0.06],[0.05,0.9],[0.09,0.95],[0.07,1.0]].map(p=>new THREE.Vector2(p[0],p[1])),16),M.brass);cs.position.set(sx*1.25,1.73,AZ+2.2+dz);cs.castShadow=true;catScene.add(cs);kcandle(sx*1.25,2.73,AZ+2.2+dz,0.34,0.035);}
     const AL=new THREE.PointLight(0xffb060,1.1,13,2);AL.position.set(0,3.4,AZ+3.2);catScene.add(AL);
-    kbox(7.0,4.6,0.5,CM.trim,0,0.6+2.3,AZ+0.6,null,{r:0.03});for(let k=0;k<5;k++){const x=-2.6+k*1.3;kbox(1.0,3.2,0.3,CM.dark,x,0.6+1.9,AZ+0.72,null,{nocast:true});const og=new THREE.Mesh(ogiveGeo(1.0,0,0.06),M.gilt);og.position.set(x,0.6+2.9-0.5,AZ+0.88);catScene.add(og);
+    kbox(9.6,4.6,0.5,CM.trim,0,0.6+2.3,AZ+0.6,null,{r:0.03});for(let k=0;k<7;k++){const x=-3.9+k*1.3;kbox(1.0,3.2,0.3,CM.dark,x,0.6+1.9,AZ+0.72,null,{nocast:true});const og=new THREE.Mesh(ogiveGeo(1.0,0,0.06),M.gilt);og.position.set(x,0.6+2.9-0.5,AZ+0.88);catScene.add(og);
       kbox(0.06,2.7,0.1,M.gilt,x-0.5,0.6+1.75,AZ+0.9,null,{nocast:true});kbox(0.06,2.7,0.1,M.gilt,x+0.5,0.6+1.75,AZ+0.9,null,{nocast:true});
       const st=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.2,0.3,12),M.gilt);st.position.set(x,0.6+0.55,AZ+0.85);catScene.add(st);kcandle(x,0.6+0.7,AZ+0.85,0.3,0.03);}
-    for(let k=0;k<7;k++){const x=-3.3+k*1.1;const pin=new THREE.Mesh(new THREE.ConeGeometry(0.16,0.7,8),M.gilt);pin.position.set(x,0.6+4.6+0.35,AZ+0.6);catScene.add(pin);}
+    for(let k=0;k<9;k++){const x=-4.4+k*1.1;const pin=new THREE.Mesh(new THREE.ConeGeometry(0.16,0.7,8),M.gilt);pin.position.set(x,0.6+4.6+0.35,AZ+0.6);catScene.add(pin);}
     const RL=new THREE.PointLight(0xffc890,0.8,9,2);RL.position.set(0,3.5,AZ+1.6);catScene.add(RL);
-    for(const sx of [-1,1]){kbox(4.2,0.08,0.12,M.shelf,sx*3.6,1.0,AZ+5.6,null,{nocast:true});for(let k=0;k<9;k++){const b=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.05,0.9,8),M.shelf);b.position.set(sx*(1.6+k*0.5),0.55,AZ+5.6);catScene.add(b);}}
+    for(const sx of [-1,1]){kbox(7.2,0.08,0.12,M.shelf,sx*5.1,1.0,AZ+5.6,null,{nocast:true});for(let k=0;k<15;k++){const b=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.05,0.9,8),M.shelf);b.position.set(sx*(1.6+k*0.5),0.55,AZ+5.6);catScene.add(b);}}
     const pulp=new THREE.Group();pulp.position.set(CX-1.0,0,AZ+7.2);catScene.add(pulp);const pb=new THREE.Mesh(new THREE.CylinderGeometry(0.45,0.3,1.4,10),M.shelf);pb.position.y=0.7;pb.castShadow=true;pulp.add(pb);kbox(1.2,0.9,1.2,M.shelf,0,1.85,0,pulp,{r:0.03});kbox(0.7,0.06,0.5,M.shelf,0,2.35,-0.5,pulp);
-    rose(0,16.2,AZ+0.25,0,3.1,5);for(const sx of [-1,1])lancet(sx*4.6,WY+0.4,AZ+0.22,0,WW,WH,sx>0?1:3);
+    rose(0,16.2,AZ+0.25,0,3.1,5);for(const sx of [-1,1])for(const lx of [4.6,7.3])lancet(sx*lx,WY+0.4,AZ+0.22,0,WW,WH,sx>0?1:3);
     const GL=new THREE.PointLight(0xb8a0ff,0.7,16,2);GL.position.set(0,13,AZ+4);catScene.add(GL); }
   // ---- entrada: portal com duas folhas, tímpano de vitral, rosácea e lancetas ----
 yield;
@@ -6374,17 +6376,17 @@ yield;
     { const pq=portalQuad(rectShape(2.8,4.5));pq.position.set(0,0,0);pq.rotation.y=Math.PI;dg.add(pq);CAT.pq=pq; }
     for(const sx of [-1,1])kbox(0.5,5.0,0.7,CM.trim,sx*1.65,2.5,0,dg,{r:0.04});const og=new THREE.Mesh(ogiveGeo(3.3,4.6,0.24),CM.trim);og.position.set(0,0,-0.1);dg.add(og);const og2=new THREE.Mesh(ogiveGeo(3.9,4.6,0.16),CM.column);og2.position.set(0,0,-0.15);dg.add(og2);
     const tp=new THREE.Mesh(new THREE.CircleGeometry(1.45,32,0,Math.PI),glassMat(tympTex(30)));tp.position.set(0,4.65,-0.02);tp.rotation.y=Math.PI;tp.userData.fx=true;dg.add(tp);CAT.glow.push(tp);
-    rose(0,15.0,EZ-0.22,Math.PI,2.5,9);for(const sx of [-1,1])lancet(sx*4.6,WY+0.4,EZ-0.22,Math.PI,WW,WH,sx>0?2:0);
+    rose(0,15.0,EZ-0.22,Math.PI,2.5,9);for(const sx of [-1,1])for(const lx of [4.6,7.3])lancet(sx*lx,WY+0.4,EZ-0.22,Math.PI,WW,WH,sx>0?2:0);
     const EL=new THREE.PointLight(0xffb060,0.6,8,2);EL.position.set(0,4.5,EZ-2);catScene.add(EL);for(const sx of [-1,1])kcandle(sx*2.1,3.4,EZ-0.7,0.26,0.03); }
   // ---- bancos (o leitor senta no primeiro banco à direita) ----
 yield;
   { const rows=[];for(let z=1.2;z<=8.5;z+=1.75)rows.push(z);
-    for(const sx of [-1,1]){const mb=mboxes(),mv=mboxes();for(const z of rows){const x=sx*2.25;mb.add(2.6,0.07,0.42,x,0.46,z);mb.add(2.6,0.55,0.06,x,0.78,z+0.22);mb.add(2.6,0.05,0.12,x,1.06,z+0.24);for(const ex of [-1.27,1.27])mb.add(0.06,0.95,0.46,x+ex,0.5,z+0.02);mb.add(2.4,0.05,0.3,x,0.12,z-0.45);mv.add(2.4,0.04,0.12,x,0.155,z-0.45);}
+    for(const sx of [-1,1]){const mb=mboxes(),mv=mboxes();for(const z of rows){const x=sx*2.95;mb.add(3.2,0.07,0.42,x,0.46,z);mb.add(3.2,0.55,0.06,x,0.78,z+0.22);mb.add(3.2,0.05,0.12,x,1.06,z+0.24);for(const ex of [-1.57,1.57])mb.add(0.06,0.95,0.46,x+ex,0.5,z+0.02);mb.add(3.0,0.05,0.3,x,0.12,z-0.45);mv.add(3.0,0.04,0.12,x,0.155,z-0.45);}
       const pm=mb.mesh(M.shelf,catScene);const vm=mv.mesh(M.velvet,catScene,{nocast:true});CAT.chairMeshes.push(pm,vm);}
-    CAT.chair={x:1.35,z:1.2,fx:0,fz:-1};CAT.rows=rows;
+    CAT.chair={x:1.8,z:1.2,fx:0,fz:-1};CAT.rows=rows;
     // fileiras extras (nave dobrada): uma malha por lado
     const extraRows=[];for(let z=-16;z<=-2;z+=1.75)extraRows.push(z);for(let z=10.25;z<=17.5;z+=1.75)extraRows.push(z);CAT.extraRows=extraRows;
-    for(const sx of [-1,1]){const mb=mboxes(),mv=mboxes();for(const z of extraRows){const x=sx*2.25;mb.add(2.6,0.07,0.42,x,0.46,z);mb.add(2.6,0.55,0.06,x,0.78,z+0.22);mb.add(2.6,0.05,0.12,x,1.06,z+0.24);for(const ex of [-1.27,1.27])mb.add(0.06,0.95,0.46,x+ex,0.5,z+0.02);mb.add(2.4,0.05,0.3,x,0.12,z-0.45);mv.add(2.4,0.04,0.12,x,0.155,z-0.45);}
+    for(const sx of [-1,1]){const mb=mboxes(),mv=mboxes();for(const z of extraRows){const x=sx*2.95;mb.add(3.2,0.07,0.42,x,0.46,z);mb.add(3.2,0.55,0.06,x,0.78,z+0.22);mb.add(3.2,0.05,0.12,x,1.06,z+0.24);for(const ex of [-1.57,1.57])mb.add(0.06,0.95,0.46,x+ex,0.5,z+0.02);mb.add(3.0,0.05,0.3,x,0.12,z-0.45);mv.add(3.0,0.04,0.12,x,0.155,z-0.45);}
       mb.mesh(M.shelf,catScene);mv.mesh(M.velvet,catScene,{nocast:true});} }
   // ---- capela dos livros (nave esquerda): Minha Estante, mesa de leitura, estandartes nas arcadas ----
 yield;
@@ -6393,9 +6395,9 @@ yield;
     const pl=new THREE.Mesh(new THREE.BoxGeometry(1.7,0.3,0.05),[M.shelf,M.shelf,M.shelf,M.shelf,new THREE.MeshStandardMaterial({map:new THREE.CanvasTexture(c),roughness:0.7}),M.shelf]);pl.position.set(0,y6+0.2,CAT.shelf.depth/2+0.05);CAT.shelf.g.add(pl);
     kcandle(CAT.shelf.x0+0.35,y6+0.02,CAT.shelf.depth/2+0.06,0.24,0.03,CAT.shelf.g);kcandle(CAT.shelf.x1-0.35,y6+0.02,CAT.shelf.depth/2+0.06,0.24,0.03,CAT.shelf.g);
     const SL=new THREE.PointLight(0xffb060,0.8,6,2);SL.position.set(-KW/2+1.4,3.0,2.0);catScene.add(SL);
-    const tg=new THREE.Group();tg.position.set(-5.4,0,-2.6);catScene.add(tg);CAT.tableG=tg;kbox(1.5,0.06,0.9,M.shelf,0,0.78,0,tg,{r:0.01});for(const [x,z] of [[-0.65,-0.35],[0.65,-0.35],[-0.65,0.35],[0.65,0.35]]){const l=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.05,0.76,8),M.shelf);l.position.set(x,0.38,z);tg.add(l);}
+    const tg=new THREE.Group();tg.position.set(-KW/2+1.6,0,-2.6);catScene.add(tg);CAT.tableG=tg;kbox(1.5,0.06,0.9,M.shelf,0,0.78,0,tg,{r:0.01});for(const [x,z] of [[-0.65,-0.35],[0.65,-0.35],[-0.65,0.35],[0.65,0.35]]){const l=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.05,0.76,8),M.shelf);l.position.set(x,0.38,z);tg.add(l);}
     kbox(1.5,0.05,0.1,M.shelf,0,0.4,0.4,tg,{nocast:true});kcandle(0.55,0.81,0.25,0.22,0.025,tg);const TL=new THREE.PointLight(0xffb060,0.5,4,2);TL.position.set(0,1.5,0);tg.add(TL);
-    CAT.tableAt={x:-5.4,z:-2.6};
+    CAT.tableAt={x:-KW/2+1.6,z:-2.6};
     let k=0;const BANM=[0,1,2,3].map(i=>new THREE.MeshStandardMaterial({map:bannerTex(i),roughness:1,side:THREE.DoubleSide,normalMap:KNIT.normalMap,normalScale:new THREE.Vector2(0.3,0.3)}));for(const sx of [-1,1])for(const z of [-22,-18,-14,-10,-6,-2,2,6,10,14,18,22]){const b=new THREE.Mesh(new THREE.PlaneGeometry(1.1,2.2),BANM[k%4]);b.position.set(sx*(CX-0.6),SPRING-1.4,z);b.rotation.y=Math.PI/2;b.castShadow=true;catScene.add(b);CAT.banners.push({m:b,ph:k*1.3});
       const rod=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,1.3,6),M.iron);rod.rotation.x=Math.PI/2;rod.position.set(sx*(CX-0.6),SPRING-0.25,z);catScene.add(rod);k++;} }
   // ---- luz: sol pela nave direita (com sombras das colunas), feixes volumétricos e o vitral projetado no piso ----
@@ -6424,11 +6426,11 @@ function bookPile(x,y,z,n,rot,sc,open){const g=new THREE.Group();g.position.set(
 yield;
 { const AZ=-KD/2;let k=0;const piles=[[-3.0,0,-8.0,5,1],[3.1,0,-7.4,4,0],[-3.1,0,-3.2,6,1],[3.1,0,-0.9,3,0],[-3.1,0,4.9,5,0],[3.1,0,8.9,7,1],[-3.0,0,9.1,4,0],[2.4,0.6,AZ+3.2,6,1],[-2.6,0.6,AZ+3.3,4,0],[4.6,0.2,AZ+5.0,5,0],[-4.8,0.2,AZ+4.9,3,1],[-4.3,0,-1.5,6,0],[-6.1,0,-4.0,8,1],[-5.9,0,5.6,5,0],[2.9,0,-6.6,3,0],[2.6,0,12.4,5,1],[-2.7,0,12.3,4,0],[-1.1,0,-8.2,3,0],[-3.1,0,-16.9,5,1],[3.1,0,-19.2,4,0],[-3.0,0,-23.1,6,0],[3.1,0,16.9,3,1],[-3.1,0,20.8,5,0],[3.0,0,24.6,4,1],[-6.0,0,-12.2,7,1],[6.1,0,14.0,4,0],[-6.1,0,18.5,5,1],[6.0,0,-20.4,3,0]];
 yield;
-  for(const [x,y,z,n,op] of piles){bookPile(x,y,z,n,(k*1.7)%6.28,catScene,!!op);k++;}
+  for(const [x,y,z,n,op] of piles){k++;if(y===0)continue; /* pilhas no chão retiradas (14/set) */bookPile(x,y,z,n,((k-1)*1.7)%6.28,catScene,!!op);}
 yield;
   bookPile(3.3,0.5,1.2,2,0.3,catScene,true);bookPile(-3.1,0.5,2.95,3,-0.2,catScene,false); // sobre bancos
   bookPile(2.8,2.38,AZ+7.2-0.5,2,0.2,catScene,true); // púlpito
-  CAT.pileObst=piles.filter(p=>p[1]===0).map(p=>[p[0],p[2],0.32]); }
+  CAT.pileObst=[]; }
 // ---- nave dobrada: labirinto no piso, coroas de velas, capelas laterais, pia batismal, confessionários ----
 yield;
 const CAT_NEW_OBST=[];
@@ -6458,9 +6460,9 @@ yield;
     const L=new THREE.PointLight(0xffb060,0.7,6,2);L.position.set(-0.8,2.0,0);g.add(L);CAT_NEW_OBST.push([KW/2-1.1,z,1.1]);}}
 yield;
 { // pia batismal (perto da entrada, nave esquerda)
-  const font=new THREE.Mesh(new THREE.LatheGeometry([[0.5,0],[0.5,0.1],[0.22,0.16],[0.22,0.8],[0.62,0.95],[0.66,1.08],[0.58,1.1],[0.5,1.0]].map(p=>new THREE.Vector2(p[0],p[1])),20),CM.trim);font.position.set(-5.2,0,KD/2-6.5);font.castShadow=true;font.receiveShadow=true;catScene.add(font);
+  const font=new THREE.Mesh(new THREE.LatheGeometry([[0.5,0],[0.5,0.1],[0.22,0.16],[0.22,0.8],[0.62,0.95],[0.66,1.08],[0.58,1.1],[0.5,1.0]].map(p=>new THREE.Vector2(p[0],p[1])),20),CM.trim);font.position.set(-KW/2+1.8,0,KD/2-6.5);font.castShadow=true;font.receiveShadow=true;catScene.add(font);
 yield;
-  const water=new THREE.Mesh(new THREE.CircleGeometry(0.48,24),new THREE.MeshStandardMaterial({color:0x2a4a6a,roughness:0.05,metalness:0.3}));water.rotation.x=-Math.PI/2;water.position.set(-5.2,1.0,KD/2-6.5);catScene.add(water);CAT_NEW_OBST.push([-5.2,KD/2-6.5,0.8]);}
+  const water=new THREE.Mesh(new THREE.CircleGeometry(0.48,24),new THREE.MeshStandardMaterial({color:0x2a4a6a,roughness:0.05,metalness:0.3}));water.rotation.x=-Math.PI/2;water.position.set(-KW/2+1.8,1.0,KD/2-6.5);catScene.add(water);CAT_NEW_OBST.push([-KW/2+1.8,KD/2-6.5,0.8]);}
 yield;
 { // confessionários (nave esquerda, z = ±20)
   for(const z of [-20,20]){const mb=mboxes();const x=-KW/2+0.9;mb.add(1.7,2.6,0.9,x,1.3,z);mb.add(1.9,0.25,1.1,x,2.72,z);for(const dz of [-0.85,0.85])mb.add(0.6,2.0,0.06,x+0.45,1.0,z+dz);mb.mesh(M.shelf,catScene);
@@ -6473,9 +6475,9 @@ yield;
 function catTick(dt){for(const s of CAT.shafts)s.material.uniforms.t.value+=dt;for(const b of CAT.banners)b.m.rotation.x=Math.sin(t*0.6+b.ph)*0.04;}
 
 yield;
-const CAT_OBST=(()=>{const o=[];for(const sx of [-1,1])for(const z of CAT.CZ)o.push([sx*3.8,z,0.8]);for(const sx of [-1,1])for(const z of CAT.rows.concat(CAT.extraRows)){o.push([sx*1.6,z,0.75]);o.push([sx*2.9,z,0.75]);}o.push([0,-KD/2+2.2,1.3]);for(let x=-6.6;x<=6.6;x+=1.1)o.push([x,-KD/2+5.45,0.75]);for(const q of CAT.pileObst)o.push(q);o.push([2.8,-KD/2+7.2,0.9],[-5.4,-2.6,1.0],[-6.6,0,0.8],[-6.6,2,0.8],[-6.6,4,0.8],[0,KD/2,1.2],[5.6,-3.0,0.6]);for(const q of CAT_NEW_OBST)o.push(q);return o;})();
+const CAT_OBST=(()=>{const o=[];for(const sx of [-1,1])for(const z of CAT.CZ)o.push([sx*CAT.cx,z,0.8]);for(const sx of [-1,1])for(const z of CAT.rows.concat(CAT.extraRows)){o.push([sx*1.9,z,0.75]);o.push([sx*3.0,z,0.75]);o.push([sx*4.1,z,0.75]);}o.push([0,-KD/2+2.2,1.3]);for(let x=-9.9;x<=9.9;x+=1.1)o.push([x,-KD/2+5.45,0.75]);for(const q of CAT.pileObst)o.push(q);o.push([CAT.cx-1.0,-KD/2+7.2,0.9],[-KW/2+1.6,-2.6,1.0],[-KW/2+0.4,0,0.8],[-KW/2+0.4,2,0.8],[-KW/2+0.4,4,0.8],[0,KD/2,1.2],[KW/2-1.4,-3.0,0.6]);for(const q of CAT_NEW_OBST)o.push(q);return o;})();
 yield;
-ROOMS.cat={scene:catScene,world:boxWorld(KW,KD,KH,CAT_OBST),spawn:{x:0,z:KD/2-4.2,dir:Math.PI},chair:CAT.chair,chairMeshes:CAT.chairMeshes,door:CAT.doorG,portalQuad:CAT.pq,doorFront:[0,KD/2-1.6],seat:'num banco',altarBook:CAT.book,altarAt:[0,-KD/2+6.9],altarLook:[0,-KD/2],shelf:CAT.shelf,tableG:CAT.tableG,tableAt:CAT.tableAt,books:CAT.books,placeTable:placeTableCat,tick:catTick,myGroup:null,tableBooks:null};
+ROOMS.cat={czs:CAT.CZ,cx:CAT.cx,scene:catScene,world:boxWorld(KW,KD,KH,CAT_OBST),spawn:{x:0,z:KD/2-4.2,dir:Math.PI},chair:CAT.chair,chairMeshes:CAT.chairMeshes,door:CAT.doorG,portalQuad:CAT.pq,doorFront:[0,KD/2-1.6],seat:'num banco',altarBook:CAT.book,altarAt:[0,-KD/2+6.9],altarLook:[0,-KD/2],shelf:CAT.shelf,tableG:CAT.tableG,tableAt:CAT.tableAt,books:CAT.books,placeTable:placeTableCat,tick:catTick,myGroup:null,tableBooks:null};
 }
 /* ================= SALA · FANTASIA (clareira encantada: a Grande Árvore, três luas, fada e vaga-lumes) ================= */
 function* build_fant(){
@@ -7107,7 +7109,7 @@ const ADV_WORLD={ext:ZS+1,clamp:(x,z,m)=>{const zc=Math.max(ZF+0.8,Math.min(ZS-1
     if(dy<-1e-6)t=Math.min(t,(0.35-oy)/dy);
     const Rc=52;const a=dx*dx+dz*dz+dy*dy,b=2*(ox*dx+oz*dz+(oy-SEAY)*dy),c=ox*ox+oz*oz+(oy-SEAY)*(oy-SEAY)-Rc*Rc;const disc=b*b-4*a*c;if(disc>0){const tt=(-b+Math.sqrt(disc))/(2*a);if(tt>0)t=Math.min(t,tt);}return t;}};
 yield;
-ROOMS.adv={scene:advScene,exposure:1.0,world:ADV_WORLD,spawn:{x:-1.1,z:ZQ-2.8,dir:Math.PI},chair:ADV.chair,chairMeshes:ADV.chairMeshes,door:ADV.doorG,portalQuad:ADV.pq,doorFront:[-1.1,ZQ-1.3],seat:'na poltrona do capitão',altarBook:ADV.chest,altarAt:[-4.15,1.95],altarLook:[-5.2,1.2],altarLabel:'O Diário de Bordo · abrir a Estante',floorY:ADV.floorY,route:ADV.route,shelf:ADV.shelf,tableG:ADV.tableG,tableAt:ADV.tableAt,books:ADV.books,placeTable:placeTableAdv,tick:advTick,myGroup:null,tableBooks:null};
+ROOMS.adv={lamps:ADV.lamps,canvasMat:AM.canvas,scene:advScene,exposure:1.0,world:ADV_WORLD,spawn:{x:-1.1,z:ZQ-2.8,dir:Math.PI},chair:ADV.chair,chairMeshes:ADV.chairMeshes,door:ADV.doorG,portalQuad:ADV.pq,doorFront:[-1.1,ZQ-1.3],seat:'na poltrona do capitão',altarBook:ADV.chest,altarAt:[-4.15,1.95],altarLook:[-5.2,1.2],altarLabel:'O Diário de Bordo · abrir a Estante',floorY:ADV.floorY,route:ADV.route,shelf:ADV.shelf,tableG:ADV.tableG,tableAt:ADV.tableAt,books:ADV.books,placeTable:placeTableAdv,tick:advTick,myGroup:null,tableBooks:null};
 }
 /* ================= SEGUNDO ANDAR · cinco salas reaproveitadas (Mistério à mão; Romance, Distopia, Paranormal e Quadrinhos pelo kit) ================= */
 /* ================= SALA · MISTÉRIO E INVESTIGAÇÃO (escritório de detetive numa noite de chuva: persianas, neon, quadro de pistas) ================= */
@@ -8330,7 +8332,7 @@ window.__portais={lista:PORTALS,render:renderPortals,miudos:()=>[miudosN,mediosN
 /* ================= MOEDAS (nascem todo dia pelo mundo; a carteira fica salva e vai servir para a loja) ================= */
 const COIN_KEY='mundo.moedas.v1',COIN_VER=3;const COINS={saldo:0,total:0,dia:'',ver:0,coletadas:{},sets:{},scene:null,active:[],anim:[],lastCheck:0,doneToast:{}};
 const COIN_N={hall:12,hall2:12,lib:16,cat:18,sci:16,fant:20,adv:16,mys:16,vila:16,guerra:16,outono:16,quadrinhos:16};
-const COIN_NOSPAWN={hall:(x,z)=>{const r=Math.hypot(x,z);return r>HR-1.45||r<2.1;},hall2:(x,z)=>{const r=Math.hypot(x,z);return r>HR-1.45||r<2.1;},cat:(x,z)=>z<-KD/2+5.8||Math.abs(x)>6.0,fant:(x,z)=>Math.hypot(x,z-FTZ)<6.8||Math.hypot(x-5.4,z-2.2)<4.3,adv:(x,z)=>(z>ZQ-0.8&&z<ZQ+0.1),guerra:(x,z)=>(x<-3.3&&z>2.2)};
+const COIN_NOSPAWN={hall:(x,z)=>{const r=Math.hypot(x,z);return r>HR-1.45||r<2.1;},hall2:(x,z)=>{const r=Math.hypot(x,z);return r>HR-1.45||r<2.1;},cat:(x,z)=>z<-KD/2+5.8||Math.abs(x)>KW/2-1.0,fant:(x,z)=>Math.hypot(x,z-FTZ)<6.8||Math.hypot(x-5.4,z-2.2)<4.3,adv:(x,z)=>(z>ZQ-0.8&&z<ZQ+0.1),guerra:(x,z)=>(x<-3.3&&z>2.2)};
 function coinLoad(){try{const d=JSON.parse(localStorage.getItem(COIN_KEY)||'null');if(d){COINS.saldo=d.saldo|0;COINS.total=d.total|0;COINS.dia=d.dia||'';COINS.ver=d.ver|0;COINS.coletadas=d.coletadas||{};}}catch(e){}}
 function coinSave(){try{localStorage.setItem(COIN_KEY,JSON.stringify({saldo:COINS.saldo,total:COINS.total,dia:COINS.dia,ver:COIN_VER,coletadas:COINS.coletadas}));}catch(e){}}
 function dayKey(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -8376,7 +8378,7 @@ const KEY_STORE='mundo.chaves.v1',KEY_VER=5;const KEYS={tem:{},baus:{},ver:0,ite
 // gênero da chave → [cena onde está escondida, x, y, z]: uma caça em cadeia (a do Hall abre o baú de Fantasia, que esconde a chave de Terror, e assim por diante)
 // a chave do Hall fica no chão, diante do arco da sala cujo baú ela abre (pedido de 14/set: não mais debaixo do Livro dos Contos) — a mesma cor do vitral do arco
 function hallKeySpot(n,genre){const keys=n===1?GEN_KEYS:GEN_KEYS2;const i=Math.max(0,keys.indexOf(genre));const th=i/keys.length*Math.PI*2,r=HR-2.7;return [Math.cos(th)*r,1.0,Math.sin(th)*r];}
-const KEY_SPOTS={castelo:['hall',...hallKeySpot(1,'castelo')],charneca:['fant',-0.35,3.98,FTZ+4.5],catedral:['lib',3.3,1.2,-0.4],mesa:['cat',2.8,2.6,-7.1],navegacoes:['sci',5.8,1.15,1.0],ilha:['hall2',...hallKeySpot(2,'ilha')],vila:['mys',-3.95,1.55,-14.1],guerra:['vila',2.4,1.2,-12.85],outono:['guerra',12.55,1.15,8.6],quadrinhos:['outono',-3.8,1.0,-4.6]}; // cadeia: atril do Hall → Fantasia → Terror → Histórica → Ficção científica → Aventura
+const KEY_SPOTS={castelo:['hall',...hallKeySpot(1,'castelo')],charneca:['fant',-0.35,3.98,FTZ+4.5],catedral:['lib',3.3,1.2,-0.4],mesa:['cat',4.4,2.6,-7.1],navegacoes:['sci',5.8,1.15,1.0],ilha:['hall2',...hallKeySpot(2,'ilha')],vila:['mys',-3.95,1.55,-14.1],guerra:['vila',2.4,1.2,-12.85],outono:['guerra',12.55,1.15,8.6],quadrinhos:['outono',-3.8,1.0,-4.6]}; // cadeia: atril do Hall → Fantasia → Terror → Histórica → Ficção científica → Aventura
 function keyLoad(){try{const d=JSON.parse(localStorage.getItem(KEY_STORE)||'null');if(d&&d.tem){KEYS.tem=d.tem;KEYS.baus=d.baus||{};KEYS.ver=d.ver|0;}}catch(e){}}
 function keySave(){try{localStorage.setItem(KEY_STORE,JSON.stringify({tem:KEYS.tem,baus:KEYS.baus,ver:KEY_VER}));}catch(e){}}
 function hasKey(genre){return !!KEYS.tem[genre];}
@@ -8407,7 +8409,7 @@ function keyHint(){showToast(nextStep(),{queue:true,big:true});}
 if(keyBtn)keyBtn.addEventListener('click',()=>{const built=Object.keys(GENRE_ROOM);const tem=built.filter(k=>hasKey(k)&&!KEYS.baus[k]).map(k=>corNome(k)),nb=built.filter(k=>KEYS.baus[k]).length;showToast((tem.length?'Chaves na mão: '+tem.join(', '):'Nenhuma chave na mão')+' · baús abertos: '+nb+' de '+built.length+' · cada chave abre o baú da mesma cor');});
 window.__chaves={tem:KEYS.tem,dar:g=>keyGrant(g,'achada'),estado:KEYS,items:KEYS.items,baus:KEYS.baus,spots:KEY_SPOTS};
 /* ================= BAÚS TRANCADOS (um por sala; a chave do gênero abre o dele: +25 moedas e uma relíquia) ================= */
-const CHEST_SPOTS=Object.assign({lib:[4.0,4.8,-2.45],cat:[5.6,-3.0,-1.57],sci:[2.6,-5.8,-0.42],adv:[3.0,-11.8,-0.25]},Object.fromEntries(Object.keys(NR_SPOTS).map(k=>[k,NR_SPOTS[k].chest]))); // sala → [x,z,rotação]; Mistério usa o cofre do escritório
+const CHEST_SPOTS=Object.assign({lib:[4.0,4.8,-2.45],cat:[KW/2-1.4,-3.0,-1.57],sci:[2.6,-5.8,-0.42],adv:[3.0,-11.8,-0.25]},Object.fromEntries(Object.keys(NR_SPOTS).map(k=>[k,NR_SPOTS[k].chest]))); // sala → [x,z,rotação]; Mistério usa o cofre do escritório
 const CHEST_NAME={fant:'Baú do Castelo',lib:'Baú da Biblioteca Gótica',cat:'Arca da Catedral',sci:'Cápsula Selada',adv:'Cofre do Capitão',mys:'Cofre do Detetive',vila:'Baú das Cartas',guerra:'Cofre do Bunker',outono:'Baú do Sótão',quadrinhos:'Baú do Estúdio'};const chestNm=room=>((room==='cat'||room==='sci')?'a ':'o ')+CHEST_NAME[room]; // com artigo (Arca e Cápsula são femininos)
 const CHEST_RELIC={castelo:'Cristal do Castelo',charneca:'Vela Negra',catedral:'Pergaminho Iluminado',mesa:'Fragmento de Meteorito',navegacoes:'Bússola de Bronze',ilha:'Lupa do Detetive',vila:'Carta Lacrada',guerra:'Página Censurada',outono:'Bola de Cristal',quadrinhos:'Página Original'};
 function relicGoal(){return Object.keys(GENRE_ROOM).length;}
@@ -8579,7 +8581,7 @@ const nivelNEl=document.getElementById('nivelN'),nivelTEl=document.getElementByI
 function nivelHud(){const n=nivelAtual();if(nivelNEl)nivelNEl.textContent='Nível '+n;if(nivelTEl)nivelTEl.textContent=nivelNome(n);}
 function palavras(txt){return (txt.match(/\S+/g)||[]).length;}
 // ---- atris: um por sala, virados para a entrada ----
-const CONTO_SPOTS=Object.assign({lib:[-0.9,3.6],cat:[3.1,10.2],fant:[1.8,5.6],sci:[-0.9,3.5],adv:[2.8,2.4],mys:[0.6,1.6]},Object.fromEntries(Object.keys(NR_SPOTS).map(k=>[k,NR_SPOTS[k].stand])));
+const CONTO_SPOTS=Object.assign({lib:[-0.9,3.6],cat:[7.4,10.2],fant:[1.8,5.6],sci:[-0.9,3.5],adv:[2.8,2.4],mys:[0.6,1.6]},Object.fromEntries(Object.keys(NR_SPOTS).map(k=>[k,NR_SPOTS[k].stand])));
 const STANDS={};
 function storyStand(hue){const g=new THREE.Group();const col=new THREE.Color().setHSL(hue/360,0.8,0.55);
   // livro aberto flutuando na altura do peito (sem pedestal nem obstáculo): fácil de ver, de clicar e de contornar
@@ -9000,6 +9002,57 @@ function camTP(dt){
   const k=MODE==='gm'?1:(1-Math.exp(-dt*7)),kl=1-Math.exp(-dt*(MODE==='gm'?22:7));camPos.lerp(camDes,k);camLook.lerp(lookDes,kl);camera.position.copy(camPos);camera.lookAt(camLook);
   const d=camPos.distanceTo(lookDes);setReaderOpacity(Math.max(0,Math.min(1,(d-0.55)/0.7)));}
 
+/* ================= ACABAMENTO DAS SALAS (v42i): poeira no ar, brilhos que tremulam e vinhetas de entrada ================= */
+// Tudo barato de propósito: nenhuma luz nova (o orçamento do Leve é fixo), materiais com os mesmos programas já compilados,
+// um desenho só por conjunto de brilhos (THREE.Points) e obstáculos registrados no mundo da sala para a navegação continuar certa.
+const POLISH_TICKS=[];
+function polishTick(dt){for(let i=0;i<POLISH_TICKS.length;i++){const p=POLISH_TICKS[i];if(p.sc===ACTIVE){try{p.fn(dt);}catch(e){}}}}
+// poeira/pólen flutuando devagar numa caixa
+function rkDust(sc,o){const n=o.n||400,r=rnd(o.seed||7);const p=new Float32Array(n*3),ph=new Float32Array(n);for(let i=0;i<n;i++){p[i*3]=o.x0+r()*(o.x1-o.x0);p[i*3+1]=o.y0+r()*(o.y1-o.y0);p[i*3+2]=o.z0+r()*(o.z1-o.z0);ph[i]=r()*6.283;}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(p,3));const m=new THREE.Points(g,new THREE.PointsMaterial({map:GLOW,color:o.color||0xffe0b8,size:o.size||0.07,transparent:true,opacity:o.opacity||0.3,blending:THREE.AdditiveBlending,depthWrite:false}));m.userData.fx=true;m.layers.set(1);sc.add(m);
+  const sp=o.speed||0.05;POLISH_TICKS.push({sc,fn:(dt)=>{const a=g.attributes.position.array;for(let i=0;i<n;i++){a[i*3+1]+=(0.35+Math.sin(t*0.7+ph[i]))*dt*sp;a[i*3]+=Math.cos(t*0.45+ph[i])*dt*sp*0.7;if(a[i*3+1]>o.y1)a[i*3+1]=o.y0;else if(a[i*3+1]<o.y0)a[i*3+1]=o.y1;if(a[i*3]>o.x1)a[i*3]=o.x0;else if(a[i*3]<o.x0)a[i*3]=o.x1;}g.attributes.position.needsUpdate=true;}});return m;}
+// vários brilhos (velas, lâmpadas, luzinhas) num desenho só
+function rkGlowPts(sc,pts,color,size,opacity){const p=new Float32Array(pts.length*3);pts.forEach((q,i)=>{p[i*3]=q[0];p[i*3+1]=q[1];p[i*3+2]=q[2];});const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(p,3));
+  const m=new THREE.Points(g,new THREE.PointsMaterial({map:GLOW,color,size,transparent:true,opacity,blending:THREE.AdditiveBlending,depthWrite:false}));m.userData.fx=true;m.layers.set(1);sc.add(m);return m;}
+function rkFlicker(sc,m,base,amp,speed){POLISH_TICKS.push({sc,fn:()=>{m.material.opacity=base+amp*(0.5+0.35*Math.sin(t*speed)+0.25*Math.sin(t*speed*2.7+1.3)+0.15*Math.sin(t*speed*6.1));}});}
+function inScene(o,sc){while(o){if(o===sc)return true;o=o.parent;}return false;}
+function worldPts(list,dy){const out=[];for(const o of list){const obj=o&&(o.isObject3D?o:(o.g||o.m||o.mesh));if(!obj||!obj.getWorldPosition)continue;const v=new THREE.Vector3();obj.getWorldPosition(v);out.push([v.x,v.y+(dy||0),v.z]);}return out;}
+const POLISH={
+  lib(R){const sc=R.scene;rkDust(sc,{x0:-12,x1:12,z0:-13,z1:13,y0:0.6,y1:6.5,n:520,color:0xffd2a0,size:0.07,opacity:0.32,seed:11});
+    const g=rkGlowPts(sc,[[-5.6,2.75,14.55],[0.5,2.75,14.55]],0xffb060,1.5,0.5);rkFlicker(sc,g,0.4,0.18,7.3); // arandelas junto da porta
+    const p2=worldPts(CANDLEF.map(c=>c.sp).filter(sp=>inScene(sp,sc)),0.05);if(p2.length){const g2=rkGlowPts(sc,p2.slice(0,60),0xffc070,0.75,0.4);rkFlicker(sc,g2,0.32,0.16,9.1);}},
+  cat(R){const sc=R.scene;sc.userData.liteHemi=1.75;
+    const pts=[];for(const sx of [-1,1])for(const z of (R.czs||[]))pts.push([sx*((R.cx||3.8)-0.55),3.5,z]);const g=rkGlowPts(sc,pts,0xffb060,1.35,0.5);rkFlicker(sc,g,0.42,0.16,6.1); // velas das colunas
+    const vel=M.velvet.clone();vel.color.set(0x6a1c2c);vel.emissive.set(0x2a0810);vel.emissiveIntensity=0.35;sc.traverse(o=>{if(o.isMesh&&o.material===M.velvet)o.material=vel;}); // bancos: veludo vinho visível no Leve
+    rkDust(sc,{x0:-6,x1:6,z0:-26,z1:26,y0:0.5,y1:9,n:600,color:0xffe0b8,size:0.06,opacity:0.22,speed:0.04,seed:31});},
+  fant(R){const sc=R.scene;rkDust(sc,{x0:-18,x1:18,z0:-16,z1:18,y0:0.3,y1:5.5,n:420,color:0xd8f0a0,size:0.06,opacity:0.28,speed:0.08,seed:13});}, // pólen
+  adv(R){const sc=R.scene;if(R.canvasMat)R.canvasMat.emissiveIntensity=0.42; // as velas ficavam pretas por baixo
+    const pts=worldPts(R.lamps||[],-0.22);if(pts.length){const g=rkGlowPts(sc,pts,0xffc070,1.1,0.45);rkFlicker(sc,g,0.36,0.14,5.7);}},
+  sci(R){const sc=R.scene;sc.userData.liteHemi=1.35;rkDust(sc,{x0:-13,x1:13,z0:-14,z1:14,y0:0.4,y1:5.8,n:300,color:0xa8d8ff,size:0.05,opacity:0.2,speed:0.03,seed:37});},
+  mys(R){const sc=R.scene;rkDust(sc,{x0:-13,x1:13,z0:-14,z1:14,y0:0.5,y1:4.2,n:420,color:0xc8d0e0,size:0.06,opacity:0.22,seed:17});
+    // vinheta da entrada: balcão de recepção com luminária verde de banqueiro, cabideiro e dois arquivos de aço
+    const mt=rkSolid(0x4a3524,0.8),mtop=rkSolid(0x2a1c14,0.55),steel=rkSolid(0x6a6e72,0.5,0.6);
+    const B=mboxes();B.add(2.2,1.02,0.6,-5.6,0.51,12.6);B.add(0.06,0.7,0.5,-6.66,0.66,12.6);B.add(0.06,0.7,0.5,-4.54,0.66,12.6);B.mesh(mt,sc);const B2=mboxes();B2.add(2.4,0.06,0.74,-5.6,1.05,12.6);B2.mesh(mtop,sc);
+    const lampG=new THREE.Group();lampG.position.set(-5.0,1.09,12.5);sc.add(lampG);const lbase=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.09,0.03,10),M.brass);lbase.position.y=0.015;lampG.add(lbase);const stem=new THREE.Mesh(new THREE.CylinderGeometry(0.012,0.012,0.3,6),M.brass);stem.position.y=0.17;lampG.add(stem);const shade=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.2,0.1,12,1,true),rkGlow(0x2f8a55,1.2,{side:THREE.DoubleSide}));shade.position.set(0,0.33,0.05);shade.rotation.x=0.35;lampG.add(shade);
+    rkSprite(sc,0x9fe0a8,1.3,0.45,-5.0,1.4,12.5);
+    const cab=mboxes();cab.add(0.06,1.9,0.06,3.4,0.95,14.3);for(const [dx,dz] of [[0.18,0],[-0.18,0],[0,0.18],[0,-0.18]])cab.add(0.04,0.04,0.3,3.4+dx,1.78,14.3+dz);cab.add(0.5,0.04,0.5,3.4,0.02,14.3);cab.mesh(mt,sc);
+    const ar=mboxes();for(const x of [-9.4,-10.3]){ar.add(0.8,1.5,0.5,x,0.75,14.45);for(let k=0;k<4;k++)ar.add(0.7,0.02,0.02,x,0.2+k*0.36,14.19);}ar.mesh(steel,sc);
+    R.world.obst.push([-5.6,12.6,1.35],[3.4,14.3,0.35],[-9.85,14.4,0.9]);},
+  vila(R){const sc=R.scene;rkDust(sc,{x0:-13,x1:13,z0:-14,z1:14,y0:0.6,y1:5,n:380,color:0xffd8b0,size:0.06,opacity:0.25,seed:19});
+    // varais de luzinhas quentes cruzando o salão
+    const pts=[],wire=[[],[]];for(let i=0;i<=22;i++){const u=i/22,x=-12+24*u,y=4.95-Math.sin(u*Math.PI)*0.9;pts.push([x,y,-4],[x,y,4]);wire[0].push(new THREE.Vector3(x,y+0.04,-4));wire[1].push(new THREE.Vector3(x,y+0.04,4));}
+    const g=rkGlowPts(sc,pts,0xffd090,0.6,0.7);rkFlicker(sc,g,0.62,0.1,2.1);for(const w of wire){const lg=new THREE.BufferGeometry().setFromPoints(w);const ln=new THREE.Line(lg,new THREE.LineBasicMaterial({color:0x2a1a14}));ln.userData.fx=true;sc.add(ln);}
+    const board=txtTex(['CAFÉ','LITERÁRIO','sarau às 19h','café coado · pão de queijo'],{w:512,h:640,bg:'#1e2a22',fg:'#f2e6c8',fs:54,border:'#c9a24a',bw:8});
+    rkPoster(sc,board,0.9,1.15,3.4,1.0,13.6,-0.5,rkSolid(0x5a3a22,0.8));const legs=mboxes();for(const dx of [-0.36,0.36])legs.add(0.05,1.7,0.05,3.4+dx*Math.cos(0.5),0.85,13.6+dx*Math.sin(0.5)*-1);legs.mesh(rkSolid(0x5a3a22,0.8),sc);
+    R.world.obst.push([3.4,13.6,0.55]);},
+  guerra(R){const sc=R.scene;rkDust(sc,{x0:-13,x1:13,z0:-14,z1:14,y0:0.5,y1:4.5,n:360,color:0xb0b8a0,size:0.07,opacity:0.2,seed:23});},
+  outono(R){const sc=R.scene;rkDust(sc,{x0:-13,x1:13,z0:-14,z1:14,y0:0.5,y1:4.5,n:420,color:0xd0c8e8,size:0.07,opacity:0.24,seed:29});
+    const cand=(NR.outono&&NR.outono.cand)||[];const pts=worldPts(cand,0.12);if(pts.length){const g=rkGlowPts(sc,pts,0xffc890,0.9,0.5);rkFlicker(sc,g,0.4,0.2,8.3);}},
+  quadrinhos(R){const sc=R.scene;rkDust(sc,{x0:-13,x1:13,z0:-14,z1:14,y0:0.5,y1:4.6,n:260,color:0xfff0c0,size:0.05,opacity:0.18,seed:41});}
+};
+function polishRoom(key){const R=ROOMS[key];if(!R||R.polished||!POLISH[key])return;R.polished=true;try{POLISH[key](R);}catch(e){console.error('acabamento',key,e);}try{lightBudget(R.scene);}catch(e){}}
+function polishHall(){try{for(const n in HALLS){const sc=HALLS[n].scene;if(sc.userData.polished)continue;sc.userData.polished=true;rkDust(sc,{x0:-6.5,x1:6.5,z0:-6.5,z1:6.5,y0:0.8,y1:7.5,n:380,color:0xffd8a8,size:0.07,opacity:0.26,speed:0.04,seed:43+(+n)});}}catch(e){console.error('acabamento hall',e);}}
+
 /* ---- ao nascer, a sala entra em tudo: livros do leitor, baú, atril do conto, portal do arco, miúdos, orçamento de luzes e ajustes de qualidade ---- */
 function finishRoom(key){const R=ROOMS[key];if(!R||R.ready)return;R.ready=true;
   try{buildBooksFor(R);}catch(e){console.error('livros',key,e);}
@@ -9008,8 +9061,9 @@ function finishRoom(key){const R=ROOMS[key];if(!R||R.ready)return;R.ready=true;
   const genre=chestGenre(key);if(genre)try{registerPortal(genre);}catch(e){console.error('portal',key,e);}
   try{markMiudos(R.scene);}catch(e){}
   try{setQuality(Q.name);}catch(e){}
+  try{polishRoom(key);}catch(e){}
   if(Q.lite)try{warmCollect(R.scene);}catch(e){}}
-tmark('nucleo');finishRoom('lib');tmark('biblioteca2');
+tmark('nucleo');finishRoom('lib');polishHall();tmark('biblioteca2');
 /* ================= LAÇO ================= */
 loadMsg('acendendo as luzes do Hall…');let mode0=null;try{mode0=localStorage.getItem('bibmode2');}catch(e){}if(!['gm','tp','fp'].includes(mode0))mode0='gm';MODE='gm';for(const sc of allScenes())lightBudget(sc);jump('hall',null);buildMap();initCtrl();setMode(mode0);keyHud();
 try{if((navigator.maxTouchPoints>0||'ontouchstart' in window)&&matchMedia('(orientation:portrait)').matches)setTimeout(()=>showToast('Dica: o Mundo fica melhor na horizontal — vire o celular',{ms:6000,queue:true}),900);}catch(e){}
@@ -9053,7 +9107,7 @@ function tick(dt){t+=dt;
   for(const g of HALL_DOORS){const tgt=g.userData.open?1.5:0;for(const pv of g.userData.leaves){const want=-pv.userData.sx*tgt;if(g.userData.shake>0){g.userData.shake-=dt;pv.rotation.y=Math.sin(t*45+pv.userData.sx)*0.012*Math.max(0,g.userData.shake);}else pv.rotation.y+=(want-pv.rotation.y)*Math.min(1,dt*5);}}
   for(const s of SLICES)s.material.uniforms.t.value+=dt;
   if(CUR==='room'){if(ROOM.tick)ROOM.tick(dt);storyFloat();}else if(CUR==='hall')hallTick(dt);
-  coinTick(dt);keyTick(dt);chestTick(dt);gearTick(dt);storyTick(dt);
+  coinTick(dt);keyTick(dt);chestTick(dt);gearTick(dt);storyTick(dt);polishTick(dt);
   // foco da profundidade de campo: no personagem (3ª pessoa) ou a meia distância (1ª pessoa)
   { const want=MODE!=='fp'?Math.max(1.2,camera.position.distanceTo(new THREE.Vector3(CH.x,1.1,CH.z))):3.0;const u=bokeh.uniforms['focus'];u.value+=(want-u.value)*Math.min(1,dt*4); }
   // haze de calor: projeta o fogo na tela
