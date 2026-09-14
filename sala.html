@@ -4658,7 +4658,7 @@ for(let i=0;i<14;i++){const l=new THREE.Mesh(new THREE.PlaneGeometry(0.22,0.14),
 
 
 /* ---- salão dobrado (28 × 30 m): colunas, mesas de leitura, lustres extras, passadeira, poltronas junto à janela, escada, globo ---- */
-const LIB_NEW_OBST=[];
+const LIB_NEW_OBST=[];const LIBX={};
 const W2L=(cx,cz,rot,lx,lz)=>[cx+lx*Math.cos(rot)+lz*Math.sin(rot),cz-lx*Math.sin(rot)+lz*Math.cos(rot)]; // local → mundo (rotação em Y)
 {
   // colunas de pedra sob as vigas do teto (o salão ficou largo demais para vãos livres)
@@ -4694,12 +4694,51 @@ const W2L=(cx,cz,rot,lx,lz)=>[cx+lx*Math.cos(rot)+lz*Math.sin(rot),cz-lx*Math.si
   // arandelas com vela nas estantes novas (a sala comprida não fica no escuro)
   for(const [x,z] of [[-10.3,-D/2+0.6],[10.3,-D/2+0.6],[-10.4,D/2-0.6],[10.4,D/2-0.6],[-W/2+0.6,-11.2],[-W/2+0.6,11.2],[W/2-0.6,-11.2],[W/2-0.6,11.2]]){candle(x,3.5,z,0.22,0.03);const L=new THREE.PointLight(0xffb060,0.6,7,2);L.position.set(x*0.93,4.0,z*0.93);scene.add(L);}
   // passadeira da porta até o tapete central
-  const run=new THREE.Mesh(new THREE.PlaneGeometry(1.6,9.0),M.rug);run.rotation.x=-Math.PI/2;run.position.set(-2.55,0.011,D/2-5.2);run.receiveShadow=true;scene.add(run);
+  function runnerTex(){const Wc=192,Hc=1080,c=can(Wc,Hc),x=c.getContext('2d'),r=rnd(21);x.fillStyle='#5c1a1f';x.fillRect(0,0,Wc,Hc);const bd=18;x.fillStyle='#16182c';x.fillRect(bd,bd*2,Wc-2*bd,Hc-4*bd);
+    x.strokeStyle='#d9c49a';x.lineWidth=3;x.strokeRect(bd*0.5,bd*1.2,Wc-bd,Hc-bd*2.4);x.strokeRect(bd*1.5,bd*2.8,Wc-bd*3,Hc-bd*5.6);
+    for(let i=0;i<26;i++){const py=bd*3.6+i*((Hc-bd*7.2)/25);for(const px of [bd*0.95,Wc-bd*0.95]){x.save();x.translate(px,py);x.rotate(Math.PI/4);x.fillStyle='#d9c49a';x.fillRect(-4,-4,8,8);x.restore();}}
+    for(let i=0;i<11;i++){const py=bd*5+i*((Hc-bd*10)/10);x.save();x.translate(Wc/2,py);x.rotate(Math.PI/4);x.fillStyle='#7a2028';x.fillRect(-26,-26,52,52);x.fillStyle='#d9c49a';x.fillRect(-15,-15,30,30);x.fillStyle='#16182c';x.fillRect(-7,-7,14,14);x.restore();
+      if(i<10){const py2=py+((Hc-bd*10)/20);for(const sx of [-1,1]){x.save();x.translate(Wc/2+sx*46,py2);x.rotate(Math.PI/4);x.fillStyle='#c9a24a';x.fillRect(-6,-6,12,12);x.restore();}}}
+    x.fillStyle='#d9c49a';for(let k=0;k<Wc/9;k++){x.fillRect(k*9+2,0,3,bd*1.4);x.fillRect(k*9+2,Hc-bd*1.4,3,bd*1.4);} // franjas
+    x.globalAlpha=0.08;for(let i=0;i<5000;i++){x.fillStyle=r()>0.5?'#000':'#fff';x.fillRect(r()*Wc,r()*Hc,2,2);}x.globalAlpha=1;const t=new THREE.CanvasTexture(c);t.anisotropy=8;return t;}
+  const run=new THREE.Mesh(new THREE.PlaneGeometry(1.6,9.0),new THREE.MeshStandardMaterial({map:runnerTex(),roughness:0.98}));run.rotation.x=-Math.PI/2;run.position.set(-2.55,0.011,D/2-5.2);run.receiveShadow=true;scene.add(run);
   // poltronas junto à janela (cópias da poltrona principal) e mesinha com vela
   for(const [x,z,ry] of [[-W/2+2.6,1.1,1.25],[-W/2+2.6,-3.0,1.9]]){const c=CHAIR_G.clone();c.position.set(x,0,z);c.rotation.y=ry;scene.add(c);LIB_NEW_OBST.push([x,z,0.8]);}
   { const g=new THREE.Group();g.position.set(-W/2+2.9,0,-0.95);scene.add(g);const top=new THREE.Mesh(new THREE.CylinderGeometry(0.36,0.36,0.05,20),M.shelf);top.position.y=0.62;g.add(top);const leg=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.06,0.6,10),M.shelf);leg.position.y=0.3;g.add(leg);candle(0,0.65,0,0.22,0.03,g);LIB_NEW_OBST.push([-W/2+2.9,-0.95,0.45]);}
   // escada de biblioteca encostada na estante da direita
   { const mb=mboxes();for(const dz of [-0.25,0.25])mb.add(0.06,7.4,0.06,0,3.7,dz);for(let k=0;k<11;k++)mb.add(0.04,0.04,0.5,0,0.5+k*0.62,0);const m=mb.mesh(M.shelf,scene);m.position.set(W/2-2.6,0,-9.4);m.rotation.z=-0.3;LIB_NEW_OBST.push([W/2-2.2,-9.4,0.5]);}
+  // esqueleto leitor: sentado na poltrona da janela, com um livro aberto no colo
+  { const bone=new THREE.MeshStandardMaterial({color:0xe4dac4,roughness:0.72}),dark=new THREE.MeshStandardMaterial({color:0x14100c,roughness:1});
+    const g=new THREE.Group();g.position.set(-W/2+2.6,0,1.1);g.rotation.y=1.25;scene.add(g);LIBX.skeleton=g;
+    const P=(geo,mat,x,y,z,rx,ry,rz)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);if(rx)m.rotation.x=rx;if(ry)m.rotation.y=ry;if(rz)m.rotation.z=rz;m.castShadow=true;g.add(m);return m;};
+    P(new THREE.BoxGeometry(0.3,0.13,0.2),bone,0,0.5,-0.02); // pélvis
+    for(let k=0;k<6;k++)P(new THREE.CylinderGeometry(0.03,0.032,0.06,8),bone,0,0.6+k*0.075,-0.06+k*0.012); // coluna
+    for(let k=0;k<6;k++){const r=0.15-k*0.008;const rib=P(new THREE.TorusGeometry(r,0.011,6,20),bone,0,0.7+k*0.055,-0.02,Math.PI/2);rib.scale.z=0.72;}
+    P(new THREE.BoxGeometry(0.03,0.28,0.02),bone,0,0.85,0.1); // esterno
+    P(new THREE.BoxGeometry(0.4,0.03,0.05),bone,0,1.05,-0.02); // clavículas/ombros
+    const skull=new THREE.Group();skull.position.set(0,1.26,0.0);skull.rotation.x=0.42;g.add(skull);LIBX.skull=skull;
+    { const m=new THREE.Mesh(new THREE.SphereGeometry(0.11,16,12),bone);m.scale.set(0.95,1,1.05);m.castShadow=true;skull.add(m);const jaw=new THREE.Mesh(new THREE.BoxGeometry(0.13,0.05,0.11),bone);jaw.position.set(0,-0.085,0.02);skull.add(jaw);
+      for(const sx of [-1,1]){const e=new THREE.Mesh(new THREE.SphereGeometry(0.03,8,6),dark);e.position.set(sx*0.042,0.01,0.095);skull.add(e);}const nose=new THREE.Mesh(new THREE.ConeGeometry(0.014,0.03,4),dark);nose.position.set(0,-0.03,0.105);nose.rotation.x=Math.PI/2;skull.add(nose);
+      for(let k=0;k<6;k++){const th=new THREE.Mesh(new THREE.BoxGeometry(0.012,0.02,0.01),bone);th.position.set(-0.035+k*0.014,-0.055,0.1);skull.add(th);} }
+    for(const sx of [-1,1]){P(new THREE.CylinderGeometry(0.022,0.02,0.3,8),bone,sx*0.21,0.88,0.02,0.35,0,sx*0.12); // úmero
+      P(new THREE.CylinderGeometry(0.018,0.016,0.28,8),bone,sx*0.17,0.72,0.2,1.35); // antebraço apoiado no colo
+      P(new THREE.BoxGeometry(0.07,0.02,0.1),bone,sx*0.14,0.7,0.33);
+      P(new THREE.CylinderGeometry(0.03,0.028,0.44,8),bone,sx*0.1,0.5,0.22,Math.PI/2); // fêmur
+      P(new THREE.CylinderGeometry(0.026,0.022,0.44,8),bone,sx*0.1,0.27,0.44); // tíbia
+      P(new THREE.BoxGeometry(0.08,0.035,0.22,1,1,1),bone,sx*0.1,0.03,0.52);}
+    { const bk=new THREE.Group();bk.position.set(0,0.73,0.3);bk.rotation.x=-0.5;g.add(bk);const cov=new THREE.MeshStandardMaterial({color:0x3a2a52,roughness:0.8});for(const sx of [-1,1]){const c=new THREE.Mesh(new THREE.BoxGeometry(0.17,0.012,0.22),cov);c.position.set(sx*0.09,0,0);c.rotation.z=sx*0.25;bk.add(c);const pg=new THREE.Mesh(new THREE.BoxGeometry(0.15,0.02,0.2),M.pages);pg.position.set(sx*0.09,0.014,0);pg.rotation.z=sx*0.25;bk.add(pg);}}
+    // teia no canto da poltrona e uma vela quase no fim ao lado
+    { const web=new THREE.Mesh(new THREE.PlaneGeometry(0.7,0.7),new THREE.MeshBasicMaterial({map:(()=>{const S=128,c=can(S,S),x=c.getContext('2d');x.clearRect(0,0,S,S);x.strokeStyle='rgba(230,230,240,.8)';x.lineWidth=1;for(let k=0;k<=6;k++){const a=k/6*Math.PI/2;x.beginPath();x.moveTo(0,0);x.lineTo(Math.cos(a)*S*1.5,Math.sin(a)*S*1.5);x.stroke();}for(let rr=14;rr<S*1.4;rr+=16){x.beginPath();for(let k=0;k<=6;k++){const a=k/6*Math.PI/2;const px=Math.cos(a)*rr,py=Math.sin(a)*rr;if(k===0)x.moveTo(px,py);else x.lineTo(px,py);}x.stroke();}return new THREE.CanvasTexture(c);})(),transparent:true,opacity:0.55,side:THREE.DoubleSide,depthWrite:false}));web.position.set(-0.42,1.32,-0.34);web.rotation.y=Math.PI/2;web.userData.fx=true;g.add(web);}
+  }
+  // morcegos: voam em círculos pelo alto do salão e, de vez em quando, ficam pendurados numa viga
+  { const BATS=[];LIBX.bats=BATS;const bm=new THREE.MeshStandardMaterial({color:0x2a2018,emissive:0x0e0a08,emissiveIntensity:0.6,roughness:0.9,side:THREE.DoubleSide});const eyeM=new THREE.MeshStandardMaterial({color:0xff5030,emissive:0xff3020,emissiveIntensity:2.2,roughness:0.4});const eyeG=new THREE.SphereGeometry(0.009,6,5);
+    const wingShape=(sx)=>{const sh=new THREE.Shape();sh.moveTo(0,0);sh.lineTo(sx*0.14,0.06);sh.lineTo(sx*0.3,0.09);sh.lineTo(sx*0.36,-0.01);sh.lineTo(sx*0.28,-0.06);sh.lineTo(sx*0.18,-0.09);sh.lineTo(sx*0.06,-0.06);sh.closePath();return new THREE.ShapeGeometry(sh);};
+    const wgL=wingShape(-1),wgR=wingShape(1);const bodyGeo=new THREE.SphereGeometry(0.06,8,6),headGeo=new THREE.SphereGeometry(0.038,8,6),earGeo=new THREE.ConeGeometry(0.014,0.04,5);
+    const roosts=[];for(const bx of [-W/3,W/3])for(const bz of [-9,-4,1,6,11])roosts.push([bx,H-0.42,bz]);
+    for(let i=0;i<9;i++){const g=new THREE.Group();scene.add(g);const body=new THREE.Mesh(bodyGeo,bm);body.scale.set(0.8,0.7,1.3);g.add(body);const head=new THREE.Mesh(headGeo,bm);head.position.set(0,0.03,0.08);g.add(head);for(const sx of [-1,1]){const e=new THREE.Mesh(earGeo,bm);e.position.set(sx*0.02,0.07,0.08);g.add(e);const ey=new THREE.Mesh(eyeG,eyeM);ey.position.set(sx*0.016,0.035,0.113);g.add(ey);}
+      const wl=new THREE.Mesh(wgL,bm);wl.rotation.x=-Math.PI/2;wl.position.set(-0.03,0.01,0);g.add(wl);const wr=new THREE.Mesh(wgR,bm);wr.rotation.x=-Math.PI/2;wr.position.set(0.03,0.01,0);g.add(wr);
+      g.traverse(o=>{o.castShadow=false;});
+      g.scale.setScalar(1.45);BATS.push({g,wl,wr,cx:(R()-0.5)*14,cz:(R()-0.5)*16,r:2.5+R()*4.5,h:3.0+R()*2.6,ph:R()*7,spd:0.45+R()*0.35,flap:9+R()*4,state:'fly',st:12+R()*30,roost:roosts[(i*3)%roosts.length],dir:R()<0.5?1:-1});} }
   // globo terrestre grande
   { const g=new THREE.Group();g.position.set(7.2,0,-9.6);g.rotation.y=0.4;scene.add(g);const base=new THREE.Mesh(new THREE.CylinderGeometry(0.28,0.36,0.05,16),M.shelf);base.position.y=0.03;g.add(base);const st=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.04,0.9,8),M.brass);st.position.y=0.5;g.add(st);
     const globe=new THREE.Mesh(new THREE.SphereGeometry(0.42,24,18),new THREE.MeshStandardMaterial({color:0x7a6236,roughness:0.55,metalness:0.1}));globe.position.y=1.35;g.add(globe);const ring=new THREE.Mesh(new THREE.TorusGeometry(0.47,0.015,8,40),M.brass);ring.position.y=1.35;ring.rotation.z=0.4;g.add(ring);LIB_NEW_OBST.push([7.2,-9.6,0.6]);}
@@ -4831,6 +4870,9 @@ const GEN_KEYS=Object.keys(EST.GENEROS);
 const GENRE_ROOM={catedral:'cat',charneca:'lib',mesa:'sci',castelo:'fant',navegacoes:'adv'}; // gênero → sala (os cinco gêneros do Mundo); sem entrada = porta trancada
 const HALLX={shop:null,owl:null,anim:[],atril:null};
 const GEN_HUES={catedral:35,charneca:0,mesa:190,castelo:275,navegacoes:215};
+const HUE_NOMES=[[0,'vermelha','vermelho'],[35,'dourada','dourado'],[60,'amarela','amarelo'],[95,'verde','verde'],[150,'verde-água','verde-água'],[190,'ciano','ciano'],[215,'azul','azul'],[275,'roxa','roxo'],[300,'magenta','magenta'],[330,'rosa','rosa']];
+function corNome(genre,masc){const h=((GEN_HUES[genre]||40)%360+360)%360;let best=HUE_NOMES[0],bd=999;for(const q of HUE_NOMES){const d=Math.min(Math.abs(q[0]-h),360-Math.abs(q[0]-h));if(d<bd){bd=d;best=q;}}return masc?best[2]:best[1];}
+function genColor(genre){return new THREE.Color().setHSL(((GEN_HUES[genre]||40)%360)/360,0.85,0.55);}
 function clonedTex(t,rx,ry){const c=t.clone();c.needsUpdate=true;c.repeat.set(rx,ry);return c;}
 function marbleSet(S){const fbm=mkNoise(53);const A=can(S,S),a=A.getContext('2d');const ad=a.createImageData(S,S);const Hc=can(S,S),h=Hc.getContext('2d');const hd=h.createImageData(S,S);const Rc=can(S,S),rc=Rc.getContext('2d');const rd=rc.createImageData(S,S);const T=S/2;
   for(let y=0;y<S;y++)for(let x=0;x<S;x++){const dark=((Math.floor(x/T)+Math.floor(y/T))%2)===0;const v=fbm(x*0.012,y*0.012,3);const vein=Math.pow(Math.abs(Math.sin((x*0.02+y*0.013)+v*6.0)),16.0);
@@ -5123,7 +5165,15 @@ function catTickLib(dt){const c=CATB;if(!GOTHG.visible)return;c.t-=dt;
   c.body.rotation.x=sit?-0.3:0;c.body.position.y=sit?0.18:0.2;c.headG.position.y=sit?0.34:0.3;c.headG.rotation.y=sit?Math.sin(t*0.7)*0.5:Math.sin(t*2)*0.08;c.headG.rotation.x=sit?Math.sin(t*1.3)*0.1:0.1;
   c.tailG.rotation.y=Math.sin(t*2.1)*0.35+(walking?Math.sin(c.walkT*0.5)*0.2:0);c.tailG.rotation.x=sit?0.5:0;
   for(const e of GOTH.catEyes)e.material.emissiveIntensity=1.2+0.4*Math.sin(t*3);}
-function libTick(dt){catTickLib(dt);if(GOTH.pend)GOTH.pend.rotation.z=Math.sin(t*Math.PI)*0.16;const e=0.45+0.35*(0.5+0.5*Math.sin(t*1.3));for(const m of GOTH.eyes)m.material.emissiveIntensity=e;}
+function libTick(dt){catTickLib(dt);if(GOTH.pend)GOTH.pend.rotation.z=Math.sin(t*Math.PI)*0.16;const e=0.45+0.35*(0.5+0.5*Math.sin(t*1.3));for(const m of GOTH.eyes)m.material.emissiveIntensity=e;
+  if(LIBX.skull)LIBX.skull.rotation.y=Math.sin(t*0.35)*0.18;
+  if(LIBX.bats)for(const b of LIBX.bats){b.st-=dt;
+    if(b.state==='fly'){const a=b.ph+t*b.spd*b.dir;const x=b.cx+Math.cos(a)*b.r,z=b.cz+Math.sin(a)*b.r*0.8,y=b.h+Math.sin(t*1.3+b.ph)*0.6+Math.sin(t*3.1+b.ph*2)*0.15;
+      const dx=-Math.sin(a)*b.r*b.dir,dz=Math.cos(a)*b.r*0.8*b.dir;const gp=b.g.position;if(b.st<1.2&&b.roost){const k=1-b.st/1.2;gp.set(x+(b.roost[0]-x)*k,y+(b.roost[1]-0.35-y)*k,z+(b.roost[2]-z)*k);}else gp.set(x,y,z);
+      b.g.rotation.set(0,Math.atan2(dx,dz),Math.sin(t*2+b.ph)*0.25,'YXZ');const f=Math.sin(t*b.flap+b.ph)*0.95-0.25;b.wl.rotation.y=-f;b.wr.rotation.y=f;
+      if(b.st<=0){b.state='roost';b.st=8+R()*16;b.g.position.set(b.roost[0],b.roost[1]-0.34,b.roost[2]);b.g.rotation.set(Math.PI,R()*6,0,'YXZ');b.wl.rotation.y=-1.35;b.wr.rotation.y=1.35;}}
+    else{b.g.position.y=b.roost[1]-0.34+Math.sin(t*1.7+b.ph)*0.01;if(b.st<=0){b.state='fly';b.st=14+R()*30;b.cx=(R()-0.5)*14;b.cz=(R()-0.5)*16;b.ph=Math.atan2(b.roost[2]-b.cz,(b.roost[0]-b.cx)/0.8)-t*b.spd*b.dir;b.r=Math.min(7,Math.max(2.5,Math.hypot(b.roost[0]-b.cx,(b.roost[2]-b.cz)/0.8)));b.h=3.4+R()*2.8;const q=roostsFree(LIBX.bats,b);b.roost=q;}}}}
+function roostsFree(list,me){const used=new Set(list.filter(b=>b!==me&&b.roost).map(b=>b.roost.join(',')));const all=[];for(const bx of [-W/3,W/3])for(const bz of [-9,-4,1,6,11])all.push([bx,H-0.42,bz]);const free=all.filter(r=>!used.has(r.join(',')));return free.length?free[(R()*free.length)|0]:all[0];}
 scene.traverse(o=>{if(o.isSprite||o.isPoints||o.userData.fx)o.layers.set(1);});
 
 /* ================= SALA · FICÇÃO CIENTÍFICA (deck de observação orbital) ================= */
@@ -5654,6 +5704,18 @@ const ffMat=new THREE.ShaderMaterial({uniforms:{t:{value:0},pr:{value:PR}},trans
   const LILY=lilyTex();for(let k=0;k<9;k++){const a=rr()*7,d=rr()*(PRad-0.8);const l=new THREE.Mesh(new THREE.PlaneGeometry(0.5,0.5),new THREE.MeshStandardMaterial({map:LILY,transparent:true,alphaTest:0.5,roughness:0.9,side:THREE.DoubleSide}));l.rotation.x=-Math.PI/2;l.rotation.z=rr()*7;l.position.set(PX+Math.cos(a)*d,0.055,PZ+Math.sin(a)*d);fantScene.add(l);FANT.lily.push({m:l,ph:rr()*7});
     if(k<3){const lo=new THREE.Mesh(new THREE.ConeGeometry(0.11,0.16,7),FM.lotus);lo.position.set(l.position.x,0.13,l.position.z);fantScene.add(lo);}}
   const lotL=new THREE.PointLight(0xff80c0,0.6,4,2);lotL.position.set(PX-0.5,0.5,PZ+0.3);fantScene.add(lotL);
+  // ---- sapos: em vitórias-régias e nas pedras da margem; coaxam (papo pulsa) e dão pulinhos entre dois pontos ----
+  { const FROGS=[];FANT.frogs=FROGS;const skin=new THREE.MeshStandardMaterial({color:0x3f8a3a,roughness:0.75}),belly=new THREE.MeshStandardMaterial({color:0xb9d68a,roughness:0.8}),eyeW=new THREE.MeshStandardMaterial({color:0xf2e6a0,roughness:0.4}),eyeB=new THREE.MeshStandardMaterial({color:0x111111,roughness:0.3});
+    const mkFrog=()=>{const g=new THREE.Group();const b=new THREE.Mesh(new THREE.SphereGeometry(0.11,12,9),skin);b.scale.set(1,0.62,1.25);b.position.y=0.07;b.castShadow=true;g.add(b);
+      const th=new THREE.Mesh(new THREE.SphereGeometry(0.055,10,8),belly);th.position.set(0,0.05,0.11);g.add(th);
+      for(const sx of [-1,1]){const e=new THREE.Mesh(new THREE.SphereGeometry(0.03,8,6),eyeW);e.position.set(sx*0.055,0.14,0.07);g.add(e);const p=new THREE.Mesh(new THREE.SphereGeometry(0.014,6,5),eyeB);p.position.set(sx*0.055,0.145,0.095);g.add(p);
+        const leg=new THREE.Mesh(new THREE.SphereGeometry(0.045,8,6),skin);leg.scale.set(0.8,0.6,1.5);leg.position.set(sx*0.11,0.035,-0.02);g.add(leg);const foot=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.012,0.09),skin);foot.position.set(sx*0.13,0.008,0.06);g.add(foot);}
+      g.userData.throat=th;return g;};
+    const pads=FANT.lily.slice(3).map(L=>[L.m.position.x,0.07,L.m.position.z]);
+    const bankPt=a=>[PX+Math.cos(a)*(PRad+0.55),0.09,PZ+Math.sin(a)*(PRad+0.55)];
+    const spots=[[pads[0],pads[1]],[pads[2],pads[3]],[pads[4],pads[5]],[bankPt(0.4),bankPt(0.75)],[bankPt(2.3),bankPt(2.7)],[bankPt(3.9),bankPt(4.25)],[bankPt(5.3),bankPt(5.65)]];
+    spots.forEach(([A,B],i)=>{if(!A||!B)return;const g=mkFrog();g.position.set(A[0],A[1],A[2]);const face=Math.atan2(B[0]-A[0],B[2]-A[2]);g.rotation.y=face;fantScene.add(g);
+      FROGS.push({g,A,B,at:0,hop:0,next:3+rr()*7,ph:rr()*7,croak:4+rr()*9,th:g.userData.throat});}); }
   // ---- floresta em volta: troncos, copas, arbustos; tufos de relva e flores instanciados ----
   const treeAt=(x,z,h,r0)=>{const g=new THREE.Group();g.position.set(x,0,z);g.rotation.y=rr()*7;fantScene.add(g);const tr=new THREE.Mesh(new THREE.CylinderGeometry(r0*0.55,r0,h,10),FM.bark);tr.position.y=h/2;tr.castShadow=true;g.add(tr);
     for(let k=0;k<4;k++){const a=k/4*Math.PI*2;const root=new THREE.Mesh(new THREE.CylinderGeometry(0.06,r0*0.45,1.2,6),FM.bark);root.position.set(Math.cos(a)*r0*1.1,0.2,Math.sin(a)*r0*1.1);root.rotation.z=Math.cos(a)*1.1;root.rotation.x=-Math.sin(a)*1.1;g.add(root);}
@@ -5715,15 +5777,45 @@ const ffMat=new THREE.ShaderMaterial({uniforms:{t:{value:0},pr:{value:PR}},trans
     for(let k=0;k<14;k++){const a=k/14*Math.PI*2,d=3+rr()*5.5,cr=3.6+rr()*2.6;const c=new THREE.Mesh(new THREE.SphereGeometry(cr,14,10),(k%2)?FM.canopyL:FM.canopy);c.position.set(TX+Math.cos(a)*d,13+rr()*3.5,TZ+Math.sin(a)*d);c.castShadow=true;fantScene.add(c);}
     for(let k=0;k<6;k++){const a=k/6*Math.PI*2+0.4;const br=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.5,7.0,7),FM.barkHuge);br.position.set(TX+Math.cos(a)*5.4,12.2,TZ+Math.sin(a)*5.4);br.rotation.z=Math.cos(a)*1.15;br.rotation.x=-Math.sin(a)*1.15;br.castShadow=true;fantScene.add(br);}
     // escada em espiral abraçando o tronco (começa ao lado da alcova e sobe pelas costas) até o deque da casa na árvore
-    let prev=null;const NST=24;for(let k=0;k<NST;k++){const a=0.78-k*0.148,y=0.3+k*0.27,rad=rT(y)+0.55;const st=fbox(1.4,0.1,0.62,M.shelf,TX+Math.cos(a)*rad,y,TZ+Math.sin(a)*rad,null,{r:0.01});st.rotation.y=-a;const post=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.9,6),FM.bark);post.position.set(TX+Math.cos(a)*(rad+0.62),y+0.45,TZ+Math.sin(a)*(rad+0.62));fantScene.add(post);
-      if(k<6)FANT.trunkObst.push([TX+Math.cos(a)*rad,TZ+Math.sin(a)*rad,0.75]);
+    let prev=null;const NST=24;const STEPS=[];FANT.steps=STEPS;for(let k=0;k<NST;k++){const a=0.78-k*0.148,y=0.3+k*0.27,rad=rT(y)+0.55;const st=fbox(1.4,0.1,0.62,M.shelf,TX+Math.cos(a)*rad,y,TZ+Math.sin(a)*rad,null,{r:0.01});st.rotation.y=-a;st.userData.stepK=k;STEPS.push(st);const post=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.9,6),FM.bark);post.position.set(TX+Math.cos(a)*(rad+0.62),y+0.45,TZ+Math.sin(a)*(rad+0.62));fantScene.add(post);
+      if(k>=2&&k<7)FANT.trunkObst.push([TX+Math.cos(a)*(rad+0.15),TZ+Math.sin(a)*(rad+0.15),0.62]); // no chão, não se atravessa a escada pelo lado (a entrada é pelos primeiros degraus)
       if(prev){const c=new THREE.CatmullRomCurve3([prev,new THREE.Vector3(TX+Math.cos(a)*(rad+0.62),y+0.85,TZ+Math.sin(a)*(rad+0.62))]);fantScene.add(new THREE.Mesh(new THREE.TubeGeometry(c,4,0.02,5),FM.rope));}prev=new THREE.Vector3(TX+Math.cos(a)*(rad+0.62),y+0.85,TZ+Math.sin(a)*(rad+0.62));}
     const DY=0.3+NST*0.27,DR0=rT(DY)+0.05,DR1=DR0+2.2;
-    const deck=new THREE.Mesh(new THREE.RingGeometry(DR0,DR1,48),M.shelf);deck.rotation.x=-Math.PI/2;deck.position.set(TX,DY,TZ);deck.castShadow=true;deck.receiveShadow=true;fantScene.add(deck);const deck2=deck.clone();deck2.rotation.x=Math.PI/2;deck2.position.y=DY-0.06;fantScene.add(deck2);
-    for(let k=0;k<26;k++){const a=k/26*Math.PI*2;const p=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,1.0,6),FM.bark);p.position.set(TX+Math.cos(a)*(DR1-0.1),DY+0.5,TZ+Math.sin(a)*(DR1-0.1));fantScene.add(p);if(k%4===0){const lg=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.24,0.16),FM.glass);lg.position.set(TX+Math.cos(a)*(DR1-0.1),DY+1.2,TZ+Math.sin(a)*(DR1-0.1));fantScene.add(lg);fbox(0.2,0.05,0.2,M.iron,TX+Math.cos(a)*(DR1-0.1),DY+1.35,TZ+Math.sin(a)*(DR1-0.1),null,{nocast:true});}}
-    const rail=new THREE.Mesh(new THREE.TorusGeometry(DR1-0.1,0.03,6,64),FM.rope);rail.rotation.x=Math.PI/2;rail.position.set(TX,DY+0.97,TZ);fantScene.add(rail);
-    const hut=new THREE.Group();const ha=-2.35;hut.position.set(TX+Math.cos(ha)*(DR0+1.15),DY+0.05,TZ+Math.sin(ha)*(DR0+1.15));hut.rotation.y=-ha+Math.PI/2;fantScene.add(hut);fbox(1.9,1.6,1.6,M.shelf,0,0.8,0,hut,{r:0.03});const roof=new THREE.Mesh(new THREE.ConeGeometry(1.6,1.2,4),FM.moss);roof.position.y=2.2;roof.rotation.y=Math.PI/4;hut.add(roof);fbox(0.5,0.6,0.05,FM.glass,0,0.95,0.81,hut,{nocast:true});
-    const hl=new THREE.PointLight(0xffb050,1.0,10,2);hl.position.set(TX,DY+1.3,TZ+DR0+1.2);fantScene.add(hl);
+    // o deque é um arco (o patamar da árvore): começa no topo da escada e dá a volta pela frente até a cabana; a escada fica livre por baixo
+    const TH0=0.78-23.7*0.148+Math.PI*2,TLEN=2.62; // início do arco (topo da escada, em ângulo do mundo) e abertura
+    const deck=new THREE.Mesh(new THREE.RingGeometry(DR0,DR1,40,1,-TH0,TLEN),M.shelf);deck.rotation.x=-Math.PI/2;deck.position.set(TX,DY,TZ);deck.castShadow=true;deck.receiveShadow=true;deck.userData.deck=true;fantScene.add(deck);FANT.deck=deck;
+    const deck2=new THREE.Mesh(new THREE.RingGeometry(DR0,DR1,40,1,TH0-TLEN,TLEN),M.shelf);deck2.rotation.x=Math.PI/2;deck2.position.set(TX,DY-0.06,TZ);deck2.userData.deck=true;fantScene.add(deck2);FANT.deck2=deck2;
+    { const pts=[];for(let i=0;i<=40;i++){const a=TH0-TLEN*i/40;pts.push(new THREE.Vector3(TX+Math.cos(a)*(DR1-0.1),DY+0.97,TZ+Math.sin(a)*(DR1-0.1)));}const rail=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),48,0.03,6),FM.rope);fantScene.add(rail);
+      for(let k=0;k<=17;k++){const a=TH0-0.04-(TLEN-0.08)*k/17;const p=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,1.0,6),FM.bark);p.position.set(TX+Math.cos(a)*(DR1-0.1),DY+0.5,TZ+Math.sin(a)*(DR1-0.1));fantScene.add(p);
+        if(k%4===2){const lg=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.24,0.16),FM.glass);lg.position.set(TX+Math.cos(a)*(DR1-0.1),DY+1.2,TZ+Math.sin(a)*(DR1-0.1));fantScene.add(lg);fbox(0.2,0.05,0.2,M.iron,TX+Math.cos(a)*(DR1-0.1),DY+1.35,TZ+Math.sin(a)*(DR1-0.1),null,{nocast:true});const L=new THREE.PointLight(0xffb050,0.55,5,2);L.position.set(TX+Math.cos(a)*(DR1-0.5),DY+1.2,TZ+Math.sin(a)*(DR1-0.5));fantScene.add(L);}}
+      // guarda na ponta do arco (o lado da escada fica aberto)
+      const ae=TH0-TLEN;const gr=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([new THREE.Vector3(TX+Math.cos(ae)*(DR0+0.1),DY+0.97,TZ+Math.sin(ae)*(DR0+0.1)),new THREE.Vector3(TX+Math.cos(ae)*(DR1-0.1),DY+0.97,TZ+Math.sin(ae)*(DR1-0.1))]),4,0.03,6),FM.rope);fantScene.add(gr);for(const rr2 of [DR0+0.5,DR0+1.2])fbox(0.06,1.0,0.06,FM.bark,TX+Math.cos(ae)*rr2,DY+0.5,TZ+Math.sin(ae)*rr2,null,{nocast:true}); }
+    const hut=new THREE.Group();const ha=TH0-TLEN+0.2;hut.position.set(TX+Math.cos(ha)*(DR0+1.1),DY+0.05,TZ+Math.sin(ha)*(DR0+1.1));hut.rotation.y=-ha+Math.PI/2;fantScene.add(hut);fbox(1.7,1.6,1.5,M.shelf,0,0.8,0,hut,{r:0.03});const roof=new THREE.Mesh(new THREE.ConeGeometry(1.5,1.2,4),FM.moss);roof.position.y=2.2;roof.rotation.y=Math.PI/4;hut.add(roof);fbox(0.5,0.6,0.05,FM.glass,0,0.95,0.76,hut,{nocast:true});
+    const hl=new THREE.PointLight(0xffb050,1.0,9,2);hl.position.set(TX+Math.cos(Math.PI/2)*(DR0+1.1),DY+1.3,TZ+Math.sin(Math.PI/2)*(DR0+1.1));fantScene.add(hl);
+    // níveis: 0 = chão · 1 = escada · 2 = deque. O nível muda ao pisar nos primeiros degraus / chegar ao topo; cada nível tem o seu chão, os seus limites e os seus obstáculos
+    FANT.lvl=0;const SA0=0.78,SDA=0.148,SY0=0.3,SDY=0.27;const kOf=(x,z)=>{const th=Math.atan2(z-TZ,x-TX);let d=SA0-th;d=((d+0.6)%(Math.PI*2)+Math.PI*2)%(Math.PI*2)-0.6;return d/SDA;};const eOf=(x,z)=>{const th=Math.atan2(z-TZ,x-TX);let e=TH0-th;e=((e+0.45)%(Math.PI*2)+Math.PI*2)%(Math.PI*2)-0.45;return e;};
+    const yK=k=>SY0+Math.max(0,Math.min(NST,k))*SDY,radK=k=>rT(yK(k))+0.55,rOf=(x,z)=>Math.hypot(x-TX,z-TZ);
+    const onStair=(x,z)=>{const k=kOf(x,z);if(k<-0.5||k>NST+0.7)return false;return Math.abs(rOf(x,z)-radK(k))<=0.75;};
+    const onDeck=(x,z)=>{const e=eOf(x,z);const r=rOf(x,z);return e>=-0.12&&e<=TLEN+0.05&&r>=DR0-0.05&&r<=DR1+0.1;};
+    FANT.kOf=kOf;FANT.eOf=eOf;FANT.deckY=DY;FANT.DR0=DR0;FANT.DR1=DR1;FANT.TH0=TH0;FANT.TLEN=TLEN;FANT.radK=radK;FANT.NST=NST;
+    FANT.floorY=(x,z)=>{if(FANT.lvl===2)return DY;if(FANT.lvl===1){const k=kOf(x,z);return yK(k);}return 0;};
+    FANT.levelAt=(x,z)=>onDeck(x,z)?2:(onStair(x,z)&&kOf(x,z)>=0?1:0);
+    FANT.levelUpdate=(x,z)=>{const k=kOf(x,z),r=rOf(x,z);
+      if(FANT.lvl===0){if(k>=-0.2&&k<=1.6&&Math.abs(r-radK(k))<=0.7)FANT.lvl=1;}
+      else if(FANT.lvl===1){if(k<-0.35||(k<1.2&&r>radK(k)+0.5))FANT.lvl=0;else if(k>=NST-0.1)FANT.lvl=2;}
+      else{if(k<=NST-0.6&&k>NST-3&&Math.abs(r-radK(k))<=0.8)FANT.lvl=1;}};
+    FANT.clampLvl=(x,z,m)=>{const r=rOf(x,z);
+      if(FANT.lvl===1){let k=kOf(x,z);k=Math.max(-0.4,Math.min(NST+0.4,k));const rad=radK(k);const out=k<1.2?1.2:0.55;const rr2=Math.max(rad-0.55,Math.min(rad+out,r));const a=SA0-k*SDA;return [TX+Math.cos(a)*rr2,TZ+Math.sin(a)*rr2];}
+      if(FANT.lvl===2){let e=eOf(x,z);const eMin=-0.28,eMax=TLEN-0.5;const r0=DR0+0.4,r1=DR1-0.42;const th=Math.atan2(z-TZ,x-TX);
+        if(e>=eMin&&e<=eMax&&r>=r0&&r<=r1)return [x,z];const ee=Math.max(eMin,Math.min(eMax,e)),rr2=Math.max(r0,Math.min(r1,r));const a=(e>=eMin&&e<=eMax)?th:TH0-ee;return [TX+Math.cos(a)*rr2,TZ+Math.sin(a)*rr2];}
+      return [x,z];};
+    FANT.reset=()=>{FANT.lvl=0;};
+    // rota entre níveis: pelos degraus, em pernas curtas (a malha 2D não sabe subir)
+    FANT.route=(fx,fz,tx,tz,tl)=>{const fl=FANT.lvl;if(tl===undefined)tl=FANT.levelAt(tx,tz);if(fl===tl)return [];const pt=k=>{const a=SA0-k*SDA,rad=radK(k);return [TX+Math.cos(a)*rad,TZ+Math.sin(a)*rad];};
+      const ks=[];for(let k=0.5;k<NST;k+=3)ks.push(k);ks.push(NST+0.6);const kf=kOf(fx,fz),kt=tl===1?kOf(tx,tz):(tl===2?NST+9:-9);
+      if(fl<tl){let list=ks.filter(k=>k>kf+0.3&&k<kt-0.3);if(fl===0)list=ks.filter(k=>k<kt-0.3);return list.map(pt);}
+      let list=ks.slice().reverse().filter(k=>k<kf-0.3&&k>kt+0.3);if(fl===2)list=[NST-1.2].concat(ks.slice().reverse().filter(k=>k<NST-1.5&&k>kt+0.3));const out=list.map(pt);if(tl===0){const a=SA0-0.3*SDA,rad=radK(0.3)+0.95;out.push([TX+Math.cos(a)*rad,TZ+Math.sin(a)*rad]);}return out;};
+    FANT.deckObst=[[TX+Math.cos(ha)*(DR0+1.1),TZ+Math.sin(ha)*(DR0+1.1),1.05]];FANT.chestAt={x:TX+Math.cos(1.62)*(DR0+0.9),z:TZ+Math.sin(1.62)*(DR0+0.9),rot:-1.62,y:DY};
     // obstáculos do tronco (anel de círculos, menos a frente) e da frente das prateleiras
     { const n=27;for(let k=0;k<=n;k++){const a=Math.PI/2+0.5+k*(Math.PI*2-1.0)/n;FANT.trunkObst.push([TX+Math.cos(a)*5.1,TZ+Math.sin(a)*5.1,1.0]);} }
     for(const x of [-2.0,-1.0,0,1.0,2.0])FANT.trunkObst.push([TX+x,TZ+ZB+1.2,0.75]);
@@ -5766,6 +5858,9 @@ const ffMat=new THREE.ShaderMaterial({uniforms:{t:{value:0},pr:{value:PR}},trans
 fantScene.traverse(o=>{if(o.isSprite||o.isPoints||o.userData.fx)o.layers.set(1);});
 function fantTick(dt){const F=FANT;portalMat.uniforms.t.value=t;auroraMat.uniforms.t.value=t;ffMat.uniforms.t.value=t;
   F.water.material.normalMap.offset.set(t*0.006,t*0.009);for(const L of F.lily)L.m.position.y=0.055+Math.sin(t*0.9+L.ph)*0.006;
+  if(F.frogs){for(const fr of F.frogs){fr.croak-=dt;const pu=fr.croak<0.9?0.5+0.5*Math.sin((0.9-fr.croak)*22):0;fr.th.scale.setScalar(1+pu*0.9);if(fr.croak<=0){fr.croak=5+R()*10;if(Math.hypot(CH.x-fr.g.position.x,CH.z-fr.g.position.z)<9)croakSound();}
+      if(fr.hop>0){fr.hop-=dt;const k=1-Math.max(0,fr.hop)/0.55;const S=fr.at?fr.B:fr.A,T=fr.at?fr.A:fr.B;fr.g.position.set(S[0]+(T[0]-S[0])*k,S[1]+(T[1]-S[1])*k+Math.sin(k*Math.PI)*0.28,S[2]+(T[2]-S[2])*k);fr.g.rotation.x=-Math.sin(k*Math.PI)*0.5;if(fr.hop<=0){fr.at=1-fr.at;fr.g.rotation.x=0;fr.g.rotation.y+=Math.PI;fr.next=4+R()*9;}}
+      else{fr.next-=dt;if(fr.next<=0)fr.hop=0.55;}}}
   for(const a of F.anim){a.m.rotation.z=Math.sin(t*0.9+a.ph)*0.05;a.l.intensity=0.55+0.12*Math.sin(t*7+a.ph*3);}
   // fada: voa entre pontos da clareira e de vez em quando vem ver o leitor
   const f=F.fairy;f.t-=dt;if(f.t<=0){f.t=3+R()*4;if(R()<0.35){f.tx=CH.x+(R()-0.5)*1.6;f.ty=1.5+R()*0.6;f.tz=CH.z+(R()-0.5)*1.6;}else{const s=f.spots[(R()*f.spots.length)|0];f.tx=s[0]+(R()-0.5);f.ty=s[1]+R()*0.8;f.tz=s[2]+(R()-0.5);}}
@@ -6071,9 +6166,9 @@ function placeTableMys(meshes,group,books){let yy=0.8;for(const m of meshes){con
 function placeTableSci(meshes,group,books){const N=meshes.length;meshes.forEach((m,i)=>{const a=i/N*Math.PI*2;m.position.set(Math.cos(a)*0.55,0.1,Math.sin(a)*0.55);m.rotation.y=Math.PI/2-a;group.add(m);books.push(m);});}
 const SCI_OBST=[[-0.4,1.7,1.0],[-2.7,0.6,0.85],[-9.6,-9.2,0.8],[9.6,-9.2,0.8],[-9.6,7.4,0.8],[9.6,7.4,0.8],[SW/2-0.8,-0.6,0.9],[SW/2-0.8,1.0,0.9],[SW/2-0.8,2.6,0.9],[-2.55,SD/2,1.2],[2.6,-5.8,0.6]].concat(SCI_NEW_OBST);
 const CAT_OBST=(()=>{const o=[];for(const sx of [-1,1])for(const z of CAT.CZ)o.push([sx*3.8,z,0.8]);for(const sx of [-1,1])for(const z of CAT.rows.concat(CAT.extraRows)){o.push([sx*1.6,z,0.75]);o.push([sx*2.9,z,0.75]);}o.push([0,-KD/2+2.2,1.3]);for(let x=-6.6;x<=6.6;x+=1.1)o.push([x,-KD/2+5.45,0.75]);for(const q of CAT.pileObst)o.push(q);o.push([2.8,-KD/2+7.2,0.9],[-5.4,-2.6,1.0],[-6.6,0,0.8],[-6.6,2,0.8],[-6.6,4,0.8],[0,KD/2,1.2],[5.6,-3.0,0.6]);for(const q of CAT_NEW_OBST)o.push(q);return o;})();
-const FANT_OBST=[[5.4,2.2,3.5],[-3.0,FTZ+6.9,0.72],[-1.1,FTZ+8.0,1.0],[-2.6,FTZ+8.7,0.25],[-6.2,3.4,0.7],[6.8,-3.6,0.7],[-7.4,-2.0,0.7],[5.6,-6.0,0.7],[-3.8,6.8,0.7],[7.0,6.6,0.7],[-13,4,0.7],[12,-4,0.7],[-11,-11,0.7],[13,7,0.7],[-16,-1,0.7],[16,2,0.7],[-7,14,0.7],[7,-13,0.7],[3,-17,0.7],[-1.35,FR-0.9,0.6],[1.35,FR-0.9,0.6],[-13.6,0.8,0.6]].concat(FANT.stoneObst,FANT.trunkObst,FANT_NEW_OBST);
-const FANT_WORLD={ext:FR+0.6,clamp:(x,z,m)=>{const r=Math.hypot(x,z),rm=FR-m;if(r>rm){x*=rm/r;z*=rm/r;}return [x,z];},obst:FANT_OBST,
-  camT:(ox,oy,oz,dx,dy,dz,dist)=>{const Rc=FR-0.6;const a=dx*dx+dz*dz,b=2*(ox*dx+oz*dz),c=ox*ox+oz*oz-Rc*Rc;let t=dist;if(a>1e-6){const disc=b*b-4*a*c;if(disc>0){const tt=(-b+Math.sqrt(disc))/(2*a);if(tt>0)t=Math.min(t,tt);}}
+const FANT_STAIR_OBST=[],FANT_DECK_EXTRA=[];const FANT_OBST=[[5.4,2.2,3.5],[-3.0,FTZ+6.9,0.72],[-1.1,FTZ+8.0,1.0],[-2.6,FTZ+8.7,0.25],[-6.2,3.4,0.7],[6.8,-3.6,0.7],[-7.4,-2.0,0.7],[5.6,-6.0,0.7],[-3.8,6.8,0.7],[7.0,6.6,0.7],[-13,4,0.7],[12,-4,0.7],[-11,-11,0.7],[13,7,0.7],[-16,-1,0.7],[16,2,0.7],[-7,14,0.7],[7,-13,0.7],[3,-17,0.7],[-1.35,FR-0.9,0.6],[1.35,FR-0.9,0.6]].concat(FANT.stoneObst,FANT.trunkObst,FANT_NEW_OBST);FANT_DECK_EXTRA.push([FANT.chestAt.x,FANT.chestAt.z,0.55]);
+const FANT_WORLD={ext:Math.max(FR+0.6,-FTZ+8.5),clamp:(x,z,m,noLvl)=>{if(!noLvl&&FANT.lvl)return FANT.clampLvl(x,z,m);const r=Math.hypot(x,z),rm=FR-m;if(r>rm){x*=rm/r;z*=rm/r;}return [x,z];},get obst(){return FANT.lvl===0?FANT_OBST:(FANT.lvl===1?FANT_STAIR_OBST:FANT.deckObst.concat(FANT_DECK_EXTRA));},navKey:()=>'f'+FANT.lvl,
+  camT:(ox,oy,oz,dx,dy,dz,dist)=>{const Rc=FANT.lvl?36:FR-0.6;const a=dx*dx+dz*dz,b=2*(ox*dx+oz*dz),c=ox*ox+oz*oz-Rc*Rc;let t=dist;if(a>1e-6){const disc=b*b-4*a*c;if(disc>0){const tt=(-b+Math.sqrt(disc))/(2*a);if(tt>0)t=Math.min(t,tt);}}
     if(dz>1e-6){const tw=(FR-1.1-oz)/dz;if(tw>0&&tw<t){const xw=ox+dx*tw,yw=oy+dy*tw;if(Math.abs(xw)<2.8&&yw<4.4)t=tw;}} // portal de volta ao hall: a câmera fica na frente dele
     { const T=FANT.tree;const px=ox-T.x,pz=oz-T.z;const b2=2*(px*dx+pz*dz),c2=px*px+pz*pz-T.r*T.r;if(a>1e-6&&c2>0){const d2=b2*b2-4*a*c2;if(d2>0){const t1=(-b2-Math.sqrt(d2))/(2*a);if(t1>0&&oy+dy*t1<17)t=Math.min(t,t1);}}}
     if(dy>1e-6)t=Math.min(t,(30-oy)/dy);return t;}};
@@ -6091,7 +6186,7 @@ const MYS_OBST=[[-0.7,-2.4,0.72],[0,-2.4,0.72],[0.7,-2.4,0.72],[0,-3.4,0.42],[-1
 const ROOMS={
   lib:{scene,world:ROOM_WORLD,spawn:{x:-2.55,z:D/2-2.7,dir:Math.PI},chair:{x:-2.7,z:0.6,fx:Math.sin(-0.75),fz:Math.cos(-0.75)},chairMeshes:CHAIR_MESHES,door:ROOM_DOOR,portalQuad:LIB_PQ,doorFront:[-2.55,D/2-1.35],shelf:MYSHELF,tableG:TABLE_G,tableAt:{x:-0.4,z:1.7},books:MYBOOKS,placeTable:placeTableLib,tick:libTick,myGroup:null,tableBooks:null},
   cat:{scene:catScene,world:boxWorld(KW,KD,KH,CAT_OBST),spawn:{x:0,z:KD/2-4.2,dir:Math.PI},chair:CAT.chair,chairMeshes:CAT.chairMeshes,door:CAT.doorG,portalQuad:CAT.pq,doorFront:[0,KD/2-1.6],seat:'num banco',altarBook:CAT.book,altarAt:[0,-KD/2+6.9],altarLook:[0,-KD/2],shelf:CAT.shelf,tableG:CAT.tableG,tableAt:CAT.tableAt,books:CAT.books,placeTable:placeTableCat,tick:catTick,myGroup:null,tableBooks:null},
-  fant:{scene:fantScene,exposure:1.25,world:FANT_WORLD,spawn:{x:0,z:FR-2.9,dir:Math.PI},chair:FANT.chair,chairMeshes:FANT.chairMeshes,door:FANT.doorG,portalQuad:FANT.portal,doorFront:[0,FR-2.2],seat:'no toco',shelf:FANT.shelf,tableG:FANT.tableG,tableAt:FANT.tableAt,books:FANT.books,placeTable:placeTableFant,tick:fantTick,myGroup:null,tableBooks:null},
+  fant:{scene:fantScene,exposure:1.25,world:FANT_WORLD,floorY:FANT.floorY,levelUpdate:FANT.levelUpdate,levelAt:FANT.levelAt,route:FANT.route,reset:FANT.reset,floorMeshes:()=>[FANT.deck,FANT.deck2].concat(FANT.steps),spawn:{x:0,z:FR-2.9,dir:Math.PI},chair:FANT.chair,chairMeshes:FANT.chairMeshes,door:FANT.doorG,portalQuad:FANT.portal,doorFront:[0,FR-2.2],seat:'no toco',shelf:FANT.shelf,tableG:FANT.tableG,tableAt:FANT.tableAt,books:FANT.books,placeTable:placeTableFant,tick:fantTick,myGroup:null,tableBooks:null},
   adv:{scene:advScene,exposure:1.0,world:ADV_WORLD,spawn:{x:-1.1,z:ZQ-2.8,dir:Math.PI},chair:ADV.chair,chairMeshes:ADV.chairMeshes,door:ADV.doorG,portalQuad:ADV.pq,doorFront:[-1.1,ZQ-1.3],seat:'na poltrona do capitão',altarBook:ADV.chest,altarAt:[-4.15,1.95],altarLook:[-5.2,1.2],altarLabel:'O Baú do Tesouro · abrir a Estante',floorY:ADV.floorY,route:ADV.route,shelf:ADV.shelf,tableG:ADV.tableG,tableAt:ADV.tableAt,books:ADV.books,placeTable:placeTableAdv,tick:advTick,myGroup:null,tableBooks:null},
   sci:{scene:sciScene,world:boxWorld(SW,SD,SH,SCI_OBST),spawn:{x:-2.55,z:SD/2-2.7,dir:Math.PI},chair:{x:-2.7,z:0.6,fx:Math.sin(-0.75),fz:Math.cos(-0.75)},chairMeshes:SCI.chairMeshes,door:SCI.doorG,portalQuad:SCI.pq,doorFront:[-2.55,SD/2-1.7],shelf:SCI.shelf,tableG:SCI.orbit,tableAt:{x:-0.4,z:1.7},books:SCI.books,placeTable:placeTableSci,tick:sciTick,myGroup:null,tableBooks:null},
 };
@@ -6206,7 +6301,8 @@ function coinBuild(key){const sc=key==='hall'?hallScene:ROOMS[key].scene,world=k
   return set;}
 function coinActivate(){const key=coinKeyFor();const set=coinBuild(key);COINS.scene=ACTIVE;COINS.key=key;COINS.active=set.coins.filter(c=>!c.got).map(c=>c.m);coinHud();
   if(!COINS.active.length&&set.coins.length&&!COINS.doneToast[key+COINS.dia]){COINS.doneToast[key+COINS.dia]=1;setTimeout(()=>showToast('Você já pegou todas as moedas de hoje aqui — as próximas nascem à meia-noite (em '+untilMidnight()+'); as outras salas podem ter moedas sobrando',{queue:true}),900);}}
-let AC=null;function ding(val){if(!SET.sound)return;try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const t0=AC.currentTime;const o=AC.createOscillator(),gn=AC.createGain();o.type='sine';o.frequency.setValueAtTime(val>1?1318:1047,t0);o.frequency.setValueAtTime(val>1?1976:1568,t0+0.07);gn.gain.setValueAtTime(0.0001,t0);gn.gain.exponentialRampToValueAtTime(0.09,t0+0.012);gn.gain.exponentialRampToValueAtTime(0.0001,t0+0.34);o.connect(gn).connect(AC.destination);o.start(t0);o.stop(t0+0.36);}catch(e){}}
+let AC=null;let croakLast=0;function croakSound(){if(!SET.sound||performance.now()-croakLast<700)return;croakLast=performance.now();try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const t0=AC.currentTime;for(let i=0;i<2;i++){const o=AC.createOscillator(),gn=AC.createGain(),lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=600;o.type='sawtooth';const s=t0+i*0.16;o.frequency.setValueAtTime(170,s);o.frequency.exponentialRampToValueAtTime(95,s+0.13);gn.gain.setValueAtTime(0.0001,s);gn.gain.exponentialRampToValueAtTime(0.035,s+0.02);gn.gain.exponentialRampToValueAtTime(0.0001,s+0.15);o.connect(lp).connect(gn).connect(AC.destination);o.start(s);o.stop(s+0.17);}}catch(e){}}
+function ding(val){if(!SET.sound)return;try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const t0=AC.currentTime;const o=AC.createOscillator(),gn=AC.createGain();o.type='sine';o.frequency.setValueAtTime(val>1?1318:1047,t0);o.frequency.setValueAtTime(val>1?1976:1568,t0+0.07);gn.gain.setValueAtTime(0.0001,t0);gn.gain.exponentialRampToValueAtTime(0.09,t0+0.012);gn.gain.exponentialRampToValueAtTime(0.0001,t0+0.34);o.connect(gn).connect(AC.destination);o.start(t0);o.stop(t0+0.36);}catch(e){}}
 const coinNEl=document.getElementById('coinN'),coinBtn=document.getElementById('coins'),coinPlus=document.getElementById('coinPlus'),coinDayEl=document.getElementById('coinDay');
 function untilMidnight(){const d=new Date();const ms=new Date(d.getFullYear(),d.getMonth(),d.getDate()+1)-d;const h=Math.floor(ms/3600000),m=Math.floor(ms%3600000/60000);return h>0?h+'h'+String(m).padStart(2,'0'):m+' min';}
 function coinHud(){if(coinNEl)coinNEl.textContent=COINS.saldo;if(coinDayEl){const set=COINS.sets[COINS.key];if(set){const tot=set.coins.length,got=set.coins.filter(c=>c.got).length;coinDayEl.textContent=got>=tot?'✓ '+got+'/'+tot+' · novas em '+untilMidnight():got+'/'+tot+' hoje';}}}
@@ -6228,41 +6324,41 @@ const KEY_SPOTS={castelo:['hall',0,1.0,0],charneca:['fant',-0.35,3.98,FTZ+4.5],c
 function keyLoad(){try{const d=JSON.parse(localStorage.getItem(KEY_STORE)||'null');if(d&&d.tem){KEYS.tem=d.tem;KEYS.baus=d.baus||{};KEYS.ver=d.ver|0;}}catch(e){}}
 function keySave(){try{localStorage.setItem(KEY_STORE,JSON.stringify({tem:KEYS.tem,baus:KEYS.baus,ver:KEY_VER}));}catch(e){}}
 function hasKey(genre){return !!KEYS.tem[genre];}
-function keyMesh(hue){const g=new THREE.Group();const col=new THREE.Color().setHSL(hue/360,0.85,0.55);const gold=new THREE.MeshStandardMaterial({color:0xf0c860,metalness:0.9,roughness:0.28,emissive:0x7a5010,emissiveIntensity:0.45});
-  const bow=new THREE.Mesh(new THREE.TorusGeometry(0.105,0.028,10,24),gold);bow.position.y=0.3;bow.castShadow=true;g.add(bow);const gem=new THREE.Mesh(new THREE.SphereGeometry(0.05,12,10),new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:1.1,roughness:0.25}));gem.position.y=0.3;g.add(gem);
+function keyMesh(hue){const g=new THREE.Group();const col=new THREE.Color().setHSL(hue/360,0.85,0.55);const gold=new THREE.MeshStandardMaterial({color:col.clone().lerp(new THREE.Color(0xffffff),0.2),metalness:0.7,roughness:0.3,emissive:col,emissiveIntensity:0.6});g.userData.metal=gold;
+  const bow=new THREE.Mesh(new THREE.TorusGeometry(0.105,0.028,10,24),gold);bow.position.y=0.3;bow.castShadow=true;g.add(bow);const gem=new THREE.Mesh(new THREE.SphereGeometry(0.065,12,10),new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:1.3,roughness:0.25}));gem.position.y=0.3;g.add(gem);g.userData.gem=gem;
   const shaft=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.034,0.44,10),gold);shaft.position.y=0.0;shaft.castShadow=true;g.add(shaft);for(const [w,y] of [[0.13,-0.17],[0.1,-0.09]]){const bit=new THREE.Mesh(new THREE.BoxGeometry(w,0.05,0.035),gold);bit.position.set(w/2+0.02,y,0);g.add(bit);}
   const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,color:col,transparent:true,opacity:0.5,blending:THREE.AdditiveBlending,depthWrite:false}));sp.scale.set(1.0,1.0,1);sp.position.y=0.1;sp.layers.set(1);g.add(sp);
   const bm=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,color:col,transparent:true,opacity:0.22,blending:THREE.AdditiveBlending,depthWrite:false}));bm.scale.set(0.45,2.6,1);bm.position.y=1.1;bm.layers.set(1);g.add(bm);
   const L=new THREE.PointLight(col,0.8,3.5,2);L.position.y=0.3;g.add(L);g.userData.sp=sp;g.userData.bm=bm;g.userData.L=L;return g;}
 function keySceneFor(key){return key==='hall'?hallScene:(ROOMS[key]&&ROOMS[key].scene);}
 function keyActivate(){const key=coinKeyFor();KEYS.scene=ACTIVE;KEYS.key=key;const sc=keySceneFor(key);KEYS.active=[];
-  for(const genre in KEY_SPOTS){const [where,x,y,z]=KEY_SPOTS[genre];if(where!==key||hasKey(genre))continue;let it=KEYS.items[genre];if(!it){const g=keyMesh(GEN_HUES[genre]||40);g.position.set(x,y,z);g.rotation.z=0.25;if(where==='hall'){g.scale.setScalar(1.3);g.userData.s0=1.3;g.userData.bm.scale.set(0.8,5.2,1);g.userData.bm.position.y=2.4;g.userData.bm.material.opacity=0.32;g.userData.sp.scale.set(1.4,1.4,1);g.userData.L.intensity=1.6;g.userData.L.distance=6;}sc.add(g);it={genre,g,x,y,z,t:0,got:false};KEYS.items[genre]=it;}if(!it.got){it.g.visible=true;KEYS.active.push(it);}}
+  for(const genre in KEY_SPOTS){const [where,x,y,z]=KEY_SPOTS[genre];if(where!==key||hasKey(genre))continue;let it=KEYS.items[genre];if(!it){const g=keyMesh(GEN_HUES[genre]||40);g.position.set(x,y,z);g.rotation.z=0.25;if(where==='hall'){g.scale.setScalar(1.3);g.userData.s0=1.3;g.userData.bm.scale.set(0.8,5.2,1);g.userData.bm.position.y=2.4;g.userData.bm.material.opacity=0.32;g.userData.sp.scale.set(1.4,1.4,1);g.userData.L.intensity=1.6;g.userData.L.distance=6;}g.userData.L0=g.userData.L.intensity;sc.add(g);it={genre,g,x,y,z,t:0,got:false};KEYS.items[genre]=it;}if(!it.got){it.g.visible=true;KEYS.active.push(it);}}
   keyHud();}
 function keyChime(){if(!SET.sound)return;try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const t0=AC.currentTime;[[880,0],[1175,0.11],[1568,0.22],[2093,0.33]].forEach(([f,d])=>{const o=AC.createOscillator(),gn=AC.createGain();o.type='triangle';o.frequency.value=f;gn.gain.setValueAtTime(0.0001,t0+d);gn.gain.exponentialRampToValueAtTime(0.08,t0+d+0.015);gn.gain.exponentialRampToValueAtTime(0.0001,t0+d+0.45);o.connect(gn).connect(AC.destination);o.start(t0+d);o.stop(t0+d+0.5);});}catch(e){}}
 const keyBtn=document.getElementById('keysBtn'),keyNEl=document.getElementById('keyN'),bauNEl=document.getElementById('bauN');
 function keyHud(){if(!keyNEl)return;const built=Object.keys(GENRE_ROOM);const n=built.filter(hasKey).length,nb=built.filter(k=>KEYS.baus[k]).length;keyNEl.textContent=n+'/'+built.length;if(bauNEl)bauNEl.textContent='📦 '+nb+'/'+built.length;if(mapOpen)refreshMap();}
 function keyGrant(genre,how,quiet){if(hasKey(genre))return false;KEYS.tem[genre]=true;keySave();const it=KEYS.items[genre];if(it&&!it.got){it.got=true;it.t=0.0001;KEYS.anim.push(it);KEYS.active=KEYS.active.filter(q=>q!==it);}
   keyHud();if(quiet)return true;keyChime();const nome=EST.GENEROS[genre]?EST.GENEROS[genre].nome:genre;if(keyBtn){keyBtn.classList.remove('pop');void keyBtn.offsetWidth;keyBtn.classList.add('pop');}
-  showToast('🔑 Você encontrou a chave de '+nome+'! Ela abre '+chestNm(GENRE_ROOM[genre])+', na sala de '+nome+' — o Diário (J) guarda esta informação.',{big:true,ms:9000});return true;}
+  showToast('🔑 Chave '+corNome(genre)+' encontrada',{ms:2600});return true;}
 function keyCollect(it){if(it.got)return;keyGrant(it.genre,'achada');}
 function keyTick(dt){if(ACTIVE!==KEYS.scene)keyActivate();const px=MODE==='fp'?P.x:CH.x,pz=MODE==='fp'?P.z:CH.z;
-  for(const it of KEYS.active){const g=it.g;g.rotation.y=t*1.3+it.x;g.position.y=it.y+Math.sin(t*1.8+it.z)*0.05;g.userData.sp.material.opacity=0.42+0.14*Math.sin(t*3+it.x);if(Math.hypot(px-it.x,pz-it.z)<1.6)keyCollect(it);}
+  for(const it of KEYS.active){const g=it.g;g.rotation.y=t*1.3+it.x;g.position.y=it.y+Math.sin(t*1.8+it.z)*0.05;const pu=0.5+0.5*Math.sin(t*4.2+it.x);g.userData.sp.material.opacity=0.3+0.5*pu;if(g.userData.metal)g.userData.metal.emissiveIntensity=0.35+0.9*pu;if(g.userData.gem)g.userData.gem.material.emissiveIntensity=0.8+1.4*pu;g.userData.L.intensity=(g.userData.L0||0.8)*(0.6+0.9*pu);if(Math.hypot(px-it.x,pz-it.z)<1.6&&it.y-CH.fy>-1.5)keyCollect(it);}
   for(let i=KEYS.anim.length-1;i>=0;i--){const it=KEYS.anim[i];it.t+=dt;const k=Math.min(1,it.t/0.7);it.g.position.y=it.y+k*1.4;it.g.rotation.y+=dt*14;const sc=Math.max(0.001,1-k)*(it.g.userData.s0||1);it.g.scale.setScalar(sc);it.g.userData.sp.scale.setScalar(1+k*2.2);it.g.userData.sp.material.opacity=0.6*(1-k);it.g.userData.L.intensity=0.8*(1-k);if(k>=1){it.g.visible=false;KEYS.anim.splice(i,1);}}}
 keyLoad();if(KEYS.ver!==KEY_VER){const had=KEYS.ver>0;KEYS.tem={};KEYS.baus={};keySave();if(had)setTimeout(()=>showToast('Mundo atualizado: as salas estão todas abertas e as chaves agora abrem os baús trancados — chaves e baús recomeçaram; a primeira chave brilha no atril do Hall',{queue:true,big:true}),1800);}
 // dica de rumo ao começar: onde está a próxima chave ou o baú que ela abre
-function nextStep(){const built=Object.keys(GENRE_ROOM);const nome=k=>EST.GENEROS[k]?EST.GENEROS[k].nome:k;if(!Object.keys(KEYS.tem).length)return 'Uma chave brilha sob o Livro dos Contos, no centro do Hall — pegue-a: ela abre o Baú do Castelo, na sala de Fantasia';const pend=built.find(k=>hasKey(k)&&!KEYS.baus[k]);if(pend)return 'Você tem a chave de '+nome(pend)+' — o '+CHEST_NAME[GENRE_ROOM[pend]]+' espera por você na sala de '+nome(pend);const falta=built.filter(k=>!hasKey(k));if(falta.length)return 'Faltam '+falta.length+' chave'+(falta.length>1?'s':'')+' — cada uma está escondida numa das salas; a de '+nome(falta[0])+' vem primeiro';return 'Todos os baús abertos e as '+relicGoal()+' relíquias reunidas — a Coroa do Leitor é sua na Lojinha da Coruja';}
+function nextStep(){const built=Object.keys(GENRE_ROOM);const pend=built.filter(k=>hasKey(k)&&!KEYS.baus[k]);if(pend.length)return 'Chave e baú têm a mesma cor: você tem a chave '+pend.map(k=>corNome(k)).join(' e a ')+' — procure o baú dessa cor';const falta=built.filter(k=>!hasKey(k));if(falta.length)return 'Cada chave abre o baú da mesma cor — faltam '+falta.length+' chave'+(falta.length>1?'s':'')+' pelo mundo';return 'Todos os baús abertos e as '+relicGoal()+' relíquias reunidas — a Coroa do Leitor é sua na Lojinha da Coruja';}
 function keyHint(){showToast(nextStep(),{queue:true,big:true});}
-if(keyBtn)keyBtn.addEventListener('click',()=>{const built=Object.keys(GENRE_ROOM);const nome=k=>EST.GENEROS[k]?EST.GENEROS[k].nome:k;const tem=built.filter(hasKey).map(nome),falta=built.filter(k=>!hasKey(k)).map(nome),nb=built.filter(k=>KEYS.baus[k]).length;showToast((tem.length?'Chaves: '+tem.join(', '):'Você ainda não tem chaves — a primeira está no atril do Hall')+(falta.length?' · faltam: '+falta.join(', '):'')+' · baús abertos: '+nb+' de '+built.length+' — cada chave abre o baú trancado da sua sala');});
+if(keyBtn)keyBtn.addEventListener('click',()=>{const built=Object.keys(GENRE_ROOM);const tem=built.filter(k=>hasKey(k)&&!KEYS.baus[k]).map(k=>corNome(k)),nb=built.filter(k=>KEYS.baus[k]).length;showToast((tem.length?'Chaves na mão: '+tem.join(', '):'Nenhuma chave na mão')+' · baús abertos: '+nb+' de '+built.length+' · cada chave abre o baú da mesma cor');});
 window.__chaves={tem:KEYS.tem,dar:g=>keyGrant(g,'achada'),estado:KEYS,items:KEYS.items,baus:KEYS.baus,spots:KEY_SPOTS};
 /* ================= BAÚS TRANCADOS (um por sala; a chave do gênero abre o dele: +25 moedas e uma relíquia) ================= */
-const CHEST_SPOTS={fant:[-13.6,0.8,1.38],lib:[4.0,4.8,-2.45],cat:[5.6,-3.0,-1.57],sci:[2.6,-5.8,-0.42],adv:[3.0,-11.8,-0.25]}; // sala → [x,z,rotação]
+const CHEST_SPOTS={fant:[FANT.chestAt.x,FANT.chestAt.z,FANT.chestAt.rot,FANT.chestAt.y],lib:[4.0,4.8,-2.45],cat:[5.6,-3.0,-1.57],sci:[2.6,-5.8,-0.42],adv:[3.0,-11.8,-0.25]}; // sala → [x,z,rotação]
 const CHEST_NAME={fant:'Baú do Castelo',lib:'Baú da Biblioteca Gótica',cat:'Arca da Catedral',sci:'Cápsula Selada',adv:'Cofre do Capitão'};const chestNm=room=>((room==='cat'||room==='sci')?'a ':'o ')+CHEST_NAME[room]; // com artigo (Arca e Cápsula são femininos)
 const CHEST_RELIC={castelo:'Cristal do Castelo',charneca:'Vela Negra',catedral:'Pergaminho Iluminado',mesa:'Fragmento de Meteorito',navegacoes:'Bússola de Bronze'};
 function relicGoal(){return Object.keys(GENRE_ROOM).length;}
 const CHEST_COINS=25;const CHESTS={};const BURST=[];
 function relicCount(){return Object.keys(GENRE_ROOM).filter(k=>KEYS.baus[k]).length;}
 function lockedChest(hue,opt){opt=opt||{};const g=new THREE.Group();const col=new THREE.Color().setHSL(hue/360,0.85,0.55);
-  const wood=new THREE.MeshStandardMaterial({map:clonedTex(WOOD2.map,1,1),normalMap:clonedTex(WOOD2.normalMap,1,1),color:opt.iron?0x767682:0xa07048,roughness:0.85,metalness:opt.iron?0.45:0,side:THREE.DoubleSide});
+  const tint=col.clone().lerp(new THREE.Color(opt.iron?0xa0a0aa:0xd0a070),0.3);const wood=new THREE.MeshStandardMaterial({map:clonedTex(WOOD2.map,1,1),normalMap:clonedTex(WOOD2.normalMap,1,1),color:tint,roughness:0.8,metalness:opt.iron?0.45:0,emissive:col,emissiveIntensity:0.1,side:THREE.DoubleSide});
   const iron=new THREE.MeshStandardMaterial({color:0x2a2a30,roughness:0.5,metalness:0.7}),brass=new THREE.MeshStandardMaterial({color:0xd8b050,roughness:0.35,metalness:0.85,emissive:0x3a2808,emissiveIntensity:0.25});
   const BW=0.9,BH=0.46,BD=0.56;
   const body=new THREE.Mesh(new THREE.BoxGeometry(BW,BH,BD),wood);body.position.y=BH/2;body.castShadow=body.receiveShadow=true;g.add(body);
@@ -6273,28 +6369,29 @@ function lockedChest(hue,opt){opt=opt||{};const g=new THREE.Group();const col=ne
   for(const x of [-0.3,0.3]){const b=new THREE.Mesh(new THREE.TorusGeometry(BD/2+0.01,0.035,8,18,Math.PI),iron);b.rotation.y=Math.PI/2;b.position.set(x,0,BD/2);lid.add(b);}
   const hasp=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.16,0.03),iron);hasp.position.set(0,-0.06,BD+0.02);lid.add(hasp);
   const lock=new THREE.Group();lock.position.set(0,-0.2,BD+0.03);lid.add(lock);const lb=new THREE.Mesh(new THREE.RoundedBoxGeometry(0.15,0.16,0.07,2,0.02),brass);lb.castShadow=true;lock.add(lb);const sh=new THREE.Mesh(new THREE.TorusGeometry(0.05,0.013,8,16,Math.PI),iron);sh.position.y=0.08;lock.add(sh);
-  const gem=new THREE.Mesh(new THREE.SphereGeometry(0.035,12,10),new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:1.2,roughness:0.2}));gem.position.z=0.04;lock.add(gem);
+  const gem=new THREE.Mesh(new THREE.SphereGeometry(0.05,12,10),new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:1.2,roughness:0.2}));gem.position.z=0.05;lock.add(gem);
+  const CL=new THREE.PointLight(col,0.7,3.2,2);CL.position.y=BH+0.5;g.add(CL);
   const gold=new THREE.Group();gold.visible=false;g.add(gold);const heap=new THREE.Mesh(new THREE.SphereGeometry(0.32,14,10),brass);heap.scale.set(1.25,0.5,0.75);heap.position.y=BH-0.08;gold.add(heap);
   for(let k=0;k<7;k++){const c=new THREE.Mesh(COIN_GEO,COIN_MAT.n);c.scale.setScalar(0.6);c.rotation.set(Math.PI/2+(k%3-1)*0.3,k*0.9,0);c.position.set((k%4-1.5)*0.16,BH+0.02+(k%2)*0.03,(k%3-1)*0.12);gold.add(c);}
   const L=new THREE.PointLight(0xffc060,0,4.0,2);L.position.y=BH+0.45;g.add(L);
   const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,color:col,transparent:true,opacity:0.4,blending:THREE.AdditiveBlending,depthWrite:false}));sp.scale.set(1.6,1.6,1);sp.position.y=0.45;sp.layers.set(1);g.add(sp);
-  g.userData.chest={lid,lock,gold,L,sp,gem,col};return g;}
+  g.userData.chest={lid,lock,gold,L,CL,sp,gem,col,wood};return g;}
 function chestGenre(room){for(const g in GENRE_ROOM)if(GENRE_ROOM[g]===room)return g;return null;}
-for(const room in CHEST_SPOTS){const [x,z,rot]=CHEST_SPOTS[room];const genre=chestGenre(room);const R=ROOMS[room];const g=lockedChest(GEN_HUES[genre]||40,{iron:room==='adv'});g.position.set(x,R.floorY?R.floorY(x,z):0,z);g.rotation.y=rot;R.scene.add(g);
-  CHESTS[room]={g,genre,x,z,rot,open:false,t:0,shake:0,ax:x+Math.sin(rot)*1.15,az:z+Math.cos(rot)*1.15,parts:g.userData.chest};}
-function chestSetOpen(C){C.open=true;C.t=0;const P=C.parts;if(C.safe)P.lid.rotation.y=1.6;else{P.lid.rotation.x=-1.9;if(P.gold)P.gold.visible=true;if(P.lock)P.lock.visible=false;}P.L.intensity=1.5;P.sp.material.color.set(0xffc060);P.sp.material.opacity=0.28;try{if(typeof renderGoBar==='function')renderGoBar();}catch(e){}}
+for(const room in CHEST_SPOTS){const [x,z,rot,yy]=CHEST_SPOTS[room];const genre=chestGenre(room);const R=ROOMS[room];const g=lockedChest(GEN_HUES[genre]||40,{iron:room==='adv'});g.position.set(x,yy!==undefined?yy:(R.floorY?R.floorY(x,z):0),z);g.rotation.y=rot;R.scene.add(g);
+  CHESTS[room]={g,genre,x,z,rot,lvl:yy!==undefined?2:undefined,open:false,t:0,shake:0,ax:x+Math.sin(rot)*1.15,az:z+Math.cos(rot)*1.15,parts:g.userData.chest};}
+function chestSetOpen(C){C.open=true;C.t=0;const P=C.parts;if(C.safe)P.lid.rotation.y=1.6;else{P.lid.rotation.x=-1.9;if(P.gold)P.gold.visible=true;if(P.lock)P.lock.visible=false;}P.L.intensity=1.5;if(P.CL)P.CL.intensity=0;P.sp.material.color.set(0xffc060);P.sp.material.opacity=0.28;try{if(typeof renderGoBar==='function')renderGoBar();}catch(e){}}
 for(const room in CHESTS){if(KEYS.baus[CHESTS[room].genre])chestSetOpen(CHESTS[room]);}
 function chestFor(){if(CUR!=='room')return null;return CHESTS[GENRE_ROOM[CUR_GENRE]]||null;}
-function chestLabel(C){const nome=EST.GENEROS[C.genre]?EST.GENEROS[C.genre].nome:C.genre;const nm=CHEST_NAME[GENRE_ROOM[C.genre]];const ab=(GENRE_ROOM[C.genre]==='cat'||GENRE_ROOM[C.genre]==='sci')?'aberta':'aberto';return C.open?nm+' · já '+ab:(hasKey(C.genre)?'Abrir '+chestNm(GENRE_ROOM[C.genre])+' (chave de '+nome+')':nm+' · trancad'+ab.slice(-1)+' — chave de '+nome);}
-function chestTry(C){if(!C)return;if(C.open){showToast('Você já levou o tesouro d'+chestNm(GENRE_ROOM[C.genre]));return;}if(!hasKey(C.genre)){const nome=EST.GENEROS[C.genre].nome;C.shake=0.5;showToast('Trancado: precisa da chave de '+nome+' — ela está escondida em algum lugar do mundo');return;}chestOpen(C);}
-function chestOpen(C){C.open=true;C.t=0.0001;KEYS.baus[C.genre]=1;keySave();keyHud();keyChime();const relic=CHEST_RELIC[C.genre];COINS.saldo+=CHEST_COINS;COINS.total+=CHEST_COINS;coinSave();coinHud();
+function chestLabel(C){const nm=CHEST_NAME[GENRE_ROOM[C.genre]];const fem=(GENRE_ROOM[C.genre]==='cat'||GENRE_ROOM[C.genre]==='sci');const ab=fem?'aberta':'aberto';return C.open?nm+' · já '+ab:(hasKey(C.genre)?'Abrir '+chestNm(GENRE_ROOM[C.genre]):nm+' · trancad'+ab.slice(-1)+' · chave '+corNome(C.genre));}
+function chestTry(C){if(!C)return;if(C.open){showToast('Você já levou o tesouro d'+chestNm(GENRE_ROOM[C.genre]));return;}if(!hasKey(C.genre)){C.shake=0.5;showToast('Trancado — falta a chave '+corNome(C.genre));return;}chestOpen(C);}
+function chestOpen(C){C.open=true;C.t=0.0001;if(C.parts.CL)C.parts.CL.intensity=0;if(C.parts.wood)C.parts.wood.emissiveIntensity=0.05;KEYS.baus[C.genre]=1;keySave();keyHud();keyChime();const relic=CHEST_RELIC[C.genre];COINS.saldo+=CHEST_COINS;COINS.total+=CHEST_COINS;coinSave();coinHud();
   if(coinBtn){coinBtn.classList.remove('pop');void coinBtn.offsetWidth;coinBtn.classList.add('pop');}if(coinPlus){coinPlus.textContent='+'+CHEST_COINS;coinPlus.classList.remove('show');void coinPlus.offsetWidth;coinPlus.classList.add('show');}
   chestBurst(C);const n=relicCount();showToast('📦 '+CHEST_NAME[GENRE_ROOM[C.genre]]+' aberto! +'+CHEST_COINS+' moedas e a relíquia “'+relic+'” ('+n+' de '+relicGoal()+(n>=relicGoal()?' — a Coroa do Leitor está liberada na Lojinha!':'')+')',{big:true,ms:9000});}
 function chestBurst(C){const sc=C.g.parent||ACTIVE;const y0=C.g.position.y+0.55;for(let k=0;k<14;k++){const m=new THREE.Mesh(COIN_GEO,COIN_MAT.n);m.scale.setScalar(0.7);m.position.set(C.x,y0,C.z+(C.safe?0.5:0));sc.add(m);const a=Math.random()*Math.PI*2,sp=0.7+Math.random()*1.3;BURST.push({m,sc,vx:Math.cos(a)*sp,vz:Math.sin(a)*sp,vy:2.4+Math.random()*1.6,t:0});}}
 function chestTick(dt){const C=chestFor();
   if(C){const P=C.parts;if(C.shake>0){C.shake-=dt;const s=Math.max(0,C.shake);if(!C.safe)C.g.rotation.z=Math.sin(t*50)*0.03*s;else P.lid.rotation.y=Math.sin(t*50)*0.012*s;}
     if(C.open&&C.t>0){C.t+=dt;const k=Math.min(1,C.t/1.1),e=1-Math.pow(1-k,3);if(C.safe)P.lid.rotation.y=1.6*e;else{P.lid.rotation.x=-1.9*e;if(P.lock&&k>0.05)P.lock.visible=false;if(P.gold&&k>0.25)P.gold.visible=true;}P.L.intensity=1.5*e+1.6*Math.sin(k*Math.PI);P.sp.material.color.set(0xffc060);P.sp.material.opacity=0.28+0.5*Math.sin(k*Math.PI);P.sp.scale.setScalar(1.4+1.6*Math.sin(k*Math.PI));if(k>=1){C.t=0;P.sp.scale.setScalar(1.4);}}
-    else if(!C.open){P.sp.material.opacity=0.32+0.12*Math.sin(t*2.5);if(P.gem)P.gem.material.emissiveIntensity=0.9+0.5*Math.sin(t*3);}}
+    else if(!C.open){const pu=0.5+0.5*Math.sin(t*2.6);P.sp.material.opacity=0.28+0.3*pu;if(P.gem)P.gem.material.emissiveIntensity=0.8+1.2*pu;if(P.CL)P.CL.intensity=0.35+0.8*pu;if(P.wood)P.wood.emissiveIntensity=0.06+0.16*pu;}}
   for(let i=BURST.length-1;i>=0;i--){const b=BURST[i];b.t+=dt;b.vy-=9*dt;const m=b.m;m.position.x+=b.vx*dt;m.position.z+=b.vz*dt;m.position.y+=b.vy*dt;m.rotation.y+=dt*9;m.rotation.x+=dt*4;const fl=floorAt(m.position.x,m.position.z)+0.1;if(m.position.y<fl){m.position.y=fl;b.vy=Math.abs(b.vy)*0.35;b.vx*=0.7;b.vz*=0.7;}
     if(b.t>1.6)m.scale.setScalar(0.7*Math.max(0.001,1-(b.t-1.6)/0.4));if(b.t>2.0){b.sc.remove(m);BURST.splice(i,1);}}}
 window.__baus={lista:CHESTS,abrir:chestTry,forcar:chestOpen,reliquias:relicCount};
@@ -6501,16 +6598,20 @@ function setMode(m){const was=MODE;MODE=m;
   document.querySelectorAll('#ctrl .modes button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
   cv.style.cursor=m==='tp'?'default':'crosshair';setFocus(null);fillCtrl();hintFor();try{localStorage.setItem('bibmode2',m);}catch(e){}}
 function standUp(){if(CH.sitting){CH.sitting=false;try{renderGoBar();}catch(e){}}else CH.sitting=false;}
-function walkTo(x,z,cb){[x,z]=WORLD.clamp(x,z,1.0);
-  for(const [ox,oz,orr] of WORLD.obst){let dx=x-ox,dz=z-oz,d=Math.hypot(dx,dz);if(d<orr+0.05){if(d<0.01){dx=CH.x-ox;dz=CH.z-oz;d=Math.hypot(dx,dz)||1;}x=ox+dx/d*(orr+0.05);z=oz+dz/d*(orr+0.05);}}
+function walkTo(x,z,cb,lvl){const legs=(CUR==='room'&&ROOM&&ROOM.route)?ROOM.route(CH.x,CH.z,x,z,lvl):[];
+  [x,z]=WORLD.clamp(x,z,1.0,legs.length>0);
+  if(!legs.length){for(const [ox,oz,orr] of WORLD.obst){let dx=x-ox,dz=z-oz,d=Math.hypot(dx,dz);if(d<orr+0.05){if(d<0.01){dx=CH.x-ox;dz=CH.z-oz;d=Math.hypot(dx,dz)||1;}x=ox+dx/d*(orr+0.05);z=oz+dz/d*(orr+0.05);}}}
   const wasSit=CH.sitting;standUp();let pre=[];
   if(wasSit&&CUR==='room'&&ROOM.chair){const C=ROOM.chair;const ax=C.ax!==undefined?C.ax:C.x+C.fx*1.0,az=C.az!==undefined?C.az:C.z+C.fz*1.0;if(Math.hypot(ax-x,az-z)>0.3)pre=[[ax,az]];}
-  const sx=pre.length?pre[0][0]:CH.x,sz=pre.length?pre[0][1]:CH.z;const path=findPath(sx,sz,x,z)||[[x,z]];goVia(pre.concat(path),cb);}
-function goVia(list,cb){const [wx,wz]=list[0];CH.target={x:wx,z:wz,r:list.length>1?0.32:0.12};CH.onArrive=list.length>1?()=>goVia(list.slice(1),cb):(cb||null);CH.stuckT=0;}
+  legs.push([x,z]);
+  // cada perna é planejada quando começa (o nível — chão, escada, deque — pode ter mudado no caminho)
+  const runLeg=(i)=>{if(i>=legs.length){if(cb)cb();return;}const [lx,lz]=legs[i];const last=i===legs.length-1;const path=findPath(CH.x,CH.z,lx,lz)||[[lx,lz]];goVia(path,()=>runLeg(i+1),!last);};
+  if(pre.length){goVia(pre,()=>runLeg(0),true);}else runLeg(0);}
+function goVia(list,cb,mid){const [wx,wz]=list[0];CH.target={x:wx,z:wz,r:(list.length>1||mid)?0.32:0.12};CH.onArrive=list.length>1?()=>goVia(list.slice(1),cb,mid):(cb||null);CH.stuckT=0;}
 // malha de navegação por sala (células de 30 cm) + A*: o clique acha o caminho em volta dos móveis
-function navFor(world){if(world.__nav&&world.__navN===world.obst.length)return world.__nav;const S=0.3,N=Math.ceil((world.ext||16.8)*2/S),H=N*S/2;const walk=new Uint8Array(N*N);
+function navFor(world){const nk=world.navKey?world.navKey():'';if(world.__nav&&world.__navN===world.obst.length&&world.__navK===nk)return world.__nav;const S=0.3,N=Math.ceil((world.ext||16.8)*2/S),H=N*S/2;const walk=new Uint8Array(N*N);
   for(let j=0;j<N;j++)for(let i=0;i<N;i++){const x=-H+(i+0.5)*S,z=-H+(j+0.5)*S;const [cx,cz]=world.clamp(x,z,0.9);if(Math.abs(cx-x)>0.01||Math.abs(cz-z)>0.01)continue;let ok=true;for(const [ox,oz,r] of world.obst){if(Math.hypot(x-ox,z-oz)<r+0.06){ok=false;break;}}walk[j*N+i]=ok?1:0;}
-  world.__nav={S,N,H,walk};world.__navN=world.obst.length;return world.__nav;}
+  world.__nav={S,N,H,walk};world.__navN=world.obst.length;world.__navK=nk;return world.__nav;}
 function findPath(x0,z0,x1,z1){const nv=navFor(WORLD);const {S,N,H,walk}=nv;const ci=v=>Math.max(0,Math.min(N-1,Math.floor((v+H)/S)));
   const near=c=>{if(walk[c[1]*N+c[0]])return c;for(let r=1;r<=5;r++){let best=null,bd=1e9;for(let dj=-r;dj<=r;dj++)for(let di=-r;di<=r;di++){const i=c[0]+di,j=c[1]+dj;if(i<0||j<0||i>=N||j>=N||!walk[j*N+i])continue;const d=di*di+dj*dj;if(d<bd){bd=d;best=[i,j];}}if(best)return best;}return null;};
   const s=near([ci(x0),ci(z0)]),g=near([ci(x1),ci(z1)]);if(!s||!g)return null;if(s[0]===g[0]&&s[1]===g[1])return [[x1,z1]];
@@ -6531,7 +6632,7 @@ const REACH={hdoor:4.4,door:4.4,book:3.2,altar:3.8,chair:3.8,coin:4.5,key:3.2,ch
 function behindPlayer(h){if(MODE==='fp')return false;toC.set(CH.x,1.15+CH.fy,CH.z).sub(camera.position);const dC=toC.length();if(dC<0.3)return false;toC.divideScalar(dC);return h.distance<dC-0.3&&ray.ray.direction.dot(toC)>0.88;}
 const firstHit=list=>{for(const h of list){if(!behindPlayer(h))return h;}return null;};
 function resolveAt(px,py,center){if(center)ndc.set(0,0);else ndc.set((px/innerWidth)*2-1,-(py/innerHeight)*2+1);ray.setFromCamera(ndc,camera);floorPlane.constant=-CH.fy;
-  if(KEYS.active.length){for(const it of KEYS.active){const hk=firstHit(ray.intersectObject(it.g,true));if(hk){const nome=EST.GENEROS[it.genre]?EST.GENEROS[it.genre].nome:it.genre;return {kind:'key',obj:it.g,item:it,dist:hk.distance,tip:'Chave · '+nome,label:'Pegar a chave de '+nome};}}}
+  if(KEYS.active.length){for(const it of KEYS.active){const hk=firstHit(ray.intersectObject(it.g,true));if(hk){const cor=corNome(it.genre);return {kind:'key',obj:it.g,item:it,dist:hk.distance,tip:'Chave '+cor,label:'Pegar a chave '+cor};}}}
   if(COINS.active.length){const hc=firstHit(ray.intersectObjects(COINS.active,false));if(hc){const c=hc.object.userData.coin;return {kind:'coin',obj:hc.object,coin:c,dist:hc.distance,tip:c.val>1?'Moeda do dia (+5)':'Moeda',label:c.val>1?'Pegar a moeda do dia (+5)':'Pegar a moeda'};}}
   if(CUR==='hall'){if(HALLX.shop){const hs=firstHit(ray.intersectObject(HALLX.shop,true));if(hs)return {kind:'shop',obj:HALLX.shop,dist:hs.distance,tip:'Lojinha da Coruja · troque suas moedas',label:'Abrir a Lojinha da Coruja'};}
     if(HALLX.atril){const ha=firstHit(ray.intersectObject(HALLX.atril,true));if(ha)return {kind:'hlivro',obj:HALLX.atril,dist:ha.distance,tip:'Livro dos Contos · os cinco contos das salas',label:'Abrir o Livro dos Contos'};}
@@ -6543,12 +6644,14 @@ function resolveAt(px,py,center){if(center)ndc.set(0,0);else ndc.set((px/innerWi
   { const C=chestFor();if(C){const h0=firstHit(ray.intersectObject(C.g,true));if(h0){const l=chestLabel(C);return {kind:'chest',obj:C.g,chest:C,dist:h0.distance,tip:l,label:l};}} }
   { const S=storyFor();if(S){const h0=firstHit(ray.intersectObject(S.g,true));if(h0){const l=storyLabel(S);return {kind:'story',obj:S.g,story:S,dist:h0.distance,tip:l,label:l};}} }
   const hc0=firstHit(ray.intersectObjects(ROOM.chairMeshes,false));if(hc0)return {kind:'chair',obj:hc0.object,dist:hc0.distance,tip:'Sentar '+(ROOM.seat||'na poltrona'),label:'Sentar '+(ROOM.seat||'na poltrona')};
-  if(ray.ray.intersectPlane(floorPlane,hitP))return {kind:'floor',x:hitP.x,z:hitP.z};return null;}
+  if(ROOM.floorMeshes){const hf=firstHit(ray.intersectObjects(ROOM.floorMeshes(),false));if(hf){const o=hf.object;const lvl=o.userData.deck?2:1;return {kind:'floor',x:hf.point.x,z:hf.point.z,lvl};}}
+  if(ROOM.floorMeshes)floorPlane.constant=0; // com níveis, um toque fora do deque e da escada é no chão de verdade
+  if(ray.ray.intersectPlane(floorPlane,hitP))return {kind:'floor',x:hitP.x,z:hitP.z,lvl:ROOM.floorMeshes?0:undefined};return null;}
 function act(tg){if(!tg)return;
   if(tg.kind==='hdoor'){const g=tg.g;const [tx,tz]=doorFront(g,1.35);walkTo(tx,tz,()=>{CH.dir=Math.atan2(g.position.x-CH.x,g.position.z-CH.z);if(g.userData.locked){g.userData.shake=0.6;showToast('Sala em construção — em breve');return;}openDoor(g,()=>enterRoom(g.userData.genre));});return;}
   if(tg.kind==='shop'){walkTo(-4.55,0,()=>{CH.dir=Math.atan2(-6-CH.x,0-CH.z);unlock();openShop();});return;}
   if(tg.kind==='hlivro'){const d=Math.hypot(CH.x,CH.z)||1;if(d<2.6){unlock();openLivro();return;}walkTo(CH.x/d*1.6,CH.z/d*1.6,()=>{CH.dir=Math.atan2(-CH.x,-CH.z);unlock();openLivro();});return;}
-  if(tg.kind==='chest'){const C=tg.chest;walkTo(C.ax,C.az,()=>{CH.dir=Math.atan2(C.x-CH.x,C.z-CH.z);chestTry(C);});return;}
+  if(tg.kind==='chest'){const C=tg.chest;walkTo(C.ax,C.az,()=>{CH.dir=Math.atan2(C.x-CH.x,C.z-CH.z);chestTry(C);},C.lvl);return;}
   if(tg.kind==='story'){const S=tg.story;walkTo(S.ax,S.az,()=>{CH.dir=Math.atan2(S.x-CH.x,S.z-CH.z);unlock();openStory(S.genre);});return;}
   if(tg.kind==='door'){const [dx,dz]=ROOM.doorFront;walkTo(dx,dz,()=>{CH.dir=0;goHall();});return;}
   if(tg.kind==='book'){const m=tg.m;const w=m.getWorldPosition(new THREE.Vector3());const onTable=!!(ROOM.tableBooks&&ROOM.tableBooks.children.includes(m));let tx,tz;
@@ -6559,7 +6662,7 @@ function act(tg){if(!tg)return;
   if(tg.kind==='stand'){const C=ROOM.chair;const ax=C.ax!==undefined?C.ax:C.x+C.fx*0.9,az=C.az!==undefined?C.az:C.z+C.fz*0.9;standUp();walkTo(ax,az);return;}
   if(tg.kind==='coin'){const c=tg.coin;if(Math.hypot(CH.x-c.x,CH.z-c.z)<2.2)coinCollect(c);else walkTo(c.x,c.z);return;}
   if(tg.kind==='key'){const it=tg.item;if(Math.hypot(CH.x-it.x,CH.z-it.z)<2.8)keyCollect(it);else walkTo(it.x,it.z,()=>{if(Math.hypot(CH.x-it.x,CH.z-it.z)<2.8)keyCollect(it);});return;}
-  if(tg.kind==='floor')walkTo(tg.x,tg.z);}
+  if(tg.kind==='floor')walkTo(tg.x,tg.z,null,tg.lvl);}
 function actFP(tg){if(!tg)return;
   if(tg.kind==='coin'){if(tg.dist<3)coinCollect(tg.coin);return;}
   if(tg.kind==='key'){if(tg.dist<3.5)keyCollect(tg.item);return;}
@@ -6578,7 +6681,7 @@ const MARK=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,color:0xffd070,tr
 const mbox=new THREE.Box3(),mctr=new THREE.Vector3();
 function anchorOf(tg){if(!tg||!tg.obj)return null;mbox.setFromObject(tg.obj);if(mbox.isEmpty())return null;mbox.getCenter(mctr);let y=mbox.max.y+0.12;if(tg.kind==='hdoor'||tg.kind==='door')y=Math.min(mbox.max.y,mbox.min.y+2.3);else if(tg.kind==='shop'){y=1.75;mctr.x=-5.5;mctr.z=0;}else if(tg.kind==='hlivro'){y=HALLX.livroY+0.6;mctr.x=0;mctr.z=0;}else if(tg.kind==='chair')y=mbox.max.y+0.3;else if(tg.kind==='book')y=mbox.max.y+0.08;return mctr.set(mctr.x,y,mctr.z);}
 function reachOK(tg){if(!tg||tg.kind==='floor')return false;const a=anchorOf(tg);if(!a)return false;return Math.hypot(a.x-CH.x,a.z-CH.z)<=(REACH[tg.kind]||3.5);}
-function nearBy(){for(const it of KEYS.active){if(Math.hypot(it.x-CH.x,it.z-CH.z)<2.7){const nome=EST.GENEROS[it.genre]?EST.GENEROS[it.genre].nome:it.genre;return {kind:'key',obj:it.g,item:it,label:'Pegar a chave de '+nome};}}
+function nearBy(){for(const it of KEYS.active){if(Math.hypot(it.x-CH.x,it.z-CH.z)<2.7&&it.y-CH.fy>-1.5){return {kind:'key',obj:it.g,item:it,label:'Pegar a chave '+corNome(it.genre)};}}
   if(CUR==='hall'){if(HALLX.shop&&Math.hypot(-5.0-CH.x,CH.z)<2.6)return {kind:'shop',obj:HALLX.shop,label:'Abrir a Lojinha da Coruja'};if(HALLX.atril&&Math.hypot(CH.x,CH.z)<2.8)return {kind:'hlivro',obj:HALLX.atril,label:'Abrir o Livro dos Contos'};let best=null,bd=2.0;for(const g of HALL_DOORS){const [fx,fz]=doorFront(g,0.4);const d=Math.hypot(fx-CH.x,fz-CH.z);if(d<bd){bd=d;best=g;}}if(!best)return null;const G=EST.GENEROS[best.userData.genre];const nome=G?G.nome:best.userData.genre;return {kind:'hdoor',obj:best,g:best,dist:bd,label:best.userData.locked?nome+' · em construção':'Entrar: '+nome};}
   const c=[];if(ROOM.door){const [dx,dz]=ROOM.doorFront;c.push([Math.hypot(dx-CH.x,dz-CH.z),{kind:'door',obj:ROOM.door,label:'Voltar ao Hall dos Gêneros'}]);}
   if(ROOM.chair&&ROOM.chairMeshes.length){const C=ROOM.chair;c.push([Math.hypot(C.x-CH.x,C.z-CH.z),{kind:'chair',obj:ROOM.chairMeshes[0],label:'Sentar '+(ROOM.seat||'na poltrona')}]);}
@@ -6598,7 +6701,7 @@ function updateFocus(){if(MODE==='tp'||fadeOnAt||mapOpen||ctrlOpen||lojaOpen||di
   if(MARK.visible){const a=anchorOf(FOCUS);if(a){MARK.position.copy(a);const sc=0.3+0.06*Math.sin(t*5);MARK.scale.set(sc,sc,1);}else MARK.visible=false;}}
 // chegar perto basta: o conto da sala abre ao encostar no livro; no Hall o Livro dos Contos abre quando o leitor para junto dele; a chave é apanhada ao passar por cima
 function autoNear(){if(MODE==='tp'||fadeOnAt||CH.sitting||mapOpen||ctrlOpen||lojaOpen||diaryOpen||leituraOpen||livroOpen||menuOpen)return;const px=MODE==='fp'?P.x:CH.x,pz=MODE==='fp'?P.z:CH.z;
-  for(const it of KEYS.active){if(!it.got&&Math.hypot(it.x-px,it.z-pz)<1.1){keyCollect(it);break;}}
+  for(const it of KEYS.active){if(!it.got&&Math.hypot(it.x-px,it.z-pz)<1.1&&it.y-CH.fy>-1.5){keyCollect(it);break;}}
   if(CUR==='room'){const S=storyFor();if(S){const d=Math.hypot(S.x-px,S.z-pz);if(d<1.3){if(!S.nearLock&&!CH.target){S.nearLock=true;CH.target=null;CH.onArrive=null;CH.vx=CH.vz=0;CH.dir=Math.atan2(S.x-CH.x,S.z-CH.z);try{DP.clear();dpApply();}catch(e){}unlock();openStory(S.genre);}}else if(d>2.1)S.nearLock=false;if(d<1.3&&CH.target)S.nearLock=true;}}
   else if(CUR==='hall'&&HALLX.atril){const d=Math.hypot(px,pz),spd=MODE==='fp'?Math.hypot(vx,vz):Math.hypot(CH.vx,CH.vz);if(d<1.15&&spd<0.3&&!CH.target){if(!HALLX.nearLock){HALLX.nearLock=true;try{DP.clear();dpApply();}catch(e){}unlock();openLivro();}}else if(d>2.0)HALLX.nearLock=false;}}
 function doInteract(){if(mapOpen||ctrlOpen||lojaOpen||diaryOpen||leituraOpen||livroOpen||menuOpen)return;const tg=FOCUS;if(!tg||tg.far)return;if(MODE==='fp')actFP(tg);else act(tg);}
@@ -6692,7 +6795,7 @@ function buildMap(){if(!ringEl)return;ringEl.innerHTML='';
 function refreshMap(){if(!ringEl)return;ringEl.querySelectorAll('button').forEach(b=>{const key=b.dataset.key;const here=key==='hall'?CUR==='hall':(CUR==='room'&&CUR_GENRE===key);const open=key==='hall'||!!roomFor(key);b.classList.toggle('here',here);b.classList.toggle('locked',!open);const B=b.querySelector('b'),S=b.querySelector('small');
     if(key==='hall'){S.textContent=here?'você está aqui · os cinco arcos e a Lojinha da Coruja':'voltar ao saguão das portas e à Lojinha da Coruja';b.title=here?'':'voltar ao Hall';return;}
     B.textContent=EST.GENEROS[key].nome;if(!open){S.textContent='em construção — em breve';b.title='em construção';return;}
-    const st=[here?'você está aqui':'sala aberta'];if(LEITOR.lidos[key])st.push('📖 conto lido');else if(CONTOS[key])st.push('📖 conto «'+CONTOS[key].titulo+'»');if(KEYS.baus[key])st.push('✦ baú aberto');else if(hasKey(key))st.push('🔑 você tem a chave do baú');else st.push('baú trancado');S.textContent=st.join(' · ');b.title=here?'':'ir para a sala';});}
+    const st=[here?'você está aqui':'sala aberta'];if(LEITOR.lidos[key])st.push('📖 conto lido');else if(CONTOS[key])st.push('📖 conto «'+CONTOS[key].titulo+'»');if(KEYS.baus[key])st.push('✦ baú aberto');else st.push('baú trancado');S.textContent=st.join(' · ');b.title=here?'':'ir para a sala';});}
 function toggleMap(){if(mapOpen)closeMap();else openMap();}
 function openMap(){if(!mapEl)return;mapOpen=true;unlock();refreshMap();mapEl.hidden=false;if(ctrlOpen)showCtrl(false);if(lojaOpen)closeShop();if(diaryOpen)closeDiary();if(livroOpen)closeLivro();if(leituraOpen)closeStory();}
 function closeMap(){if(!mapEl)return;mapOpen=false;mapEl.hidden=true;}
@@ -6701,9 +6804,9 @@ if(mapEl)mapEl.addEventListener('click',e=>{if(e.target===mapEl)closeMap();});
 if(document.getElementById('ctrl'))document.getElementById('ctrl').addEventListener('click',e=>{if(e.target.id==='ctrl')showCtrl(false);});
 // ---- cartão de controles (H / ?) com sensibilidade e inversão do eixo ----
 const ctrlEl=document.getElementById('ctrl'),ctrlKeys=document.getElementById('ctrlKeys');
-const CTRL_TXT={gm:[['Mouse','olhar — clique na tela para prender o cursor · Esc solta'],['W A S D','andar'],['Shift','correr'],['E · clique','interagir com o que está na mira ou logo ao lado (porta, poltrona, livro, baú…)'],['Rolagem','aproximar / afastar a câmera'],['Tab · M · 🗺','menu das salas — viagem rápida para qualquer sala'],['J · 📜','Diário do Leitor: o que você tem, o próximo passo e as últimas mensagens (clicar num aviso também abre)'],['B','Minha Estante'],['V','trocar o modo: Gamer › Clique › 1ª pessoa'],['1 · 2 · 3','qualidade gráfica'],['Controle','analógicos andam e giram · A interage · B volta ao hall · gatilho corre · Start mapa · Y estante'],['🪙 Moedas','nascem todo dia pelo hall e pelas salas — passe por cima para pegar; a carteira fica salva'],['🔑 Chaves','escondidas pelo mundo (a primeira no atril do Hall): cada uma abre o baú trancado da sua sala — +25 moedas e uma relíquia'],['🦉 Lojinha','a tenda à esquerda do Hall troca moedas por roupas, chapéus, utensílios e companheiros'],['📖 Contos','cada sala tem um conto clássico num atril iluminado — leia até o fim para subir de nível (+50 moedas)']],
-  tp:[['Clique no chão','andar até lá'],['Clique nos objetos','porta, poltrona, livro, baú…'],['Arrastar','girar a câmera'],['W A S D','andar (Shift corre)'],['Rolagem','aproximar / afastar'],['Tab · M · 🗺','menu das salas — viagem rápida'],['J · 📜','Diário do Leitor (mensagens e próximo passo)'],['E · B','Minha Estante'],['V','trocar o modo'],['🔑 · 🦉','chaves abrem os baús das salas; a Lojinha do Hall troca moedas por itens']],
-  fp:[['Mouse','olhar — clique prende o cursor · Esc solta'],['W A S D','andar (Shift corre)'],['E · clique','portas, livros e objetos'],['Rolagem','andar para a frente'],['Tab · M · 🗺','menu das salas — viagem rápida'],['J · 📜','Diário do Leitor (mensagens e próximo passo)'],['B','Minha Estante'],['V','trocar o modo'],['🔑 · 🦉','chaves abrem os baús das salas; a Lojinha do Hall troca moedas por itens']]};
+const CTRL_TXT={gm:[['Mouse','olhar — clique na tela para prender o cursor · Esc solta'],['W A S D','andar'],['Shift','correr'],['E · clique','interagir com o que está na mira ou logo ao lado (porta, poltrona, livro, baú…)'],['Rolagem','aproximar / afastar a câmera'],['Tab · M · 🗺','menu das salas — viagem rápida para qualquer sala'],['J · 📜','Diário do Leitor: o que você tem, o próximo passo e as últimas mensagens (clicar num aviso também abre)'],['B','Minha Estante'],['V','trocar o modo: Gamer › Clique › 1ª pessoa'],['1 · 2 · 3','qualidade gráfica'],['Controle','analógicos andam e giram · A interage · B volta ao hall · gatilho corre · Start mapa · Y estante'],['🪙 Moedas','nascem todo dia pelo hall e pelas salas — passe por cima para pegar; a carteira fica salva'],['🔑 Chaves','brilham escondidas pelo mundo: cada chave abre o baú da MESMA COR (a cor do vitral da sala) — +25 moedas e uma relíquia'],['🦉 Lojinha','a tenda à esquerda do Hall troca moedas por roupas, chapéus, utensílios e companheiros'],['📖 Contos','cada sala tem um conto clássico num atril iluminado — leia até o fim para subir de nível (+50 moedas)']],
+  tp:[['Clique no chão','andar até lá'],['Clique nos objetos','porta, poltrona, livro, baú…'],['Arrastar','girar a câmera'],['W A S D','andar (Shift corre)'],['Rolagem','aproximar / afastar'],['Tab · M · 🗺','menu das salas — viagem rápida'],['J · 📜','Diário do Leitor (mensagens e próximo passo)'],['E · B','Minha Estante'],['V','trocar o modo'],['🔑 · 🦉','cada chave abre o baú da mesma cor; a Lojinha do Hall troca moedas por itens']],
+  fp:[['Mouse','olhar — clique prende o cursor · Esc solta'],['W A S D','andar (Shift corre)'],['E · clique','portas, livros e objetos'],['Rolagem','andar para a frente'],['Tab · M · 🗺','menu das salas — viagem rápida'],['J · 📜','Diário do Leitor (mensagens e próximo passo)'],['B','Minha Estante'],['V','trocar o modo'],['🔑 · 🦉','cada chave abre o baú da mesma cor; a Lojinha do Hall troca moedas por itens']]};
 const TOUCH_TXT=[['▲◀▼▶','segurar anda na direção da tela (dois dedos = diagonal)'],['«Ir para»','o leitor vai sozinho até a sala, o conto, o baú, a estante…'],['Toque no chão','anda até o ponto'],['E','age no que estiver perto'],['Arrastar','gira a câmera · pinça aproxima']];
 function fillCtrl(){if(!ctrlKeys)return;const rows=VJ.touch?TOUCH_TXT.concat(CTRL_TXT[MODE].filter(r=>!/Mouse|W A S D|Shift|Rolagem|Controle|Clique no chão|Arrastar/.test(r[0]))):CTRL_TXT[MODE];ctrlKeys.innerHTML=rows.map(([k,v])=>'<dt>'+k+'</dt><dd>'+v+'</dd>').join('');}
 let ctrlTimer=null;
@@ -6733,12 +6836,12 @@ function move(dt){let f=0,s=0;if(keys['w']||keys['arrowup'])f+=1;if(keys['s']||k
   f+=wheelV;wheelV*=Math.pow(0.02,dt);const sp=(keys['shift']||PAD.run)?CH.speed*1.92:CH.speed;const fx=-Math.sin(P.yaw),fz=-Math.cos(P.yaw),rx=Math.cos(P.yaw),rz=-Math.sin(P.yaw);
   const tx=(fx*f+rx*s)*sp,tz=(fz*f+rz*s)*sp;vx+=(tx-vx)*Math.min(1,dt*9);vz+=(tz-vz)*Math.min(1,dt*9);
   let nx=P.x+vx*dt,nz=P.z+vz*dt;[nx,nz]=WORLD.clamp(nx,nz,1.0);
-  for(const [ox,oz,orr] of WORLD.obst){const dx=nx-ox,dz=nz-oz,d=Math.hypot(dx,dz);if(d<orr){nx=ox+dx/d*orr;nz=oz+dz/d*orr;}}P.x=nx;P.z=nz;}
+  for(const [ox,oz,orr] of WORLD.obst){const dx=nx-ox,dz=nz-oz,d=Math.hypot(dx,dz);if(d<orr){nx=ox+dx/d*orr;nz=oz+dz/d*orr;}}P.x=nx;P.z=nz;if(CUR==='room'&&ROOM.levelUpdate)ROOM.levelUpdate(nx,nz);}
 // contorna obstáculos redondos no caminho do clique: mira na tangente do círculo em vez de empurrar de frente
-function clustersFor(world){if(world.__cl&&world.__clN===world.obst.length)return world.__cl;const cl=world.obst.map(o=>({c:[o[0],o[1],o[2]],m:[o]}));const enc=(a,b)=>{const pts=a.m.concat(b.m);let cx=0,cz=0;for(const q of pts){cx+=q[0];cz+=q[1];}cx/=pts.length;cz/=pts.length;let R=0;for(const q of pts)R=Math.max(R,Math.hypot(q[0]-cx,q[1]-cz)+q[2]);return {c:[cx,cz,R],m:pts};};
+function clustersFor(world){const nk=world.navKey?world.navKey():'';if(world.__cl&&world.__clN===world.obst.length&&world.__clK===nk)return world.__cl;const cl=world.obst.map(o=>({c:[o[0],o[1],o[2]],m:[o]}));const enc=(a,b)=>{const pts=a.m.concat(b.m);let cx=0,cz=0;for(const q of pts){cx+=q[0];cz+=q[1];}cx/=pts.length;cz/=pts.length;let R=0;for(const q of pts)R=Math.max(R,Math.hypot(q[0]-cx,q[1]-cz)+q[2]);return {c:[cx,cz,R],m:pts};};
   for(let guard=0;guard<400;guard++){let bi=-1,bj=-1,bR=1e9,bm=null;for(let i=0;i<cl.length;i++)for(let j=i+1;j<cl.length;j++){const a=cl[i].c,b=cl[j].c;if(Math.hypot(a[0]-b[0],a[1]-b[1])>=a[2]+b[2]+0.3)continue;const mg=enc(cl[i],cl[j]);if(mg.c[2]<=2.2&&mg.c[2]<bR){bR=mg.c[2];bi=i;bj=j;bm=mg;}}
     if(bi<0)break;cl.splice(bj,1);cl.splice(bi,1);cl.push(bm);}
-  world.__cl=cl;world.__clN=world.obst.length;return cl;}
+  world.__cl=cl;world.__clN=world.obst.length;world.__clK=nk;return cl;}
 // contorna obstáculos no caminho do clique: mira na tangente do círculo (aglomerados de móveis viram um círculo só; se o destino está dentro dele, usa as peças)
 function steerAround(tx,tz,dist){let best=null,bestT=1e9;const T=CH.target;const lim=Math.min(dist,3);
   const test=(ox,oz,orr)=>{const rx=ox-CH.x,rz=oz-CH.z;const along=rx*tx+rz*tz;const R=orr+0.14;if(along<=0||along>lim+R)return;if(T&&Math.hypot(T.x-ox,T.z-oz)<R)return;const perp=rx*tz-rz*tx;if(Math.abs(perp)<R&&Math.hypot(rx,rz)>R+0.02){const t0=along-Math.sqrt(Math.max(0,R*R-perp*perp));if(t0>0.05&&t0<bestT&&t0<lim){bestT=t0;best=[ox,oz,R];}}};
@@ -6752,7 +6855,7 @@ function moveTP(dt){let f=0,s=0;if(keys['w']||keys['arrowup'])f+=1;if(keys['s']|
   else if(CH.target){const dx=CH.target.x-CH.x,dz=CH.target.z-CH.z,d=Math.hypot(dx,dz);const ar=CH.target.r||0.12;if(d<ar){const cb=CH.onArrive;CH.target=null;CH.onArrive=null;if(ar<0.2){CH.vx*=0.2;CH.vz*=0.2;}if(cb)cb();}else{tx=dx/d;tz=dz/d;const k=ar>0.2?1:Math.min(1,d/0.7+0.25);tx*=k;tz*=k;want=true;}}
   CH.run=run&&manual;const sp=CH.sitting?0:(CH.run?CH.speed*2.0:CH.speed);CH.vx+=(tx*sp-CH.vx)*Math.min(1,dt*10);CH.vz+=(tz*sp-CH.vz)*Math.min(1,dt*10);
   if(!CH.sitting){const ox0=CH.x,oz0=CH.z;let nx=CH.x+CH.vx*dt,nz=CH.z+CH.vz*dt;[nx,nz]=WORLD.clamp(nx,nz,0.9);
-    for(const [ox,oz,orr] of WORLD.obst){const dx=nx-ox,dz=nz-oz,d=Math.hypot(dx,dz);if(d<orr){const ux=dx/(d||1e-6),uz=dz/(d||1e-6);nx=ox+ux*orr;nz=oz+uz*orr;const into=-(CH.vx*ux+CH.vz*uz);if(into>0.3*Math.max(0.2,Math.hypot(CH.vx,CH.vz))){const cr=CH.vx*uz-CH.vz*ux;if(Math.abs(cr)>0.05)CH.slide=cr>0?1:-1;const sg=CH.slide||1;nx+=-uz*sg*into*dt*0.9;nz+=ux*sg*into*dt*0.9;}}}CH.x=nx;CH.z=nz;
+    for(const [ox,oz,orr] of WORLD.obst){const dx=nx-ox,dz=nz-oz,d=Math.hypot(dx,dz);if(d<orr){const ux=dx/(d||1e-6),uz=dz/(d||1e-6);nx=ox+ux*orr;nz=oz+uz*orr;const into=-(CH.vx*ux+CH.vz*uz);if(into>0.3*Math.max(0.2,Math.hypot(CH.vx,CH.vz))){const cr=CH.vx*uz-CH.vz*ux;if(Math.abs(cr)>0.05)CH.slide=cr>0?1:-1;const sg=CH.slide||1;nx+=-uz*sg*into*dt*0.9;nz+=ux*sg*into*dt*0.9;}}}CH.x=nx;CH.z=nz;if(CUR==='room'&&ROOM.levelUpdate)ROOM.levelUpdate(nx,nz);
     const moved=Math.hypot(nx-ox0,nz-oz0);if(want&&CH.target&&moved<0.004){CH.stuckT+=dt;if(CH.stuckT>0.8){CH.target=null;CH.onArrive=null;CH.stuckT=0;}}else CH.stuckT=0;}
   const spd=Math.hypot(CH.vx,CH.vz);if(spd>0.2&&!CH.sitting)CH.dir=lerpAng(CH.dir,Math.atan2(CH.vx,CH.vz),Math.min(1,dt*12));
   // câmera travada: com setas, teclado ou analógico ela não gira sozinha (as direções da tela ficam estáveis); num trajeto automático ela só vira quando o destino está atrás dela
@@ -6778,7 +6881,7 @@ function placeHall(genre){const i=Math.max(0,GEN_KEYS.indexOf(genre));const th=i
   CH.target=null;CH.onArrive=null;CH.sitting=false;CH.vx=CH.vz=0;CAM.yaw=CH.dir+Math.PI;camInit=false;syncP();HALL_DOORS.forEach(d=>{d.userData.open=0;d.userData.leaves.forEach(pv=>pv.rotation.y=0);});}
 function goHall(){fadeTo(()=>{CUR='hall';WORLD=HALL_WORLD;setActive(hallScene);placeHall(CUR_GENRE);if(titleEl)titleEl.textContent='Hall dos Gêneros';if(btnHall)btnHall.hidden=true;hintFor();});}
 function syncP(){P.x=CH.x;P.z=CH.z;P.yaw=CH.dir+Math.PI;P.pitch=0;vx=vz=0;}
-function placeRoom(){const sp=ROOM.spawn;CH.x=sp.x;CH.z=sp.z;CH.dir=sp.dir;CH.target=null;CH.onArrive=null;CH.sitting=false;CH.vx=CH.vz=0;CAM.yaw=0.28;if(VJ.touch){CAM.pitch=CAMDEF.pitch;CAM.dist=CAMDEF.dist;}else CAM.pitch=Math.max(CAM.pitch,0.42);CAM.follow=false;camInit=false;syncP();}
+function placeRoom(){if(ROOM.reset)ROOM.reset();const sp=ROOM.spawn;CH.x=sp.x;CH.z=sp.z;CH.dir=sp.dir;CH.target=null;CH.onArrive=null;CH.sitting=false;CH.vx=CH.vz=0;CAM.yaw=0.28;if(VJ.touch){CAM.pitch=CAMDEF.pitch;CAM.dist=CAMDEF.dist;}else CAM.pitch=Math.max(CAM.pitch,0.42);CAM.follow=false;camInit=false;syncP();}
 function roomTitle(genre){return 'Sala · '+(EST.GENEROS[genre]?EST.GENEROS[genre].nome:'');}
 function enterRoom(genre){if(!roomFor(genre)){showToast('Sala em construção — em breve');return;}fadeTo(()=>{CUR='room';CUR_GENRE=genre;ROOM=roomFor(genre);WORLD=ROOM.world;setActive(ROOM.scene);placeRoom();
   if(titleEl)titleEl.textContent=roomTitle(genre);if(btnHall)btnHall.hidden=false;hintFor();});}
@@ -6789,7 +6892,7 @@ const diaryEl=document.getElementById('diario'),diaryNow=document.getElementById
 function esc(str){return String(str).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 function renderDiary(){if(!diaryEl)return;const built=Object.keys(GENRE_ROOM);const nome=k=>EST.GENEROS[k]?EST.GENEROS[k].nome:k;const tem=built.filter(hasKey),baus=built.filter(k=>KEYS.baus[k]);const set=COINS.sets[COINS.key];const got=set?set.coins.filter(c=>c.got).length:0,tot=set?set.coins.length:0;
   const cl=contosLidos();const rows=[['⭐ Nível','<b>Nível '+nivelAtual()+' · '+nivelNome()+'</b> · contos lidos: '+(cl.length?cl.map(g=>'«'+CONTOS[g].titulo+'»').join(', '):'nenhum ainda')+(cl.length<Object.keys(CONTOS).length?' · cada sala tem um conto clássico num atril: leia até o fim para subir de nível (+'+NIVEL_MOEDAS+' moedas)':' · você leu todos os contos das salas!')],['🪙 Moedas','<b>'+COINS.saldo+'</b> na carteira · '+(CUR==='hall'?'no Hall':'nesta sala')+' hoje: '+got+' de '+tot+(got>=tot&&tot?' · as próximas nascem à meia-noite (em '+untilMidnight()+')':'')],
-    ['🔑 Chaves',tem.length?tem.map(k=>nome(k)+(KEYS.baus[k]?' (baú já aberto)':' → abre '+chestNm(GENRE_ROOM[k])+', na sala de '+nome(k))).join(' · '):'nenhuma ainda — a primeira brilha no atril do Hall'],
+    ['🔑 Chaves',tem.length?tem.map(k=>'chave '+corNome(k)+(KEYS.baus[k]?' (baú aberto)':'')).join(' · '):'nenhuma ainda — as chaves brilham pelo mundo, cada uma na cor do seu baú'],
     ['📦 Baús',baus.length+' de '+built.length+' abertos'+(baus.length?' · relíquias: '+baus.map(k=>CHEST_RELIC[k]).join(', '):'')],
     ['➜ Próximo passo',nextStep()],
     ['🦉 Lojinha','no Hall, à esquerda: troque moedas por roupas, chapéus, utensílios e companheiros']];
@@ -6824,7 +6927,7 @@ function camTP(dt){
   const d=camPos.distanceTo(lookDes);setReaderOpacity(Math.max(0,Math.min(1,(d-0.55)/0.7)));}
 
 /* ================= LAÇO ================= */
-loadEl.style.display='none';let mode0=null;try{mode0=localStorage.getItem('bibmode2');}catch(e){}if(!['gm','tp','fp'].includes(mode0))mode0='gm';MODE='gm';for(const sc of allScenes())lightBudget(sc);jump('hall',null);buildMap();initCtrl();setMode(mode0);keyHud();setTimeout(keyHint,5600);
+loadEl.style.display='none';let mode0=null;try{mode0=localStorage.getItem('bibmode2');}catch(e){}if(!['gm','tp','fp'].includes(mode0))mode0='gm';MODE='gm';for(const sc of allScenes())lightBudget(sc);jump('hall',null);buildMap();initCtrl();setMode(mode0);keyHud();
 let last=performance.now(),t=0,fpsAcc=0,fpsN=0,fpsChecked=false;const FIREPOS=new THREE.Vector3(FX,1.5,FZ+0.6),tmpV=new THREE.Vector3();
 let frameErr=0;function frame(now){const dt=Math.min(0.1,(now-last)/1000);last=now;try{tick(dt);draw(dt);}catch(e){console.error(e);if(frameErr++<1)try{showToast('Erro interno: '+(e&&e.message||e)+' — o jogo continua; se a tela ficar preta, recarregue',{big:true,ms:9000});}catch(x){}}if(!window.__pause)requestAnimationFrame(frame);}
 cv.addEventListener('webglcontextlost',e=>{e.preventDefault();window.__pause=true;let n=0;try{n=+(localStorage.getItem('mundo.gpulost')||0)+1;localStorage.setItem('mundo.gpulost',String(n));localStorage.setItem('bibq2','leve');}catch(x){}try{showToast('O aparelho reiniciou a placa de vídeo (memória) — recarregando em modo Leve…',{big:true,ms:5000});}catch(x){}setTimeout(()=>location.reload(),2200);});
@@ -6870,7 +6973,7 @@ function draw(dt){lastDt=dt;renderPortals();if(Q.lite){renderer.setRenderTarget(
   if(!fpsChecked&&t>4){fpsAcc+=dt;fpsN++;if(fpsAcc>2.5){const fps=fpsN/fpsAcc;fpsChecked=true;if(fps<22&&Q.name==='ultra'){setQuality('alto');showToast('qualidade ajustada para Alto pelo desempenho (tecla 3 volta ao Ultra)');}else if(fps<16&&Q.name==='alto'){setQuality('classico');showToast('qualidade ajustada para Clássico pelo desempenho');}else if(fps<18&&Q.name==='classico'){setQuality('leve');showToast('qualidade ajustada para Leve pelo desempenho');}}}
 }
 requestAnimationFrame(frame);
-window.__ready=true;window.__renderer=renderer;window.__P=P;window.__CH=CH;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__sit=sitDown;window.__setQ=setQuality;window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__diario={log:LOG,abrir:openDiary,fechar:closeDiary,proximo:nextStep};
+window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__FANT=FANT;window.__findPath=findPath;window.__resolveAt=resolveAt;window.__P=P;window.__CH=CH;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__sit=sitDown;window.__setQ=setQuality;window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__diario={log:LOG,abrir:openDiary,fechar:closeDiary,proximo:nextStep};
 })();
 
 </script>
