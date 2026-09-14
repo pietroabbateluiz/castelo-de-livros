@@ -38,7 +38,10 @@
   .ltxt i{font-style:normal;display:inline-block;animation:ldot 1.3s infinite;opacity:.2} .ltxt i:nth-child(2){animation-delay:.3s} .ltxt i:nth-child(3){animation-delay:.6s}
   @keyframes ldot{0%,100%{opacity:.2}50%{opacity:1}}
   .lsub{font-size:11px;letter-spacing:.2em;color:#8a7a60;text-transform:none;min-height:1.4em}
-  @media (prefers-reduced-motion:reduce){.lbook .lpage,.ltxt i{animation:none}}
+  .lrot{display:flex;align-items:center;gap:12px;font-size:12px;letter-spacing:.12em;color:var(--gold2);text-transform:none;margin-top:4px;border:1px solid rgba(201,162,74,.45);padding:9px 14px;border-radius:3px;background:rgba(60,36,14,.35)}
+  .lphone{display:inline-block;width:11px;height:19px;border:2px solid var(--gold2);border-radius:3px;animation:lrot 2.4s ease-in-out infinite;flex:none}
+  @keyframes lrot{0%,30%{transform:rotate(0deg)}60%,100%{transform:rotate(90deg)}}
+  @media (prefers-reduced-motion:reduce){.lbook .lpage,.ltxt i,.lphone{animation:none}}
   .toast{position:fixed;left:50%;top:60px;transform:translateX(-50%);background:rgba(20,12,6,.88);border:1px solid rgba(233,220,196,.25);color:#f3e6c8;font-size:13px;letter-spacing:.08em;line-height:1.45;padding:9px 16px;border-radius:3px;opacity:0;transition:opacity .4s;pointer-events:none;max-width:min(760px,90vw);text-align:center;z-index:9}
   .toast.show,.toast.on{opacity:1;pointer-events:auto;cursor:pointer}
   #toast.big{border-color:var(--gold);box-shadow:0 0 0 1px rgba(201,162,74,.35),0 8px 30px rgba(0,0,0,.5);font-size:14px;padding:12px 20px;background:rgba(30,18,8,.94)}
@@ -246,7 +249,8 @@
   </form>
   <p class="rodape">Na sala: seus livros ficam na estante “Minha Estante” (à esquerda da lareira), com o título na lombada; os que estão em <b>Lendo</b> ficam empilhados na mesa. Clique num livro na sala (ou mire nele e aperte E) para abri-lo aqui. Tecla B abre e fecha este painel.</p>
 </aside>
-<div class="load" id="load" role="status" aria-live="polite"><div class="lbook" aria-hidden="true"><div class="lcov l"></div><div class="lcov r"></div><div class="lstack l"></div><div class="lstack r"></div><div class="lpage p4"></div><div class="lpage p3"></div><div class="lpage p2"></div><div class="lpage p1"></div><div class="lspine"></div></div><div class="ltxt">Carregando<i>.</i><i>.</i><i>.</i></div><div class="lsub" id="loadSub">abrindo a biblioteca…</div></div>
+<div class="load" id="load" role="status" aria-live="polite"><div class="lbook" aria-hidden="true"><div class="lcov l"></div><div class="lcov r"></div><div class="lstack l"></div><div class="lstack r"></div><div class="lpage p4"></div><div class="lpage p3"></div><div class="lpage p2"></div><div class="lpage p1"></div><div class="lspine"></div></div><div class="ltxt">Carregando<i>.</i><i>.</i><i>.</i></div><div class="lsub" id="loadSub">abrindo a biblioteca…</div><div class="lrot" id="loadRot" hidden><span class="lphone"></span>Melhor na horizontal — vire o celular</div></div>
+<script>try{if((navigator.maxTouchPoints>0||('ontouchstart' in window))&&matchMedia('(orientation:portrait)').matches)document.getElementById('loadRot').hidden=false;}catch(e){}</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 ( function () {
@@ -5441,6 +5445,7 @@ function setQuality(n){if(!qb[n])n='leve';Q.name=n;const wasLite=!!Q.lite;Q.lite
   sao.enabled=Q.sao;bokeh.enabled=Q.bokeh;refl.visible=Q.refl;M.floor.opacity=Q.refl?0.82:1.0;M.floor.transparent=Q.refl;M.floor.needsUpdate=true;if(window.__hrefl){window.__hrefl.visible=Q.refl;}if(window.__srefl){window.__srefl.visible=Q.refl;}if(window.__krefl){window.__krefl.visible=Q.refl;}if(window.__frefl){window.__frefl.visible=Q.refl;}if(window.__yrefl){window.__yrefl.visible=Q.refl;}if(window.__MY){window.__MY.floor.opacity=Q.refl?0.86:1.0;window.__MY.floor.transparent=Q.refl;window.__MY.floor.needsUpdate=true;}if(window.__CM){window.__CM.floor.opacity=Q.refl?0.86:1.0;window.__CM.floor.transparent=Q.refl;window.__CM.floor.needsUpdate=true;}if(window.__CATSHAFTS){const nn=n==='ultra'?4:(n==='alto'?2:1);for(const s of window.__CATSHAFTS)s.visible=s.userData.idx<nn;}if(window.__SM){window.__SM.floor.opacity=Q.refl?0.8:1.0;window.__SM.floor.transparent=Q.refl;window.__SM.floor.needsUpdate=true;}if(window.__HM){window.__HM.floor.opacity=Q.refl?0.8:1.0;window.__HM.floor.transparent=Q.refl;window.__HM.floor.needsUpdate=true;}
   SLICES.forEach((s,i)=>{s.visible=i<Q.slices;s.material.uniforms.op.value=(0.055*22/Q.slices)*(1-i/Q.slices*0.85);});
   for(const k in qb)qb[k].classList.toggle('on',k===n);for(const sc of allScenes()){lightBudget(sc);sc.traverse(o=>{if(o.userData.lodPages||o.userData.lodLite)o.visible=!Q.lite;});}
+  if(window.__repintarPostais)try{window.__repintarPostais();}catch(e){}
   try{localStorage.setItem('bibq2',n);}catch(e){}}
 for(const k in qb)qb[k].addEventListener('click',()=>setQuality(k));
 {let q0=null;try{q0=localStorage.getItem('bibq2');}catch(e){}setQuality(qb[q0]?q0:'leve');} // padrão: Leve (o mais modesto); a escolha fica guardada
@@ -7700,6 +7705,21 @@ function portalFrameM(origin,right,fwd){const m=new THREE.Matrix4();m.makeBasis(
 function mkPortal(quad,sceneA,sceneB,M,clipB,exposure,roomKey){
   const mat=new THREE.ShaderMaterial({uniforms:{tex:{value:null},vp:{value:new THREE.Matrix4()},ready:{value:0},fogColor:{value:sceneA.fog?sceneA.fog.color.clone():new THREE.Color(0)},fogDensity:{value:sceneA.fog?sceneA.fog.density:0}},vertexShader:PORTAL_VS,fragmentShader:PORTAL_FS,side:THREE.DoubleSide,toneMapped:false});
   quad.material=mat;const p={quad,sceneA,sceneB,M,clipB,exposure:exposure||1.08,rt:null,mat,cam:new THREE.PerspectiveCamera(70,1,0.05,60),last:-1e9,seen:-1e9,shadow:false,roomKey,bb:null};p.cam.layers.enable(1);p.cam.matrixAutoUpdate=false;PORTALS.push(p);return p;}
+// ---- postais: os arcos do Hall mostram uma IMAGEM ESTÁTICA de cada sala (pintada uma vez, da porta para dentro), não um portal vivo ----
+// (pedido de 14/set: os portais vivos ficavam "bugados, com muita informação"; o postal é calmo, barato e igual em todo aparelho)
+const STILLS=[];const STILL_ASPECT=2.8/3.3;
+function mkStill(quad,R,key,exposure){const mat=new THREE.MeshBasicMaterial({color:0x06040a,toneMapped:false});quad.material=mat;const s={quad,R,key,exposure:exposure||1.08,mat,rt:null,done:false};STILLS.push(s);return s;}
+function renderStill(s){const R=s.R,sp=R.spawn;if(!R||!sp)return;const cam=new THREE.PerspectiveCamera(60,STILL_ASPECT,0.05,140);cam.layers.enable(1);
+  const y=(R.floorY?R.floorY(sp.x,sp.z):0)+1.55,dx=Math.sin(sp.dir),dz=Math.cos(sp.dir);cam.position.set(sp.x-dx*0.6,y,sp.z-dz*0.6);cam.lookAt(sp.x+dx*12,y-0.9,sp.z+dz*12);cam.updateMatrixWorld();
+  const W0=Q.lite?384:640,H0=Math.round(W0/STILL_ASPECT);if(s.rt&&s.rt.width!==W0){s.rt.dispose();s.rt=null;}
+  if(!s.rt)s.rt=new THREE.WebGLRenderTarget(W0,H0,{minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter,format:THREE.RGBAFormat,stencilBuffer:false});
+  const ex=renderer.toneMappingExposure,au=renderer.shadowMap.autoUpdate,rt0=renderer.getRenderTarget(),ac=renderer.autoClear;PORTAL_ON=true;renderer.toneMappingExposure=s.exposure;renderer.shadowMap.autoUpdate=false;renderer.shadowMap.needsUpdate=true;
+  const pq=R.portalQuad;if(pq)pq.visible=false;
+  try{renderer.setRenderTarget(s.rt);renderer.autoClear=true;renderer.setClearColor(0x000000,1);renderer.clear();renderer.render(R.scene,cam);}catch(e){console.error('postal',s.key,e);}
+  renderer.setRenderTarget(rt0);renderer.autoClear=ac;renderer.toneMappingExposure=ex;renderer.shadowMap.autoUpdate=au;PORTAL_ON=false;if(pq)pq.visible=true;
+  const op=s.quad.userData.op,t=s.rt.texture;t.repeat.set(1/(op.x1-op.x0),1/(op.y1-op.y0));t.offset.set(-op.x0/(op.x1-op.x0),-op.y0/(op.y1-op.y0));s.mat.map=t;s.mat.color.set(0xffffff);s.mat.needsUpdate=true;s.done=true;}
+function renderStills(){for(const s of STILLS)renderStill(s);STILLS.inited=true;}
+window.__repintarPostais=()=>{if(STILLS.inited)renderStills();};
 const _pv=new THREE.Vector3(),_pv2=new THREE.Vector3(),_pv4=new THREE.Vector4(),_pplane=new THREE.Plane(),_pq=new THREE.Vector4(),_pcp=new THREE.Vector4(),_pn=new THREE.Vector3();
 const _pool=[];for(let i=0;i<8;i++)_pool.push(new THREE.Vector3());
 function portalBBox(p){const o=p.quad.userData.op;const q=p.quad;q.updateMatrixWorld();
@@ -7758,10 +7778,10 @@ for(const genre in GENRE_ROOM){const key=GENRE_ROOM[genre];const R=ROOMS[key];co
   const Fh=portalFrameM(ho,new THREE.Vector3(-Math.sin(th),0,Math.cos(th)),new THREE.Vector3(Math.cos(th),0,Math.sin(th)));
   const Fr=portalFrameM(ro,new THREE.Vector3(1,0,0),new THREE.Vector3(0,0,-1));
   const Mhr=new THREE.Matrix4().multiplyMatrices(Fr,Fh.clone().invert()),Mrh=Mhr.clone().invert();
-  const pa=mkPortal(g.userData.quad,hallScene,R.scene,Mhr,new THREE.Plane(new THREE.Vector3(0,0,-1),ro.z-0.01),R.exposure||1.08,key);pa.twin=rq;
+  mkStill(g.userData.quad,R,key,R.exposure||1.08);
   const pb=mkPortal(rq,R.scene,hallScene,Mrh,new THREE.Plane(new THREE.Vector3(-Math.cos(th),0,-Math.sin(th)),hr-0.01),1.08,null);pb.twin=g.userData.quad;
   R.portalAt={x:ro.x,z:ro.z};}
-window.__portais={lista:PORTALS,render:renderPortals};
+window.__portais={lista:PORTALS,render:renderPortals,postais:STILLS,pintar:renderStills};
 
 /* ================= MOEDAS (nascem todo dia pelo mundo; a carteira fica salva e vai servir para a loja) ================= */
 const COIN_KEY='mundo.moedas.v1',COIN_VER=3;const COINS={saldo:0,total:0,dia:'',ver:0,coletadas:{},sets:{},scene:null,active:[],anim:[],lastCheck:0,doneToast:{}};
@@ -8432,7 +8452,9 @@ function camTP(dt){
   const d=camPos.distanceTo(lookDes);setReaderOpacity(Math.max(0,Math.min(1,(d-0.55)/0.7)));}
 
 /* ================= LAÇO ================= */
+loadMsg('pintando as portas do Hall…');try{renderStills();}catch(e){console.error(e);}
 loadEl.style.display='none';let mode0=null;try{mode0=localStorage.getItem('bibmode2');}catch(e){}if(!['gm','tp','fp'].includes(mode0))mode0='gm';MODE='gm';for(const sc of allScenes())lightBudget(sc);jump('hall',null);buildMap();initCtrl();setMode(mode0);keyHud();
+try{if((navigator.maxTouchPoints>0||'ontouchstart' in window)&&matchMedia('(orientation:portrait)').matches)setTimeout(()=>showToast('Dica: o Mundo fica melhor na horizontal — vire o celular',{ms:6000,queue:true}),900);}catch(e){}
 let last=performance.now(),t=0,fpsAcc=0,fpsN=0,fpsChecked=false;const FIREPOS=new THREE.Vector3(FX,1.5,FZ+0.6),tmpV=new THREE.Vector3();
 let frameErr=0;function frame(now){const dt=Math.min(0.1,(now-last)/1000);last=now;try{tick(dt);draw(dt);}catch(e){console.error(e);if(frameErr++<1)try{showToast('Erro interno: '+(e&&e.message||e)+' — o jogo continua; se a tela ficar preta, recarregue',{big:true,ms:9000});}catch(x){}}if(!window.__pause)requestAnimationFrame(frame);}
 cv.addEventListener('webglcontextlost',e=>{e.preventDefault();window.__pause=true;let n=0;try{n=+(localStorage.getItem('mundo.gpulost')||0)+1;localStorage.setItem('mundo.gpulost',String(n));localStorage.setItem('bibq2','leve');}catch(x){}try{showToast('O aparelho reiniciou a placa de vídeo (memória) — recarregando em modo Leve…',{big:true,ms:5000});}catch(x){}setTimeout(()=>location.reload(),2200);});
