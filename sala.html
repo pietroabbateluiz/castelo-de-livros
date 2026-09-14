@@ -4879,7 +4879,9 @@ LEGENDA: Fim da primeira história. Não da última.`},
 </script>
 <script>
 (function(){
-const TEMPOS={};function tmark(n){TEMPOS[n]=Math.round(performance.now());}tmark('cena');window.__tempos=TEMPOS; // marcos de tempo do carregamento (ms desde a navegação)
+const TEMPOS={};function tmark(n){TEMPOS[n]=Math.round(performance.now());}tmark('cena');window.__tempos=TEMPOS;
+// último erro interno fica guardado (aparece no Diário): ajuda a entender o que deu errado num aparelho que não dá para depurar
+window.__lastErr=null;{const ce=console.error.bind(console);console.error=(...a)=>{try{window.__lastErr={t:Date.now(),m:a.map(x=>(x&&x.message)?x.message:String(x)).join(' ').slice(0,240)};}catch(e){}ce(...a);};} // marcos de tempo do carregamento (ms desde a navegação)
 const cv=document.getElementById('c'), loadEl=document.getElementById('load'), hint=document.getElementById('hint'), toast=document.getElementById('toast');
 function loadMsg(s){const e=document.getElementById('loadSub');if(e)e.textContent=s;else if(loadEl)loadEl.textContent=s;} // legenda sob o livro que folheia na tela de carregamento
 if(!window.THREE||!THREE.EffectComposer||!THREE.SAOPass||!THREE.SMAAPass||!THREE.Reflector){loadEl.textContent='Não foi possível carregar o Three.js (rede).';return;}
@@ -8767,7 +8769,7 @@ function nearBy(){for(const it of KEYS.active){if(Math.hypot(it.x-CH.x,it.z-CH.z
 function setFocus(tg){FOCUS=tg;const key=tg?(tg.kind+':'+(tg.label||'')+(tg.far?':far':'')):null;
   if(key!==focusKey){focusKey=key;vjFocus(tg);if(promptEl){if(tg){promptEl.hidden=false;promptTxt.textContent=tg.far?tg.label.replace('Entrar: ','')+' · aproxime-se':tg.label;const noKey=!!tg.far||(tg.kind==='hdoor'&&tg.g&&tg.g.userData.locked);promptKey.hidden=noKey;promptKey.textContent=PAD.on?'A':'E';}else promptEl.hidden=true;}}
   MARK.visible=!!(tg&&tg.obj&&!tg.far);}
-function updateFocus(){if(MODE==='tp'||fadeOnAt||mapOpen||ctrlOpen||lojaOpen||diaryOpen||leituraOpen||livroOpen||menuOpen){setFocus(null);return;}
+function updateFocus(){if(uiBlocked()){setFocus(null);return;}
   if(CH.sitting&&MODE!=='fp'){setFocus({kind:'stand',label:'Levantar'});return;}
   let tg=null;const aim=locked?resolveAt(0,0,true):((mouseIn&&!dragging)?resolveAt(mx,my,false):null);
   if(aim&&aim.kind!=='floor'){if(MODE==='fp'?aim.dist<5:reachOK(aim))tg=aim;else if(aim.kind==='hdoor'||aim.kind==='shop'||aim.kind==='chest'||aim.kind==='story'||aim.kind==='stair')tg=Object.assign({},aim,{far:true});}
@@ -8775,11 +8777,16 @@ function updateFocus(){if(MODE==='tp'||fadeOnAt||mapOpen||ctrlOpen||lojaOpen||di
   setFocus(tg);
   if(MARK.visible){const a=anchorOf(FOCUS);if(a){MARK.position.copy(a);const sc=0.3+0.06*Math.sin(t*5);MARK.scale.set(sc,sc,1);}else MARK.visible=false;}}
 // chegar perto basta: o conto da sala abre ao encostar no livro; no Hall o Livro dos Contos abre quando o leitor para junto dele; a chave é apanhada ao passar por cima
-function autoNear(){if(MODE==='tp'||fadeOnAt||CH.sitting||mapOpen||ctrlOpen||lojaOpen||diaryOpen||leituraOpen||livroOpen||menuOpen)return;const px=MODE==='fp'?P.x:CH.x,pz=MODE==='fp'?P.z:CH.z;
+// o que está mesmo na frente do jogo, lido do DOM (e não de flags): se alguma flag desandar, chegar perto continua abrindo o conto
+function uiBlocked(){const vis=el=>!!(el&&!el.hidden);return vis(leiEl)||vis(mapEl)||vis(ctrlEl)||vis(lojaEl)||vis(diaryEl)||vis(livroEl)||vis(menuOv)||!!fadeOnAt||!!(fadeEl&&fadeEl.classList.contains('on'));}
+// chegar perto basta, em qualquer modo (Gamer, Clique ou 1ª pessoa): raio de 1,5 m (1,7 m no toque, em que a câmera fica alta e o livro parece mais longe)
+function autoNear(){if(uiBlocked()||CH.sitting)return;const px=MODE==='fp'?P.x:CH.x,pz=MODE==='fp'?P.z:CH.z;
   for(const it of KEYS.active){if(!it.got&&Math.hypot(it.x-px,it.z-pz)<1.1&&it.y-CH.fy>-1.5){keyCollect(it);break;}}
-  if(CUR==='room'){const S=storyFor();if(S){const d=Math.hypot(S.x-px,S.z-pz);if(d<1.3){if(!S.nearLock&&!CH.target){S.nearLock=true;CH.target=null;CH.onArrive=null;CH.vx=CH.vz=0;CH.dir=Math.atan2(S.x-CH.x,S.z-CH.z);try{DP.clear();dpApply();}catch(e){}unlock();openStory(S.genre);}}else if(d>2.1)S.nearLock=false;if(d<1.3&&CH.target&&Math.hypot(CH.target.x-S.x,CH.target.z-S.z)>1.9)S.nearLock=true;}}
+  if(CUR==='room'){const S=storyFor();if(S){const d=Math.hypot(S.x-px,S.z-pz),R=VJ.touch?1.7:1.5;
+      if(d>R+0.5)S.nearLock=false; // afastou-se: a próxima chegada abre de novo (a trava só evita reabrir logo depois de fechar)
+      else if(d<R&&!S.nearLock&&!CH.target){S.nearLock=true;CH.target=null;CH.onArrive=null;CH.vx=CH.vz=0;CH.dir=Math.atan2(S.x-CH.x,S.z-CH.z);try{DP.clear();dpApply();}catch(e){}for(const k in keys)keys[k]=false;unlock();openStory(S.genre);}}}
   else if(CUR==='hall'&&HALLX.atril){const d=Math.hypot(px,pz),spd=MODE==='fp'?Math.hypot(vx,vz):Math.hypot(CH.vx,CH.vz);if(d<1.15&&spd<0.3&&!CH.target){if(!HALLX.nearLock){HALLX.nearLock=true;try{DP.clear();dpApply();}catch(e){}unlock();openLivro();}}else if(d>2.0)HALLX.nearLock=false;}}
-function doInteract(){if(mapOpen||ctrlOpen||lojaOpen||diaryOpen||leituraOpen||livroOpen||menuOpen)return;const tg=FOCUS;if(!tg||tg.far)return;if(MODE==='fp')actFP(tg);else act(tg);}
+function doInteract(){if(uiBlocked())return;const tg=FOCUS;if(!tg||tg.far)return;if(MODE==='fp')actFP(tg);else act(tg);}
 let sx=0,sy=0,hoverN=0;
 function hover(e){if(e.pointerType==='touch'||(++hoverN%3))return;const tg=resolveAt(e.clientX,e.clientY,false);const key=(tg&&tg.kind!=='floor')?(tg.kind+':'+(tg.tip||'')):null;
   if(key!==hoverId){hoverId=key;if(tip){if(key&&tg.tip&&MODE!=='gm'){tip.textContent=tg.tip;tip.hidden=false;}else tip.hidden=true;}}
@@ -8853,7 +8860,7 @@ addEventListener('keydown',e=>{if(typing(e))return;const k=e.key.toLowerCase();k
   if(k==='j'){e.preventDefault();if(leituraOpen)closeStory();toggleDiary();return;}
   if(k==='h'||k==='?'||e.key==='F1'){e.preventDefault();if(lojaOpen)closeShop();if(diaryOpen)closeDiary();if(livroOpen)closeLivro();if(leituraOpen)closeStory();showCtrl(!ctrlOpen);return;}
   if(k==='b'&&window.__panel){if(lojaOpen)closeShop();if(diaryOpen)closeDiary();if(livroOpen)closeLivro();if(leituraOpen)closeStory();window.__panel.toggle();if(!document.getElementById('est').hidden)unlock();return;}
-  if(k==='e'&&!e.repeat){if(MODE==='tp'){if(window.__panel)window.__panel.toggle();}else doInteract();return;}
+  if(k==='e'&&!e.repeat){if(MODE==='tp'&&!(FOCUS&&!FOCUS.far)){if(window.__panel)window.__panel.toggle();}else doInteract();return;} // no modo Clique, E interage se há algo ao alcance; senão abre a Estante
   if(k==='v')setMode(MODE==='gm'?'tp':(MODE==='tp'?'fp':'gm'));});
 addEventListener('keyup',e=>{if(typing(e))return;keys[e.key.toLowerCase()]=false;});
 addEventListener('blur',()=>{for(const k in keys)keys[k]=false;});
@@ -8971,6 +8978,8 @@ function renderDiary(){if(!diaryEl)return;const built=Object.keys(GENRE_ROOM);co
     ['🔑 Chaves',tem.length?tem.map(k=>'chave '+corNome(k)+(KEYS.baus[k]?' (baú aberto)':'')).join(' · '):'nenhuma ainda — as chaves brilham pelo mundo, cada uma na cor do seu baú'],
     ['📦 Baús',baus.length+' de '+built.length+' abertos'+(baus.length?' · relíquias: '+baus.map(k=>CHEST_RELIC[k]).join(', '):'')],
     ['➜ Próximo passo',nextStep()],
+    ...(window.__lastErr?[['⚠ Último erro interno',esc(window.__lastErr.m)+' · '+new Date(window.__lastErr.t).toLocaleTimeString('pt-BR')]]:[]),
+    ...((()=>{const S=(CUR==='room')?storyFor():null;if(!S)return [];const d=Math.hypot(S.x-CH.x,S.z-CH.z),R=VJ.touch?1.7:1.5;return [['📖 Conto da sala','«'+CONTOS[S.genre].titulo+'» · o livro está a <b>'+d.toFixed(1)+' m</b> de você · abre sozinho a menos de '+R.toFixed(1)+' m (modo '+MODE+(S.nearLock?', já abriu aqui — afaste-se '+(R+0.5).toFixed(1)+' m e volte, ou use E':'')+')']];})()),
     ['🦉 Lojinha','no Hall, à esquerda: troque moedas por roupas, chapéus, utensílios e companheiros']];
   diaryNow.innerHTML=rows.map(([k,v])=>'<dt>'+k+'</dt><dd>'+v+'</dd>').join('');
   const fmt=t=>{const d=new Date(t);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
@@ -9121,7 +9130,7 @@ tmark('preDraw');try{tick(0.016);draw(0.016);}catch(e){console.error(e);}tmark('
 loadEl.style.display='none';LOADED=true;if(Q.lite){try{warmCollect(HALLS[1].scene);warmCollect(scene);warmCollect(HALLS[2].scene);}catch(e){}}
 queueRooms(FLOOR1_ORDER);if(galeriaAberta())queueRooms(FLOOR2_ORDER); // as salas nascem uma a uma nos primeiros segundos; o 2º andar só quando a Galeria está aberta
 requestAnimationFrame(frame);
-window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__sit=sitDown;window.__setQ=setQuality;window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__diario={log:LOG,abrir:openDiary,fechar:closeDiary,proximo:nextStep};
+window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__sit=sitDown;window.__setQ=setQuality;window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__diario={log:LOG,abrir:openDiary,fechar:closeDiary,proximo:nextStep};
 })();
 
 </script>
