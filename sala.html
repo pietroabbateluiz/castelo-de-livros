@@ -6778,7 +6778,7 @@ const FANT_WORLD={ext:Math.max(FR+0.6,-FTZ+8.5),clamp:(x,z,m,noLvl)=>{if(!noLvl&
 yield;
 CHEST_SPOTS.fant=[FANT.chestAt.x,FANT.chestAt.z,FANT.chestAt.rot,FANT.chestAt.y];
 yield;
-ROOMS.fant={scene:fantScene,exposure:1.25,world:FANT_WORLD,floorY:FANT.floorY,levelUpdate:FANT.levelUpdate,levelAt:FANT.levelAt,route:FANT.route,reset:FANT.reset,floorMeshes:()=>[FANT.deck,FANT.deck2].concat(FANT.steps),spawn:{x:0,z:FR-2.9,dir:Math.PI},chair:FANT.chair,chairMeshes:FANT.chairMeshes,door:FANT.doorG,portalQuad:FANT.portal,doorFront:[0,FR-2.2],seat:'no toco',shelf:FANT.shelf,tableG:FANT.tableG,tableAt:FANT.tableAt,books:FANT.books,placeTable:placeTableFant,tick:fantTick,myGroup:null,tableBooks:null};
+ROOMS.fant={far:120,scene:fantScene,exposure:1.25,world:FANT_WORLD,floorY:FANT.floorY,levelUpdate:FANT.levelUpdate,levelAt:FANT.levelAt,route:FANT.route,reset:FANT.reset,floorMeshes:()=>[FANT.deck,FANT.deck2].concat(FANT.steps),spawn:{x:0,z:FR-2.9,dir:Math.PI},chair:FANT.chair,chairMeshes:FANT.chairMeshes,door:FANT.doorG,portalQuad:FANT.portal,doorFront:[0,FR-2.2],seat:'no toco',shelf:FANT.shelf,tableG:FANT.tableG,tableAt:FANT.tableAt,books:FANT.books,placeTable:placeTableFant,tick:fantTick,myGroup:null,tableBooks:null};
 yield;
 window.__FANT=FANT;
 }
@@ -7053,7 +7053,7 @@ yield;
 yield;
   { const dome=new THREE.Mesh(new THREE.SphereGeometry(56,48,28),new THREE.MeshBasicMaterial({map:daySkyTex(),side:THREE.BackSide,fog:false}));dome.position.y=SEAY;advScene.add(dome);
     const sp=SEA_SUN.clone().multiplyScalar(52);sp.y+=SEAY;const sun=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,color:0xfff2d0,blending:THREE.AdditiveBlending,depthWrite:false,opacity:0.95,fog:false}));sun.position.copy(sp);sun.scale.set(9.5,9.5,1);advScene.add(sun);const halo=sun.clone();halo.material=sun.material.clone();halo.material.opacity=0.35;halo.material.color.set(0xffe0a0);halo.scale.set(30,30,1);advScene.add(halo);
-    const CT=[cloudTex(961),cloudTex(962),cloudTex(963)];for(let k=0;k<13;k++){const a=k/13*Math.PI*2+rr()*0.4;const d=42+rr()*8;const s=new THREE.Sprite(new THREE.SpriteMaterial({map:CT[k%3],transparent:true,opacity:0.8+rr()*0.15,depthWrite:false}));const w=13+rr()*14;s.scale.set(w,w*0.42,1);s.position.set(Math.cos(a)*d,SEAY+6+rr()*10,Math.sin(a)*d);advScene.add(s);ADV.clouds.push({s,a,d,y:s.position.y,sp:0.004+rr()*0.004});}
+    const CT=[cloudTex(961),cloudTex(962),cloudTex(963)];for(let k=0;k<13;k++){const a=k/13*Math.PI*2+rr()*0.4;const d=42+rr()*8;const s=new THREE.Sprite(new THREE.SpriteMaterial({map:CT[k%3],transparent:true,opacity:0.8+rr()*0.15,depthWrite:false,fog:false}));const w=13+rr()*14;s.scale.set(w,w*0.42,1);s.position.set(Math.cos(a)*d,SEAY+6+rr()*10,Math.sin(a)*d);advScene.add(s);ADV.clouds.push({s,a,d,y:s.position.y,sp:0.004+rr()*0.004});}
     const isl=(x,z,r,h,rot)=>{const g=new THREE.Group();g.position.set(x,SEAY-0.2,z);g.rotation.y=rot;advScene.add(g);const m=new THREE.Mesh(new THREE.SphereGeometry(r,18,10,0,Math.PI*2,0,Math.PI/2),AM.island);m.scale.set(1,h/r*0.8,0.7);g.add(m);const m2=new THREE.Mesh(new THREE.SphereGeometry(r*0.6,14,8,0,Math.PI*2,0,Math.PI/2),AM.island);m2.scale.set(1.2,h*1.25/(r*0.6),0.8);m2.position.set(r*0.35,0,-r*0.1);g.add(m2);const m3=new THREE.Mesh(new THREE.SphereGeometry(r*0.5,12,8,0,Math.PI*2,0,Math.PI/2),AM.island);m3.scale.set(1.3,h*0.7/(r*0.5),0.9);m3.position.set(-r*0.5,0,r*0.15);g.add(m3);const sd=new THREE.Mesh(new THREE.CircleGeometry(r*1.12,24),AM.sand);sd.rotation.x=-Math.PI/2;sd.position.y=0.25;sd.scale.z=0.78;g.add(sd);
       for(let k=0;k<5;k++){const a=rr()*7,dd=r*0.5+rr()*r*0.5;const tr=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.1,1.4,6),AM.wood);tr.position.set(Math.cos(a)*dd,0.9,Math.sin(a)*dd*0.7);tr.rotation.z=(rr()-0.5)*0.5;g.add(tr);const cr=new THREE.Mesh(new THREE.SphereGeometry(0.55,8,6),new THREE.MeshStandardMaterial({color:0x2e6a3a,roughness:1}));cr.position.set(tr.position.x+Math.sin(tr.rotation.z)*0.6,1.7,tr.position.z);cr.scale.y=0.5;g.add(cr);}};
     isl(36,-32,9,5.2,0.4);isl(46,6,6,3.2,1.9);isl(-40,19,4.4,2.2,0.3);isl(-30,-38,5,2.4,2.6);
@@ -7111,7 +7111,7 @@ const ADV_WORLD={ext:ZS+1,clamp:(x,z,m)=>{const zc=Math.max(ZF+0.8,Math.min(ZS-1
     if(dy<-1e-6)t=Math.min(t,(0.35-oy)/dy);
     const Rc=52;const a=dx*dx+dz*dz+dy*dy,b=2*(ox*dx+oz*dz+(oy-SEAY)*dy),c=ox*ox+oz*oz+(oy-SEAY)*(oy-SEAY)-Rc*Rc;const disc=b*b-4*a*c;if(disc>0){const tt=(-b+Math.sqrt(disc))/(2*a);if(tt>0)t=Math.min(t,tt);}return t;}};
 yield;
-ROOMS.adv={lamps:ADV.lamps,canvasMat:AM.canvas,scene:advScene,exposure:1.0,world:ADV_WORLD,spawn:{x:-1.1,z:ZQ-2.8,dir:Math.PI},chair:ADV.chair,chairMeshes:ADV.chairMeshes,door:ADV.doorG,portalQuad:ADV.pq,doorFront:[-1.1,ZQ-1.3],seat:'na poltrona do capitão',altarBook:ADV.chest,altarAt:[-4.15,1.95],altarLook:[-5.2,1.2],altarLabel:'O Diário de Bordo · abrir a Estante',floorY:ADV.floorY,route:ADV.route,shelf:ADV.shelf,tableG:ADV.tableG,tableAt:ADV.tableAt,books:ADV.books,placeTable:placeTableAdv,tick:advTick,myGroup:null,tableBooks:null};
+ROOMS.adv={far:150,lamps:ADV.lamps,canvasMat:AM.canvas,scene:advScene,exposure:1.0,world:ADV_WORLD,spawn:{x:-1.1,z:ZQ-2.8,dir:Math.PI},chair:ADV.chair,chairMeshes:ADV.chairMeshes,door:ADV.doorG,portalQuad:ADV.pq,doorFront:[-1.1,ZQ-1.3],seat:'na poltrona do capitão',altarBook:ADV.chest,altarAt:[-4.15,1.95],altarLook:[-5.2,1.2],altarLabel:'O Diário de Bordo · abrir a Estante',floorY:ADV.floorY,route:ADV.route,shelf:ADV.shelf,tableG:ADV.tableG,tableAt:ADV.tableAt,books:ADV.books,placeTable:placeTableAdv,tick:advTick,myGroup:null,tableBooks:null};
 }
 /* ================= SEGUNDO ANDAR · cinco salas reaproveitadas (Mistério à mão; Romance, Distopia, Paranormal e Quadrinhos pelo kit) ================= */
 /* ================= SALA · MISTÉRIO E INVESTIGAÇÃO (escritório de detetive numa noite de chuva: persianas, neon, quadro de pistas) ================= */
@@ -8276,7 +8276,7 @@ function portalRT(p,bb){const [pw,ph]=rtSize(bb);
   if(!p.rt){p.rt=new THREE.WebGLRenderTarget(pw,ph,{minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter,format:THREE.RGBAFormat,stencilBuffer:false});p.mat.uniforms.tex.value=p.rt.texture;}
   return p.rt;}
 function portalStill(p){const l=p.lastPose;if(!l||!p.lastBB)return false;const e=camera.matrixWorld.elements;for(let i=0;i<16;i++)if(Math.abs(e[i]-l[i])>1e-5)return false;const b=p.lastBB,c=p.bb;return Math.abs(b.x-c.x)<0.5&&Math.abs(b.y-c.y)<0.5&&Math.abs(b.w-c.w)<0.5&&Math.abs(b.h-c.h)<0.5;}
-function renderPortal(p,bb,slow){const cam=p.cam;cam.fov=camera.fov;cam.near=camera.near;cam.far=camera.far;cam.aspect=camera.aspect;cam.setViewOffset(innerWidth,innerHeight,bb.x,bb.y,bb.w,bb.h);cam.updateProjectionMatrix();
+function renderPortal(p,bb,slow){const cam=p.cam;const RF=p.roomKey&&ROOMS[p.roomKey]&&ROOMS[p.roomKey].far;cam.fov=camera.fov;cam.near=camera.near;cam.far=RF||camera.far;cam.aspect=camera.aspect;cam.setViewOffset(innerWidth,innerHeight,bb.x,bb.y,bb.w,bb.h);cam.updateProjectionMatrix();
   cam.layers.mask=Q.lite?3:11; // camadas 0+1 (e a 3, dos médios, fora do Leve); a 2, dos miúdos, nunca
   const sB=p.sceneB;if(!sB.userData.refls){const L=[];sB.traverse(o=>{if(o.isReflector)L.push(o);});sB.userData.refls=L;}const hideR=slow&&sB.userData.refls.length;if(hideR)for(const o of sB.userData.refls){o.userData.pv=o.visible;o.visible=false;}
   cam.matrixWorld.multiplyMatrices(p.M,camera.matrixWorld);cam.matrixWorldInverse.copy(cam.matrixWorld).invert();
@@ -8954,7 +8954,8 @@ function setReaderOpacity(op){if(Math.abs(op-readerOp)<0.01&&(op>0.99)===(reader
 const camPos=new THREE.Vector3(),camLook=new THREE.Vector3(),camDes=new THREE.Vector3(),lookDes=new THREE.Vector3();let camInit=false;
 /* ---- troca de cena (hall ↔ sala) ---- */
 const fadeEl=document.getElementById('fade'),titleEl=document.getElementById('title'),btnHall=document.getElementById('btnHall');
-function setActive(sc){ACTIVE=sc;renderPass.scene=sc;sao.scene=sc;bokeh.scene=sc;sc.add(READER.g);sc.add(MARK);try{lightBudget(sc);}catch(e){}renderer.toneMappingExposure=(CUR==='room'&&ROOM&&ROOM.scene===sc&&ROOM.exposure)||1.08;setTimeout(()=>{try{renderGoBar();}catch(e){}},0);}
+// alcance da câmera por sala: as salas ao ar livre (galeão, clareira) têm céu a mais de 40 m — com o corte padrão o domo sumia e ficava um vazio preto no céu
+function setActive(sc){ACTIVE=sc;renderPass.scene=sc;sao.scene=sc;bokeh.scene=sc;sc.add(READER.g);sc.add(MARK);try{lightBudget(sc);}catch(e){}{const far=(CUR==='room'&&ROOM&&ROOM.far)||40;if(camera.far!==far){camera.far=far;camera.updateProjectionMatrix();fxCam.far=far;fxCam.updateProjectionMatrix();}}renderer.toneMappingExposure=(CUR==='room'&&ROOM&&ROOM.scene===sc&&ROOM.exposure)||1.08;setTimeout(()=>{try{renderGoBar();}catch(e){}},0);}
 let fadeOnAt=0;
 function fadeTo(fn){if(!fadeEl){fn();return;}fadeEl.classList.add('on');fadeOnAt=performance.now();setTimeout(()=>{try{fn();}finally{setTimeout(()=>{fadeEl.classList.remove('on');fadeOnAt=0;},150);}},480);}
 function openDoor(g,cb){g.userData.open=1;setTimeout(cb,120);} // arco aberto: só um passo e a travessia começa
