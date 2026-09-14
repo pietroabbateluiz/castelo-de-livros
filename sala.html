@@ -196,7 +196,7 @@
 <div class="vig"></div>
 <div class="t" id="title">Hall dos Gêneros</div>
 <button class="est-btn hall" id="btnHall" type="button" hidden>⟵ Voltar ao Hall</button>
-<button class="est-btn coins" id="coins" type="button" title="Moedas nascem todo dia pelo mundo — troque na Lojinha da Coruja, no Hall (clique aqui quando estiver no Hall)">🪙 <b id="coinN">0</b><small id="coinDay"></small></button><div class="coinPlus" id="coinPlus"></div>
+<button class="est-btn coins" id="coins" type="button" title="Sua carteira · quantas moedas ainda há neste mapa e quando todas nascem de novo (meia-noite) · no Hall, clique para abrir a Lojinha da Coruja">🪙 <b id="coinN">0</b><small id="coinDay"></small></button><div class="coinPlus" id="coinPlus"></div>
 <button class="est-btn keys" id="keysBtn" type="button" title="Chaves dos baús: cada uma está escondida em algum lugar do mundo e abre o baú trancado da sua sala (+25 moedas e uma relíquia)">🔑 <b id="keyN">0/0</b><small id="bauN"></small></button>
 <button class="est-btn rooms" id="btnRooms" type="button" title="Menu das salas — ir direto para qualquer sala (Tab ou M)">🗺 Salas</button>
 <button class="est-btn diario" id="btnDiario" type="button" title="Diário do Leitor: o que você tem, o próximo passo e as últimas mensagens (tecla J)">📜 Diário</button>
@@ -257,7 +257,8 @@
 // se algo falhar enquanto a tela de carregamento ainda está na frente, o erro aparece nela (em vez de "carregando" para sempre) e um toque recarrega
 window.__loadErr=null;addEventListener('error',function(e){try{var ld=document.getElementById('load');if(!ld||ld.style.display==='none'||window.__ready)return;var m=(e&&e.message)||'erro desconhecido';if(window.__loadErr)return;window.__loadErr=m;var sub=document.getElementById('loadSub');if(sub)sub.textContent='Não deu para abrir o Mundo: '+m+' — toque aqui para tentar de novo';ld.style.cursor='pointer';ld.addEventListener('click',function(){location.reload();});}catch(x){}});
 addEventListener('unhandledrejection',function(e){try{var ld=document.getElementById('load');if(!ld||ld.style.display==='none'||window.__ready||window.__loadErr)return;var r=e&&e.reason;var m=(r&&r.message)||String(r||'erro');window.__loadErr=m;var sub=document.getElementById('loadSub');if(sub)sub.textContent='Não deu para abrir o Mundo: '+m+' — toque aqui para tentar de novo';ld.style.cursor='pointer';ld.addEventListener('click',function(){location.reload();});}catch(x){}});</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>window.__tempos0={html:Math.round(performance.now())};</script><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>window.__tempos0.three=Math.round(performance.now());</script>
 <script>
 ( function () {
 
@@ -4878,6 +4879,7 @@ LEGENDA: Fim da primeira história. Não da última.`},
 </script>
 <script>
 (function(){
+const TEMPOS={};function tmark(n){TEMPOS[n]=Math.round(performance.now());}tmark('cena');window.__tempos=TEMPOS; // marcos de tempo do carregamento (ms desde a navegação)
 const cv=document.getElementById('c'), loadEl=document.getElementById('load'), hint=document.getElementById('hint'), toast=document.getElementById('toast');
 function loadMsg(s){const e=document.getElementById('loadSub');if(e)e.textContent=s;else if(loadEl)loadEl.textContent=s;} // legenda sob o livro que folheia na tela de carregamento
 if(!window.THREE||!THREE.EffectComposer||!THREE.SAOPass||!THREE.SMAAPass||!THREE.Reflector){loadEl.textContent='Não foi possível carregar o Three.js (rede).';return;}
@@ -4999,6 +5001,7 @@ const LEATHER=leatherSet(512);
 const STONE=stoneSet(512,[2,2]);
 const GLOW=glowTex(),SMOKE=smokeTex(),SKY=skyTex(),LATT=latticeTex(),SOOT=sootTex(),LEAF=leafTex(),KNIT=knitSet(),FRINGE=fringeTex();
 
+tmark('texturas');
 /* ================= MATERIAIS ================= */
 const M={
   wall:new THREE.MeshStandardMaterial({map:WOOD.map,normalMap:WOOD.normalMap,roughnessMap:WOOD.roughnessMap,color:0x9a8270,roughness:1,metalness:0.02,normalScale:new THREE.Vector2(0.8,0.8)}),
@@ -5437,8 +5440,46 @@ const Q={sao:true,bokeh:true,refl:true,slices:22,name:'ultra'};let PORTAL_ON=fal
 const qb={leve:document.getElementById('q0'),classico:document.getElementById('q1'),alto:document.getElementById('q2'),ultra:document.getElementById('q3')};
 function allScenes(){const L=[];const add=x=>{if(x&&x.isScene&&!L.includes(x))L.push(x);};try{add(scene);}catch(e){}try{for(const k in HALLS)add(HALLS[k].scene);}catch(e){}try{for(const k in ROOMS)add(ROOMS[k].scene);}catch(e){}return L;}
 function remakeMaterials(){for(const sc of allScenes())sc.traverse(o=>{if(o.material){(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{m.needsUpdate=true;});}});}
-function lightBudget(sc){if(!sc||!sc.isScene)return;const N=Q.lite?(sc.userData.liteN||12):999;const pts=[];sc.traverse(o=>{if(o.isHemisphereLight||o.isAmbientLight){if(o.userData.i0===undefined)o.userData.i0=o.intensity;o.intensity=o.userData.i0*(Q.lite?(sc.userData.liteHemi||1):1);}});sc.traverse(o=>{if(o.isPointLight){if(o.userData.i0===undefined)o.userData.i0=o.intensity;if(o.visible||o.userData.liteOff)pts.push(o);}});
-  pts.sort((a,b)=>b.userData.i0*(b.distance||10)-a.userData.i0*(a.distance||10));pts.forEach((L,i)=>{const off=i>=N;if(off){L.visible=false;L.userData.liteOff=true;}else if(L.userData.liteOff){L.visible=true;L.userData.liteOff=false;}});}
+// Orçamento de luzes. No Leve, toda cena passa a ter a MESMA formação (1 direcional, 12 pontuais, 2 spots, 1 hemisfério, nenhuma retangular, nenhuma sombra):
+// o three.js compila um programa de shader por combinação material × contagem de luzes, então com a formação igual os programas do Hall servem
+// para todas as salas — em vez de ~15-20 compilações por sala (segundos no Windows/ANGLE), cada sala nova compila só o que lhe é exclusivo.
+const LITE_P=12,LITE_S=3;
+function lightBudget(sc){if(!sc||!sc.isScene)return;const lite=!!Q.lite;
+  const pts=[],dirs=[],spots=[],rects=[];
+  sc.traverse(o=>{if(!o.isLight||o.userData.padLight)return;if(o.userData.cs0===undefined)o.userData.cs0=o.castShadow;
+    if(o.isRectAreaLight){if(o.visible||o.userData.liteOff)rects.push(o);}});
+  // retangulares: no Leve saem de cena e uma pontual substituta toma o lugar (a retangular custa caro por pixel e obriga a um shader próprio)
+  for(const r of rects){let sub=r.userData.sub;if(!sub){sub=new THREE.PointLight(r.color.getHex(),0,Math.min(40,Math.max(7,Math.max(r.width,r.height)*1.3)),1.6);sub.userData.rectSub=true;sub.userData.i0=Math.min(3,r.intensity*0.8);r.userData.sub=sub;sc.add(sub);}
+    if(lite){r.getWorldPosition(sub.position);sub.intensity=sub.userData.i0;sub.visible=true;if(!r.userData.liteOff){r.visible=false;r.userData.liteOff=true;}}
+    else{sub.visible=false;if(r.userData.liteOff){r.visible=true;r.userData.liteOff=false;}}}
+  sc.traverse(o=>{if(!o.isLight||o.userData.padLight)return;
+    if(o.isPointLight){if(o.userData.i0===undefined)o.userData.i0=o.intensity;if(o.userData.rectSub){if(lite)pts.push(o);return;}if(o.visible||o.userData.liteOff)pts.push(o);}
+    else if(o.isDirectionalLight){if(o.visible||o.userData.liteOff)dirs.push(o);}
+    else if(o.isSpotLight){if(o.visible||o.userData.liteOff)spots.push(o);}});
+  const w=o=>(o.userData.i0!==undefined?o.userData.i0:o.intensity)*(o.distance||10);
+  const keep=(L,N)=>{L.sort((a,b)=>w(b)-w(a));L.forEach((o,i)=>{const off=lite&&i>=N;if(off){o.visible=false;o.userData.liteOff=true;}else if(o.userData.liteOff){o.visible=true;o.userData.liteOff=false;}});};
+  keep(pts,LITE_P);keep(dirs,1);keep(spots,LITE_S);
+  // hemisfério: no Leve, o multiplicador da cena mais uma compensação pelas luzes que ficaram de fora da formação
+  const prevN=Math.min(pts.length,sc.userData.liteN||12);const hid=lite?(Math.max(0,prevN-LITE_P)*0.05+Math.max(0,spots.length-LITE_S)*0.06+Math.max(0,dirs.length-1)*0.08):0;const hemiMul=lite?(sc.userData.liteHemi||1)*Math.min(1.5,1+hid):1; // compensa só o que o Leve antigo mostrava e agora fica de fora
+  sc.traverse(o=>{if(o.isHemisphereLight||o.isAmbientLight){if(o.userData.i0===undefined)o.userData.i0=o.intensity;o.intensity=o.userData.i0*hemiMul;}});
+  // sombras: no Leve nenhuma luz projeta (o shader fica igual entre as cenas); fora dele, cada luz volta ao que era
+  sc.traverse(o=>{if(o.isLight&&o.userData.cs0!==undefined&&!o.userData.padLight)o.castShadow=lite?false:o.userData.cs0;});
+  // enchimento até a formação canônica: luzes de intensidade zero (só visíveis no Leve)
+  let pad=sc.userData.padLights;if(!pad)pad=sc.userData.padLights={p:[],d:[],s:[]};
+  const fill=(arr,mk,n)=>{while(arr.length<n){const L=mk();L.userData.padLight=true;L.intensity=0;sc.add(L);arr.push(L);}arr.forEach((L,i)=>{L.visible=lite&&i<n;});};
+  const vp=lite?pts.filter(o=>o.visible).length:0,vd=lite?dirs.filter(o=>o.visible).length:0,vs=lite?spots.filter(o=>o.visible).length:0;
+  fill(pad.p,()=>new THREE.PointLight(0xffffff,0,0.01,2),lite?Math.max(0,LITE_P-vp):0);
+  fill(pad.d,()=>{const L=new THREE.DirectionalLight(0xffffff,0);L.position.set(0,10,0);return L;},lite?Math.max(0,1-vd):0);
+  fill(pad.s,()=>{const L=new THREE.SpotLight(0xffffff,0,0.01);L.position.set(0,10,0);return L;},lite?Math.max(0,LITE_S-vs):0);}
+// aquecimento dos shaders no Leve, um material por vez, numa cena de ensaio com a mesma formação de luzes: cada programa novo compila num quadro só seu
+const WARM_DONE=new WeakSet(),warmQ=[];let warmScene=null,warmCam=null,warmGeo=null;
+function warmCollect(sc){if(!sc)return;sc.traverse(o=>{if(!o.material)return;const ms=Array.isArray(o.material)?o.material:[o.material];for(const m of ms){if(!m||WARM_DONE.has(m))continue;WARM_DONE.add(m);warmQ.push({m,kind:o.isInstancedMesh?'inst':(o.isSprite?'sprite':(o.isPoints?'points':'mesh')),fog:sc.fog||null});}});}
+function warmStep(){if(!warmQ.length)return false;
+  if(!warmScene){warmScene=new THREE.Scene();warmCam=new THREE.PerspectiveCamera(60,1,0.1,100);warmCam.position.set(0,0,4);warmCam.lookAt(0,0,0);warmCam.layers.enableAll();warmGeo=new THREE.BoxGeometry(0.1,0.1,0.1);
+    for(let i=0;i<LITE_P;i++)warmScene.add(new THREE.PointLight(0xffffff,0,0.01,2));const D=new THREE.DirectionalLight(0xffffff,0);D.position.set(0,10,0);warmScene.add(D);for(let i=0;i<LITE_S;i++){const S=new THREE.SpotLight(0xffffff,0,0.01);S.position.set(0,10,0);warmScene.add(S);}warmScene.add(new THREE.HemisphereLight(0xffffff,0x000000,0));}
+  const it=warmQ.shift();warmScene.fog=it.fog;let obj;
+  if(it.kind==='sprite')obj=new THREE.Sprite(it.m);else if(it.kind==='points')obj=new THREE.Points(warmGeo,it.m);else if(it.kind==='inst')obj=new THREE.InstancedMesh(warmGeo,it.m,1);else obj=new THREE.Mesh(warmGeo,it.m);
+  obj.layers.enableAll();warmScene.add(obj);try{renderer.compile(warmScene,warmCam);}catch(e){}warmScene.remove(obj);return true;}
 function setQuality(n){if(!qb[n])n='leve';Q.name=n;const wasLite=!!Q.lite;Q.lite=(n==='leve');
   if(n==='ultra'){Q.sao=true;Q.bokeh=true;Q.refl=true;Q.slices=22;}
   else if(n==='alto'){Q.sao=true;Q.bokeh=false;Q.refl=true;Q.slices=12;}
@@ -5468,6 +5509,7 @@ function showToast(msg,opt){opt=opt||{};const ms=opt.ms||Math.max(3400,Math.min(
 toast.addEventListener('pointerenter',()=>{toastHold=true;});toast.addEventListener('pointerleave',()=>{toastHold=false;});toast.addEventListener('click',()=>{toastHold=false;if(typeof toggleDiary==='function')toggleDiary();});
 logLoad();
 
+tmark('biblioteca');
 /* ================= HALL DOS GÊNEROS (cena-hub: rotunda com uma porta por gênero) ================= */
 const HR=7.4,HH=8.2; // rotunda de 5 arcos
 let hallScene=null,HALL_DOORS=[],HALLX=null,HALLN=1; // andar atual do Hall (1 = Hall dos Gêneros, 2 = Galeria)
@@ -5683,6 +5725,7 @@ function setHallN(n){HALLN=n;hallScene=HALLS[n].scene;HALL_DOORS=HALLS[n].doors;
 setHallN(1);
 
 
+tmark('hall');
 /* ================= GÓTICO EXTRA: gárgulas, piano de cauda, relógio de pêndulo, candelabro, telescópio, tapeçaria ================= */
 const GOTH={eyes:[],pend:null,pianoLid:null,catEyes:[]};
 const GOTHG=new THREE.Group();scene.add(GOTHG); // grupo do gótico extra (sala Terror e horror)
@@ -7337,7 +7380,7 @@ yield;
 yield;
   { const mo=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,color:0xe8dcc0,depthWrite:false,transparent:true,opacity:0.85}));mo.scale.set(0.07,0.07,1);mysScene.add(mo);MYS.moth={s:mo,ph:0,cx:0.62,cy:1.35,cz:-9.78,t:0,mode:0}; }
 yield;
-  mysScene.add(new THREE.HemisphereLight(0x3a4658,0x2a1c14,1.15));mysScene.userData.liteN=16;mysScene.userData.liteHemi=1.25;
+  mysScene.add(new THREE.HemisphereLight(0x3a4658,0x2a1c14,1.15));mysScene.userData.liteN=16;mysScene.userData.liteHemi=1.42;
 yield;
   for(const [x,z,inten] of [[-9,-2,1.0],[9,-2,1.0],[-9,4,0.9],[0,2,0.9],[9,12,0.8],[-3,12,0.8],[0,-4,0.8],[4,6,0.7]]){const L=new THREE.PointLight(0xffd8b0,inten,12,2);L.position.set(x,YH-0.4,z);mysScene.add(L);}
 }
@@ -8110,6 +8153,7 @@ yield;
 yield;
 registerKitRoom('quadrinhos');
 }
+tmark('salasKit');
 /* ================= PERSONAGEM (o leitor) ================= */
 const READER=(function(){
   const g=new THREE.Group();scene.add(g);
@@ -8242,7 +8286,8 @@ function renderPortal(p,bb,slow){const cam=p.cam;cam.fov=camera.fov;cam.near=cam
 let portalEma=0.016; // média móvel do tempo de quadro: com o jogo lento (< 33 fps), os portais passam a atualizar em quadros alternados
 function renderPortals(){if(!PORTALS.length||fadeOnAt)return;frameN++;camera.updateMatrixWorld();camera.matrixWorldInverse.copy(camera.matrixWorld).invert();portalEma+=(lastDt-portalEma)*0.08;
   // aquecimento: compila os shaders das cenas uma por quadro, para os primeiros portais não engasgarem
-  if(portalWarm<PORTALS.length&&lastDt<0.06&&!buildBusy){const p=PORTALS[portalWarm++];warmedAt=frameN;try{renderer.compile(p.sceneB,p.cam);}catch(e){}}
+  if(Q.lite){if(warmQ.length&&lastDt<0.06&&!buildBusy&&(frameN%2===0)){warmedAt=frameN;warmStep();}}
+  else if(portalWarm<PORTALS.length&&lastDt<0.06&&!buildBusy){const p=PORTALS[portalWarm++];warmedAt=frameN;try{renderer.compile(p.sceneB,p.cam);}catch(e){}}
   const list=[];for(const p of PORTALS){if(p.sceneA!==ACTIVE){p.bb=null;continue;}const bb=portalBBox(p);p.bb=bb;if(!bb)continue;p.seen=frameN;list.push(p);}
   // alvos de portais fora de vista há muito tempo são liberados (voltam a ser criados quando reaparecem)
   for(const p of PORTALS){if(p.rt&&frameN-p.seen>900){p.rt.dispose();p.rt=null;p.mat.uniforms.tex.value=null;p.mat.uniforms.ready.value=0;}}
@@ -8309,21 +8354,21 @@ function coinBuild(key){const isH=key==='hall'||key==='hall2';const sc=isH?HALLS
     const coin={id,x,z,y0,g:cg,m,sp,val:bonus?5:1,ph:i*1.7,got:!!COINS.coletadas[id],t:0};cg.visible=!coin.got;m.userData.coin=coin;set.coins.push(coin);});
   return set;}
 function coinActivate(){const key=coinKeyFor();const set=coinBuild(key);COINS.scene=ACTIVE;COINS.key=key;COINS.active=set.coins.filter(c=>!c.got).map(c=>c.m);coinHud();
-  if(!COINS.active.length&&set.coins.length&&!COINS.doneToast[key+COINS.dia]){COINS.doneToast[key+COINS.dia]=1;setTimeout(()=>showToast('Você já pegou todas as moedas de hoje aqui — as próximas nascem à meia-noite (em '+untilMidnight()+'); as outras salas podem ter moedas sobrando',{queue:true}),900);}}
+}
 let AC=null;let croakLast=0;function croakSound(){if(!SET.sound||performance.now()-croakLast<700)return;croakLast=performance.now();try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const t0=AC.currentTime;for(let i=0;i<2;i++){const o=AC.createOscillator(),gn=AC.createGain(),lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=600;o.type='sawtooth';const s=t0+i*0.16;o.frequency.setValueAtTime(170,s);o.frequency.exponentialRampToValueAtTime(95,s+0.13);gn.gain.setValueAtTime(0.0001,s);gn.gain.exponentialRampToValueAtTime(0.035,s+0.02);gn.gain.exponentialRampToValueAtTime(0.0001,s+0.15);o.connect(lp).connect(gn).connect(AC.destination);o.start(s);o.stop(s+0.17);}}catch(e){}}
 function ding(val){if(!SET.sound)return;try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const t0=AC.currentTime;const o=AC.createOscillator(),gn=AC.createGain();o.type='sine';o.frequency.setValueAtTime(val>1?1318:1047,t0);o.frequency.setValueAtTime(val>1?1976:1568,t0+0.07);gn.gain.setValueAtTime(0.0001,t0);gn.gain.exponentialRampToValueAtTime(0.09,t0+0.012);gn.gain.exponentialRampToValueAtTime(0.0001,t0+0.34);o.connect(gn).connect(AC.destination);o.start(t0);o.stop(t0+0.36);}catch(e){}}
 const coinNEl=document.getElementById('coinN'),coinBtn=document.getElementById('coins'),coinPlus=document.getElementById('coinPlus'),coinDayEl=document.getElementById('coinDay');
 function untilMidnight(){const d=new Date();const ms=new Date(d.getFullYear(),d.getMonth(),d.getDate()+1)-d;const h=Math.floor(ms/3600000),m=Math.floor(ms%3600000/60000);return h>0?h+'h'+String(m).padStart(2,'0'):m+' min';}
-function coinHud(){if(coinNEl)coinNEl.textContent=COINS.saldo;if(coinDayEl){const set=COINS.sets[COINS.key];if(set){const tot=set.coins.length,got=set.coins.filter(c=>c.got).length;coinDayEl.textContent=got>=tot?'✓ '+got+'/'+tot+' · novas em '+untilMidnight():got+'/'+tot+' hoje';}}}
+function coinHud(){if(coinNEl)coinNEl.textContent=COINS.saldo;if(coinDayEl){const set=COINS.sets[COINS.key];if(set){const tot=set.coins.length,left=set.coins.filter(c=>!c.got).length;coinDayEl.textContent=(left>0?left+' no mapa':'0 no mapa')+' · zera em '+untilMidnight();}}}
 function coinCollect(c){if(c.got)return;c.got=true;c.t=0.0001;COINS.coletadas[c.id]=1;COINS.saldo+=c.val;COINS.total+=c.val;coinSave();COINS.active=COINS.active.filter(m=>m!==c.m);COINS.anim.push(c);ding(c.val);coinHud();
   if(coinBtn){coinBtn.classList.remove('pop');void coinBtn.offsetWidth;coinBtn.classList.add('pop');}if(coinPlus){coinPlus.textContent='+'+c.val;coinPlus.classList.remove('show');void coinPlus.offsetWidth;coinPlus.classList.add('show');}
-  if(c.val>1)showToast('Moeda do dia! +5 moedas');}
-function coinTick(dt){if(ACTIVE!==COINS.scene)coinActivate();COINS.lastCheck+=dt;if(COINS.lastCheck>20){COINS.lastCheck=0;coinHud();if(COINS.dia!==dayKey()){COINS.dia=dayKey();COINS.coletadas={};coinSave();coinActivate();showToast('Um novo dia: moedas novas pelo mundo!',{big:true});}}
+}
+function coinTick(dt){if(ACTIVE!==COINS.scene)coinActivate();COINS.lastCheck+=dt;if(COINS.lastCheck>20){COINS.lastCheck=0;coinHud();if(COINS.dia!==dayKey()){COINS.dia=dayKey();COINS.coletadas={};coinSave();coinActivate();}}
   const px=MODE==='fp'?P.x:CH.x,pz=MODE==='fp'?P.z:CH.z;const set=COINS.sets[COINS.key];if(!set)return;
   for(const c of set.coins){if(c.got)continue;c.m.rotation.y=t*2.6+c.ph;c.g.position.y=c.y0+Math.sin(t*2.2+c.ph)*0.06;if(Math.hypot(px-c.x,pz-c.z)<coinReach())coinCollect(c);}
   for(let i=COINS.anim.length-1;i>=0;i--){const c=COINS.anim[i];c.t+=dt;const k=Math.min(1,c.t/0.5);c.g.position.y=c.y0+k*1.1;c.m.rotation.y+=dt*18;const sc=(1-k)*(c.val>1?1.45:1);c.m.scale.setScalar(Math.max(0.001,sc));c.sp.scale.setScalar(0.6+k*1.6);c.sp.material.opacity=0.5*(1-k);if(k>=1){c.g.visible=false;COINS.anim.splice(i,1);}}}
 coinLoad();if(COINS.dia!==dayKey()){COINS.dia=dayKey();COINS.coletadas={};coinSave();}else if(COINS.ver!==COIN_VER){COINS.coletadas={};coinSave();setTimeout(()=>showToast('Mundo atualizado: as moedas de hoje nasceram de novo pelo Hall e pelas salas',{queue:true,big:true}),1500);}
-if(coinBtn)coinBtn.addEventListener('click',()=>{if(CUR==='hall'&&HALLN===1&&!fadeOnAt){openShop();return;}const set=COINS.sets[COINS.key];const got=set?set.coins.filter(c=>c.got).length:0,tot=set?set.coins.length:0;showToast('Você tem '+COINS.saldo+' moeda'+(COINS.saldo===1?'':'s')+' · nesta sala hoje: '+got+' de '+tot+' · as próximas nascem à meia-noite (em '+untilMidnight()+') · troque-as na Lojinha da Coruja, no Hall');});
+if(coinBtn)coinBtn.addEventListener('click',()=>{if(CUR==='hall'&&HALLN===1&&!fadeOnAt){openShop();return;}try{openDiary();}catch(e){}});
 window.__coins={get saldo(){return COINS.saldo;},ganhar(n){COINS.saldo+=n|0;COINS.total+=Math.max(0,n|0);coinSave();coinHud();},gastar(n){n=n|0;if(n>COINS.saldo)return false;COINS.saldo-=n;coinSave();coinHud();return true;},sets:COINS.sets,collect:coinCollect,state:COINS};
 
 /* ================= CHAVES (escondidas pelo mundo; cada uma abre o baú trancado da sua sala — as portas ficam todas abertas) ================= */
@@ -8411,6 +8456,7 @@ function chestTick(dt){const C=chestFor();
   for(let i=BURST.length-1;i>=0;i--){const b=BURST[i];b.t+=dt;b.vy-=9*dt;const m=b.m;m.position.x+=b.vx*dt;m.position.z+=b.vz*dt;m.position.y+=b.vy*dt;m.rotation.y+=dt*9;m.rotation.x+=dt*4;const fl=floorAt(m.position.x,m.position.z)+0.1;if(m.position.y<fl){m.position.y=fl;b.vy=Math.abs(b.vy)*0.35;b.vx*=0.7;b.vz*=0.7;}
     if(b.t>1.6)m.scale.setScalar(0.7*Math.max(0.001,1-(b.t-1.6)/0.4));if(b.t>2.0){b.sc.remove(m);BURST.splice(i,1);}}}
 window.__baus={lista:CHESTS,abrir:chestTry,forcar:chestOpen,reliquias:relicCount};
+window.__moedas={estado:COINS,sets:COINS.sets,hud:coinHud};
 
 /* ================= LOJINHA DA CORUJA (no Hall: troca moedas por roupas, chapéus, utensílios e companheiros) ================= */
 const LOJA_KEY='mundo.loja.v1';const LOJA={itens:{},equip:{sueter:null,cachecol:null,chapeu:null,capa:false,lanterna:false,botas:false,ima:false,pet:null},tab:'Roupas'};
@@ -8961,8 +9007,9 @@ function finishRoom(key){const R=ROOMS[key];if(!R||R.ready)return;R.ready=true;
   try{registerStand(key);}catch(e){console.error('atril',key,e);}
   const genre=chestGenre(key);if(genre)try{registerPortal(genre);}catch(e){console.error('portal',key,e);}
   try{markMiudos(R.scene);}catch(e){}
-  try{setQuality(Q.name);}catch(e){}}
-finishRoom('lib');
+  try{setQuality(Q.name);}catch(e){}
+  if(Q.lite)try{warmCollect(R.scene);}catch(e){}}
+tmark('nucleo');finishRoom('lib');tmark('biblioteca2');
 /* ================= LAÇO ================= */
 loadMsg('acendendo as luzes do Hall…');let mode0=null;try{mode0=localStorage.getItem('bibmode2');}catch(e){}if(!['gm','tp','fp'].includes(mode0))mode0='gm';MODE='gm';for(const sc of allScenes())lightBudget(sc);jump('hall',null);buildMap();initCtrl();setMode(mode0);keyHud();
 try{if((navigator.maxTouchPoints>0||'ontouchstart' in window)&&matchMedia('(orientation:portrait)').matches)setTimeout(()=>showToast('Dica: o Mundo fica melhor na horizontal — vire o celular',{ms:6000,queue:true}),900);}catch(e){}
@@ -9016,8 +9063,8 @@ function draw(dt){lastDt=dt;renderPortals();if(Q.lite){renderer.setRenderTarget(
   // auto-ajuste de qualidade
   if(!fpsChecked&&t>4&&!window.__noAutoQ){fpsAcc+=dt;fpsN++;if(fpsAcc>2.5){const fps=fpsN/fpsAcc;fpsChecked=true;if(fps<22&&Q.name==='ultra'){setQuality('alto');showToast('qualidade ajustada para Alto pelo desempenho (tecla 3 volta ao Ultra)');}else if(fps<16&&Q.name==='alto'){setQuality('classico');showToast('qualidade ajustada para Clássico pelo desempenho');}else if(fps<18&&Q.name==='classico'){setQuality('leve');showToast('qualidade ajustada para Leve pelo desempenho');}}}
 }
-try{tick(0.016);draw(0.016);}catch(e){console.error(e);} // primeiro quadro ainda atrás da tela de carregamento (os shaders do Hall compilam sem engasgo visível)
-loadEl.style.display='none';LOADED=true;
+tmark('preDraw');try{tick(0.016);draw(0.016);}catch(e){console.error(e);}tmark('primeiroQuadro'); // primeiro quadro ainda atrás da tela de carregamento (os shaders do Hall compilam sem engasgo visível)
+loadEl.style.display='none';LOADED=true;if(Q.lite){try{warmCollect(HALLS[1].scene);warmCollect(scene);warmCollect(HALLS[2].scene);}catch(e){}}
 queueRooms(FLOOR1_ORDER);if(galeriaAberta())queueRooms(FLOOR2_ORDER); // as salas nascem uma a uma nos primeiros segundos; o 2º andar só quando a Galeria está aberta
 requestAnimationFrame(frame);
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__sit=sitDown;window.__setQ=setQuality;window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__diario={log:LOG,abrir:openDiary,fechar:closeDiary,proximo:nextStep};
