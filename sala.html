@@ -5235,12 +5235,7 @@ let CHAIR_G=null;const CHAIR_MESHES=[];
   box(1.35,0.5,1.25,M.leather,0,0.42,0,g,{r:0.06});box(1.25,0.24,1.05,M.leather,0,0.73,0.02,g,{r:0.09});
   box(1.35,1.05,0.4,M.leather,0,1.1,-0.5,g,{r:0.08});box(0.3,0.78,1.2,M.leather,-0.55,0.9,0,g,{r:0.09});box(0.3,0.78,1.2,M.leather,0.55,0.9,0,g,{r:0.09});
   for(const [x,z] of [[-0.55,-0.5],[0.55,-0.5],[-0.55,0.5],[0.55,0.5]]){const f=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.06,0.2,8),M.shelf);f.position.set(x,0.1,z);g.add(f);}
-  { const curve=new THREE.CatmullRomCurve3([new THREE.Vector3(0.05,0.87,0),new THREE.Vector3(0.3,0.9,0),new THREE.Vector3(0.45,1.24,0),new THREE.Vector3(0.6,1.31,0),new THREE.Vector3(0.72,1.15,0),new THREE.Vector3(0.75,0.72,0),new THREE.Vector3(0.74,0.42,0)]);
-    const N=40,Mw=14,wid=0.95,pos=[],uv=[],idx=[];for(let i=0;i<=N;i++){const pt=curve.getPoint(i/N);for(let j=0;j<=Mw;j++){const v=j/Mw;const z=-0.32+v*wid;const sag=(i/N>0.55?1:0.3)*Math.sin(v*Math.PI*3+i*0.2)*0.025+(i/N>0.6?(i/N-0.6)*0.05*Math.sin(v*9):0);
-      pos.push(pt.x+sag*0.5,pt.y+(i/N<0.5?Math.sin(v*Math.PI)*0.02:0),z+sag);uv.push(i/N*3,v*2);}}
-    for(let i=0;i<N;i++)for(let j=0;j<Mw;j++){const a=i*(Mw+1)+j,b=a+Mw+1;idx.push(a,b,a+1,b,b+1,a+1);}
-    const gg=new THREE.BufferGeometry();gg.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));gg.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));gg.setIndex(idx);gg.computeVertexNormals();
-    const th=new THREE.Mesh(gg,M.throw);th.castShadow=true;th.receiveShadow=true;g.add(th); }
+  // a manta drapeada sobre o braco da poltrona foi removida: a malha curva atravessava o estofado e o leitor sentado
   g.traverse(o=>{if(o.isMesh)CHAIR_MESHES.push(o);}); }
 { const st=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.44,0.5,20),M.shelf);st.position.set(-3.9,0.25,2.3);st.castShadow=true;scene.add(st);
   const cush=new THREE.Mesh(new THREE.CylinderGeometry(0.42,0.42,0.1,20),M.leather);cush.position.set(-3.9,0.55,2.3);scene.add(cush);
