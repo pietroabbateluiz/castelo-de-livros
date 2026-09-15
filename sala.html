@@ -8619,7 +8619,9 @@ function leitorSave(){try{localStorage.setItem(CONTO_KEY,JSON.stringify({lidos:L
 leitorLoad();
 function contosLidos(){return Object.keys(LEITOR.lidos).filter(g=>CONTOS[g]);}
 function galeriaProgresso(){return GEN_KEYS.filter(g=>!!LEITOR.lidos[g]).length;}
-function galeriaAberta(){return galeriaProgresso()>=GEN_KEYS.length;}
+// versão webmaster: a Galeria do 2º andar já entra aberta, sem marcar conto nenhum como lido
+const WEBMASTER=!!(window.__WEBMASTER)||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(location.search+location.hash);
+function galeriaAberta(){return WEBMASTER||galeriaProgresso()>=GEN_KEYS.length;}
 function syncGaleria(){const X=HALLS[1].X;if(!X||!X.stair)return;const open=galeriaAberta();X.stair.open=open;if(open&&LOADED)queueRooms(FLOOR2_ORDER);if(X.stair.plate)X.stair.plate.set(open?'Galeria aberta|suba as escadas':'Galeria · 2º andar|leia os 5 contos do 1º andar · '+galeriaProgresso()+'/5');}
 window.__galeria={aberta:galeriaAberta,progresso:galeriaProgresso,sync:syncGaleria,liberar:()=>{for(const g of GEN_KEYS)if(!LEITOR.lidos[g])LEITOR.lidos[g]={t:Date.now(),seg:1};leitorSave();syncGaleria();nivelHud();}};
 function nivelAtual(){return Math.min(NIVEIS.length,1+contosLidos().length);}
