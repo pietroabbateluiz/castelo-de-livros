@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v437</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v438</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -56067,6 +56067,47 @@ const AT437_FN={epistolar:at437Epistolar,viagens:at437Viagens,western:at437Weste
 {const prev=registerKitRoom;registerKitRoom=function(k){prev.apply(this,arguments);const f=AT437_FN[k];if(!f||AT437.feito[k])return;AT437.feito[k]=true;const t0=performance.now();try{const R=NR[k];if(R){if(!R.key)R.key=k;AT437.info[k]=f(R)||{};}}catch(e){at437Erro(k,'montagem',e);}
   try{const w=ROOMS[k]&&ROOMS[k].world;if(w)w.__nav=null;}catch(e){}AT437.info[k]=Object.assign(AT437.info[k]||{},{ms:+(performance.now()-t0).toFixed(1)});};}
 window.__atlas437={estado:AT437,fn:AT437_FN};
+
+/* ===================== v438 · O ANDAR DO JAVALI (pedido do Luiz: «deixe o andar do porco no hall mais natural») =====================
+   O javali mecânico deixa de virar de uma vez para o próximo ponto e de andar em ritmo fixo. Agora: curva suave antes de
+   acelerar; aceleração e frenagem; passo sincronizado com a velocidade (sobe e desce, rola e cabeceia); paradas de duração
+   variada em que fareja o chão e olha em volta; para e vira para o leitor quando ele chega perto; escolhe o próximo destino
+   à frente, como quem perambula, e só por caminhos livres. Vale enquanto ele está manso (fase «asleep»); a corrida da
+   cabeçada (v436) e o combate (v428) seguem como estavam. */
+const JAV438={vmax:1.15,erros:[]};
+function jav438Ang(a,b){let d=b-a;while(d>Math.PI)d-=Math.PI*2;while(d<-Math.PI)d+=Math.PI*2;return d;}
+function jav438Livre(R,k,x,z,r){return ally428Free(R,x,z,r);}
+function jav438Caminho(R,k,x0,z0,x1,z1){const n=Math.ceil(Math.hypot(x1-x0,z1-z0)/.45);for(let i=1;i<=n;i++){const u=i/n;if(!jav438Livre(R,k,x0+(x1-x0)*u,z0+(z1-z0)*u,k.radius+.25))return false;}return true;}
+function jav438Alvo(B,k,S){const r=hallRadius(GENRE_FLOOR('mesa')),R=B.room;for(let j=0;j<26;j++){const abertura=j<14?1.2:Math.PI;const a=S.yaw+(Math.random()*2-1)*abertura,d=3.5+Math.random()*5.5,x=k.x+Math.sin(a)*d,z=k.z+Math.cos(a)*d,rc=Math.hypot(x,z);
+    if(rc<2.6||rc>r*.66)continue;if(!jav438Livre(R,k,x,z,1.1)||!jav438Caminho(R,k,k.x,k.z,x,z))continue;return {x,z};}return null;}
+function jav438Patrulha(dt){const B=BOAR428,k=B.enemy;if(!k||!boar433Here()||B.phase!=='asleep'||PAC.on||CAV.morto||uiBlocked()||document.hidden)return;
+  dt=Math.max(0,Math.min(.05,dt));const S=B.p438||(B.p438={yaw:k.g.rotation.y,vel:0,t:0,wait:.5,alvo:null,modo:'espera',fase:0,ux:k.x,uz:k.z,nariz:0,olha:0,olhaAlvo:0,olhaT:0,farejo:0});
+  if(Math.hypot(k.x-S.ux,k.z-S.uz)>1){S.yaw=k.g.rotation.y;S.alvo=null;S.vel=0;S.modo='espera';S.wait=.8;} // foi reposto (entrada no Hall, fim da corrida)
+  S.t+=dt;const m=k.mesh,base=m?(m.userData.base434??=m.position.y):0;const p=cavPos(),dp=Math.hypot(p.x-k.x,p.z-k.z);
+  // o leitor chega perto: para, vira para ele e fica atento
+  if(dp<3.4&&S.modo!=='curioso'){S.modo='curioso';S.alvo=null;}else if(S.modo==='curioso'&&dp>4.6){S.modo='espera';S.wait=.5+Math.random();}
+  if(S.modo==='curioso'){const want=Math.atan2(p.x-k.x,p.z-k.z);S.yaw+=jav438Ang(S.yaw,want)*Math.min(1,dt*3);S.vel=Math.max(0,S.vel-dt*3);S.nariz+=((Math.sin(S.t*1.3)*.05-.03)-S.nariz)*Math.min(1,dt*4);}
+  else if(S.modo==='espera'){S.wait-=dt;S.vel=Math.max(0,S.vel-dt*2.6);
+    // olha em volta devagar; de vez em quando fareja o chão
+    if(S.olhaT<=0){S.olhaAlvo=(Math.random()*2-1)*.5;S.olhaT=1.2+Math.random()*1.8;}S.olhaT-=dt;S.olha+=(S.olhaAlvo-S.olha)*Math.min(1,dt*1.5);
+    if(S.farejo<=0&&Math.random()<dt*.35)S.farejo=1.4;if(S.farejo>0){S.farejo-=dt;const u=1-S.farejo/1.4;S.nariz+=((-.22*Math.sin(u*Math.PI)-.04*Math.sin(u*Math.PI*6))-S.nariz)*Math.min(1,dt*8);}else S.nariz+=(0-S.nariz)*Math.min(1,dt*3);
+    if(S.wait<=0){S.alvo=jav438Alvo(B,k,S);if(S.alvo){S.modo='anda';S.olha=0;}else S.wait=.8;}}
+  else{ // anda
+    if(!S.alvo){S.alvo=jav438Alvo(B,k,S);if(!S.alvo){S.modo='espera';S.wait=.8;}}
+    if(S.alvo){const dx=S.alvo.x-k.x,dz=S.alvo.z-k.z,d=Math.hypot(dx,dz);
+      if(d<.5){S.modo='espera';S.wait=1+Math.random()*2.8;S.alvo=null;}
+      else{const want=Math.atan2(dx,dz),err=jav438Ang(S.yaw,want);S.yaw+=err*Math.min(1,dt*2.4);
+        const vmax=JAV438.vmax*(Math.abs(err)>.9?.3:Math.abs(err)>.4?.65:1)*(d<1.6?.55:1);S.vel+=(vmax-S.vel)*Math.min(1,dt*(S.vel<vmax?1.5:3.5));
+        const nx=k.x+Math.sin(S.yaw)*S.vel*dt,nz=k.z+Math.cos(S.yaw)*S.vel*dt;
+        if(jav438Livre(B.room,k,nx,nz,k.radius)){k.x=nx;k.z=nz;}else{S.modo='espera';S.wait=.6+Math.random();S.alvo=null;S.vel=0;}
+        S.nariz+=(0-S.nariz)*Math.min(1,dt*3);}}}
+  // pose: posição, rumo e o passo (amplitude cresce com a velocidade)
+  const spd=Math.min(1,S.vel/JAV438.vmax);S.fase+=dt*(2.2+S.vel*4.6);
+  k.g.position.set(k.x,0,k.z);k.g.rotation.y=S.yaw+(S.modo==='espera'?S.olha:0);
+  if(m){m.position.y=base+Math.abs(Math.sin(S.fase))*.045*spd+Math.sin(S.t*2.1)*.006;m.rotation.z=Math.sin(S.fase)*.035*spd;m.rotation.x=Math.sin(S.fase*2)*.014*spd+S.nariz;}
+  S.ux=k.x;S.uz=k.z;k.viva=false;try{k.g.userData.barra.sp.visible=false;}catch(e){}}
+boar434Patrol=function(dt){if(typeof JAV436!=='undefined'&&JAV436.fase)return;try{jav438Patrulha(dt);}catch(e){if(JAV438.erros.length<20)JAV438.erros.push(String(e&&e.message||e));}};
+window.__javali438={estado:JAV438,patrulha:()=>BOAR428.p438};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
