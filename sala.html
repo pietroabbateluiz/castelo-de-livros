@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v435</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v436</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -313,7 +313,7 @@ body:not(.touch)>#podBar>.podBt{flex:0 0 46px}
 <button class="est-btn visual" id="btnVisual" type="button" title="Visual do leitor: trocar de companheiro, capa (cor, forro e insígnia) e roupas (tecla U)">👤 Visual</button>
 <button class="est-btn visita" id="btnVisita" type="button" hidden title="Gera um link para um amigo visitar a sua sala e ver a sua estante">🔗 Convidar</button>
 <button class="est-btn coins" id="coins" type="button" title="Sua carteira · quantas moedas ainda há neste mapa e quando todas nascem de novo (meia-noite) · no Hall, clique para abrir a Lojinha da Coruja">🪙 <b id="coinN">0</b><small id="coinDay"></small></button><div class="coinPlus" id="coinPlus"></div>
-<button class="est-btn keys" id="keysBtn" type="button" title="Chaves dos baús: cada sala esconde duas — a dourada abre o baú da sala (+25 moedas e uma relíquia) e a de prata abre o baú de prata (+25 moedas)">🔑 <b id="keyN">0/0</b><small id="bauN"></small></button>
+<button class="est-btn keys" id="keysBtn" type="button" title="Chaves dos baús: cada sala esconde duas — a dourada abre o baú da sala (+25 moedas e uma relíquia) e a de prata abre o baú de prata (+25 moedas)">🔑 <b id="keyN">0/0</b><small id="bauN"></small><small id="macaN" hidden></small></button>
 <div class="est-btn hp" id="hpBox" title="Sua vida"><span>❤</span><i class="hpBar"><b id="hpFill"></b></i><b id="hpTxt">100</b></div>
 <button class="est-btn rooms" id="btnRooms" type="button" title="Menu das salas — ir direto para qualquer sala (Tab ou M)">🗺 Salas</button>
 <button class="est-btn diario" id="btnDiario" type="button" title="Diário do Leitor: o que você tem, o próximo passo e as últimas mensagens (tecla J)">📜 Diário</button>
@@ -55792,6 +55792,100 @@ function drama434Finish(M){
  for(const key of ['ouro','prata','cordao']){M[key].envMap=metal434Environment();M[key].envMapIntensity=.8;M[key].roughness=key==='cordao'?.32:.22;M[key].needsUpdate=true;}
  M.ouro.color.setHex(0xebbf69);M.prata.color.setHex(0x92d6e3);M.toga.color.setHex(0x702d67);M.toga.roughness=.74;M.fita.color.setHex(0xca4564);M.fita2.color.setHex(0x458cc3);M.louro.color.setHex(0x639f75);return M;
 }
+
+/* ===================== v436 · O JAVALI E AS MAÇÃS (pedido do Luiz) =====================
+   O javali mecânico que anda pelo Hall dos Gêneros pede 8 maçãs para abrir a passagem do 2.º andar. Há duas maçãs
+   logo na entrada de cada sala do 1.º andar (10 no total; bastam 8). Ao receber as 8, ele dispara contra a grade da
+   escada da Galeria e a derruba com uma cabeçada. A grade só se abre assim (no Webmaster já está aberta; quem já tinha
+   cumprido os 2 minutos em cada sala da v372 continua com ela aberta). Depois de alimentado, o javali fica manso para
+   sempre (não acorda como inimigo quando o Titã cai). Interruptor de teste: ?javali=0 apaga o progresso da missão. */
+const JAV436={KEY:SKEY('mundo.javali436.v1'),N:8,save:{macas:{},entregue:false},legacy:false,itens:{},salas:{},fase:'',t:0,alvo:null,dir:null,volta:null,grade:null,perto:false,aviso:0,halo:null,erros:[]};
+function jav436Erro(onde,e){try{if(JAV436.erros.length<30)JAV436.erros.push(onde+': '+String(e&&e.message||e));console.error('javali436',onde,e);}catch(x){}}
+function jav436Le(){try{const d=JSON.parse(localStorage.getItem(JAV436.KEY)||'null');if(d&&typeof d==='object'){JAV436.save.macas=(d.macas&&typeof d.macas==='object')?d.macas:{};JAV436.save.entregue=d.entregue===true;}}catch(e){}}
+function jav436Grava(){try{localStorage.setItem(JAV436.KEY,JSON.stringify(JAV436.save));}catch(e){jav436Erro('gravar',e);}}
+function jav436Tem(){return Object.keys(JAV436.save.macas).length;}
+function jav436T(pt,en,es){return text428(pt,en,es);}
+function jav436Escada(){const X=HALLS[1]&&HALLS[1].X;if(!X)return null;return (X.stairs||[X.stair]).find(s=>s&&s.to===2)||null;}
+function jav436Hostil(){const B=BOAR428;return !PAC.on&&!['asleep','won'].includes(B.phase);}
+// ---- a maçã: modelo pequeno, sem luz própria (um halo em sprite para ser vista de longe) ----
+function jav436Halo(){if(JAV436.halo)return JAV436.halo;const c=can(64,64),x=c.getContext('2d');const g=x.createRadialGradient(32,32,2,32,32,30);g.addColorStop(0,'rgba(255,205,170,.95)');g.addColorStop(.45,'rgba(255,120,80,.35)');g.addColorStop(1,'rgba(255,80,40,0)');x.fillStyle=g;x.fillRect(0,0,64,64);const t=new THREE.CanvasTexture(c);JAV436.halo=t;return t;}
+function jav436Modelo(){const K=t160Kit('436 maçã');const pele=t160Std('436 maçã pele',0xd63a2c,.42,0,{emissive:0x3c0906,emissiveIntensity:.4}),cabo=t160Std('436 maçã cabo',0x5a3a1c,.9),folha=t160Std('436 maçã folha',0x4f9a3a,.7,0,{side:THREE.DoubleSide});
+  K.sph(.16,pele,0,.16,0,1,.9,1,14,10);K.cyl(.012,.018,.12,cabo,0,.36,0,6);K.plane(.15,.08,folha,.07,.38,0,.4,-1.15,.35);
+  const g=new THREE.Group();g.name='Maçã do javali · bicho';K.fim(g,{sombra:false,nome:'436 maçã'});
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:jav436Halo(),color:0xffc0a8,transparent:true,opacity:.55,depthWrite:false,blending:THREE.AdditiveBlending}));sp.scale.set(.95,.95,1);sp.position.y=.2;g.add(sp);g.userData.sp=sp;
+  g.traverse(o=>{o.__fusaoMoveu=9;o.userData.dynamic434=true;});return g;}
+// ---- onde ficam: duas por sala, a 2,2–4,6 m de caminhada da entrada, de lados diferentes, fora dos obstáculos ----
+function jav436Planeja(room){const R=ROOMS[room];if(!R||!R.ready||!R.world||!R.spawn)return null;const floorY=R.floorY||(()=>0);
+  let reach;try{reach=keyDistances(R.world,[R.spawn.x,R.spawn.z],floorY);}catch(e){jav436Erro('rota '+room,e);return null;}
+  const nav=reach.nav,dist=reach.distances,S=nav.S,N=nav.N,H=nav.H,walk=nav.walk,obst=R.world.obst||[],cands=[];
+  const livre=(x,z)=>{try{if(!R.world.clamp)return true;const p=R.world.clamp(x,z,.6);const cx=Array.isArray(p)?p[0]:p.x,cz=Array.isArray(p)?p[1]:p.z;return Number.isFinite(cx)&&Math.hypot(cx-x,cz-z)<.03;}catch(e){return true;}}; // o limite real de andar da sala (lago, borda do convés), não só a malha
+  for(let id=0;id<walk.length;id++){const d=dist[id];if(!walk[id]||!Number.isFinite(d)||d<2.2||d>4.6)continue;const x=-H+(id%N+.5)*S,z=-H+(Math.floor(id/N)+.5)*S;
+    if(!obst.every(o=>Math.hypot(x-o[0],z-o[1])>o[2]+.55)||!livre(x,z))continue;cands.push({x,z,d});}
+  if(cands.length<2)return null;cands.sort((p,q)=>q.d-p.d);const a=cands[0];let b=null,bd=0;for(const c of cands){const dd=Math.hypot(c.x-a.x,c.z-a.z);if(dd>bd){bd=dd;b=c;}}
+  if(!b||bd<1.6)return null;return [a,b].map((c,i)=>({id:room+':'+i,room,x:c.x,z:c.z,y:floorY(c.x,c.z)+.5}));}
+function jav436Monta(room){if(JAV436.salas[room]||JAV436.save.entregue)return;const R=ROOMS[room];if(!R||!R.ready)return;JAV436.salas[room]=true;const plano=jav436Planeja(room);if(!plano){jav436Erro('lugar '+room,'sem lugar para as maçãs');return;}
+  for(const p of plano){if(JAV436.save.macas[p.id])continue;const g=jav436Modelo();g.position.set(p.x,p.y,p.z);g.rotation.y=(p.x*7+p.z*3)%6.28;R.scene.add(g);JAV436.itens[p.id]={...p,g,got:false,t:0};}}
+function jav436Hud(){const el=document.getElementById('macaN');if(!el)return;if(JAV436.save.entregue){el.hidden=true;return;}el.hidden=false;el.textContent='🍎 '+jav436Tem()+'/'+JAV436.N;}
+function jav436Pega(it){if(it.got||JAV436.save.macas[it.id])return;it.got=true;it.t=0;JAV436.save.macas[it.id]=Date.now();jav436Grava();const n=jav436Tem();try{ding(1);}catch(e){}jav436Hud();
+  try{if(keyBtn){keyBtn.classList.remove('pop');void keyBtn.offsetWidth;keyBtn.classList.add('pop');}}catch(e){}
+  showToast(n>=JAV436.N?jav436T('🍎 '+n+' maçãs — já dá para alimentar o javali mecânico, no Hall','🍎 '+n+' apples — enough to feed the mechanical boar in the Hall','🍎 '+n+' manzanas: ya puedes alimentar al jabalí mecánico, en el vestíbulo'):jav436T('🍎 Maçã '+n+'/'+JAV436.N+' para o javali mecânico','🍎 Apple '+n+'/'+JAV436.N+' for the mechanical boar','🍎 Manzana '+n+'/'+JAV436.N+' para el jabalí mecánico'),{ms:2200,queue:true});
+  try{logAdd('🍎 Maçã apanhada ('+n+'/'+JAV436.N+') — o javali mecânico do Hall quer 8');}catch(e){}}
+function jav436Colhe(dt){if(CUR!=='room'||JAV436.save.entregue||SALA_ED.ativo)return;const room=coinKeyFor();if(!room||!GEN_KEYS.includes(CUR_GENRE))return;jav436Monta(room);
+  const px=MODE==='fp'?P.x:CH.x,pz=MODE==='fp'?P.z:CH.z,lvl=ROOM.keyLevel?ROOM.keyLevel():0;
+  for(const id in JAV436.itens){const it=JAV436.itens[id];if(it.room!==room)continue;const g=it.g;
+    if(it.got){it.t+=dt;const k=Math.min(1,it.t/.6);g.position.y=it.y+k*1.2;g.rotation.y+=dt*12;g.scale.setScalar(Math.max(.001,1-k));if(g.userData.sp)g.userData.sp.material.opacity=.55*(1-k);if(k>=1){g.visible=false;if(g.parent)g.parent.remove(g);delete JAV436.itens[id];}continue;}
+    g.rotation.y+=dt*.9;g.position.y=it.y+Math.sin(t*2+it.x)*.04;
+    if(lvl===0&&!document.hidden&&Math.hypot(px-it.x,pz-it.z)<1.5&&Math.abs(floorAt(px,pz)-(it.y-.5))<.9)jav436Pega(it);}}
+// ---- o javali no Hall: pede, recebe, corre e derruba a grade ----
+function jav436Pedido(){const n=jav436Tem();return jav436T('🐗 Javali mecânico: «Grunf! Minhas engrenagens pedem maçãs. Traga-me 8 — há duas logo na entrada de cada sala deste andar — e eu abro a passagem para o segundo andar.» ('+n+'/8)','🐗 Mechanical boar: “Grunt! My gears crave apples. Bring me 8 — two wait right at the entrance of each room on this floor — and I will open the way to the second floor.” ('+n+'/8)','🐗 Jabalí mecánico: «¡Gruñ! Mis engranajes piden manzanas. Tráeme 8 —hay dos justo en la entrada de cada sala de este piso— y te abro el paso al segundo piso.» ('+n+'/8)');}
+function jav436Entrega(k){const S=jav436Escada();try{sfx('conquista');}catch(e){}try{logAdd('🐗 Você entregou 8 maçãs ao javali mecânico',true);}catch(e){}
+  showToast(jav436T('🐗 «Grunf-grunf! Oito maçãs! Agora afaste-se…» — o javali mecânico dispara contra a grade do segundo andar!','🐗 “Grunt-grunt! Eight apples! Now stand back…” — the mechanical boar charges at the second-floor gate!','🐗 «¡Gruñ-gruñ! ¡Ocho manzanas! Ahora apártate…» — ¡el jabalí mecánico embiste la reja del segundo piso!'),{big:true,ms:5000});
+  if(!S||!k){jav436Impacto(S,k);return;}JAV436.fase='corre';JAV436.t=0;JAV436.alvo=S;k.path=null;k.tPath=0;}
+function jav436Impacto(S,k){JAV436.fase=k?'volta':'';JAV436.t=0;JAV436.save.entregue=true;jav436Grava();jav436Hud();
+  for(const id in JAV436.itens){const it=JAV436.itens[id];try{if(it.g.parent)it.g.parent.remove(it.g);}catch(e){}delete JAV436.itens[id];}
+  if(S&&S.gate){const g=S.gate;S.gate=null;JAV436.grade={g,t:0};}
+  try{sfx('bau');}catch(e){}try{ding(5);}catch(e){}
+  if(k&&S){const r=hallRadius(1),a=S.angle;JAV436.volta={x:Math.cos(a)*r*.42,z:Math.sin(a)*r*.42};k.path=null;k.tPath=0;}
+  try{gate372Sync();}catch(e){}try{if(typeof elevAtualiza==='function')elevAtualiza();}catch(e){}try{if(typeof renderGoBar==='function')renderGoBar();}catch(e){}
+  showToast(jav436T('💥 A grade caiu! O segundo andar — a Galeria — está aberto. Suba as escadas.','💥 The gate is down! The second floor — the Gallery — is open. Take the stairs.','💥 ¡La reja cayó! El segundo piso —la Galería— está abierto. Sube las escaleras.'),{big:true,ms:8000,queue:true});
+  try{logAdd('💥 O javali derrubou a grade: Galeria (2.º andar) aberta',true);}catch(e){}try{MEV('andar',{n:2,via:'javali'});}catch(e){}}
+function jav436Corrida(dt,k){const S=JAV436.alvo;JAV436.t+=dt;
+  if(JAV436.fase==='corre'){if(!S){jav436Impacto(null,k);return;}const fx=S.front[0],fz=S.front[1],v=k.vel;k.vel=6.5;try{ally428Move(k,BOAR428.room,fx,fz,dt,.9);}finally{k.vel=v;}
+    if(k.mesh){k.mesh.rotation.z=Math.sin(JAV436.t*16)*.05;k.mesh.position.y=(k.mesh.userData.base434??=k.mesh.position.y)+Math.abs(Math.sin(JAV436.t*16))*.06;}
+    if(Math.hypot(k.x-fx,k.z-fz)<1||JAV436.t>9){JAV436.fase='cabecada';JAV436.t=0;const mx=S.mouth[0],mz=S.mouth[1],l=Math.hypot(mx-k.x,mz-k.z)||1;JAV436.dir={x:(mx-k.x)/l,z:(mz-k.z)/l};k.g.rotation.y=Math.atan2(mx-k.x,mz-k.z);}}
+  else if(JAV436.fase==='cabecada'){const u=Math.min(1,JAV436.t/.45);if(k.mesh)k.mesh.rotation.x=u<.5?-.6*u*2:-.6+(u-.5)*2*1.05;
+    const step=9*dt;k.x+=JAV436.dir.x*step;k.z+=JAV436.dir.z*step;k.g.position.set(k.x,0,k.z);
+    if(Math.hypot(k.x-S.mouth[0],k.z-S.mouth[1])<.9||JAV436.t>.6)jav436Impacto(S,k);}
+  else if(JAV436.fase==='volta'){const v=k.vel;k.vel=1.6;try{ally428Move(k,BOAR428.room,JAV436.volta.x,JAV436.volta.z,dt,.5);}finally{k.vel=v;}if(k.mesh)k.mesh.rotation.x+=(0-k.mesh.rotation.x)*Math.min(1,dt*6);
+    if(Math.hypot(k.x-JAV436.volta.x,k.z-JAV436.volta.z)<.8||JAV436.t>8){JAV436.fase='';if(k.mesh){k.mesh.rotation.x=0;k.mesh.rotation.z=0;}k.path=null;k.tPath=0;}}}
+function jav436Hall(dt){if(!boar433Here())return;const B=BOAR428,k=B.enemy;if(!k)return;dt=Math.min(.05,Math.max(0,dt)); // boar433Here: o tique do javali roda num contexto que finge a sala de Ficção Científica (CUR vira 'room')
+  const S=jav436Escada();if(S&&S.gate&&JAV436.save.entregue&&!JAV436.grade){const g=S.gate;S.gate=null;g.rotation.set(-1.42,0,.1);g.position.y=.06;} // grade já derrubada numa visita anterior
+  if(PAC.on&&!jav436Hostil()){k.g.visible=true;k.viva=false;try{k.g.userData.barra.sp.visible=false;}catch(e){}if(!JAV436.fase){PAC.on=false;try{boar434Patrol(dt);}finally{PAC.on=true;}}} // Sem Inimigos: o javali manso continua à vista e andando
+  if(JAV436.fase){jav436Corrida(dt,k);return;}
+  if(JAV436.save.entregue||jav436Hostil()||document.hidden||uiBlocked()||CAV.morto||!k.g.visible)return;
+  const p=cavPos(),d=Math.hypot(p.x-k.x,p.z-k.z);
+  if(d<2.4){if(!JAV436.perto){JAV436.perto=true;if(jav436Tem()>=JAV436.N)jav436Entrega(k);else if(performance.now()-JAV436.aviso>8000){JAV436.aviso=performance.now();showToast(jav436Pedido(),{big:true,ms:7500,queue:true});try{logAdd('🐗 O javali mecânico pede 8 maçãs para abrir o segundo andar');}catch(e){}}}}
+  else if(d>3.6)JAV436.perto=false;}
+function jav436Grade(dt){const G=JAV436.grade;if(!G||CUR!=='hall'||HALLN!==1)return;G.t+=dt;const u=Math.min(1,G.t/.7),e=1-Math.pow(1-u,3),salto=u<1?Math.sin(u*Math.PI)*.16*(1-u):0;G.g.rotation.x=-1.42*e+salto;G.g.rotation.z=.1*e;G.g.position.y=.06*e;if(u>=1)JAV436.grade=null;}
+function jav436Tick(dt){try{jav436Colhe(dt);}catch(e){jav436Erro('colhe',e);}try{jav436Grade(dt);}catch(e){jav436Erro('grade',e);}}
+// ---- ligações ----
+if(/[?&#]javali=0/i.test(location.search+location.hash)){try{localStorage.removeItem(JAV436.KEY);}catch(e){}}
+jav436Le();
+JAV436.legacy=!WEBMASTER&&GEN_KEYS.every(g=>GATE372.seconds[g]>=120); // quem já tinha cumprido os 2 minutos (v372) não perde a Galeria
+gate372Open=function(){return WEBMASTER||JAV436.save.entregue||JAV436.legacy;};galeriaAberta=gate372Open;if(window.__galeria)window.__galeria.aberta=gate372Open;
+galeriaProgresso=()=>JAV436.save.entregue?GEN_KEYS.length:Math.min(GEN_KEYS.length,Math.floor(jav436Tem()/JAV436.N*GEN_KEYS.length));
+gate372Sync=function(){const S=jav436Escada();if(!S)return;S.open=gate372Open();if(S.plate)S.plate.set(S.open?'Galeria aberta|suba as escadas':jav436T('Segundo andar trancado|o javali mecânico quer 8 maçãs','Second floor locked|the mechanical boar wants 8 apples','Segundo piso cerrado|el jabalí mecánico quiere 8 manzanas'));};syncGaleria=gate372Sync;if(window.__galeria)window.__galeria.sync=gate372Sync;
+gate372Message=function(){return jav436T('A grade do segundo andar está trancada. O javali mecânico que anda pelo Hall abre a passagem em troca de 8 maçãs — há duas logo na entrada de cada sala deste andar ('+jav436Tem()+'/8).','The second-floor gate is locked. The mechanical boar roaming the Hall opens the way in exchange for 8 apples — two wait right at the entrance of each room on this floor ('+jav436Tem()+'/8).','La reja del segundo piso está cerrada. El jabalí mecánico que anda por el vestíbulo abre el paso a cambio de 8 manzanas: hay dos justo en la entrada de cada sala de este piso ('+jav436Tem()+'/8).');};
+gate372Notice=function(){showToast(gate372Message(),{big:true,ms:9000});};
+gate372Step=function(){const hidden=(typeof leituraOpen!=='undefined'&&leituraOpen)||document.hidden||window.__pause||fadeOnAt||PERF130.busy;const S=CUR==='hall'&&HALLN===1?jav436Escada():null;const p=MODE==='fp'?P:CH,near=!hidden&&S&&!S.open&&Math.hypot(p.x-S.front[0],p.z-S.front[1])<2.25;if(near&&!GATE372.near&&!uiBlocked())gate372Notice();GATE372.near=!!near;}; // os 2 minutos por sala deixam de contar
+{const lbl=stairLabel;stairLabel=function(S){return S.to===2&&!S.open?jav436T('Trancado · o javali mecânico abre com 8 maçãs','Locked · the mechanical boar opens it for 8 apples','Cerrado · el jabalí mecánico lo abre por 8 manzanas'):lbl.apply(this,arguments);};}
+{const won=boar433TitanWon;boar433TitanWon=function(){return !JAV436.save.entregue&&!JAV436.fase&&won.apply(this,arguments);};} // alimentado, o javali fica manso
+{const pat=boar434Patrol;boar434Patrol=function(dt){if(JAV436.fase)return;return pat.apply(this,arguments);};}
+{const bt=boar428Tick;boar428Tick=function(dt){const r=bt.apply(this,arguments);try{jav436Hall(dt);}catch(e){jav436Erro('hall',e);}return r;};}
+{const old=tick;tick=function(dt){const r=old.apply(this,arguments);jav436Tick(dt);return r;};}
+try{gate372Sync();}catch(e){}jav436Hud();
+window.__javali436={estado:JAV436,tem:jav436Tem,monta:jav436Monta,planeja:jav436Planeja,entregar:()=>jav436Entrega(BOAR428.enemy),escada:jav436Escada,hud:jav436Hud,
+  diag:()=>{const k=BOAR428.enemy,p=cavPos();return {cur:CUR,halln:HALLN,aqui:boar433Here(),hostil:jav436Hostil(),hidden:document.hidden,ui:uiBlocked(),fade:fadeOnAt,morto:CAV.morto,visivel:!!(k&&k.g.visible),perto:JAV436.perto,d:k?+Math.hypot(p.x-k.x,p.z-k.z).toFixed(2):null,pos:[+p.x.toFixed(1),+p.z.toFixed(1)]};}};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
