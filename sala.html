@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v438</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v439</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -56108,6 +56108,153 @@ function jav438Patrulha(dt){const B=BOAR428,k=B.enemy;if(!k||!boar433Here()||B.p
   S.ux=k.x;S.uz=k.z;k.viva=false;try{k.g.userData.barra.sp.visible=false;}catch(e){}}
 boar434Patrol=function(dt){if(typeof JAV436!=='undefined'&&JAV436.fase)return;try{jav438Patrulha(dt);}catch(e){if(JAV438.erros.length<20)JAV438.erros.push(String(e&&e.message||e));}};
 window.__javali438={estado:JAV438,patrulha:()=>BOAR428.p438};
+
+/* ===================== v439 · O PORTÃO DO TORREÃO E O DRAGÃO DOS RUBIS (pedido do Luiz) =====================
+   «A passagem para o terceiro andar só se abre com o dragão dos rubis chocados. Coloque ali o personagem do arco e flecha ao
+   lado; ao chegar perto ele diz que só um dragão muito grande seria capaz de derreter o portão. O dragão grande, depois que
+   entrega os rubis ao ovo, taca fogo ali e abre a passagem. E retire os rubis do terceiro andar pra cima.»
+   · A grade de ferro da escada Galeria → Torreão (2.º → 3.º andar) passa a nascer fechada. Elevador, mapa, atalhos e a própria
+     escada respeitam o portão (como a grade do 2.º andar na v372/v436). Quem já tinha estado do 3.º andar para cima (chave,
+     baú, conto ou sala limpa lá em cima) continua com a passagem aberta.
+   · Bento, o arqueiro (a mesma peça da Vila), fica de guarda ao lado do portão. Perto dele, fala conforme o caso: ovo por
+     chocar, dragão ainda pequeno, dragão grande mas não equipado, portão já derretido.
+   · Com o dragão dos rubis no tamanho máximo (4×, 600 rubis dados ao ovo depois dos 1000 do choque) equipado e perto do
+     portão, ele se vira para a grade, sopra fogo, as barras ficam em brasa e escorrem até virar uma poça; a passagem abre
+     e fica aberta para sempre (gravado). Sem luzes novas: brasa por emissivo e sprites aditivos.
+   · Rubis só nos dois primeiros andares (halls 1 e 2 e suas salas): do Torreão para cima não nascem mais.
+   Testes: ?portao=0 apaga o progresso do portão; ?portao=1 faz o Webmaster respeitar o portão como um leitor. */
+const P439={KEY:SKEY('mundo.portao439.v1'),ESTAGIO:4,save:{aberto:false,legado:false,quando:0},forcar:/[?&#]portao=1/i.test(location.search+location.hash),fase:'',t:0,arq:null,arqBase:0,arqYaw:0,arqAlvo:0,fogo:null,gota:[],poca:null,gpos:null,gmats:[],perto:false,falou:0,ultimo:'',pet:null,erros:[]};
+function p439Erro(onde,e){try{if(P439.erros.length<30)P439.erros.push(onde+': '+String(e&&e.message||e));console.error('portao439',onde,e);}catch(x){}}
+function p439T(pt,en,es){return text428(pt,en,es||en);}
+function p439Le(){try{const d=JSON.parse(localStorage.getItem(P439.KEY)||'null');if(d&&typeof d==='object'){P439.save.aberto=d.aberto===true;P439.save.legado=d.legado===true;P439.save.quando=+d.quando||0;}}catch(e){}}
+function p439Grava(){try{localStorage.setItem(P439.KEY,JSON.stringify(P439.save));}catch(e){p439Erro('gravar',e);}}
+function p439Escada(){const X=HALLS[2]&&HALLS[2].X;if(!X)return null;return (X.stairs||[X.stair]).find(s=>s&&s.to===3)||null;}
+function p439Dragao(){const d=RUBY422.data,nasceu=d.donated>=1000,estagio=nasceu?ruby422Stage():0,pet=GEAR.pet,equipado=!!pet&&pet.userData.pet==='dragon422'&&pet.visible!==false;return {nasceu,estagio,grande:nasceu&&estagio>=P439.ESTAGIO,equipado,growth:d.growth,donated:d.donated};}
+// quem já esteve do 3.º andar para cima (antes da v439) não perde o acesso
+function p439Legado(){try{for(const n of [3,4,5,6,7])for(const g of ((EST.ANDARES&&EST.ANDARES[n])||[])){const k=GENRE_ROOM[g];
+    if((KEYS.tem&&(KEYS.tem[g]||KEYS.tem[k]))||(KEYS.baus&&(KEYS.baus[g]||KEYS.baus[k]))||(LEITOR.lidos&&(LEITOR.lidos[g]||LEITOR.lidos[k])))return true;
+    if(CAV.estado&&CAV.estado.limpas&&(CAV.estado.limpas[k]||CAV.estado.limpas[g]))return true;}
+  if(gate372Floor()>=3)return true;}catch(e){p439Erro('legado',e);}return false;}
+function p439Aberto(){return (WEBMASTER&&!P439.forcar)||P439.save.aberto||P439.save.legado;}
+function p439Blocked(n){if(!(n>=3)||p439Aberto())return false;const cur=gate372Floor();return !(cur>=3&&n<=cur);}
+function p439Mensagem(){const D=p439Dragao();
+  if(!D.nasceu)return p439T('A escada do Torreão (3.º andar), na Galeria, está fechada por um portão de ferro sem chave. Só um dragão muito grande seria capaz de derretê-lo: choque o ovo ao lado da porta de Fantasia com 1000 rubis e faça o dragão crescer até 4×.','The Keep stairs (3rd floor), in the Gallery, are closed by an iron gate with no key. Only a very large dragon could melt it: hatch the egg beside the Fantasy door with 1000 rubies and grow the dragon to 4×.');
+  if(!D.grande)return p439T('O portão do Torreão só derrete com um dragão muito grande. O seu ainda está em '+D.estagio+'× — leve rubis ao ovo de Fantasia até ele chegar a 4× ('+D.growth+'/600).','The Keep gate only melts under a very large dragon. Yours is still '+D.estagio+'× — bring rubies to the Fantasy egg until it reaches 4× ('+D.growth+'/600).');
+  if(!D.equipado)return p439T('Seu dragão já é grande o bastante para derreter o portão do Torreão: equipe-o (no ovo de Fantasia ou na lojinha, em Companheiros) e leve-o até a escada do Torreão, na Galeria.','Your dragon is already large enough to melt the Keep gate: equip it (at the Fantasy egg or in the shop, under Companions) and bring it to the Keep stairs in the Gallery.');
+  return p439T('Leve o dragão dos rubis até o portão da escada do Torreão, na Galeria: ele derrete o ferro com o fogo.','Bring the ruby dragon to the gate of the Keep stairs in the Gallery: it melts the iron with its fire.');}
+function p439Aviso(){try{showToast(p439Mensagem(),{big:true,ms:9000});}catch(e){}}
+function p439Fala(){const D=p439Dragao();if(P439.fase)return p439T('Isso! Um dragão desse tamanho… deixe-o cuidar do portão!','Yes! A dragon of that size… let it deal with the gate!');
+  if(p439Escada()&&p439Escada().open)return P439.save.aberto?p439T('O dragão derreteu o portão! O Torreão está aberto — suba as escadas quando quiser.','The dragon melted the gate! The Keep is open — climb the stairs whenever you like.'):p439T('O portão está aberto para você — suba as escadas quando quiser.','The gate is open for you — climb the stairs whenever you like.');
+  if(!D.nasceu)return p439T('Sou Bento, arqueiro da guarda — vim vigiar este portão. Ele não tem chave: só um dragão muito grande seria capaz de derretê-lo. Dizem que o ovo ao lado da porta de Fantasia choca com 1000 rubis…','I am Bento, archer of the guard — I came to watch this gate. It has no key: only a very large dragon could melt it. They say the egg beside the Fantasy door hatches with 1000 rubies…');
+  if(!D.grande)return p439T('Seu dragão nasceu, mas ainda é pequeno ('+D.estagio+'×). Só um dragão muito grande derrete este portão: leve rubis ao ovo até ele chegar a 4× ('+D.growth+'/600).','Your dragon has hatched, but it is still small ('+D.estagio+'×). Only a very large dragon melts this gate: bring rubies to the egg until it reaches 4× ('+D.growth+'/600).');
+  if(!D.equipado)return p439T('Um dragão desse tamanho derrete o portão com um sopro — equipe-o e traga-o até aqui.','A dragon of that size melts the gate with one breath — equip it and bring it here.');
+  return p439T('Chegue com o dragão mais perto do portão e deixe-o soprar.','Bring the dragon closer to the gate and let it breathe.');}
+function p439Placa(S){if(!S||!S.plate)return;S.plate.set(S.open?p439T('Torreão aberto|suba as escadas','Keep open|climb the stairs'):p439T('Terceiro andar trancado|só um dragão muito grande derrete o portão','Third floor locked|only a very large dragon melts the gate'));}
+function p439Rubis(key){if(!key)return false;if(/^hall\d?$/.test(key))return (key==='hall'?1:+key.slice(4))>=3;for(const g in GENRE_ROOM)if(GENRE_ROOM[g]===key)return GENRE_FLOOR(g)>=3;return false;} // true = sem rubis aqui
+function p439Mat(cor,emis){const m=new THREE.MeshStandardMaterial({color:cor,roughness:.62,metalness:.55,emissive:emis||0x000000,emissiveIntensity:1});m.userData.papelKeep=true;return m;}
+function p439Marca(o){o.userData.noCam=true;o.__fusaoMoveu=9;o.userData.dynamic434=true;if(o.isMesh){o.userData.papelKeepGeo=true;o.raycast=()=>{};}}
+function p439Halo(){const c=can(128,128),x=c.getContext('2d'),g=x.createRadialGradient(64,64,4,64,64,64);g.addColorStop(0,'rgba(255,246,214,1)');g.addColorStop(.3,'rgba(255,176,72,.9)');g.addColorStop(.7,'rgba(255,92,24,.35)');g.addColorStop(1,'rgba(255,60,10,0)');x.fillStyle=g;x.fillRect(0,0,128,128);const t=new THREE.CanvasTexture(c);const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:0}));sp.name='Portão do Torreão · brasa · bicho';p439Marca(sp);return sp;}
+// --- o portão: estado fechado no início; poça e barras derretidas depois ---
+function p439Preparar(S){if(!S||S.__p439)return;S.__p439=true;const gate=S.gate;if(!gate)return;
+  gate.traverse(o=>{if(o.isMesh&&o.material&&!Array.isArray(o.material)){o.material=o.material.clone();o.material.userData.papelKeep=true;P439.gmats.push(o.material);}});
+  const bars=gate.children.find(c=>c.isMesh&&c.geometry&&c.geometry.type==='BufferGeometry'),tips=gate.children.filter(c=>c.isMesh&&c.geometry&&c.geometry.type==='ConeGeometry'),lock=gate.children.find(c=>c.isMesh&&c.geometry&&c.geometry.type==='BoxGeometry'&&c!==(S.plate&&S.plate.mesh));
+  // centro da grade no mundo, medido com ela fechada (no início ela nasce girada para «aberta»)
+  P439.gate={g:gate,bars,tips,lock,S};const rot=gate.rotation.y;gate.rotation.y=0;gate.updateWorldMatrix(true,false);const v=new THREE.Vector3(1.35,1.5,0);gate.localToWorld(v);P439.gpos=v;gate.rotation.y=rot;gate.updateWorldMatrix(true,false);}
+function p439Poca(S){if(P439.poca||!S)return;const g=S.g,gate=S.gate||(P439.gate&&P439.gate.g);if(!g||!gate)return;const m=new THREE.Mesh(new THREE.CylinderGeometry(1.42,1.52,.035,28),p439Mat(0x2a1612,0x5a1208));m.scale.set(1,1,.42);m.position.set(gate.position.x+1.35,.02,gate.position.z+.05);m.rotation.y=0;m.name='Portão do Torreão · ferro derretido';p439Marca(m);m.material.emissiveIntensity=0;g.add(m);P439.poca=m;
+  // o aviso da escada passa para um poste, já que a grade virou poça
+  try{if(S.plate&&S.plate.mesh&&S.plate.mesh.parent===gate){const pl=S.plate.mesh;g.attach(pl);pl.position.x=-1.2*(P439.lado||1);pl.position.z=.33; // encostada na beira do vão, do lado oposto ao Bento: o caminho da escada fica livre
+    const post=new THREE.Mesh(new THREE.CylinderGeometry(.03,.035,pl.position.y-.18,8),p439Mat(0x1c1a1c));post.position.set(pl.position.x,(pl.position.y-.18)/2,pl.position.z-.02);post.name='Portão do Torreão · poste da placa';p439Marca(post);g.add(post);}}catch(e){p439Erro('poste',e);}}
+function p439Derretido(S,u){const G=P439.gate;if(!G)return;u=Math.max(0,Math.min(1,u));const k=1-Math.pow(1-u,2);
+  if(G.bars){G.bars.scale.y=1-k*.965;G.bars.scale.x=1+k*.08;}
+  G.tips.forEach((c,i)=>{c.position.y=3.07-(3.07-.05)*k;c.scale.setScalar(1-k*.65);c.rotation.z=k*((i%2?1:-1)*(.6+(i%3)*.3));c.rotation.x=k*.4*((i%3)-1);});
+  if(G.lock){G.lock.position.y=1.45-(1.45-.09)*k;G.lock.rotation.z=k*.85;G.lock.rotation.x=k*.5;}
+  if(P439.poca){P439.poca.visible=u>.05;P439.poca.scale.set(.3+.7*k,1,.42*(.3+.7*k));}}
+function p439Abrir(S,animado){if(!S)return;S.open=true;if(S.gate){S.gate.rotation.y=0;p439Preparar(S);p439Poca(S);p439Derretido(S,1);S.gate=null;}
+  for(const m of P439.gmats)if(m.emissive){m.emissive.setHex(0x3a0c06);m.emissiveIntensity=.25;}p439Placa(S);
+  if(!P439.save.aberto){P439.save.aberto=true;P439.save.quando=Date.now();p439Grava();}
+  try{if(typeof elevAtualiza==='function')elevAtualiza();}catch(e){}try{if(typeof renderGoBar==='function')renderGoBar();}catch(e){}
+  if(animado){try{showToast(p439T('🔥 O dragão dos rubis derreteu o portão! O Torreão (3.º andar) está aberto.','🔥 The ruby dragon melted the gate! The Keep (3rd floor) is open.'),{big:true,ms:9000});}catch(e){}try{logAdd(p439T('🔥 O dragão derreteu o portão do Torreão','🔥 The dragon melted the Keep gate'));}catch(e){}try{sfx('conquista');}catch(e){}try{MEV('andar',{n:3,via:'dragao439'});}catch(e){}}}
+function p439Sync(){const S=p439Escada();if(!S)return;p439Preparar(S);
+  if(P439.save.aberto){if(S.gate||!S.open)p439Abrir(S,false);return;}
+  if(p439Aberto()){S.open=true;if(S.gate)S.gate.rotation.y=1.6;return;} // Webmaster ou legado: a grade segue aberta, como antes
+  S.open=false;if(S.gate)S.gate.rotation.y=0;p439Placa(S);}
+// --- Bento ao lado do portão ---
+function p439Lugar(S){const HR=hallRadius(2),A=S.angle,ux=Math.cos(A),uz=Math.sin(A),lx=-Math.sin(A),lz=Math.cos(A),raio=.45,H=HALLS[2],doors=H.doors||[];
+  const livre=(x,z)=>{if(Math.hypot(x,z)>HR-.85)return false;for(const o of HOBST2)if(Math.hypot(x-o[0],z-o[1])<o[2]+raio+.3)return false;
+    for(const p of doors){const f=p.userData.angle,cf=Math.cos(f),sf=Math.sin(f),al=HR-(x*cf+z*sf),ac=-x*sf+z*cf;if(al<3.3&&Math.abs(ac)<1.62+.25+raio)return false;}
+    for(const T of (H.X.stairs||[])){const ca=Math.cos(T.angle),sa=Math.sin(T.angle),al=HR-(x*ca+z*sa),ac=-x*sa+z*ca;if(al<3.2&&Math.abs(ac)<1.75+.3+raio)return false;}
+    try{for(const o of ((typeof H236!=='undefined'&&H236.postos[2])||[]))if(Math.hypot(x-o.x,z-o.z)<o.raio+raio+.6)return false;}catch(e){}
+    try{for(const c of RUBY422.clockItems)if(c.hall===2&&Math.hypot(x-c.x,z-c.z)<1.3)return false;}catch(e){}return true;};
+  for(const r of [HR-1.1,HR-1.35,HR-1.65,HR-2,HR-2.4])for(const lat of [2.7,3,3.35,3.75])for(const s of [1,-1]){const x=ux*r+lx*lat*s,z=uz*r+lz*lat*s;if(livre(x,z))return {x,z,s,r,lat};}return null;}
+function p439Bento(){if(P439.arq||P439.arq===false)return;const S=p439Escada();if(!S)return;p439Preparar(S);
+  if(typeof A232!=='undefined'&&A232.pronto===false){if(!P439.adiado){P439.adiado=true;A232.aoPronto.push(()=>{P439.adiado=false;try{p439Bento();}catch(e){p439Erro('bento',e);}});}return;}
+  let m=null;try{m=a232Malha('arqueiro');}catch(e){p439Erro('malha',e);}if(!m){P439.arq=false;return;}
+  const L=p439Lugar(S);if(!L){P439.arq=false;P439.erros.push('sem lugar para Bento');return;}
+  const grp=new THREE.Group();grp.name='Bento, o arqueiro · guarda do portão · bicho';grp.position.set(L.x,0,L.z);const e=.95;m.scale.setScalar(e);m.position.y=0;m.userData.galeria232='arqueiro';m.userData.arqueiro439=true;grp.add(m);
+  grp.traverse(o=>{o.__fusaoMoveu=9;o.userData.noCam=true;if(o.isMesh)o.userData.papelKeepGeo=true;});
+  try{const mat=m.material;if(mat&&!mat.userData.v258){mat.userData.v258=true;mat.roughness=.76;mat.needsUpdate=true;}}catch(e){}
+  HALLS[2].scene.add(grp);try{if(typeof Q!=='undefined'&&Q.papel&&typeof papelApply==='function')papelApply(grp);}catch(e){}
+  HOBST2.push([L.x,L.z,.45]); // a malha de caminhos do hall se refaz sozinha quando a lista de obstáculos muda
+  // olha para o meio da Galeria, um pouco virado para o portão
+  const gp=P439.gpos||{x:0,z:0};P439.arqYaw=Math.atan2((-L.x)*.7+(gp.x-L.x)*.3,(-L.z)*.7+(gp.z-L.z)*.3);grp.rotation.y=P439.arqYaw;
+  P439.lado=L.s;P439.arq={grp,m,e,x:L.x,z:L.z,ph:Math.random()*6.28,t:0};}
+// --- o fogo do dragão ---
+function p439Fogo(){if(P439.fogo)return P439.fogo;const sc=HALLS[2].scene,mk=(r,cor,op)=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(r,.04,1,14,1,true),new THREE.MeshBasicMaterial({color:cor,transparent:true,opacity:op,depthWrite:false,side:THREE.DoubleSide}));m.name='Dragão dos rubis · fogo no portão · bicho';p439Marca(m);m.visible=false;sc.add(m);return m;};
+  const F={fora:mk(.95,0xff8a2a,.72),dentro:mk(.5,0xfff0b8,.85),halo:p439Halo(),up:new THREE.Vector3(0,1,0),boca:new THREE.Vector3(),dir:new THREE.Vector3(),t:0};F.halo.scale.set(3.2,3.2,1);F.halo.visible=false;sc.add(F.halo);
+  for(let i=0;i<7;i++){const g=new THREE.Mesh(new THREE.SphereGeometry(.05+Math.random()*.035,8,6),p439Mat(0x3a1a12,0xff5a14));g.name='Portão do Torreão · gota · bicho';p439Marca(g);g.visible=false;g.userData.u=Math.random();g.userData.x=.2+Math.random()*2.3;g.userData.v=.6+Math.random()*.9;sc.add(g);P439.gota.push(g);}
+  P439.fogo=F;return F;}
+function p439Pet(){const p=GEAR.pet;return p&&p.userData.pet==='dragon422'&&p.userData.ruby422?p:null;}
+function p439Mira(pet,dt,ligado){ // o dragão vira para o portão (rotação local = rumo no mundo − rumo do leitor)
+  if(!pet)return;const r=pet.userData.ruby422;if(!r.__q439){r.__q439=new THREE.Quaternion();r.__e439=new THREE.Euler();r.__w439=new THREE.Vector3();}
+  let alvo=0;if(ligado&&P439.gpos){pet.getWorldPosition(r.__w439);const want=Math.atan2(P439.gpos.x-r.__w439.x,P439.gpos.z-r.__w439.z);if(pet.parent){pet.parent.getWorldQuaternion(r.__q439);r.__e439.setFromQuaternion(r.__q439,'YXZ');alvo=want-r.__e439.y;}else alvo=want;}
+  let d=alvo-pet.rotation.y;while(d>Math.PI)d-=Math.PI*2;while(d<-Math.PI)d+=Math.PI*2;pet.rotation.y+=d*Math.min(1,dt*(ligado?4:3));if(!ligado&&Math.abs(d)<.01)pet.rotation.y=0;}
+function p439Chamas(pet,dt,forca){const F=p439Fogo();if(!pet||forca<=0){for(const m of [F.fora,F.dentro,F.halo])m.visible=false;return;}F.t+=dt;const stage=ruby422Stage();
+  pet.updateWorldMatrix(true,true);F.boca.set(0,.18,.65);pet.localToWorld(F.boca);F.dir.subVectors(P439.gpos,F.boca);const len=F.dir.length();F.dir.normalize();
+  const tremor=1+Math.sin(F.t*31)*.08+Math.sin(F.t*17.3)*.06;
+  for(const [m,esc,op] of [[F.fora,.28*stage*tremor,.72],[F.dentro,.15*stage*(2-tremor),.85]]){m.visible=true;m.position.copy(F.boca).addScaledVector(F.dir,len*.5);m.scale.set(esc,len,esc);m.quaternion.setFromUnitVectors(F.up,F.dir);m.material.opacity=op*forca;}
+  F.halo.visible=true;F.halo.position.copy(P439.gpos).addScaledVector(F.dir,-.35);F.halo.material.opacity=Math.min(1,forca)*(.75+Math.sin(F.t*23)*.15);F.halo.scale.set(3.2*tremor,3.2*tremor,1);}
+function p439Brasa(u){for(const m of P439.gmats)if(m.emissive){m.emissive.setHex(0xff4a12);m.emissiveIntensity=Math.max(0,u)*1.6;}}
+function p439Gotas(dt,ativo){const G=P439.gate;if(!G)return;for(const g of P439.gota){if(!ativo){g.visible=false;continue;}g.visible=true;g.userData.u+=dt*g.userData.v;if(g.userData.u>1){g.userData.u=0;g.userData.x=.2+Math.random()*2.3;}
+    const y=2.9-g.userData.u*2.85;G.g.updateWorldMatrix(true,false);const v=new THREE.Vector3(g.userData.x,y,0);G.g.localToWorld(v);g.position.copy(v);g.scale.set(1,1+g.userData.u*1.6,1);}}
+function p439Sequencia(dt){const S=p439Escada(),pet=p439Pet();if(!S)return;P439.t+=dt;const f=P439.fase;
+  if(f==='encara'){p439Mira(pet,dt,true);if(P439.t>=.9){P439.fase='fogo';P439.t=0;try{sfx('fogo');}catch(e){}}}
+  else if(f==='fogo'){p439Mira(pet,dt,true);const u=P439.t/2.8;p439Chamas(pet,dt,Math.min(1,P439.t*3));p439Brasa(u);p439Gotas(dt,u>.55);if(P439.t>=2.8){P439.fase='derrete';P439.t=0;p439Poca(S);try{sfx('fogo');}catch(e){}}}
+  else if(f==='derrete'){p439Mira(pet,dt,true);const u=P439.t/2.4;p439Chamas(pet,dt,Math.max(0,1-P439.t/.8));p439Brasa(1-u*.6);p439Derretido(S,u);p439Gotas(dt,u<.8);if(P439.poca)P439.poca.material.emissiveIntensity=1.4*Math.min(1,u*2);
+    if(P439.t>=2.4){p439Gotas(0,false);p439Chamas(pet,0,0);p439Abrir(S,true);P439.fase='volta';P439.t=0;}}
+  else if(f==='volta'){p439Mira(pet,dt,false);const u=P439.t/6;for(const m of P439.gmats)if(m.emissive)m.emissiveIntensity=.65*(1-u)+.25*u;if(P439.poca)P439.poca.material.emissiveIntensity=1.4*(1-u)+.12*u;if(P439.t>=6){P439.fase='';P439.t=0;if(pet)pet.rotation.y=0;}}}
+function p439Tick(dt){if(CUR!=='hall'||HALLN!==2||document.hidden)return;dt=Math.max(0,Math.min(.05,dt));const S=p439Escada();if(!S)return;if(!P439.gpos)p439Preparar(S);
+  const p=cavPos(),B=P439.arq;
+  // Bento: respira, acompanha o leitor com o olhar e fala quando ele chega perto
+  if(B){B.t+=dt;const s=Math.sin(B.t*1.9+B.ph);B.m.scale.set(B.e*(1-s*.006),B.e*(1+s*.012),B.e*(1-s*.006));const d=Math.hypot(p.x-B.x,p.z-B.z);
+    const want=d<4.6?Math.atan2(p.x-B.x,p.z-B.z):P439.arqYaw;let dd=want-B.grp.rotation.y;while(dd>Math.PI)dd-=Math.PI*2;while(dd<-Math.PI)dd+=Math.PI*2;B.grp.rotation.y+=dd*Math.min(1,dt*3);}
+  const dB=B?Math.hypot(p.x-B.x,p.z-B.z):99,dF=Math.hypot(p.x-S.front[0],p.z-S.front[1]),dG=P439.gpos?Math.hypot(p.x-P439.gpos.x,p.z-P439.gpos.z):99;
+  const perto=(dB<2.7||(dF<2.4&&!S.open))&&!uiBlocked();P439.falou-=dt;
+  if(perto&&(!P439.perto||P439.falou<=0)){const msg=p439Fala();if(msg!==P439.ultimo||P439.falou<=0){P439.ultimo=msg;P439.falou=10;try{showToast((B?'🏹 Bento: ':'')+msg,{big:true,ms:8000});}catch(e){}}}
+  if(!perto&&dB>3.8&&dF>3.4)P439.perto=false;else if(perto)P439.perto=true;
+  if(P439.fase){p439Sequencia(dt);return;}
+  if(!S.open&&!p439Aberto()&&dG<6.5&&!uiBlocked()&&!CAV.morto){const D=p439Dragao();if(D.grande&&D.equipado&&p439Pet()){P439.fase='encara';P439.t=0;P439.ultimo='';P439.falou=0;}}}
+// --- ligações ---
+if(/[?&#]portao=0/i.test(location.search+location.hash)){try{localStorage.removeItem(P439.KEY);}catch(e){}}
+p439Le();if(!P439.save.aberto&&!P439.save.legado){try{if(p439Legado()){P439.save.legado=true;p439Grava();}}catch(e){}}
+{const gh=goHall;goHall=function(n,via){const dest=n||(CUR==='room'?GENRE_FLOOR(CUR_GENRE):HALLN);if(p439Blocked(dest)){p439Aviso();return;}return gh.apply(this,arguments);};
+ const er=enterRoom;enterRoom=function(g){if(p439Blocked(GENRE_FLOOR(g)||1)){p439Aviso();return;}return er.apply(this,arguments);};
+ const tr=travel;travel=function(key){const n=/^hall\d?$/.test(key)?(key==='hall'?1:+key.slice(4)):(GENRE_FLOOR(key)||1);if(p439Blocked(n)){p439Aviso();return;}return tr.apply(this,arguments);};
+ const jp=jump;jump=function(where,g){const n=where==='room'?(GENRE_FLOOR(g)||1):/^hall[2-7]$/.test(where)?+where.slice(4):(GENRE_FLOOR(g)||1);if(p439Blocked(n)){p439Aviso();return;}return jp.apply(this,arguments);};window.__jump=jump;
+ const sh=setHallN;setHallN=function(n){if(p439Blocked(n)){p439Aviso();n=2;}return sh.call(this,n);};
+ const ea=elevAberto;elevAberto=n=>ea(n)&&!p439Blocked(+n);
+ const lbl=stairLabel;stairLabel=function(S){return S&&S.to===3&&!S.open?p439T('Trancado · só um dragão muito grande derrete o portão','Locked · only a very large dragon melts the gate'):lbl.apply(this,arguments);};
+ const gn=gate372Notice;gate372Notice=function(){const S=p439Escada();if(S&&!S.open&&CUR==='hall'&&HALLN===2)return p439Aviso();return gn.apply(this,arguments);};
+ // rubis só nos dois primeiros andares
+ const rs=ruby422Set;ruby422Set=function(key){if(p439Rubis(key)){const old=RUBY422.sets[key];if(old){try{old.mesh.parent&&old.mesh.parent.remove(old.mesh);old.mesh.geometry.dispose();}catch(e){}delete RUBY422.sets[key];}return null;}return rs.apply(this,arguments);};
+ try{const e=document.getElementById('ruby422Hud');if(e)e.onclick=()=>{if(RUBY422.data.donated>=1000&&GEAR.pet&&GEAR.pet.userData.pet==='dragon422'){egg422Open(true);return;}showToast(p439T('Leve os rubis ao ovo ao lado da porta de Fantasia: 1000 chocam o dragão e mais 600 fazem-no crescer até 4× — o tamanho que derrete o portão do Torreão. Cada cristal vale 5 rubis; eles ficam nos dois primeiros andares.','Bring rubies to the egg beside the Fantasy door: 1000 hatch the dragon and 600 more grow it to 4× — the size that melts the Keep gate. Each crystal is worth 5 rubies; they lie on the first two floors.')+' '+ruby422Text('Retorno em ','Respawn every ')+RUBY422.data.hours+'h.');};}catch(e){}
+ const ht=hallTick;hallTick=function(dt){ht.apply(this,arguments);try{p439Tick(dt);}catch(e){p439Erro('tick',e);}};
+ try{p439Bento();}catch(e){p439Erro('bento',e);}try{p439Sync();}catch(e){p439Erro('sync',e);}
+ try{const tag=document.getElementById('wmTag');if(tag&&!WEBMASTER)tag.hidden=true;}catch(e){} // a tarja «Webmaster · moedas infinitas…» aparecia para todos os leitores
+ try{if(typeof elevAtualiza==='function')elevAtualiza();}catch(e){}}
+window.__portao439={estado:P439,escada:p439Escada,dragao:p439Dragao,aberto:p439Aberto,bloqueado:p439Blocked,sync:p439Sync,bento:p439Bento,fala:p439Fala,mensagem:p439Mensagem,
+  reset(){P439.save={aberto:false,legado:false,quando:0};p439Grava();},
+  // atalhos de teste: dragão pronto (4×) e equipado
+  dragaoPronto(){try{ruby422Commit(s=>{s.wallet+=2000;s.total+=2000;});ruby422Donate(1000);ruby422Grow(600);ruby422Reward(true);ruby422HUD();}catch(e){p439Erro('teste',e);}}};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
