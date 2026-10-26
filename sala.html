@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v439</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v440</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -56255,6 +56255,111 @@ window.__portao439={estado:P439,escada:p439Escada,dragao:p439Dragao,aberto:p439A
   reset(){P439.save={aberto:false,legado:false,quando:0};p439Grava();},
   // atalhos de teste: dragão pronto (4×) e equipado
   dragaoPronto(){try{ruby422Commit(s=>{s.wallet+=2000;s.total+=2000;});ruby422Donate(1000);ruby422Grow(600);ruby422Reward(true);ruby422HUD();}catch(e){p439Erro('teste',e);}}};
+
+/* ===================== v440 · O ROBÔ DE GUARDA E O PORTÃO DO OBSERVATÓRIO; RUBIS MAIS RÁPIDOS (pedido do Luiz) =====================
+   «A abertura do quarto andar é os óleos entregues para o robô: serve pra ele ajudar com o boss e pra abrir a porta.»
+   «Abrande pra conseguir [o dragão] bem mais rápido.»
+   · A grade da escada Torreão → Observatório (3.º → 4.º andar) nasce fechada, nos mesmos moldes do portão do Torreão (v439).
+     Ao lado dela fica um robô de guarda (o «mech_robo», um dos seis aliados do óleo da v428). Chegar perto com um Óleo
+     Mecânico na mochila entrega a lata na hora; ele então caminha até o portão, força a grade e a passagem fica aberta
+     para sempre (gravado). O mesmo robô conta como aliado contra o Deus Tirânico Robô (é o id «mech_robo» do óleo).
+     Conversar com ele (clique/E) continua funcionando, com o botão «Entregar 1 Óleo Mecânico» da v428.
+   · Rubis: cada cristal passa a valer 10 (era 5), e a ampulheta de 4 h sai do Torreão (atrás do portão do dragão) e vai
+     para a Galeria, onde já serve a quem junta rubis para o ovo. Chocar + crescer até 4× custa 1.600; os dois primeiros
+     andares rendem ~3.300 por ciclo.
+   Testes: ?portao=0 apaga também este save; ?portao=1 faz o Webmaster respeitar o portão. */
+const R440={KEY:SKEY('mundo.portao440.v1'),ID:'mech_robo',save:{aberto:false,legado:false,quando:0},forcar:/[?&#]portao=1/i.test(location.search+location.hash),fase:'',t:0,robo:null,gpos:null,alvo:null,perto:false,falou:0,ultimo:'',erros:[]};
+function r440Erro(onde,e){try{if(R440.erros.length<30)R440.erros.push(onde+': '+String(e&&e.message||e));console.error('robo440',onde,e);}catch(x){}}
+function r440T(pt,en,es){return text428(pt,en,es||en);}
+function r440Le(){try{const d=JSON.parse(localStorage.getItem(R440.KEY)||'null');if(d&&typeof d==='object'){R440.save.aberto=d.aberto===true;R440.save.legado=d.legado===true;R440.save.quando=+d.quando||0;}}catch(e){}}
+function r440Grava(){try{localStorage.setItem(R440.KEY,JSON.stringify(R440.save));}catch(e){r440Erro('gravar',e);}}
+function r440Escada(){const X=HALLS[3]&&HALLS[3].X;if(!X)return null;return (X.stairs||[X.stair]).find(s=>s&&s.to===4)||null;}
+function r440Oleo(){try{return OIL428.save.given.includes(R440.ID);}catch(e){return false;}}
+function r440Legado(){try{for(const n of [4,5,6,7])for(const g of ((EST.ANDARES&&EST.ANDARES[n])||[])){const k=GENRE_ROOM[g];
+    if((KEYS.tem&&(KEYS.tem[g]||KEYS.tem[k]))||(KEYS.baus&&(KEYS.baus[g]||KEYS.baus[k]))||(LEITOR.lidos&&(LEITOR.lidos[g]||LEITOR.lidos[k])))return true;
+    if(CAV.estado&&CAV.estado.limpas&&(CAV.estado.limpas[k]||CAV.estado.limpas[g]))return true;}
+  if(gate372Floor()>=4)return true;}catch(e){r440Erro('legado',e);}return false;}
+function r440Aberto(){return (WEBMASTER&&!R440.forcar)||R440.save.aberto||R440.save.legado;}
+function r440Blocked(n){if(!(n>=4)||r440Aberto())return false;const cur=gate372Floor();return !(cur>=4&&n<=cur);}
+function r440Mochila(){try{return oil428Count();}catch(e){return 0;}}
+function r440Mensagem(){if(r440Oleo())return r440T('O robô de guarda já recebeu o óleo: vá até o portão da escada do Observatório, no Torreão, que ele abre a passagem.','The guard robot already has its oil: go to the gate of the Observatory stairs in the Keep and it opens the way.');
+  return r440T('A escada do Observatório (4.º andar), no Torreão, está fechada por um portão. O robô de guarda ao lado abre a passagem em troca de um Óleo Mecânico — há latas nas casas de colmo e da Clareira (Fantasia) e nas casas do Tecelão, das Ervas, dos Pergaminhos e na Pousada (Histórica). Óleos na mochila: '+r440Mochila()+'.','The Observatory stairs (4th floor), in the Keep, are closed by a gate. The guard robot beside it opens the way for one Mechanical Oil can — look in the thatched and Clearing houses (Fantasy) and in the Weaver’s, Herbalist’s and Scroll houses and the Inn (Historical). Oil cans carried: '+r440Mochila()+'.');}
+function r440Aviso(){try{showToast(r440Mensagem(),{big:true,ms:9000});}catch(e){}}
+function r440Fala(){const S=r440Escada();if(R440.fase)return r440T('Óleo recebido. Abrindo o portão.','Oil received. Opening the gate.');
+  if(S&&S.open)return R440.save.aberto?r440T('Portão aberto. Com o óleo que você me deu, eu também vou ajudar contra o Deus Tirânico Robô, no sétimo andar.','Gate open. With the oil you gave me, I will also help against the Tyrannical Robot God on floor seven.'):r440T('O portão está aberto para você — suba as escadas quando quiser.','The gate is open for you — climb the stairs whenever you like.');
+  if(r440Mochila()>0)return r440T('Óleo Mecânico detectado. Chegue mais perto e eu abro o portão.','Mechanical Oil detected. Come closer and I will open the gate.');
+  return r440T('Sou o robô de guarda. Minhas juntas estão secas: traga-me um Óleo Mecânico e eu abro este portão — e ainda ajudo contra o Deus Tirânico Robô. As latas estão nas casas de Fantasia e de Histórica.','I am the guard robot. My joints are dry: bring me one Mechanical Oil can and I open this gate — and I will even help against the Tyrannical Robot God. The cans are in the houses of Fantasy and Historical.');}
+function r440Placa(S){if(!S||!S.plate)return;S.plate.set(S.open?r440T('Observatório aberto|suba as escadas','Observatory open|climb the stairs'):r440T('Quarto andar trancado|o robô abre com um Óleo Mecânico','Fourth floor locked|the robot opens it for one Mechanical Oil'));}
+function r440Preparar(S){if(!S||!S.gate||R440.gpos)return;const gate=S.gate,rot=gate.rotation.y;gate.rotation.y=0;gate.updateWorldMatrix(true,false);const v=new THREE.Vector3(1.35,0,0);gate.localToWorld(v);R440.gpos=v;const h=new THREE.Vector3(.1,0,0);gate.localToWorld(h);R440.dobradica=h;gate.rotation.y=rot;gate.updateWorldMatrix(true,false);}
+function r440Abrir(S,animado){if(!S)return;S.open=true;r440Placa(S);if(!R440.save.aberto){R440.save.aberto=true;R440.save.quando=Date.now();r440Grava();}
+  try{if(typeof elevAtualiza==='function')elevAtualiza();}catch(e){}try{if(typeof renderGoBar==='function')renderGoBar();}catch(e){}
+  if(animado){try{showToast(r440T('⚙️ O robô de guarda abriu o portão! O Observatório (4.º andar) está aberto.','⚙️ The guard robot opened the gate! The Observatory (4th floor) is open.'),{big:true,ms:9000});}catch(e){}try{logAdd(r440T('⚙️ O robô abriu o portão do Observatório','⚙️ The robot opened the Observatory gate'));}catch(e){}try{sfx('conquista');}catch(e){}try{MEV('andar',{n:4,via:'robo440'});}catch(e){}}}
+function r440Sync(){const S=r440Escada();if(!S)return;r440Preparar(S);if(r440Aberto()){S.open=true;if(S.gate)S.gate.rotation.y=1.6;if(R440.save.aberto)r440Placa(S);return;}S.open=false;if(S.gate)S.gate.rotation.y=0;r440Placa(S);}
+// --- o robô ao lado do portão ---
+function r440Livre(x,z,r){const HR=hallRadius(3);if(Math.hypot(x,z)>HR-r-.12)return false;const meu=R440.robo&&R440.robo.ob;for(const o of HOBST3){if(o===meu)continue;if(Math.hypot(x-o[0],z-o[1])<o[2]+r)return false;}return true;}
+function r440Lugar(S){const HR=hallRadius(3),A=S.angle,ux=Math.cos(A),uz=Math.sin(A),lx=-Math.sin(A),lz=Math.cos(A),raio=.6,H=HALLS[3],doors=H.doors||[];
+  const livre=(x,z)=>{if(Math.hypot(x,z)>HR-.95)return false;for(const o of HOBST3)if(Math.hypot(x-o[0],z-o[1])<o[2]+raio+.3)return false;
+    for(const p of doors){const f=p.userData.angle,cf=Math.cos(f),sf=Math.sin(f),al=HR-(x*cf+z*sf),ac=-x*sf+z*cf;if(al<3.3&&Math.abs(ac)<1.62+.25+raio)return false;}
+    for(const T of (H.X.stairs||[])){const ca=Math.cos(T.angle),sa=Math.sin(T.angle),al=HR-(x*ca+z*sa),ac=-x*sa+z*ca;if(al<3.2&&Math.abs(ac)<1.75+.3+raio)return false;}
+    try{for(const o of ((typeof H236!=='undefined'&&H236.postos[3])||[]))if(Math.hypot(x-o.x,z-o.z)<o.raio+raio+.6)return false;}catch(e){}
+    try{for(const c of RUBY422.clockItems)if(c.hall===3&&Math.hypot(x-c.x,z-c.z)<1.4)return false;}catch(e){}return true;};
+  for(const r of [HR-1.2,HR-1.5,HR-1.8,HR-2.2,HR-2.6])for(const lat of [2.9,3.2,3.6,4])for(const s of [-1,1]){const x=ux*r+lx*lat*s,z=uz*r+lz*lat*s;if(livre(x,z))return {x,z,s,r,lat};}return null;}
+function r440Robo(){if(R440.robo||R440.robo===false)return;const S=r440Escada();if(!S)return;r440Preparar(S);
+  if(typeof A232!=='undefined'&&A232.pronto===false){if(!R440.adiado){R440.adiado=true;A232.aoPronto.push(()=>{R440.adiado=false;try{r440Robo();}catch(e){r440Erro('robo',e);}});}return;}
+  let m=null;try{m=a232Malha(R440.ID);}catch(e){r440Erro('malha',e);}if(!m){R440.robo=false;return;}
+  const L=r440Lugar(S);if(!L){R440.robo=false;R440.erros.push('sem lugar para o robô');return;}
+  const grp=new THREE.Group();grp.name='Robô de guarda · portão do Observatório · bicho';m.position.set(0,0,0);delete m.userData.anim232;grp.add(m);grp.updateMatrixWorld(true);
+  const box=new THREE.Box3().setFromObject(m),height=box.max.y-box.min.y;if(height>0){m.scale.multiplyScalar(1.75/height);m.position.y=-box.min.y*1.75/height;}
+  grp.position.set(L.x,0,L.z);grp.traverse(o=>{o.__fusaoMoveu=9;o.userData.noCam=true;if(o.isMesh)o.userData.papelKeepGeo=true;});
+  HALLS[3].scene.add(grp);try{if(typeof Q!=='undefined'&&Q.papel&&typeof papelApply==='function')papelApply(grp);}catch(e){}
+  const ob=[L.x,L.z,.6];HOBST3.push(ob);const gp=R440.gpos||{x:0,z:0};const yaw=Math.atan2((-L.x)*.7+(gp.x-L.x)*.3,(-L.z)*.7+(gp.z-L.z)*.3);grp.rotation.y=yaw;
+  let n=null;try{n=npcAdd('hall3',grp,r440T('Robô de guarda','Guard robot'),{genre:'ciencia',hall347:3,oil428:R440.ID,robo440:true});}catch(e){r440Erro('npc',e);}
+  R440.robo={grp,m,x:L.x,z:L.z,px:L.x,pz:L.z,yaw,yaw0:yaw,ob,n,t:0,lado:L.s,baseY:m.position.y};}
+function r440Entrega(){const s=OIL428.save;if(s.given.includes(R440.ID)||r440Mochila()<1)return false;if(!oil428Save({...s,given:[...s.given,R440.ID]}))return false;
+  try{showToast(r440T('Óleo Mecânico entregue ao robô de guarda! Ele vai abrir o portão e lutar ao seu lado.','Mechanical Oil delivered to the guard robot! It will open the gate and fight at your side.')+' '+OIL428.save.given.length+'/6',{big:true,ms:7000});}catch(e){}try{sfx('pronto');}catch(e){}return true;}
+function r440Anda(B,tx,tz,dt,vel){const dx=tx-B.x,dz=tz-B.z,d=Math.hypot(dx,dz);if(d<.12)return true;const want=Math.atan2(dx,dz);let e=want-B.yaw;while(e>Math.PI)e-=Math.PI*2;while(e<-Math.PI)e+=Math.PI*2;B.yaw+=e*Math.min(1,dt*4);
+  const passo=Math.min(d,vel*dt),nx=B.x+Math.sin(B.yaw)*passo,nz=B.z+Math.cos(B.yaw)*passo;if(r440Livre(nx,nz,.5)){B.x=nx;B.z=nz;}else{const nx2=B.x+dx/d*passo,nz2=B.z+dz/d*passo;if(r440Livre(nx2,nz2,.5)){B.x=nx2;B.z=nz2;}else return true;}
+  B.ob[0]=B.x;B.ob[1]=B.z;return false;}
+function r440Sequencia(dt){const S=r440Escada(),B=R440.robo;if(!S||!B)return;R440.t+=dt;B.t+=dt;
+  if(R440.fase==='vai'){if(!R440.alvo){const g=R440.gpos,h=R440.dobradica;const d=Math.hypot(g.x,g.z);const cx=g.x*(d-1.6)/d,cz=g.z*(d-1.6)/d;const lx=h.x-g.x,lz=h.z-g.z,ll=Math.hypot(lx,lz)||1;R440.alvo={x:cx+lx/ll*.9,z:cz+lz/ll*.9};}
+    if(r440Anda(B,R440.alvo.x,R440.alvo.z,dt,1.5)||R440.t>14){R440.fase='abre';R440.t=0;}}
+  else if(R440.fase==='abre'){const g=R440.gpos,want=Math.atan2(g.x-B.x,g.z-B.z);let e=want-B.yaw;while(e>Math.PI)e-=Math.PI*2;while(e<-Math.PI)e+=Math.PI*2;B.yaw+=e*Math.min(1,dt*4);
+    const u=Math.min(1,R440.t/2.4);B.m.rotation.x=Math.sin(u*Math.PI)*.16;if(R440.t>=.7&&!S.open){r440Abrir(S,true);try{sfx('bloqueado');}catch(x){}}
+    if(R440.t>=2.4){R440.fase='volta';R440.t=0;B.m.rotation.x=0;}}
+  else if(R440.fase==='volta'){if(r440Anda(B,B.px,B.pz,dt,1.3)||R440.t>14){B.x=B.px;B.z=B.pz;B.ob[0]=B.x;B.ob[1]=B.z;R440.fase='';R440.t=0;R440.alvo=null;}}
+  B.grp.position.set(B.x,0,B.z);B.grp.rotation.y=B.yaw;}
+function r440Tick(dt){if(CUR!=='hall'||HALLN!==3||document.hidden)return;dt=Math.max(0,Math.min(.05,dt));const S=r440Escada();if(!S)return;const B=R440.robo;if(!B)return;const p=cavPos();
+  if(R440.fase){r440Sequencia(dt);return;}
+  B.t+=dt;B.m.position.y=B.baseY+Math.sin(B.t*1.7)*.012;const d=Math.hypot(p.x-B.x,p.z-B.z);
+  const want=d<5?Math.atan2(p.x-B.x,p.z-B.z):B.yaw0;let e=want-B.yaw;while(e>Math.PI)e-=Math.PI*2;while(e<-Math.PI)e+=Math.PI*2;B.yaw+=e*Math.min(1,dt*2.5);B.grp.rotation.y=B.yaw;
+  const dF=Math.hypot(p.x-S.front[0],p.z-S.front[1]),perto=(d<2.6||(dF<2.4&&!S.open))&&!uiBlocked();R440.falou-=dt;
+  if(perto&&!S.open&&!r440Oleo()&&r440Mochila()>=1&&!NPC127.open){if(r440Entrega()){R440.ultimo='';R440.falou=0;}}
+  if(perto&&(!R440.perto||R440.falou<=0)&&!NPC127.open){const msg=r440Fala();if(msg!==R440.ultimo||R440.falou<=0){R440.ultimo=msg;R440.falou=10;try{showToast('🤖 '+msg,{big:true,ms:8000});}catch(e){}}}
+  if(!perto&&d>3.8&&dF>3.4)R440.perto=false;else if(perto)R440.perto=true;
+  if(!S.open&&!r440Aberto()&&r440Oleo()&&!CAV.morto){R440.fase='vai';R440.t=0;R440.alvo=null;R440.ultimo='';}}
+// --- rubis: cada cristal vale 10; a ampulheta de 4 h vai para a Galeria ---
+function r440Ampulheta(){try{const i=RUBY422.clockItems.findIndex(c=>c.hours===4&&c.hall===3);if(i<0)return;const it=RUBY422.clockItems[i];RUBY422.clockItems.splice(i,1);try{ruby422ClockBuild(2,4);it.g.parent&&it.g.parent.remove(it.g);}catch(e){RUBY422.clockItems.splice(i,0,it);r440Erro('ampulheta',e);}}catch(e){r440Erro('ampulheta',e);}}
+// --- ligações ---
+if(/[?&#]portao=0/i.test(location.search+location.hash)){try{localStorage.removeItem(R440.KEY);}catch(e){}}
+r440Le();if(!R440.save.aberto&&!R440.save.legado){try{if(r440Legado()){R440.save.legado=true;r440Grava();}}catch(e){}}
+{const gh=goHall;goHall=function(n,via){const dest=n||(CUR==='room'?GENRE_FLOOR(CUR_GENRE):HALLN);if(r440Blocked(dest)){r440Aviso();return;}return gh.apply(this,arguments);};
+ const er=enterRoom;enterRoom=function(g){if(r440Blocked(GENRE_FLOOR(g)||1)){r440Aviso();return;}return er.apply(this,arguments);};
+ const tr=travel;travel=function(key){const n=/^hall\d?$/.test(key)?(key==='hall'?1:+key.slice(4)):(GENRE_FLOOR(key)||1);if(r440Blocked(n)){r440Aviso();return;}return tr.apply(this,arguments);};
+ const jp=jump;jump=function(where,g){const n=where==='room'?(GENRE_FLOOR(g)||1):/^hall[2-7]$/.test(where)?+where.slice(4):(GENRE_FLOOR(g)||1);if(r440Blocked(n)){r440Aviso();return;}return jp.apply(this,arguments);};window.__jump=jump;
+ const sh=setHallN;setHallN=function(n){if(r440Blocked(n)){r440Aviso();n=3;}return sh.call(this,n);};
+ const ea=elevAberto;elevAberto=n=>ea(n)&&!r440Blocked(+n);
+ const lbl=stairLabel;stairLabel=function(S){return S&&S.to===4&&!S.open?r440T('Trancado · o robô de guarda abre com um Óleo Mecânico','Locked · the guard robot opens it for one Mechanical Oil'):lbl.apply(this,arguments);};
+ const gn=gate372Notice;gate372Notice=function(){const S=r440Escada();if(S&&!S.open&&CUR==='hall'&&HALLN===3)return r440Aviso();return gn.apply(this,arguments);};
+ const nl=npcLines;npcLines=function(n){if(n&&n.robo440){const S=r440Escada();return {text:r440Fala(),extra:(S&&S.open?'':r440T('Latas de óleo: casas de colmo e da Clareira (Fantasia); Tecelão, Ervas, Pergaminhos e Pousada (Histórica). ','Oil cans: thatched and Clearing houses (Fantasy); Weaver’s, Herbalist’s, Scrolls and Inn (Historical). '))+r440T('Óleos na mochila: ','Oil cans carried: ')+r440Mochila()+' · '+OIL428.save.given.length+'/6'};}return nl.apply(this,arguments);};
+ const rs=ruby422Set;ruby422Set=function(key){const set=rs.apply(this,arguments);if(set&&!set.v440){set.v440=true;for(const c of set.coins)if(c.value===5)c.value=10;}return set;};
+ try{const e=document.getElementById('ruby422Hud');if(e)e.onclick=()=>{if(RUBY422.data.donated>=1000&&GEAR.pet&&GEAR.pet.userData.pet==='dragon422'){egg422Open(true);return;}showToast(r440T('Leve os rubis ao ovo ao lado da porta de Fantasia: 1000 chocam o dragão e mais 600 fazem-no crescer até 4× — o tamanho que derrete o portão do Torreão. Cada cristal vale 10 rubis; eles ficam nos dois primeiros andares.','Bring rubies to the egg beside the Fantasy door: 1000 hatch the dragon and 600 more grow it to 4× — the size that melts the Keep gate. Each crystal is worth 10 rubies; they lie on the first two floors.')+' '+ruby422Text('Retorno em ','Respawn every ')+RUBY422.data.hours+'h.');};}catch(e){}
+ const ht=hallTick;hallTick=function(dt){ht.apply(this,arguments);try{r440Tick(dt);}catch(e){r440Erro('tick',e);}};
+ try{r440Robo();}catch(e){r440Erro('robo',e);}try{r440Sync();}catch(e){r440Erro('sync',e);}try{r440Ampulheta();}catch(e){}
+ try{if(typeof elevAtualiza==='function')elevAtualiza();}catch(e){}}
+window.__robo440={estado:R440,escada:r440Escada,aberto:r440Aberto,bloqueado:r440Blocked,fala:r440Fala,mensagem:r440Mensagem,entrega:r440Entrega,
+  reset(){R440.save={aberto:false,legado:false,quando:0};r440Grava();},
+  // atalho de teste: uma lata de óleo na mochila
+  oleo(){try{const s=OIL428.save,h=OIL428.homes.find(h=>!s.collected.includes(h.id));if(h)oil428Save({...s,collected:[...s.collected,h.id]});}catch(e){r440Erro('teste',e);}}};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
