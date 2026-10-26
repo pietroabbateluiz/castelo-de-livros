@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v447</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v448</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -56808,6 +56808,95 @@ window.__v446={estado:V446};
 try{if(WEBMASTER&&!JAV436.save.entregue&&jav436Tem()<JAV436.N&&!/[?&#]javali=0/i.test(location.search+location.hash)){
   const salas=GEN_KEYS.map(g=>GENRE_ROOM[g]).filter(Boolean);let n=0;for(const room of salas){for(const i of [0,1]){if(n>=JAV436.N)break;const id=room+':'+i;if(!JAV436.save.macas[id]){JAV436.save.macas[id]=Date.now();}n=jav436Tem();}}
   jav436Grava();try{jav436Hud();}catch(e){}}}catch(e){console.error('v447',e);}
+
+/* ===================== v448 · A ILHA DAS MOEDAS (a ilha do fundo da Aventura) E A AMPULHETA (pedido do Luiz: «na última
+   ilha tem pedras praticamente flutuando e a ilha toda está muito básica e sem graça, aperfeiçoe a beleza dela. E a
+   ampulheta que reduz o tempo do restore deve ser tirada do hall e inserida ali na ilha do fundo») =====================
+   · A ilha grande (Ilha das Moedas, v294) recebia os acabamentos da ilha pequena clonados e dobrados — pedras e plantas
+     calculadas para outra altura, daí o ar de «flutuando». Esses dois acabamentos clonados ficam escondidos só nela e a
+     ilha ganha decoração própria, medida ponto a ponto com a altura real da areia (`i294Floor`) e afundada no chão:
+     penhascos de pedra meio enterrados na orla, poça de maré com estrelas-do-mar, troncos à deriva, a proa de um naufrágio
+     com mastro e vela rasgada, um píer de madeira com lanternas, âncora enferrujada, barris e caixote, placa de madeira,
+     moitas de folhas de verdade (não bolas), hibiscos, tufos de capim, conchas, estrelas-do-mar e quatro gaivotas em voo.
+     A areia, as palmeiras, a fogueira e o baú gigante continuam.
+   · A ampulheta de 12 h sai do Hall dos Gêneros e fica num pedestal de pedra na praia da ilha; apanha-se chegando perto.
+     (A de 4 h segue na Galeria.) Obstáculos novos entram em `ILHA294.obst` antes de a malha da ilha ser criada. */
+const ILHA448={feito:false,aves:[],amp:null,erros:[],n:{}};
+function i448Erro(onde,e){try{if(ILHA448.erros.length<30)ILHA448.erros.push(onde+': '+String(e&&e.message||e));console.error('ilha448',onde,e);}catch(x){}}
+function i448T(pt,en,es){return text428(pt,en,es||en);}
+function i448Rocha(K,mat,x,y,z,s,seed,ax,az){const T=THREE,g=new T.IcosahedronGeometry(1,2),p=g.attributes.position,c=[],sand=new T.Color(0xcbbf9f),stone=new T.Color(0x5b6a70),dark=new T.Color(0x3e474c),moss=new T.Color(0x6f8a4e),r=rnd(seed*17+3);
+  for(let i=0;i<p.count;i++){const xx=p.getX(i),yy=p.getY(i),zz=p.getZ(i),n=1+.14*Math.sin(xx*6.3+zz*7.1+seed)+.07*Math.sin(yy*13+seed*2)+.04*Math.sin(xx*19-zz*11);p.setXYZ(i,xx*n*(ax||1),Math.max(-.5,yy*.72*n),zz*n*(az||1));
+    const col=stone.clone().lerp(dark,Math.max(0,-yy*.6)).lerp(sand,Math.max(0,yy*.25+.1)*.6);if(yy>.35&&Math.sin(xx*4+zz*5+seed)>.1)col.lerp(moss,.55);col.multiplyScalar(.92+r()*.14);c.push(col.r,col.g,col.b);}
+  g.setAttribute('color',new T.Float32BufferAttribute(c,3));g.computeVertexNormals();K.add(g,mat,x,y,z,seed*.7,seed*1.3,0,s,s*.85,s);}
+function i448Estrela(K,mat,x,y,z,s,ry){const T=THREE,sh=new T.Shape();for(let i=0;i<10;i++){const a=i*Math.PI/5-Math.PI/2,rr=i%2?.38:1;const px=Math.cos(a)*rr,py=Math.sin(a)*rr;i?sh.lineTo(px,py):sh.moveTo(px,py);}sh.closePath();K.ext(sh,.12,mat,x,y,z,ry||0,-Math.PI/2,0,.03,s,s,s);}
+function i448Concha(K,mat,x,y,z,ry){const T=THREE,sh=new T.Shape();sh.moveTo(0,0);sh.absarc(0,0,.11,0,Math.PI,false);sh.closePath();K.ext(sh,.03,mat,x,y,z,ry,-Math.PI/2,0,.005);}
+function i448Texto(txt){return t160Tex('448 placa '+txt,256,64,(x,w,h)=>{x.fillStyle='#6e5537';x.fillRect(0,0,w,h);x.strokeStyle='#3b2a18';x.lineWidth=4;x.strokeRect(3,3,w-6,h-6);x.fillStyle='#f0e2c2';x.font='bold 30px Georgia';x.textAlign='center';x.textBaseline='middle';x.fillText(txt,w/2,h/2+2);});}
+function i448Ampulheta(K,gold,glass,sand,x,y,z,s){for(const yy of [0,.65])K.cyl(.25*s,.25*s,.07*s,gold,x,y+yy*s,z,16);for(let j=0;j<4;j++){const a=j*Math.PI/2;K.cyl(.018*s,.018*s,.65*s,gold,x+Math.cos(a)*.21*s,y+.325*s,z+Math.sin(a)*.21*s,6);}
+  K.lathe([[.16,.06],[.13,.17],[.025,.32],[.13,.48],[.16,.59]].map(p=>[p[0]*s,p[1]*s]),glass,x,y,z,16);K.cone(.125*s,.18*s,sand,x,y+.16*s,z,12);K.cyl(.008*s,.008*s,.28*s,sand,x,y+.34*s,z,5);}
+function i448Build(){if(ILHA448.feito)return;const I=ILHA294,R=ROOMS.adv;if(!I||!I.g||!R||!R.scene)return;ILHA448.feito=true;const T=THREE,sc=R.scene,cx=I.x,cz=I.z,r0=rnd(44801);
+  // 1) os acabamentos clonados da ilha pequena somem só aqui (eram eles que «flutuavam»)
+  for(const o of I.g.children){const n=o.name||'';if(n.startsWith('Ilha · acabamento')||n.startsWith('Ilhas ·'))o.visible=false;}
+  // as «bolas» e cones verdes da ilha pequena clonada (relva e moitas esféricas) também saem: a vegetação nova é de folhas
+  I.g.traverse(o=>{if(!o.isMesh||!o.material)return;const mn=o.material.name||'';if(mn.includes('ilha253 relva')){o.visible=false;return;}if(/palm|folha|leaves|rocha|barco|brilho|areia/i.test(mn))return;const c=o.geometry&&o.geometry.attributes&&o.geometry.attributes.color;
+    if(c){ // malha fundida com várias peças: afunda só os vértices verdes (as moitas-bola), numa cópia da geometria
+      let verdes=0;for(let i=0;i<c.count;i++)if(c.getY(i)>c.getX(i)*1.25&&c.getY(i)>c.getZ(i)*1.25)verdes++;if(!verdes)return;o.geometry=o.geometry.clone();const q=o.geometry.attributes.position,cc=o.geometry.attributes.color;for(let i=0;i<cc.count;i++)if(cc.getY(i)>cc.getX(i)*1.25&&cc.getY(i)>cc.getZ(i)*1.25)q.setY(i,-60);q.needsUpdate=true;o.geometry.computeBoundingSphere();o.geometry.computeBoundingBox();}
+    else if(o.material.color){const col=o.material.color;if(col.g>col.r*1.25&&col.g>col.b*1.25)o.visible=false;}});
+  const F=(x,z)=>i294Floor(x,z),P=(a,r)=>[cx+Math.cos(a)*r,cz+Math.sin(a)*r],perto=(x,z,d)=>I.obst.some(o=>Math.hypot(x-o[0],z-o[1])<o[2]+d);
+  const root=new T.Group();root.name='Ilha das Moedas · decoração v448';sc.add(root);const K=t160Kit('448 ilha');
+  const rocha=t160Mat('448 rocha vc',()=>new T.MeshStandardMaterial({vertexColors:true,color:0xffffff,roughness:.9})),bark=t160Std('448 tronco',0x7d6a4b,.95),plank=t160Std('448 tábua',0x8a6b47,.9),plankDark=t160Std('448 tábua escura',0x5e4530,.92),rope=t160Std('448 corda',0xb8a37c,.95),rust=t160Std('448 ferrugem',0x6b4a36,.8,.35),sail=t160Std('448 vela',0xd9d2bd,.85,0,{side:T.DoubleSide}),leaf=t160Std('448 folha',0x3f8a52,.75,0,{side:T.DoubleSide}),leaf2=t160Std('448 folha clara',0x8fb35a,.8,0,{side:T.DoubleSide}),grass=t160Std('448 capim',0xa8b06a,.9,0,{side:T.DoubleSide}),petal=t160Std('448 hibisco',0xe9636a,.75),heart=t160Std('448 pólen',0xf4d27a,.8),star=t160Std('448 estrela-do-mar',0xe8823c,.82),shell=t160Std('448 concha',0xeadcc2,.6),shell2=t160Std('448 concha rosa',0xd9a79a,.65),glassW=t160Mat('448 água da poça',()=>{const m=new T.MeshStandardMaterial({color:0x3fa0b5,transparent:true,opacity:.72,roughness:.12,metalness:.1});m.userData.papelKeep=true;return m;}),lamp=t160Std('448 lanterna',0x2a2622,.6,.6),lampGlass=t160Std('448 vidro da lanterna',0xffd27a,.3,0,{emissive:0xff9a2a,emissiveIntensity:.9}),stoneP=t160Std('448 pedestal',0x8a8378,.92),gold=t160Std('448 ouro',0xd9b76c,.4,.5),glass=t160Std('448 vidro',0xb9abdf,.28,.2),sandM=t160Std('448 areia da ampulheta',0xf1d392,.8);
+  const n=ILHA448.n;
+  // 2) penhascos meio enterrados na orla
+  n.rochas=0;for(const [a,k] of [[.3,0],[1.5,1],[2.9,2],[3.95,3],[5.25,4]]){for(let j=0;j<4;j++){const q=a+(j-1.5)*.13,rr=14.3+(j%2)*1.1+r0()*.5,[x,z]=P(q,rr),s=.6+r0()*.75;i448Rocha(K,rocha,x,F(x,z)-s*.32,z,s,k*7+j,1+r0()*.3,1);n.rochas++;}
+    const [ox,oz]=P(a,14.9);I.obst.push([ox,oz,2.4]);}
+  // 3) poça de maré com estrelas-do-mar
+  {const [px,pz]=P(3.45,13.2),py=F(px,pz);K.add(new T.CircleGeometry(1.75,28),glassW,px,py+.035,pz,-Math.PI/2,0,0);for(let j=0;j<10;j++){const a=j*Math.PI*2/10+.2,[x,z]=[px+Math.cos(a)*1.95,pz+Math.sin(a)*1.95],s=.3+r0()*.22;i448Rocha(K,rocha,x,F(x,z)-s*.3,z,s,30+j);}
+    for(const [dx,dz,s] of [[.4,.3,.22],[-.6,-.5,.18],[.2,-.9,.2]])i448Estrela(K,star,px+dx,py+.012,pz+dz,s,r0()*3);I.obst.push([px,pz,2.3]);n.poca=1;}
+  // 4) troncos à deriva
+  for(const [a,rr,rot] of [[.95,15.4,.5],[2.25,15.6,2.1],[4.85,15.2,1.3]]){const [x,z]=P(a,rr),y=F(x,z)-.06,dx=Math.cos(rot),dz=Math.sin(rot);K.tube([[x-dx*1.2,y+.14,z-dz*1.2],[x-dx*.4,y+.2,z-dz*.4],[x+dx*.5,y+.17,z+dz*.5],[x+dx*1.25,y+.12,z+dz*1.25]],.17,bark,10,8);K.cyl(.05,.07,.5,bark,x+dx*.3,y+.42,z+dz*.3,6,0,0,.6);I.obst.push([x,z,1.1]);}
+  // 5) a proa do naufrágio
+  {const [wx,wz]=P(4.4,15.1),wy=F(wx,wz),ang=4.4+Math.PI/2;const g=new T.Group();g.position.set(wx,wy-.5,wz);g.rotation.y=-ang;g.rotation.z=.32;root.add(g);const Kw=t160Kit('448 naufrágio');
+    for(let i=0;i<7;i++){const t=i/6,yy=.35+t*1.9,ww=2.4+Math.sin(t*Math.PI)*1.2;Kw.box(ww,.2,.08,i%2?plank:plankDark,0,yy,-(1-t)*.9,0,0,0);Kw.box(ww*.9,.2,.08,i%2?plankDark:plank,0,yy,(1-t)*.9,0,0,0);}
+    Kw.cyl(.1,.14,.6,plankDark,0,.5,0,8);for(const z of [-.9,.9])Kw.box(.14,2.2,.14,plankDark,0,1.3,z);Kw.cyl(.12,.16,3.2,plankDark,.3,2.6,0,10,0,0,.35);Kw.plane(1.7,1.2,sail,.9,3.1,0,.1,0,.35);Kw.tube([[.3,4.1,0],[1.6,2.4,.6],[2.1,.4,.9]],.02,rope,6,4);
+    Kw.fim(g,{sombra:true});g.traverse(o=>{o.userData.noCam=true;o.userData.papelKeepGeo=true;});I.obst.push([wx,wz,2.6]);n.naufragio=1;}
+  // 6) o píer com lanternas
+  {const a=.6,ux=Math.cos(a),uz=Math.sin(a),lx=-uz,lz=ux;const [bx,bz]=P(a,12.6),deck=F(bx,bz)+.28;for(let i=0;i<9;i++){const rr=12.6+i*.95,[x,z]=P(a,rr);K.box(.9,.07,1.7,i%3===1?plankDark:plank,x,deck,z,0,Math.PI/2-a,0);}
+    for(let i=0;i<5;i++){const rr=12.4+i*1.9,[x,z]=P(a,rr);for(const s of [-1,1]){const px=x+lx*s*.8,pz=z+lz*s*.8,base=F(px,pz)-.6;K.cyl(.08,.1,deck+.55-base,plankDark,px,(deck+.55+base)/2,pz,8);}}
+    for(const s of [-1,1]){const pts=[];for(let i=0;i<5;i++){const rr=12.4+i*1.9,[x,z]=P(a,rr);pts.push([x+lx*s*.8,deck+.5,z+lz*s*.8]);}K.tube(pts,.02,rope,16,5);}
+    const [ex,ez]=P(a,20);for(const s of [-1,1]){const px=ex+lx*s*.8,pz=ez+lz*s*.8;K.box(.2,.3,.2,lamp,px,deck+.75,pz);K.sph(.08,lampGlass,px,deck+.75,pz,1,1,1,10,8);K.cone(.14,.1,lamp,px,deck+.95,pz,6);}
+    for(const rr of [13.4,15,16.6]){const [x,z]=P(a,rr);I.obst.push([x,z,1.0]);}n.pier=1;}
+  // 7) âncora, barris, caixote, placa
+  {const [ax,az]=P(1.15,11.6),ay=F(ax,az);K.cyl(.08,.08,1.9,rust,ax,ay+.35,az,10,0,0,1.1);K.add(new T.TorusGeometry(.3,.05,8,18),rust,ax-.9,ay+.25,az,0,0,0,1,1,1);K.tube([[ax+.9,ay+.75,az],[ax+1.2,ay+.5,az+.5],[ax+.9,ay+.25,az+.9]],.07,rust,8,6);K.tube([[ax+.9,ay+.75,az],[ax+1.2,ay+.5,az-.5],[ax+.9,ay+.25,az-.9]],.07,rust,8,6);K.box(.9,.08,.08,rust,ax+.1,ay+.9,az,0,0,.3);I.obst.push([ax,az,.9]);}
+  for(const [dx,dz] of [[5.8,-7.2],[-6.1,-6.4]]){const x=cx+dx,z=cz+dz,y=F(x,z);K.cyl(.33,.3,.9,plank,x,y+.45,z,14);for(const yy of [.2,.72])K.cyl(.345,.345,.06,rust,x,y+yy,z,14);I.obst.push([x,z,.5]);}
+  {const x=cx+6.9,z=cz-6.3,y=F(x,z);K.box(.85,.8,.85,plankDark,x,y+.4,z,0,.4,0);for(const yy of [.12,.68])K.box(.9,.06,.9,plank,x,y+yy,z,0,.4,0);I.obst.push([x,z,.6]);}
+  {const [sx,sz]=P(2.05,8.8),sy=F(sx,sz);K.cyl(.06,.07,2,plankDark,sx,sy+1,sz,8);for(const [yy,txt,ry] of [[1.6,i448T('Baú gigante','Giant chest'),-Math.PI/2+.3],[1.25,i448T('Ilha','Island'),.9]]){const m=new T.MeshStandardMaterial({map:i448Texto(txt),roughness:.85});m.userData.papelKeep=true;K.box(.95,.24,.05,m,sx+Math.sin(ry)*.3,sy+yy,sz+Math.cos(ry)*.3,0,ry,0);}I.obst.push([sx,sz,.3]);}
+  // 8) vegetação: moitas de folhas, hibiscos, capim
+  n.moitas=0;for(const a of [.15,1.3,3.15,3.9,5.6]){const [x,z]=P(a,10.8+r0()*1.2),y=F(x,z);if(perto(x,z,.8))continue;for(let f=0;f<14;f++){const q=f*2.399+r0()*.3;sea416Leaf(K,[x,y+.04,z],q,.55+r0()*.4,.3,.14,f%3?leaf:leaf2,f%2===0);}
+    for(let f=0;f<3;f++){const q=f*2.1+.4,fx=x+Math.cos(q)*.42,fz=z+Math.sin(q)*.42;K.cyl(.012,.014,.5,leaf,fx,y+.28,fz,5);for(let p=0;p<5;p++){const aa=p*Math.PI*2/5;K.sphR(.08,petal,fx+Math.cos(aa)*.07,y+.55,fz+Math.sin(aa)*.07,-aa,0,.12,1,.22,1.55,10,7);}K.sph(.028,heart,fx,y+.57,fz,1,1,1,9,6);}
+    I.obst.push([x,z,1.0]);n.moitas++;}
+  n.capim=0;for(let j=0;j<46;j++){const a=r0()*Math.PI*2,rr=6+r0()*7.5;if((a>1.9&&a<2.8&&rr<10)||(a>4.3&&a<5.1&&rr<10))continue;const [x,z]=P(a,rr),y=F(x,z);if(perto(x,z,.5))continue;for(let k=0;k<5;k++){const q=a*3+k*1.26;sea416Leaf(K,[x,y+.02,z],q,.22+r0()*.25,.05,.05,k%2?grass:leaf2,false);}n.capim++;}
+  // 9) conchas e estrelas-do-mar espalhadas
+  for(let j=0;j<14;j++){const a=r0()*Math.PI*2,rr=5+r0()*9,[x,z]=P(a,rr);if(perto(x,z,.3))continue;i448Concha(K,j%2?shell:shell2,x,F(x,z)+.01,z,r0()*6.28);}
+  for(let j=0;j<4;j++){const a=1.2+j*1.5,[x,z]=P(a,12.3+(j%2)*.9);if(perto(x,z,.3))continue;i448Estrela(K,star,x,F(x,z)+.012,z,.16+r0()*.08,r0()*3);}
+  // 10) o pedestal e a ampulheta de 12 h
+  {const ax=cx+6.2,az=cz+1.6,ay=F(ax,az);K.cyl(.55,.65,.62,stoneP,ax,ay+.31,az,12);K.cyl(.62,.55,.1,stoneP,ax,ay+.66,az,12);I.obst.push([ax,az,.75]);
+    // o item: fica fora da fusão (gira sozinho e some quando apanhado)
+    const g=new T.Group();g.name='Ampulheta · 12h · ilha';g.position.set(ax,ay+.72,az);sc.add(g);const Ka=t160Kit('448 ampulheta');i448Ampulheta(Ka,gold,glass,sandM,0,0,0,1.25);Ka.fim(g,{sombra:true});g.traverse(o=>{o.userData.noCam=true;o.userData.papelKeepGeo=true;o.__fusaoMoveu=9;});
+    const got=!!RUBY422.data.clocks[12];g.visible=!got;const item={g,hours:12,x:ax,z:az,y:ay+.72,got,hall:0,ilha294:true};RUBY422.clockItems.push(item);ILHA448.amp=item;}
+  K.fim(root,{sombra:true});root.traverse(o=>{o.userData.noCam=true;o.userData.papelKeepGeo=true;if(o.isMesh&&o.material&&o.material.userData)o.material.userData.papelKeep=true;});
+  // 11) gaivotas
+  try{ILHA448.aves=at437Bando(R,'Gaivota da Ilha das Moedas',4,0xf4f4f4,0x9c9c9c,.95,cx,cz,8.5,F(cx,cz)+6.5,2.4);}catch(e){i448Erro('gaivotas',e);}
+  n.obst=I.obst.length;}
+function i448Tick(dt){if(CUR!=='room'||ROOM!==ROOMS.adv||document.hidden)return;dt=Math.min(.05,Math.max(0,dt));
+  if(ILHA448.aves.length)try{at437Voo(ILHA448.aves,dt,t);}catch(e){}
+  const c=ILHA448.amp;if(c&&!c.got){c.g.rotation.y+=dt*.4;const p=cavPos();if(NAV252.onde==='ilha294'&&!uiBlocked()&&Math.hypot(p.x-c.x,p.z-c.z)<1.35)ruby422Take(c);}}
+// --- ligações ---
+{try{const i=RUBY422.clockItems.findIndex(c=>c.hours===12&&c.hall===1);if(i>=0){const it=RUBY422.clockItems[i];it.g.parent&&it.g.parent.remove(it.g);RUBY422.clockItems.splice(i,1);}}catch(e){i448Erro('hall',e);}
+ const fr=finishRoom;finishRoom=function(key){const r=fr.apply(this,arguments);if(key==='adv')try{i448Build();}catch(e){i448Erro('build',e);}return r;};
+ try{if(ROOMS.adv&&ROOMS.adv.ready&&ILHA294.g)i448Build();}catch(e){i448Erro('build0',e);}
+ const tk=tick;tick=function(dt){const r=tk.apply(this,arguments);try{i448Tick(dt);}catch(e){i448Erro('tick',e);}return r;};
+ // o botão de rubis explica onde está a ampulheta agora
+ try{const e=document.getElementById('ruby422Hud');if(e){const old=e.onclick;e.onclick=function(){if(RUBY422.data.donated>=1000&&GEAR.pet&&GEAR.pet.userData.pet==='dragon422'){egg422Open(true);return;}showToast(i448T('Leve os rubis ao ovo ao lado da porta de Fantasia: 1000 chocam o dragão e mais 600 fazem-no crescer até 4× — o tamanho que derrete o portão do Torreão. Cada cristal vale 10 rubis; eles ficam nos dois primeiros andares. As ampulhetas que encurtam o retorno estão na Ilha das Moedas (Aventura) e na Galeria.','Bring rubies to the egg beside the Fantasy door: 1000 hatch the dragon and 600 more grow it to 4× — the size that melts the Keep gate. Each crystal is worth 10 rubies; they lie on the first two floors. The hourglasses that shorten the respawn are on Coin Island (Adventure) and in the Gallery.')+' '+ruby422Text('Retorno em ','Respawn every ')+RUBY422.data.hours+'h.');};}}catch(e){}}
+window.__ilha448={estado:ILHA448,montar:i448Build};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
