@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v441</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v442</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -56424,6 +56424,51 @@ function d441Tick(g,dt){const D=g&&g.userData.d441;if(!D)return;dt=Math.min(.05,
  const t0=ruby422BabyTick;ruby422BabyTick=function(g,dt){t0.apply(this,arguments);try{d441Tick(g,dt);}catch(e){}};
  try{if(GEAR.pet&&GEAR.pet.userData.pet==='dragon422')d441Estetica(GEAR.pet);}catch(e){v441Erro('pet',e);}}
 window.__v441={estado:V441,estetica:d441Estetica};
+
+/* ===================== v442 · O JAVALI É SÓLIDO E FALA LOGO (pedido do Luiz: «estou atravessando o javali, bugado. E ele
+   precisa falar comigo logo que chego perto») =====================
+   · O javali manso ganha um obstáculo redondo que acompanha o corpo dele na lista de obstáculos do Hall: o leitor não o
+     atravessa mais (é empurrado para fora, como nas peças fixas). O círculo some (raio 0) quando ele está hostil, na
+     corrida da cabeçada ou escondido, para não atrapalhar o combate nem a própria corrida; e as checagens de caminho do
+     próprio javali ignoram o círculo dele.
+   · Ele fala assim que o leitor chega a 3,4 m (a mesma distância em que para e vira para o leitor), sem esperar o toque;
+     repete o pedido a cada 8 s enquanto o leitor fica por perto. Com as 8 laranjas, a entrega acontece nessa distância.
+   · A entrega («joga elas no chão e mostra ele comendo antes de ele correr»): as 8 laranjas voam da mão do leitor e caem
+     entre os dois; o javali vai até o monte e come uma por uma (focinho no chão, cada laranja some com uma mordida); só
+     então vem o grunhido e a corrida da cabeçada da v436. */
+const JAV442={ob:[0,0,0],RAIO:1.25,FALA:3.4,posto:false,come:null,erros:[]};
+function jav442Ativo(){const B=BOAR428,k=B.enemy;return !!k&&k.g.visible&&B.phase==='asleep'&&(!JAV436.fase||JAV436.fase==='come')&&!CAV.morto;}
+function jav442Obst(){const B=BOAR428,k=B.enemy;if(!k)return;if(!JAV442.posto){JAV442.posto=true;HOBST.push(JAV442.ob);}const ob=JAV442.ob;ob[0]=k.x;ob[1]=k.z;ob[2]=jav442Ativo()?JAV442.RAIO:0;}
+function jav442Fala(dt){const B=BOAR428,k=B.enemy;if(!k||CUR!=='hall'||HALLN!==1||JAV436.save.entregue||jav436Hostil()||document.hidden||uiBlocked()||CAV.morto||!k.g.visible||JAV436.fase)return;
+  const p=cavPos(),d=Math.hypot(p.x-k.x,p.z-k.z),agora=performance.now();
+  if(d<JAV442.FALA){if(!JAV436.perto||agora-JAV436.aviso>8000){JAV436.perto=true;if(jav436Tem()>=JAV436.N){jav436Entrega(k);return;}JAV436.aviso=agora;showToast(jav436Pedido(),{big:true,ms:7500});}}
+  else if(d>JAV442.FALA+1.2)JAV436.perto=false;}
+
+// ---- a refeição: laranjas jogadas no chão, o javali come, depois corre ----
+function jav442Ang(a,b){let d=b-a;while(d>Math.PI)d-=Math.PI*2;while(d<-Math.PI)d+=Math.PI*2;return d;}
+function jav442Joga(k){const p=cavPos(),sc=k.g.parent||HALLS[1].scene,dx=p.x-k.x,dz=p.z-k.z,d=Math.hypot(dx,dz)||1,cx=k.x+dx/d*Math.min(1.4,d*.5),cz=k.z+dz/d*Math.min(1.4,d*.5),L=[];
+  for(let i=0;i<JAV436.N;i++){const g=jav436Modelo();if(g.userData.sp)g.userData.sp.visible=false;g.name='Laranja jogada · bicho';const a=i/JAV436.N*Math.PI*2+.4,r=.18+(i%3)*.17;const fim={x:cx+Math.cos(a)*r,z:cz+Math.sin(a)*r};
+    g.position.set(p.x,1.05,p.z);g.scale.setScalar(.001);sc.add(g);L.push({g,ini:{x:p.x,z:p.z},fim,t0:i*.09,dur:.62+(i%4)*.06,rot:Math.random()*6.28,comida:false});}
+  return {k,L,etapa:'joga',t:0,i:0,mordida:0,cx,cz};}
+function jav442Come(dt){const C=JAV442.come;if(!C)return;dt=Math.min(.05,Math.max(0,dt));const k=C.k,m=k.mesh;C.t+=dt;
+  if(C.etapa==='joga'){for(const o of C.L){const u=Math.max(0,Math.min(1,(C.t-o.t0)/o.dur));if(u<=0)continue;o.g.scale.setScalar(Math.min(1,u*6));const x=o.ini.x+(o.fim.x-o.ini.x)*u,z=o.ini.z+(o.fim.z-o.ini.z)*u;o.g.position.set(x,1.05*(1-u)+.0+4*.75*u*(1-u),z);o.g.rotation.y=o.rot+u*5;o.g.rotation.x=u*3*(1-u);}
+    const want=Math.atan2(C.cx-k.x,C.cz-k.z);k.g.rotation.y+=jav442Ang(k.g.rotation.y,want)*Math.min(1,dt*3);
+    if(C.t>=1.2){for(const o of C.L){o.g.position.set(o.fim.x,0,o.fim.z);o.g.rotation.set(0,o.rot,0);o.g.scale.setScalar(1);}C.etapa='anda';C.t=0;}}
+  else if(C.etapa==='anda'){const dx=C.cx-k.x,dz=C.cz-k.z,d=Math.hypot(dx,dz);const want=Math.atan2(dx,dz);k.g.rotation.y+=jav442Ang(k.g.rotation.y,want)*Math.min(1,dt*4);
+    if(d>1.05&&C.t<6){const s=Math.min(d-1.05,1.1*dt);k.x+=dx/d*s;k.z+=dz/d*s;k.g.position.set(k.x,0,k.z);if(m){const b=m.userData.base434??=m.position.y;m.position.y=b+Math.abs(Math.sin(C.t*9))*.04;m.rotation.z=Math.sin(C.t*9)*.03;}}
+    else{C.etapa='come';C.t=0;C.i=0;C.mordida=0;if(m){m.rotation.z=0;m.position.y=m.userData.base434??m.position.y;}}}
+  else if(C.etapa==='come'){const per=.62;C.mordida+=dt;const u=C.mordida/per;if(m)m.rotation.x=-.34*Math.max(0,Math.sin(Math.min(1,u)*Math.PI));
+    const o=C.L[C.i];if(o&&!o.comida&&u>.45){const e=Math.max(0,1-(u-.45)/.3);o.g.scale.setScalar(Math.max(.001,e));if(e<=0){o.comida=true;o.g.parent&&o.g.parent.remove(o.g);}}
+    if(u>=1){C.mordida=0;C.i++;if(C.i>=C.L.length){C.etapa='fim';C.t=0;if(m)m.rotation.x=0;}}}
+  else if(C.etapa==='fim'){if(C.t>=.5){for(const o of C.L)o.g.parent&&o.g.parent.remove(o.g);JAV442.come=null;JAV436.fase='';try{JAV442.entrega0.call(null,k);}catch(e){JAV442.erros.push('entrega: '+(e&&e.message||e));JAV436.fase='';}}}}
+{JAV442.entrega0=jav436Entrega;jav436Entrega=function(k){if(JAV442.come||!k||!boar433Here()){return JAV442.entrega0.apply(this,arguments);}
+  try{JAV442.come=jav442Joga(k);JAV436.fase='come';JAV436.t=0;JAV436.alvo=null;try{logAdd(jav436T('🍊 Você jogou as 8 laranjas no chão para o javali mecânico','🍊 You threw the 8 oranges on the ground for the mechanical boar','🍊 Tiraste las 8 naranjas al suelo para el jabalí mecánico'));}catch(e){}
+    showToast(jav436T('🍊 Você joga as 8 laranjas no chão — o javali mecânico vem comer.','🍊 You throw the 8 oranges on the ground — the mechanical boar comes to eat.','🍊 Tiras las 8 naranjas al suelo: el jabalí mecánico viene a comer.'),{big:true,ms:5000});}
+  catch(e){JAV442.erros.push('joga: '+(e&&e.message||e));JAV442.come=null;return JAV442.entrega0.apply(this,arguments);}};}
+{const livre=jav438Livre;jav438Livre=function(){const ob=JAV442.ob,r=ob[2];ob[2]=0;try{return livre.apply(this,arguments);}finally{ob[2]=r;}};
+ const ht=hallTick;hallTick=function(dt){ht.apply(this,arguments);try{jav442Obst();}catch(e){if(JAV442.erros.length<20)JAV442.erros.push('obst: '+(e&&e.message||e));}try{jav442Fala(dt);}catch(e){if(JAV442.erros.length<20)JAV442.erros.push('fala: '+(e&&e.message||e));}try{jav442Come(dt);}catch(e){if(JAV442.erros.length<20)JAV442.erros.push('come: '+(e&&e.message||e));JAV442.come=null;JAV436.fase='';}};
+ try{jav442Obst();}catch(e){}}
+window.__javali442={estado:JAV442};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
