@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v451</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v452</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -57303,6 +57303,310 @@ try{if(typeof M232_T!=='undefined'&&M232_T){T451_FORA.push(M232_T.dorme);M232_T.
 function t451Fora(m){if(typeof m!=='string')return false;for(const f of T451_FORA){if(f instanceof RegExp?f.test(m):m===f){const k=m.slice(0,60);T451.calados[k]=(T451.calados[k]||0)+1;return true;}}return false;}
 {const st=showToast;showToast=function(msg){try{if(t451Fora(msg))return;}catch(e){}return st.apply(this,arguments);};}
 window.__textos451={fora:T451_FORA,estado:T451};
+
+/* ===================== v452 · MODO COMBATENTE — MIRA LIVRE E LIVRO-ESCUDO (pedido do Luiz: «pense uma mudança para
+   que o jogo tenha mira, e um sistema de usar o livro como escudo dos golpes… Pense num modo que adicione as mecânicas
+   de combate» → «ok, siga então com as propostas») =====================
+   Um terceiro jeito de jogar, ao lado do «Sem Inimigos» e do combate de sempre (o «Clássico», com a mira automática,
+   que não muda em nada). Liga no Menu; no computador é perguntado uma vez, na primeira luta.
+   · MIRA LIVRE (Gamer e 1.ª pessoa): com inimigo acordado por perto, a câmera vai para cima do ombro direito, aparece a
+     retícula e o leitor fica de frente para ela, andando de lado. Clique esquerdo ou Espaço (segurados, repetem) soltam
+     o poder onde a retícula aponta — dá para errar: o feixe de vento é instantâneo até 16 m e para na parede; a bola de
+     fogo voa reto até o ponto mirado (sem perseguir); o relâmpago (Q) parte do inimigo mirado. Na cabeça, crítico ×1,5
+     (marca dourada na retícula). No controle: RT atira, LT ergue o livro, L3 corre, com um ímã leve de mira. No modo
+     Clique, clicar num inimigo ataca ele. No celular o ⚔ continua com a mira automática e ganha o botão 🛡.
+   · LIVRO-ESCUDO: segurar o botão direito ergue o livro aberto na frente do corpo. Ele bloqueia o que vem pela frente
+     (150°) — tiros, garras, mordidas —; por trás e pelos lados, não. O fôlego do livro (o anel em volta da retícula)
+     aguenta 4 bloqueios (golpe pesado de chefe gasta 2; o 2.º e o 3.º tiro de uma rajada que chega junta gastam quase
+     nada) e volta com o livro abaixado; se zera, o livro cai das mãos por 1,2 s e é preciso soltar e erguer de novo.
+     Erguido, o leitor anda devagar, não corre e não ataca.
+   · PÁGINA REFLETORA: erguer o livro até 0,2 s antes do impacto devolve o tiro a quem atirou (40 de dano), sem gastar
+     fôlego; contra golpe corpo a corpo, atordoa o atacante 1,5 s e o próximo tiro sai crítico.
+   Sem luz nova (o livro e o arco brilham por material e sprite). Valores em C452. ?combate=1 liga e ?combate=0 desliga,
+   sem perguntar. */
+const C452={KEY:SKEY('mundo.combate452.v1'),save:{modo:''},
+  ALCANCE:16,CRIT:1.5,LADO:.72,ALT:1.3,BRACO:3.1,CONE:Math.cos(75*Math.PI/180),JANELA:.2,ANTISPAM:.3,FOLEGO:100,CUSTO:25,PESADO:50,
+  RECARGA:30,ESPERA:.6,QUEBRA:1.2,REFLEXO:40,ATORDOA:1.5,LENTO:.5,IMA:.05,PERTO:26,RAJADA:.25,CUSTO_RAJADA:8,ultimoBloq:-9,
+  w:0,postura:false,manual:0,arm:3.1,soltar:false,look:null,lookOk:false,pitchAjuste:0,pitchVolta:0,ctx:false,
+  bloqIn:{rmb:false,lt:false,toque:false},bloq:false,desde:-9,baixou:-9,folego:100,semBloq:0,quebra:0,queda:0,erguido:0,flash:0,flashCor:0,
+  lmb:false,rt:false,rtAntes:false,engoleUp:false,forcado:null,mira:null,miraQuadro:null,atacando:false,critK:null,critProx:false,
+  passam:0,refl:[],entrada:'mouse',dialogo:null,perguntou:false,hud:null,escudo:null,
+  stats:{tiros:0,acertos:0,criticos:0,erros:0,bloqueios:0,perfeitos:0,quebras:0,refletidos:0,reflexoAcertos:0,passaram:0},erros:[]};
+function c452T(pt,en,es){try{return text428(pt,en,es);}catch(e){return pt;}}
+function c452Erro(o,e){if(C452.erros.length<20)C452.erros.push(o+': '+(e&&e.message||e));}
+function c452Load(){try{const d=JSON.parse(localStorage.getItem(C452.KEY)||'null');if(d&&typeof d.modo==='string')C452.save.modo=d.modo;}catch(e){}
+  const q=location.search+location.hash;if(/[?&#]combate=1(?![0-9])/i.test(q))C452.save.modo='combatente';else if(/[?&#]combate=0(?![0-9])/i.test(q))C452.save.modo='classico';}
+function c452Grava(){try{localStorage.setItem(C452.KEY,JSON.stringify(C452.save));}catch(e){}}
+function c452UI(){try{return typeof uiBlocked==='function'&&uiBlocked();}catch(e){return false;}}
+function c452On(){try{return C452.save.modo==='combatente'&&!PAC.on;}catch(e){return false;}}
+function c452MiraModo(){return c452On()&&!TOUCHDEV&&(MODE==='gm'||MODE==='fp');}
+function c452Livre(){return c452MiraModo()&&(MODE==='fp'?C452.postura:C452.w>.55);}
+function c452Sala(){try{return CUR_GENRE==='gallery397'?'gallery397':cavRoom();}catch(e){return null;}}
+function c452S(){const r=c452Sala();return r&&CAV.salas[r]?CAV.salas[r]:null;}
+// roda dentro dos contextos de luta fora das salas (Galeria do 7.º andar, javali), na mesma ordem dos ataques
+function c452Ctx(fn){let f=fn;try{if(typeof gallery397Context==='function'){const g=f;f=()=>gallery397Context(g,null,[]);}}catch(e){}
+  try{if(typeof boar433Context==='function'){const b=f;f=()=>boar433Context(b,null,[]);}}catch(e){}return f();}
+function c452Acordado(k){return !!(k&&k.viva&&!(k.sono>0));}
+function c452Perto(S,pl,r){if(!S)return null;let m=null,md=r;for(const k of S.lista){if(!c452Acordado(k))continue;const d=Math.hypot(k.x-pl.x,k.z-pl.z);if(d<md){md=d;m=k;}}return m;}
+// direção para onde o leitor (e o livro) está virado
+function c452Frente(){if(MODE==='fp'){const a=P.yaw+Math.PI;return [Math.sin(a),Math.cos(a),a];}if(MODE==='gm'&&C452.w>.3){const a=CAM.yaw+Math.PI;return [Math.sin(a),Math.cos(a),a];}return [Math.sin(CH.dir),Math.cos(CH.dir),CH.dir];}
+function c452Frontal(x,z){const pl=cavPos(),[fx,fz]=c452Frente(),dx=x-pl.x,dz=z-pl.z,d=Math.hypot(dx,dz);if(d<.05)return true;return (dx*fx+dz*fz)/d>=C452.CONE;}
+
+/* ---- volumes de acerto: corpo e cabeça, medidos uma vez por inimigo pela caixa das malhas (sem a barra de vida) ---- */
+const C452_B=new THREE.Box3(),C452_B2=new THREE.Box3();
+function c452Volume(k){const g=k&&k.g;if(!g)return null;const sc=g.scale.x,V=k.vol452;if(V&&Math.abs(V.sc-sc)<.02)return V;
+  C452_B.makeEmpty();try{g.updateMatrixWorld(true);g.traverse(o=>{if(!o.isMesh||o.isSprite||!o.visible||!o.geometry)return;if(o.userData&&(o.userData.fx||o.userData.barra))return;const G=o.geometry;if(!G.boundingBox)G.computeBoundingBox();if(!G.boundingBox)return;C452_B2.copy(G.boundingBox).applyMatrix4(o.matrixWorld);C452_B.union(C452_B2);});}catch(e){}
+  const p=g.position;let h=1.3,w=.8,base=0;if(!C452_B.isEmpty()){h=Math.max(.5,Math.min(8,C452_B.max.y-p.y));base=Math.max(-.4,Math.min(1.2,C452_B.min.y-p.y));w=Math.max(.4,Math.min(6,Math.max(C452_B.max.x-C452_B.min.x,C452_B.max.z-C452_B.min.z)));}
+  const alt=Math.max(.4,h-base),R={sc,h,yb:base+alt*.46,rb:Math.max(.32,Math.min(2.2,Math.max(w*.42,alt*.3))),yc:base+alt*.86,rc:Math.max(.16,Math.min(.9,alt*.15))};k.vol452=R;
+  // o inimigo sai da lista de colisão da câmera: a malha dele «tapava» a própria cabeça no teste de parede (e a câmera não precisa bater nele)
+  if(!k.semCam452){k.semCam452=true;try{g.traverse(o=>{if(o.isMesh)o.userData.noCam=true;});camBlockT190=-1e9;}catch(e){}}return R;}
+function c452Esfera(O,D,cx,cy,cz,r){const ox=O.x-cx,oy=O.y-cy,oz=O.z-cz,b=ox*D.x+oy*D.y+oz*D.z,c=ox*ox+oy*oy+oz*oz-r*r,disc=b*b-c;if(disc<0)return -1;const s=Math.sqrt(disc);let t=-b-s;if(t<0)t=-b+s;return t;}
+/* ---- o raio da mira: da câmera pelo centro da tela (no Gamer, a partir do ombro), até a parede ou 16 m ---- */
+const C452_O=new THREE.Vector3(),C452_D=new THREE.Vector3(),C452_V=new THREE.Vector3();
+function c452Raio(){camera.getWorldDirection(C452_D);C452_O.copy(camera.position);if(MODE==='gm'){const t0=Math.max(0,C452_O.distanceTo(camLook)-.05);C452_O.addScaledVector(C452_D,t0);}return [C452_O,C452_D];}
+function c452Testa(O,D,S,max){let tw=max;try{tw=Math.min(tw,WORLD.camT(O.x,O.y,O.z,D.x,D.y,D.z,max));}catch(e){}try{tw=Math.min(tw,camHit(O.x,O.y,O.z,D.x,D.y,D.z,max));}catch(e){}
+  let best=null,bt=tw,crit=false;const ima=C452.entrada==='pad'?C452.IMA:0;
+  if(S)for(const k of S.lista){if(!k.viva||!k.g)continue;const V=c452Volume(k);if(!V)continue;const p=k.g.position,ex=ima*Math.hypot(p.x-O.x,p.z-O.z);
+    const tc=c452Esfera(O,D,p.x,p.y+V.yc,p.z,V.rc+ex*.6),tb=c452Esfera(O,D,p.x,p.y+V.yb,p.z,V.rb+ex);let tk=-1,c=false;
+    if(tc>=0){c=true;tk=tb>=0?Math.min(tb,tc):tc;}else if(tb>=0)tk=tb;if(tk>=0&&tk<bt){bt=tk;best=k;crit=c;}}
+  const L=Math.min(bt,max);return {k:best,crit:!!best&&crit,t:bt,parede:!best&&tw<max,ponto:{x:O.x+D.x*L,y:O.y+D.y*L,z:O.z+D.z*L}};}
+function c452Mira(){const [O,D]=c452Raio();return c452Testa(O,D,c452S(),C452.ALCANCE);}
+// modo Clique: o inimigo sob o ponteiro
+function c452Clique(cx,cy){const S=c452S();if(!S)return null;C452_V.set(cx/innerWidth*2-1,-(cy/innerHeight)*2+1,.5).unproject(camera).sub(camera.position).normalize();const M=c452Testa(camera.position,C452_V,S,40);return M.k;}
+
+/* ---- mira: o alvo e a direção dos poderes passam a vir da retícula ---- */
+{const al=cavAlvo;cavAlvo=function(){if(C452.forcado&&C452.forcado.viva)return C452.forcado;if(!c452Livre())return al.apply(this,arguments);const M=C452.atacando&&C452.mira?C452.mira:c452Mira();return M.k;};}
+{const mi=cavMira;cavMira=function(){const pl=cavPos();if(C452.forcado&&C452.forcado.viva)return Math.atan2(C452.forcado.x-pl.x,C452.forcado.z-pl.z);if(!c452Livre())return mi.apply(this,arguments);
+  const M=C452.atacando&&C452.mira?C452.mira:c452Mira(),dx=M.ponto.x-pl.x,dz=M.ponto.z-pl.z;if(Math.hypot(dx,dz)<.3)return mi.apply(this,arguments);return Math.atan2(dx,dz);};}
+// a bola de fogo voa reto até o ponto mirado (sem perseguir)
+{const bf=cavBolaFogo;cavBolaFogo=function(dir,alvo){if(C452.atacando&&c452Livre())return bf.call(this,dir,null);return bf.apply(this,arguments);};}
+// crítico na cabeça: só o golpe deste disparo, só no alvo mirado
+{const fe=cavFerir;cavFerir=function(k,n){if(C452.atacando&&k&&k===C452.critK&&typeof n==='number')n*=C452.CRIT;return fe.call(this,k,n);};if(window.__cav)window.__cav.ferir=cavFerir;}
+// o relâmpago parte do inimigo mirado; mirando o nada, o raio cai onde a retícula aponta
+{const pr=podRaio;podRaio=function(){if(!c452Livre())return pr.apply(this,arguments);const M=c452Mira();if(M.k){C452.forcado=M.k;try{return pr.apply(this,arguments);}finally{C452.forcado=null;}}
+  try{c452RaioErra(M);}catch(e){c452Erro('relâmpago',e);}C452.stats.erros++;return 0;};}
+function c452RaioErra(M){const pl=cavPos(),a=new THREE.Vector3(pl.x,pl.fy+1.3,pl.z),b=new THREE.Vector3(M.ponto.x,M.ponto.y,M.ponto.z),pts=[];for(let j=0;j<=8;j++){const p=a.clone().lerp(b,j/8);if(j>0&&j<8){p.x+=(Math.random()-.5)*.45;p.y+=(Math.random()-.5)*.45;p.z+=(Math.random()-.5)*.45;}pts.push(p);}
+  const geo=new THREE.BufferGeometry().setFromPoints(pts),L=new THREE.Line(geo,new THREE.LineBasicMaterial({color:0xcfe4ff,transparent:true,opacity:1,blending:THREE.AdditiveBlending,depthWrite:false})),L2=new THREE.Line(geo,new THREE.LineBasicMaterial({color:0x4fa0ff,transparent:true,opacity:.6,blending:THREE.AdditiveBlending,depthWrite:false}));
+  L.raycast=L2.raycast=()=>{};ROOM.scene.add(L);ROOM.scene.add(L2);try{podEfeito({tipo:'raio',L,L2,t:0});}catch(e){}c452Papel(M.ponto,6,0xcfe4ff);}
+// o ataque (Espaço, clique, RT): no Combatente escolhe vento ou fogo sem o relâmpago automático e mede acerto e erro
+{const at=atacar151;atacar151=function(tipo){if(!c452On())return at.apply(this,arguments);if(C452.bloq)return false;
+  const forc=!!(C452.forcado&&C452.forcado.viva),livre=c452Livre();
+  if(!livre&&!forc){if(c452MiraModo()&&MODE==='gm'&&C452.ctx){C452.manual=Math.max(C452.manual,4);return false;}return at.apply(this,arguments);}
+  if(tipo==='auto'||tipo===undefined)tipo=(CAV.estado.fogo&&CAV.recFogo<=0)?'fogo':'vento';
+  const rv=CAV.recVento,rf=CAV.recFogo;
+  try{C452.mira=forc?{k:C452.forcado,crit:false,t:0,parede:false,ponto:{x:C452.forcado.x,y:0,z:C452.forcado.z}}:c452Ctx(()=>c452Mira());}catch(e){C452.mira={k:null,crit:false,t:0,parede:false,ponto:{x:CH.x,y:0,z:CH.z}};}
+  C452.critK=tipo==='vento'&&C452.mira.k&&(C452.mira.crit||C452.critProx)?C452.mira.k:null;C452.atacando=true;let r;
+  try{r=at.call(this,tipo);}finally{C452.atacando=false;}
+  try{const atirou=CAV.recVento>rv+1e-6||CAV.recFogo>rf+1e-6,M=C452.mira;
+    if(atirou){C452.stats.tiros++;C452.manual=Math.max(C452.manual,4);
+      if(M.k){C452.stats.acertos++;if(C452.critK){C452.stats.criticos++;C452.critProx=false;}if(tipo==='vento')c452Marca(C452.critK?2:1);}
+      else{C452.stats.erros++;if(tipo==='vento')c452FeixeAte(M);}}}catch(e){c452Erro('ataque',e);}
+  C452.critK=null;C452.mira=null;return r;};if(window.__cav)window.__cav.atacar=atacar151;}
+// tiro que erra: o feixe vai só até a parede (ou 16 m) e estoura em papel
+function c452FeixeAte(M){for(let i=CAV.tiros.length-1;i>=0;i--){const o=CAV.tiros[i];if(o.tipo!=='vento'||o.t>.05)continue;const g=o.g,P_=g&&g.userData&&g.userData.partes;if(!P_)break;
+    const L=Math.max(.6,Math.min(C452.ALCANCE,Math.hypot(M.ponto.x-g.position.x,M.ponto.z-g.position.z)));
+    for(const c of [P_.cone,P_.core]){if(c){c.scale.y=L;c.position.z=L/2;}}if(P_.sps)for(const sp of P_.sps)sp.position.z=.3+Math.random()*Math.max(.1,L-.3);break;}
+  if(M.parede)c452Papel(M.ponto,7);}
+function c452Disparo(){try{atacar151('auto');}catch(e){c452Erro('disparo',e);}}
+
+/* ---- livro-escudo: bloqueio, Página Refletora e quebra de guarda ---- */
+function c452Papel(p,n,cor){const cena=(ROOM&&ROOM.scene)||(READER.g&&READER.g.parent)||scene;for(let i=0;i<(n||8);i++){try{cavFaisca(cena,p.x+(Math.random()-.5)*.5,p.y+(Math.random()-.5)*.5,p.z+(Math.random()-.5)*.5,cor||(i%2?0xf6eedb:0xe8d9b4),.16+Math.random()*.16,.35+Math.random()*.3);}catch(e){}}}
+function c452Som(n){try{if(n==='bloqueio'){if(window.__mus199&&window.__mus199.sfx)window.__mus199.sfx('escudoBate');else sfx('escudoBate');}else sfx(n==='perfeito'?'perfeito452':'quebra452');}catch(e){}}
+try{SFX199.perfeito452=function(){[79,84,88,91].forEach((n,i)=>setTimeout(()=>{try{musSino(n,.1);}catch(e){}},i*55));};SFX199.quebra452=function(){try{musHarpa(43,.22);setTimeout(()=>{try{musHarpa(38,.18);}catch(e){}},90);}catch(e){}};}catch(e){}
+function c452PontoFrente(){const pl=cavPos(),[fx,fz]=c452Frente();return {x:pl.x+fx*.55,y:(pl.fy||0)+.95,z:pl.z+fz*.55};}
+// uma rajada que chega junta (até 0,25 s depois do bloqueio anterior) gasta pouco: o livro já está firme
+function c452Gasta(n,p){if(t-C452.ultimoBloq<C452.RAJADA)n=Math.min(n,C452.CUSTO_RAJADA);C452.ultimoBloq=t;C452.folego-=n;C452.semBloq=0;C452.flash=1;C452.flashCor=0;c452Papel(p,8);c452Som('bloqueio');
+  try{if(MODE!=='fp'){const [fx,fz]=c452Frente();CH.vx-=fx*1.4;CH.vz-=fz*1.4;}}catch(e){}
+  if(C452.folego<=0){C452.folego=0;C452.quebra=C452.QUEBRA;C452.queda=.5;C452.bloq=false;C452.soltar=true;C452.stats.quebras++;C452.flashCor=2;c452Som('quebra');}c452HudJa();}
+function c452Perfeito(p){C452.folego=Math.min(C452.FOLEGO,C452.folego+10);C452.flash=1.4;C452.flashCor=1;c452Papel(p,10,0xffd27a);c452Som('perfeito');c452HudJa('perf');}
+function c452Atordoa(k){if(!k||!k.viva||k.ally428||k.deity428||k.robot315||k.para318)return;k.sono=Math.max(k.sono||0,C452.ATORDOA);C452.critProx=true;}
+// tiro devolvido: volta (reto, sem gravidade) para o inimigo mais perto de onde ele saiu
+function c452Reflete(o){const sc=o.scene;let g=o.g;try{g=o.g.clone();sc.add(g);sc.remove(o.g);}catch(e){g=o.g;}
+  const x0=o.x-o.vx*o.t,z0=o.z-o.vz*o.t,S=c452S();let alvo=null,md=5;if(S)for(const k of S.lista){if(!k.viva||!k.g)continue;const d=Math.hypot(k.x-x0,k.z-z0);if(d<md){md=d;alvo=k;}}
+  const v=Math.max(14,Math.hypot(o.vx,o.vz)*1.3);let tx,ty,tz;if(alvo){const V=c452Volume(alvo)||{yb:.6};tx=alvo.x;tz=alvo.z;ty=alvo.g.position.y+V.yb;}else{tx=o.x-o.vx*3;tz=o.z-o.vz*3;ty=o.y;}
+  const dx=tx-o.x,dz=tz-o.z,dist=Math.hypot(dx,dz)||1,T=dist/v;C452.refl.push({g,scene:sc,x:o.x,y:o.y,z:o.z,vx:dx/T,vy:(ty-o.y)/T,vz:dz/T,t:0,vida:T+.7});}
+function c452BloqueiaTiro(o,i){CAV.ossos.splice(i,1);const p={x:o.x,y:o.y,z:o.z};
+  if(t-C452.desde<=C452.JANELA){C452.stats.perfeitos++;C452.stats.refletidos++;try{c452Reflete(o);}catch(e){try{o.scene.remove(o.g);}catch(x){}c452Erro('reflexo',e);}c452Perfeito(p);}
+  else{try{o.scene.remove(o.g);}catch(e){}C452.stats.bloqueios++;c452Gasta(C452.CUSTO,p);}}
+// antes do laço antigo: o que vai acertar neste quadro e vem pela frente bate no livro; o resto passa (e é contado)
+function c452Antes(dt){C452.passam=0;if(!CAV.ossos.length||CAV.morto||CAV.invul>0)return;const pl=cavPos(),fy=pl.fy||0;
+  for(let i=CAV.ossos.length-1;i>=0;i--){const o=CAV.ossos[i];if(!o||o.t>=o.vida)continue;
+    const vy=o.vy-(o.grav||0)*dt,nx=o.x+o.vx*dt,ny=o.y+vy*dt,nz=o.z+o.vz*dt;
+    const vai=Math.hypot(nx-pl.x,nz-pl.z)<.8&&ny>fy-.1&&ny<fy+2.0;let chega=false;
+    if(C452.bloq&&!vai){const rx=o.x-pl.x,rz=o.z-pl.z,d=Math.hypot(rx,rz);if(d<1.25&&o.y>fy-.2&&o.y<fy+2.1){const vv=o.vx*o.vx+o.vz*o.vz;if(vv>1e-4){const ts=-(rx*o.vx+rz*o.vz)/vv;if(ts>0&&ts<.3&&Math.hypot(rx+o.vx*ts,rz+o.vz*ts)<.8)chega=true;}}}
+    if(!vai&&!chega)continue;
+    if(C452.bloq&&c452Frontal(o.x,o.z)){c452BloqueiaTiro(o,i);continue;}
+    if(vai)C452.passam++;}}
+function c452Atacante(){const pl=cavPos(),S=c452S();let best=null,bd=1e9;
+  if(S)for(const k of S.lista){if(!c452Acordado(k)||!k.g)continue;const d=Math.hypot(k.x-pl.x,k.z-pl.z);if(d<bd){bd=d;best=k;}}
+  try{const M=MIM232.salas[c452Sala()];if(M&&M.g){const d=Math.hypot(M.x-pl.x,M.z-pl.z);if(d<3&&d<bd)return {x:M.x,z:M.z,k:null,pesado:false};}}catch(e){}
+  if(!best||bd>40)return null;return {x:best.x,z:best.z,k:best,pesado:!!(best.ally428||best.deity428||best.robot315||best.para318)};}
+// golpes que não são projéteis da lista (garras, mordida, golpes de chefe): bloqueia se o atacante está à frente
+{const dn=cavDano;cavDano=function(n){try{if(!C449.dentro&&!CAV.morto&&!(CAV.invul>0)){
+      if(C452.passam>0){C452.passam--;if(C452.bloq)C452.stats.passaram++;}
+      else if(C452.bloq){const at=c452Ctx(()=>c452Atacante());if(!at||c452Frontal(at.x,at.z)){const pl=cavPos(),p=at?{x:(at.x+pl.x)/2,y:(pl.fy||0)+1,z:(at.z+pl.z)/2}:c452PontoFrente();
+          if(t-C452.desde<=C452.JANELA){C452.stats.perfeitos++;c452Perfeito(p);if(at&&at.k)c452Atordoa(at.k);}
+          else{C452.stats.bloqueios++;c452Gasta((typeof n==='number'&&n>=30)||(at&&at.pesado)?C452.PESADO:C452.CUSTO,p);}
+          return;}}}}catch(e){c452Erro('dano',e);}
+  return dn.apply(this,arguments);};if(window.__cav)window.__cav.dano=cavDano;}
+// tiros devolvidos em voo: acertam inimigos (40) ou estouram na parede
+function c452Refl(dt){if(!C452.refl.length)return;const S=c452S();
+  for(let i=C452.refl.length-1;i>=0;i--){const r=C452.refl[i];r.t+=dt;r.x+=r.vx*dt;r.y+=r.vy*dt;r.z+=r.vz*dt;try{r.g.position.set(r.x,r.y,r.z);r.g.rotation.y+=dt*12;}catch(e){}let fim=r.t>=r.vida;
+    if(!fim&&S)for(const k of S.lista){if(!k.viva||!k.g)continue;const V=c452Volume(k),ky=k.g.position.y;
+      if(Math.hypot(k.x-r.x,k.z-r.z)<(V?Math.min(1.4,V.rb+.3):.9)&&r.y>ky-.2&&r.y<ky+(V?V.h:2)+.2){cavFerir(k,C452.REFLEXO);try{const L=Math.hypot(r.vx,r.vz)||1;k.knock.x+=r.vx/L*3;k.knock.z+=r.vz/L*3;}catch(e){}C452.stats.reflexoAcertos++;c452Marca(1);fim=true;break;}}
+    if(!fim){try{const c=WORLD.clamp(r.x,r.z,.3),cx=Array.isArray(c)?c[0]:c.x,cz=Array.isArray(c)?c[1]:c.z;if(Math.hypot(cx-r.x,cz-r.z)>.05)fim=true;}catch(e){}}
+    if(fim){c452Papel({x:r.x,y:r.y,z:r.z},6,0xffd27a);try{r.scene.remove(r.g);}catch(e){}C452.refl.splice(i,1);}}}
+
+/* ---- o livro erguido: um livro aberto na frente do peito, páginas para o inimigo, e um arco fraco do lado protegido ---- */
+function c452EscudoMalha(){const T=THREE,g=new T.Group();g.name='Livro-escudo (v452)';
+  const capaM=new T.MeshStandardMaterial({color:0x6b1f1f,roughness:.7,emissive:0x2a0606,emissiveIntensity:.4}),pagM=new T.MeshStandardMaterial({color:0xf3ead2,roughness:.85,emissive:0xffe2a8,emissiveIntensity:.35}),linM=new T.MeshBasicMaterial({color:0x8a7a62});
+  const livro=new T.Group();g.add(livro);
+  for(const s of [-1,1]){const meia=new T.Group();meia.rotation.y=-s*.24;livro.add(meia);const capa=new T.Mesh(new T.BoxGeometry(.25,.34,.016),capaM);capa.position.set(s*.13,0,-.01);meia.add(capa);
+    const pag=new T.Mesh(new T.BoxGeometry(.23,.31,.022),pagM);pag.position.set(s*.122,0,.008);meia.add(pag);for(let i=0;i<5;i++){const ln=new T.Mesh(new T.PlaneGeometry(.15,.008),linM);ln.position.set(s*.122,.1-i*.05,.0205);meia.add(ln);}}
+  const lomb=new T.Mesh(new T.BoxGeometry(.03,.35,.03),capaM);lomb.position.z=-.012;livro.add(lomb);
+  // de costas (é assim que o leitor vê o livro erguido): moldura e emblema dourados na capa e um brilho que vaza pelas bordas
+  const ouro=new T.MeshStandardMaterial({color:0xd9a441,roughness:.35,metalness:.8,emissive:0x6a4206,emissiveIntensity:.6});
+  for(const s of [-1,1]){const meia=livro.children[s<0?0:1];for(const [w,h,x,y] of [[.25,.016,s*.13,.162],[.25,.016,s*.13,-.162],[.016,.34,s*.25,0]]){const f=new T.Mesh(new T.BoxGeometry(w,h,.008),ouro);f.position.set(x,y,-.02);meia.add(f);}
+    const em=new T.Mesh(new T.CircleGeometry(.045,20),ouro);em.position.set(s*.13,0,-.0185);em.rotation.y=Math.PI;meia.add(em);}
+  const halo=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:0xffcf7a,transparent:true,opacity:.35,blending:T.AdditiveBlending,depthWrite:false}));halo.scale.set(1.1,.9,1);halo.position.z=-.08;livro.add(halo);
+  const brilho=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:0xffd58a,transparent:true,opacity:.5,blending:T.AdditiveBlending,depthWrite:false}));brilho.scale.set(.9,.9,1);brilho.position.z=.05;livro.add(brilho);
+  const runa=new T.Mesh(new T.RingGeometry(.3,.325,48),new T.MeshBasicMaterial({color:0xffcf6a,transparent:true,opacity:.55,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide}));runa.position.z=.035;livro.add(runa);
+  const arco=new T.Mesh(new T.CylinderGeometry(.82,.82,1.4,28,1,true,-1.31,2.62),new T.MeshBasicMaterial({color:0xffe6b0,transparent:true,opacity:.1,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide}));arco.position.y=.85;g.add(arco);
+  const aro=new T.Mesh(new T.TorusGeometry(.82,.014,6,40,2.62),new T.MeshBasicMaterial({color:0xffd27a,transparent:true,opacity:.7,blending:T.AdditiveBlending,depthWrite:false}));aro.rotation.x=Math.PI/2;aro.rotation.z=Math.PI/2-1.31;aro.position.y=1.55;g.add(aro);
+  g.traverse(o=>{o.raycast=()=>{};o.castShadow=false;o.receiveShadow=false;o.userData.fx=true;o.userData.noCam=true;o.userData.papelKeep=true;o.userData.papelKeepGeo=true;o.__fusaoMoveu=9;});
+  g.visible=false;g.userData.c452={livro,brilho,runa,arco,aro,halo};return g;}
+function c452Escudo(dt){const alvo=C452.bloq?1:0;C452.erguido+=(alvo-C452.erguido)*Math.min(1,dt*(alvo?16:9));C452.flash=Math.max(0,C452.flash-dt*3);if(C452.queda>0)C452.queda=Math.max(0,C452.queda-dt);
+  let g=C452.escudo;const vis=(C452.erguido>.02||C452.queda>0)&&!CAV.morto;if(!vis){if(g)g.visible=false;return;}
+  if(!g)g=C452.escudo=c452EscudoMalha();const cena=(READER.g&&READER.g.parent)||scene;if(g.parent!==cena)cena.add(g);
+  const pl=cavPos(),U=g.userData.c452,e=C452.erguido,ez=1-Math.pow(1-e,3);g.position.set(pl.x,pl.fy||0,pl.z);g.rotation.y=c452Frente()[2];
+  if(C452.queda>0){const q=1-C452.queda/.5;U.livro.position.set(0,.88-q*.6,.42+q*.1);U.livro.rotation.x=-q*1.6;U.livro.scale.setScalar(1.15);}
+  else if(MODE==='fp'){U.livro.position.set(.21*ez,.62+.33*ez,.25+.3*ez);U.livro.rotation.x=(1-ez)*-.9;U.livro.scale.setScalar((.35+.85*ez)*.66);} // na 1.ª pessoa, embaixo à esquerda, sem tapar a retícula
+  else{U.livro.position.set(-.06*ez,.7+.42*ez,.2+.36*ez);U.livro.rotation.x=(1-ez)*-.9;U.livro.scale.setScalar((.35+.85*ez)*1.75);}
+  U.brilho.material.opacity=(.35+.5*C452.flash)*ez;U.halo.material.opacity=(.28+.45*C452.flash)*ez;U.runa.rotation.z+=dt*1.2;U.runa.material.opacity=(.45+.4*C452.flash)*ez;
+  U.arco.material.opacity=(.09+.3*C452.flash)*ez;const cor=C452.flashCor===1?0xffd060:C452.flashCor===2?0xff6040:0xffe6b0;U.arco.material.color.setHex(cor);U.aro.material.opacity=(.55+.4*C452.flash)*ez;U.aro.material.color.setHex(C452.flashCor===2?0xff6040:0xffd27a);U.arco.visible=U.aro.visible=MODE!=='fp';g.visible=true;}
+
+/* ---- câmera por cima do ombro direito (só no Gamer, em postura de luta) e o leitor de frente para a mira ---- */
+const C452_C=new THREE.Vector3(),C452_L=new THREE.Vector3();
+// em postura a câmera não gira sozinha (o giro automático para longe da parede, sem o cursor preso, tirava a mira do lugar)
+{const ct=camTP;camTP=function(dt){const y0=CAM.yaw,trava=C452.postura&&MODE==='gm';ct.apply(this,arguments);if(trava)CAM.yaw=y0;try{c452Camera(dt);}catch(e){c452Erro('câmera',e);}};}
+function c452Camera(dt){dt=Math.min(.1,Math.max(0,dt||0));
+  if(C452.pitchAjuste>0){C452.pitchAjuste-=dt;if(CAM.pitch>.2)CAM.pitch+=(.1-CAM.pitch)*Math.min(1,dt*7);}
+  if(C452.pitchVolta>0){C452.pitchVolta-=dt;if(CAM.pitch<.35)CAM.pitch+=(CAMDEF.pitch-CAM.pitch)*Math.min(1,dt*5);}
+  const alvo=(C452.postura&&MODE==='gm'&&!CH.sitting)?1:0;C452.w+=(alvo-C452.w)*Math.min(1,dt*7);if(!alvo&&C452.w<.003){C452.w=0;C452.lookOk=false;return;}
+  if(alvo)CAM.pitch=Math.max(-.45,Math.min(.85,CAM.pitch));
+  const yaw=CAM.yaw,p=Math.max(-.5,Math.min(.85,CAM.pitch)),cp=Math.cos(p),dx=Math.sin(yaw)*cp,dy=Math.sin(p),dz=Math.cos(yaw)*cp,rx=Math.cos(yaw),rz=-Math.sin(yaw);
+  const px=CH.x+rx*C452.LADO,py=(CH.fy||0)+C452.ALT,pz=CH.z+rz*C452.LADO;let tmax=C452.BRACO;
+  try{tmax=Math.min(tmax,WORLD.camT(px,py,pz,dx,dy,dz,C452.BRACO));}catch(e){}try{tmax=Math.min(tmax,camHit(px,py,pz,dx,dy,dz,C452.BRACO));}catch(e){}
+  const arm=Math.max(.45,Math.min(C452.BRACO,tmax-.12));C452.arm+=(arm<C452.arm?(arm-C452.arm)*Math.min(1,dt*22):(arm-C452.arm)*Math.min(1,dt*4));
+  let cy=py+dy*C452.arm;const cx=px+dx*C452.arm,cz=pz+dz*C452.arm;try{const fl=floorAt(cx,cz);if(cy<fl+.28)cy=fl+.28;}catch(e){}
+  const w=C452.w*C452.w*(3-2*C452.w);C452_C.set(cx,cy,cz);camPos.lerp(C452_C,w);
+  C452_L.set(px,py,pz);if(!C452.lookOk||!C452.look){C452.look=(C452.look||new THREE.Vector3()).copy(camLook);C452.lookOk=true;}C452.look.lerp(C452_L,1-Math.exp(-dt*25));
+  camLook.lerp(C452.look,w);camera.position.copy(camPos);camera.lookAt(camLook);
+  try{const d=Math.hypot(camPos.x-CH.x,camPos.y-((CH.fy||0)+.9),camPos.z-CH.z);setReaderOpacity(Math.max(0,Math.min(1,(d-.55)/.7)));}catch(e){}}
+// andar de lado de frente para a mira; erguido, o leitor anda devagar e não corre
+{const mt=moveTP;moveTP=function(dt){const lento=C452.bloq,y0=CAM.yaw,trava=C452.postura&&MODE==='gm';let sp0=0,sh=false,pr=false;if(lento){sp0=CH.speed;CH.speed=sp0*C452.LENTO;sh=keys['shift'];keys['shift']=false;pr=PAD.run;PAD.run=false;}
+  try{mt.apply(this,arguments);}finally{if(lento){CH.speed=sp0;keys['shift']=sh;PAD.run=pr;}if(trava)CAM.yaw=y0;}
+  try{if(MODE==='gm'&&C452.w>.3&&!CH.sitting)CH.dir=lerpAng(CH.dir,CAM.yaw+Math.PI,Math.min(1,dt*16));}catch(e){}};}
+{const mv=move;move=function(dt){if(!C452.bloq)return mv.apply(this,arguments);const sp0=CH.speed,sh=keys['shift'],pr=PAD.run;CH.speed=sp0*C452.LENTO;keys['shift']=false;PAD.run=false;
+  try{return mv.apply(this,arguments);}finally{CH.speed=sp0;keys['shift']=sh;PAD.run=pr;}};}
+
+/* ---- a retícula: pontinho, quatro traços, marca de acerto (dourada no crítico) e o anel do fôlego do livro ---- */
+function c452Css(){if(document.getElementById('combate452css'))return;const st=document.createElement('style');st.id='combate452css';st.textContent=
+  '#mira452{position:fixed;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;pointer-events:none;z-index:6}'+
+  '#mira452 svg{width:64px;height:64px;overflow:visible;display:block}'+
+  '#mira452 .tr{stroke:#fff;stroke-width:2;stroke-linecap:round;filter:drop-shadow(0 0 1.2px rgba(0,0,0,.95))}'+
+  '#mira452 .pt{fill:#fff;filter:drop-shadow(0 0 1.2px rgba(0,0,0,.95))}'+
+  '#mira452.sobre .tr{stroke:#ff9d7e}#mira452.sobre .pt{fill:#ff9d7e}'+
+  '#mira452 .an0{fill:none;stroke:rgba(20,12,8,.55);stroke-width:3.6}#mira452 .an{fill:none;stroke:#f3e6c8;stroke-width:2.4;stroke-linecap:round}'+
+  '#mira452 .anel{opacity:0;transition:opacity .2s}#mira452.anelOn .anel{opacity:1}#mira452.baixo .an{stroke:#ffb35a}#mira452.quebrado .an0{stroke:rgba(255,70,40,.8)}'+
+  '#mira452.perf .an{stroke:#ffd76a}#mira452 .mk{stroke:#fff;stroke-width:2.1;stroke-linecap:round;opacity:0;transform-origin:0 0}'+
+  '#mira452.hit .mk{animation:mk452 .24s ease-out}#mira452.crit .mk{stroke:#ffcf5a;stroke-width:2.8}'+
+  '@keyframes mk452{0%{opacity:1;transform:scale(1.3)}100%{opacity:0;transform:scale(.9)}}'+
+  '.vjBloq452{right:105px!important;border-color:#c9b27a!important}body.pacifico #vjBloq452{display:none!important}'+
+  '.c452dlg{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;background:rgba(8,5,3,.55)}'+
+  '.c452box{background:#241a14;border:1px solid #9a8666;border-radius:12px;padding:18px 18px 12px;width:min(92vw,360px);color:#f2e5cb;font-family:Georgia,serif;box-shadow:0 10px 40px rgba(0,0,0,.6)}'+
+  '.c452box h3{margin:0 0 12px;font-size:18px;color:#f4d58d;font-weight:normal}.c452box button{display:block;width:100%;text-align:left;margin:0 0 8px;padding:11px 12px;border-radius:9px;border:1px solid #8a7656;background:#33261d;color:#f2e5cb;cursor:pointer;font:inherit}'+
+  '.c452box button:hover,.c452box button:focus-visible{background:#46342a;outline:none;border-color:#e0c080}.c452box button b{display:block;font-size:15px}.c452box button span{font-size:12px;color:#cdbf9f}.c452box small{display:block;text-align:center;font-size:11.5px;color:#b7a888;margin-top:2px}';
+  document.head.appendChild(st);}
+function c452HudMonta(){if(C452.hud)return C452.hud;c452Css();const d=document.createElement('div');d.id='mira452';d.hidden=true;d.setAttribute('aria-hidden','true');
+  d.innerHTML='<svg viewBox="-32 -32 64 64"><g class="anel" transform="rotate(-90)"><circle class="an0" r="19"/><circle class="an" r="19" stroke-dasharray="119.4 200"/></g>'
+    +'<line class="tr" x1="0" y1="-11" x2="0" y2="-5"/><line class="tr" x1="0" y1="5" x2="0" y2="11"/><line class="tr" x1="-11" y1="0" x2="-5" y2="0"/><line class="tr" x1="5" y1="0" x2="11" y2="0"/><circle class="pt" r="1.6"/>'
+    +'<g class="mk"><line x1="-10" y1="-10" x2="-5" y2="-5"/><line x1="10" y1="-10" x2="5" y2="-5"/><line x1="-10" y1="10" x2="-5" y2="5"/><line x1="10" y1="10" x2="5" y2="5"/></g></svg>';
+  document.body.appendChild(d);C452.hud={el:d,an:d.querySelector('.an'),vis:false,sig:''};return C452.hud;}
+function c452Marca(tipo){try{const H=c452HudMonta(),el=H.el;el.classList.remove('hit','crit');void el.offsetWidth;el.classList.add('hit');if(tipo===2)el.classList.add('crit');}catch(e){}}
+function c452HudJa(cls){try{const H=c452HudMonta();if(cls==='perf'){H.el.classList.remove('perf');void H.el.offsetWidth;H.el.classList.add('perf');setTimeout(()=>{try{H.el.classList.remove('perf');}catch(e){}},420);}H.sig='';}catch(e){}}
+function c452Hud(){const H=c452HudMonta();const ver=c452MiraModo()&&C452.ctx&&!CAV.morto&&!CH.sitting&&!c452UI()&&(MODE==='fp'?C452.postura:C452.w>.35);
+  if(ver!==H.vis){H.vis=ver;H.el.hidden=!ver;try{if(retEl)retEl.style.visibility=ver?'hidden':'';}catch(e){}}if(!ver)return;
+  const f=Math.max(0,Math.min(1,C452.folego/C452.FOLEGO)),anel=C452.bloq||f<.999||C452.quebra>0,sobre=!!(C452.miraQuadro&&C452.miraQuadro.k);
+  const sig=(anel?1:0)+'|'+Math.round(f*60)+'|'+(sobre?1:0)+'|'+(C452.quebra>0?1:0);if(sig===H.sig)return;H.sig=sig;
+  H.an.setAttribute('stroke-dasharray',(119.4*f).toFixed(1)+' 200');H.el.classList.toggle('anelOn',anel);H.el.classList.toggle('baixo',f<.5);H.el.classList.toggle('quebrado',C452.quebra>0);H.el.classList.toggle('sobre',sobre);}
+
+/* ---- entradas: botões do mouse, controle e o 🛡 do celular ---- */
+function c452Down(e){if(!c452On()||e.pointerType==='touch'||c452UI())return;const noCanvas=e.target===cv||(locked&&document.pointerLockElement===cv);if(!noCanvas)return;
+  if(e.button===2){if(!C452.ctx)return;C452.bloqIn.rmb=true;C452.entrada='mouse';e.preventDefault();e.stopPropagation();return;}
+  if(e.button!==0||!C452.ctx)return;
+  if(MODE==='tp'){const k=c452Ctx(()=>c452Clique(e.clientX,e.clientY));if(k){C452.forcado=k;try{atacar151('auto');}finally{C452.forcado=null;}C452.engoleUp=true;e.preventDefault();e.stopPropagation();}return;}
+  if(c452MiraModo()&&locked){C452.lmb=true;C452.engoleUp=true;C452.entrada='mouse';c452Disparo();e.preventDefault();e.stopPropagation();}}
+function c452Up(e){if(e.button===2&&C452.bloqIn.rmb){C452.bloqIn.rmb=false;e.preventDefault();e.stopPropagation();return;}
+  if(e.button===0){C452.lmb=false;if(C452.engoleUp){C452.engoleUp=false;e.preventDefault();e.stopPropagation();}}}
+try{addEventListener('pointerdown',e=>{try{c452Down(e);}catch(x){c452Erro('mouse',x);}},{capture:true});addEventListener('pointerup',e=>{try{c452Up(e);}catch(x){c452Erro('mouse',x);}},{capture:true});
+  cv.addEventListener('contextmenu',e=>{if(c452On())e.preventDefault();});addEventListener('blur',()=>{C452.bloqIn.rmb=false;C452.lmb=false;});
+  addEventListener('pointermove',e=>{if(e.pointerType!=='touch'&&(e.movementX||e.movementY))C452.entrada='mouse';},{passive:true});}catch(e){c452Erro('ouvintes',e);}
+{const pp=pollPad;pollPad=function(dt){const r=pp.apply(this,arguments);try{c452Pad();}catch(e){c452Erro('controle',e);}return r;};}
+function c452Pad(){if(!c452On()||!PAD.on){C452.bloqIn.lt=false;C452.rt=false;C452.rtAntes=false;return;}let gp=null;try{const gps=navigator.getGamepads?navigator.getGamepads():null;if(gps)for(const g of gps){if(g&&g.connected){gp=g;break;}}}catch(e){}if(!gp)return;
+  const b=i=>!!(gp.buttons[i]&&(gp.buttons[i].pressed||gp.buttons[i].value>.4)),lt=b(6),rt=b(7);
+  if(C452.ctx){C452.bloqIn.lt=lt;if(rt&&!C452.rtAntes)c452Disparo();C452.rt=rt;PAD.run=b(10);}else{C452.bloqIn.lt=false;C452.rt=false;}C452.rtAntes=rt;
+  if(lt||rt||Math.abs(PAD.cx)>.2||Math.abs(PAD.cy)>.2)C452.entrada='pad';}
+function c452Toque(){if(!TOUCHDEV)return;const atk=document.getElementById('vjAtk');if(!atk)return;let b=document.getElementById('vjBloq452');
+  if(!b){c452Css();b=document.createElement('button');b.id='vjBloq452';b.type='button';b.className='vjAct vjAtk vjBloq452';b.hidden=true;b.setAttribute('aria-label',c452T('Livro-escudo','Book shield','Libro-escudo'));b.innerHTML='<b>🛡</b><span>'+c452T('escudo','shield','escudo')+'</span>';atk.insertAdjacentElement('afterend',b);
+    const off=()=>{C452.bloqIn.toque=false;};b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();C452.bloqIn.toque=true;try{b.setPointerCapture(e.pointerId);}catch(x){}},{capture:true});
+    b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('lostpointercapture',off);b.addEventListener('contextmenu',e=>e.preventDefault());}
+  const quer=c452On()&&!atk.hidden;if(b.hidden===quer)b.hidden=!quer;if(!quer)C452.bloqIn.toque=false;}
+
+/* ---- escolher o modo: no Menu (ao lado do «Sem Inimigos») e uma pergunta só, na primeira luta no computador ---- */
+function c452Modo(m){C452.save.modo=m==='combatente'?'combatente':'classico';c452Grava();const sw=document.getElementById('combate452Switch');if(sw)sw.checked=C452.save.modo==='combatente';
+  if(C452.save.modo!=='combatente'){C452.postura=false;C452.bloq=false;C452.lmb=false;C452.bloqIn.rmb=C452.bloqIn.lt=C452.bloqIn.toque=false;}}
+function c452Menu(){const host=document.getElementById('menuBtns');if(!host||document.getElementById('combate452Switch'))return;
+  const box=document.createElement('label');box.style.cssText='display:block;padding:14px;border:1px solid #998766;border-radius:9px;width:100%;box-sizing:border-box;background:#3a2b22;color:#f2e5cb;margin-top:8px';
+  const input=document.createElement('input');input.type='checkbox';input.id='combate452Switch';input.checked=C452.save.modo==='combatente';input.addEventListener('change',()=>c452Modo(input.checked?'combatente':'classico'));box.appendChild(input);
+  const title=document.createElement('strong');title.textContent=' ⚔ '+c452T('Modo Combatente','Fighter mode','Modo Combatiente');box.appendChild(title);
+  const text=document.createElement('div');text.style.cssText='font-size:12px;line-height:1.5;margin:7px 0 0';
+  text.textContent=TOUCHDEV?c452T('Segure 🛡 para erguer o livro como escudo; erguido bem na hora do golpe, ele devolve o tiro. No computador, a mira também fica livre.','Hold 🛡 to raise the book as a shield; raised right as the blow lands, it sends the shot back. On a computer, aiming is free too.','Mantén 🛡 para alzar el libro como escudo; alzado justo a tiempo, devuelve el disparo. En el ordenador, la mira también es libre.')
+    :c452T('Mira livre: o clique esquerdo (ou Espaço) atira onde a retícula aponta — na cabeça, crítico. Segure o botão direito para erguer o livro como escudo; erguido bem na hora do golpe, ele devolve o tiro. Desligado, a mira volta a ser automática.','Free aim: left click (or Space) shoots where the reticle points — headshots are critical. Hold the right button to raise the book as a shield; raised right as the blow lands, it sends the shot back. When off, aiming is automatic again.','Mira libre: el clic izquierdo (o Espacio) dispara donde apunta la retícula — en la cabeza, crítico. Mantén el botón derecho para alzar el libro como escudo; alzado justo a tiempo, devuelve el disparo. Desactivado, la mira vuelve a ser automática.');
+  box.appendChild(text);const pe=document.getElementById('peace412Switch'),lab=pe&&pe.closest('label');if(lab&&lab.parentNode===host)lab.insertAdjacentElement('afterend',box);else host.appendChild(box);}
+function c452Pergunta(){if(C452.dialogo)return;C452.perguntou=true;c452Css();try{unlock();}catch(e){}C452.bloqIn.rmb=false;C452.lmb=false;
+  const d=document.createElement('div');d.id='combate452Dlg';d.className='c452dlg';
+  d.innerHTML='<div class="c452box" role="dialog" aria-modal="true"><h3>'+c452T('Como você quer lutar?','How do you want to fight?','¿Cómo quieres luchar?')+'</h3>'
+    +'<button type="button" data-m="combatente"><b>⚔ '+c452T('Combatente','Fighter','Combatiente')+'</b><span>'+c452T('mira livre e livro-escudo','free aim and book shield','mira libre y libro-escudo')+'</span></button>'
+    +'<button type="button" data-m="classico"><b>📖 '+c452T('Clássico','Classic','Clásico')+'</b><span>'+c452T('mira automática','automatic aim','mira automática')+'</span></button>'
+    +'<small>'+c452T('Dá para trocar no Menu.','You can change it in the Menu.','Puedes cambiarlo en el Menú.')+'</small></div>';
+  document.body.appendChild(d);C452.dialogo=d;for(const b of d.querySelectorAll('button'))b.addEventListener('click',ev=>{ev.stopPropagation();c452Modo(b.dataset.m);d.remove();C452.dialogo=null;});
+  try{d.querySelector('button').focus();}catch(e){}}
+{const ub=uiBlocked;uiBlocked=function(){return !!C452.dialogo||ub.apply(this,arguments);};}
+try{if(typeof CTRL_TXT!=='undefined'){const L=[c452T('Modo Combatente','Fighter mode','Modo Combatiente'),c452T('liga no Menu · clique esquerdo ou Espaço atira na retícula (na cabeça, crítico) · segurar o botão direito ergue o livro-escudo · erguê-lo bem na hora devolve o tiro · no controle: RT atira, LT ergue o livro, L3 corre','turn it on in the Menu · left click or Space shoots at the reticle (headshots are critical) · hold the right button to raise the book shield · raise it right on time to send the shot back · gamepad: RT shoots, LT raises the book, L3 runs','actívalo en el Menú · clic izquierdo o Espacio dispara a la retícula (en la cabeza, crítico) · mantener el botón derecho alza el libro-escudo · alzarlo justo a tiempo devuelve el disparo · mando: RT dispara, LT alza el libro, L3 corre')];
+  for(const m of ['gm','fp']){const A=CTRL_TXT[m];if(Array.isArray(A)&&!A.some(x=>x&&x[0]===L[0])){const i=A.findIndex(x=>x&&/^F · G/.test(String(x[0])));A.splice(i>=0?i+1:A.length,0,L);}}}}catch(e){c452Erro('ajuda',e);}
+
+/* ---- o quadro: antes do laço antigo, o livro pega os tiros; depois, postura, fôlego, tiros devolvidos, retícula ---- */
+function c452Quadro(dt){const on=c452On(),S=c452S(),pl=cavPos();C452.ctx=!!S&&!PAC.on;const ui=c452UI();
+  let quer=C452.bloqIn.rmb||C452.bloqIn.lt||C452.bloqIn.toque;if(C452.soltar){if(!quer)C452.soltar=false;quer=false;}const pode=on&&C452.ctx&&!CAV.morto&&C452.quebra<=0&&!CH.sitting&&!ui,agora=quer&&pode;
+  if(agora&&!C452.bloq){C452.desde=(t-C452.baixou>=C452.ANTISPAM)?t:-9;C452.manual=Math.max(C452.manual,4);}if(!agora&&C452.bloq)C452.baixou=t;C452.bloq=agora;
+  if(C452.quebra>0)C452.quebra=Math.max(0,C452.quebra-dt);
+  if(C452.bloq)C452.semBloq=0;else{C452.semBloq+=dt;if(C452.semBloq>C452.ESPERA&&C452.folego<C452.FOLEGO)C452.folego=Math.min(C452.FOLEGO,C452.folego+C452.RECARGA*dt);}
+  if(C452.manual>0)C452.manual=Math.max(0,C452.manual-dt);
+  const perto=S?c452Perto(S,pl,C452.PERTO):null,antes=C452.postura;
+  C452.postura=on&&c452MiraModo()&&C452.ctx&&!CAV.morto&&!CH.sitting&&!ui&&(!!perto||C452.manual>0||C452.bloq);
+  if(C452.postura&&!antes&&MODE==='gm'){C452.pitchAjuste=.45;C452.pitchVolta=0;}if(!C452.postura&&antes&&MODE==='gm'){C452.pitchVolta=.6;C452.pitchAjuste=0;}
+  C452.miraQuadro=c452Livre()?c452Mira():null;
+  if(C452.postura&&!C452.bloq&&(C452.lmb||C452.rt||keys[' ']))c452Disparo();
+  if(!C452.save.modo&&!C452.perguntou&&!TOUCHDEV&&(MODE==='gm'||MODE==='fp')&&perto&&!PAC.on&&!ui)c452Pergunta();
+  if(C452.bloq&&perto&&(MODE==='tp'||TOUCHDEV))CH.dir=lerpAng(CH.dir,Math.atan2(perto.x-pl.x,perto.z-pl.z),Math.min(1,dt*10));
+  c452Refl(dt);}
+{const tk=caveirasTick;caveirasTick=function(dt){try{if(c452On())c452Antes(Math.min(.1,Math.max(0,dt||0)));}catch(e){c452Erro('antes',e);}
+  let r;try{r=tk.apply(this,arguments);}finally{C452.passam=0;}
+  try{const d=Math.min(.1,Math.max(0,dt||0));c452Ctx(()=>c452Quadro(d));c452Escudo(d);c452Hud();c452Toque();}catch(e){c452Erro('quadro',e);}return r;};}
+try{c452Load();c452Menu();setTimeout(()=>{try{c452Menu();}catch(e){}},0);}catch(e){c452Erro('início',e);}
+window.__combate452={estado:C452,mira:()=>c452Ctx(()=>c452Mira()),volume:c452Volume,modo:c452Modo,on:c452On,livre:c452Livre,
+  bloquear(v){C452.bloqIn.rmb=!!v;},disparar(){c452Disparo();},frente:c452Frente};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
