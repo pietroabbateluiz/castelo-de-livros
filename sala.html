@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v449</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v450</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -57120,6 +57120,175 @@ try{c449Load();C449.iniciado=false;c449Recalc(true);C449.iniciado=true;}catch(e)
 window.__coracoes449={estado:C449,lugares:C449_LUGARES,recalc:c449Recalc,total:c449Total,achados:c449Achados,texto:c449Texto,pista:c449Pista,
   reset(){C449.save.achados={};c449Grava();for(const id in C449.itens){const it=C449.itens[id];if(it.g.parent)it.g.parent.remove(it.g);}C449.itens={};c449Recalc(true);},
   dar(id){const s=C449_LUGARES.find(o=>o.id===id);if(!s)return false;C449.save.achados[s.id]=Date.now();c449Grava();c449Recalc(true);return true;}};
+
+/* ===================== v450 · OS TRÊS ÚLTIMOS ANDARES BEM DIFÍCEIS (pedido do Luiz: «Deixe os 3 últimos andares bem
+   difíceis») =====================
+   A regra dos corações continua: cada golpe ou tiro que acerta desbota meio coração (ver coracoes450). A dificuldade
+   vem do comportamento dos inimigos, crescendo andar a andar — 5.º difícil, 6.º muito difícil, 7.º brutal:
+   · mais inimigos por sala (7 no 5.º e no 7.º; o 6.º fica com 6, que a v421 já deixou com 6× de vida);
+   · mais resistentes: 2× de vida no 5.º; 4× de vida e 30 % menos dano recebido no 7.º (o 6.º já tinha 6× e −30 %);
+   · acordam depressa (1,6 s / 1,1 s / 0,8 s, os outros logo em seguida) e andam mais rápido;
+   · atiram mais vezes e de mais longe (15 / 17 / 19 m), com projéteis mais rápidos (×1,25 / ×1,3 / ×1,45) e mira que
+     antecipa (90 % no 5.º, por completo no 6.º e no 7.º) para onde o leitor está correndo; no 6.º cada disparo é uma rajada dupla e no 7.º, tripla, em leque;
+   · sem descanso no meio da luta: enquanto houver inimigo acordado a menos de 26 m, a vida não volta sozinha (fada,
+     Canto da Coruja, abóboras e o escudo continuam valendo);
+   · os chefes desses andares (Professor Autômato, Guardião da Chave dos Ecos, esqueletos e Deus Tirânico Robô da
+     Galeria) agem 25 % / 35 % / 50 % mais depressa.
+   Na primeira entrada em sala de cada um desses andares, um aviso diz o que muda. Valores em D450 para ajustar. */
+const D450={
+  5:{nivel:['difícil','hard','difícil'],inimigos:7,vida:2,reduz:1,recarga:[2.0,2.8],rajada:1,abre:0,tiro:1.25,mira:.9,sono:1.6,passo:.55,vel:1.2,alcance:15,chefe:1.25},
+  6:{nivel:['muito difícil','very hard','muy difícil'],inimigos:0,vida:1,reduz:1,recarga:[3.2,4.4],rajada:2,abre:.32,tiro:1.3,mira:.95,sono:1.1,passo:.45,vel:1.15,alcance:17,chefe:1.35},
+  7:{nivel:['brutal','brutal','brutal'],inimigos:7,vida:4,reduz:.7,recarga:[2.4,3.3],rajada:3,abre:.3,tiro:1.45,mira:1,sono:.8,passo:.4,vel:1.35,alcance:19,chefe:1.5}};
+const DIF450={avisos:{},andarSala:{},pool:{},erros:[],stats:{}};
+function d450Conta(campo,n){try{const f=floor421Current()||0,S=DIF450.stats[f]=DIF450.stats[f]||{tiros:0,golpes:0};S[campo]+=n||1;}catch(e){}}
+function d450Erro(o,e){if(DIF450.erros.length<20)DIF450.erros.push(o+': '+(e&&e.message||e));}
+function d450T(pt,en,es){try{return text428(pt,en,es);}catch(e){return pt;}}
+function d450Andar(room){if(!room)return 0;if(room==='gallery397')return 7;if(room in DIF450.andarSala)return DIF450.andarSala[room];let f=0;
+  try{const g=Object.keys(GENRE_ROOM).find(k=>GENRE_ROOM[k]===room);f=g?(+GENRE_FLOOR(g)||0):0;}catch(e){f=0;}DIF450.andarSala[room]=f;return f;}
+function d450Regra(){try{if(CUR!=='room'||PAC.on)return null;return D450[floor421Current()]||null;}catch(e){return null;}}
+function d450Sala(){return CUR_GENRE==='gallery397'?'gallery397':cavRoom();}
+function d450Especial(k){return !k||!!(k.ally428||k.robot315||k.para318||k.deity428);}
+// vida e passo: uma vez por inimigo (marcado), depois de a v421 aplicar o dela no 6.º
+function d450Escala(room){const D=D450[d450Andar(room)],S=CAV.salas[room];if(!D||!S)return;
+  for(const k of S.lista){if(d450Especial(k)||k.d450)continue;const max=k.max||k.hp||CAV.hpCaveira,fr=k.viva?Math.max(0,Math.min(1,(k.hp||max)/max)):0;
+    k.d450={max0:max,vel0:k.vel,reduz:D.reduz};k.max=Math.round(max*D.vida);k.hp=k.max*fr;k.vel=(k.vel||CAV.vel)*D.vel;try{if(k.g&&k.g.userData.barra)cavBarra(k);}catch(e){}}}
+// entrar na sala: acordam logo, primeiro tiro mais cedo, piscina de projéteis maior, aviso do andar
+function d450Prepara(room){const f=d450Andar(room),D=D450[f],S=CAV.salas[room];if(!D||!S)return;d450Escala(room);let i=0;
+  for(const k of S.lista){if(d450Especial(k))continue;if(k.viva)k.hp=k.max;k.sono=D.sono+i*D.passo;k.rec=D.recarga[0]*.5+Math.random()*D.recarga[0]*.6;i++;try{if(k.g&&k.g.userData.barra)cavBarra(k);}catch(e){}}
+  d450Pool(S);d450Aviso(f);}
+function d450Pool(S){try{const tipo=((INI155[S.tipo]||INI155.caveira).proj)||'osso';if(DIF450.pool[tipo])return;const P=projPool155(tipo);if(!P||!P.arr||!P.arr.length)return;
+  const base=P.arr[0];while(P.arr.length<44){const c=base.clone(true);c.traverse(o=>{o.raycast=()=>{};});P.arr.push(c);}DIF450.pool[tipo]=true;}catch(e){d450Erro('piscina',e);}}
+function d450Aviso(f){if(DIF450.avisos[f])return;DIF450.avisos[f]=true;const D=D450[f];if(!D)return;
+  const txt=f===5?d450T('⚠ 5º andar · difícil — os inimigos acordam depressa, atiram mais rápido e de mais longe, e no meio da luta não há descanso: a vida só volta sozinha com a sala limpa ou longe deles.','⚠ Floor 5 · hard — enemies wake fast, shoot faster and from farther away, and there is no rest mid-fight: health only comes back on its own once the room is clear or you are far from them.','⚠ Piso 5 · difícil — los enemigos despiertan rápido, disparan más rápido y desde más lejos, y en plena lucha no hay descanso: la vida solo vuelve sola con la sala limpia o lejos de ellos.')
+    :f===6?d450T('⚠ 6º andar · muito difícil — rajadas duplas, inimigos blindados e mais rápidos, chefes apressados e nenhum descanso no meio da luta.','⚠ Floor 6 · very hard — double volleys, armored and faster enemies, hastier bosses and no rest mid-fight.','⚠ Piso 6 · muy difícil — ráfagas dobles, enemigos blindados y más rápidos, jefes acelerados y ningún descanso en plena lucha.')
+    :d450T('☠ 7º andar · brutal — mais inimigos, rajadas triplas em leque, tiros mais rápidos e certeiros, inimigos blindados, chefes muito mais rápidos e nenhum descanso no meio da luta.','☠ Floor 7 · brutal — more enemies, triple spread volleys, faster and deadlier shots, armored enemies, much faster bosses and no rest mid-fight.','☠ Piso 7 · brutal — más enemigos, ráfagas triples en abanico, disparos más rápidos y certeros, enemigos blindados, jefes mucho más rápidos y ningún descanso en plena lucha.');
+  try{showToast(txt,{big:true,ms:9000,queue:true});}catch(e){}}
+// mira: antecipa a corrida do leitor (fator 'mira'), com o projétil mais rápido; 'ang' abre o leque das rajadas
+function d450Mira(o,D,ang){const pl=cavPos(),P=PROJ155[o.tipo]||PROJ155.osso,v=(P.vel||10)*D.tiro,g=o.grav||0,x0=o.x,y0=o.y,z0=o.z,ty=(pl.fy||0)+1.0,m=D.mira||1,vx0=(pl.vx||0)*m,vz0=(pl.vz||0)*m;
+  let T=Math.max(.3,Math.hypot(pl.x-x0,pl.z-z0)/v);for(let i=0;i<3;i++){T=Math.max(.3,Math.hypot(pl.x+vx0*T-x0,pl.z+vz0*T-z0)/v);}
+  let vx=(pl.x+vx0*T-x0)/T,vz=(pl.z+vz0*T-z0)/T;if(ang){const c=Math.cos(ang),s=Math.sin(ang),nx=vx*c-vz*s,nz=vx*s+vz*c;vx=nx;vz=nz;}
+  o.vx=vx;o.vz=vz;o.vy=(ty-y0)/T+.5*g*T;o.vida=T+.8;o.t=0;}
+
+{const arr0=cavArremessar;cavArremessar=function(k){const D=d450Regra();d450Conta('tiros');if(!D||d450Especial(k))return arr0.apply(this,arguments);
+  const n0=CAV.ossos.length,r=arr0.apply(this,arguments),rec=k.rec;
+  try{const o=CAV.ossos[CAV.ossos.length-1];if(CAV.ossos.length>n0&&o){d450Mira(o,D,0);
+    for(let j=1;j<D.rajada;j++){const n1=CAV.ossos.length;arr0.call(this,k);const q=CAV.ossos[CAV.ossos.length-1];if(CAV.ossos.length>n1&&q){d450Mira(q,D,(j%2?1:-1)*D.abre*Math.ceil(j/2));d450Conta('tiros');}}}}
+  catch(e){d450Erro('tiro',e);}k.rec=rec;return r;};}
+{const fer=cavFerir;cavFerir=function(k,n){if(k&&k.d450&&k.d450.reduz<1&&typeof n==='number')n*=k.d450.reduz;return fer.call(this,k,n);};if(window.__cav)window.__cav.ferir=cavFerir;}
+{const reg=caveirasRegistrar;caveirasRegistrar=function(room){const D=D450[d450Andar(room)];if(!D)return reg.apply(this,arguments);const p0=CAV.porSala;if(D.inimigos)CAV.porSala=D.inimigos;let r;
+  try{r=reg.apply(this,arguments);}finally{CAV.porSala=p0;}try{d450Escala(room);}catch(e){d450Erro('registro',e);}return r;};if(window.__cav)window.__cav.registrar=caveirasRegistrar;}
+{const ent=cavEntrar;cavEntrar=function(room){const r=ent.apply(this,arguments);try{d450Prepara(room);}catch(e){d450Erro('entrar',e);}return r;};if(window.__cav)window.__cav.entrar=cavEntrar;}
+// sem descanso no meio da luta
+function d450EmLuta(){const room=d450Sala(),S=room&&CAV.salas[room];if(!S)return false;const p=cavPos();for(const k of S.lista){if(k&&k.viva&&!(k.sono>0)&&Math.hypot(k.x-p.x,k.z-p.z)<26)return true;}return false;}
+{const dn=cavDano;cavDano=function(){const h0=CAV.hp,r=dn.apply(this,arguments);try{if(CAV.hp<h0)d450Conta('golpes');}catch(e){}return r;};if(window.__cav)window.__cav.dano=cavDano;}
+{const tk=caveirasTick;caveirasTick=function(dt){const D=d450Regra();if(!D)return tk.apply(this,arguments);
+  const sv=[CAV.recarga,CAV.alcance,CAV.sono];CAV.recarga=D.recarga;CAV.alcance=D.alcance;CAV.sono=D.sono;
+  try{if(d450EmLuta())CAV.ultimoDano=t;}catch(e){d450Erro('luta',e);}
+  try{return tk.apply(this,arguments);}finally{CAV.recarga=sv[0];CAV.alcance=sv[1];CAV.sono=sv[2];}};}
+// chefes apressados nesses andares
+{const at=ally428Tick;ally428Tick=function(dt){const D=d450Regra();return at.call(this,D?dt*D.chefe:dt);};
+ const dy=deity428Tick;deity428Tick=function(dt){const D=d450Regra();return dy.call(this,D?dt*D.chefe:dt);};}
+window.__dificil450={regras:D450,estado:DIF450,andar:d450Andar,prepara:d450Prepara,emLuta:d450EmLuta};
+
+/* ===================== v450 · CORAÇÕES EM DUAS CAMADAS (pedido do Luiz: «diminua os corações. Ele é vermelho, quando
+   toma dano fica branco, depois fica metade vermelho, metade branco... Assim pode reduzir a qtde») =====================
+   · Cada coração tem duas camadas: vermelha por cima, branca por baixo. Cada golpe ou tiro que acerta desbota METADE
+     do coração: a metade direita do vermelho vira branca (metade vermelho, metade branco), depois a esquerda (coração
+     branco), depois o branco se apaga, metade por metade. Um coração aguenta 4 golpes, e a fileira cai pela metade —
+     no máximo 6 corações em vez de 12 — com exatamente a mesma vida da v449 (por dentro, 10 pontos por golpe).
+   · O leitor começa com 1 coração e meio (os mesmos 6 golpes). Os 8 corações escondidos e a abóbora dourada do Bento
+     viram MEIOS corações: cada um soma meio coração e enche todos; dois completam um coração inteiro. Um coração ainda
+     incompleto aparece como meio coração, com o contorno tracejado da metade que falta.
+   · As curas valem o mesmo que antes: a abóbora recupera 1 coração (4 golpes), o Canto da Coruja ¾; o descanso e a fada
+     acendem meia camada por vez — primeiro o branco, depois o vermelho por cima.
+   · HUD, Diário, avisos, Bento, abóbora e coruja falam a nova conta; o «−¼» do golpe sai na cor da camada perdida. */
+const C450={U:10,u0:-1,erros:[],geo:null};
+const C450_D={M:'M8 14.3C6.6 13.3 1 9.4 1 5.2 1 2.8 2.8 1 5 1c1.4 0 2.5.7 3 1.9z',G:'M8 2.9C8.5 1.7 9.6 1 11 1c2.2 0 4 1.8 4 4.2 0 4.2-5.6 8.1-7 9.1'};
+function c450T(pt,en,es){try{return text428(pt,en,es);}catch(e){return pt;}}
+function c450Erro(o,e){if(C450.erros.length<20)C450.erros.push(o+': '+(e&&e.message||e));}
+// quartos de coração: 6 golpes → «1½», 3 → «¾», 9 → «2¼»
+function c450Fmt(u){u=Math.max(0,Math.round(u||0));const n=Math.floor(u/4),r=u%4;return (n?String(n):(r?'':'0'))+['','¼','½','¾'][r];}
+c449Fmt=c450Fmt;   // a abóbora («+1 ❤») passa a falar em quartos de coração
+function c450Cap(){return Math.max(1,Math.round(CAV.hpMax/C450.U));}   // quantos golpes cabem nos corações
+function c450Css(){if(document.getElementById('coracoes450'))return;const st=document.createElement('style');st.id='coracoes450';st.textContent=
+  '#hpBox svg.cz5 .c5F{fill:rgba(48,20,15,.82);stroke:rgba(233,220,196,.42);stroke-width:1}'+
+  '#hpBox svg.cz5 .c5W{fill:url(#cz450w);opacity:0}#hpBox svg.cz5 .c5R{fill:url(#cz449g);opacity:0}'+
+  '#hpBox svg.cz5 .c5W.on,#hpBox svg.cz5 .c5R.on{opacity:1}'+
+  '#hpBox svg.cz5 .c5W.p{fill:#fff;opacity:calc(.12 + .5*var(--p,0))}#hpBox svg.cz5 .c5R.p{fill:#ff7889;opacity:calc(.16 + .55*var(--p,0))}'+
+  '#hpBox svg.cz5 .c5B{fill:none;stroke:#2b0c06;stroke-width:1.05;stroke-linejoin:round}'+
+  '#hpBox svg.cz5 .c5H{fill:none;stroke:rgba(255,255,255,.8);stroke-width:1.25;stroke-linecap:round;opacity:0}#hpBox svg.cz5.cheio .c5H{opacity:1}'+
+  '#hpBox svg.cz5 .c5G{fill:rgba(255,255,255,.05);stroke:rgba(233,220,196,.62);stroke-width:.9;stroke-dasharray:1.5 1.3;stroke-linecap:round}';
+  document.head.appendChild(st);
+  if(!document.getElementById('cz450w')){const d=document.createElement('div');d.innerHTML='<svg width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true" focusable="false"><defs><linearGradient id="cz450w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#f3eee8"/><stop offset="1" stop-color="#c9c0b6"/></linearGradient></defs></svg>';document.body.appendChild(d.firstChild);}}
+// um coração inteiro (camadas: branco esq., branco dir., vermelho esq., vermelho dir.) ou meio coração (branco, vermelho)
+function c450Coracao(forma){const NS='http://www.w3.org/2000/svg',s=document.createElementNS(NS,'svg');s.setAttribute('viewBox','0 0 16 15');s.setAttribute('class','cz cz5'+(forma<4?' meia':''));s.setAttribute('aria-hidden','true');
+  const p=(c,d)=>{const e=document.createElementNS(NS,'path');e.setAttribute('d',d);e.setAttribute('class',c);s.appendChild(e);return e;};let u;
+  if(forma>=4){p('c5F',C449_D.F);const wl=p('c5W',C449_D.E),wr=p('c5W',C449_D.D),rl=p('c5R',C449_D.E),rr=p('c5R',C449_D.D);u=[wl,wr,rl,rr];p('c5H',C449_D.H);p('c5B',C449_D.F);}
+  else{p('c5F',C450_D.M);const wl=p('c5W',C450_D.M),rl=p('c5R',C450_D.M);u=[wl,rl];p('c5H',C449_D.H);p('c5B',C450_D.M);p('c5G',C450_D.G);}
+  return {s,u,forma:forma>=4?4:2,estado:'',v450:true};}
+cavHud=function(){if(C449.dentro)return;const box=document.getElementById('hpBox');if(!box)return;try{c449Monta(box);c450Css();}catch(e){return;}
+  if(C449.els.some(c=>!c.v450)){for(const c of C449.els){try{c.s.remove();}catch(e){}}C449.els=[];C449.meiosAntes=-1;C449.totAntes=-1;}
+  const capU=c450Cap(),hp=Math.max(0,Math.min(CAV.hp,CAV.hpMax)),u=Math.min(capU,Math.floor(hp/C450.U+1e-6));
+  const fr=u>=capU||CAV.morto?0:Math.max(0,Math.min(.97,((hp-u*C450.U)+C449.acc)/C450.U)),nC=Math.ceil(capU/4),ult=u>0?Math.floor((u-1)/4):-1;
+  while(C449.els.length>nC){const c=C449.els.pop();c.s.remove();}
+  for(let i=0;i<nC;i++){const cap=Math.min(4,capU-4*i),forma=cap>=3?4:2;let c=C449.els[i];
+    if(!c||c.forma!==forma){const n=c450Coracao(forma);if(c&&c.s.parentNode===C449.lista)C449.lista.replaceChild(n.s,c.s);else C449.lista.appendChild(n.s);C449.els[i]=c=n;}
+    const k0=4*i,cheios=Math.max(0,Math.min(cap,u-k0)),pp=(fr>.03&&u>=k0&&u<k0+cap)?u-k0:-1,est=forma+'|'+cheios+'|'+pp+(i===ult?'b':'');
+    if(est!==c.estado){c.u.forEach((e,j)=>{e.classList.toggle('on',j<cheios);e.classList.toggle('p',j===pp);});c.s.classList.toggle('cheio',cheios>(forma===4?2:1));c.s.classList.toggle('bate',i===ult);c.estado=est;}
+    if(pp>=0)c.u[pp].style.setProperty('--p',fr.toFixed(2));}
+  const antes=C449.meiosAntes,capA=C449.totAntes;
+  if(antes>=0&&C449.iniciado){if(capU>capA&&capA>0){for(let i=Math.floor(capA/4);i<nC;i++)c449Anima(C449.els[i].s,'novo');}
+    else if(u<antes){for(let k=u;k<antes&&k<capU;k++){const c=C449.els[k>>2];if(c&&c.u[k-4*(k>>2)])c449Anima(c.u[k-4*(k>>2)],'sai');}c449Anima(C449.lista,'treme');}
+    else if(u>antes){const vistos=new Set();for(let k=antes;k<u;k++){const c=C449.els[k>>2];if(c&&!vistos.has(c)){vistos.add(c);c449Anima(c.s,'ganha');}}}}
+  if(capU!==C449.totAntes)setTimeout(c449Vizinho,0);C449.meiosAntes=u;C449.totAntes=capU;
+  box.classList.toggle('baixo',u<=2&&u<capU&&!CAV.morto);
+  let S=null,vivas=0,I=null;try{S=cavRoom()&&CAV.salas[cavRoom()];vivas=S?S.lista.filter(k=>k.viva).length:0;I=S?(INI155[S.tipo]||INI155.caveira):null;}catch(e){S=null;}
+  const ach=c449Achados(),N=C449_LUGARES.length;
+  const tit=c450T('Seus corações: ','Your hearts: ','Tus corazones: ')+c450Fmt(u)+c450T(' de ',' of ',' de ')+c450Fmt(capU)+'. '
+    +c450T('Cada golpe ou tiro desbota meio coração — o vermelho vira branco e o branco se apaga —, então cada coração aguenta 4 golpes; fora de combate eles voltam aos poucos. ','Every hit or shot fades half a heart — red turns white, then white goes out — so each heart takes 4 hits; out of combat they come back little by little. ','Cada golpe o disparo destiñe medio corazón — el rojo se vuelve blanco y el blanco se apaga —, así que cada corazón aguanta 4 golpes; fuera de combate vuelven poco a poco. ')
+    +c450T('Meios corações achados: ','Half hearts found: ','Medios corazones encontrados: ')+ach+'/'+N+c449Pista()
+    +c450T(' · meio coração do Bento: ',' · Bento’s half heart: ',' · medio corazón de Bento: ')+(c449Bento()?'✓':'—')+'.'
+    +(WEBMASTER?c450T(' Webmaster: nunca passa de ¼ de coração.',' Webmaster: never drops below ¼ of a heart.',' Webmaster: nunca baja de ¼ de corazón.'):'')+' '
+    +(S&&I?(vivas?vivas+' '+(vivas>1?I.plural:String(I.nome).toLowerCase())+c450T(' nesta sala — Espaço (ou F) dispara o feixe de vento; ',' in this room — Space (or F) fires the wind beam; ',' en esta sala — Espacio (o F) dispara el haz de viento; '):c450T('sala limpa hoje; ','room cleared today; ','sala limpia hoy; ')):'')
+    +(CAV.estado.fogo?c450T('Espaço (ou G) dispara a bola de fogo azul. ','Space (or G) fires the blue fireball. ','Espacio (o G) dispara la bola de fuego azul. '):(S&&I?c450T('a bola de fogo azul acorda quando todas as salas estiverem limpas (','the blue fireball awakens once every room is cleared (','la bola de fuego azul despierta cuando todas las salas estén limpias ('):c450T('A bola de fogo azul acorda quando todas as salas estiverem limpas (','The blue fireball awakens once every room is cleared (','La bola de fuego azul despierta cuando todas las salas estén limpias ('))+cavLimpasN()+'/'+cavSalasTotal()+'). ')
+    +c450T('Cair custa 10 % das moedas.','Falling costs 10% of your coins.','Caer cuesta el 10 % de las monedas.');
+  if(tit!==C449.titulo){C449.titulo=tit;box.title=tit;C449.lista.setAttribute('aria-label',c450T('Corações: ','Hearts: ','Corazones: ')+c450Fmt(u)+c450T(' de ',' of ',' de ')+c450Fmt(capU));}
+  box.classList.toggle('luta',!!(S&&vivas));};
+// o «−¼» do golpe, com um coraçãozinho na cor da camada que se perdeu (vermelho ou branco)
+cavPop152=function(){const box=document.getElementById('hpBox');if(!box)return;const s=document.createElement('b');s.className='hpPop cz449pop';
+  let cor='#e6293c';try{const k=C450.u0-1;if(k>=0){const i=k>>2,cap=Math.min(4,c450Cap()-4*i),j=k-4*i;cor=(cap>=3?j>=2:j>=1)?'#e6293c':'#f4efe9';}}catch(e){}
+  s.innerHTML='−¼<svg viewBox="0 0 16 15" aria-hidden="true"><path fill="'+cor+'" stroke="#2b0c06" stroke-width="1" d="'+C449_D.F+'"/></svg>';box.appendChild(s);setTimeout(()=>{try{s.remove();}catch(e){}},900);};
+{const dn=cavDano;cavDano=function(){try{if(!C449.dentro)C450.u0=Math.floor(Math.min(CAV.hp,CAV.hpMax)/C450.U+1e-6);}catch(e){}return dn.apply(this,arguments);};if(window.__cav)window.__cav.dano=cavDano;}
+
+/* ---- textos: abóbora, coruja, Bento, Diário e o aviso do coração achado ---- */
+try{const P=POD_POR.coruja;if(P)P.desc=c450T('recupera ¾ de coração em 3 s — o companheiro se anima junto','restores ¾ of a heart in 3 s — your companion cheers up too','recupera ¾ de corazón en 3 s — tu compañero se anima también');}catch(e){}
+c449Abobora=function(){const U=ESCORT428.ui;if(!U||!U.use)return;const lab=c450T('Comer abóbora','Eat pumpkin','Comer calabaza')+' ('+ESCORT428.save.pumpkins+') · +1 ❤';if(U.use.textContent!==lab)U.use.textContent=lab;};
+try{for(const tr of C449_TROCAS){if(typeof tr[1]!=='string')continue;tr[1]=tr[1].replace('virou um coração extra (+1 ❤)','virou meio coração extra (+½ ❤)').replace('became an extra heart (+1 ❤)','became an extra half heart (+½ ❤)')
+  .replace('se convirtió en un corazón extra (+1 ❤)','se convirtió en medio corazón extra (+½ ❤)').replace('cada uma recupera 2 corações','cada uma recupera 1 coração').replace('each restores 2 hearts','each restores a whole heart')
+  .replace('cada una recupera 2 corazones','cada una recupera un corazón').replace('−½ ❤','−¼ ❤');}}catch(e){c450Erro('trocas',e);}
+{const nl=npcLines;npcLines=function(n){const r=nl.apply(this,arguments);try{if(r&&typeof r.extra==='string'&&r.extra.indexOf('(+1 ❤)')>=0)r.extra=c450T('Recompensa: meio coração extra (+½ ❤) e 10 abóboras — cada uma recupera 1 coração inteiro.','Reward: an extra half heart (+½ ❤) and 10 pumpkins — each restores a whole heart.','Recompensa: medio corazón extra (+½ ❤) y 10 calabazas — cada una recupera un corazón entero.');}catch(e){}return r;};}
+{const rd=renderDiary;renderDiary=function(){const r=rd.apply(this,arguments);try{const el=document.getElementById('diarioAgora');const dt=el&&[...el.querySelectorAll('dt')].find(d=>/^❤/.test(d.textContent.trim()));const dd=dt&&dt.nextElementSibling;
+    if(dd&&dd.tagName==='DD'){const capU=c450Cap(),u=Math.floor(Math.min(CAV.hp,CAV.hpMax)/C450.U+1e-6),ach=c449Achados(),N=C449_LUGARES.length;
+      dd.innerHTML='<b>'+c450Fmt(u)+c450T(' de ',' of ',' de ')+c450Fmt(capU)+'</b> · '+c450T('cada coração aguenta 4 golpes: o vermelho vira branco e o branco se apaga, metade por golpe · meios corações achados: ','each heart takes 4 hits: red turns white and white goes out, half per hit · half hearts found: ','cada corazón aguanta 4 golpes: el rojo se vuelve blanco y el blanco se apaga, mitad por golpe · medios corazones encontrados: ')
+        +'<b>'+ach+'/'+N+'</b>'+(ach<N?c449Pista()+c450T(' (brilham em cantos afastados, longe da entrada; dois completam um coração)',' (they glow in out-of-the-way corners, far from the entrance; two make a whole heart)',' (brillan en rincones apartados, lejos de la entrada; dos completan un corazón)'):c450T(' — todos!',' — all of them!',' — ¡todos!'))
+        +c450T(' · meio coração do Bento: ',' · Bento’s half heart: ',' · medio corazón de Bento: ')+(c449Bento()?'✓':c450T('leve-o para casa','take him home','llévalo a casa'));}}catch(e){c450Erro('diário',e);}return r;};}
+c449Pega=function(s,it){C449.save.achados[s.id]=Date.now();c449Grava();it.pego=.001;c449Recalc(true);try{c449Explode(it);}catch(e){}try{sfx('coracao449');}catch(e){}
+  const capU=c450Cap(),ach=c449Achados(),N=C449_LUGARES.length,tot=c450Fmt(capU);
+  showToast(c450T('❤ Meio coração extra! ','❤ Extra half heart! ','❤ ¡Medio corazón extra! ')
+    +(capU%4===0?c450T('Ele completou um coração: agora você tem '+tot+' corações, todos cheios. ','It completed a heart: you now have '+tot+' hearts, all full. ','Completó un corazón: ahora tienes '+tot+' corazones, todos llenos. ')
+      :c450T('Agora você tem '+tot+' corações, todos cheios — mais uma metade completa o último. ','You now have '+tot+' hearts, all full — one more half completes the last one. ','Ahora tienes '+tot+' corazones, todos llenos: otra mitad completa el último. '))
+    +c450T('Achados: ','Found: ','Encontrados: ')+ach+'/'+N+(ach<N?c450T(' · há outros escondidos pelo castelo.',' · more are hidden around the castle.',' · hay otros escondidos por el castillo.'):c450T(' · você achou todos!',' · you found them all!',' · ¡los encontraste todos!')),{big:true,ms:7000,queue:true});};
+
+/* ---- no mundo, o achado agora é MEIO coração: a metade esquerda, com o aro dourado contornando também o corte ---- */
+function c450Forma(){const s=new THREE.Shape();s.moveTo(5,5);s.bezierCurveTo(5,5,4,0,0,0);s.bezierCurveTo(-6,0,-6,7,-6,7);s.bezierCurveTo(-6,11,-3,15.4,5,19);s.lineTo(5,5);return s;}
+c449Geo=function(){if(C450.geo)return C450.geo;const sh=c450Forma(),k=.029;
+  const cor=new THREE.ExtrudeGeometry(sh,{depth:3.4,bevelEnabled:true,bevelThickness:1.8,bevelSize:1.5,bevelSegments:4,curveSegments:22});cor.center();cor.rotateZ(Math.PI);cor.scale(k,k,k);
+  const aro=new THREE.ExtrudeGeometry(sh,{depth:1.1,bevelEnabled:true,bevelThickness:.7,bevelSize:2.8,bevelSegments:3,curveSegments:22});aro.center();aro.rotateZ(Math.PI);aro.scale(k*1.02,k*1.02,k*1.02);
+  C450.geo={cor,aro};return C450.geo;};
+try{for(const id in C449.itens){const it=C449.itens[id];if(it&&it.g&&it.g.parent)it.g.parent.remove(it.g);}C449.itens={};}catch(e){}
+
+try{C449.titulo='';cavHud();}catch(e){c450Erro('início',e);}
+window.__coracoes450={estado:C450,fmt:c450Fmt,cap:c450Cap,coracoes:()=>c450Fmt(c450Cap())};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
