@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v448</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v449</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -56897,6 +56897,229 @@ function i448Tick(dt){if(CUR!=='room'||ROOM!==ROOMS.adv||document.hidden)return;
  // o botão de rubis explica onde está a ampulheta agora
  try{const e=document.getElementById('ruby422Hud');if(e){const old=e.onclick;e.onclick=function(){if(RUBY422.data.donated>=1000&&GEAR.pet&&GEAR.pet.userData.pet==='dragon422'){egg422Open(true);return;}showToast(i448T('Leve os rubis ao ovo ao lado da porta de Fantasia: 1000 chocam o dragão e mais 600 fazem-no crescer até 4× — o tamanho que derrete o portão do Torreão. Cada cristal vale 10 rubis; eles ficam nos dois primeiros andares. As ampulhetas que encurtam o retorno estão na Ilha das Moedas (Aventura) e na Galeria.','Bring rubies to the egg beside the Fantasy door: 1000 hatch the dragon and 600 more grow it to 4× — the size that melts the Keep gate. Each crystal is worth 10 rubies; they lie on the first two floors. The hourglasses that shorten the respawn are on Coin Island (Adventure) and in the Gallery.')+' '+ruby422Text('Retorno em ','Respawn every ')+RUBY422.data.hours+'h.');};}}catch(e){}}
 window.__ilha448={estado:ILHA448,montar:i448Build};
+
+/* ===================== v449 · CORAÇÕES NO LUGAR DO SANGUE (pedido do Luiz: «Troque o sangue do personagem por
+   coraçõezinhos. Cada tiro ou golpe tomado tira metade do coração. Reveja o sistema de aumentar o sangue no jogo,
+   encontrando corações extras») =====================
+   · A barra de vida virou uma fileira de corações (até 10 por linha). Por dentro a vida continua em pontos — 1 coração
+     = 20, meio coração = 10 —, então todo o código antigo de cura e de morte segue valendo.
+   · Cada golpe ou tiro que acerta tira EXATAMENTE meio coração, venha de onde vier (osso, bala, garra, pisão, mordida do
+     Baú Monstro, multiplicador do 6.º andar): o dano passa pela corrente antiga só para saber SE acertou (escudo,
+     páginas do Dragonete, dragão dos rubis, prólogo e modo pacífico continuam bloqueando) e então tira 10 pontos.
+     Na rampa da primeira luta da Fantasia e no Webmaster a vida não passa de meio coração.
+   · Curas enchem meio coração por vez: o descanso fora de combate, a fada, o Canto da Coruja (agora 1 coração e meio)
+     e o Dragonete juntam pontos num «cofrinho» e cada 10 pontos acendem a próxima metade — que aparece enchendo,
+     clarinha, dentro do coração. A abóbora do Bento cura 2 corações.
+   · A vida máxima não vem mais dos chefes (eles seguem dando poderes, kits e moedas). Ela cresce com CORAÇÕES EXTRAS:
+     o leitor começa com 3 e acha mais 8 escondidos pelo castelo — um no Hall dos Gêneros, um na Ilha das Moedas (junto
+     ao naufrágio) e um no fundo de uma sala de cada andar, guardado pelos inimigos: Mistério e Investigação (2.º),
+     Contos (3.º), Mitologia (4.º), Cordel (5.º), Noir (6.º) e Teatro (7.º). A abóbora dourada do Bento vira o 9.º.
+     Cada coração extra soma um coração e enche todos; o Diário diz em que andares ainda falta achar (sem dizer a sala).
+   · Webmaster: também começa com 3 e acha os corações como o leitor (para testar); ?coracoes=0 apaga os achados e
+     ?coracoes=todos entrega todos. */
+const C449={KEY:SKEY('mundo.coracoes449.v1'),BASE:3,PTS:20,MEIO:10,save:{achados:{}},acc:0,dentro:false,iniciado:false,
+  els:[],lista:null,meiosAntes:-1,totAntes:-1,sig:'',titulo:'',itens:{},fx:[],erros:[],ultimo:0};
+const C449_D={F:'M8 14.3C6.6 13.3 1 9.4 1 5.2 1 2.8 2.8 1 5 1c1.4 0 2.5.7 3 1.9C8.5 1.7 9.6 1 11 1c2.2 0 4 1.8 4 4.2 0 4.2-5.6 8.1-7 9.1z',
+  E:'M8 14.3C6.6 13.3 1 9.4 1 5.2 1 2.8 2.8 1 5 1c1.4 0 2.5.7 3 1.9L8.3 3.3 8.3 14.1z',D:'M8 14.3c1.4-1 7-4.9 7-9.1C15 2.8 13.2 1 11 1c-1.4 0-2.5.7-3 1.9L7.7 3.3 7.7 14.1z',
+  H:'M3.3 4.7c.2-1.1 1-1.8 2-1.9'};
+// onde moram os oito corações extras (coordenadas do mundo; a altura vem do chão de cada lugar)
+// (as salas têm todas o mesmo desenho: o coração fica no fundo, longe da entrada, perto dos inimigos que a guardam)
+const C449_LUGARES=[
+  {id:'hall1',onde:'hall',n:1,andar:1,x:-3.09,z:-17.53},   // junto à parede sul, sob o vitral, longe do conto da Coruja, das portas, do ovo e da escada
+  {id:'ilha',onde:'ilha294',andar:1,x:26.37,z:-133.23},
+  {id:'a2',onde:'sala',sala:'mys',genero:'ilha',andar:2,x:10.35,z:-18.45},
+  {id:'a3',onde:'sala',sala:'bosque',genero:'bosque',andar:3,x:-9.75,z:-18.45},
+  {id:'a4',onde:'sala',sala:'mitologia',genero:'mitologia',andar:4,x:16.95,z:-11.25},
+  {id:'a5',onde:'sala',sala:'cordel',genero:'cordel',andar:5,x:-.15,z:-18.45},
+  {id:'a6',onde:'sala',sala:'noir',genero:'noir',andar:6,x:10.5,z:-4.8},
+  {id:'a7',onde:'sala',sala:'teatro',genero:'teatro',andar:7,x:7.35,z:-18.75}
+];
+// pista para o Diário: em que andares ainda há coração escondido (sem dizer a sala)
+function c449Pista(){const falta=C449_LUGARES.filter(s=>!C449.save.achados[s.id]);if(!falta.length)return '';const ilha=falta.some(s=>s.onde==='ilha294'),and=[...new Set(falta.filter(s=>s.onde!=='ilha294').map(s=>s.andar))].sort((a,b)=>a-b);
+  const ord=n=>c449T(n+'º',n+(n===1?'st':n===2?'nd':n===3?'rd':'th'),n+'º'),lista=and.map(ord),k=lista.length;
+  const junta=lista.length>1?lista.slice(0,-1).join(', ')+c449T(' e ',' and ',' y ')+lista[k-1]:(lista[0]||'');
+  const andares=k?c449T('no '+junta+(k>1?' andares':' andar'),'on the '+junta+(k>1?' floors':' floor'),(k>1?'en los pisos ':'en el piso ')+junta):'';
+  return c449T(' · ainda escondidos: ',' · still hidden: ',' · aún escondidos: ')+andares+(ilha?(k?c449T(' e ',' and ',' y '):'')+c449T('na Ilha das Moedas','on Coin Island','en la Isla de las Monedas'):'');}
+function c449T(pt,en,es){try{return text428(pt,en,es);}catch(e){return pt;}}
+function c449Grava(){try{localStorage.setItem(C449.KEY,JSON.stringify(C449.save));}catch(e){}}
+function c449Load(){try{const d=JSON.parse(localStorage.getItem(C449.KEY)||'null');if(d&&d.achados&&typeof d.achados==='object')C449.save.achados={...d.achados};}catch(e){}
+  const q=location.search+location.hash;
+  if(/[?&#]coracoes=0(?![0-9a-z])/i.test(q))C449.save.achados={};
+  else if(/[?&#]coracoes=todos/i.test(q))for(const s of C449_LUGARES)C449.save.achados[s.id]=C449.save.achados[s.id]||Date.now();
+  c449Grava();}
+function c449Achados(){let n=0;for(const s of C449_LUGARES)if(C449.save.achados[s.id])n++;return n;}
+function c449Bento(){try{return ESCORT428.save.awarded===true?1:0;}catch(e){return 0;}}
+function c449Total(){return C449.BASE+c449Achados()+c449Bento();}
+function c449Fmt(meios){const n=Math.floor(meios/2),h=meios%2;return (n?String(n):(h?'':'0'))+(h?'½':'');}
+function c449Recalc(encher){const max=c449Total()*C449.PTS,antes=CAV.hpMax;if(!C449.iniciado||!(antes>0))encher=true;CAV.hpMax=max;
+  if(encher){CAV.hp=max;C449.acc=0;}else if(max>antes&&!CAV.morto)CAV.hp=Math.min(max,CAV.hp+(max-antes));
+  if(CAV.hp>max)CAV.hp=max;try{cavHud();}catch(e){}}
+
+/* ---- o HUD: corações em SVG (metades independentes, borda escura, brilho, metade enchendo) ---- */
+function c449Css(){if(document.getElementById('coracoes449'))return;const st=document.createElement('style');st.id='coracoes449';st.textContent=
+  '#hpBox.cz449{gap:0;padding:5px 7px 5px 8px;align-items:center}'+
+  '#hpBox.cz449>span:not(.czL),#hpBox.cz449 .hpBar,#hpBox.cz449 #hpTxt{display:none!important}'+
+  '#hpBox .czL{display:flex;flex-wrap:wrap;gap:2px;max-width:214px}'+
+  '#hpBox svg.cz{width:16px;height:15px;display:block;overflow:visible;filter:drop-shadow(0 1px 1px rgba(0,0,0,.75));transform-origin:50% 60%}'+
+  '#hpBox svg.cz .czF{fill:rgba(48,20,15,.82);stroke:rgba(233,220,196,.42);stroke-width:1}'+
+  '#hpBox svg.cz .czE,#hpBox svg.cz .czD{fill:url(#cz449g);opacity:0}'+
+  '#hpBox svg.cz .czE.on,#hpBox svg.cz .czD.on{opacity:1}'+
+  '#hpBox svg.cz .czE.p,#hpBox svg.cz .czD.p{fill:#ff9eab;opacity:calc(.14 + .55*var(--p,0))}'+
+  '#hpBox svg.cz .czB{fill:none;stroke:#2b0c06;stroke-width:1.05;stroke-linejoin:round}'+
+  '#hpBox svg.cz .czH{fill:none;stroke:rgba(255,255,255,.8);stroke-width:1.25;stroke-linecap:round;opacity:0}'+
+  '#hpBox svg.cz.cheio .czH{opacity:1}'+
+  '#hpBox.baixo svg.cz.bate{animation:cz449bate .95s ease-in-out infinite}'+
+  '@keyframes cz449bate{0%,100%{transform:scale(1)}16%{transform:scale(1.24)}32%{transform:scale(1)}48%{transform:scale(1.13)}64%{transform:scale(1)}}'+
+  '#hpBox .hpPop.cz449pop{display:flex;align-items:center;gap:3px}#hpBox .hpPop.cz449pop svg{width:11px;height:10px}'+
+  '@media (prefers-reduced-motion:reduce){#hpBox.baixo svg.cz.bate{animation:none}}';
+  document.head.appendChild(st);
+  if(!document.getElementById('cz449g')){const d=document.createElement('div');d.innerHTML='<svg width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true" focusable="false"><defs><linearGradient id="cz449g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff8c97"/><stop offset=".42" stop-color="#e6293c"/><stop offset="1" stop-color="#990c1d"/></linearGradient></defs></svg>';document.body.appendChild(d.firstChild);}}
+// o «Convidar» dividia o mesmo lugar da barra de vida (top 350px) e ficava escondido atrás dela; agora fica logo à direita dos corações
+function c449Vizinho(){try{const box=document.getElementById('hpBox'),bv=document.getElementById('btnVisita');if(!box||!bv||bv.parentNode!==document.body)return;
+  const r=box.getBoundingClientRect(),q=bv.getBoundingClientRect();const lado=r.width>0&&Math.abs(r.top-q.top)<r.height;const want=lado?Math.round(r.right+8)+'px':'';if(bv.style.left!==want)bv.style.left=want;}catch(e){}}
+function c449Coracao(){const NS='http://www.w3.org/2000/svg',s=document.createElementNS(NS,'svg');s.setAttribute('viewBox','0 0 16 15');s.setAttribute('class','cz');s.setAttribute('aria-hidden','true');
+  const p=(c,d)=>{const e=document.createElementNS(NS,'path');e.setAttribute('d',d);e.setAttribute('class',c);s.appendChild(e);return e;};
+  p('czF',C449_D.F);const e=p('czE',C449_D.E),d=p('czD',C449_D.D);p('czH',C449_D.H);p('czB',C449_D.F);return {s,e,d,estado:''};}
+function c449Monta(box){if(C449.lista&&C449.lista.parentNode===box)return true;c449Css();box.classList.add('cz449');let L=box.querySelector('.czL');
+  if(!L){L=document.createElement('span');L.className='czL';L.setAttribute('role','img');box.insertBefore(L,box.firstChild);}L.textContent='';C449.lista=L;C449.els=[];C449.meiosAntes=-1;C449.totAntes=-1;return true;}
+function c449Anima(el,tipo){try{if(!el||!el.animate)return;
+  if(tipo==='sai')el.animate([{opacity:1},{opacity:1,offset:.25},{opacity:0}],{duration:560,easing:'ease-out'});
+  else if(tipo==='treme')el.animate([{transform:'translateX(0)'},{transform:'translateX(-3px)'},{transform:'translateX(3px)'},{transform:'translateX(-2px)'},{transform:'translateX(0)'}],{duration:320});
+  else if(tipo==='ganha')el.animate([{transform:'scale(1)'},{transform:'scale(1.32)'},{transform:'scale(1)'}],{duration:380,easing:'ease-out'});
+  else if(tipo==='novo')el.animate([{transform:'scale(.2)',filter:'drop-shadow(0 0 0 rgba(255,210,122,0))'},{transform:'scale(1.7)',filter:'drop-shadow(0 0 6px rgba(255,210,122,1))',offset:.45},{transform:'scale(1)',filter:'drop-shadow(0 1px 1px rgba(0,0,0,.75))'}],{duration:1100,easing:'ease-out'});}catch(e){}}
+cavHud=function(){if(C449.dentro)return;const box=document.getElementById('hpBox');if(!box)return;try{c449Monta(box);}catch(e){return;}
+  const tot=Math.max(1,Math.round(CAV.hpMax/C449.PTS)),hp=Math.max(0,Math.min(CAV.hp,CAV.hpMax)),meios=Math.min(tot*2,Math.floor(hp/C449.MEIO+1e-6));
+  const fr=meios>=tot*2||CAV.morto?0:Math.max(0,Math.min(.97,((hp-meios*C449.MEIO)+C449.acc)/C449.MEIO));
+  while(C449.els.length<tot){const c=c449Coracao();C449.lista.appendChild(c.s);C449.els.push(c);}
+  while(C449.els.length>tot){const c=C449.els.pop();c.s.remove();}
+  const ult=Math.ceil(meios/2)-1;
+  for(let i=0;i<tot;i++){const c=C449.els[i],a=2*i,b=a+1,eOn=meios>a,dOn=meios>b,eP=!eOn&&meios===a&&fr>.03,dP=eOn&&!dOn&&meios===b&&fr>.03;
+    const est=(eOn?'1':eP?'p':'0')+(dOn?'1':dP?'p':'0')+(i===ult?'b':'');
+    if(est!==c.estado){c.e.classList.toggle('on',eOn);c.e.classList.toggle('p',eP);c.d.classList.toggle('on',dOn);c.d.classList.toggle('p',dP);c.s.classList.toggle('cheio',eOn&&dOn);c.s.classList.toggle('bate',i===ult);c.estado=est;}
+    if(eP)c.e.style.setProperty('--p',fr.toFixed(2));if(dP)c.d.style.setProperty('--p',fr.toFixed(2));}
+  const antes=C449.meiosAntes,totA=C449.totAntes;
+  if(antes>=0&&C449.iniciado){if(tot>totA&&totA>0){for(let i=totA;i<tot;i++)c449Anima(C449.els[i].s,'novo');}
+    else if(meios<antes){for(let k=meios;k<antes&&k<tot*2;k++){const c=C449.els[k>>1];if(c)c449Anima(k%2?c.d:c.e,'sai');}c449Anima(C449.lista,'treme');}
+    else if(meios>antes){const vistos=new Set();for(let k=antes;k<meios;k++){const c=C449.els[k>>1];if(c&&!vistos.has(c)){vistos.add(c);c449Anima(c.s,'ganha');}}}}
+  if(tot!==C449.totAntes)setTimeout(c449Vizinho,0);C449.meiosAntes=meios;C449.totAntes=tot;
+  box.classList.toggle('baixo',meios<=2&&meios<tot*2&&!CAV.morto);
+  let S=null,vivas=0,I=null;try{S=cavRoom()&&CAV.salas[cavRoom()];vivas=S?S.lista.filter(k=>k.viva).length:0;I=S?(INI155[S.tipo]||INI155.caveira):null;}catch(e){S=null;}
+  const ach=c449Achados(),N=C449_LUGARES.length;
+  const tit=c449T('Seus corações: ','Your hearts: ','Tus corazones: ')+c449Fmt(meios)+c449T(' de ',' of ',' de ')+tot+'. '
+    +c449T('Cada golpe ou tiro tira meio coração; fora de combate eles voltam aos poucos. ','Every hit or shot takes half a heart; out of combat they come back little by little. ','Cada golpe o disparo quita medio corazón; fuera de combate vuelven poco a poco. ')
+    +c449T('Corações extras achados: ','Extra hearts found: ','Corazones extra encontrados: ')+ach+'/'+N+c449Pista()
+    +c449T(' · coração do Bento: ',' · Bento’s heart: ',' · corazón de Bento: ')+(c449Bento()?'✓':'—')+'.'
+    +(WEBMASTER?c449T(' Webmaster: nunca passa de meio coração.',' Webmaster: never drops below half a heart.',' Webmaster: nunca baja de medio corazón.'):'')+' '
+    +(S&&I?(vivas?vivas+' '+(vivas>1?I.plural:String(I.nome).toLowerCase())+c449T(' nesta sala — Espaço (ou F) dispara o feixe de vento; ',' in this room — Space (or F) fires the wind beam; ',' en esta sala — Espacio (o F) dispara el haz de viento; '):c449T('sala limpa hoje; ','room cleared today; ','sala limpia hoy; ')):'')
+    +(CAV.estado.fogo?c449T('Espaço (ou G) dispara a bola de fogo azul. ','Space (or G) fires the blue fireball. ','Espacio (o G) dispara la bola de fuego azul. '):(S&&I?c449T('a bola de fogo azul acorda quando todas as salas estiverem limpas (','the blue fireball awakens once every room is cleared (','la bola de fuego azul despierta cuando todas las salas estén limpias ('):c449T('A bola de fogo azul acorda quando todas as salas estiverem limpas (','The blue fireball awakens once every room is cleared (','La bola de fuego azul despierta cuando todas las salas estén limpias ('))+cavLimpasN()+'/'+cavSalasTotal()+'). ')
+    +c449T('Cair custa 10 % das moedas.','Falling costs 10% of your coins.','Caer cuesta el 10 % de las monedas.');
+  if(tit!==C449.titulo){C449.titulo=tit;box.title=tit;C449.lista.setAttribute('aria-label',c449T('Corações: ','Hearts: ','Corazones: ')+c449Fmt(meios)+c449T(' de ',' of ',' de ')+tot);}
+  box.classList.toggle('luta',!!(S&&vivas));};
+cavPop152=function(){const box=document.getElementById('hpBox');if(!box)return;const s=document.createElement('b');s.className='hpPop cz449pop';
+  s.innerHTML='−½<svg viewBox="0 0 16 15" aria-hidden="true"><path fill="#e6293c" stroke="#2b0c06" stroke-width="1" d="'+C449_D.F+'"/></svg>';box.appendChild(s);setTimeout(()=>{try{s.remove();}catch(e){}},900);};
+
+/* ---- o dano: a corrente antiga decide SE acertou; o golpe sempre tira meio coração ---- */
+{const dano0=cavDano;cavDano=function(n){if(C449.dentro||CAV.morto||!(CAV.hp>0))return dano0.apply(this,arguments);
+  const hp0=CAV.hp,BIG=1e6;let levou=false;C449.dentro=true;
+  try{CAV.hp=hp0+BIG;dano0.apply(this,arguments);levou=Number.isFinite(CAV.hp)&&CAV.hp<hp0+BIG-1e-6;}
+  catch(e){if(C449.erros.length<20)C449.erros.push('dano: '+(e&&e.message||e));}
+  finally{C449.dentro=false;CAV.hp=hp0;}
+  if(!levou){try{cavHud();}catch(e){}return;}
+  let rampa=false;try{rampa=!!(PRI5.rampa&&cavRoom()==='fant');}catch(e){}
+  const minimo=(WEBMASTER||rampa)?C449.MEIO:0,meios=Math.floor(Math.min(hp0,CAV.hpMax)/C449.MEIO+1e-6);
+  CAV.hp=Math.min(hp0,Math.max(minimo,(meios-1)*C449.MEIO));C449.acc=0;C449.ultimo=performance.now();
+  if(rampa&&!PRI5.dicaVida&&CAV.hp<CAV.hpMax*.5){PRI5.dicaVida=1;try{showToast(c449T('❤️ Poucos corações! ','❤️ Few hearts left! ','❤️ ¡Quedan pocos corazones! ')+(TOUCHDEV?c449T('Toque em ⚔','Tap ⚔','Toca ⚔'):c449T('Espaço ou F','Space or F','Espacio o F'))+c449T(' sopra o Feixe de Vento nos dragões — ou saia pela porta da clareira e respire.',' blows the Wind Beam at the dragons — or leave through the clearing door and catch your breath.',' sopla el Haz de Viento contra los dragones — o sal por la puerta del claro y respira.'),{big:true,ms:6500});}catch(e){}}
+  try{cavHud();}catch(e){}
+  if(CAV.hp<=0&&!CAV.morto){try{sfx('morteLeitor');}catch(e){}cavMorrer();}};
+ if(window.__cav)window.__cav.dano=cavDano;}
+
+/* ---- curas em metades: o que entra quebrado vai para o cofrinho; cada 10 pontos acendem meio coração ---- */
+function c449Quantiza(){if(C449.dentro)return;const max=CAV.hpMax;let hp=CAV.hp;if(!Number.isFinite(hp)){CAV.hp=max;C449.acc=0;return;}
+  if(hp>=max-1e-6){if(hp!==max)CAV.hp=max;C449.acc=0;return;}if(hp<0){CAV.hp=0;return;}
+  const base=Math.floor(hp/C449.MEIO+1e-6)*C449.MEIO,fr=hp-base;if(fr>1e-6){CAV.hp=base;C449.acc+=fr;}
+  while(C449.acc>=C449.MEIO-1e-6&&CAV.hp<max){CAV.hp=Math.min(max,CAV.hp+C449.MEIO);C449.acc=Math.max(0,C449.acc-C449.MEIO);}
+  if(CAV.hp>=max){CAV.hp=max;C449.acc=0;}}
+{const pc=podCoruja;podCoruja=function(){const r=pc.apply(this,arguments);try{if(CAV.cura199){CAV.cura199.resta=30;CAV.cura199.t=3.7;}}catch(e){}return r;};}
+try{const P=POD_POR.coruja;if(P)P.desc=c449T('recupera 1 coração e meio em 3 s — o companheiro se anima junto','restores 1½ hearts in 3 s — your companion cheers up too','recupera 1 corazón y medio en 3 s — tu compañero se anima también');}catch(e){}
+// a abóbora do Bento cura 2 corações; a dourada (missão completa) é o coração extra do Bento
+escort428Consume=function(){const s=ESCORT428.save;if(s.pumpkins<=0||CAV.hp>=CAV.hpMax||CAV.morto)return false;const cura=Math.min(2*C449.PTS,CAV.hpMax-CAV.hp);
+  if(!escort428Save({...s,pumpkins:s.pumpkins-1}))return false;CAV.hp=Math.min(CAV.hpMax,CAV.hp+cura);c449Quantiza();cavHud();try{escort428UI();}catch(e){}try{sfx('cura');}catch(e){}
+  showToast(c449T('🎃 Abóbora: +','🎃 Pumpkin: +','🎃 Calabaza: +')+c449Fmt(Math.round(cura/C449.MEIO))+' ❤');return true;};
+try{if(ESCORT428.ui&&ESCORT428.ui.use)ESCORT428.ui.use.onclick=escort428Consume;if(window.__escort428)window.__escort428.consume=escort428Consume;}catch(e){}
+escort428Bonus=function(){ESCORT428.applied=ESCORT428.save.awarded?C449.PTS:0;if(C449.iniciado)c449Recalc(false);};
+function c449Abobora(){const U=ESCORT428.ui;if(!U||!U.use)return;const lab=c449T('Comer abóbora','Eat pumpkin','Comer calabaza')+' ('+ESCORT428.save.pumpkins+') · +2 ❤';if(U.use.textContent!==lab)U.use.textContent=lab;}
+{const eu=escort428UI;escort428UI=function(){const r=eu.apply(this,arguments);try{c449Abobora();}catch(e){}return r;};
+ const fu=farm428UI;farm428UI=function(){const r=fu.apply(this,arguments);try{c449Abobora();}catch(e){}return r;};
+ const nl=npcLines;npcLines=function(n){const r=nl.apply(this,arguments);try{if(r&&typeof r.extra==='string'&&/\+20 (de vida máxima|maximum health)/.test(r.extra))r.extra=c449T('Recompensa: um coração extra (+1 ❤) e 10 abóboras — cada uma recupera 2 corações.','Reward: an extra heart (+1 ❤) and 10 pumpkins — each restores 2 hearts.','Recompensa: un corazón extra (+1 ❤) y 10 calabazas — cada una recupera 2 corazones.');}catch(e){}return r;};}
+// os chefes deixam de somar vida máxima (os poderes, kits e moedas continuam)
+master392Apply=function(){MASTER392.applied=Object.keys(MASTER392.rewards).reduce((n,id)=>n+(MASTER392.earned[id]?(MASTER392.rewards[id].hp||0):0),0);if(C449.iniciado)c449Recalc(false);};
+// textos antigos que falavam de «vida máxima» e «HP»
+const C449_TROCAS=[[/🏆 (.+?) · \+\d+ de vida máxima e (.+?) liberado!/,'🏆 $1 · $2 liberado!'],[/🏆 (.+?) · \+\d+ maximum HP and (.+?) liberado!/,'🏆 $1 · $2 unlocked!'],
+  [/\+\d+ de vida máxima, /,''],[/\+\d+ maximum health, /,''],
+  ['A abóbora dourada deu +20 de vida máxima. Você recebeu também 10 abóboras: cada uma recupera até 35 HP.','A abóbora dourada virou um coração extra (+1 ❤). Você recebeu também 10 abóboras: cada uma recupera 2 corações.'],
+  ['The golden pumpkin granted +20 maximum health. You also received 10 pumpkins: each restores up to 35 HP.','The golden pumpkin became an extra heart (+1 ❤). You also received 10 pumpkins: each restores 2 hearts.'],
+  ['La calabaza dorada te dio +20 de vida máxima. También recibiste 10 calabazas: cada una recupera hasta 35 HP.','La calabaza dorada se convirtió en un corazón extra (+1 ❤). También recibiste 10 calabazas: cada una recupera 2 corazones.'],
+  [/Mordida: −\d+ de vida/,'Mordida: −½ ❤'],[/Bite: −\d+ health/,'Bite: −½ ❤']];
+function c449Texto(m){if(typeof m!=='string'||!/vida|health|HP/.test(m))return m;for(const [a,b] of C449_TROCAS)m=m.replace(a,b);return m;}
+{const st=showToast;showToast=function(msg,opt){try{msg=c449Texto(msg);}catch(e){}return st.call(this,msg,opt);};}
+// no Diário: uma linha para os corações
+{const rd=renderDiary;renderDiary=function(){const r=rd.apply(this,arguments);try{const el=document.getElementById('diarioAgora');if(el){const tot=Math.round(CAV.hpMax/C449.PTS),ach=c449Achados(),N=C449_LUGARES.length;
+    const html='<dt>❤ '+c449T('Corações','Hearts','Corazones')+'</dt><dd><b>'+c449Fmt(Math.floor(Math.min(CAV.hp,CAV.hpMax)/C449.MEIO+1e-6))+c449T(' de ',' of ',' de ')+tot+'</b> · '+c449T('cada golpe ou tiro tira meio coração · corações extras achados: ','each hit or shot takes half a heart · extra hearts found: ','cada golpe o disparo quita medio corazón · corazones extra encontrados: ')+'<b>'+ach+'/'+N+'</b>'+(ach<N?c449Pista()+c449T(' (brilham em cantos afastados, longe da entrada)',' (they glow in out-of-the-way corners, far from the entrance)',' (brillan en rincones apartados, lejos de la entrada)'):c449T(' — todos!',' — all of them!',' — ¡todos!'))+c449T(' · coração do Bento: ',' · Bento’s heart: ',' · corazón de Bento: ')+(c449Bento()?'✓':c449T('leve-o para casa','take him home','llévalo a casa'))+'</dd>';
+    const dd=el.querySelector('dd');if(dd)dd.insertAdjacentHTML('afterend',html);else el.insertAdjacentHTML('afterbegin',html);}}catch(e){}return r;};}
+
+/* ---- os corações extras no mundo: coração vermelho com aro dourado, brilho, faíscas e uma coluna de luz bem fraca ---- */
+let C449_GEO=null;
+function c449Forma(){const s=new THREE.Shape();s.moveTo(5,5);s.bezierCurveTo(5,5,4,0,0,0);s.bezierCurveTo(-6,0,-6,7,-6,7);s.bezierCurveTo(-6,11,-3,15.4,5,19);s.bezierCurveTo(12,15.4,16,11,16,7);s.bezierCurveTo(16,7,16,0,10,0);s.bezierCurveTo(7,0,5,5,5,5);return s;}
+function c449Geo(){if(C449_GEO)return C449_GEO;const sh=c449Forma();
+  const cor=new THREE.ExtrudeGeometry(sh,{depth:3.4,bevelEnabled:true,bevelThickness:1.8,bevelSize:1.5,bevelSegments:4,curveSegments:22});cor.center();cor.rotateZ(Math.PI);cor.scale(.024,.024,.024);
+  const aro=new THREE.ExtrudeGeometry(sh,{depth:1.1,bevelEnabled:true,bevelThickness:.7,bevelSize:2.8,bevelSegments:3,curveSegments:22});aro.center();aro.rotateZ(Math.PI);aro.scale(.0245,.0245,.0245);
+  C449_GEO={cor,aro};return C449_GEO;}
+function c449Malha(){const G=c449Geo(),g=new THREE.Group();g.name='Coração extra (v449)';
+  const corM=new THREE.MeshStandardMaterial({color:0xe3263a,emissive:0x8c0716,emissiveIntensity:.95,roughness:.3,metalness:.08});
+  const aroM=new THREE.MeshStandardMaterial({color:0xf1c35a,emissive:0x6a4206,emissiveIntensity:.55,roughness:.28,metalness:.85});
+  const pivo=new THREE.Group();pivo.position.y=1.05;g.add(pivo);const cor=new THREE.Mesh(G.cor,corM),aro=new THREE.Mesh(G.aro,aroM);pivo.add(aro,cor);
+  const brilho=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,color:0xff4d68,transparent:true,opacity:.6,blending:THREE.AdditiveBlending,depthWrite:false}));brilho.scale.set(1.7,1.7,1);brilho.position.y=1.05;g.add(brilho);
+  const chao=new THREE.Mesh(new THREE.CircleGeometry(.85,28),new THREE.MeshBasicMaterial({map:GLOW,color:0xff5a74,transparent:true,opacity:.45,blending:THREE.AdditiveBlending,depthWrite:false}));chao.rotation.x=-Math.PI/2;chao.position.y=.04;g.add(chao);
+  const coluna=new THREE.Mesh(new THREE.CylinderGeometry(.14,.32,2.8,18,1,true),new THREE.MeshBasicMaterial({color:0xff8da2,transparent:true,opacity:.08,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));coluna.position.y=1.4;g.add(coluna);
+  const faiscas=[];for(let i=0;i<7;i++){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,color:i%2?0xffe0e6:0xffc46a,transparent:true,opacity:.8,blending:THREE.AdditiveBlending,depthWrite:false}));const s=.1+(i%3)*.035;sp.scale.set(s,s,1);g.add(sp);faiscas.push({sp,a:i/7*Math.PI*2,r:.42+(i%3)*.08,v:1.1+(i%4)*.25,h:(i%5)*.11});}
+  g.traverse(o=>{o.raycast=()=>{};o.__fusaoMoveu=9;o.castShadow=false;o.receiveShadow=false;o.userData.papelKeep=true;o.userData.papelKeepGeo=true;o.userData.noCam=true;o.userData.fx=true;});
+  g.userData.c449={pivo,brilho,chao,coluna,faiscas};return g;}
+function c449Lugar(s){try{if(s.onde==='hall'){const H=HALLS[s.n];if(CUR!=='hall'||+HALLN!==s.n||!H||!H.scene)return null;return {scene:H.scene,y:0};}
+  if(s.onde==='ilha294'){const R=ROOMS.adv;if(CUR!=='room'||!R||ROOM!==R||!R.scene||typeof ILHA294==='undefined'||!ILHA294.g)return null;return {scene:R.scene,y:i294Floor(s.x,s.z),ilha:true};}
+  const R=ROOMS[s.sala];if(CUR!=='room'||!R||ROOM!==R||!R.scene)return null;return {scene:R.scene,y:R.floorY?R.floorY(s.x,s.z):0};}catch(e){return null;}}
+function c449Item(s,L){let it=C449.itens[s.id];if(it&&it.scene===L.scene&&it.g.parent===L.scene)return it;if(it&&it.g.parent)it.g.parent.remove(it.g);
+  const g=c449Malha();g.position.set(s.x,L.y,s.z);L.scene.add(g);it={g,scene:L.scene,y:L.y,t:Math.random()*6,pego:0};C449.itens[s.id]=it;return it;}
+function c449Explode(it){const T=THREE,p=it.g.position,cena=it.scene;for(let i=0;i<18;i++){const sp=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:i%3?0xff6a84:0xffd27a,transparent:true,opacity:.95,blending:T.AdditiveBlending,depthWrite:false}));const s=.16+Math.random()*.14;sp.scale.set(s,s,1);sp.position.set(p.x,p.y+1.05,p.z);sp.raycast=()=>{};cena.add(sp);
+    const a=Math.random()*Math.PI*2,u=Math.random()*2-1,v=1.6+Math.random()*1.8;C449.fx.push({sp,cena,vx:Math.cos(a)*Math.sqrt(1-u*u)*v,vy:Math.abs(u)*v+1.2,vz:Math.sin(a)*Math.sqrt(1-u*u)*v,t:0,vida:.8+Math.random()*.5,s0:s});}}
+function c449Pega(s,it){C449.save.achados[s.id]=Date.now();c449Grava();it.pego=.001;c449Recalc(true);try{c449Explode(it);}catch(e){}try{sfx('coracao449');}catch(e){}
+  const tot=c449Total(),ach=c449Achados(),N=C449_LUGARES.length;
+  showToast(c449T('❤ Coração extra! Agora você tem ','❤ Extra heart! You now have ','❤ ¡Corazón extra! Ahora tienes ')+tot+c449T(' corações — e todos cheios. ',' hearts — all of them full. ',' corazones, y todos llenos. ')+c449T('Achados: ','Found: ','Encontrados: ')+ach+'/'+N+(ach<N?c449T(' · há outros escondidos pelo castelo.',' · more are hidden around the castle.',' · hay otros escondidos por el castillo.'):c449T(' · você achou todos!',' · you found them all!',' · ¡los encontraste todos!')),{big:true,ms:7000,queue:true});}
+function c449Mundo(dt){const pl=cavPos();
+  for(const s of C449_LUGARES){const it0=C449.itens[s.id];
+    if(C449.save.achados[s.id]&&!(it0&&it0.pego>0)){if(it0&&it0.g.parent){it0.g.parent.remove(it0.g);}continue;}
+    const L=c449Lugar(s);if(!L)continue;const it=c449Item(s,L),U=it.g.userData.c449;it.t+=dt;
+    if(it.pego>0){it.pego+=dt;const k=Math.min(1,it.pego/.75);U.pivo.position.y=1.05+k*1.4;U.pivo.scale.setScalar(Math.max(.01,1-k*k));U.pivo.rotation.y+=dt*14;U.brilho.material.opacity=.6*(1-k);U.chao.material.opacity=.45*(1-k);U.coluna.material.opacity=.08*(1-k);for(const f of U.faiscas)f.sp.material.opacity=.8*(1-k);
+      if(k>=1){it.g.parent&&it.g.parent.remove(it.g);delete C449.itens[s.id];}continue;}
+    const tt=it.t;U.pivo.position.y=1.05+Math.sin(tt*2.1)*.09;U.pivo.rotation.y+=dt*1.7;U.brilho.position.y=U.pivo.position.y;U.brilho.material.opacity=.5+.2*Math.sin(tt*3.3);U.chao.material.opacity=.36+.14*Math.sin(tt*2.1);U.coluna.material.opacity=.06+.04*Math.sin(tt*1.3);
+    for(const f of U.faiscas){f.a+=dt*f.v;f.sp.position.set(Math.cos(f.a)*f.r,U.pivo.position.y-.25+f.h+Math.sin(tt*2+f.a)*.12,Math.sin(f.a)*f.r);f.sp.material.opacity=.45+.4*Math.abs(Math.sin(tt*3+f.a*2));}
+    if(CAV.morto||document.hidden)continue;try{if(uiBlocked())continue;}catch(e){}
+    if(L.ilha){try{if(NAV252.onde!=='ilha294')continue;}catch(e){continue;}}
+    if(Math.hypot(pl.x-s.x,pl.z-s.z)<1.2&&Math.abs((pl.fy||0)-L.y)<1.8)c449Pega(s,it);}
+  for(let i=C449.fx.length-1;i>=0;i--){const f=C449.fx[i];f.t+=dt;f.vy-=3.2*dt;f.sp.position.x+=f.vx*dt;f.sp.position.y+=f.vy*dt;f.sp.position.z+=f.vz*dt;const k=f.t/f.vida;f.sp.material.opacity=.95*Math.max(0,1-k);f.sp.scale.setScalar(f.s0*(1-k*.6));
+    if(k>=1){f.cena.remove(f.sp);try{f.sp.material.dispose();}catch(e){}C449.fx.splice(i,1);}}}
+try{SFX199.coracao449=function(){[67,71,74,79,83].forEach((n,i)=>setTimeout(()=>{try{musHarpa(n,.17);}catch(e){}},i*95));setTimeout(()=>{try{musSino(91,.09);musSino(86,.06);}catch(e){}},520);};}catch(e){}
+
+/* ---- o laço: quantiza as curas, redesenha o HUD quando muda e cuida dos corações espalhados ---- */
+function c449Tick(dt){dt=Math.min(.1,Math.max(0,dt||0));c449Quantiza();
+  C449.viz=(C449.viz||0)+dt;if(C449.viz>1.5){C449.viz=0;c449Vizinho();}
+  const sig=Math.round(CAV.hp)+'|'+CAV.hpMax+'|'+Math.round(C449.acc*2)+'|'+(CAV.morto?1:0);if(sig!==C449.sig){C449.sig=sig;try{cavHud();}catch(e){}}
+  c449Mundo(dt);}
+{const tk=caveirasTick;caveirasTick=function(dt){const r=tk.apply(this,arguments);try{c449Tick(dt);}catch(e){if(C449.erros.length<20)C449.erros.push('tick: '+(e&&e.message||e));}return r;};}
+try{window.addEventListener('resize',()=>setTimeout(c449Vizinho,50));}catch(e){}
+try{c449Load();C449.iniciado=false;c449Recalc(true);C449.iniciado=true;}catch(e){C449.erros.push('início: '+(e&&e.message||e));}
+window.__coracoes449={estado:C449,lugares:C449_LUGARES,recalc:c449Recalc,total:c449Total,achados:c449Achados,texto:c449Texto,pista:c449Pista,
+  reset(){C449.save.achados={};c449Grava();for(const id in C449.itens){const it=C449.itens[id];if(it.g.parent)it.g.parent.remove(it.g);}C449.itens={};c449Recalc(true);},
+  dar(id){const s=C449_LUGARES.find(o=>o.id===id);if(!s)return false;C449.save.achados[s.id]=Date.now();c449Grava();c449Recalc(true);return true;}};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
