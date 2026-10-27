@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v453</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v454</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -57627,6 +57627,68 @@ if(ASA453.on&&typeof asa253Estreito==='function'){
   {const st=showToast;showToast=function(msg){try{if(typeof msg==='string'&&msg.indexOf('🪽')===0){for(const [a,b] of ASA453_TROCAS)msg=msg.replace(a,b);arguments[0]=msg;}}catch(e){}return st.apply(this,arguments);};}
 }
 window.__asa453=ASA453;
+
+/* ===================== v454 · O VENTO VIRA TIRO (pedido do Luiz: «O golpe inicial e básico que hj é vento precisa ser tipo um
+   tiro, com alcance muito longo») =====================
+   · O poder básico (F, e o Espaço quando a bola de fogo não está pronta) deixa de ser o cone largo de 9 m que acertava na hora:
+     agora é um TIRO — uma bala de vento comprimido (núcleo branco-azulado, halo, rastro fino e três redemoinhos) que sai do
+     livro a 70 m/s e voa até 60 m; o golpe chega junto com a bala. Dano (30), empurrão e recarga (0,5 s) são os de antes.
+   · Clássico: a mira automática passa a enxergar inimigos a até 60 m à frente, desde que a parede não esteja no meio; sem
+     ninguém à frente, vale a regra de sempre (o mais perto, a até 11 m). Combatente: a retícula alcança 60 m e a bala vai
+     até o ponto mirado (inimigo, parede ou 60 m); o crítico na cabeça e a marca da retícula chegam com ela.
+   · Sem luz nova: sprites e um traço aditivo; um anel de vento na saída e faíscas no impacto. */
+const C454={VEL:70,ALCANCE:60,DANO:30,EMPURRA:4.5,tiros:[],geo:null,mats:null,engoleMarca:false,erros:[],stats:{tiros:0,impactos:0,acertos:0}};
+function c454Erro(o,e){if(C454.erros.length<20)C454.erros.push(o+': '+(e&&e.message||e));}
+function c454Ponto(k){let V=null;try{V=c452Volume(k);}catch(e){}const y=k.g?k.g.position.y:0;return {x:k.x,y:y+(V?V.yb:.9),z:k.z};}
+function c454Parede(x,y,z,dx,dy,dz,max){let t=max;try{t=Math.min(t,WORLD.camT(x,y,z,dx,dy,dz,max));}catch(e){}return t;}
+// mira automática de longe: o melhor inimigo à frente (mesma conta do Clássico), até 60 m, com a linha livre de parede
+function c454AlvoLongo(){const S=c452S();if(!S)return null;const pl=cavPos(),a=cavMira(),fx=Math.sin(a),fz=Math.cos(a),y0=(pl.fy||0)+1.15;let best=null,bs=1e9;
+  for(const k of S.lista){if(!k.viva)continue;const dx=k.x-pl.x,dz=k.z-pl.z,d=Math.hypot(dx,dz);if(d>C454.ALCANCE||d<.1)continue;const cos=(dx*fx+dz*fz)/d;if(cos<=.2)continue;
+    const P=c454Ponto(k),ex=P.x-pl.x,ey=P.y-y0,ez=P.z-pl.z,D=Math.hypot(ex,ey,ez)||1;if(c454Parede(pl.x,y0,pl.z,ex/D,ey/D,ez/D,D)<D-.6)continue;
+    const sc=d*(1.7-cos);if(sc<bs){bs=sc;best=k;}}return best;}
+/* ---- a bala ---- */
+function c454Partes(){if(C454.geo)return;const T=THREE;const r=new T.CylinderGeometry(.05,0,1.4,8,1,true);r.rotateX(Math.PI/2);r.translate(0,0,-.7);
+  C454.geo={rastro:r,anel:new T.RingGeometry(.07,.13,28)};
+  C454.mats={rastro:new T.MeshBasicMaterial({color:0xdff4ff,transparent:true,opacity:.8,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide}),
+    nucleo:new T.SpriteMaterial({map:GLOW,color:0xeef9ff,transparent:true,opacity:.95,blending:T.AdditiveBlending,depthWrite:false}),
+    halo:new T.SpriteMaterial({map:GLOW,color:0x79c3ff,transparent:true,opacity:.5,blending:T.AdditiveBlending,depthWrite:false}),
+    gira:new T.SpriteMaterial({map:GLOW,color:0xbfe6ff,transparent:true,opacity:.8,blending:T.AdditiveBlending,depthWrite:false})};}
+function c454Bala(){c454Partes();const T=THREE,g=new T.Group();g.name='Tiro de vento (v454)';
+  const rastro=new T.Mesh(C454.geo.rastro,C454.mats.rastro);g.add(rastro);
+  const nucleo=new T.Sprite(C454.mats.nucleo);nucleo.scale.set(.46,.46,1);g.add(nucleo);const halo=new T.Sprite(C454.mats.halo);halo.scale.set(1.05,1.05,1);g.add(halo);
+  const gira=[];for(let i=0;i<3;i++){const s=new T.Sprite(C454.mats.gira);s.scale.set(.12,.12,1);g.add(s);gira.push(s);}
+  g.traverse(o=>{o.raycast=()=>{};o.castShadow=false;o.userData.fx=true;o.userData.noCam=true;if(o.isSprite)o.layers.set(1);});g.userData.gira=gira;return g;}
+function c454Anel(cena,x,y,z,dir){c454Partes();const T=THREE;const m=new T.Mesh(C454.geo.anel,new T.MeshBasicMaterial({color:0xcfeeff,transparent:true,opacity:.75,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide}));
+  m.position.set(x,y,z);m.rotation.y=dir;m.raycast=()=>{};m.userData.fx=true;m.userData.noCam=true;cena.add(m);return m;}
+// substitui o cone: a bala sai do livro e voa até o alvo (ou até a parede, ou 60 m); o golpe chega com ela
+cavFeixe=function(dir,alvo){try{const R=ROOM;if(!R||!R.scene)return;const pl=cavPos(),fx=Math.sin(dir),fz=Math.cos(dir);let k=alvo&&alvo.viva?alvo:null,ponto=null,crit=false,combate=false;
+    if(typeof C452!=='undefined'&&C452.atacando&&C452.mira){const M=C452.mira;combate=true;k=M.k&&M.k.viva?M.k:null;crit=!!(k&&C452.critK===k);ponto=k&&C452.forcado===k?c454Ponto(k):M.ponto;}
+    else{// Clássico: sem alvo à frente por perto, procura de longe (à frente e com linha livre)
+      const a=cavMira(),ax=Math.sin(a),az=Math.cos(a);const frente=k?((k.x-pl.x)*ax+(k.z-pl.z)*az)/(Math.hypot(k.x-pl.x,k.z-pl.z)||1)>.2:false;
+      if(!k||!frente){const L=c454AlvoLongo();if(L)k=L;}
+      if(k){ponto=c454Ponto(k);dir=Math.atan2(k.x-pl.x,k.z-pl.z);if(!pl.fp){CH.dir=dir;try{syncP();}catch(e){}}}}
+    const dx0=Math.sin(dir),dz0=Math.cos(dir),x0=pl.x+dx0*.5,y0=(pl.fy||0)+1.15,z0=pl.z+dz0*.5;
+    if(!ponto){const L=c454Parede(x0,y0,z0,dx0,0,dz0,C454.ALCANCE);ponto={x:x0+dx0*L,y:y0,z:z0+dz0*L};}
+    const ex=ponto.x-x0,ey=ponto.y-y0,ez=ponto.z-z0,d=Math.max(.3,Math.hypot(ex,ey,ez));
+    const g=c454Bala();g.position.set(x0,y0,z0);R.scene.add(g);g.lookAt(ponto.x,ponto.y,ponto.z);
+    const anel=c454Anel(R.scene,x0,y0,z0,dir);
+    C454.tiros.push({g,anel,scene:R.scene,x0,y0,z0,x1:ponto.x,y1:ponto.y,z1:ponto.z,t:0,T:d/C454.VEL,k,crit,combate,ux:ex/d,uz:ez/d});C454.stats.tiros++;
+    if(combate)C454.engoleMarca=true;   // a marca da retícula espera a bala chegar
+    try{sfx('vento');}catch(e){}}catch(e){c454Erro('tiro',e);}};
+function c454Impacto(o){const P={x:o.x1,y:o.y1,z:o.z1};C454.stats.impactos++;
+  if(o.k&&o.k.viva){C454.stats.acertos++;cavFerir(o.k,C454.DANO*(o.crit?C452.CRIT:1));try{o.k.knock.x+=o.ux*C454.EMPURRA;o.k.knock.z+=o.uz*C454.EMPURRA;}catch(e){}if(o.combate)try{c454MarcaReal(o.crit?2:1);}catch(e){}}
+  for(let q=0;q<10;q++){try{cavFaisca(o.scene,P.x+(Math.random()-.5)*.5,P.y+(Math.random()-.5)*.5,P.z+(Math.random()-.5)*.5,q%2?0x9fd6ff:0xeef9ff,.18+Math.random()*.2,.32+Math.random()*.2);}catch(e){}}}
+function c454Quadro(dt){for(let i=C454.tiros.length-1;i>=0;i--){const o=C454.tiros[i];o.t+=dt;const u=Math.min(1,o.t/o.T);
+    o.g.position.set(o.x0+(o.x1-o.x0)*u,o.y0+(o.y1-o.y0)*u,o.z0+(o.z1-o.z0)*u);const G=o.g.userData.gira;for(let j=0;j<G.length;j++){const a=o.t*34+j*2.094;G[j].position.set(Math.cos(a)*.15,Math.sin(a)*.15,-.25-.12*j);}
+    if(o.anel){const a=Math.min(1,o.t/.16);o.anel.scale.setScalar(1+a*2.6);o.anel.material.opacity=.75*(1-a);if(a>=1){try{o.anel.parent&&o.anel.parent.remove(o.anel);o.anel.material.dispose();}catch(e){}o.anel=null;}}
+    if(u>=1){try{c454Impacto(o);}catch(e){c454Erro('impacto',e);}try{o.g.parent&&o.g.parent.remove(o.g);}catch(e){}if(o.anel){try{o.anel.parent&&o.anel.parent.remove(o.anel);o.anel.material.dispose();}catch(e){}}C454.tiros.splice(i,1);}}}
+{const tk=caveirasTick;caveirasTick=function(dt){const r=tk.apply(this,arguments);try{c454Quadro(Math.min(.1,Math.max(0,dt||0)));}catch(e){c454Erro('quadro',e);}return r;};}
+/* ---- no Combatente: a retícula alcança 60 m; a marca de acerto vem com a bala; o tiro que erra já voa até a parede ---- */
+let c454MarcaReal=function(){};
+try{if(typeof C452!=='undefined'){C452.ALCANCE=C454.ALCANCE;c454MarcaReal=c452Marca;c452Marca=function(tipo){if(C454.engoleMarca){C454.engoleMarca=false;return;}return c454MarcaReal(tipo);};c452FeixeAte=function(){};}}catch(e){c454Erro('combatente',e);}
+{const at=atacar151;atacar151=function(){C454.engoleMarca=false;try{return at.apply(this,arguments);}finally{C454.engoleMarca=false;}};if(window.__cav)window.__cav.atacar=atacar151;}
+try{const P=POD_POR.vento;if(P)P.desc=text428('um tiro de vento comprimido, de alcance muito longo (até 60 m): 30 de dano e empurrão no primeiro inimigo da mira','a compressed wind shot with very long range (up to 60 m): 30 damage and a push on the first enemy in your aim','un disparo de viento comprimido, de alcance muy largo (hasta 60 m): 30 de daño y empuje al primer enemigo de la mira');}catch(e){c454Erro('desc',e);}
+window.__tiro454={estado:C454,alvoLongo:()=>c452Ctx(()=>c454AlvoLongo())};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
