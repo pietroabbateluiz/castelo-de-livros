@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v457</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v462</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -57867,6 +57867,76 @@ function n457Galeao(R){if(!N457.on||N457.feito||!R||!R.scene)return;N457.feito=t
 {const fr=finishRoom;finishRoom=function(key){const r=fr.apply(this,arguments);if(key==='adv')try{n457Galeao(ROOMS.adv);}catch(e){n457Erro('finishRoom',e);}return r;};}
 try{if(ROOMS.adv&&ROOMS.adv.ready)n457Galeao(ROOMS.adv);}catch(e){n457Erro('início',e);}
 window.__navio457={estado:N457,aplicar:()=>n457Galeao(ROOMS.adv)};
+
+/* ===================== v462 · RODADA DE MELHORIAS GRÁFICAS NAS PEÇAS DO TRELLIS (pedido do Luiz: «vamos manter como estava com o
+   Trellis. E faça uma rodada de melhorias gráficas nos modelos do Trellis» — as esculturas da v458–v461 foram descartadas) =====================
+   As 46 peças da galeria de IA (`A232`) continuam as mesmas; o que muda é como elas são iluminadas, assentadas e animadas:
+   · REFLEXOS DE AMBIENTE: o jogo não tinha mapa de ambiente nenhum, então metal e cerâmica ficavam foscos e escuros. Um céu simples
+     (zênite azulado, horizonte quente, chão escuro, um sol suave) vira um PMREM uma única vez e entra como `envMap` em todos os
+     materiais das peças — forte nos metais e na cerâmica (robôs, mech, armadura, escudo, máquina a vapor, vasos), discreto no resto.
+   · LUZ DE CONTORNO: um brilho de borda (fresnel) quente e fraco no shader dos materiais das peças, que descola o modelo do fundo
+     escuro das salas sem luz nova — nada de luzes dinâmicas.
+   · SOMBRA DE CONTATO: uma mancha macia no chão sob cada peça da galeria e sob cada guardião dos halls; no Leve e no Papel (sem mapa
+     de sombras) ela é o único assentamento que as peças têm; nos outros modos fica leve, só reforçando a oclusão junto ao chão.
+   · VIDA: a folhagem (palmeira, arbusto seco, planta de cachos, treliça, árvore de outono, touceira) balança devagar; os personagens
+     (bruxinha, garoto, anão, garota rosa, encapuzada, sereia, viajante, fazendeiro, entregador, orc, lobisomem, golem) viram o rosto
+     para o leitor quando ele chega a menos de 7 m e voltam à pose quando ele se afasta. Vale também para os que são NPCs com fala (o sistema
+     de habitantes não os virava). Ficam de fora os que já têm dono: Bento o arqueiro (v439), o javali titã (v428/v433), a galinha da
+     prata (v346), o Baú Monstro (v233) e as peças de parede.
+   ?trellis462=0 desliga tudo. */
+const T462={on:!/[?&#]trellis462=0/i.test(location.search+location.hash),env:null,erros:[],stats:{mats:0,sombras:0,olham:0,balancam:0},blob:null,t:0,
+  OLHA:7,GIRO:2.6,RIM:[1.0,.93,.82],RIM_F:.26,BALANCO:.02,
+  olham:/^(bruxinha|garoto_steampunk|anao_lanterna|garota_rosa|encapuzada|sereia|viajante|fazendeiro|entregador|orc|lobisomem|golem)$/,
+  balancam:/^(palmeira|arbusto_seco|planta_cachos|trelica|arvore_outono|touceira)$/,
+  metal:/^(robo_|mech_|armadura|escudo|maquina_vapor|cadeira_ferro|vaso_|ampulheta|catapulta)/};
+function t462Erro(o,e){if(T462.erros.length<12)T462.erros.push(o+': '+(e&&e.message||e));try{console.error('trellis462',o,e);}catch(_){}}
+/* ---- 1. o mapa de ambiente (PMREM de um céu desenhado) ---- */
+function t462Env(){if(T462.env!==null)return T462.env;
+  try{const T=THREE,c=document.createElement('canvas');c.width=256;c.height=128;const x=c.getContext('2d');
+    const g=x.createLinearGradient(0,0,0,128);g.addColorStop(0,'#4f6690');g.addColorStop(.42,'#a9b4c4');g.addColorStop(.5,'#d9c9a6');g.addColorStop(.56,'#5a4a38');g.addColorStop(1,'#1a140f');x.fillStyle=g;x.fillRect(0,0,256,128);
+    const s=x.createRadialGradient(64,38,2,64,38,40);s.addColorStop(0,'rgba(255,246,224,.95)');s.addColorStop(.3,'rgba(255,240,210,.45)');s.addColorStop(1,'rgba(255,240,210,0)');x.fillStyle=s;x.fillRect(0,0,256,128);
+    const s2=x.createRadialGradient(200,52,2,200,52,30);s2.addColorStop(0,'rgba(200,220,255,.35)');s2.addColorStop(1,'rgba(200,220,255,0)');x.fillStyle=s2;x.fillRect(0,0,256,128);
+    const tex=new T.CanvasTexture(c);tex.mapping=T.EquirectangularReflectionMapping;tex.encoding=T.sRGBEncoding;
+    const pm=new T.PMREMGenerator(renderer);pm.compileEquirectangularShader();const rt=pm.fromEquirectangular(tex);T462.env=rt.texture;pm.dispose();tex.dispose();}
+  catch(e){t462Erro('env',e);T462.env=false;}
+  return T462.env;}
+/* ---- 2. o material de cada peça: reflexo + luz de contorno ---- */
+function t462Material(m,nome){if(!T462.on||!m||!m.isMeshStandardMaterial||m.userData.t462)return m;m.userData.t462=true;
+  try{const env=t462Env();if(env){m.envMap=env;const metal=T462.metal.test(nome||'')||m.metalness>.15;m.envMapIntensity=metal?.95:.38;}
+    const antes=m.onBeforeCompile;const R=T462.RIM,F=T462.RIM_F;
+    m.onBeforeCompile=function(s,r){if(typeof antes==='function')antes.call(this,s,r);s.uniforms.rim462={value:T462.RIM_F};m.userData.rim462=s.uniforms.rim462;
+      s.fragmentShader='uniform float rim462;\n'+s.fragmentShader.replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\n{ float f462 = 1.0 - max( dot( normalize( normal ), normalize( vViewPosition ) ), 0.0 ); f462 = pow( f462, 3.0 ); totalEmissiveRadiance += vec3( '+R[0].toFixed(3)+', '+R[1].toFixed(3)+', '+R[2].toFixed(3)+' ) * f462 * rim462; }');};
+    const chave=m.customProgramCacheKey;m.customProgramCacheKey=function(){return 't462|'+(typeof chave==='function'?chave.call(this):'');};
+    m.needsUpdate=true;T462.stats.mats++;}catch(e){t462Erro('material '+nome,e);}
+  return m;}
+{const am=a232Mat;a232Mat=function(nome,opt){return t462Material(am.apply(this,arguments),nome);};
+ try{for(const k in A232.mats)t462Material(A232.mats[k],k.split('|')[0]);}catch(e){t462Erro('mats',e);}}
+/* ---- 3. a sombra de contato ---- */
+function t462Blob(){if(T462.blob)return T462.blob;const T=THREE,c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');
+  const g=x.createRadialGradient(64,64,4,64,64,62);g.addColorStop(0,'rgba(0,0,0,1)');g.addColorStop(.45,'rgba(0,0,0,.55)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,0,128,128);
+  const tex=new T.CanvasTexture(c);const geo=new T.CircleGeometry(1,28);geo.rotateX(-Math.PI/2);
+  const mat=new T.MeshBasicMaterial({map:tex,transparent:true,opacity:.4,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2});mat.userData.papelKeep=true;mat.userData.t160Unico=true;mat.name='v462 sombra de contato';
+  T462.blob={geo,mat};return T462.blob;}
+function t462Opacidade(){let lite=false;try{lite=!!(Q&&Q.lite);}catch(e){}return lite?.42:.2;}
+function t462Sombra(o,pai,x,y,z,raio){if(o.sombra462||!pai)return;try{const B=t462Blob();const m=new THREE.Mesh(B.geo,B.mat);m.position.set(x,y+.012,z);m.scale.setScalar(Math.max(.35,raio));m.raycast=()=>{};m.userData.noCam=true;m.userData.fx=true;m.userData.sombra462=true;m.renderOrder=-1;m.frustumCulled=true;pai.add(m);o.sombra462=m;T462.stats.sombras++;}catch(e){t462Erro('sombra',e);}}
+function t462Qualidade(){try{t462Blob().mat.opacity=t462Opacidade();}catch(e){}}
+{const sq=setQuality;setQuality=function(){const r=sq.apply(this,arguments);try{t462Qualidade();}catch(e){}return r;};}
+/* ---- 4. vida: balanço da folhagem e o olhar dos personagens ---- */
+function t462Vida(dt,lista,hall){if(!T462.on||!lista||!lista.length)return;const t=T462.t;let pl=null;
+  for(const o of lista){const m=o.m;if(!m||!m.parent)continue;const nome=hall?o.nome:(o.it&&o.it.nome);if(!nome)continue;
+    if(!o.sombra462){const r=hall?(o.raio||.6):Math.max((o.it.raio||.6),(o.it.copa||0)*.55)*(m.scale.x||1);let y=hall?0:(o.m.position.y-((o.it.y||0)*(m.scale.x||1)));if(hall&&o.grp&&o.grp.children.some(c=>c.isMesh&&c.geometry&&c.geometry.type==='CylinderGeometry'&&c.userData.halls236))y=.15;t462Sombra(o,m.parent,hall?0:o.x,y,hall?0:o.z,r*1.35);}
+    if(T462.balancam.test(nome)){if(o.ph462===undefined){o.ph462=Math.random()*6.28;T462.stats.balancam++;}m.rotation.z=Math.sin(t*1.1+o.ph462)*T462.BALANCO;m.rotation.x=Math.sin(t*.8+o.ph462*1.7)*T462.BALANCO*.6;continue;}
+    if(T462.olham.test(nome)&&!(o.it&&o.it.parede)&&!m.userData.arqueiro439){
+      if(o.rot462===undefined){o.rot462=m.rotation.y;T462.stats.olham++;}
+      if(!pl){try{pl=cavPos();}catch(e){pl={x:CH.x,z:CH.z};}}
+      const wx=hall?(o.grp?o.grp.position.x:o.x):o.x,wz=hall?(o.grp?o.grp.position.z:o.z):o.z;const dx=pl.x-wx,dz=pl.z-wz,d=Math.hypot(dx,dz);
+      const alvo=d<T462.OLHA?Math.atan2(dx,dz)-(hall&&o.grp?o.grp.rotation.y:0):o.rot462;
+      m.rotation.y=lerpAng(m.rotation.y,alvo,Math.min(1,dt*T462.GIRO));}}}
+{const gt=g232Tick;g232Tick=function(dt){const r=gt.apply(this,arguments);try{T462.t+=Math.min(.1,dt||0);if(CUR==='room'&&ROOM){for(const k in G232.postos){if(ROOMS[k]===ROOM){t462Vida(Math.min(.1,dt||0),G232.postos[k],false);}}}}catch(e){t462Erro('vida sala',e);}return r;};}
+{const ht=h236Tick;h236Tick=function(dt){const r=ht.apply(this,arguments);try{if(CUR==='hall'){const P=H236.postos[HALLN];if(P)t462Vida(Math.min(.1,dt||0),P,true);}}catch(e){t462Erro('vida hall',e);}return r;};}
+try{t462Qualidade();}catch(e){}
+function t462Ajusta(rim,env){T462.RIM_F=rim;for(const k in A232.mats){const m=A232.mats[k];if(!m||!m.userData.t462)continue;if(m.userData.rim462)m.userData.rim462.value=rim;if(env!==undefined&&m.envMap)m.envMapIntensity=env===null?(T462.metal.test(k.split('|')[0])||m.metalness>.15?.95:.38):env;}}
+window.__trellis462={estado:T462,env:t462Env,material:t462Material,ajusta:t462Ajusta};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
