@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v455</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v457</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -57706,6 +57706,167 @@ function f455Aplica(){if(!F455.on)return;try{const far=f455Far();if(camera.far!=
 {const sa=setActive;setActive=function(){const r=sa.apply(this,arguments);try{f455Aplica();}catch(e){}return r;};}
 try{f455Aplica();}catch(e){}
 window.__far455={estado:F455,far:f455Far,aplica:f455Aplica,cam:()=>({far:camera.far,near:camera.near,fx:fxCam.far,sao:sao.params.saoScale})};
+
+/* ===================== v456 · O PRADO ENTRE O MATAGAL E A CASA DA CLAREIRA (pedido do Luiz: «Na área de fantasia que fica
+   no solo onde eu sobrevoo para pular para a parte da mansão, o chão está sem vegetação e com a textura muito básica, melhore
+   isso» — «o trecho que falei é logo após o matagal») =====================
+   O que havia: o prado ao norte da clareira (de z −72, a cerca de arbustos, até a casa em z −112) usava uma textura única
+   esticada e presa nas bordas (a v422 pintou uma tela de 1024 px sobre 212 m, com os caminhos numa escala que nem batia com as
+   UVs) — de perto e de cima, uma mancha verde lisa — e não tinha uma planta sequer.
+   · Chão: volta ao MESMO material da clareira (a relva em azulejos de 6 m, que a malha já estava preparada para repetir), então
+     a textura continua sem emenda através do matagal; o tom e a terra batida da entrada ficam por conta das cores por vértice.
+   · Plantas (tudo numa malha por material, sem luz nova): ~520 tufos de relva modelada, 90 moitas de samambaia, 70 flores
+     (margaridas, lavanda e botões-de-ouro), 16 hortênsias, 14 pedras com musgo e 10 árvores jovens nas beiras — nada em
+     cima da faixa de terra que leva à porta, dos dois círculos de salto nem dos obstáculos que já existiam. Arbustos, pedras
+     e árvores entram nos obstáculos (não se atravessa). ?prado456=0 desliga. */
+const P456={on:!/[?&#]prado456=0/i.test(location.search+location.hash),feito:false,erros:[],stats:{}};
+function p456Erro(o,e){if(P456.erros.length<10)P456.erros.push(o+': '+(e&&e.message||e));try{console.error('prado456',o,e);}catch(_){}}
+function p456Altura(R,x,z){try{if(z<=-72)return cozy367Height(x,z);return R.floorY(x,z)||0;}catch(e){return 0;}}
+const p456Hash=(i,j)=>{let h=(Math.imul(i,374761393)+Math.imul(j,668265263))>>>0;h=Math.imul(h^(h>>>13),1274126177)>>>0;return ((h^(h>>>16))>>>0)/4294967296;};
+function p456Ruido(x,z){const i=Math.floor(x),j=Math.floor(z),fx=x-i,fz=z-j,u=fx*fx*(3-2*fx),v=fz*fz*(3-2*fz),a=p456Hash(i,j),b=p456Hash(i+1,j),c=p456Hash(i,j+1),d=p456Hash(i+1,j+1);return a+(b-a)*u+(c-a)*v+(a-b-c+d)*u*v;}
+function p456Cores(mesh){if(!mesh||!mesh.geometry)return;const T=THREE,g=mesh.geometry,pos=g.attributes.position,col=g.attributes.color;if(!pos||!col)return;
+  const meadow=new T.Color(0xd1dda9),shade=new T.Color(0x91ac78),soil=new T.Color(0xae9062),c=new T.Color(),o=new T.Color();let n=0;
+  for(let i=0;i<pos.count;i++){const x=pos.getX(i),z=pos.getZ(i);if(z>-72.01)continue;
+    const k=.5*p456Ruido(x/9+3.7,z/9+1.2)+.32*p456Ruido(x/23+11.1,z/23+7.3)+.18*p456Ruido(x/3.6+5.5,z/3.6+9.1);c.copy(meadow).lerp(shade,Math.max(0,Math.min(1,k*1.15-.05))*.75);
+    const front=z>=-122&&z<=-107,rear=z>=-173&&z<=-151,ed=(front||rear)?Math.max(0,Math.abs(x)-1.6):99;c.lerp(soil,Math.exp(-ed*ed/1.5)*.5);
+    const w=Math.max(0,Math.min(1,(-72-z)/11)),ww=w*w*(3-2*w);o.fromBufferAttribute(col,i).lerp(c,ww);col.setXYZ(i,o.r,o.g,o.b);n++;}
+  col.needsUpdate=true;P456.stats.coresRefeitas=n;}
+function p456Build(R){if(!P456.on||P456.feito||!R||!R.scene||!COZY355.ready)return;P456.feito=true;const T=THREE,S=COZY355,r=rnd(456001);
+  // 1) o chão volta à relva da clareira
+  try{const F=window.__FANT,orig=F&&F.ground&&F.ground.material,mesh=S.ground367&&S.ground367.mesh;if(orig&&mesh){mesh.material=orig;orig.userData.papelKeep=true;orig.needsUpdate=true;P456.stats.chao='relva da clareira';}}catch(e){p456Erro('chão',e);}
+  // 1b) as cores por vértice: o padrão sen×sen da v367 dava manchas em xadrez («texturas meio quadriculadas»); vira ruído suave em três escalas
+  try{p456Cores(S.ground367&&S.ground367.mesh);}catch(e){p456Erro('cores',e);}
+  // 2) o prado
+  const root=new T.Group();root.name='Prado da Clareira · relva, flores e moitas (v456)';R.scene.add(root);const K=t160Kit(root.name);
+  const obst=(R.world&&R.world.obst)||[],novos=[];
+  const livre=(x,z,m)=>{if(z<-112||z>-56||Math.abs(x)>52)return false;if(z<-99&&Math.abs(x)<3.4)return false;              // faixa de terra até a porta
+    if(Math.hypot(x,z+109)<4.2||Math.hypot(x-3,z+47)<5.5)return false;                                                           // círculos de salto
+    if(z<-85&&Math.hypot(x,z+137)>52)return false;                                                                               // beira da área andável
+    for(const o of obst){if(Math.hypot(x-o[0],z-o[1])<o[2]+m)return false;}for(const o of novos){if(Math.hypot(x-o[0],z-o[1])<o[2]+m)return false;}return true;};
+  const ferna=t160Std('456 samambaia',0x4f7a4c,.97),daisy=t160Std('456 margaridas',0xf0e9c2,.92),lav=t160Std('456 lavanda',0x9b7fb6,.9),gold=t160Std('456 botões-de-ouro',0xe3c24a,.9),
+    folha=t160Std('456 folha de jardim',0x5b8a4d,.95),hort=t160Std('456 hortênsia',0x8fa0d8,.9),hort2=t160Std('456 hortênsia rosada',0xd4a0b8,.9),tronco=t160Std('456 tronco jovem',0x6b5340,.92),
+    copa=t160Std('456 copa escura',0x40683d,.95),copa2=t160Std('456 copa clara',0x6b9a52,.95);
+  const st={tufos:0,samambaias:0,flores:0,hortensias:0,pedras:0,arvores:0};
+  // tufos de relva (adensam perto do matagal, para esconder a emenda, e ao longo das beiras da faixa de terra)
+  for(let i=0;i<900&&st.tufos<520;i++){let x=(r()-.5)*96,z=-56-r()*56;if(i%4===0){z=-72-(r()-.5)*5;}if(i%7===0&&z<-99){x=(r()<.5?-1:1)*(3.6+r()*1.4);}
+    if(!livre(x,z,.25))continue;const y=p456Altura(R,x,z);forest433Grass(K,x,y+.012,z,.18+r()*.27,i+456);st.tufos++;}
+  // samambaias
+  for(let i=0;i<220&&st.samambaias<90;i++){const x=(r()-.5)*92,z=-60-r()*50;if(!livre(x,z,.5))continue;const y=p456Altura(R,x,z);const a=r()*6.283;for(let k=0;k<5;k++)bot368LeafAt(K,ferna,x,y+.02,z,.33+r()*.25,a+k*1.256,.65,.3);st.samambaias++;}
+  // flores
+  for(let i=0;i<200&&st.flores<70;i++){const x=(r()-.5)*92,z=-60-r()*50;if(!livre(x,z,.4))continue;const y=p456Altura(R,x,z);const t=i%3;
+    if(t===0)bot368Bloom(K,x,y+.02,z,.22+r()*.1,daisy,folha,i);else if(t===1)bot368Bloom(K,x,y+.02,z,.2+r()*.1,lav,folha,i);else{for(let q=0;q<4;q++)bot368Flower(K,gold,x+(r()-.5)*.5,y+.14+r()*.06,z+(r()-.5)*.5,.06,r()*6.28,5);}st.flores++;}
+  // hortênsias (fora da faixa de terra, longe dos saltos)
+  for(let i=0;i<120&&st.hortensias<16;i++){const x=(r()<.5?-1:1)*(7+r()*34),z=-63-r()*46;if(!livre(x,z,1.5))continue;const y=p456Altura(R,x,z),rad=.8+r()*.45;bot368Hydrangea(K,x,z,rad,i%3?hort:hort2,y,folha);novos.push([x,z,rad*.9]);st.hortensias++;}
+  // pedras com musgo
+  for(let i=0;i<80&&st.pedras<14;i++){const x=(r()-.5)*90,z=-60-r()*50;if(!livre(x,z,1.2))continue;const y=p456Altura(R,x,z),s=.35+r()*.5;forest433Rock(K,x,y,z,s,i);novos.push([x,z,s*.9]);st.pedras++;}
+  // árvores jovens nas beiras do prado (copas em camadas, como as silhuetas do bosque)
+  for(let i=0;i<120&&st.arvores<10;i++){const x=(r()<.5?-1:1)*(15+r()*30),z=-62-r()*46;if(!livre(x,z,2.6))continue;const y=p456Altura(R,x,z),h=3.6+r()*2.2,ry=r()*6.283;
+    K.cyl(.09,.16,h*.55,tronco,x,y+h*.275,z,8);for(let b=0;b<3;b++){const a=ry+b*2.09,L=.9+r()*.5;K.tube([[x,y+h*.42,z],[x+Math.cos(a)*L*.5,y+h*.6,z+Math.sin(a)*L*.5],[x+Math.cos(a)*L,y+h*.74,z+Math.sin(a)*L]],.045,tronco,5,4);}
+    K.sph(h*.33,copa,x,y+h*.72,z,1.1,.72,1.1,12,8);K.sph(h*.26,copa2,x+Math.cos(ry)*h*.18,y+h*.86,z+Math.sin(ry)*h*.18,1,.7,1,11,7);K.sph(h*.22,copa,x-Math.cos(ry+.8)*h*.2,y+h*.8,z-Math.sin(ry+.8)*h*.2,1,.65,1,10,7);K.sph(h*.17,copa2,x,y+h*1.0,z,1,.6,1,9,6);
+    novos.push([x,z,.45]);st.arvores++;}
+  const meshes=K.fim(root,{sombra:true});let tri=0;for(const o of meshes){o.userData.noCam=true;o.userData.papelKeepGeo=true;o.userData.papelKeep=true;if(o.material&&o.material.userData)o.material.userData.papelKeep=true;o.__fusaoMoveu=9;tri+=(o.geometry.index?o.geometry.index.count:o.geometry.attributes.position.count)/3;}
+  // obstáculos novos: na lista da casa (reconstruída quando a base muda) e na lista viva de agora
+  try{for(const o of novos){S.obstacles.push(o);}const W=R.world,cur=W.obst;if(Array.isArray(cur))for(const o of novos)cur.push(o);W.__nav=null;W.__cl=null;}catch(e){p456Erro('obstáculos',e);}
+  Object.assign(P456.stats,st,{malhas:meshes.length,triangulos:Math.round(tri),obstaculos:novos.length});}
+{const cb=cozy355Build;cozy355Build=function(R){const r=cb.apply(this,arguments);try{p456Build(R);}catch(e){p456Erro('build',e);}return r;};}
+try{if(COZY355.ready&&ROOMS.fant)p456Build(ROOMS.fant);}catch(e){p456Erro('início',e);}
+window.__prado456={estado:P456,build:()=>p456Build(ROOMS.fant)};
+
+/* ===================== v457 · O GALEÃO BOA VENTURA: A CÂMERA NA AMURADA E O QUE FLUTUAVA (pedido do Luiz, com vídeo e foto:
+   «olhe como fica tremendo na amurada. Ajuste isso. é um bug antigo» · «esses pauzinhos no ar flutuando, bandeira flutuando,
+   lanternas flutuando (faz sentido essas lanternas em um barco?) tem até uma luneta ou sei lá eu que madeira flutuando. Boa
+   ventura está toscamente escrito e apertado dentro do quadrado. isso é um navio antigo») =====================
+   · A CÂMERA TREMIA junto da balaustrada do tombadilho porque o raio de colisão dela batia nos balaústres (7 cm, a cada 56 cm):
+     ora pegava um, ora passava entre dois, e o braço encurtava/alongava e o giro automático «para o lado mais aberto» ia e vinha.
+     Agora (1) a balaustrada, o corrimão de corda da escada e todas as cordas da enxárcia deixam de contar para a câmera (ela
+     passa por eles, como já passava pelas grades finas) e (2) `camHit` ganha memória: um bate que acabou de acontecer vale
+     por 0,35 s para um raio quase igual — vale em todas as salas, contra qualquer grade fina.
+   · OS «PAUZINHOS NO AR» eram os enfrechates (as travessas das enxárcias): no Papel, em resolução menor, as cordas de 1 a 2 cm
+     somem (menos de um pixel) e só as travessas ficavam flutuando. As cordas engrossam para 4 cm e ganham por cima uma linha
+     contínua (um pixel, nunca some), então enxárcias, estais e brandais aparecem inteiros de qualquer distância.
+   · A BANDEIRA DA POPA ganha um mastro de 9 cm (era 5 cm e sumia) com base de latão; a carangueja da mezena (a «madeira
+     flutuando») passa a encostar no mastro, com boca, colar de ferro e adriça até o cesto — antes pairava a 60 cm dele.
+   · AS LANTERNAS: as duas arandelas «interiores» da v407 (postas junto à porta de toda sala, aqui penduradas no ar a 2 m do
+     tombadilho, sem parede) e as dez lanternas em postes ao longo da amurada saem (não faziam sentido num galeão); no lugar,
+     dois fanais de popa — as grandes lanternas de latão que os galeões levavam na borda da popa — e dois fanais menores nas
+     amuradas do tombadilho, todos com poste, suporte e brilho próprio (sem luz nova).
+   · O NOME «BOA VENTURA» vira uma tabuleta de popa de verdade: tábua mais larga (5,2 × 1,15 m) com moldura entalhada dourada,
+     letras serifadas em folha de ouro com relevo e sombra, bem espaçadas, duas âncoras e filetes — e um friso de madeira em volta.
+   ?navio457=0 desliga tudo. Valores em N457. */
+const N457={on:!/[?&#]navio457=0/i.test(location.search+location.hash),feito:false,erros:[],stats:{},RAIO:.04,MEM:.35,ZS:22.4,QH:2.2,ZQ:12.6,ZF:-15.2,FH:1.4,MZ:15.2};
+function n457Erro(o,e){if(N457.erros.length<12)N457.erros.push(o+': '+(e&&e.message||e));try{console.error('navio457',o,e);}catch(_){}}
+/* ---- 1. a câmera: memória de 0,35 s nos bates (em todas as salas) ---- */
+{const ch=camHit;const MEM=[];camHit=function(ox,oy,oz,dx,dy,dz,dist){const r=ch.apply(this,arguments);if(!N457.on)return r;const now=performance.now()/1000;
+    try{if(r<dist-1e-6){MEM.push({t:now,ox,oy,oz,dx,dy,dz,d:r});if(MEM.length>10)MEM.shift();return r;}
+      let best=r;for(let i=MEM.length-1;i>=0;i--){const m=MEM[i];if(now-m.t>N457.MEM){MEM.splice(i,1);continue;}
+        if(Math.hypot(ox-m.ox,oy-m.oy,oz-m.oz)<.6&&(dx*m.dx+dy*m.dy+dz*m.dz)>.985&&m.d<best)best=m.d;}return best;}catch(e){return r;}};}
+/* ---- 2. o galeão ---- */
+function n457Galeao(R){if(!N457.on||N457.feito||!R||!R.scene)return;N457.feito=true;const T=THREE,sc=R.scene,B=new T.Box3(),st=N457.stats,Z=N457;
+  const hw=z=>{try{return window.__ADV_ART.hwAt(z);}catch(e){return 12;}};
+  const marca=o=>{o.userData.noCam=true;o.userData.papelKeepGeo=true;o.__fusaoMoveu=9;};
+  // 2a. balaustrada, corrimão da escada e cordas: fora da colisão da câmera
+  let bal=0,cordas=[];sc.traverse(o=>{if(!o.isMesh||!o.geometry)return;const g=o.geometry,p=g.parameters||{};
+    if(o.userData.portalFineRigging&&g.type==='CylinderGeometry'){cordas.push(o);o.userData.noCam=true;return;}
+    if(g.type==='TubeGeometry'&&p.radius<=.035){o.userData.noCam=true;return;}
+    if(g.type==='BufferGeometry'||g.type==='BoxGeometry'){B.setFromObject(o);const w=B.max.x-B.min.x,h=B.max.y-B.min.y;if(w>20&&h>1.5&&h<2.2&&B.min.y>Z.FH-.3&&B.min.y<Z.FH+.3&&B.max.y<Z.QH+1.3&&B.min.z<Z.ZF+.6&&B.max.z>Z.ZQ-.6){o.userData.noCam=true;bal++;}}});
+  st.balaustrada=bal;st.cordas=cordas.length;
+  // 2b. cordas: engrossam para 4 cm e ganham a linha contínua por cima
+  try{const pts=[],V=new T.Vector3(),A=new T.Vector3(),Bv=new T.Vector3(),Q=new T.Quaternion();
+    for(const o of cordas){const p=o.geometry.parameters,r=p.radiusTop||.02,h=p.height||1;if(r<Z.RAIO){const k=Z.RAIO/r;o.scale.set(k,o.scale.y,k);o.__fusaoMoveu=9;}
+      o.updateMatrixWorld(true);V.set(0,1,0).applyQuaternion(o.getWorldQuaternion(Q)).normalize();o.getWorldPosition(A);Bv.copy(A).addScaledVector(V,h/2);A.addScaledVector(V,-h/2);pts.push(A.x,A.y,A.z,Bv.x,Bv.y,Bv.z);}
+    if(pts.length){const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pts,3));const L=new T.LineSegments(g,new T.LineBasicMaterial({color:0x2a1d12}));L.name='Boa Ventura · cordame (linhas, v457)';L.userData.portalFineRigging=true;L.userData.papelKeep=true;L.material.userData.papelKeep=true;marca(L);L.raycast=()=>{};sc.add(L);st.linhas=pts.length/6;}}catch(e){n457Erro('cordas',e);}
+  // 2c. o mastro da bandeira da popa (5 cm → 9 cm) com base de latão
+  try{let n=0;sc.traverse(o=>{if(!o.isMesh||o.geometry.type!=='BoxGeometry')return;const p=o.geometry.parameters;if(p.width<=.06&&p.depth<=.06&&p.height>3.5&&p.height<4.2&&Math.abs(o.position.x)<.1&&o.position.z>Z.ZS-.8){o.scale.set(1.8,1,1.8);o.__fusaoMoveu=9;n++;}});st.mastroBandeira=n;
+    const lat=new T.MeshStandardMaterial({color:0xc9a45a,roughness:.4,metalness:.6});lat.userData.papelKeep=true;const base=new T.Mesh(new T.CylinderGeometry(.11,.14,.22,12),lat);base.position.set(0,Z.QH+.99,Z.ZS-.4);marca(base);sc.add(base);}catch(e){n457Erro('bandeira',e);}
+  // 2d. a carangueja encosta no mastro da mezena: boca, colar e adriça
+  try{let gaff=null,rolo=null;const ties=[];sc.traverse(o=>{if(!o.isMesh)return;const g=o.geometry,p=g.parameters||{};if(g.type==='CylinderGeometry'&&Math.abs(p.height-3.6)<.01&&p.radiusTop<=.06&&Math.abs(o.rotation.x-1.1)<.05)gaff=o;
+      else if(g.type==='CylinderGeometry'&&Math.abs(p.height-3.4)<.01&&Math.abs(p.radiusTop-.16)<.01&&Math.abs(o.rotation.x-1.1)<.05)rolo=o;else if(g.type==='TorusGeometry'&&Math.abs(p.radius-.17)<.01&&Math.abs(p.tube-.015)<.003)ties.push(o);});
+    if(gaff){const dz=-.5;for(const o of [gaff,rolo,...ties]){if(!o)continue;o.position.z+=dz;o.__fusaoMoveu=9;}gaff.scale.set(1.7,1,1.7);
+      const dir=new T.Vector3(0,Math.cos(1.1),Math.sin(1.1)),c=gaff.position,baixo=c.clone().addScaledVector(dir,-1.8),alto=c.clone().addScaledVector(dir,1.8);
+      const ferro=new T.MeshStandardMaterial({color:0x2a2622,roughness:.55,metalness:.6}),mad=new T.MeshStandardMaterial({color:0x6a4a30,roughness:.8});ferro.userData.papelKeep=mad.userData.papelKeep=true;
+      const colar=new T.Mesh(new T.TorusGeometry(.33,.045,8,18),ferro);colar.position.set(0,baixo.y,Z.MZ);colar.rotation.x=Math.PI/2;marca(colar);sc.add(colar);                    // colar no mastro
+      for(const s of [-1,1]){const boca=new T.Mesh(new T.BoxGeometry(.09,.16,.62),mad);boca.position.set(s*.2,baixo.y,(baixo.z+Z.MZ)/2+.08);boca.rotation.y=s*.25;marca(boca);sc.add(boca);}  // a boca (garfo) que abraça o mastro
+      const corda=new T.MeshStandardMaterial({color:0x3a2c1c,roughness:.9});corda.userData.papelKeep=true;const topo=new T.Vector3(0,Z.QH+18*.6-.1,Z.MZ+.3),d=new T.Vector3().subVectors(topo,alto),L=d.length();
+      const adr=new T.Mesh(new T.CylinderGeometry(.035,.035,L,6),corda);adr.position.copy(alto).addScaledVector(d,.5);adr.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),d.normalize());marca(adr);sc.add(adr);
+      const lg=new T.BufferGeometry();lg.setAttribute('position',new T.Float32BufferAttribute([alto.x,alto.y,alto.z,topo.x,topo.y,topo.z],3));const ln=new T.LineSegments(lg,new T.LineBasicMaterial({color:0x2a1d12}));ln.raycast=()=>{};marca(ln);sc.add(ln);st.carangueja=true;}}catch(e){n457Erro('carangueja',e);}
+  // 2e. lanternas: fora os dez postes da amurada; entram os fanais de popa
+  // (as «arandelas interiores» da v407 — lanternas de parede postas junto à porta de toda sala — ficavam penduradas no ar sobre o tombadilho: o convés não tem parede ali)
+  try{let tirados=0;const rem=[];sc.traverse(o=>{if(o.name==='Poste com lanterna de bordo'||/^Lanternas interiores/.test(o.name||''))rem.push(o);});for(const o of rem){if(o.parent)o.parent.remove(o);tirados++;}st.postesTirados=tirados;
+    const K=t160Kit('Boa Ventura · fanais de popa (v457)'),lat=t160Std('457 latão dos fanais',0xc9a45a,.38,.6),ferro=t160Std('457 ferro dos fanais',0x2b2724,.55,.5),
+      vidro=t160Mat('457 vidro dos fanais',()=>{const m=new T.MeshStandardMaterial({color:0xf2c98a,emissive:0xffa842,emissiveIntensity:1.1,roughness:.3,transparent:true,opacity:.92});m.userData.papelKeep=true;return m;}),mad=t160Std('457 poste dos fanais',0x4a3524,.85);
+    const fanal=(x,y,z,s,ry)=>{K.push(x,y,z,ry||0,0,0,s);K.cyl(.19,.22,.05,lat,0,.025,0,8);K.cyl(.15,.15,.5,vidro,0,.30,0,8);for(let i=0;i<8;i++){const a=i*Math.PI/4;K.box(.025,.52,.025,ferro,Math.cos(a)*.155,.30,Math.sin(a)*.155);}K.cyl(.17,.17,.03,ferro,0,.56,0,8);K.cone(.23,.2,lat,0,.67,0,8);K.sph(.045,lat,0,.80,0);K.tor(.055,.011,lat,0,.86,0);K.pop();};
+    // dois fanais grandes na borda da popa, sobre postes torneados
+    for(const s of [-1,1]){const x=s*1.75,z=Z.ZS-.55;K.cyl(.07,.09,1.0,mad,x,Z.QH+.5,z,8);K.sph(.11,lat,x,Z.QH+1.0,z,1,.6,1);fanal(x,Z.QH+1.06,z,1.35,0);}
+    // dois menores nas amuradas do tombadilho
+    for(const s of [-1,1]){const x=s*(hw(19.4)-.55),z=19.4;K.box(.09,.9,.09,mad,x,Z.QH+.45,z);K.box(.3,.05,.09,ferro,x-s*.1,Z.QH+.9,z);fanal(x-s*.2,Z.QH+.93,z,.95,0);}
+    const root=new T.Group();root.name=K.nome;sc.add(root);const ms=K.fim(root,{sombra:true});for(const o of ms)marca(o);st.fanais=4;}catch(e){n457Erro('fanais',e);}
+  // 2f. a tabuleta «BOA VENTURA»
+  try{let np=null;sc.traverse(o=>{if(!np&&o.isMesh&&o.geometry.type==='BoxGeometry'&&Math.abs(o.geometry.parameters.width-4.2)<.01&&Math.abs(o.geometry.parameters.height-.9)<.01)np=o;});
+    if(np){const W=2048,H=448,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+      // tábua: madeira escura com veios
+      x.fillStyle='#3b1b15';x.fillRect(0,0,W,H);for(let i=0;i<140;i++){x.strokeStyle=i%2?'rgba(90,40,30,.35)':'rgba(20,8,6,.35)';x.lineWidth=1+(i%3);x.beginPath();const y=(i*3.2)%H;x.moveTo(0,y);x.bezierCurveTo(W*.3,y+8,W*.6,y-10,W,y+4);x.stroke();}
+      // moldura dupla dourada com cantos entalhados
+      const ouro=x.createLinearGradient(0,0,0,H);ouro.addColorStop(0,'#f3dc8e');ouro.addColorStop(.5,'#c9a24a');ouro.addColorStop(1,'#8a6a22');
+      x.strokeStyle=ouro;x.lineWidth=14;x.strokeRect(26,26,W-52,H-52);x.lineWidth=5;x.strokeRect(58,58,W-116,H-116);
+      for(const [cx,cy] of [[58,58],[W-58,58],[58,H-58],[W-58,H-58]]){x.fillStyle=ouro;x.beginPath();x.arc(cx,cy,22,0,7);x.fill();x.fillStyle='#3b1b15';x.beginPath();x.arc(cx,cy,9,0,7);x.fill();}
+      // âncoras nas pontas
+      const ancora=(ax,ay,s)=>{x.save();x.translate(ax,ay);x.scale(s,s);x.strokeStyle=ouro;x.lineWidth=9;x.lineCap='round';x.beginPath();x.moveTo(0,-42);x.lineTo(0,40);x.stroke();x.beginPath();x.arc(0,-50,10,0,7);x.stroke();x.beginPath();x.moveTo(-30,-14);x.lineTo(30,-14);x.stroke();x.beginPath();x.arc(0,8,34,Math.PI*.15,Math.PI*.85);x.stroke();x.beginPath();x.moveTo(-34,22);x.lineTo(-44,8);x.moveTo(34,22);x.lineTo(44,8);x.stroke();x.restore();};
+      ancora(150,H/2,1.0);ancora(W-150,H/2,1.0);
+      // letras: folha de ouro com relevo (sombra escura por baixo, luz por cima); o tamanho é ajustado para o nome ocupar o meio da tábua, longe das âncoras
+      x.textAlign='center';x.textBaseline='middle';let fs=196;for(;fs>90;fs-=4){x.font='bold '+fs+'px Georgia,"Times New Roman",serif';try{x.letterSpacing=Math.round(fs*.14)+'px';}catch(e){}if(x.measureText('BOA VENTURA').width+(x.letterSpacing?0:10*fs*.14)<=W*.6)break;}
+      x.fillStyle='rgba(0,0,0,.55)';x.fillText('BOA VENTURA',W/2+8,H/2+16);x.fillStyle='#5a3d10';x.fillText('BOA VENTURA',W/2+4,H/2+8);
+      const gl=x.createLinearGradient(0,H/2-90,0,H/2+90);gl.addColorStop(0,'#fff0b8');gl.addColorStop(.45,'#e6c364');gl.addColorStop(.55,'#c59a3a');gl.addColorStop(1,'#f1d784');x.fillStyle=gl;x.fillText('BOA VENTURA',W/2,H/2);
+      x.lineWidth=3;x.strokeStyle='rgba(60,30,8,.9)';x.strokeText('BOA VENTURA',W/2,H/2);
+      x.fillStyle=ouro;for(const [fx,fy] of [[W/2,86],[W/2,H-86]]){x.beginPath();x.moveTo(fx-120,fy);x.lineTo(fx-18,fy-5);x.lineTo(fx,fy);x.lineTo(fx-18,fy+5);x.closePath();x.fill();x.beginPath();x.moveTo(fx+120,fy);x.lineTo(fx+18,fy-5);x.lineTo(fx,fy);x.lineTo(fx+18,fy+5);x.closePath();x.fill();}
+      const tex=new T.CanvasTexture(c);tex.anisotropy=8;tex.encoding=T.sRGBEncoding;const mats=Array.isArray(np.material)?np.material:[np.material];const face=mats[4]||mats[0];const nm=new T.MeshStandardMaterial({map:tex,roughness:.55,metalness:.08});nm.userData.papelKeep=true;
+      if(Array.isArray(np.material))np.material[4]=nm;else np.material=nm;np.scale.set(5.2/4.2,1.15/.9,1);np.__fusaoMoveu=9;np.userData.papelKeep=true;
+      const lat=new T.MeshStandardMaterial({color:0xc9a45a,roughness:.42,metalness:.55}),mad=new T.MeshStandardMaterial({color:0x4a2a1f,roughness:.8});lat.userData.papelKeep=mad.userData.papelKeep=true;
+      const z=np.position.z+.05,y=np.position.y;for(const [w,h,d,px,py,m] of [[5.5,.12,.1,0,y+.63,mad],[5.5,.12,.1,0,y-.63,mad],[.12,1.4,.1,-2.69,y,mad],[.12,1.4,.1,2.69,y,mad],[5.3,.05,.06,0,y+.55,lat],[5.3,.05,.06,0,y-.55,lat]]){const f=new T.Mesh(new T.BoxGeometry(w,h,d),m);f.position.set(px,py,z);marca(f);sc.add(f);}
+      st.tabuleta=true;}}catch(e){n457Erro('tabuleta',e);}
+  try{if(ACTIVE===sc&&window.__fusao)window.__fusao.limpar();}catch(e){}}
+{const fr=finishRoom;finishRoom=function(key){const r=fr.apply(this,arguments);if(key==='adv')try{n457Galeao(ROOMS.adv);}catch(e){n457Erro('finishRoom',e);}return r;};}
+try{if(ROOMS.adv&&ROOMS.adv.ready)n457Galeao(ROOMS.adv);}catch(e){n457Erro('início',e);}
+window.__navio457={estado:N457,aplicar:()=>n457Galeao(ROOMS.adv)};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
