@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v462</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v463</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -57937,6 +57937,45 @@ function t462Vida(dt,lista,hall){if(!T462.on||!lista||!lista.length)return;const
 try{t462Qualidade();}catch(e){}
 function t462Ajusta(rim,env){T462.RIM_F=rim;for(const k in A232.mats){const m=A232.mats[k];if(!m||!m.userData.t462)continue;if(m.userData.rim462)m.userData.rim462.value=rim;if(env!==undefined&&m.envMap)m.envMapIntensity=env===null?(T462.metal.test(k.split('|')[0])||m.metalness>.15?.95:.38):env;}}
 window.__trellis462={estado:T462,env:t462Env,material:t462Material,ajusta:t462Ajusta};
+
+/* ===================== v463 · A CÂMERA QUE TREMIA NA AMURADA, NOS RODAPÉS DA MANSÃO E DO MOINHO (pedido do Luiz: «a amurada do barco
+   continua bugando… o mesmo problema ocorre nos rodapés da mansão em Fantasia e do moinho») =====================
+   O que acontece: o braço da câmera é o menor entre o raio 2,5D da sala (`WORLD.camT`) e o raio nas malhas (`camHit`). Junto de
+   uma grade, de um rodapé ou de um degrau, esse raio passa RASPANDO numa aresta: uns quadros bate (o braço encurta na hora, 22/s),
+   outros passa (o braço volta devagar, 3,5/s). O gatilho é qualquer coisa que mexa um fio o raio — o mouse na mão, a mola do
+   levantamento (`camLift`), a lista de bloqueadores que se refaz a cada 3 s — e o resultado é a câmera tremendo em volta do
+   leitor parado. A «memória de bates» da v457 só prolongava cada raspão por 0,35 s (fica desligada: `N457.MEM=0`).
+   O conserto, válido em todas as salas:
+   · ENCURTAR SÓ COM INSISTÊNCIA: um bate que encurta o raio precisa se repetir em 3 quadros seguidos (ou por 70 ms, em máquinas
+     lentas) antes de valer; se no meio ele passa, a contagem zera. Um raspão que alterna bate/passa nunca encurta; uma parede de verdade encurta
+     com um atraso que não se vê (a mola do braço já leva mais que isso para fechar). Alongar continua valendo na hora.
+     Vale para `camHit` e para `WORLD.camT`, raio por raio (a câmera testa várias direções por quadro: cada uma tem a sua conta).
+   · A ANTEPARA DA POPA COM HISTERESE: na Aventura, o raio que cruza a linha do tombadilho (z = ZQ − 0,35) bloqueia se cruzar abaixo
+     de QH + 0,5 m. Com o leitor no convés principal e a câmera atrás, sobre o tombadilho, o cruzamento fica bem na altura do limite e
+     o mouse faz o braço pular entre 3 m e 6 m. Agora há uma faixa morta: bloqueia abaixo de QH + 0,35 e só libera acima de QH + 0,75;
+     no meio, mantém o que estava.
+   ?camera463=0 desliga. */
+const C463={on:!/[?&#]camera463=0/i.test(location.search+location.hash),QUADROS:3,TEMPO:.07,VIDA:.6,erros:[],stats:{segurados:0,aceitos:0,antepara:0},hit:[],camt:[],antepara:{bloq:false}};
+function c463Erro(o,e){if(C463.erros.length<12)C463.erros.push(o+': '+(e&&e.message||e));}
+// acha (ou cria) a memória do raio parecido: mesma origem (±0,5 m) e mesma direção (cos > 0,995)
+function c463Mem(L,ox,oy,oz,dx,dy,dz,now){for(let i=L.length-1;i>=0;i--){const m=L[i];if(now-m.t>C463.VIDA){L.splice(i,1);continue;}
+    if(Math.abs(ox-m.ox)<.5&&Math.abs(oy-m.oy)<.5&&Math.abs(oz-m.oz)<.5&&(dx*m.dx+dy*m.dy+dz*m.dz)>.995)return m;}
+  const m={ox,oy,oz,dx,dy,dz,r:undefined,seq:0,t:now};L.push(m);if(L.length>16)L.shift();return m;}
+function c463Estab(L,r,ox,oy,oz,dx,dy,dz){const now=performance.now()/1000;const m=c463Mem(L,ox,oy,oz,dx,dy,dz,now);m.t=now;m.ox=ox;m.oy=oy;m.oz=oz;m.dx=dx;m.dy=dy;m.dz=dz;
+  if(m.r===undefined){m.r=r;return r;}
+  if(r<m.r-1e-4){if(!m.seq)m.t0=now;m.seq++;if(m.seq<C463.QUADROS&&now-m.t0<C463.TEMPO){C463.stats.segurados++;return m.r;}C463.stats.aceitos++;m.r=r;return r;}
+  m.seq=0;m.r=r;return r;}
+{const ch=camHit;camHit=function(ox,oy,oz,dx,dy,dz,dist){const r=ch.apply(this,arguments);if(!C463.on)return r;try{return c463Estab(C463.hit,r,ox,oy,oz,dx,dy,dz);}catch(e){c463Erro('hit',e);return r;}};}
+try{if(typeof N457!=='undefined')N457.MEM=0;}catch(e){}
+// WORLD.camT muda de sala para sala (cada mundo tem o seu): embrulha na troca de cena, guardando o original em WORLD.__camT463
+function c463Mundo(){try{const W=WORLD;if(!W||!W.camT||W.__camT463===W.camT)return;const orig=W.camT;const adv=!!(typeof ADV_HW!=='undefined'&&ROOMS.adv&&W===ROOMS.adv.world);
+    const f=function(ox,oy,oz,dx,dy,dz,dist){let r=orig.apply(this,arguments);if(!C463.on)return r;
+      try{if(adv&&dz>1e-6){const tw=((ZQ-.35)-oz)/dz;if(tw>0&&tw<dist&&ox+dx*tw>ADV_SX+.6){const h=oy+dy*tw,A=C463.antepara;const bloq=h<QH+.35?true:h>QH+.75?false:A.bloq;if(bloq!==A.bloq){A.bloq=bloq;C463.stats.antepara++;}
+          if(bloq)r=Math.min(r,tw);else if(Math.abs(r-tw)<1e-6){r=dist;if(dy<-1e-6)r=Math.min(r,(0.35-oy)/dy);const a=dx*dx+dy*dy+dz*dz,b=2*(ox*dx+oz*dz+(oy-SEAY)*dy),c=ox*ox+oz*oz+(oy-SEAY)*(oy-SEAY)-52*52,disc=b*b-4*a*c;if(disc>0){const tt=(-b+Math.sqrt(disc))/(2*a);if(tt>0)r=Math.min(r,tt);}}}} // liberada na faixa morta: as outras regras do camT da Aventura (chão e esfera do mar), sem a antepara
+        return c463Estab(C463.camt,r,ox,oy,oz,dx,dy,dz);}catch(e){c463Erro('camT',e);return r;}};
+    W.camT=f;W.__camT463=f;}catch(e){c463Erro('mundo',e);}}
+{const ct=camTP;camTP=function(dt){try{c463Mundo();}catch(e){}return ct.apply(this,arguments);};}
+window.__camera463={estado:C463,mundo:c463Mundo};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
