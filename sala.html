@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v464</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v466</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -57997,6 +57997,114 @@ if(F464.on){try{
   try{for(const sc of allScenes()){if(FUSAO.cenas.get(sc)){fusaoLimpar(sc);F464.stats.limpas++;}}}catch(e){F464.erros.push('limpar: '+(e&&e.message||e));}
 }catch(e){F464.erros.push('instalar: '+(e&&e.message||e));}}
 window.__fusao464={estado:F464};
+
+/* ===================== v465 · O TREMULAR NOS RODAPÉS, NA AMURADA E EM TODO LUGAR: DUAS CAUSAS DE VERDADE (pedido do Luiz, com
+   dois vídeos: «a amurada do barco continua bugando… o mesmo problema ocorre nos rodapés da mansão em Fantasia e do moinho» ·
+   «continua mesmo no fusao» · «corrija isso de uma vez por todas») =====================
+   O que tremula são riscos finos em faixas estreitas junto ao chão — e eles mudam a cada quadro. É briga de profundidade
+   (z-fighting): duas superfícies na mesma distância da câmera, e o cartão não sabe qual desenhar. Dois motivos, os dois reais:
+   1) O BUFFER DE PROFUNDIDADE DE 16 BITS. Nos modos Clássico, Alto e Ultra a cena é desenhada num alvo de renderização do
+      pós-processamento, e o three.js r128 dá a esse alvo um buffer de profundidade de 16 bits (DEPTH_COMPONENT16) quando ele
+      não tem stencil. Com o plano próximo da câmera em 5 cm, 16 bits distinguem ~1 mm a 2 m, ~3 cm a 10 m e ~12 cm a 20 m:
+      qualquer coisa a centímetros de outra — um rodapé a 1 cm da parede, um piso a 1,8 cm do chão, a guia de um caminho —
+      pisca de longe. A tela em si tem 24 bits (por isso o Leve e o Papel, que desenham direto na tela, só sofrem do motivo 2).
+      Correção: todo alvo de renderização com profundidade passa a ter stencil, o que no WebGL dá DEPTH24_STENCIL8 — 24 bits,
+      256× mais precisão (0,1 mm a 10 m). Vale para os alvos já criados (composer, SAO, bokeh, bloom, reflexo da biblioteca)
+      e para os que ainda vão nascer (portais das portas, vistas), por um embrulho no construtor.
+   2) FACES EXATAMENTE COPLANARES. Na amurada do tombadilho a antepara (a parede de 2,2 m de altura por baixo da balaustrada,
+      30 cm de espessura) termina em y = 2,2 — a mesma altura do piso do tombadilho, que a cobre: as duas faces ocupam o mesmo
+      plano numa faixa de 30 cm ao longo de toda a amurada, e é a madeira escura da antepara que aparece em riscos através das
+      tábuas. O mesmo no castelo de proa, no convés do navio pirata e, na Casa da Clareira e no moinho, nos topos e bases das
+      paredes contra pisos e lajes, nas guias de calcário sobre o calçamento e nas soleiras de pedra contra o assoalho. Com 24
+      bits isso continua brigando, porque é exatamente o mesmo plano. Correção: um varredor automático que, em cada cena, depois
+      de ela terminar de ser construída, encontra pares de faces horizontais de malhas diferentes no mesmo plano (±1,2 mm) que se
+      sobrepõem, e afasta uma delas 1,2 cm nos próprios vértices: a face do sólido «grosso» (a parede, o pedestal) afunda para
+      dentro dele, por baixo do piso; entre duas finas, a menor sobe 4 mm (é um tapete, uma guia — com 24 bits, 4 mm bastam até 60 m). Malhas de personagens, peças da
+      galeria, efeitos, transparências e água ficam de fora. A fusão de malhas da cena é desfeita e refeita com as malhas já
+      corrigidas. Fatiado em ~3 ms por quadro, sem travar.
+   ?depth465=0 e ?coplanar465=0 desligam cada parte. */
+const D465={on:!/[?&#]depth465=0/i.test(location.search+location.hash),alvos:0,erros:[]};
+function d465Alvo(rt){try{if(rt&&rt.isWebGLRenderTarget&&!rt.isWebGLCubeRenderTarget&&rt.depthBuffer&&!rt.stencilBuffer&&!rt.depthTexture){rt.stencilBuffer=true;rt.dispose();D465.alvos++;}}catch(e){if(D465.erros.length<8)D465.erros.push('alvo: '+(e&&e.message||e));}}
+if(D465.on){try{const RT=THREE.WebGLRenderTarget;const W=function(w,h,o){o=o||{};if(o.depthBuffer!==false&&!o.depthTexture&&!o.stencilBuffer)o=Object.assign({},o,{stencilBuffer:true});return new RT(w,h,o);};W.prototype=RT.prototype;try{Object.defineProperty(W,'name',{value:'WebGLRenderTarget'});}catch(e){}THREE.WebGLRenderTarget=W;
+  try{d465Alvo(composer.renderTarget1);d465Alvo(composer.renderTarget2);for(const p of composer.passes)for(const k in p){const v=p[k];if(v&&v.isWebGLRenderTarget)d465Alvo(v);}}catch(e){D465.erros.push('composer: '+(e&&e.message||e));}
+  try{d465Alvo(refl.getRenderTarget());}catch(e){}try{d465Alvo(WARM_RT190);}catch(e){}
+}catch(e){D465.erros.push('instalar: '+(e&&e.message||e));}}
+
+const C465={on:!/[?&#]coplanar465=0/i.test(location.search+location.hash),TOL:0.0012,DESLOCA:0.012,DESLOCA_FINA:0.004,MIN_AREA:0.004,CEL:3,QUIETO:6,ORCAMENTO:3,erros:[],stats:{cenas:0,faces:0,pares:0,movidas:0,ms:0},job:null,relatorio:[]};
+function c465Erro(o,e){if(C465.erros.length<12)C465.erros.push(o+': '+(e&&e.message||e));}
+function c465Pula(o){
+  if(!o.isMesh||o.isInstancedMesh||o.isSkinnedMesh||o.isSprite||!o.geometry||!o.geometry.attributes.position)return true;
+  const u=o.userData;if(u.fusao||u.fx||u.sombra462||u.galeria232||u.halls236||u.pecas458||u.lodPages||u.lodLite)return true;
+  const m=Array.isArray(o.material)?o.material[0]:o.material;if(!m||m.isShaderMaterial||m.isRawShaderMaterial||m.transparent||m.opacity<1||m.depthWrite===false||m.depthTest===false||m.visible===false)return true;
+  const g=o.geometry;if(g.morphAttributes&&g.morphAttributes.position)return true;const cnt=g.index?g.index.count:g.attributes.position.count;if(cnt>240000)return true;
+  for(let p=o;p;p=p.parent){const w=p.userData;if(w&&(w.npc127||w.aiCharacter||w.npc||w.talkName127||w.galeria232||w.halls236||w.arqueiro439||w.pecas458||w.fx||w.cozyNpc))return true;try{if(typeof READER!=='undefined'&&p===READER.g)return true;}catch(e){}}
+  return false;}
+function* c465Varre(sc){const T=THREE,t0=performance.now();const malhas=[],usoGeo=new Map();sc.traverse(o=>{if(!c465Pula(o)){malhas.push(o);usoGeo.set(o.geometry,(usoGeo.get(o.geometry)||0)+1);}});yield;
+  const faces=[],v=[new T.Vector3(),new T.Vector3(),new T.Vector3()],e1=new T.Vector3(),e2=new T.Vector3(),n=new T.Vector3(),TOL=C465.TOL;
+  for(let mi=0;mi<malhas.length;mi++){const o=malhas[mi];try{o.updateMatrixWorld(true);const M=o.matrixWorld,g=o.geometry,pos=g.attributes.position,idx=g.index,cnt=idx?idx.count:pos.count;
+      for(let i=0;i<cnt;i+=3){for(let k=0;k<3;k++){const j=idx?idx.getX(i+k):i+k;v[k].fromBufferAttribute(pos,j).applyMatrix4(M);}
+        if(Math.abs(v[0].y-v[1].y)>TOL||Math.abs(v[0].y-v[2].y)>TOL)continue;
+        e1.subVectors(v[1],v[0]);e2.subVectors(v[2],v[0]);n.crossVectors(e1,e2);const a2=n.length();if(a2<2e-5)continue;
+        faces.push({mi,i,y:(v[0].y+v[1].y+v[2].y)/3,up:n.y>0,x0:Math.min(v[0].x,v[1].x,v[2].x),x1:Math.max(v[0].x,v[1].x,v[2].x),z0:Math.min(v[0].z,v[1].z,v[2].z),z1:Math.max(v[0].z,v[1].z,v[2].z),area:a2/2});}}catch(e){c465Erro('malha '+(o.name||mi),e);}
+    if(mi%6===5)yield;}
+  C465.stats.faces+=faces.length;
+  // baldes por altura quantizada e célula no chão
+  const CEL=C465.CEL,baldes=new Map();
+  for(let fi=0;fi<faces.length;fi++){const f=faces[fi];const yq=Math.round(f.y/TOL);const cx0=Math.floor(f.x0/CEL),cx1=Math.floor(f.x1/CEL),cz0=Math.floor(f.z0/CEL),cz1=Math.floor(f.z1/CEL);if((cx1-cx0+1)*(cz1-cz0+1)>900)continue;
+    for(let cx=cx0;cx<=cx1;cx++)for(let cz=cz0;cz<=cz1;cz++){const k=yq+'|'+cx+'|'+cz;let L=baldes.get(k);if(!L)baldes.set(k,L=[]);L.push(fi);}
+    if(fi%3000===2999)yield;}
+  // pares: mesmo balde ou balde da altura vizinha
+  const grupos=new Map(),vistos=new Set();let nb=0;
+  const testa=(fi,fj)=>{if(fi===fj)return;const a=faces[fi],b=faces[fj];if(a.mi===b.mi||a.up!==b.up||Math.abs(a.y-b.y)>TOL)return;const ox=Math.min(a.x1,b.x1)-Math.max(a.x0,b.x0),oz=Math.min(a.z1,b.z1)-Math.max(a.z0,b.z0);if(ox<=0.012||oz<=0.012||ox*oz<C465.MIN_AREA)return;
+    const key=fi<fj?fi+','+fj:fj+','+fi;if(vistos.has(key))return;vistos.add(key);const [p,q]=a.mi<b.mi?[a,b]:[b,a];const gk=p.mi+'|'+q.mi+'|'+Math.round(p.y/TOL)+'|'+(p.up?1:0);
+    let G=grupos.get(gk);if(!G)grupos.set(gk,G={a:p.mi,b:q.mi,y:p.y,up:p.up,fa:new Set(),fb:new Set(),area:0});G.fa.add(p.i);G.fb.add(q.i);G.area+=ox*oz;};
+  for(const [k,L] of baldes){const [yq,cx,cz]=k.split('|');const L2=baldes.get((+yq+1)+'|'+cx+'|'+cz);for(let i=0;i<L.length;i++){for(let j=i+1;j<L.length;j++)testa(L[i],L[j]);if(L2)for(let j=0;j<L2.length;j++)testa(L[i],L2[j]);}
+    if(++nb%400===0)yield;}
+  C465.stats.pares+=grupos.size;
+  // decide e desloca
+  const caixa=o=>{const g=o.geometry;if(!g.boundingBox)g.computeBoundingBox();return g.boundingBox.clone().applyMatrix4(o.matrixWorld);};
+  const areaDe=(o,set)=>{let s=0;const g=o.geometry,pos=g.attributes.position,idx=g.index;for(const i of set){for(let k=0;k<3;k++){const j=idx?idx.getX(i+k):i+k;v[k].fromBufferAttribute(pos,j).applyMatrix4(o.matrixWorld);}e1.subVectors(v[1],v[0]);e2.subVectors(v[2],v[0]);s+=n.crossVectors(e1,e2).length()/2;}return s;};
+  const movidas=new Map(); // malha -> {dy, idx:Set}
+  for(const G of grupos.values()){try{const A=malhas[G.a],B=malhas[G.b],bA=caixa(A),bB=caixa(B);const grossoA=G.up?bA.min.y<G.y-0.03:bA.max.y>G.y+0.03,grossoB=G.up?bB.min.y<G.y-0.03:bB.max.y>G.y+0.03;
+      let alvo,faces2,afasta;if(grossoA&&!grossoB){alvo=A;faces2=G.fa;afasta=true;}else if(grossoB&&!grossoA){alvo=B;faces2=G.fb;afasta=true;}else{const aa=areaDe(A,G.fa),ab=areaDe(B,G.fb);if(aa<=ab){alvo=A;faces2=G.fa;}else{alvo=B;faces2=G.fb;}afasta=grossoA&&grossoB;}
+      const dy=(G.up?-1:1)*(afasta?C465.DESLOCA:-C465.DESLOCA_FINA);let R=movidas.get(alvo);if(!R)movidas.set(alvo,R={dy,idx:new Set(),grupos:0,outro:(alvo===A?B:A).name||'?',y:G.y,area:0});R.grupos++;R.area+=G.area;
+      const g=alvo.geometry,idx=g.index;for(const i of faces2)for(let k=0;k<3;k++)R.idx.add(idx?idx.getX(i+k):i+k);}catch(e){c465Erro('grupo',e);}}
+  for(const [o,R] of movidas){try{if((usoGeo.get(o.geometry)||0)>1){o.geometry=o.geometry.clone();}const g=o.geometry,pos=g.attributes.position;const inv=new T.Matrix4().copy(o.matrixWorld).invert();const o0=new T.Vector3(0,0,0).applyMatrix4(inv),o1=new T.Vector3(0,R.dy,0).applyMatrix4(inv).sub(o0);
+      for(const j of R.idx){pos.setXYZ(j,pos.getX(j)+o1.x,pos.getY(j)+o1.y,pos.getZ(j)+o1.z);}pos.needsUpdate=true;g.computeBoundingBox();g.computeBoundingSphere();C465.stats.movidas++;
+      if(C465.relatorio.length<120)C465.relatorio.push({cena:sc.name||'',malha:(o.name||o.parent&&o.parent.name||'?').slice(0,60),contra:R.outro.slice(0,50),y:+R.y.toFixed(3),dy:+R.dy.toFixed(3),vertices:R.idx.size,area:+R.area.toFixed(2)});}catch(e){c465Erro('mover',e);}}
+  if(movidas.size){try{if(typeof fusaoLimpar==='function'&&FUSAO.cenas.get(sc))fusaoLimpar(sc);}catch(e){c465Erro('fusão',e);}}
+  C465.stats.cenas++;C465.stats.ms+=performance.now()-t0;return movidas.size;}
+function c465Conta(sc){let n=0;sc.traverse(o=>{if(o.isMesh)n++;});return n;}
+function c465Tick(){if(!C465.on)return;const sc=(typeof ACTIVE!=='undefined')?ACTIVE:null;if(!sc)return;const u=sc.userData;
+  if(C465.job){if(C465.job.sc!==sc){C465.job=null;}else{const t0=performance.now();try{let r;do{r=C465.job.it.next();}while(!r.done&&performance.now()-t0<C465.ORCAMENTO);if(r.done){u.c465.feito=C465.job.n;u.c465.ciclos=0;C465.job=null;}}catch(e){c465Erro('job',e);C465.job=null;u.c465.feito=u.c465.n;}return;}}
+  const st=u.c465||(u.c465={n:-1,quieto:0,feito:-1,t:0});if(++st.t%15!==0)return;
+  let ocupado=false;try{ocupado=!!(buildBusy||buildIt||BUILD_Q.length);}catch(e){}if(ocupado){st.quieto=0;return;}
+  const n=c465Conta(sc),d=Math.abs(n-st.n);st.n=n;if(d>2){st.quieto=0;return;}st.quieto++;st.ciclos=(st.ciclos||0)+1; // churn pequeno (efeitos) não zera a espera
+  if(st.feito>=0&&Math.abs(n-st.feito)<25)return; // já varrida e sem construção nova desde então
+  if(st.quieto>=C465.QUIETO||st.ciclos>=40){C465.job={sc,n,it:c465Varre(sc)};st.ciclos=0;}}
+if(C465.on){try{const d0=draw;draw=function(dt){try{c465Tick();}catch(e){c465Erro('tick',e);}return d0.apply(this,arguments);};}catch(e){c465Erro('instalar',e);}}
+window.__v465={depth:D465,coplanar:C465,varrer:(sc)=>{const it=c465Varre(sc||ACTIVE);let r;do{r=it.next();}while(!r.done);return r.value;},alvo:d465Alvo};
+
+/* ===================== v466 · ASAS PEQUENAS QUE SE DESDOBRAM NO VOO (pedido do Luiz: «A asa recolhida assim não ficou legal, em vez
+   disso, deixe ela menorzinha, bem pequena mas aberta mesmo, e quando ele voa ela se abre, se desdobrando no tamanho original») =====================
+   · Substitui o recolhimento da v453: com a Asa Azul posta, as asas ficam ABERTAS — na pose normal, com o adejo leve de sempre —
+     mas em miniatura (28 % do tamanho, presas aos ombros). Quando o leitor voa, uma mola as desdobra até o tamanho original em
+     cerca de meio segundo, junto com as batidas largas do voo; ao pousar, encolhem de volta. A dobra da v253 nas portas estreitas
+     continua valendo (as asas, mesmo pequenas, dobram para passar).
+   · Os avisos do C, da conquista e a descrição do poder passam a dizer «pequenas» / «se desdobram». ?asa466=0 volta à v453. */
+const ASA466={on:!/[?&#]asa466=0/i.test(location.search+location.hash),MIN:.28,W:7,k:.28,kv:0,erros:[]};
+if(ASA466.on&&typeof ASA453!=='undefined'&&typeof asa253Anima==='function'){
+  ASA453.aberta=true; // a v453 deixa de forçar a dobra fora do voo
+  const an=asa253Anima;asa253Anima=function(dt){const r=an.apply(this,arguments);try{const A=ASA246.asas;if(!A||!A.userData||!A.userData.lados253)return r;const S=ASA466,d=Math.min(.1,dt||.016);
+      const alvo=ASA246.voo?1:S.MIN;const w=S.W,ac=w*w*(alvo-S.k)-2*w*S.kv;S.kv+=ac*d;S.k+=S.kv*d;if(S.k<S.MIN){S.k=S.MIN;if(S.kv<0)S.kv=0;}if(S.k>1){S.k=1;if(S.kv>0)S.kv=0;}
+      for(const Ld of A.userData.lados253){Ld.omb.scale.setScalar(Ld.omb.scale.x*S.k);}}catch(e){if(ASA466.erros.length<8)ASA466.erros.push('anima: '+(e&&e.message||e));}return r;};
+  try{ASA246_PODER.desc=ASA246_EN?'puts on and takes off the blue wings: small on your back, they make you move twice as fast, and they unfold to full size when you fly — in Adventure, across to the second boat'
+    :'põe e tira as asas azuis: pequenas nas costas, elas fazem você andar duas vezes mais rápido, e se desdobram no tamanho inteiro quando você voa — na Aventura, até o segundo barco';}catch(e){ASA466.erros.push('desc: '+(e&&e.message||e));}
+  const TROCAS=[['Asas nas costas: você anda duas vezes mais rápido, e elas se abrem quando você voa','Asas pequenas: você anda duas vezes mais rápido, e elas se desdobram quando você voa'],['Wings on your back: you move twice as fast, and they spread when you fly','Small wings: you move twice as fast, and they unfold when you fly'],
+    ['🪽 Asas guardadas.','🪽 Asas recolhidas.'],['🪽 Wings put away.','🪽 Wings tucked in.'],['põe e guarda as asas','põe e tira as asas'],['puts on and stows the wings','puts on and takes off the wings']];
+  {const st=showToast;showToast=function(msg){try{if(typeof msg==='string'&&msg.indexOf('🪽')===0){for(const [a,b] of TROCAS)msg=msg.replace(a,b);arguments[0]=msg;}}catch(e){}return st.apply(this,arguments);};}
+}
+window.__asa466=ASA466;
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
