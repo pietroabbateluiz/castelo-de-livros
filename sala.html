@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v468</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v471</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -53533,7 +53533,7 @@ function dungeon395Build(){const S=DUNGEON395;if(S.built)return;const R=S.room,T
 }
 function dungeon395Here(){return CUR==='room'&&ROOM===DUNGEON395.room;}
 function dungeon395Switch(on,move=true){const S=DUNGEON395;if(on===S.active)return;if(on)dungeon395Build();const R=S.room;
- if(on){S.background=R.scene.background;S.fog=R.scene.fog;R.scene.background=new THREE.Color(0x252c36);R.scene.fog=new THREE.FogExp2(0x252c36,.011);S.hidden=[];for(const o of R.scene.children){if(o===S.root||o===READER.g||o===MARK||o.userData.dungeon395)continue;S.hidden.push([o,o.visible]);o.visible=false;}S.keyActive=KEYS.active;S.coinActive=COINS.active;KEYS.active=[];COINS.active=[];}else{R.scene.background=S.background;R.scene.fog=S.fog;for(const [o,v]of S.hidden||[])o.visible=v;KEYS.active=S.keyActive||[];COINS.active=S.coinActive||[];}
+ if(on){S.background=R.scene.background;S.fog=R.scene.fog;R.scene.background=new THREE.Color(0x252c36);R.scene.fog=new THREE.FogExp2(0x252c36,.011);S.hidden=[];for(const o of R.scene.children){if(o===S.root||o===READER.g||o===MARK||o.userData.dungeon395||o.__fusaoVis!==undefined)continue;S.hidden.push([o,o.visible]);o.visible=false;}S.keyActive=KEYS.active;S.coinActive=COINS.active;KEYS.active=[];COINS.active=[];}else{R.scene.background=S.background;R.scene.fog=S.fog;for(const [o,v]of S.hidden||[])o.visible=v;KEYS.active=S.keyActive||[];COINS.active=S.coinActive||[];}
  S.active=on;S.root.visible=on;R.world.__nav=null;R.world.__navN=-1;S.hatch.lid.rotation.x=on?-1.35:0;
  if(move){if(CH.sitting)standUp();const p=on?[0,23.4]:[S.hatch.x,S.hatch.z+1.65];CH.x=P.x=p[0];CH.z=P.z=p[1];CH.fy=on?dungeon395Floor(...p):S.baseFloor(...p);CH.dir=on?Math.PI:0;CH.target=null;CH.onArrive=null;CH.vx=CH.vz=0;syncP();camInit=false;CAV.invul=2;for(const list of [CAV.tiros,CAV.ossos]){for(const o of list)o.scene?.remove(o.g);list.length=0;}cavHud();showToast(on?'Você desceu à Galeria dos Ecos. Explore quatro câmaras; a escada atrás de você leva de volta.':'De volta à sala de Terror.',{ms:6000});}
 }
@@ -58263,6 +58263,436 @@ if(T468.on){try{
   try{ruby422HUD();}catch(e){}
 }catch(e){T468.erros.push('instalar: '+(e&&e.message||e));}}
 window.__ciclo468={estado:T468,rotulo:t468Rotulo,coage:t468Coage,dados:()=>RUBY422.data};
+
+/* ===================== v469 · MASMORRAS MAIS BELAS (pedido do Luiz: «A masmorra sob a sala de terror está fraca, melhore ela. Quero gráfico mais belo») =====================
+   · Luz: a galeria deixa de ser um corredor branco e estourado. Ambiente azulado e fraco, um hemisfério frio por cima e quente
+     por baixo, lampiões âmbar com queda mais curta (e tremular de chama de verdade), as poças de luz das tochas menores e
+     alaranjadas, fundo e névoa quase pretos. Uma lâmpada a mais no trecho escuro do corredor (z −19).
+   · Pedra: paredes e piso ganham texturas novas de 1024 px — silhares irregulares de basalto úmido com argamassa, escorridos,
+     musgo e rachaduras; lajes irregulares no chão com juntas fundas e manchas molhadas — com mapa de normais, mapa de
+     aspereza (o molhado brilha) e sem a emissão que achatava tudo. A base das paredes escurece e esverdeia no shader; o piso
+     recebe oclusão de contato junto às paredes (cor por vértice, malha de 0,5 m).
+   · Vida nas câmaras: poças d'água espelhadas, gotas que pingam do teto do corredor com respingo, névoa rasteira que se
+     arrasta, teias de aranha nos cantos e sob os arcos, correntes com algemas e um prisioneiro esquecido nas celas (palha,
+     balde, rato que corre pela parede), velas acesas no arquivo e sobre os sarcófagos, braseiros acesos e o selo rúnico da
+     Câmara dos Selos brilhando em pulsos com fagulhas que sobem, escorridos de água e manchas de musgo nas paredes.
+   · Nada muda de lugar: colisões, chaves, baús, carcereiros e a escada seguem como estavam. ?masmorras469=0 volta ao antigo. */
+const M469={on:!/[?&#]masmorras469=0/i.test(location.search+location.hash),feito:false,erros:[],stats:{},anim:{luzes:[],brilhos:[],nevoa:[],gotas:[],ratos:[],selo:null,fagulhas:null,velas:[],t:0},
+  COR:{fundo:0x07090d,nevoa:0x0a0e15,amb:0x5c6e8e,hemiCeu:0x47546e,hemiChao:0x3a2a1a},
+  LUZ:{amb:.34,hemi:.30,corredor:1.2,camara:1.25,distC:18,distK:21,decay:1.6,brilhoParede:.27,brilhoChao:.17}};
+function m469Erro(onde,e){if(M469.erros.length<12)M469.erros.push(onde+': '+(e&&e.message||e));console.warn('v469',onde,e);}
+/* ruído de 4 octavas que fecha nas bordas (mistura dos 4 cantos), devolvido como canvas cinza */
+function m469Ruido(seed,S){const f=mkNoise(seed),c=can(S,S),p=c.getContext('2d'),d=p.createImageData(S,S),k=.018;for(let y=0;y<S;y++)for(let x=0;x<S;x++){const wx=x/S,wy=y/S;const v=(f(x*k,y*k,4)*(1-wx)*(1-wy)+f((x+S)*k,y*k,4)*wx*(1-wy)+f(x*k,(y+S)*k,4)*(1-wx)*wy+f((x+S)*k,(y+S)*k,4)*wx*wy);const g=Math.round(Math.max(0,Math.min(1,(v-.5)*1.9+.5))*255),i=(y*S+x)*4;d.data[i]=d.data[i+1]=d.data[i+2]=g;d.data[i+3]=255;}p.putImageData(d,0,0);return c;}
+function m469Cobre(p,W,H,tile,op,alpha){p.save();p.globalCompositeOperation=op;p.globalAlpha=alpha;const s=tile.width;for(let y=0;y<H;y+=s)for(let x=0;x<W;x+=s)p.drawImage(tile,x,y);p.restore();}
+/* paredes: silhares irregulares de basalto úmido (1 textura = 5 m) · devolve {map,normal,rough} */
+function m469TexParede(){const S=1024,r=rnd(46901),c=can(S,S),p=c.getContext('2d'),h=can(S,S),ph=h.getContext('2d'),q=can(S,S),pq=q.getContext('2d');
+  p.fillStyle='#1d1f22';p.fillRect(0,0,S,S);ph.fillStyle='#262626';ph.fillRect(0,0,S,S);pq.fillStyle='#e6e6e6';pq.fillRect(0,0,S,S);
+  const paleta=[[96,100,106],[88,84,78],[104,98,88],[82,90,98],[92,92,94],[110,104,96]];const ROWS=12,RH=S/ROWS;
+  for(let row=0;row<ROWS;row++){let x=-r()*180;const y=row*RH;while(x<S){const w=118+r()*150;const bloco=(bx)=>{const g=paleta[(r()*paleta.length)|0],v=.86+r()*.3;const grad=p.createLinearGradient(bx,y,bx+w,y+RH);grad.addColorStop(0,'rgb('+Math.round(g[0]*v*1.08)+','+Math.round(g[1]*v*1.08)+','+Math.round(g[2]*v*1.06)+')');grad.addColorStop(1,'rgb('+Math.round(g[0]*v*.84)+','+Math.round(g[1]*v*.86)+','+Math.round(g[2]*v*.9)+')');
+      p.fillStyle=grad;p.beginPath();p.roundRect(bx+4,y+4,w-8,RH-8,5);p.fill();p.strokeStyle='rgba(215,210,196,.16)';p.lineWidth=2;p.beginPath();p.moveTo(bx+8,y+RH-8);p.lineTo(bx+8,y+8);p.lineTo(bx+w-8,y+8);p.stroke();p.strokeStyle='rgba(8,10,14,.5)';p.beginPath();p.moveTo(bx+8,y+RH-7);p.lineTo(bx+w-7,y+RH-7);p.lineTo(bx+w-7,y+8);p.stroke();
+      const hv=150+r()*70;const hg=ph.createRadialGradient(bx+w/2,y+RH/2,4,bx+w/2,y+RH/2,w*.62);hg.addColorStop(0,'rgb('+Math.round(hv+22)+','+Math.round(hv+22)+','+Math.round(hv+22)+')');hg.addColorStop(.8,'rgb('+Math.round(hv)+','+Math.round(hv)+','+Math.round(hv)+')');hg.addColorStop(1,'rgb('+Math.round(hv-40)+','+Math.round(hv-40)+','+Math.round(hv-40)+')');ph.fillStyle=hg;ph.beginPath();ph.roundRect(bx+4,y+4,w-8,RH-8,5);ph.fill();
+      for(let j=0;j<26;j++){p.fillStyle=j%2?'rgba(230,222,205,.09)':'rgba(10,12,18,.14)';p.fillRect(bx+8+r()*(w-16),y+8+r()*(RH-16),1+r()*5,1+r()*2);}
+      if(r()>.72){p.strokeStyle='rgba(12,14,18,.55)';p.lineWidth=1.2;p.beginPath();let cx=bx+12+r()*(w-24),cy=y+6;p.moveTo(cx,cy);for(let j=0;j<5;j++){cx+=(r()-.5)*18;cy+=RH/5;p.lineTo(cx,cy);}p.stroke();ph.strokeStyle='rgba(40,40,40,.8)';ph.lineWidth=2;ph.beginPath();ph.moveTo(cx,cy);ph.lineTo(cx-10,cy-RH*.8);ph.stroke();}};
+      bloco(x);if(x+w>S)bloco(x-S);x+=w;}}
+  const ruido=m469Ruido(46902,256);m469Cobre(p,S,S,ruido,'overlay',.55);m469Cobre(ph,S,S,ruido,'overlay',.35);
+  // escorridos de água, musgo e líquen
+  for(let j=0;j<14;j++){const x=r()*S,y0=r()*S*.5,len=120+r()*380,w=10+r()*26;const g=p.createLinearGradient(0,y0,0,y0+len);g.addColorStop(0,'rgba(14,16,20,.0)');g.addColorStop(.15,'rgba(14,16,20,.42)');g.addColorStop(1,'rgba(14,16,20,0)');p.fillStyle=g;p.fillRect(x-w/2,y0,w,len);pq.fillStyle='rgba(120,120,120,.5)';pq.fillRect(x-w/2,y0,w,len);}
+  for(let j=0;j<18;j++){const x=r()*S,y=r()*S,rr=18+r()*46;const g=p.createRadialGradient(x,y,2,x,y,rr);g.addColorStop(0,'rgba(78,104,52,.5)');g.addColorStop(.6,'rgba(62,88,44,.26)');g.addColorStop(1,'rgba(50,70,38,0)');p.fillStyle=g;p.beginPath();p.arc(x,y,rr,0,7);p.fill();}
+  for(let j=0;j<40;j++){const x=r()*S,y=r()*S,rr=3+r()*9;p.fillStyle=j%3?'rgba(168,172,150,.22)':'rgba(190,180,150,.18)';p.beginPath();p.arc(x,y,rr,0,7);p.fill();}
+  return {map:c,normal:normalFrom(h,2.3),rough:q};}
+/* piso: lajes irregulares com juntas fundas e trechos molhados (1 textura = 11,1 m) */
+function m469TexPiso(){const S=1024,r=rnd(46903),c=can(S,S),p=c.getContext('2d'),h=can(S,S),ph=h.getContext('2d'),q=can(S,S),pq=q.getContext('2d');
+  p.fillStyle='#17191c';p.fillRect(0,0,S,S);ph.fillStyle='#1e1e1e';ph.fillRect(0,0,S,S);pq.fillStyle='#e2e2e2';pq.fillRect(0,0,S,S);
+  const paleta=[[84,88,94],[92,88,80],[78,82,90],[96,96,98],[72,76,82],[100,94,86]];const ROWS=9,RH=S/ROWS;
+  for(let row=0;row<ROWS;row++){let x=-r()*160;const y=row*RH;while(x<S){const w=90+r()*120;const laje=(bx)=>{const g=paleta[(r()*paleta.length)|0],v=.82+r()*.34,j=()=>(r()-.5)*14;const pts=[[bx+5+j(),y+5+j()],[bx+w-5+j(),y+5+j()],[bx+w-5+j(),y+RH-5+j()],[bx+5+j(),y+RH-5+j()]];
+      const grad=p.createLinearGradient(bx,y,bx+w*.7,y+RH);grad.addColorStop(0,'rgb('+Math.round(g[0]*v*1.1)+','+Math.round(g[1]*v*1.08)+','+Math.round(g[2]*v*1.06)+')');grad.addColorStop(1,'rgb('+Math.round(g[0]*v*.82)+','+Math.round(g[1]*v*.84)+','+Math.round(g[2]*v*.9)+')');
+      const tr=(ctx)=>{ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<4;i++)ctx.lineTo(pts[i][0],pts[i][1]);ctx.closePath();};
+      p.fillStyle=grad;tr(p);p.fill();p.strokeStyle='rgba(225,218,200,.14)';p.lineWidth=2;tr(p);p.stroke();
+      const hv=140+r()*80;ph.fillStyle='rgb('+hv+','+hv+','+hv+')';tr(ph);ph.fill();const hg=ph.createRadialGradient(bx+w/2,y+RH/2,2,bx+w/2,y+RH/2,w*.7);hg.addColorStop(0,'rgba(255,255,255,.18)');hg.addColorStop(1,'rgba(0,0,0,.25)');ph.fillStyle=hg;tr(ph);ph.fill();
+      for(let k=0;k<30;k++){p.fillStyle=k%2?'rgba(232,224,206,.08)':'rgba(8,10,14,.16)';p.fillRect(bx+8+r()*(w-16),y+8+r()*(RH-16),1+r()*6,1+r()*2);}
+      if(r()>.78){p.strokeStyle='rgba(10,12,16,.5)';p.lineWidth=1.3;p.beginPath();let cx=bx+10+r()*(w-20),cy=y+8;p.moveTo(cx,cy);for(let k=0;k<4;k++){cx+=(r()-.5)*22;cy+=RH/4.5;p.lineTo(cx,cy);}p.stroke();}};
+      laje(x);if(x+w>S)laje(x-S);x+=w;}}
+  const ruido=m469Ruido(46904,256);m469Cobre(p,S,S,ruido,'overlay',.5);m469Cobre(ph,S,S,ruido,'overlay',.3);
+  // trechos molhados: mais escuros no mapa e lisos no mapa de aspereza; musgo nas juntas
+  for(let j=0;j<9;j++){const x=r()*S,y=r()*S,rr=70+r()*150;for(const [ctx,col] of [[p,'rgba(8,10,14,'],[pq,'rgba(70,70,70,']]){const g=ctx.createRadialGradient(x,y,4,x,y,rr);g.addColorStop(0,col+'.55)');g.addColorStop(.7,col+'.28)');g.addColorStop(1,col+'0)');ctx.fillStyle=g;for(const dx of [-S,0,S])for(const dy of [-S,0,S]){ctx.beginPath();ctx.arc(x+dx,y+dy,rr,0,7);ctx.fill();}}}
+  for(let j=0;j<24;j++){const x=r()*S,y=r()*S,rr=8+r()*22;const g=p.createRadialGradient(x,y,1,x,y,rr);g.addColorStop(0,'rgba(74,98,50,.42)');g.addColorStop(1,'rgba(60,80,44,0)');p.fillStyle=g;p.beginPath();p.arc(x,y,rr,0,7);p.fill();}
+  return {map:c,normal:normalFrom(h,2.0),rough:q};}
+function m469TexCanvas(c,srgb,rep){const tx=new THREE.CanvasTexture(c);tx.wrapS=tx.wrapT=THREE.RepeatWrapping;if(srgb)tx.encoding=THREE.sRGBEncoding;tx.anisotropy=8;if(rep)tx.repeat.set(rep,rep);return tx;}
+/* texturas pequenas dos adereços */
+function m469TexTeia(){return t160Tex('469 teia',256,256,(p,W,H)=>{p.clearRect(0,0,W,H);const r=rnd(46905),cx=W/2,cy=2;p.strokeStyle='rgba(236,232,220,.9)';p.lineWidth=1.1;for(let j=0;j<=10;j++){const a=j*Math.PI/10;p.beginPath();p.moveTo(cx,cy);p.lineTo(cx+Math.cos(a)*W,cy+Math.sin(a)*H*1.1);p.stroke();}
+  for(let k=1;k<=11;k++){const rr=k*21+r()*6;p.lineWidth=k%3?.8:1.1;p.beginPath();for(let j=0;j<=40;j++){const a=j*Math.PI/40,s=rr*(.95+r()*.08);const x=cx+Math.cos(a)*s,y=cy+Math.sin(a)*s;j?p.lineTo(x,y):p.moveTo(x,y);}p.stroke();}
+  for(let j=0;j<16;j++){p.beginPath();const a=r()*Math.PI,r0=20+r()*200;p.moveTo(cx+Math.cos(a)*r0,cy+Math.sin(a)*r0);p.lineTo(cx+Math.cos(a+.25)*(r0+30),cy+Math.sin(a+.25)*(r0+30));p.stroke();}
+  p.globalCompositeOperation='destination-in';const g=p.createRadialGradient(cx,cy,10,cx,cy,250);g.addColorStop(0,'rgba(0,0,0,1)');g.addColorStop(.72,'rgba(0,0,0,.85)');g.addColorStop(1,'rgba(0,0,0,0)');p.fillStyle=g;p.fillRect(0,0,W,H);});}
+function m469TexMancha(){return t160Tex('469 escorrido',128,256,(p,W,H)=>{p.clearRect(0,0,W,H);const r=rnd(46906);for(let j=0;j<7;j++){const x=20+r()*88,w=5+r()*16,len=90+r()*160;const g=p.createLinearGradient(0,0,0,len);g.addColorStop(0,'rgba(255,255,255,.95)');g.addColorStop(.6,'rgba(255,255,255,.5)');g.addColorStop(1,'rgba(255,255,255,0)');p.fillStyle=g;p.fillRect(x-w/2,0,w,len);}});}
+function m469TexMusgo(){return t160Tex('469 musgo',256,128,(p,W,H)=>{p.clearRect(0,0,W,H);const r=rnd(46907);for(let j=0;j<40;j++){const x=r()*W,y=H*.45+r()*H*.55,rr=10+r()*30;const g=p.createRadialGradient(x,y,1,x,y,rr);g.addColorStop(0,'rgba(255,255,255,.9)');g.addColorStop(1,'rgba(255,255,255,0)');p.fillStyle=g;p.beginPath();p.arc(x,y,rr,0,7);p.fill();}});}
+function m469TexNevoa(){return t160Tex('469 nevoa',128,128,(p,W,H)=>{p.clearRect(0,0,W,H);const r=rnd(46908);for(let j=0;j<9;j++){const x=30+r()*68,y=30+r()*68,rr=26+r()*34;const g=p.createRadialGradient(x,y,1,x,y,rr);g.addColorStop(0,'rgba(255,255,255,.5)');g.addColorStop(1,'rgba(255,255,255,0)');p.fillStyle=g;p.beginPath();p.arc(x,y,rr,0,7);p.fill();}});}
+function m469TexHalo(){return t160Tex('469 halo',128,128,(p,W,H)=>{p.clearRect(0,0,W,H);const g=p.createRadialGradient(64,64,0,64,64,64);g.addColorStop(0,'rgba(255,255,255,.55)');g.addColorStop(.45,'rgba(255,255,255,.22)');g.addColorStop(1,'rgba(255,255,255,0)');p.fillStyle=g;p.fillRect(0,0,W,H);});}
+function m469TexPonto(){return t160Tex('469 fagulha',32,32,(p,W,H)=>{p.clearRect(0,0,W,H);const g=p.createRadialGradient(16,16,0,16,16,16);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.3,'rgba(255,255,255,.6)');g.addColorStop(1,'rgba(255,255,255,0)');p.fillStyle=g;p.fillRect(0,0,W,H);});}
+/* cubo de reflexo das poças: teto escuro azulado com os halos quentes das tochas */
+function m469Cubo(){if(M469.cubo)return M469.cubo;const faces=[];for(let f=0;f<6;f++){const c=can(64,64),p=c.getContext('2d');if(f===3){p.fillStyle='#07090c';p.fillRect(0,0,64,64);}else{if(f===2){p.fillStyle='#4a5466';p.fillRect(0,0,64,64);}else{const g=p.createLinearGradient(0,0,0,64);g.addColorStop(0,'#4a5466');g.addColorStop(1,'#0b0e14');p.fillStyle=g;p.fillRect(0,0,64,64);}
+    for(const [x,y,rr] of f===2?[[16,20,18],[46,40,16],[30,54,13],[52,12,14]]:[[32,20,18]]){const rg=p.createRadialGradient(x,y,1,x,y,rr);rg.addColorStop(0,'rgba(255,210,140,1)');rg.addColorStop(.5,'rgba(255,180,100,.45)');rg.addColorStop(1,'rgba(255,160,80,0)');p.fillStyle=rg;p.fillRect(0,0,64,64);}}faces.push(c);}
+  const cube=new THREE.CubeTexture(faces);cube.encoding=THREE.sRGBEncoding;cube.needsUpdate=true;M469.cubo=cube;return cube;}
+/* as paredes da masmorra (caixas de colisão da v395) para a oclusão de contato do piso */
+function m469Paredes(){const L=[];const add=(x,z,w,d)=>L.push([x-w/2,x+w/2,z-d/2,z+d/2]);for(const x of [-2.55,2.55])for(const [z,d] of [[3.625,12.75],[-14,13.5],[-27.625,4.75]])add(x,z,.5,d);
+  for(const s of [-1,1]){add(s*20.25,-5,.5,14.5);add(s*20.25,-23,.5,14.5);for(const z of [2.25,-12.25,-15.75,-30.25])add(s*13,z,14.5,.5);for(const z of [-.5,-9.5,-18.5,-27.5])add(s*5.75,z,.5,5);for(const z of [-7.25,-2.75,-25.25,-20.75])add(s*4.15,z,3.7,.5);add(s*2.42,19,.3,10);add(s*4.15,10.25,3.7,.5);add(s*6.25,14,.5,8);}
+  add(0,-30.25,5.1,.5);for(const z of [-29.4,-16.6])add(-13,z,10,.4);for(const x of [10,15.5])for(const z of [-10.5,.5])add(x,z,2.7,1.15);return L;}
+function m469Aplica(){const S=DUNGEON395;if(M469.feito||!M469.on||!S.built)return;M469.feito=true;const T=THREE,R=S.room,A=M469.anim,t0=performance.now();
+  /* ---------- 1 · pedra nova nas paredes e no piso ---------- */
+  try{const wall=dungeon395Stone('walls'),floor=dungeon395Stone('floor'),tp=m469TexParede(),tf=m469TexPiso();
+    const troca=(m,t,rep)=>{m.map=m469TexCanvas(t.map,true,rep);m.normalMap=m469TexCanvas(t.normal,false,rep);m.normalScale=new T.Vector2(.75,.75);m.roughnessMap=m469TexCanvas(t.rough,false,rep);m.roughness=1;m.metalness=.04;m.bumpMap=null;m.emissiveMap=null;m.emissive.set(0x000000);m.emissiveIntensity=0;m.dithering=true;m.userData.papelKeep=true;m.needsUpdate=true;};
+    troca(wall,tp,1);troca(floor,tf,1);
+    // base escura e musgosa e topo na penumbra, calculados no shader pela altura no mundo
+    wall.onBeforeCompile=sh=>{sh.vertexShader='varying float vM469y;\n'+sh.vertexShader.replace('#include <worldpos_vertex>','#include <worldpos_vertex>\nvM469y=(modelMatrix*vec4(transformed,1.0)).y;');
+      sh.fragmentShader='varying float vM469y;\n'+sh.fragmentShader.replace('#include <map_fragment>','#include <map_fragment>\ndiffuseColor.rgb*=mix(vec3(.34,.40,.33),vec3(1.0),smoothstep(-8.0,-6.3,vM469y))*mix(1.0,.70,smoothstep(-3.8,-2.9,vM469y));');};
+    wall.customProgramCacheKey=()=>'m469-parede';wall.needsUpdate=true;
+    // a abóbada do corredor usa um clone do material: recebe os mesmos mapas
+    S.ceiling.traverse(o=>{if(o.isMesh&&o.material!==wall&&o.material.map&&o.material.name===wall.name){const m=wall.clone();m.side=T.DoubleSide;m.onBeforeCompile=wall.onBeforeCompile;m.customProgramCacheKey=wall.customProgramCacheKey;o.material=m;}});
+    // piso em malha de 0,5 m com oclusão de contato junto às paredes e variação de tom
+    const paredes=m469Paredes(),noise=mkNoise(46909),C=new T.Color();floor.vertexColors=true;floor.needsUpdate=true;let refeitos=0;
+    for(const mesh of S.floors){if(mesh.material!==floor||mesh.geometry.type!=='PlaneGeometry')continue;const pr=mesh.geometry.parameters,w=pr.width,d=pr.height,g=new T.PlaneGeometry(w,d,Math.max(1,Math.round(w*2)),Math.max(1,Math.round(d*2)));const p=g.attributes.position,uv=g.attributes.uv,col=new Float32Array(p.count*3);
+      for(let i=0;i<p.count;i++){const x=p.getX(i)+mesh.position.x,z=-p.getY(i)+mesh.position.z;uv.setXY(i,x*.09,z*.09);let dmin=9;for(const b of paredes){const dx=Math.max(b[0]-x,0,x-b[1]),dz=Math.max(b[2]-z,0,z-b[3]);const dd=Math.hypot(dx,dz);if(dd<dmin)dmin=dd;}
+        const ao=.42+.58*Math.min(1,dmin/1.35)**.8,tom=.74+.16*noise(x*.35+30,z*.35+30,2);const v=ao*tom;col[i*3]=v;col[i*3+1]=v*(1-.02*(1-ao));col[i*3+2]=v*(1-.05*(1-ao));}
+      g.setAttribute('color',new T.BufferAttribute(col,3));mesh.geometry.dispose();mesh.geometry=g;refeitos++;}
+    M469.stats.pisos=refeitos;}catch(e){m469Erro('pedra',e);}
+  /* ---------- 2 · luz: penumbra azulada, lampiões âmbar e poças de tocha discretas ---------- */
+  try{const L=M469.LUZ;const amb=S.root.children.find(o=>o.isAmbientLight);if(amb){amb.color.set(M469.COR.amb);amb.intensity=L.amb;amb.userData.i0=L.amb;}
+    const hemi=new T.HemisphereLight(M469.COR.hemiCeu,M469.COR.hemiChao,L.hemi);hemi.userData.i0=L.hemi;hemi.userData.dungeon395=true;hemi.name='469 hemisfério das masmorras';S.root.add(hemi);
+    // uma lâmpada a mais no vão escuro do corredor (entre a −10 e a −28)
+    for(const [x,y,z,nome] of [[1.8,-4.9,-19,'469 lampião do corredor'],[0,-2.1,19.5,'469 lampião da escada']]){const extra=new T.PointLight(0xffc27a,1,19,1.6);extra.position.set(x,y,z);extra.userData.dungeon395=true;extra.name=nome;S.root.add(extra);if(S.lights398)S.lights398.push(extra);}
+    const sel=S.root.children.filter(o=>o.isPointLight);for(const l of sel){const camara=Math.abs(l.position.x)>10;const i0=camara?L.camara:L.corredor;l.userData.dungeon421Intensity=i0;l.userData.i0=i0;l.intensity=i0;l.distance=camara?L.distK:L.distC;l.decay=L.decay;const fria=camara&&l.position.x>0;l.color.set(fria?(l.position.z<-15?0xb7a3ff:0x9fd0e6):0xffb866);A.luzes.push({l,i0,seed:A.luzes.length*1.7});}
+    for(const [chave,base] of [['421 torch pool true',L.brilhoParede],['421 torch pool false',L.brilhoChao]]){const m=T160.cache.get('m:'+chave);if(m){m.opacity=base;m.color.set(0xffb070);A.brilhos.push({m,base});}}
+    for(const l of sel){l.userData.interior276=true;l.userData.interiorActive276=!!S.active;}
+    M469.stats.luzes=sel.length;}catch(e){m469Erro('luz',e);}
+  /* ---------- 3 · adereços estáticos (fundidos em poucas malhas) ---------- */
+  try{const root=new T.Group();root.name='Masmorras · v469 vida nas câmaras';S.root.add(root);const K=t160Kit(root.name),FX=t160Kit('Masmorras · v469 luzes e teias'),r=rnd(46910);
+    const iron=t160Std('469 ferro das correntes',0x2a2d33,.62,.55),rust=t160Std('469 ferrugem',0x5a3b28,.9,.2),bone=t160Std('469 osso',0xcfc3a4,.85),dark=t160Std('469 vazio',0x0d0f12,1),wax=t160Std('469 cera',0xe9dcb8,.6),wood=t160Std('469 madeira do balde',0x4f3c2c,.92),straw=t160Std('469 palha',0xa98a48,.95),straw2=t160Std('469 palha escura',0x7d6232,.95),pelo=t160Std('469 pelo do rato',0x4a4038,.95),rosa=t160Std('469 rabo do rato',0x8c6c66,.8),ember=t160Mat('469 brasa',()=>new T.MeshStandardMaterial({color:0xff8a2a,emissive:0xff5a10,emissiveIntensity:1.2,roughness:.7}));
+    const agua=t160Mat('469 poça',()=>{const m=new T.MeshStandardMaterial({color:0xa8b8cc,roughness:.18,metalness:.7,envMap:m469Cubo(),envMapIntensity:1.8,transparent:true,opacity:.72,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2});m.userData.papelKeep=true;return m;});
+    const borda=t160Mat('469 borda molhada',()=>{const m=new T.MeshStandardMaterial({color:0x06080b,roughness:.3,transparent:true,opacity:.25,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1});m.userData.papelKeep=true;return m;});
+    const teia=t160Mat('469 teia',()=>{const m=new T.MeshStandardMaterial({map:m469TexTeia(),transparent:true,opacity:.7,depthWrite:false,side:T.DoubleSide,color:0xd9d4c6,emissive:0x2a2a24,roughness:1});m.userData.papelKeep=true;return m;});
+    const mancha=t160Mat('469 escorrido',()=>{const m=new T.MeshStandardMaterial({color:0x0c1014,alphaMap:m469TexMancha(),transparent:true,opacity:.72,depthWrite:false,roughness:.5,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1});m.userData.papelKeep=true;return m;});
+    const musgo=t160Mat('469 musgo',()=>{const m=new T.MeshStandardMaterial({color:0x3e5a2c,alphaMap:m469TexMusgo(),transparent:true,opacity:.85,depthWrite:false,roughness:1,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1});m.userData.papelKeep=true;return m;});
+    const poça=(x,z,rr,seed)=>{const g=new T.CircleGeometry(rr,22),p=g.attributes.position,rr2=rnd(seed);for(let i=1;i<p.count;i++){const a=Math.atan2(p.getY(i),p.getX(i)),k=.72+.28*Math.abs(Math.sin(a*3+seed)+.4*Math.cos(a*5-seed));p.setXY(i,Math.cos(a)*rr*k,Math.sin(a)*rr*k);}g.rotateX(-Math.PI/2);K.add(g.clone().scale(1.16,1,1.16),borda,x,-7.991,z);K.add(g,agua,x,-7.986,z);};
+    // poças no corredor e nas câmaras (fora do centro dos selos, dos baús e das chaves)
+    for(const [x,z,rr,s] of [[-.9,3.2,.75,1],[1.1,-5.6,.6,2],[-.6,-15.8,.9,3],[.9,-24.3,.65,4],[-9.4,-2.6,.8,5],[-16.8,-7.4,.7,6],[9.6,-7.6,.85,7],[17.6,-2.4,.6,8],[-9.6,-19.4,.75,9],[-15.4,-27.2,.5,10],[8.6,-25.6,.7,11],[18,-20.2,.6,12],[0,11.2,.7,13]])poça(x,z,rr,s);
+    // teias nos cantos altos das câmaras (diagonais, viradas para o centro) e sob os arcos do corredor
+    for(const [cx,cz] of [[-13,-5],[13,-5],[-13,-23],[13,-23]])for(const sx of [-1,1])for(const sz of [-1,1]){if(r()<.3)continue;const sc=.9+r()*.7,x=cx+sx*(6.95-.55*sc),z=cz+sz*(6.95-.55*sc);FX.add(new T.PlaneGeometry(1.5*sc,1.2*sc),teia,x,-2.95-.6*sc,z,Math.atan2(-sx,-sz));}
+    for(const z of [8,-1,-19,-28])for(const s of [-1,1]){if(r()<.35)continue;const sc=.5+r()*.35;FX.add(new T.PlaneGeometry(1.3*sc,1.0*sc),teia,s*2.2,-2.95-.5*sc,z+.4,s<0?Math.PI/2:-Math.PI/2);}
+    // escorridos de água sob as cornijas e musgo na base das paredes (longe das insígnias, placas e arcos)
+    for(const [cx,cz] of [[-13,-5],[13,-5],[-13,-23],[13,-23]]){const s=Math.sign(cx);for(let j=0;j<4;j++){const z=cz-5.4+j*3.6+(r()-.5)*1.2;if(r()<.3||Math.abs(z-cz)<3.3)continue;K.add(new T.PlaneGeometry(1.1,3.0),mancha,s*19.955,-4.95-r()*.3,z,s<0?Math.PI/2:-Math.PI/2);}
+      for(const sz of [-1,1])for(let j=0;j<4;j++){const x=cx-5.4+j*3.6+(r()-.5)*1.2;if(r()<.3||Math.abs(x-cx)<2.4)continue;K.add(new T.PlaneGeometry(1.1,3.0),mancha,x,-4.95-r()*.3,cz+sz*6.955,sz>0?Math.PI:0);}
+      for(let j=0;j<5;j++){const z=cz-6+j*3+(r()-.5)*1.4;K.add(new T.PlaneGeometry(1.7,.75),musgo,s*19.95,-7.62,z,s<0?Math.PI/2:-Math.PI/2);}for(const sz of [-1,1])for(let j=0;j<5;j++){const x=cx-6+j*3+(r()-.5)*1.4;K.add(new T.PlaneGeometry(1.7,.75),musgo,x,-7.62,cz+sz*6.95,sz>0?Math.PI:0);}}
+    for(let j=0;j<12;j++){const z=-29+j*4.6+(r()-.5)*2,s=j%2?1:-1;if(Math.abs(z+5)<2.6||Math.abs(z+23)<2.6)continue;const ry=s<0?Math.PI/2:-Math.PI/2;K.add(new T.PlaneGeometry(1.4,.7),musgo,s*2.245,-7.63,z,ry);if(r()<.5)K.add(new T.PlaneGeometry(.9,2.4),mancha,s*2.245,-5.3,z+.6,ry);}
+    // celas esquecidas: correntes com algemas, prisioneiro, palha, balde
+    const corrente=(x,y,z,n,ry)=>{K.box(.03,.2,.2,iron,x-.09,y,z);K.tor(.08,.02,iron,x,y,z,Math.PI*2,Math.PI/2,0,0,6,14);let yy=y;for(let j=0;j<n;j++){yy-=.115;K.tor(.062,.017,j%5===2?rust:iron,x,yy,z,Math.PI*2,ry+(j%2?Math.PI/2:0),0,0,5,10);}return yy;};
+    for(const [z,n] of [[-11.4,12],[-9.9,13],[.89,19],[1.81,19]]){const fim=corrente(-19.82,-4.35,z,n,0);K.tor(.11,.026,rust,-19.78,fim-.1,z,Math.PI*1.75,Math.PI/2,0,0,6,16);}
+    K.push(-19.35,-8,1.35,Math.PI/2);{// esqueleto sentado contra a parede, braços erguidos pelas correntes
+      K.sph(.14,bone,0,.17,.02,1,.6,.8,10,7);dungeon398Skull(K,0,.9,0,0,bone,dark,1.05);for(let j=0;j<6;j++)K.tor(.16-j*.012,.02,bone,0,.62-j*.09,-.03,Math.PI,0,Math.PI/2,0,5,12);K.box(.09,.5,.07,bone,0,.42,-.06);
+      for(const s of [-1,1]){K.tube([[s*.2,.66,0],[s*.42,.95,.3],[s*.46,1.3,.4]],.026,bone,8,5);K.sph(.045,bone,s*.46,1.33,.42,1,1,1,7,5);K.tube([[s*.1,.2,.05],[s*.18,.12,.5],[s*.14,.08,.95]],.034,bone,8,5);K.box(.09,.05,.2,bone,s*.14,.07,1.02);}
+      K.box(.5,.16,.26,straw2,0,.08,.35);}K.pop();S.world.obst.push([-19.35,1.35,.55]);
+    for(const z0 of [-11.6,.3])for(let j=0;j<42;j++){const x=-19.4+r()*3.8,z=z0+r()*1.6,l=.22+r()*.24;if(Math.hypot(x+16.5,z-(z0<-5?-10.6:.6))<1.1)continue;K.box(l,.006,.025,j%3?straw:straw2,x,-7.992+(j%4)*.0025,z,r()*Math.PI);}
+    K.lathe([[.13,0],[.17,.02],[.18,.34],[.16,.36],[.14,.35],[.13,.03]],wood,-18.9,-8,-9.25,14);for(const y of [-7.92,-7.7])K.tor(.178,.012,iron,-18.9,y,-9.25,Math.PI*2,0,Math.PI/2,0,5,16);K.tube([[-19.05,-7.64,-9.25],[-18.9,-7.42,-9.25],[-18.75,-7.64,-9.25]],.012,iron,8,5);S.world.obst.push([-18.9,-9.25,.3]);
+    // velas: arquivo (mesa), ossuário (sarcófagos), patamar da escada
+    const vela=(x,y,z,h,s)=>{K.cyl(.028*s,.032*s,h,wax,x,y+h/2,z,9);for(let j=0;j<3;j++)K.sph(.012*s,wax,x+Math.sin(j*2.1)*.026*s,y+h-.03-j*.04,z+Math.cos(j*2.1)*.026*s,1,1.8,1,6,4);K.cyl(.004,.004,.03,dark,x,y+h+.012,z,5);FX.add(dungeon421FlameGeo(.26*s),dungeon421FireMat(),x,y+h+.02,z);A.velas.push([x,y,z]);};
+    for(const [x,z,h,s] of [[-16.95,-22.72,.17,1],[-17.12,-23.38,.11,.9],[-16.8,-23.1,.21,1.1]])vela(x,-6.81,z,h,s);
+    for(const [x,z] of [[10,.5],[15.5,-10.5]])for(let j=0;j<3;j++)vela(x-.6+j*.5+(r()-.5)*.2,-7.14,z+(j%2?.28:-.28),.09+r()*.12,.9+r()*.3);
+    for(const s of [-1,1])for(let j=0;j<4;j++)vela(s*5.6+(r()-.5)*.3,-7.995,15.2+j*.42,.07+r()*.14,.9+r()*.3);
+    // braseiros da câmara dos selos acesos
+    for(const x of [9,17])for(const z of [-27,-19]){K.sph(.2,ember,x,-6.98,z,1.4,.5,1.4,8,5);FX.add(dungeon421FlameGeo(1.25),dungeon421FireMat(),x,-6.97,z);FX.add(new T.PlaneGeometry(2.8,2.8,2,2),dungeon421Glow(false),x,-7.97,z,0,-Math.PI/2);}
+    // pequenos halos quentes sobre as velas e o selo rúnico brilhando
+    for(const [x,y,z] of A.velas)FX.add(new T.PlaneGeometry(.9,.9),dungeon421Glow(false),x,y+.012,z,0,-Math.PI/2);
+    const built=[...K.fim(root,{sombra:true}),...FX.fim(root)];for(const m of built){m.userData.papelKeepGeo=true;m.userData.noCam=true;m.userData.dungeon395=true;m.__fusaoMoveu=9;m.material.userData.papelKeep=true;}
+    M469.stats.adereços=built.length;}catch(e){m469Erro('adereços',e);}
+  /* ---------- 4 · o que se mexe: névoa, gotas, ratos, fagulhas do selo ---------- */
+  try{const anim=new T.Group();anim.name='Masmorras · v469 animações';S.root.add(anim);const r=rnd(46911);
+    const nev=new T.MeshStandardMaterial({map:m469TexNevoa(),transparent:true,opacity:.13,depthWrite:false,color:0xb6c4d6,emissive:0x141a24,roughness:1,side:T.DoubleSide});nev.userData.papelKeep=true;
+    for(const [x,z,w] of [[0,4,6],[0,-8,6],[0,-18,6],[0,-26,6],[-13,-4,9],[-13,-24,9],[13,-4,9],[13,-24,9],[-10,-6,7],[16,-21,7],[0,13,5]]){const m=new T.Mesh(new T.PlaneGeometry(w,w),nev);m.rotation.x=-Math.PI/2;m.position.set(x,-7.55+r()*.25,z);m.userData.fx=true;m.layers.set(1);m.renderOrder=3;m.raycast=()=>{};anim.add(m);A.nevoa.push({m,x,z,f:.6+r()*.8,s:r()*7,w});}
+    const gota=t160Mat('469 gota',()=>{const m=new T.MeshStandardMaterial({color:0xaac6e0,roughness:.1,metalness:.6,envMap:m469Cubo(),transparent:true,opacity:.8});m.userData.papelKeep=true;return m;}),anel=new T.MeshBasicMaterial({color:0x9fb8d0,transparent:true,opacity:.5,depthWrite:false});anel.userData.papelKeep=true;
+    const gg=new T.SphereGeometry(.028,6,5).scale(1,2.2,1),ag=new T.TorusGeometry(.12,.012,4,16).rotateX(Math.PI/2);
+    for(const [x,z] of [[-1.2,5.5],[1.4,-3],[-.4,-12.5],[1.1,-21],[-1.3,-26.5],[16.5,-8.2],[-9.5,-21],[12,0]]){const g=new T.Mesh(gg,gota),a=new T.Mesh(ag,anel);g.raycast=a.raycast=()=>{};a.position.set(x,-7.985,z);a.visible=false;g.position.set(x,-3.1,z);anim.add(g);anim.add(a);A.gotas.push({g,a,x,z,t:-r()*5,yTop:-3.1,yChao:-7.98,pausa:1.6+r()*3});}
+    const rato=(x,z)=>{const g=new T.Group(),Kr=t160Kit('469 rato');Kr.sph(.075,t160Std('469 pelo do rato',0x4a4038,.95),0,.07,0,1,.8,1.7,9,6);Kr.sph(.045,t160Std('469 pelo do rato',0x4a4038,.95),0,.085,.14,1,.85,1.25,8,6);for(const s of [-1,1]){Kr.sph(.02,t160Std('469 rabo do rato',0x8c6c66,.8),s*.035,.13,.13,1,1,.35,6,4);Kr.sph(.006,t160Std('469 olho',0x120d0a,.3),s*.022,.095,.19,1,1,1,5,4);}Kr.tube([[0,.06,-.1],[.04,.05,-.2],[-.02,.03,-.3],[.03,.02,-.38]],.008,t160Std('469 rabo do rato',0x8c6c66,.8),10,4);for(const s of [-1,1])for(const zz of [-.05,.09])Kr.sph(.014,t160Std('469 pelo do rato',0x4a4038,.95),s*.05,.018,zz,1,1,1.4,5,4);
+      for(const m of Kr.fim(g)){m.userData.papelKeepGeo=true;m.raycast=()=>{};}g.position.set(x,-8,z);anim.add(g);return g;};
+    for(const [x,z0,z1] of [[-19.45,-8.9,-1.4],[-1.95,-26,-12.5],[19.45,-11.3,-1.3]]){const g=rato(x,z0);A.ratos.push({g,x,z0,z1,t:r()*4,vel:.9+r()*.5,dir:1,espera:0});}
+    // o selo rúnico da câmara pulsa em azul-esverdeado; fagulhas sobem do círculo
+    const runas=T160.cache.get('m:398 runes ');if(runas){runas.emissiveMap=runas.map;runas.emissive.set(0x8ff2e6);runas.emissiveIntensity=.9;runas.needsUpdate=true;A.selo=runas;}
+    const halo=new T.Mesh(new T.PlaneGeometry(7.2,7.2),new T.MeshBasicMaterial({map:m469TexHalo(),color:0x4fd8cc,transparent:true,opacity:.22,depthWrite:false,blending:T.AdditiveBlending}));halo.rotation.x=-Math.PI/2;halo.position.set(13,-7.94,-23);halo.userData.fx=true;halo.layers.set(1);halo.raycast=()=>{};halo.material.userData.papelKeep=true;anim.add(halo);A.halo=halo;
+    const N=110,pos=new Float32Array(N*3),fase=new Float32Array(N);for(let i=0;i<N;i++){const a=r()*Math.PI*2,rr=2.1+r()*1.3;pos[i*3]=13+Math.cos(a)*rr;pos[i*3+1]=-7.9+r()*2.6;pos[i*3+2]=-23+Math.sin(a)*rr;fase[i]=r();}
+    const pg=new T.BufferGeometry();pg.setAttribute('position',new T.BufferAttribute(pos,3));const pm=new T.PointsMaterial({color:0x8af0e4,size:.17,map:m469TexPonto(),transparent:true,opacity:.9,depthWrite:false,blending:T.AdditiveBlending,sizeAttenuation:true});pm.userData.papelKeep=true;const pts=new T.Points(pg,pm);pts.layers.set(1);pts.userData.fx=true;pts.raycast=()=>{};pts.frustumCulled=false;anim.add(pts);A.fagulhas={pts,pos,fase,N};
+    anim.traverse(o=>{o.userData.dungeon395=true;o.__fusaoMoveu=9;});
+    // o relógio: tremular das lâmpadas e das poças de luz, névoa, gotas, ratos, selo
+    const tick=R.tick;R.tick=function(dt){const r0=tick.apply(this,arguments);if(!S.active||document.hidden)return r0;try{const d=Math.min(.05,dt||.016);A.t+=d;const t=A.t;
+      for(const o of A.luzes){const n=Math.sin(t*7.3+o.seed)*.5+Math.sin(t*11.9+o.seed*2.3)*.3+Math.sin(t*23.1+o.seed*.7)*.2;o.l.intensity=o.i0*(1+.085*n);}
+      const nb=Math.sin(t*6.1)*.5+Math.sin(t*13.7)*.5;for(const b of A.brilhos)b.m.opacity=b.base*(1+.14*nb);
+      for(const n of A.nevoa){n.m.position.x=n.x+Math.sin(t*.11*n.f+n.s)*1.1;n.m.position.z=n.z+Math.cos(t*.09*n.f+n.s*1.3)*1.1;n.m.rotation.z=t*.02*n.f+n.s;n.m.material.opacity=.09+.035*Math.sin(t*.23+n.s);}
+      for(const g of A.gotas){g.t+=d;const ciclo=g.pausa+1.05;if(g.t<0){g.g.visible=false;continue;}const u=g.t%ciclo;if(u<.9){g.g.visible=true;g.g.position.y=g.yTop-(g.yTop-g.yChao)*(u/.9)**2;g.a.visible=false;}else if(u<1.25){g.g.visible=false;g.a.visible=true;const k=(u-.9)/.35;g.a.scale.setScalar(.3+k*2.2);g.a.material.opacity=.5*(1-k);}else{g.g.visible=false;g.a.visible=false;}}
+      for(const q of A.ratos){if(q.espera>0){q.espera-=d;q.g.position.y=-8+Math.abs(Math.sin(t*9))*.01;continue;}q.t+=d*q.vel*q.dir;const L=q.z1-q.z0;let u=q.t/L;if(u>=1){u=1;q.dir=-1;q.espera=1.5+Math.random()*3;}else if(u<=0){u=0;q.dir=1;q.espera=1.5+Math.random()*3;}q.g.position.z=q.z0+u*L;q.g.rotation.y=q.dir>0?0:Math.PI;q.g.position.y=-8+Math.abs(Math.sin(t*22))*.012;}
+      const pulso=.5+.5*Math.sin(t*1.6);if(A.selo)A.selo.emissiveIntensity=.6+.9*pulso;if(A.halo)A.halo.material.opacity=.12+.2*pulso;if(A.fagulhas){const F=A.fagulhas,p=F.pos;for(let i=0;i<F.N;i++){let y=p[i*3+1]+d*(.25+F.fase[i]*.35);if(y>-5.2)y=-7.9;p[i*3+1]=y;const a=t*.15*(1+F.fase[i])+F.fase[i]*7,rr=2.1+F.fase[i]*1.3;p[i*3]=13+Math.cos(a)*rr;p[i*3+2]=-23+Math.sin(a)*rr;}F.pts.geometry.attributes.position.needsUpdate=true;}
+    }catch(e){m469Erro('tick',e);}return r0;};
+    M469.stats.animados=A.nevoa.length+A.gotas.length+A.ratos.length;}catch(e){m469Erro('animações',e);}
+  M469.stats.ms=Math.round(performance.now()-t0);M469.stats.erros=M469.erros.length;
+}
+/* orçamento de luzes (L226): as lâmpadas da masmorra só contam lá embaixo, e as da sala de Terror só lá em cima */
+function m469Interior(root,sc,on){const E=M469;E.luzFlags=E.luzFlags||new Map();sc.traverse(o=>{if(!o.isPointLight)return;let dentro=false;for(let p=o;p;p=p.parent)if(p===root){dentro=true;break;}
+  if(dentro){o.userData.interior276=true;o.userData.interiorActive276=on;if(!on)o.visible=false;}
+  else if(on){if(!E.luzFlags.has(o))E.luzFlags.set(o,[o.userData.interior276,o.userData.interiorActive276]);o.userData.interior276=true;o.userData.interiorActive276=false;}
+  else{const f=E.luzFlags.get(o);if(f){o.userData.interior276=f[0];o.userData.interiorActive276=f[1];E.luzFlags.delete(o);}}});}
+if(M469.on){
+  {const old=dungeon395Build;dungeon395Build=function(){const r=old.apply(this,arguments);try{m469Aplica();}catch(e){m469Erro('aplicar',e);}return r;};}
+  // fundo e névoa quase pretos enquanto se está lá embaixo (a v395 guarda e devolve os da sala de Terror)
+  {const old=dungeon395Switch;dungeon395Switch=function(on){const S=DUNGEON395,antes=S.active;const r=old.apply(this,arguments);try{if(S.active!==antes&&S.room){if(on){S.room.scene.background=new THREE.Color(M469.COR.fundo);S.room.scene.fog=new THREE.FogExp2(M469.COR.nevoa,.026);}m469Interior(S.root,S.room.scene,!!on);}}catch(e){m469Erro('troca',e);}return r;};}
+  try{if(DUNGEON395.built)m469Aplica();}catch(e){m469Erro('aplicar já construída',e);}
+}
+window.__masmorras469={estado:M469,aplicar:m469Aplica,tex:{parede:m469TexParede,piso:m469TexPiso,ruido:m469Ruido,cubo:m469Cubo}};
+
+/* ===================== v470 · ECLUSA NA FICÇÃO CIENTÍFICA → ESTUFA ORBITAL (pedido do Luiz: «A sala de sci-fi, faça uma porta nela levando para outro ambiente») =====================
+   · Na parede esquerda do deck de observação (x = −SW/2, z = 16) nasce uma eclusa: moldura escura com nervuras, duas folhas que
+     deslizam quando o leitor se aproxima, frisos de luz ciano, lâmpada âmbar, placa «ESTUFA ORBITAL», faixas de aviso no piso e,
+     atrás das folhas, uma câmara de ar iluminada. Perto dela, E / clique: «Entrar na Estufa Orbital».
+   · A Estufa Orbital é um novo ambiente dentro da mesma cena (como as masmorras sob a sala de Terror): um domo de vidro de 13 m
+     sob as estrelas e o planeta de anéis, com piso de grade metálica, seis canteiros hidropônicos de plantas bioluminescentes
+     (samambaias de luz, lanternas rosa, trepadeiras violeta, cogumelos-lima, capins), um lago central com a Árvore de Luz numa ilha,
+     nenúfares e um chafariz, trilhos de luz, três bancos de leitura com luminárias, painéis holográficos, um robô jardineiro que
+     circula pelos canteiros, vaga-lumes, um baú de recompensa (uma vez: +60 moedas) e a eclusa de volta ao deck.
+   · O mundo troca junto: colisão circular, câmera presa ao domo, piso plano, sem inimigos nem tiros lá dentro; os robôs, a nave
+     e os tesouros do deck ficam quietos enquanto se está na estufa. ?estufa470=0 desliga tudo. */
+const E470={on:!/[?&#]estufa470=0/i.test(location.search+location.hash),active:false,built:false,room:null,root:null,porta:null,items:[],saved:{bau:false},store:SKEY('mundo.estufa470.v1'),time:0,erros:[],stats:{},
+  R:11.9,DOME:13.2,PZ:16,anim:{abre:0,folhas:[],robo:null,vaga:null,chafariz:null,holos:[],ondas:[],luzes:[],folhasLuz:[]}};
+const E470_EN=typeof EN!=='undefined'&&EN;
+const e470T=(pt,en)=>E470_EN?en:pt;
+function e470Erro(onde,e){if(E470.erros.length<12)E470.erros.push(onde+': '+(e&&e.message||e));console.warn('v470',onde,e);}
+try{const d=JSON.parse(localStorage.getItem(E470.store)||'null');if(d)E470.saved.bau=!!d.bau;}catch(e){}
+function e470Save(){try{localStorage.setItem(E470.store,JSON.stringify(E470.saved));}catch(e){console.warn('Estufa: salvamento indisponível',e);}}
+function e470Here(){return CUR==='room'&&ROOM===E470.room;}
+/* mundo circular da estufa */
+function e470World(){const R=E470.R,inside=(x,z,m)=>Math.hypot(x,z)<=R-(m||0);const clamp=(x,z,m=.3)=>{const d=Math.hypot(x,z),lim=R-m;if(d<=lim)return [x,z];const k=lim/Math.max(1e-6,d);return [x*k,z*k];};
+  return {ext:R+1.5,obst:[],clamp,inside,camT:(x,y,z,dx,dy,dz,max)=>{for(let d=.2;d<=max;d+=.2){const xx=x+dx*d,yy=y+dy*d,zz=z+dz*d;if(yy<.3)return Math.max(.4,d-.2);if(Math.hypot(xx,yy,zz)>E470.DOME-.5)return Math.max(.4,d-.2);}return max;}};}
+/* texturas */
+function e470TexGrade(){return t160Tex('470 grade',512,512,(p,W,H)=>{p.fillStyle='#262c36';p.fillRect(0,0,W,H);const r=rnd(47001);for(let j=0;j<400;j++){p.fillStyle=j%2?'rgba(255,255,255,.035)':'rgba(0,0,0,.12)';p.fillRect(r()*W,r()*H,2+r()*6,1+r()*2);}
+  p.strokeStyle='rgba(8,10,14,.9)';p.lineWidth=5;for(let i=0;i<=8;i++){p.beginPath();p.moveTo(i*64,0);p.lineTo(i*64,H);p.stroke();p.beginPath();p.moveTo(0,i*64);p.lineTo(W,i*64);p.stroke();}
+  p.strokeStyle='rgba(140,160,190,.18)';p.lineWidth=1.5;for(let i=0;i<=8;i++){p.beginPath();p.moveTo(i*64+3,0);p.lineTo(i*64+3,H);p.stroke();p.beginPath();p.moveTo(0,i*64+3);p.lineTo(W,i*64+3);p.stroke();}
+  for(let y=16;y<H;y+=64)for(let x=16;x<W;x+=64){p.fillStyle='rgba(10,12,16,.75)';p.fillRect(x,y,34,34);p.fillStyle='rgba(60,70,90,.5)';p.fillRect(x+3,y+3,28,28);}},[1,1]);}
+function e470TexSolo(){return t160Tex('470 solo',256,256,(p,W,H)=>{p.fillStyle='#2b2118';p.fillRect(0,0,W,H);const r=rnd(47002);for(let j=0;j<2600;j++){p.fillStyle=j%3?'rgba(70,52,36,.5)':'rgba(10,8,6,.5)';p.beginPath();p.arc(r()*W,r()*H,1+r()*3,0,7);p.fill();}for(let j=0;j<60;j++){p.fillStyle='rgba(90,140,70,.35)';p.beginPath();p.arc(r()*W,r()*H,2+r()*4,0,7);p.fill();}},[1,1]);}
+function e470TexHolo(i){return t160Tex('470 holo '+i,256,160,(p,W,H)=>{p.fillStyle='rgba(5,20,30,.85)';p.fillRect(0,0,W,H);p.strokeStyle='#5fe0ff';p.lineWidth=2;p.strokeRect(4,4,W-8,H-8);p.fillStyle='#9ff4ff';p.font='bold 18px "Segoe UI",Arial,sans-serif';const nomes=E470_EN?['FERN · LUMEN','LANTERN · ROSEA','VINE · VIOLA']:['SAMAMBAIA · LUMEN','LANTERNA · ROSEA','TREPADEIRA · VIOLA'];p.fillText(nomes[i%3],14,30);
+  const r=rnd(47010+i);p.fillStyle='#2fd9c9';for(let k=0;k<12;k++){const h=20+r()*80;p.fillRect(14+k*19,H-16-h,12,h);}p.fillStyle='#ff9ad0';p.font='13px "Segoe UI",Arial,sans-serif';p.fillText((E470_EN?'growth ':'crescimento ')+(72+((r()*25)|0))+'% · pH 6.'+((r()*9)|0),14,52);});}
+function e470TexPonto(){return t160Tex('470 ponto',32,32,(p,W,H)=>{p.clearRect(0,0,W,H);const g=p.createRadialGradient(16,16,0,16,16,16);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.35,'rgba(255,255,255,.6)');g.addColorStop(1,'rgba(255,255,255,0)');p.fillStyle=g;p.fillRect(0,0,W,H);});}
+function e470TexFaixa(){return t160Tex('470 faixa',256,64,(p,W,H)=>{p.fillStyle='#1a1d24';p.fillRect(0,0,W,H);p.fillStyle='#e8b422';for(let x=-64;x<W;x+=48){p.beginPath();p.moveTo(x,H);p.lineTo(x+24,H);p.lineTo(x+56,0);p.lineTo(x+32,0);p.closePath();p.fill();}},[1,1]);}
+function e470Placa(texto,w,h,fs){return txtTex(texto,{w:w||768,h:h||160,bg:'#0a1420',fg:'#5fe0ff',fs:fs||54});}
+/* o vão: a parede do casco (uma caixa só) vira três peças com as mesmas UVs, deixando a abertura da eclusa */
+function e470Recorta(R){const T=THREE,sc=R.scene;let alvo=null;sc.traverse(o=>{if(alvo||!o.isMesh||!o.geometry||o.geometry.type!=='BoxGeometry')return;const p=o.geometry.parameters;if(p&&Math.abs(p.width-.3)<.01&&Math.abs(p.height-SH)<.01&&Math.abs(p.depth-SD)<.01&&Math.abs(o.position.x+SW/2+.15)<.02)alvo=o;});if(!alvo)return false;
+  const Z=E470.PZ,hw=1.35,ht=3.4,parts=[];const peça=(z0,z1,y0,y1)=>{const g=new T.BoxGeometry(.3,y1-y0,z1-z0);g.translate(0,(y0+y1)/2-SH/2,(z0+z1)/2);const p=g.attributes.position,n=g.attributes.normal,uv=g.attributes.uv;for(let i=0;i<p.count;i++){const y=p.getY(i)+SH/2,z=p.getZ(i);if(Math.abs(n.getX(i))>.5)uv.setXY(i,n.getX(i)>0?(SD/2-z)/SD:(z+SD/2)/SD,y/SH);}parts.push(g);};
+  peça(-SD/2,Z-hw,0,SH);peça(Z+hw,SD/2,0,SH);peça(Z-hw,Z+hw,ht,SH);const geo=t160Fundir(parts,false);alvo.geometry.dispose();alvo.geometry=geo;alvo.userData.papelKeepGeo=true;try{fusaoLimpar(sc);}catch(e){}return true;}
+/* ---------- a eclusa no deck (parede esquerda, z = 16) ---------- */
+function e470Install(R){const S=E470;if(S.room||!S.on)return;S.room=R;S.baseFloor=R.floorY||(()=>0);S.baseWorld={...R.world,obst:R.world.obst};const T=THREE,X=-SW/2,Z=S.PZ;try{S.vao=e470Recorta(R);}catch(e){e470Erro('recorte',e);}
+  const g=new T.Group();g.name='Eclusa da Estufa Orbital';g.position.set(X,0,Z);R.scene.add(g);S.portaG=g;
+  const K=t160Kit('470 eclusa'),rib=t160Std('470 nervura',0x353d4a,.45,.85),dark=t160Std('470 câmara escura',0x151920,.55,.6),hull=t160Std('470 casco claro',0xc6ced8,.6,.55),cyan=t160Mat('470 ciano',()=>new T.MeshStandardMaterial({color:0x4fd8ff,emissive:0x4fd8ff,emissiveIntensity:2.2,roughness:.4})),amber=t160Mat('470 âmbar',()=>new T.MeshStandardMaterial({color:0xffb060,emissive:0xff9a30,emissiveIntensity:2,roughness:.4})),faixa=t160Mat('470 faixa',()=>new T.MeshStandardMaterial({map:e470TexFaixa(),roughness:.8}));
+  // moldura: ombreiras, verga, soleira e a câmara de ar atrás das folhas (x negativo = para fora do deck)
+  K.box(.5,3.6,.34,rib,0,1.8,-1.47);K.box(.5,3.6,.34,rib,0,1.8,1.47);K.box(.5,.34,3.3,rib,0,3.43,0);K.box(.6,.12,3.0,rib,0,.06,0);
+  for(const s of [-1,1]){K.box(.06,3.1,.05,cyan,.22,1.75,s*1.33);}K.box(.06,.05,2.7,cyan,.22,3.33,0);K.sph(.11,amber,.2,3.9,0,1,1,1,10,7);K.box(.3,.08,.3,rib,.1,3.8,0);
+  K.box(2.6,.06,2.6,dark,-1.55,.0,0);K.box(2.6,.06,2.6,dark,-1.55,3.3,0);for(const s of [-1,1])K.box(2.6,3.3,.06,dark,-1.55,1.65,s*1.3);K.box(.06,3.3,2.6,rib,-2.85,1.65,0);K.box(.03,2.3,.05,cyan,-2.81,1.65,0);K.box(.03,.05,1.6,cyan,-2.81,1.65,0);for(const s of [-1,1])K.box(1.9,.02,.04,amber,-1.5,.04,s*1.0);
+  K.add(new T.PlaneGeometry(2.4,.46),t160Mat('470 placa estufa',()=>{const tx=e470Placa(e470T('ESTUFA ORBITAL','ORBITAL GREENHOUSE'),768,160,66);const m=new T.MeshStandardMaterial({map:tx,emissiveMap:tx,emissive:0xffffff,emissiveIntensity:1.5,roughness:.5});m.userData.papelKeep=true;return m;}),.26,4.25,0,Math.PI/2);
+  K.add(new T.PlaneGeometry(2.6,1.0),faixa,.75,.012,0,0,-Math.PI/2);for(let j=0;j<3;j++)K.box(.16,.012,.16,cyan,1.6+j*.5,.014,0,Math.PI/4);
+  for(const m of K.fim(g,{sombra:true})){m.userData.papelKeepGeo=true;m.userData.noCam=true;m.material.userData.papelKeep=true;}
+  // as duas folhas deslizantes (malhas próprias, animadas no tick)
+  const folha=new T.Mesh(new T.BoxGeometry(.12,3.1,1.3),hull);for(const s of [-1,1]){const f=folha.clone();f.position.set(-.1,1.67,s*.66);const risco=new T.Mesh(new T.BoxGeometry(.02,2.2,.04),cyan);risco.position.set(.07,0,-s*.55);f.add(risco);const puxador=new T.Mesh(new T.BoxGeometry(.05,.5,.08),rib);puxador.position.set(.09,0,-s*.42);f.add(puxador);f.castShadow=true;f.userData.papelKeepGeo=true;g.add(f);S.anim.folhas.push({m:f,s});}
+  const L=new T.PointLight(0xffa040,.7,4.5,2);L.position.set(-1.4,2.9,0);g.add(L);const L2=new T.PointLight(0x4fd8ff,.5,4,2);L2.position.set(.9,2.6,0);g.add(L2);
+  g.traverse(o=>{o.userData.estufa470Porta=true;o.__fusaoMoveu=9;});
+  S.porta={kind:'porta',g,x:X+1.1,z:Z,label:e470T('Entrar na Estufa Orbital','Enter the Orbital Greenhouse')};
+  // o mundo do deck passa a trocar com o da estufa quando ela está ativa
+  const W=R.world;W.clamp=(x,z,m)=>S.active?S.world.clamp(x,z,m):S.baseWorld.clamp(x,z,m);W.camT=(...a)=>S.active?S.world.camT(...a):S.baseWorld.camT(...a);W.navKey=()=>S.active?'estufa470':('sci470'+(S.baseWorld.navKey?.()||''));
+  Object.defineProperty(W,'obst',{configurable:true,get:()=>S.active?S.world.obst:S.baseWorld.obst,set:v=>{(S.active?S.world:S.baseWorld).obst=v;}});Object.defineProperty(W,'ext',{configurable:true,get:()=>S.active?S.world.ext:S.baseWorld.ext});
+  R.floorY=(x,z)=>S.active?0:S.baseFloor(x,z);
+  const tick=R.tick;R.tick=function(dt){const r=tick?tick.apply(this,arguments):undefined;try{e470Tick(Math.min(.05,dt||.016));}catch(e){e470Erro('tick',e);}return r;};
+  const reset=R.reset;R.reset=function(){if(S.active)e470Switch(false,false);if(reset)return reset.apply(this,arguments);};
+  CAV.salas.estufa470={room:'estufa470',lista:[],pts:[]};S.world=e470World();
+}
+/* ---------- a estufa ---------- */
+function e470Build(){const S=E470;if(S.built||!S.room)return;const T=THREE,R=S.room,root=new T.Group();root.name='Estufa Orbital';root.visible=false;root.userData.estufa470=true;S.root=root;R.scene.add(root);const A=S.anim,r=rnd(47020);S.floors=[];
+  const K=t160Kit('Estufa · estrutura'),FX=t160Kit('Estufa · luzes'),PL=t160Kit('Estufa · plantas');
+  const metal=t160Std('470 metal do domo',0x3a4452,.5,.8,{side:THREE.DoubleSide}),claro=t160Std('470 metal claro',0xaab4c2,.5,.7),rib=t160Std('470 nervura',0x353d4a,.45,.85),branco=t160Std('470 composto branco',0xe6eaf0,.45,.15),almofada=t160Std('470 almofada',0x2c3a52,.95),escuro=t160Std('470 metal escuro',0x151920,.55,.6),tronco=t160Std('470 tronco pálido',0xd8d2c6,.7),pedra=t160Std('470 pedra do lago',0x5c6670,.9),vaso=t160Std('470 canteiro',0x2f3744,.6,.6);
+  const cyan=t160Mat('470 ciano',()=>new T.MeshStandardMaterial({color:0x4fd8ff,emissive:0x4fd8ff,emissiveIntensity:2.2,roughness:.4})),amber=t160Mat('470 âmbar',()=>new T.MeshStandardMaterial({color:0xffb060,emissive:0xff9a30,emissiveIntensity:2,roughness:.4}));
+  const lum=(nome,cor,emis,k)=>t160Mat('470 '+nome,()=>{const m=new T.MeshStandardMaterial({color:cor,emissive:emis,emissiveIntensity:k,roughness:.55});m.userData.papelKeep=true;return m;});
+  const teal=lum('folha lumen',0x2fd9c9,0x1fbfae,.85),rosa=lum('lanterna rosea',0xff8ad0,0xff5bb8,1.1),viola=lum('trepadeira viola',0x9a6cff,0x7a3cff,.9),lima=lum('cogumelo lima',0xb8ff5a,0x7fe02a,.9),caule=lum('caule',0x3f6a55,0x1c3a2c,.35),luz=lum('árvore de luz',0xcffff4,0x8ffbe6,1.3),loto=lum('lótus',0xfff0a8,0xffd060,1.0);
+  const vidro=t160Mat('470 vidro do domo',()=>{const m=new T.MeshStandardMaterial({color:0xbfd8ff,transparent:true,opacity:.13,roughness:.05,metalness:.25,side:T.DoubleSide,depthWrite:false});m.userData.papelKeep=true;return m;});
+  const grade=t160Mat('470 grade',()=>{const tx=e470TexGrade();tx.repeat.set(13,13);const m=new T.MeshStandardMaterial({map:tx,color:0xc2ccd8,roughness:.55,metalness:.5});m.userData.papelKeep=true;return m;});
+  const solo=t160Mat('470 solo',()=>{const tx=e470TexSolo();tx.repeat.set(2,1);const m=new T.MeshStandardMaterial({map:tx,roughness:1});m.userData.papelKeep=true;return m;});
+  const agua=t160Mat('470 água',()=>{const m=new T.MeshStandardMaterial({color:0x17525e,emissive:0x0a3a46,emissiveIntensity:.2,roughness:.08,metalness:.3,transparent:true,opacity:.85,depthWrite:false});m.userData.papelKeep=true;return m;});
+  const D=S.DOME,RW=S.R;
+  // piso de grade, anel da base, domo de vidro e nervuras
+  {const piso=new T.Mesh(new T.CircleGeometry(D+.2,72),grade);piso.rotation.x=-Math.PI/2;piso.receiveShadow=true;piso.userData.papelKeepGeo=true;root.add(piso);S.floors.push(piso);}
+  K.cyl(D+.35,D+.35,1.1,metal,0,.55,0,72,0,0,0,true);K.tor(D+.33,.09,claro,0,1.12,0,Math.PI*2,0,Math.PI/2,0,8,96);K.tor(D+.3,.03,cyan,0,.95,0,Math.PI*2,0,Math.PI/2,0,5,96);K.tor(D+.3,.03,cyan,0,.18,0,Math.PI*2,0,Math.PI/2,0,5,96);
+  {const dome=new T.Mesh(new T.SphereGeometry(D,48,18,0,Math.PI*2,0,Math.PI/2),vidro);dome.position.y=.9;dome.userData.fx=true;dome.renderOrder=5;dome.raycast=()=>{};root.add(dome);}
+  for(let i=0;i<16;i++){const a=i*Math.PI*2/16,pts=[];for(let j=0;j<=20;j++){const t=j/20*Math.PI/2;pts.push([Math.cos(a)*Math.cos(t)*(D+.06),.9+Math.sin(t)*(D+.06),Math.sin(a)*Math.cos(t)*(D+.06)]);}K.tube(pts,.07,rib,20,6);}
+  for(const t of [.28,.56,.84]){K.tor(Math.cos(t)*(D+.06),.06,rib,0,.9+Math.sin(t)*(D+.06),0,Math.PI*2,0,Math.PI/2,0,6,96);}
+  K.sph(.5,claro,0,.9+D+.05,0,1,.5,1,16,8);K.sph(.18,amber,0,.9+D+.35,0,1,1,1,10,7);
+  // trilhos de luz: seis raios e um anel
+  for(let i=0;i<6;i++){const a=i*Math.PI/3+Math.PI/6;K.push(0,0,0,a);K.box(.08,.02,RW-3.6,cyan,0,.012,3.6+(RW-3.6)/2);K.pop();}
+  for(let i=0;i<72;i++){const a=i*Math.PI*2/72;K.box(.12,.016,.12,i%6?claro:cyan,Math.cos(a)*9.2,.012,Math.sin(a)*9.2,-a+Math.PI/4);}
+  // lago central com ilha, nenúfares, lótus e chafariz; a Árvore de Luz
+  K.tor(2.75,.16,pedra,0,.14,0,Math.PI*2,0,Math.PI/2,0,8,64);K.cyl(2.75,2.9,.26,pedra,0,.13,0,64);{const lago=new T.Mesh(new T.CircleGeometry(2.62,48),agua);lago.rotation.x=-Math.PI/2;lago.position.y=.2;lago.raycast=()=>{};root.add(lago);}
+  K.cyl(.85,1.05,.42,pedra,0,.21,0,18);K.cyl(.8,.8,.08,solo,0,.46,0,18);
+  for(const [x,z,s] of [[1.5,.8,1],[-1.2,1.4,.8],[.4,-1.9,.9],[-1.8,-.9,.7],[1.9,-1.2,.6]]){K.cyl(.32*s,.32*s,.02,teal,x,.21,z,14);K.sph(.06*s,lima,x+.1,.24,z,1,1,1,6,5);}
+  for(const [x,z] of [[1.0,1.6],[-1.7,.2]]){for(let j=0;j<6;j++){const a=j*Math.PI/3;K.cone(.08,.22,loto,x+Math.sin(a)*.1,.3,z+Math.cos(a)*.1,6,0,.5*Math.cos(a),-.5*Math.sin(a));}K.sph(.06,loto,x,.33,z,1,1,1,6,5);}
+  S.world.obst.push([0,0,3.0]);
+  {// a árvore: tronco pálido que se abre em galhos; folhagem de luz em cachos
+    K.lathe([[.0,0],[.34,0],[.28,.5],[.22,1.4],[.18,2.2],[.14,2.8]],tronco,0,.46,0,12);const galhos=[];for(let i=0;i<7;i++){const a=i*Math.PI*2/7+r()*.4,len=1.4+r()*1.2,h=2.2+r()*.8,pts=[[0,h,0],[Math.cos(a)*len*.45,h+.55,Math.sin(a)*len*.45],[Math.cos(a)*len,h+1.1+r()*.5,Math.sin(a)*len]];K.push(0,.46,0);K.tube(pts,.07,tronco,10,6);K.pop();galhos.push(pts[2]);}
+    for(const p of galhos){const n=2+((r()*2)|0);for(let j=0;j<n;j++){const rr=.42+r()*.4;PL.sph(rr,j%2?luz:teal,p[0]+(r()-.5)*.6,.46+p[1]+(r()-.5)*.5+.2,p[2]+(r()-.5)*.6,1,.72,1,10,7);}}
+    PL.sph(.75,luz,0,.46+4.1,0,1,.7,1,12,8);const Lt=new T.PointLight(0x8ffbe6,2.1,21,1.7);Lt.position.set(0,4.4,0);root.add(Lt);A.luzes.push({l:Lt,i0:2.1,seed:0});}
+  // seis canteiros radiais com plantas bioluminescentes
+  const planta=(tipo,x,z,s,ry)=>{PL.push(x,0,z,ry,0,0,s);if(tipo===0){for(let j=0;j<7;j++){const a=j*Math.PI*2/7;PL.push(0,0,0,a);PL.tube([[0,.05,.1],[0,.45,.5],[0,.6,.95]],.025,caule,8,5);for(let k=0;k<5;k++){const t=.25+k*.15;PL.box(.05,.012,.28,teal,0,.05+t*.6,.1+t*.9,0,0,.5);}PL.pop();}}
+    else if(tipo===1){PL.tube([[0,0,0],[.05,.5,0],[0,1.0,.05]],.03,caule,8,5);for(let j=0;j<3;j++){const y=.45+j*.28;PL.sph(.11,rosa,Math.sin(j*2.1)*.12,y,Math.cos(j*2.1)*.12,1,1.3,1,10,7);PL.tube([[0,y+.05,0],[Math.sin(j*2.1)*.1,y+.08,Math.cos(j*2.1)*.1]],.012,caule,4,4);}}
+    else if(tipo===2){const pts=[];for(let j=0;j<=14;j++){const t=j/14;pts.push([Math.cos(t*9)*.16,t*1.3,Math.sin(t*9)*.16]);}PL.tube(pts,.022,viola,24,5);for(let j=0;j<6;j++){const t=(j+.5)/6;PL.sph(.045,viola,Math.cos(t*9)*.22,t*1.3,Math.sin(t*9)*.22,1,1,1,6,5);}PL.cyl(.015,.02,1.3,caule,0,.65,0,5);}
+    else if(tipo===3){for(let j=0;j<4;j++){const a=j*1.7,rr=.1+j*.06;PL.cyl(.03,.045,.25+j*.08,caule,Math.cos(a)*rr,.12+j*.04,Math.sin(a)*rr,6);PL.sph(.1+j*.03,lima,Math.cos(a)*rr,.26+j*.1,Math.sin(a)*rr,1,.55,1,10,6);}}
+    else{for(let j=0;j<9;j++){const a=j*.7,rr=.05+(j%3)*.08;PL.cone(.025,.7+(j%4)*.2,j%2?teal:lima,Math.cos(a)*rr,.35+(j%4)*.1,Math.sin(a)*rr,5,0,(r()-.5)*.3,(r()-.5)*.3);}}
+    PL.pop();};
+  for(let i=0;i<6;i++){const a=i*Math.PI/3,cx=Math.cos(a)*6.6,cz=Math.sin(a)*6.6,tx=-Math.sin(a),tz=Math.cos(a),nx=-Math.cos(a),nz=-Math.sin(a);K.push(cx,0,cz,-a-Math.PI/2);K.rbox(3.4,.72,1.5,.08,vaso,0,.36,0);K.box(3.2,.04,1.3,solo,0,.72,0);K.box(3.5,.05,.08,claro,0,.75,.74);K.box(3.5,.05,.08,claro,0,.75,-.74);K.box(.06,.03,1.3,cyan,-1.72,.74,0);K.box(.06,.03,1.3,cyan,1.72,.74,0);
+    // tubulação hidropônica e bocal de névoa
+    K.tube([[-1.6,.2,.8],[0,.25,.85],[1.6,.2,.8]],.04,claro,12,6);for(const dx of [-1.1,0,1.1])K.cyl(.05,.07,.12,escuro,dx,.86,.82,8);K.pop();
+    const tipos=[0,1,2,3,4,0,1,3,2,4];for(let j=0;j<7;j++){const t=tipos[(i*7+j)%tipos.length],lx=-1.35+j*.45,lz=(j%2?.32:-.32)*(1+(r()-.5)*.5);planta(t,cx+lx*tx+lz*nx,cz+lx*tz+lz*nz,1.25+r()*.6,r()*6.3);}
+    S.world.obst.push([cx,cz,1.2],[cx+tx*1.2,cz+tz*1.2,.9],[cx-tx*1.2,cz-tz*1.2,.9]);
+    const cores=[0x7a3cff,0xff5bb8,0x7fe02a,0x2fd9c9,0xff5bb8,0x9a6cff];{const L=new T.PointLight(cores[i],1.15,10,1.8);L.position.set(cx*.9,2.0,cz*.9);root.add(L);A.luzes.push({l:L,i0:1.15,seed:i});}}
+  // bancos de leitura com luminária, painéis holográficos
+  for(const [i,a] of [Math.PI/3,Math.PI,Math.PI*5/3].entries()){const x=Math.cos(a)*10.3,z=Math.sin(a)*10.3;K.push(x,0,z,Math.atan2(-Math.cos(a),-Math.sin(a)));K.rbox(2.4,.12,.6,.04,branco,0,.46,0);K.rbox(2.4,.5,.1,.03,branco,0,.72,-.3);K.rbox(2.3,.08,.55,.03,almofada,0,.54,.02);for(const s of [-1,1])K.box(.12,.44,.5,escuro,s*1.05,.22,0);
+    K.cyl(.03,.03,1.9,claro,1.45,.95,-.25,8);K.cone(.22,.18,claro,1.45,1.95,-.25,12,0,Math.PI,0);K.sph(.06,amber,1.45,1.86,-.25,1,1,1,8,6);K.pop();
+    const L=new T.PointLight(0xffb060,.75,7,2);L.position.set(x+Math.cos(a)*-.3,1.8,z+Math.sin(a)*-.3);root.add(L);A.luzes.push({l:L,i0:.75,seed:7+i});S.world.obst.push([x,z,1.3]);}
+  for(let i=0;i<3;i++){const a=i*Math.PI*2/3+Math.PI/2,x=Math.cos(a)*4.6,z=Math.sin(a)*4.6;const h=new T.Mesh(new T.PlaneGeometry(1.5,.95),new T.MeshBasicMaterial({map:e470TexHolo(i),transparent:true,opacity:.85,side:T.DoubleSide,depthWrite:false}));h.material.userData.papelKeep=true;h.position.set(x,1.7,z);h.lookAt(0,1.7,0);h.userData.fx=true;h.raycast=()=>{};root.add(h);A.holos.push({m:h,y:1.7,s:i});
+    K.cyl(.02,.02,1.25,claro,x,.62,z,6);K.cyl(.14,.18,.05,escuro,x,.025,z,10);}
+  // eclusa de volta ao deck (x positivo) e o baú no lado oposto
+  {const x=RW+.9;K.push(x,0,0,-Math.PI/2);K.box(3.3,3.6,.5,rib,0,1.8,0);K.box(2.4,3.1,.2,escuro,0,1.6,.2);for(const s of [-1,1])K.box(.05,2.9,.06,cyan,s*1.1,1.6,.32);K.box(1.0,.05,.06,cyan,0,3.05,.32);K.sph(.1,amber,0,3.85,.2,1,1,1,8,6);
+    K.add(new T.PlaneGeometry(2.2,.44),t160Mat('470 placa deck',()=>{const tx=e470Placa(e470T('← DECK DE OBSERVAÇÃO','← OBSERVATION DECK'));const m=new T.MeshStandardMaterial({map:tx,emissiveMap:tx,emissive:0xffffff,emissiveIntensity:.9,roughness:.5});m.userData.papelKeep=true;return m;}),0,4.2,.3);K.pop();
+    S.items=[{kind:'saida',x:RW-.4,z:0,y:0,label:e470T('Voltar ao deck de observação','Back to the observation deck')}];}
+  {const cx=0,cz=RW-1.0;K.cyl(.9,1.0,.18,claro,cx,.09,cz,18);K.tor(.95,.025,cyan,cx,.19,cz,Math.PI*2,0,Math.PI/2,0,5,36);const cg=lockedChest(170);cg.position.set(cx,.18,cz);cg.rotation.y=Math.PI;root.add(cg);const chest={g:cg,parts:cg.userData.chest,slot:0,open:false,t:0};if(S.saved.bau)chestSetOpen(chest);
+    S.items.push({kind:'bau',g:cg,x:cx,z:cz,y:.18,chest,label:e470T('Baú da estufa','Greenhouse chest')});S.world.obst.push([cx,cz,.7]);}
+  // robô jardineiro (grupo próprio, circula pelo anel dos canteiros)
+  {const g=new T.Group(),Kr=t160Kit('470 robô');Kr.sph(.42,branco,0,.9,0,1,.8,1,16,10);Kr.tor(.46,.05,escuro,0,.9,0,Math.PI*2,0,Math.PI/2,0,6,28);Kr.cyl(.22,.3,.5,escuro,0,.35,0,12);Kr.tor(.3,.04,cyan,0,.14,0,Math.PI*2,0,Math.PI/2,0,5,24);Kr.box(.26,.09,.05,cyan,0,.98,.4);for(const s of [-1,1]){Kr.cyl(.04,.04,.6,claro,s*.42,.75,.15,8,0,0,s*.9);Kr.box(.1,.08,.22,escuro,s*.66,.52,.35);Kr.cyl(.02,.02,.22,amber,s*.66,.52,.5,5,0,Math.PI/2,0);}Kr.cyl(.02,.02,.4,claro,0,1.45,0,5);Kr.sph(.06,amber,0,1.68,0,1,1,1,8,6);
+    for(const m of Kr.fim(g)){m.userData.papelKeepGeo=true;m.raycast=()=>{};}root.add(g);A.robo={g,a:0,r:8.6};}
+  // estrelas próprias ao redor do domo (o planeta de anéis do deck continua visível lá fora)
+  {const N=1400,p=new Float32Array(N*3),c=new Float32Array(N*3);for(let i=0;i<N;i++){const th=r()*Math.PI*2,ph=Math.acos(r()*2-1),rr=30+r()*4;p[i*3]=Math.sin(ph)*Math.cos(th)*rr;p[i*3+1]=Math.abs(Math.sin(ph)*Math.sin(th))*rr*.95+1;p[i*3+2]=Math.cos(ph)*rr;const k=r(),col=k<.15?[.7,.8,1]:k<.3?[1,.85,.7]:[1,1,1],br=.5+r()*.5;c[i*3]=col[0]*br;c[i*3+1]=col[1]*br;c[i*3+2]=col[2]*br;}
+    const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(p,3));g.setAttribute('color',new T.BufferAttribute(c,3));const st=new T.Points(g,new T.PointsMaterial({map:e470TexPonto(),vertexColors:true,size:.24,transparent:true,opacity:.95,blending:T.AdditiveBlending,depthWrite:false,fog:false}));st.frustumCulled=false;st.layers.set(1);st.userData.fx=true;st.raycast=()=>{};root.add(st);}
+  // vaga-lumes e o chafariz (pontos animados)
+  {const N=140,p=new Float32Array(N*3),f=new Float32Array(N*4);for(let i=0;i<N;i++){const a=r()*Math.PI*2,rr=1+r()*10.5;p[i*3]=Math.cos(a)*rr;p[i*3+1]=.6+r()*5;p[i*3+2]=Math.sin(a)*rr;f[i*4]=r()*7;f[i*4+1]=.3+r()*.7;f[i*4+2]=r()*7;f[i*4+3]=rr;}
+    const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(p,3));const pts=new T.Points(g,new T.PointsMaterial({color:0xaaffdc,size:.14,map:e470TexPonto(),transparent:true,opacity:.9,depthWrite:false,blending:T.AdditiveBlending}));pts.frustumCulled=false;pts.layers.set(1);pts.userData.fx=true;pts.raycast=()=>{};root.add(pts);A.vaga={pts,p,f,N};}
+  {const N=90,p=new Float32Array(N*3),f=new Float32Array(N*2);for(let i=0;i<N;i++){f[i*2]=r();f[i*2+1]=r()*Math.PI*2;p[i*3]=0;p[i*3+1]=.5;p[i*3+2]=0;}const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(p,3));const pts=new T.Points(g,new T.PointsMaterial({color:0xcffcff,size:.09,map:e470TexPonto(),transparent:true,opacity:.85,depthWrite:false,blending:T.AdditiveBlending}));pts.frustumCulled=false;pts.layers.set(1);pts.userData.fx=true;pts.raycast=()=>{};root.add(pts);A.chafariz={pts,p,f,N};}
+  // luzes gerais
+  {const amb=new T.AmbientLight(0x8fb0d0,.42);root.add(amb);const hemi=new T.HemisphereLight(0x6f8fc0,0x24301e,.8);root.add(hemi);}
+  const built=[...K.fim(root,{sombra:true}),...PL.fim(root,{sombra:true}),...FX.fim(root)];let tri=0;for(const m of built){m.userData.papelKeepGeo=true;m.userData.noCam=true;m.material.userData.papelKeep=true;tri+=(m.geometry.index?.count||m.geometry.attributes.position.count)/3;}
+  root.traverse(o=>{o.userData.estufa470=true;o.__fusaoMoveu=9;});S.stats={meshes:built.length,triangulos:Math.round(tri),luzes:A.luzes.length+2,obst:S.world.obst.length};S.built=true;
+}
+/* ---------- entrar e sair ---------- */
+function e470Switch(on,move=true){const S=E470;if(on===S.active||!S.room)return;if(on)e470Build();const R=S.room,T=THREE;
+  if(on){S.background=R.scene.background;S.fog=R.scene.fog;R.scene.background=new T.Color(0x020409);R.scene.fog=new T.FogExp2(0x070b14,.011);S.hidden=[];const keep=S.keep||(S.keep=e470Keep(R.scene));for(const o of keep)o.traverse(c=>{if(c.isPoints&&c!==o){S.hidden.push([c,c.visible]);c.visible=false;}});S.far=camera.far;camera.far=Math.max(camera.far,90);camera.updateProjectionMatrix();
+    for(const o of R.scene.children){if(o===S.root||o===READER.g||o===MARK||o.userData.estufa470||keep.has(o)||o.__fusaoVis!==undefined)continue;S.hidden.push([o,o.visible]);o.visible=false;}S.keyActive=KEYS.active;S.coinActive=COINS.active;KEYS.active=[];COINS.active=[];}
+  else{R.scene.background=S.background;R.scene.fog=S.fog;for(const [o,v] of S.hidden||[])o.visible=v;KEYS.active=S.keyActive||[];COINS.active=S.coinActive||[];if(S.far){camera.far=S.far;camera.updateProjectionMatrix();}}
+  S.active=on;S.root.visible=on;R.world.__nav=null;R.world.__navN=-1;try{e470Interior(S.root,R.scene,on);}catch(e){e470Erro('luzes',e);}
+  if(move){if(CH.sitting)standUp();const p=on?[S.R-1.9,0]:[S.porta.x+1.0,S.porta.z];CH.x=P.x=p[0];CH.z=P.z=p[1];CH.fy=0;CH.dir=on?-Math.PI/2:Math.PI/2;CH.target=null;CH.onArrive=null;CH.vx=CH.vz=0;syncP();camInit=false;CAV.invul=2;for(const list of [CAV.tiros,CAV.ossos]){for(const o of list)o.scene?.remove(o.g);list.length=0;}cavHud();
+    showToast(on?e470T('Você entrou na Estufa Orbital. Plantas de luz sob as estrelas; a eclusa à direita leva de volta ao deck.','You entered the Orbital Greenhouse. Plants of light under the stars; the airlock on the right leads back to the deck.'):e470T('De volta ao deck de observação.','Back on the observation deck.'),{ms:6000});}
+}
+/* orçamento de luzes (L226): as lâmpadas da estufa só contam lá dentro, e as do deck só lá fora */
+function e470Interior(root,sc,on){const E=E470;E.luzFlags=E.luzFlags||new Map();sc.traverse(o=>{if(!o.isPointLight)return;let dentro=false;for(let p=o;p;p=p.parent)if(p===root){dentro=true;break;}
+  if(dentro){o.userData.interior276=true;o.userData.interiorActive276=on;if(!on)o.visible=false;}
+  else if(on){if(!E.luzFlags.has(o))E.luzFlags.set(o,[o.userData.interior276,o.userData.interiorActive276]);o.userData.interior276=true;o.userData.interiorActive276=false;}
+  else{const f=E.luzFlags.get(o);if(f){o.userData.interior276=f[0];o.userData.interiorActive276=f[1];E.luzFlags.delete(o);}}});}
+/* o que continua visível de dentro do domo: o espaço lá fora (estrelas, nebulosa, planeta de anéis) */
+function e470Keep(sc){const keep=new Set();try{for(const o of sc.children){if(o.isGroup&&Math.abs(o.position.z+SD/2)<.05&&Math.abs(o.position.y-2.8)<.05&&o.children.some(c=>c.isPoints))keep.add(o);if(o.isMesh&&o.geometry&&o.geometry.parameters&&o.geometry.parameters.width===30&&o.geometry.parameters.height===19)keep.add(o);}}catch(e){e470Erro('keep',e);}return keep;}
+function e470Near(){const S=E470;if(!e470Here()||CAV.morto||ASA246.voo)return null;const p=MODE==='fp'?P:CH,cand=S.active?S.items:[S.porta];let best=null;for(const it of cand){if(!it)continue;const d=Math.hypot(p.x-it.x,p.z-it.z);if(d<2.3&&(!best||d<best.dist))best={kind:'estufa470',item:it,obj:it.g,label:it.label,tip:it.label,dist:d};}return best;}
+function e470Use(it){const S=E470;if(!e470Here()||uiBlocked()||CAV.morto)return;const p=MODE==='fp'?P:CH;if(Math.hypot(p.x-it.x,p.z-it.z)>2.5)return;
+  if(it.kind==='porta'||it.kind==='saida'){const on=it.kind==='porta';fadeTo(()=>e470Switch(on),{kind:'room',alvo:on?e470T('Estufa Orbital','Orbital Greenhouse'):e470T('Ficção científica','Science fiction')});return;}
+  if(it.kind==='bau'){if(S.saved.bau){showToast(e470T('O baú da estufa já foi aberto.','The greenhouse chest is already open.'));return;}S.saved.bau=true;chestSetOpen(it.chest);const n=60;COINS.saldo+=n;COINS.total+=n;coinSave();coinHud();e470Save();showToast(e470T('Baú da estufa aberto · +60 moedas de ouro!','Greenhouse chest opened · +60 gold coins!'),{ms:5000});}
+}
+function e470Tick(dt){const S=E470,A=S.anim;if(!e470Here()||document.hidden)return;S.time+=dt;const t=S.time;
+  // as folhas da eclusa abrem quando o leitor chega perto (e ficam abertas enquanto se está lá dentro)
+  if(S.porta){const p=MODE==='fp'?P:CH;const perto=S.active||Math.hypot(p.x-S.porta.x,p.z-S.porta.z)<3.4;A.abre+=((perto?1:0)-A.abre)*Math.min(1,dt*4);for(const f of A.folhas)f.m.position.z=f.s*(.66+A.abre*1.08);}
+  if(!S.active)return;
+  for(const o of A.luzes){o.l.intensity=o.i0*(1+.05*Math.sin(t*1.7+o.seed));}
+  for(const h of A.holos){h.m.position.y=h.y+Math.sin(t*.8+h.s)*.06;}
+  if(A.robo){const R=A.robo;R.a+=dt*.11;R.g.position.set(Math.cos(R.a)*R.r,.12+Math.sin(t*1.3)*.05,Math.sin(R.a)*R.r);R.g.rotation.y=-R.a;}
+  if(A.vaga){const V=A.vaga,p=V.p,f=V.f;for(let i=0;i<V.N;i++){const ph=f[i*4],sp=f[i*4+1],ph2=f[i*4+2],rr=f[i*4+3];const a=ph+t*.07*sp;p[i*3]=Math.cos(a)*rr+Math.sin(t*.9+ph2)*.3;p[i*3+1]=.6+(Math.sin(t*.25*sp+ph2)*.5+.5)*4.8;p[i*3+2]=Math.sin(a)*rr+Math.cos(t*.7+ph)*.3;}V.pts.geometry.attributes.position.needsUpdate=true;V.pts.material.opacity=.7+.25*Math.sin(t*2.3);}
+  if(A.chafariz){const C=A.chafariz,p=C.p,f=C.f;for(let i=0;i<C.N;i++){const u=(f[i*2]+t*.55)%1,a=f[i*2+1];const rr=u*1.4;p[i*3]=Math.cos(a)*rr*.5;p[i*3+1]=.5+Math.sin(u*Math.PI)*1.9;p[i*3+2]=Math.sin(a)*rr*.5;}C.pts.geometry.attributes.position.needsUpdate=true;}
+}
+if(E470.on){
+  {const old=finishRoom;finishRoom=function(key){const r=old.apply(this,arguments);if(key==='sci')try{e470Install(ROOMS.sci);}catch(e){e470Erro('instalar',e);}return r;};}
+  try{if(ROOMS.sci&&ROOMS.sci.scene&&ROOMS.sci.world)e470Install(ROOMS.sci);}catch(e){e470Erro('instalar já pronta',e);}
+  {const old=updateFocus;updateFocus=function(){if(e470Here()&&E470.active){if(uiBlocked()){setFocus(null);return;}const aim=locked?resolveAt(0,0,true):(mouseIn&&!dragging?resolveAt(mx,my,false):null);setFocus(aim?.kind==='estufa470'&&aim.dist<=2.5?aim:e470Near());return;}old.apply(this,arguments);if(uiBlocked())return;const tg=e470Near();if(tg)setFocus(tg);};}
+  {const old=act;act=function(tg){if(tg?.kind==='estufa470'){if(tg.dist<=2.5)e470Use(tg.item);else walkTo(tg.item.x+(tg.item.kind==='porta'?.9:tg.item.kind==='saida'?-1.0:1.1),tg.item.z,()=>e470Use(tg.item));return;}return old.apply(this,arguments);};}
+  {const old=actFP;actFP=function(tg){if(tg?.kind==='estufa470'){e470Use(tg.item);return;}return old.apply(this,arguments);};}
+  {const old=resolveAt;resolveAt=function(px,py,center){const S=E470;if(!e470Here())return old.apply(this,arguments);if(center)ndc.set(0,0);else ndc.set(px/innerWidth*2-1,-py/innerHeight*2+1);ray.setFromCamera(ndc,camera);for(const it of S.active?S.items:[S.porta]){if(!it||!it.g||!it.g.visible)continue;const h=firstHit(ray.intersectObject(it.g,true));if(h)return {kind:'estufa470',item:it,obj:it.g,label:it.label,tip:it.label,dist:Math.hypot(CH.x-it.x,CH.z-it.z)};}if(S.active){const h=firstHit(ray.intersectObjects(S.floors,false));return h?{kind:'floor',x:h.point.x,z:h.point.z}:null;}return old.apply(this,arguments);};}
+  {const old=cavRoom;cavRoom=function(){return e470Here()&&E470.active?'estufa470':old.apply(this,arguments);};}
+  {const old=coinKeyFor;coinKeyFor=function(){return e470Here()&&E470.active?'estufa470':old.apply(this,arguments);};}
+  {const old=autoNear;autoNear=function(){if(e470Here()&&E470.active){return;}return old.apply(this,arguments);};}
+  {const old=setActive;setActive=function(sc){const S=E470;if(S.active&&sc!==S.room.scene)e470Switch(false,false);return old.apply(this,arguments);};}
+  {const old=fusaoPodeCena;fusaoPodeCena=function(sc){return E470.active&&sc===E470.room?.scene?false:old.apply(this,arguments);};}
+  {const old=g232Trabalha;g232Trabalha=function(){if(E470.active)return;return old.apply(this,arguments);};}
+  // os robôs, a nave e os tesouros do deck dormem enquanto se está na estufa
+  if(typeof robot315Here==='function'){const old=robot315Here;robot315Here=function(){return E470.active?false:old.apply(this,arguments);};}
+  if(typeof s302Near==='function'){const old=s302Near;s302Near=function(){return E470.active?null:old.apply(this,arguments);};}
+  if(typeof s302Here==='function'){const old=s302Here;s302Here=function(){return E470.active?false:old.apply(this,arguments);};}
+}
+window.__estufa470={estado:E470,entrar:()=>e470Switch(true),sair:()=>e470Switch(false),construir:()=>e470Build()};
+
+/* ===================== v471 · O TREMULAR DOS RODAPÉS DA MANSÃO E DO MOINHO: AS FACES VERTICAIS (bloco `C471`) =====================
+   · Revisão pedida pelo Luiz («Depois revise o fix do bug nos rodapés da mansão e moinho de fantasia»). O varredor da v465 (`c465Varre`)
+     só olhava faces HORIZONTAIS (3 vértices na mesma altura). Medido na v470, na Casa da Clareira: as faces horizontais estão resolvidas
+     (168 m² piso × base das paredes, 186 m² topo das paredes × vigas — 32 malhas deslocadas), mas sobraram pares VERTICAIS coplanares,
+     que são exatamente os rodapés: «Carvalho encerado» (rodapé de 19 cm) rente ao «Reboco de cal» nas faces x = ±13,88/±14,12 (11 m² cada),
+     ±1,68/±1,92 (9 m²) e, no moinho, ±3,48/±3,72 (5,5 m²); as vigas-cornija rentes ao reboco em y 4,45–4,6 (9,8–11,5 m²); o lambri de
+     carvalho × vigas em z = −121,1 (16,7 m²); o calcário do moinho × reboco; a placa de latão × painel. A foto da própria página com
+     `near` 0,05 × 0,0515 acende a linha do rodapé (`R1_casa_rodape`).
+   · `c471VarreEixo(sc,eixo)` generaliza o varredor para faces alinhadas a qualquer eixo (y, x, z): mesma coleta, mesmos baldes
+     (coordenada constante quantizada × célula de 3 m nos outros dois eixos), mesmos pares (malhas diferentes, mesma orientação, caixas
+     sobrepostas ≥ 1,2 cm e ≥ 0,004 m²). Nas faces horizontais vale a regra da v465. Nas verticais a regra é outra: quem se move é sempre
+     a peça MENOR (ou a fina), e ela avança 4 mm PARA FORA, na direção da normal (`DESLOCA_FINA`): o rodapé fica 4 mm saliente da parede
+     em vez de afundar nela e sumir. `c465Varre` passa a rodar os três eixos em sequência (y, x, z), no mesmo gatilho e no mesmo
+     orçamento de 3 ms por quadro. `?coplanar471=0` volta ao varredor só horizontal. Gancho: `window.__v471`. */
+const C471={on:!/[?&#]coplanar471=0/i.test(location.search+location.hash),erros:[],stats:{x:{faces:0,pares:0,movidas:0},z:{faces:0,pares:0,movidas:0}},relatorio:[]};
+function c471Erro(o,e){if(C471.erros.length<12)C471.erros.push(o+': '+(e&&e.message||e));}
+function* c471VarreEixo(sc,eixo){const T=THREE,t0=performance.now(),vert=eixo!=='y',ST=vert?C471.stats[eixo]:null;const malhas=[],usoGeo=new Map();sc.traverse(o=>{if(!c465Pula(o)){malhas.push(o);usoGeo.set(o.geometry,(usoGeo.get(o.geometry)||0)+1);}});yield;
+  const faces=[],v=[new T.Vector3(),new T.Vector3(),new T.Vector3()],e1=new T.Vector3(),e2=new T.Vector3(),n=new T.Vector3(),TOL=C465.TOL;
+  const A=eixo,B=eixo==='x'?'z':'x',Cc=eixo==='y'?'z':'y'; // A = eixo constante; (B, Cc) = plano da face
+  for(let mi=0;mi<malhas.length;mi++){const o=malhas[mi];try{o.updateMatrixWorld(true);const M=o.matrixWorld,g=o.geometry,pos=g.attributes.position,idx=g.index,cnt=idx?idx.count:pos.count;
+      for(let i=0;i<cnt;i+=3){for(let k=0;k<3;k++){const j=idx?idx.getX(i+k):i+k;v[k].fromBufferAttribute(pos,j).applyMatrix4(M);}
+        if(Math.abs(v[0][A]-v[1][A])>TOL||Math.abs(v[0][A]-v[2][A])>TOL)continue;
+        e1.subVectors(v[1],v[0]);e2.subVectors(v[2],v[0]);n.crossVectors(e1,e2);const a2=n.length();if(a2<2e-5)continue;
+        faces.push({mi,i,c:(v[0][A]+v[1][A]+v[2][A])/3,up:n[A]>0,b0:Math.min(v[0][B],v[1][B],v[2][B]),b1:Math.max(v[0][B],v[1][B],v[2][B]),c0:Math.min(v[0][Cc],v[1][Cc],v[2][Cc]),c1:Math.max(v[0][Cc],v[1][Cc],v[2][Cc]),area:a2/2});}}catch(e){c471Erro('malha '+eixo+' '+(o.name||mi),e);}
+    if(mi%6===5)yield;}
+  if(ST)ST.faces+=faces.length;else C465.stats.faces+=faces.length;
+  const CEL=C465.CEL,baldes=new Map();
+  for(let fi=0;fi<faces.length;fi++){const f=faces[fi];const q=Math.round(f.c/TOL);const cb0=Math.floor(f.b0/CEL),cb1=Math.floor(f.b1/CEL),cc0=Math.floor(f.c0/CEL),cc1=Math.floor(f.c1/CEL);if((cb1-cb0+1)*(cc1-cc0+1)>900)continue;
+    for(let cb=cb0;cb<=cb1;cb++)for(let cc=cc0;cc<=cc1;cc++){const k=q+'|'+cb+'|'+cc;let L=baldes.get(k);if(!L)baldes.set(k,L=[]);L.push(fi);}
+    if(fi%3000===2999)yield;}
+  const grupos=new Map(),vistos=new Set();let nb=0;
+  const testa=(fi,fj)=>{if(fi===fj)return;const a=faces[fi],b=faces[fj];if(a.mi===b.mi||a.up!==b.up||Math.abs(a.c-b.c)>TOL)return;const ob=Math.min(a.b1,b.b1)-Math.max(a.b0,b.b0),oc=Math.min(a.c1,b.c1)-Math.max(a.c0,b.c0);if(ob<=0.012||oc<=0.012||ob*oc<C465.MIN_AREA)return;
+    const key=fi<fj?fi+','+fj:fj+','+fi;if(vistos.has(key))return;vistos.add(key);const [p,q]=a.mi<b.mi?[a,b]:[b,a];const gk=p.mi+'|'+q.mi+'|'+Math.round(p.c/TOL)+'|'+(p.up?1:0);
+    let G=grupos.get(gk);if(!G)grupos.set(gk,G={a:p.mi,b:q.mi,c:p.c,up:p.up,fa:new Set(),fb:new Set(),ra:new Set(),rb:new Set(),area:0});G.fa.add(p.i);G.fb.add(q.i);G.ra.add(p===a?fi:fj);G.rb.add(q===b?fj:fi);G.area+=ob*oc;};
+  for(const [k,L] of baldes){const [q,cb,cc]=k.split('|');const L2=baldes.get((+q+1)+'|'+cb+'|'+cc);for(let i=0;i<L.length;i++){for(let j=i+1;j<L.length;j++)testa(L[i],L[j]);if(L2)for(let j=0;j<L2.length;j++)testa(L[i],L2[j]);}
+    if(++nb%400===0)yield;}
+  if(ST)ST.pares+=grupos.size;else C465.stats.pares+=grupos.size;
+  const caixa=o=>{const g=o.geometry;if(!g.boundingBox)g.computeBoundingBox();return g.boundingBox.clone().applyMatrix4(o.matrixWorld);};
+  const areaDe=(o,set)=>{let s=0;const g=o.geometry,pos=g.attributes.position,idx=g.index;for(const i of set){for(let k=0;k<3;k++){const j=idx?idx.getX(i+k):i+k;v[k].fromBufferAttribute(pos,j).applyMatrix4(o.matrixWorld);}e1.subVectors(v[1],v[0]);e2.subVectors(v[2],v[0]);s+=n.crossVectors(e1,e2).length()/2;}return s;};
+  // movidas: malha -> lista de {d, idx} (um deslocamento por plano); nas faces verticais cada plano tem NÍVEIS por malha (1 = 4 mm, 2 = 8 mm…)
+  // para que duas peças empurradas pelo mesmo plano não voltem a coincidir (foi o que sobrou na primeira medição: calcário × reboco × calcário claro)
+  // o destino tem de estar livre: nenhuma face de OUTRA malha no plano de chegada (±TOL) sobre a mesma região — senão o deslocamento só trocaria de briga
+  const chegadas=[];const sobrepoe=(f,g)=>(Math.min(f.b1,g.b1)-Math.max(f.b0,g.b0))>0.012&&(Math.min(f.c1,g.c1)-Math.max(f.c0,g.c0))>0.012;
+  const livre=(cNovo,mi,recs)=>{const q=Math.round(cNovo/TOL);for(const ch of chegadas){if(ch.mi===mi||Math.abs(ch.c-cNovo)>TOL)continue;for(const ri of recs){const f=faces[ri];for(const rj of ch.recs)if(sobrepoe(f,faces[rj]))return false;}}
+    for(const ri of recs){const f=faces[ri];const cb0=Math.floor(f.b0/CEL),cb1=Math.floor(f.b1/CEL),cc0=Math.floor(f.c0/CEL),cc1=Math.floor(f.c1/CEL);
+      for(let cb=cb0;cb<=cb1;cb++)for(let cc=cc0;cc<=cc1;cc++)for(let dq=-1;dq<=1;dq++){const L=baldes.get((q+dq)+'|'+cb+'|'+cc);if(!L)continue;for(const fj of L){const g=faces[fj];if(g.mi===mi||Math.abs(g.c-cNovo)>TOL)continue;const ob=Math.min(f.b1,g.b1)-Math.max(f.b0,g.b0),oc=Math.min(f.c1,g.c1)-Math.max(f.c0,g.c0);if(ob>0.012&&oc>0.012)return false;}}}return true;};
+  const movidas=new Map(),niveis=new Map();const ordem=[...grupos.values()].sort((p,q)=>q.area-p.area);
+  const registra=(alvo,faces2,d,G,outro,plano)=>{chegadas.push({mi:alvo===malhas[G.a]?G.a:G.b,c:G.c+d,recs:alvo===malhas[G.a]?G.ra:G.rb});let L=movidas.get(alvo);if(!L)movidas.set(alvo,L=[]);let R=L.find(r=>r.plano===plano);if(!R)L.push(R={plano,d,idx:new Set(),grupos:0,outro:outro.name||'?',c:G.c,area:0});R.d=d;R.grupos++;R.area+=G.area;const g=alvo.geometry,idx=g.index;for(const i of faces2)for(let k=0;k<3;k++)R.idx.add(idx?idx.getX(i+k):i+k);};
+  for(const G of ordem){try{const Ma=malhas[G.a],Mb=malhas[G.b],bA=caixa(Ma),bB=caixa(Mb);const grossoA=G.up?bA.min[A]<G.c-0.03:bA.max[A]>G.c+0.03,grossoB=G.up?bB.min[A]<G.c-0.03:bB.max[A]>G.c+0.03;const plano=Math.round(G.c/TOL)+'|'+(G.up?1:0);
+      if(vert){// faces verticais: a peça menor (ou a fina) avança para fora, na direção da normal, um nível (4 mm) acima da outra
+        let nv=niveis.get(plano);if(!nv)niveis.set(plano,nv=new Map());const la=nv.get(G.a)||0,lb=nv.get(G.b)||0;if(la!==lb)continue; // já separadas por um par anterior
+        let alvo,faces2,mi;if(grossoA&&!grossoB){alvo=Mb;faces2=G.fb;mi=G.b;}else if(grossoB&&!grossoA){alvo=Ma;faces2=G.fa;mi=G.a;}else{const aa=areaDe(Ma,G.fa),ab=areaDe(Mb,G.fb);if(aa<=ab){alvo=Ma;faces2=G.fa;mi=G.a;}else{alvo=Mb;faces2=G.fb;mi=G.b;}}
+        let nivel=la+1;const recs=mi===G.a?G.ra:G.rb;for(let t=0;t<4&&!livre(G.c+(G.up?1:-1)*C465.DESLOCA_FINA*nivel,mi,recs);t++)nivel++;nv.set(mi,nivel);registra(alvo,faces2,(G.up?1:-1)*C465.DESLOCA_FINA*nivel,G,alvo===Ma?Mb:Ma,plano);}
+      else{let alvo,faces2,afasta;if(grossoA&&!grossoB){alvo=Ma;faces2=G.fa;afasta=true;}else if(grossoB&&!grossoA){alvo=Mb;faces2=G.fb;afasta=true;}else{const aa=areaDe(Ma,G.fa),ab=areaDe(Mb,G.fb);if(aa<=ab){alvo=Ma;faces2=G.fa;}else{alvo=Mb;faces2=G.fb;}afasta=grossoA&&grossoB;}
+        let d=(G.up?-1:1)*(afasta?C465.DESLOCA:-C465.DESLOCA_FINA);const mi=alvo===Ma?G.a:G.b,recs=alvo===Ma?G.ra:G.rb;for(let t=0;t<3&&!livre(G.c+d,mi,recs);t++)d+=(G.up?-1:1)*(afasta?C465.DESLOCA:-C465.DESLOCA_FINA);registra(alvo,faces2,d,G,alvo===Ma?Mb:Ma,plano);}}catch(e){c471Erro('grupo '+eixo,e);}}
+  for(const [o,L] of movidas){try{if((usoGeo.get(o.geometry)||0)>1){o.geometry=o.geometry.clone();}const g=o.geometry,pos=g.attributes.position;const inv=new T.Matrix4().copy(o.matrixWorld).invert();const o0=new T.Vector3(0,0,0).applyMatrix4(inv);
+      for(const R of L){const dv=new T.Vector3(0,0,0);dv[A]=R.d;const o1=dv.applyMatrix4(inv).sub(o0);for(const j of R.idx){pos.setXYZ(j,pos.getX(j)+o1.x,pos.getY(j)+o1.y,pos.getZ(j)+o1.z);}
+        const rel=ST?C471.relatorio:C465.relatorio;if(rel.length<160)rel.push({cena:sc.name||'',eixo,malha:(o.name||o.parent&&o.parent.name||'?').slice(0,60),contra:R.outro.slice(0,50),c:+R.c.toFixed(3),d:+R.d.toFixed(3),vertices:R.idx.size,area:+R.area.toFixed(2)});}
+      pos.needsUpdate=true;g.computeBoundingBox();g.computeBoundingSphere();if(ST)ST.movidas++;else C465.stats.movidas++;}catch(e){c471Erro('mover '+eixo,e);}}
+  if(movidas.size){try{if(typeof fusaoLimpar==='function'&&FUSAO.cenas.get(sc))fusaoLimpar(sc);}catch(e){c471Erro('fusão',e);}}
+  if(!ST){C465.stats.cenas++;C465.stats.ms+=performance.now()-t0;}return movidas.size;}
+if(C471.on){
+  c465Varre=function*(sc){let n=0;n+=yield* c471VarreEixo(sc,'y');n+=yield* c471VarreEixo(sc,'x');n+=yield* c471VarreEixo(sc,'z');return n;};
+  window.__v465.varrer=(sc)=>{const it=c465Varre(sc||ACTIVE);let r;do{r=it.next();}while(!r.done);return r.value;};
+}
+window.__v471={estado:C471,varrerEixo:(sc,eixo)=>{const it=c471VarreEixo(sc||ACTIVE,eixo);let r;do{r=it.next();}while(!r.done);return r.value;}};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
