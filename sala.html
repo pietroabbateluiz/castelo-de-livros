@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v473</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v474</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -58789,6 +58789,83 @@ if(S473.on){
   try{const d0=draw;draw=function(dt){try{s473Tick();}catch(e){s473Erro('tick',e);}return d0.apply(this,arguments);};}catch(e){s473Erro('instalar',e);}
 }
 window.__salas473={estado:S473,aplicar:s473Aplica};
+
+/* ===================== v474 · INIMIGOS DE TODAS AS SALAS: PRESENÇA, MOVIMENTO, TELEGRAFIA, ACERTO E MORTE (bloco `N474`) =====================
+   · Pedido do Luiz: «depois melhore os inimigos de cada sala». Primeira camada, válida para os inimigos comuns de TODAS as salas
+     (os registrados por `caveirasRegistrar` → `inimigoMesh155`: caveira, dragãozinho, robô, pirata, espectro e as famílias das
+     v210/v225/v249/v288/v388, mais os carcereiros das masmorras); chefes, aliados e a nave (`robot315`, `para318`, `ally428`,
+     `ship316`) ficam fora.
+   · Presença: sombra de contato (disco escuro suave no chão, do tamanho da peça, que esmaece quando a criatura flutua).
+   · Movimento: giro suave (sem virar de estalo), inclinação para a frente ao avançar e para o lado ao deslizar, balanço do
+     corpo proporcional à velocidade (parado quase não balança), e um comportamento novo — ao chegar ao alcance de tiro a
+     criatura passa a ORBITAR o leitor (direção sorteada, troca a cada 2,5–5,5 s), respeitando obstáculos, limites e os colegas.
+   · Telegrafia: antes de cada tiro os olhos incandescem durante 0,32 s e o corpo se arma (avisa o jogador em vez de disparar do nada).
+   · Acerto: esmagamento rápido (1,14 × 0,86) e um clarão branco na peça. Morte: em vez de sumir no mesmo quadro, a criatura gira,
+     encolhe e afunda em 0,55 s com uma explosão maior de fagulhas nas cores do tipo (os bonecos da v163, que já têm queda, ficam como são).
+   · Presença (2): cada criatura acordada ganha uma AURA de partículas nas cores do tipo (brasas do dragão, faíscas do robô,
+     fiapos do espectro, penas do corvo…) que gira devagar e some quando dorme; e em cada sala uma única luz pontual (fora do
+     orçamento, como a lanterna do leitor) acompanha a criatura acordada mais próxima do leitor, na cor do tipo — o chão em volta
+     dela acende, e o jogador sabe de onde vem o perigo. Não roda no Leve nem no Papel.
+   · ?inimigos474=0 desliga. Gancho: `window.__inimigos474`. */
+const N474={on:!/[?&#]inimigos474=0/i.test(location.search+location.hash),TELE:.32,erros:[],stats:{preparados:0,tiros:0,mortes:0,acertos:0}};
+function n474Erro(o,e){if(N474.erros.length<12)N474.erros.push(o+': '+(e&&e.message||e));console.warn('v474',o,e);}
+function n474SombraTex(){return t160Tex('474 sombra',64,64,(p,W,H)=>{p.clearRect(0,0,W,H);const g=p.createRadialGradient(32,32,2,32,32,32);g.addColorStop(0,'rgba(0,0,0,.95)');g.addColorStop(.55,'rgba(0,0,0,.55)');g.addColorStop(1,'rgba(0,0,0,0)');p.fillStyle=g;p.fillRect(0,0,W,H);});}
+function n474Prepara(g,tipo){if(!g||g.userData.n474)return;try{const T=THREE,box=new T.Box3().setFromObject(g),w=Math.max(.3,Math.min(2.4,((box.max.x-box.min.x)+(box.max.z-box.min.z))/2));
+    const m=new T.Mesh(new T.PlaneGeometry(w*1.5,w*1.5),new T.MeshBasicMaterial({map:n474SombraTex(),transparent:true,opacity:.5,depthWrite:false,color:0x000000}));m.rotation.x=-Math.PI/2;m.renderOrder=1;m.raycast=()=>{};m.userData.fx=true;m.userData.noFade=true;m.layers.set(1);m.name='474 sombra de contato';m.visible=false;
+    g.userData.n474={tipo,sombra:m,w,chao:!!((INI155[tipo]||{}).chao),pe:box.min.y<-.9||!!((INI155[tipo]||{}).chao)};N474.stats.preparados++;}catch(e){n474Erro('preparar',e);}}
+function n474Aura(g,tipo){const T=THREE,I=INI155[tipo]||INI155.caveira,D=g.userData.n474,N=16,pos=new Float32Array(N*3),r=rnd(474+(tipo.length*31));const w=Math.max(.5,D.w*.9);
+  for(let i=0;i<N;i++){const a=r()*6.283,b=(r()-.5)*2;pos[i*3]=Math.cos(a)*w*.55*(.6+.4*r());pos[i*3+1]=b*w*.5+(D.pe?-.4:0);pos[i*3+2]=Math.sin(a)*w*.55*(.6+.4*r());}
+  const geo=new T.BufferGeometry();geo.setAttribute('position',new T.BufferAttribute(pos,3));const m=new T.Points(geo,new T.PointsMaterial({map:GLOW,color:I.faisca?I.faisca[1]:0xffd080,size:.11,transparent:true,opacity:0,blending:T.AdditiveBlending,depthWrite:false,sizeAttenuation:true}));
+  m.layers.set(1);m.userData.fx=true;m.userData.noFade=true;m.raycast=()=>{};m.name='474 aura';m.frustumCulled=false;g.add(m);D.aura=m;return m;}
+/* a luz fica SEMPRE visível (intensidade 0 quando ociosa): acender/apagar uma luz muda a contagem e obriga a recompilar os shaders da cena — é criada no registro dos inimigos, antes do aquecimento dos shaders */
+function n474Luz(sc){let L=sc.userData.luz474;if(L)return L;L=new THREE.PointLight(0xffd080,0,5.5,1.8);L.userData.padLight=true;L.userData.n474=true;L.name='474 luz do inimigo';sc.add(L);sc.userData.luz474=L;return L;}
+function n474Estado(k){return k.n474||(k.n474={yaw:k.g.rotation.y,px:k.x,pz:k.z,orb:(k.id%2)?1:-1,tOrb:2+Math.random()*3,flash:0,squash:0,tele:0,morte:null,esc:false});}
+function n474Clarao(k,cor,s,vida){try{const sc=ROOMS[k.room]&&ROOMS[k.room].scene;if(!sc)return;const p=k.g.position;cavFaisca(sc,p.x,p.y+.5,p.z,cor,s,vida);}catch(e){}}
+function n474Tick(dt){const room=cavRoom();const S=room&&CAV.salas[room];if(!S||!S.lista)return;const pl=cavPos(),d0=Math.min(.05,dt||.016);const R=ROOM;const perto={d:1e9,k:null};N474.fx=!(Q.lite||Q.papel);
+  for(const k of S.lista){const g=k.g;if(!g||!g.userData.n474)continue;const st=n474Estado(k);
+    if(!k.viva){if(g.userData.n474.sombra)g.userData.n474.sombra.visible=false;if(g.userData.n474.aura)g.userData.n474.aura.visible=false;}
+    if(st.morte){if(k.viva){st.morte=null;g.scale.set(1,1,1);g.rotation.x=0;g.rotation.z=0;continue;}st.morte.t+=d0;const p=Math.min(1,st.morte.t/.55),q=1-p;g.visible=true;g.scale.setScalar(.15+.85*q*q);g.rotation.y+=d0*7*(1+p);g.position.y=st.morte.y0+Math.sin(p*Math.PI)*.35-p*p*.9;if(p>=1){g.visible=false;g.scale.set(1,1,1);g.rotation.x=0;g.rotation.z=0;st.morte=null;}continue;}
+    if(!k.viva||k.robot315||k.para318||k.ally428||k.ship316)continue;const D=g.userData.n474;if(!N474.fx&&D.aura&&D.aura.visible){D.aura.visible=false;D.aura.material.opacity=0;}
+    const vel=k.vel||CAV.vel||2.5;const vx=(k.x-st.px)/d0,vz=(k.z-st.pz)/d0;const sp=Math.hypot(vx,vz);
+    // órbita ao alcance: tangente ao leitor, com obstáculos, limites e colegas
+    if(!(k.sono>0)&&!CAV.morto&&!CH.sitting){const dx=pl.x-k.x,dz=pl.z-k.z,d=Math.hypot(dx,dz);st.tOrb-=d0;if(st.tOrb<=0){st.tOrb=2.5+Math.random()*3;if(Math.random()<.55)st.orb*=-1;}
+      if(d<=(CAV.distMin||6)+.6&&d>1.3){const tx=-dz/d*st.orb,tz=dx/d*st.orb;let nx=k.x+tx*vel*.42*d0,nz=k.z+tz*vel*.42*d0;
+        const obst=(WORLD&&WORLD.obst)||[];for(let q=0;q<obst.length;q++){const ob=obst[q];const ox=nx-ob[0],oz=nz-ob[1],od=Math.hypot(ox,oz),rr=(ob[2]||.5)+.3;if(od<rr&&od>1e-3){nx=ob[0]+ox/od*rr;nz=ob[1]+oz/od*rr;}}
+        if(WORLD&&WORLD.clamp){const c=WORLD.clamp(nx,nz,.35);nx=Array.isArray(c)?c[0]:c.x;nz=Array.isArray(c)?c[1]:c.z;}
+        let livre=true;for(const o of S.lista){if(o===k||!o.viva)continue;if(Math.hypot(nx-o.x,nz-o.z)<1.0){livre=false;break;}}
+        if(livre){k.x=nx;k.z=nz;g.position.x=nx;g.position.z=nz;}}}
+    st.px=k.x;st.pz=k.z;
+    // giro suave + inclinação
+    const alvo=g.rotation.y;let dy=alvo-st.yaw;dy=Math.atan2(Math.sin(dy),Math.cos(dy));st.yaw+=dy*Math.min(1,d0*9);g.rotation.y=st.yaw;
+    const fwd=Math.sin(st.yaw)*vx+Math.cos(st.yaw)*vz,lado=Math.cos(st.yaw)*vx-Math.sin(st.yaw)*vz,vm=Math.max(.6,vel);
+    const amp=g.userData.n474.chao?.45:1,ix=-Math.max(-1,Math.min(1,fwd/vm))*.13*amp,iz=Math.max(-1,Math.min(1,lado/vm))*.11*amp,kk=Math.min(1,d0*8);g.rotation.x+=(ix-g.rotation.x)*kk;g.rotation.z+=(iz-g.rotation.z)*kk;
+    // balanço pela velocidade (só nos que flutuam: os que andam descontam o balanço inteiro na raiz) e sombra de contato no chão da sala
+    let base;try{base=cavY(R,k.x,k.z);}catch(e){base=g.position.y;}const chao=base-1.35,vk=Math.min(1,sp/vm);
+    if(!D.chao&&!(k.sono>0)){const b0=Math.sin(k.bob*2.2);if(Math.abs(g.position.y-(base+b0*.08))<.003)g.position.y=base+b0*(.025+.075*vk);} // só quando o tick antigo escreveu a altura padrão neste quadro (tipos com altura própria ficam como estão)
+    const sh=D.sombra;if(sh){if(sh.parent!==g.parent&&g.parent){g.parent.add(sh);}sh.visible=g.visible;sh.position.set(k.x,chao+.015,k.z);const h=D.chao?Math.max(0,g.position.y-base):Math.max(0,g.position.y-chao);sh.material.opacity=D.pe?.5:Math.max(.14,.42-.2*Math.min(1,h/1.8));const e=D.pe?1:1+.4*Math.min(1,h/1.8);sh.scale.set(e,e,1);}
+    // acerto: esmagamento; telegrafia do tiro
+    if(st.squash>0){st.squash-=d0;const q=Math.max(0,st.squash/.18);g.scale.set(1+.14*q,1-.14*q,1+.14*q);st.esc=true;}else if(st.esc){g.scale.set(1,1,1);st.esc=false;}
+    if(st.tele>0){st.tele-=d0;const q=1-Math.max(0,st.tele)/N474.TELE;for(const o of g.userData.olhos||[])if(o.material)o.material.emissiveIntensity=2.2+7*q;if(st.tele<=0){st.tele=0;n474Dispara(k);}}
+    // aura: acesa quando acordada, apagada no sono; gira devagar
+    if(N474.fx){const A=D.aura||n474Aura(g,k.tipo);const alvo=(k.sono>0||CAV.morto)?0:.55+.25*Math.max(0,st.tele>0?1:0);A.material.opacity+=(alvo-A.material.opacity)*Math.min(1,d0*3);A.visible=A.material.opacity>.02;A.rotation.y+=d0*.8;A.rotation.x=Math.sin(k.bob*.7)*.2;const pul=1+.06*Math.sin(k.bob*3.1);A.scale.set(pul,pul,pul);
+      const dx=pl.x-k.x,dz=pl.z-k.z,dd=dx*dx+dz*dz;if(!(k.sono>0)&&dd<perto.d){perto.d=dd;perto.k=k;}}
+  }
+  // luz da sala: segue a criatura acordada mais perto do leitor (uma por sala, fora do orçamento)
+  {const sc=ROOMS[room]&&ROOMS[room].scene,L=sc&&sc.userData.luz474;if(L){const k=N474.fx?perto.k:null;const alvo=k&&perto.d<196?.95:0;L.intensity+=(alvo-L.intensity)*Math.min(1,d0*4);if(k){const I=INI155[k.tipo]||INI155.caveira;L.color.set(I.faisca?I.faisca[1]:0xffd080);L.position.set(k.x,k.g.position.y+.4,k.z);}}}
+  }
+function n474Dispara(k){const st=k.n474;if(!st||!k.viva)return;st.disparando=true;try{cavArremessar(k);N474.stats.tiros++;}catch(e){n474Erro('disparo',e);}finally{st.disparando=false;}for(const o of k.g.userData.olhos||[])if(o.material)o.material.emissiveIntensity=2.2;}
+if(N474.on){
+  {const old=inimigoMesh155;inimigoMesh155=function(tipo){const g=old.apply(this,arguments);try{n474Prepara(g,tipo);}catch(e){n474Erro('malha',e);}return g;};}
+  {const old=cavArremessar;cavArremessar=function(k){try{if(k&&k.n474&&k.g&&k.g.userData.n474&&!k.n474.disparando&&k.viva){if(k.n474.tele<=0)k.n474.tele=N474.TELE;return;}}catch(e){n474Erro('telegrafia',e);}return old.apply(this,arguments);};}
+  {const old=cavFerir;cavFerir=function(k,n){const viva=k&&k.viva,hp0=k?k.hp:0;const r=old.apply(this,arguments);try{if(viva&&k&&k.g&&k.g.userData.n474&&k.hp<hp0){const st=n474Estado(k);st.squash=.18;N474.stats.acertos++;n474Clarao(k,0xffffff,.9,.16);}}catch(e){n474Erro('acerto',e);}return r;};}
+  {const old=cavMatar;cavMatar=function(k){const viva=k&&k.viva;const r=old.apply(this,arguments);try{if(viva&&k&&k.g&&k.g.userData.n474&&!k.viva&&!k.g.userData.v163){const st=n474Estado(k);st.morte={t:0,y0:k.g.position.y};st.tele=0;k.g.visible=true;N474.stats.mortes++;const I=INI155[k.tipo]||INI155.caveira,sc=ROOMS[k.room]&&ROOMS[k.room].scene,p=k.g.position;if(sc)for(let i=0;i<16;i++)cavFaisca(sc,p.x+(Math.random()-.5)*1.1,p.y+.2+Math.random()*.9,p.z+(Math.random()-.5)*1.1,i%2?I.faisca[0]:I.faisca[1],.3+Math.random()*.5,.5+Math.random()*.5);}}catch(e){n474Erro('morte',e);}return r;};}
+  {const old=caveirasTick;caveirasTick=function(dt){const r=old.apply(this,arguments);try{n474Tick(dt);}catch(e){n474Erro('tick',e);}return r;};}
+  {const old=caveirasRegistrar;caveirasRegistrar=function(room){const r=old.apply(this,arguments);try{if(CAV.salas[room]&&ROOMS[room]&&ROOMS[room].scene)n474Luz(ROOMS[room].scene);}catch(e){n474Erro('luz',e);}return r;};}
+  // os inimigos já registrados antes deste bloco (nenhum na carga, mas por via das dúvidas)
+  try{for(const S of Object.values(CAV.salas||{})){for(const k of (S.lista||[]))if(k.g&&!k.g.userData.n474&&k.tipo)n474Prepara(k.g,k.tipo);if(S.room&&ROOMS[S.room]&&ROOMS[S.room].scene)n474Luz(ROOMS[S.room].scene);}}catch(e){n474Erro('existentes',e);}
+}
+try{if(window.__cav)Object.assign(window.__cav,{ferir:cavFerir,matar:cavMatar,registrar:caveirasRegistrar});if(window.__inimigos)window.__inimigos.mesh=inimigoMesh155;}catch(e){}
+window.__inimigos474={estado:N474};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
