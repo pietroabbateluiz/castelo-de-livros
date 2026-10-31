@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v471</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v473</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -58693,6 +58693,102 @@ if(C471.on){
   window.__v465.varrer=(sc)=>{const it=c465Varre(sc||ACTIVE);let r;do{r=it.next();}while(!r.done);return r.value;};
 }
 window.__v471={estado:C471,varrerEixo:(sc,eixo)=>{const it=c471VarreEixo(sc||ACTIVE,eixo);let r;do{r=it.next();}while(!r.done);return r.value;}};
+
+/* ===================== v472 · PASSE GRÁFICO GLOBAL: REFLEXO DE AMBIENTE POR SALA E FILTRAGEM ANISOTRÓPICA MÁXIMA (bloco `A472`) =====================
+   · Pedido do Luiz: «Agora melhore o gráfico de todas as salas». O que vale para todas de uma vez:
+   · (1) Cada cena (Hall e salas) ganha um mapa de ambiente de verdade: ao entrar, uma `CubeCamera` fotografa a própria sala em 6 faces de
+     64 px a partir da posição do leitor (1,7 m), um `PMREMGenerator.fromCubemap` transforma isso em irradiância + reflexos filtrados e o
+     resultado vai para `scene.environment`. Metais, vidros, pisos envernizados, armaduras e lustres passam a refletir a sala em que estão
+     (até hoje refletiam nada: metal preto, vidro morto) e as superfícies foscas recebem um quê de luz rebatida das paredes. A intensidade
+     é contida (`envMapIntensity` .42 em todo material padrão sem `envMap` próprio; os que já tinham — poças da v469, peças Trellis v462 — ficam)
+     e ADAPTATIVA: a luminância média das 6 faces capturadas reduz a intensidade nas salas claras (alvo .2: uma sala branca a .6 fica
+     com um terço), para o ambiente não somar luz onde já sobra — nas salas escuras entra inteira.
+     A foto é refeita a ~4 s (construções preguiçosas) e quando a contagem de malhas muda muito. Não roda no Leve (celular) nem no Papel.
+     Os refletores (piso da Ficção científica) e o leitor ficam de fora da foto (`PORTAL_ON` durante a captura).
+   · (2) Toda textura de cor/normal/aspereza/emissão sobe para a anisotropia máxima da placa (16 na maioria): os pisos deixam de virar
+     borrão nas vistas rasantes. Feito aos poucos (12 texturas por quadro) para não travar a entrada.
+   · ?ambiente472=0 desliga o ambiente; ?aniso472=0 desliga a anisotropia. Gancho: `window.__ambiente472`. */
+const A472={on:!/[?&#]ambiente472=0/i.test(location.search+location.hash),aniso:!/[?&#]aniso472=0/i.test(location.search+location.hash),RES:64,INT:.42,ALVO:.2,erros:[],cenas:new Map(),ultima:null,quadros:0,stats:{capturas:0,materiais:0,texturas:0,ms:0},maxAniso:0};
+function a472Erro(o,e){if(A472.erros.length<12)A472.erros.push(o+': '+(e&&e.message||e));console.warn('v472',o,e);}
+function a472Conta(sc){let n=0;sc.traverse(o=>{if(o.isMesh)n++;});return n;}
+/* a foto da sala: 6 faces a partir do leitor, sem o leitor, sem refletores */
+function a472Onde(sc){try{if(sc===ACTIVE){const p=(typeof MODE!=='undefined'&&MODE==='fp')?P:CH;return [p.x,(CH.fy||0)+1.7,p.z];}for(const k in ROOMS){const R=ROOMS[k];if(R&&R.scene===sc&&R.spawn){const y=R.floorY?R.floorY(R.spawn.x,R.spawn.z):0;return [R.spawn.x,y+1.7,R.spawn.z-2];}}}catch(e){}return [0,1.7,4];}
+function a472Captura(sc){const T=THREE,t0=performance.now();const rt=new T.WebGLCubeRenderTarget(A472.RES,{format:T.RGBAFormat,generateMipmaps:true,minFilter:T.LinearMipmapLinearFilter,encoding:T.sRGBEncoding});
+  const cam=new T.CubeCamera(.08,80,rt);const [px,py,pz]=a472Onde(sc);cam.position.set(px,py,pz);sc.add(cam);
+  const esc=[];try{for(const o of [READER.g,MARK]){if(o&&o.visible){esc.push(o);o.visible=false;}}}catch(e){}
+  const portal=PORTAL_ON;PORTAL_ON=true;const sm=renderer.shadowMap.autoUpdate;
+  try{cam.update(renderer,sc);}finally{PORTAL_ON=portal;renderer.shadowMap.autoUpdate=sm;for(const o of esc)o.visible=true;sc.remove(cam);}
+  // luminância média das 6 faces: salas claras recebem menos irradiância (senão o ambiente soma luz onde já sobra)
+  let lum=A472.ALVO;try{const N=A472.RES,buf=new Uint8Array(N*N*4);let soma=0,n=0;for(let f=0;f<6;f++){renderer.readRenderTargetPixels(rt,0,0,N,N,buf,f);for(let i=0;i<buf.length;i+=16){soma+=buf[i]*.2126+buf[i+1]*.7152+buf[i+2]*.0722;n++;}}lum=soma/n/255;}catch(e){a472Erro('luminância',e);}
+  const pm=new T.PMREMGenerator(renderer);pm.compileCubemapShader();const env=pm.fromCubemap(rt.texture);pm.dispose();rt.dispose();env.lum472=lum;env.int472=A472.INT*Math.max(.2,Math.min(1,A472.ALVO/Math.max(.02,lum)));
+  A472.stats.capturas++;A472.stats.ms+=performance.now()-t0;return env;}
+function a472Aplica(sc,env){let E=A472.cenas.get(sc);if(!E){E={q0:A472.quadros,env:null,n:0,feitas:0,tUlt:0,chave:0};A472.cenas.set(sc,E);}if(E.env&&E.env!==env){try{E.env.dispose();}catch(e){}}E.env=env;E.int=env.int472||A472.INT;E.lum=env.lum472;
+  sc.environment=env.texture;sc.userData.env472=env;a472Materiais(sc);}
+function a472Chave(){let k=0;try{if(typeof DUNGEON395!=='undefined'&&DUNGEON395.active)k+=1;if(typeof E470!=='undefined'&&E470.active)k+=2;}catch(e){}return k;}
+/* intensidade contida nos materiais padrão sem envMap próprio (uma vez por material) */
+function a472Materiais(sc){let n=0;const E=A472.cenas.get(sc),I=(E&&E.int)||A472.INT;sc.traverse(o=>{if(!o.isMesh||!o.material)return;const ms=Array.isArray(o.material)?o.material:[o.material];for(const m of ms){if(!m||!(m.isMeshStandardMaterial)||m.envMap)continue;if(m.userData.a472){if(m.envMapIntensity!==I)m.envMapIntensity=I;continue;}m.envMapIntensity=I;m.userData.a472=true;n++;}});A472.stats.materiais+=n;return n;}
+/* anisotropia máxima, aos poucos */
+function a472Aniso(sc,orcamento){if(!A472.aniso)return 0;if(!A472.maxAniso){try{A472.maxAniso=renderer.capabilities.getMaxAnisotropy()||1;}catch(e){A472.maxAniso=1;}}const MAX=A472.maxAniso;if(MAX<=4)return 0;
+  const fila=sc.userData.aniso472||(sc.userData.aniso472=[]);if(!fila.length&&!sc.userData.aniso472Varrido){const vistos=new Set();sc.traverse(o=>{if(!o.isMesh||!o.material)return;const ms=Array.isArray(o.material)?o.material:[o.material];for(const m of ms){if(!m)continue;for(const k of ['map','normalMap','roughnessMap','metalnessMap','bumpMap','emissiveMap','alphaMap','aoMap']){const t=m[k];if(t&&t.isTexture&&!t.isCubeTexture&&!t.isCompressedTexture&&t.anisotropy<MAX&&!vistos.has(t)&&!t.__aniso472){vistos.add(t);fila.push(t);}}}});sc.userData.aniso472Varrido=a472Conta(sc);}
+  let n=0;while(fila.length&&n<orcamento){const t=fila.shift();try{if(t.image&&(t.image.width||t.image.length)){t.anisotropy=MAX;t.needsUpdate=true;t.__aniso472=true;n++;}}catch(e){a472Erro('aniso',e);}}A472.stats.texturas+=n;return n;}
+function a472Tick(){const sc=(typeof ACTIVE!=='undefined')?ACTIVE:null;if(!sc||!sc.isScene)return;A472.quadros++;
+  if(sc!==A472.ultima){A472.ultima=sc;const E=A472.cenas.get(sc)||{q0:A472.quadros,env:null,n:0,feitas:0,tUlt:0,chave:a472Chave()};E.q0=A472.quadros;if(!E.env)E.feitas=0;else E.feitas=1;A472.cenas.set(sc,E);}
+  const E=A472.cenas.get(sc);if(!E)return;const ch=a472Chave();if(E.chave!==ch){E.chave=ch;E.q0=A472.quadros;E.feitas=Math.min(E.feitas,1);if(E.feitas===1)E.feitas=0;}const dq=A472.quadros-E.q0;
+  // anisotropia: desde o 2.º quadro, 12 texturas por quadro; nova varredura quando a cena cresce
+  if(A472.aniso){try{if(sc.userData.aniso472Varrido&&!(sc.userData.aniso472||[]).length&&A472.quadros%90===0){const n=a472Conta(sc);if(Math.abs(n-sc.userData.aniso472Varrido)>=25)sc.userData.aniso472Varrido=0;}a472Aniso(sc,12);}catch(e){a472Erro('aniso tick',e);}}
+  if(!A472.on||Q.lite||Q.papel){if(sc.environment&&sc.userData.env472){sc.environment=null;}return;}
+  if(sc.userData.env472&&!sc.environment)sc.environment=sc.userData.env472.texture; // voltou do Leve/Papel
+  let ocupado=false;try{ocupado=!!(buildBusy||buildIt||BUILD_Q.length)||PERF130.busy;}catch(e){}
+  const agora=performance.now();
+  if((dq===20&&E.feitas===0)||(dq===240&&E.feitas===1)){if(ocupado){E.q0=A472.quadros-dq+30;return;}try{a472Aplica(sc,a472Captura(sc));E.feitas++;E.n=a472Conta(sc);E.tUlt=agora;}catch(e){a472Erro('captura',e);E.feitas=9;}return;}
+  if(E.feitas>=2&&A472.quadros%60===0&&agora-E.tUlt>15000&&!ocupado){const n=a472Conta(sc);if(Math.abs(n-E.n)>=40){try{a472Aplica(sc,a472Captura(sc));E.n=n;E.tUlt=agora;}catch(e){a472Erro('recaptura',e);}}}
+  if(A472.quadros%120===0)try{a472Materiais(sc);}catch(e){}
+}
+if(A472.on){try{const prep=travel434Prepare;travel434Prepare=async function(scene,revision,doorways){try{if(scene&&scene.isScene&&!Q.lite&&!Q.papel&&!scene.userData.env472&&!(typeof PERF130!=='undefined'&&PERF130.busy)){a472Aplica(scene,a472Captura(scene));}}catch(e){a472Erro('preparar',e);}return prep.apply(this,arguments);};}catch(e){a472Erro('instalar preparar',e);}}
+if(A472.on||A472.aniso){try{const d0=draw;draw=function(dt){try{a472Tick();}catch(e){a472Erro('tick',e);}return d0.apply(this,arguments);};}catch(e){a472Erro('instalar',e);}}
+window.__ambiente472={estado:A472,capturar:(sc)=>{const s=sc||ACTIVE;const env=a472Captura(s);a472Aplica(s,env);return A472.stats;},materiais:a472Materiais};
+
+/* ===================== v473 · AFINAÇÃO SALA A SALA (bloco `S473`) =====================
+   · Pedido do Luiz: «Agora melhore o gráfico de todas as salas». Depois do passe global da v472 (ambiente + anisotropia), cada sala
+     recebe a sua afinação a partir do levantamento fotográfico (luminância média, pixels estourados/escuros, saturação) e da leitura
+     das fotos: exposição, hemisfério/ambiente, névoa, luzes de preenchimento e, onde faltava, um toque de vida (partículas).
+   · A tabela `S473.salas` é aplicada por wrapper de `finishRoom(key)` (e de imediato nas salas já prontas): `exp` muda `R.exposure`
+     (lida em `setActive`), `hemi`/`amb`/`dir`/`pt` multiplicam a intensidade base (`userData.i0`) das luzes do tipo, `fog` multiplica
+     a densidade (ou ajusta near/far), `cor` troca a cor do hemisfério, `fill` acrescenta luzes pontuais {x,y,z,cor,i,d} marcadas
+     `interior276` (não entram no orçamento quando apagadas) e `poeira` acrescenta partículas em suspensão.
+   · ?salas473=0 desliga. Gancho: `window.__salas473`. */
+const S473={on:!/[?&#]salas473=0/i.test(location.search+location.hash),erros:[],feitas:{},salas:{
+  // salas escuras demais no levantamento (luminância média das fotos < .14): exposição acima, hemisfério de apoio e preenchimentos
+  acropole:{exp:1.28,poeira:{n:350,w:22,d:22,h:6,cor:0xffd8a0,op:.22},hemiAdd:[0x8a7a9a,0x2a1e1e,.5],fill:[{x:-7,y:4.2,z:5,cor:0xffd2a0,i:.6,d:13},{x:7,y:4.2,z:5,cor:0xffd2a0,i:.6,d:13},{x:0,y:4.5,z:-6,cor:0xffc890,i:.5,d:13}]},
+  digital:{exp:1.28,hemiAdd:[0x3aa0c0,0x101820,.42],fill:[{x:-6,y:3.5,z:0,cor:0x40d0ff,i:.45,d:12},{x:6,y:3.5,z:0,cor:0xff60c0,i:.35,d:12}]},
+  poesia:{exp:1.25,hemiAdd:[0x8a94c8,0x141826,.36]},outono:{exp:1.3,poeira:{n:320,w:20,d:20,h:5,cor:0xd8c8ff,op:.2},hemiAdd:[0x6a7aa0,0x120c08,.3]},
+  guerra:{exp:1.15,hemiAdd:[0x7a8a90,0x1c1c1c,.38],fill:[{x:-6,y:4,z:-4,cor:0x9fc0d0,i:.45,d:12},{x:6,y:4,z:4,cor:0xffb070,i:.4,d:11}]},
+  mys:{exp:1.34,poeira:{n:300,w:18,d:18,h:4,cor:0xffe0b0,op:.24},hemiAdd:[0x9a8060,0x241a10,.42],fill:[{x:-6,y:3,z:-5,cor:0xffc070,i:.7,d:11},{x:6,y:3,z:-5,cor:0xffc070,i:.7,d:11},{x:0,y:3,z:6,cor:0xffd090,i:.5,d:10}]},
+  arena:{exp:1.2,hemiAdd:[0x8090b0,0x202020,.32]},
+  vila:{exp:1.06,hemi:1.2},biografia:{exp:1.18,poeira:{n:260,w:18,d:18,h:4,cor:0xffe8c0,op:.2}},bosque:{exp:1.18},teatro:{exp:1.2,poeira:{n:260,w:18,d:18,h:6,cor:0xffd0c0,op:.2},hemiAdd:[0x9a6a7a,0x241818,.3]},ciencia:{exp:1.16},lib:{exp:1.32,poeira:{n:300,w:20,d:20,h:5,cor:0xc8d0e0,op:.18},hemiAdd:[0x6a7890,0x100a0a,.22]},
+  // salas estouradas (luminância > .5 ou muitos pixels brancos): exposição abaixo
+  surrealismo:{exp:.82},utopia:{exp:.8},infantil:{exp:.78},solarpunk:{exp:.85},autoajuda:{exp:.86},filosofia:{exp:.86},realismo:{exp:1.0}
+}};
+function s473Erro(o,e){if(S473.erros.length<12)S473.erros.push(o+': '+(e&&e.message||e));console.warn('v473',o,e);}
+function s473Poeira(sc,c){const T=THREE,N=c.n||400,p=new Float32Array(N*3),r=rnd(4730+N);for(let i=0;i<N;i++){p[i*3]=(r()-.5)*(c.w||20);p[i*3+1]=.3+r()*(c.h||5);p[i*3+2]=(r()-.5)*(c.d||20);}
+  const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(p,3));const m=new T.Points(g,new T.PointsMaterial({map:GLOW,color:c.cor||0xffe2b0,size:c.s||.045,transparent:true,opacity:c.op||.3,blending:T.AdditiveBlending,depthWrite:false}));m.layers.set(1);m.userData.fx=true;m.raycast=()=>{};m.name='473 poeira';m.userData.s473=true;m.userData.f=Math.random()*6;sc.add(m);(sc.userData.poeira473=sc.userData.poeira473||[]).push(m);return m;}
+function s473Tick(){const sc=(typeof ACTIVE!=='undefined')?ACTIVE:null;if(!sc||Q.lite||Q.papel)return;const L=sc.userData.poeira473;if(!L)return;const tt=performance.now()/1000;for(const m of L){if(!m.visible)continue;m.position.y=Math.sin(tt*.11+m.userData.f)*.25;m.position.x=Math.sin(tt*.07+m.userData.f)*.4;m.rotation.y=tt*.004;}}
+function s473Aplica(key){const c=S473.salas[key];if(!c||S473.feitas[key])return;const R=ROOMS[key];if(!R||!R.scene)return;S473.feitas[key]=true;const sc=R.scene,T=THREE;try{
+    if(c.exp!==undefined)R.exposure=c.exp;
+    sc.traverse(o=>{if(!o.isLight)return;const base=o.userData.i0!==undefined?o.userData.i0:o.intensity;let f=1;if(o.isHemisphereLight&&c.hemi!==undefined)f=c.hemi;else if(o.isAmbientLight&&c.amb!==undefined)f=c.amb;else if(o.isDirectionalLight&&c.dir!==undefined)f=c.dir;else if(o.isPointLight&&c.pt!==undefined)f=c.pt;else if(o.isSpotLight&&c.spot!==undefined)f=c.spot;if(f!==1){o.userData.i0=base*f;o.intensity=o.intensity*f;}
+      if(o.isHemisphereLight&&c.cor){o.color.set(c.cor[0]);if(c.cor[1])o.groundColor.set(c.cor[1]);}});
+    if(c.fog!==undefined&&sc.fog){if(sc.fog.isFogExp2)sc.fog.density*=c.fog;else{sc.fog.near*=c.fog;sc.fog.far*=c.fog;}}
+    if(c.fogCor&&sc.fog)sc.fog.color.set(c.fogCor);if(c.fundo!==undefined)sc.background=c.fundo===null?null:new T.Color(c.fundo);
+    if(c.hemiAdd){const h=new T.HemisphereLight(c.hemiAdd[0],c.hemiAdd[1],c.hemiAdd[2]);h.userData.i0=c.hemiAdd[2];h.userData.s473=true;h.name='473 hemisfério';sc.add(h);}
+    for(const L of (c.fill||[])){const l=new T.PointLight(L.cor||0xffd9a8,L.i||.6,L.d||10,L.decay||1.8);l.position.set(L.x,L.y,L.z);l.userData.i0=l.intensity;l.userData.s473=true;l.name='473 preenchimento';sc.add(l);}
+    if(c.poeira)s473Poeira(sc,c.poeira);
+  }catch(e){s473Erro(key,e);}}
+if(S473.on){
+  {const old=finishRoom;finishRoom=function(key){const r=old.apply(this,arguments);try{s473Aplica(key);}catch(e){s473Erro('finish '+key,e);}return r;};}
+  try{for(const k of Object.keys(S473.salas))if(ROOMS[k]&&ROOMS[k].scene)s473Aplica(k);}catch(e){s473Erro('prontas',e);}
+  try{const d0=draw;draw=function(dt){try{s473Tick();}catch(e){s473Erro('tick',e);}return d0.apply(this,arguments);};}catch(e){s473Erro('instalar',e);}
+}
+window.__salas473={estado:S473,aplicar:s473Aplica};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
