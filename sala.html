@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v500</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v501</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -59981,6 +59981,168 @@ if(HIST500.on){
   try{if(ROOMS.cat&&ROOMS.cat.scene&&typeof fusaoLimpar==='function')fusaoLimpar(ROOMS.cat.scene);}catch(e){}
 }
 window.__hist500={estado:HIST500};
+
+/* ===================== v501 · AVENTURA — ILHAS COM VEGETAÇÃO NATURAL E AS LANTERNAS DO PÍER NO LUGAR (bloco `ILHA501`) =====================
+   Pedido do Luiz: «melhore a vegetação da ilha, está artificial. E tem tochas suspensas meio que sobre o mar… precisam ser naturais».
+   · PALMEIRAS: as da v468 (tronco em anéis, folhas de folíolos soltos em V, que lembram arame) somem (malhas dos materiais «468 tronco/
+     fibra/coco/ráquis/folha de palmeira») e nascem outras nos mesmos lugares, com a mesma altura e inclinação (as posições vêm das
+     malhas escondidas: os troncos são agrupados vértice a vértice). Tronco liso e curvo com cicatrizes das folhas velhas e base alargada;
+     coroa com 16–20 folhas em fita curva e caída (geometria em tira, 12 segmentos), com uma textura pintada de folíolos finos e densos
+     (alfa recortada — a silhueta da folha é a da pena de uma palmeira, não de um pente), verdes do escuro da base ao claro da ponta,
+     3–4 folhas novas eretas no centro, 2 folhas secas penduradas, cocos verdes e fibra no coração; tudo balança no vento com o mesmo
+     deslocamento da v468.
+   · AMENDOEIRAS-DA-PRAIA (v468): as copas de elipsoides empilhados viram tufos de cartões de folhagem nas pontas dos galhos
+     (o tronco e os três andares de galhos continuam).
+   · MOITAS: as bolas verdes da v253 (cinco esferas por moita, dobradas na Ilha das Moedas) somem; no lugar, moitas de cartões cruzados com
+     textura de folhagem (6 cartões de 1,1 × 0,95 m com alfa, cores por vértice do verde-escuro ao oliva, saia de folhas baixas), e ao redor
+     tufos de capim e duas ou três plantas de folha larga.
+   · LANTERNAS DO PÍER (Ilha das Moedas): as duas caixas com vidro aceso que ficavam soltas no topo dos postes do fim do píer, por cima
+     da água, saem; entram dois lampiões de ferro PENDURADOS em braços de ferro presos aos postes (corrente curta, vidro quente) e duas
+     tochas de bambu fincadas na areia na cabeça do píer, com pano, chama e brasa. Nada de luz nova (emissão + brilho).
+   · Os obstáculos das palmeiras e moitas continuam os mesmos (as posições não mudam). ?ilha501=0 desliga. Gancho: `window.__ilha501`. */
+const ILHA501={on:!/[?&#]ilha501=0/i.test(location.search+location.hash),erros:[],feito:false,stats:{palmeiras:0,moitas:0,escondidas:0,lanternas:0,tochas:0,triangulos:0},mats:null,vento:[]};
+function i501Erro(o,e){if(ILHA501.erros.length<16)ILHA501.erros.push(o+': '+(e&&e.message||e));console.warn('v501',o,e);}
+/* ---------- texturas ---------- */
+function i501TexFolha(seca){return t160Tex('501 folha de palmeira'+(seca?' seca':''),256,1024,(x,w,h)=>{x.clearRect(0,0,w,h);const r=rnd(seca?5012:5011);
+    const cor=(u,k)=>{ // u ao longo da folha, k 0 centro → 1 borda do folíolo
+      if(seca){const g=120+u*40+k*25;return 'rgb('+(g+30|0)+','+(g-20|0)+','+(g-70|0)+')';}
+      const R=48+u*72+k*34,G=112+u*82+k*40,B=32+u*22+k*10;return 'rgb('+(R|0)+','+(G|0)+','+(B|0)+')';};
+    // folíolos: pares ao longo da ráquis, inclinados para a ponta, mais curtos perto da ponta
+    const n=46;for(let i=0;i<n;i++){const u=.02+(i/n)*.95;const y=u*h;const L=(1-Math.pow(u,1.6))*w*.47+10;const ang=.55+u*.45;const lw=(7+(1-u)*5)*(.9+r()*.3);
+      for(const s of [-1,1]){const dx=s*Math.cos(ang)*L,dy=Math.sin(ang)*L*.55+L*.15*(seca?1.6:1);const tx=w/2+dx,ty=y+dy;
+        const g=x.createLinearGradient(w/2,y,tx,ty);g.addColorStop(0,cor(u,0));g.addColorStop(.5,cor(u,.4));g.addColorStop(1,cor(u,1));x.fillStyle=g;
+        x.beginPath();x.moveTo(w/2,y-lw*.5);x.quadraticCurveTo((w/2+tx)/2+s*lw*.6,(y+ty)/2-lw*.4,tx,ty);x.quadraticCurveTo((w/2+tx)/2-s*lw*.2,(y+ty)/2+lw*.6,w/2,y+lw*.6);x.closePath();x.fill();
+        x.strokeStyle='rgba(20,40,15,.35)';x.lineWidth=1;x.beginPath();x.moveTo(w/2,y);x.lineTo(tx,ty);x.stroke();}}
+    // ráquis
+    const g2=x.createLinearGradient(0,0,0,h);g2.addColorStop(0,seca?'#8a6a3a':'#5d7f2a');g2.addColorStop(1,seca?'#6d4f2a':'#8aa848');x.fillStyle=g2;x.beginPath();x.moveTo(w/2-7,0);x.lineTo(w/2+7,0);x.lineTo(w/2+1.5,h);x.lineTo(w/2-1.5,h);x.closePath();x.fill();
+  });}
+function i501TexMoita(){return t160Tex('501 moita',512,512,(x,w,h)=>{x.clearRect(0,0,w,h);const r=rnd(5013);
+    for(let i=0;i<420;i++){const cx=w*.5+(r()-.5)*w*.9,cy=h*.62+(r()-.5)*h*.75;const d=Math.hypot((cx-w/2)/(w*.48),(cy-h*.62)/(h*.4));if(d>1)continue;const L=14+r()*22,W=6+r()*8,a=r()*6.283;
+      const t=.35+.65*(1-d)*r();const R=58+t*72,G=112+t*92,B=36+t*34;x.fillStyle='rgb('+(R|0)+','+(G|0)+','+(B|0)+')';x.save();x.translate(cx,cy);x.rotate(a);x.beginPath();x.ellipse(0,0,L,W,0,0,6.283);x.fill();x.strokeStyle='rgba(15,35,10,.35)';x.lineWidth=1;x.beginPath();x.moveTo(-L,0);x.lineTo(L,0);x.stroke();x.restore();}
+  });}
+function i501TexCapim(){return t160Tex('501 capim',256,256,(x,w,h)=>{x.clearRect(0,0,w,h);const r=rnd(5014);
+    for(let i=0;i<70;i++){const bx=w/2+(r()-.5)*w*.55,top=h*.05+r()*h*.4;const lean=(r()-.5)*w*.5;const t=r();x.strokeStyle='rgb('+(90+t*70|0)+','+(140+t*60|0)+','+(50+t*30|0)+')';x.lineWidth=2.5+r()*2.5;x.beginPath();x.moveTo(bx,h);x.quadraticCurveTo(bx+lean*.3,h*.55,bx+lean,top);x.stroke();}
+  });}
+function i501Mats(){if(ILHA501.mats)return ILHA501.mats;const T=THREE;const vento=(tag,base)=>t160Mat('501 '+tag,()=>{const m=new T.MeshStandardMaterial({color:0xffffff,roughness:.75,metalness:0,vertexColors:true,side:T.DoubleSide,alphaTest:.45,map:tag==='moita'?i501TexMoita():tag==='capim'?i501TexCapim():i501TexFolha(tag==='folha seca')});m.map.encoding=T.sRGBEncoding;m.map.anisotropy=8;m.userData.papelKeep=true;
+      m.onBeforeCompile=function(s){s.uniforms.uTime468={value:0};s.uniforms.uBase468={value:base};m.userData.uni468=s.uniforms;
+        s.vertexShader='uniform float uTime468;uniform float uBase468;\n'+s.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\n{ float w468 = clamp( ( transformed.y - uBase468 ) / 4.5, 0.0, 1.0 ); w468 *= w468; float t468 = uTime468; transformed.x += w468 * 0.085 * sin( t468 * 1.15 + transformed.z * 0.45 + transformed.y * 0.3 ); transformed.z += w468 * 0.07 * sin( t468 * 0.95 + transformed.x * 0.5 + 1.7 ); transformed.y += w468 * 0.028 * sin( t468 * 1.4 + transformed.x * 0.6 + transformed.z * 0.4 ); }');};
+      m.customProgramCacheKey=()=>'folha501|'+tag;try{I468.vento.mats.push(m);}catch(e){}return m;});
+    const M={folha:vento('folha',1.2),folhaSeca:vento('folha seca',1.2),moita:vento('moita',-6),capim:vento('capim',-6),
+      tronco:t160Mat('501 tronco',()=>{const m=new T.MeshStandardMaterial({color:0xffffff,roughness:.92,metalness:0,vertexColors:true});return m;}),
+      fibra:t160Std('501 fibra',0x4a3522,1),coco:t160Std('501 coco',0x7c8c3c,.8),cocoSeco:t160Std('501 coco seco',0x6a4a2e,.95),
+      ferro:t160Std('501 ferro',0x2b2724,.6,.55),vidro:t160Mat('501 vidro quente',()=>new T.MeshStandardMaterial({color:0xffd27a,roughness:.3,metalness:0,emissive:0xff9a2a,emissiveIntensity:1.2,transparent:true,opacity:.85})),
+      bambu:t160Std('501 bambu',0xb8a36a,.85),pano:t160Std('501 pano',0x6b3a2a,.95),chama:t160Brilho('501 chama',0xffb347,1.6),chamaN:t160Brilho('501 chama núcleo',0xfff1c0,2.2),brasa:t160Brilho('501 brasa',0xff6a20,1.3)};
+    ILHA501.mats=M;return M;}
+/* ---------- geometria: tira ao longo de uma curva (u = largura, v = comprimento) ---------- */
+function i501Tira(pts,larg){const T=THREE;const n=pts.length;const pos=[],uv=[],idx=[];const up=new T.Vector3(0,1,0),t=new T.Vector3(),s=new T.Vector3();
+  for(let i=0;i<n;i++){const P=pts[i];const Q=pts[Math.min(n-1,i+1)],R=pts[Math.max(0,i-1)];t.set(Q[0]-R[0],Q[1]-R[1],Q[2]-R[2]).normalize();s.crossVectors(t,up).normalize();if(s.lengthSq()<1e-6)s.set(1,0,0);const w=larg(i/(n-1));
+    pos.push(P[0]-s.x*w,P[1]-s.y*w,P[2]-s.z*w,P[0]+s.x*w,P[1]+s.y*w,P[2]+s.z*w);uv.push(0,i/(n-1),1,i/(n-1));
+    if(i<n-1){const a=i*2;idx.push(a,a+1,a+2,a+1,a+3,a+2);}}
+  const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeVertexNormals();return g;}
+/* ---------- palmeira ---------- */
+function i501Palmeira(K,M,x,z,y,h,lean,ry,r){const T=THREE;const Lc=c=>new T.Color(c).convertSRGBToLinear();const dx=Math.cos(ry),dz=Math.sin(ry);const n=16;const pts=[];
+  for(let i=0;i<=n;i++){const t=i/n;const off=lean*Math.pow(t,1.5)*h*.42;const s=.1*Math.sin(t*Math.PI)*h*.06;pts.push([x+dx*off-dz*s,y+t*h,z+dz*off+dx*s]);}
+  const raio=t=>.24-(.24-.14)*Math.pow(t,.8);
+  // base alargada (lathe de contorno) e raízes
+  const prof=[];for(let k=0;k<=6;k++){const t=k/6;prof.push([raio(0)*(1.75-.75*t),t*.55]);}K.addC(new T.LatheGeometry(prof.map(p=>new T.Vector2(p[0],p[1])),14),M.tronco,Lc(0x7a6448),x,y-.02,z);
+  for(let k=0;k<7;k++){const a=k*.9+r()*.5;K.addC(new T.SphereGeometry(.09,7,5),M.tronco,Lc(0x5e4a34),x+Math.cos(a)*.32,y+.03,z+Math.sin(a)*.32,a,0,0,1.8,.45,.7);}
+  const cc=new T.Color();
+  for(let i=0;i<n;i++){const A=pts[i],B=pts[i+1];const d=[B[0]-A[0],B[1]-A[1],B[2]-A[2]];const L=Math.hypot(d[0],d[1],d[2]);const th=Math.acos(d[1]/L),ph=Math.atan2(d[0],d[2]);const rA=raio(i/n),rB=raio((i+1)/n);
+    cc.copy(Lc(0x8c7656)).lerp(Lc(0xa08a66),(i%2)*.35).multiplyScalar(.92+.16*r());K.addC(new T.CylinderGeometry(rB,rA,L+.03,12),M.tronco,cc.getHex(),(A[0]+B[0])/2,(A[1]+B[1])/2,(A[2]+B[2])/2,ph,th,0);
+    // cicatrizes das folhas velhas: meia-lua rente ao tronco, alternadas
+    if(i>0){for(const sd of [-1,1]){const a=ph+sd*1.1+(i%2)*.8;const rr=rA*1.02;K.addC(new T.SphereGeometry(rA*.5,7,4),M.tronco,Lc(i%3?0x6b5740:0x55432f),B[0]+Math.sin(a)*rr,B[1]-L*.35,B[2]+Math.cos(a)*rr,0,0,0,1,.35,.9);}}}
+  const Tp=pts[n];const dirTopo=[pts[n][0]-pts[n-1][0],pts[n][1]-pts[n-1][1],pts[n][2]-pts[n-1][2]];const dl=Math.hypot(...dirTopo);dirTopo[0]/=dl;dirTopo[1]/=dl;dirTopo[2]/=dl;
+  // coração: fibra e cocos
+  K.cone(.3,.5,M.fibra,Tp[0],Tp[1]-.1,Tp[2],9);for(let k=0;k<5;k++){const a=k*1.3+r();K.sph(.12,k%4===3?M.cocoSeco:M.coco,Tp[0]+Math.cos(a)*.2,Tp[1]-.2-(k%2)*.05,Tp[2]+Math.sin(a)*.2,1,1.15,1,8,6);}
+  // folhas em fita
+  const nF=16+Math.floor(r()*5);const corB=Lc(0x8fbf80),corM=Lc(0xa8d48c),corP=Lc(0xd8ecb0),corV=Lc(0xc8c890);const esc=h/7;
+  const folha=(ang,elev,len,seca,nova)=>{const fd=[Math.cos(ang),0,Math.sin(ang)];const segs=12;const pr=[];const droop=seca?2.4:(nova?.55:1.15);
+      for(let i=0;i<=segs;i++){const u=i/segs;const flat=u*len*Math.cos(elev);const lift=Math.sin(elev)*u*len-droop*u*u*len*.42;const wob=.06*len*Math.sin(u*3+ang)*(seca?2:1);pr.push([Tp[0]+fd[0]*flat-fd[2]*wob,Tp[1]+.06+lift,Tp[2]+fd[2]*flat+fd[0]*wob]);}
+      const larg=u=>(.52*esc)*(1-Math.pow(u,1.4)*.9)+.04;const g=i501Tira(pr,larg);
+      if(seca)cc.setHex(0x9a7a46).convertSRGBToLinear().multiplyScalar(.8+.3*r());else cc.copy(nova?corM:(r()<.25?corV:corB)).lerp(corP,nova?.6:.3+.3*r()).multiplyScalar(1.15+.3*r());
+      K.addC(g,seca?M.folhaSeca:M.folha,cc.getHex());};
+  const a0=r()*6.283;for(let i=0;i<nF;i++){const ang=a0+i*(6.283/nF)+(r()-.5)*.25;const fase=i%4;const elev=fase===0?.95:fase===1?.45:fase===2?.1:-.22;const len=(fase===0?2.1:fase===1?2.9:fase===2?3.2:3.0)*esc*(.9+.2*r());folha(ang,elev,len,false,fase===0);}
+  for(let i=0;i<3;i++){const ang=a0+i*2.2+.9;folha(ang,-.55,2.6*esc,true,false);}
+  for(let i=0;i<2;i++){const ang=a0+i*3.1+.4;folha(ang,-.9,1.9*esc,true,false);}
+  ILHA501.stats.palmeiras++;}
+/* ---------- amendoeira-da-praia: tronco, três andares de galhos quase horizontais e copa de cartões de folhagem ---------- */
+function i501Amendoeira(K,M468,x,z,y,h,r,obst){const T=THREE;const M=i501Mats();const Lc=c=>new T.Color(c).convertSRGBToLinear();const cc=new T.Color();const galho=M468&&M468.galho?M468.galho:M.fibra;
+  const tr=[[x,y,z],[x+.12,y+h*.4,z-.08],[x+.04,y+h*.75,z+.08],[x,y+h,z]];K.tube(tr,.17,galho,8,8);K.cyl(.22,.34,.5,galho,x,y+.22,z,9);
+  const tufo=(cx,cy,cz,s,seed)=>{for(let k=0;k<5;k++){const a=k*1.25+seed+(r()-.5)*.4;const g=new T.PlaneGeometry(1.5*s,1.0*s);cc.copy(Lc(0xb0cc86)).lerp(Lc(0xe8f2c0),r()*.6).multiplyScalar(.85+.3*r());K.addC(g,M.moita,cc.getHex(),cx+(r()-.5)*.3*s,cy+(r()-.5)*.2*s,cz+(r()-.5)*.3*s,a,(r()-.5)*.5-.15,(r()-.5)*.3);}
+    // um ou dois cartões deitados por cima (a copa achatada da amendoeira)
+    for(let k=0;k<2;k++){const g=new T.PlaneGeometry(1.7*s,1.2*s);cc.copy(Lc(0xc4dc96)).multiplyScalar(.9+.2*r());K.addC(g,M.moita,cc.getHex(),cx,cy+.25*s,cz,r()*3.14,-1.35+(r()-.5)*.3,0);}};
+  for(let andar=0;andar<3;andar++){const cy=y+h*(.5+andar*.22);const nG=5-andar;const esc=1.3-andar*.25;for(let k=0;k<nG;k++){const a=k/nG*6.283+andar*.7+r()*.4;const L=h*(.5-andar*.1);const ex=x+Math.cos(a)*L,ez=z+Math.sin(a)*L;
+      K.tube([[x,cy,z],[x+Math.cos(a)*L*.5,cy+.15,z+Math.sin(a)*L*.5],[ex,cy+.08,ez]],.065-andar*.015,galho,6,6);tufo(ex,cy+.25,ez,esc,k+andar*3);}}
+  tufo(x,y+h+.3,z,1.1,9);if(obst)obst(x,z,.45);ILHA501.stats.arvores=(ILHA501.stats.arvores||0)+1;}
+/* ---------- moita de cartões ---------- */
+function i501Moita(K,M,x,z,y,s,r){const T=THREE;const Lc=c=>new T.Color(c).convertSRGBToLinear();const cc=new T.Color();const nC=6;
+  for(let i=0;i<nC;i++){const a=i*(Math.PI/nC)+(r()-.5)*.3;const w=1.15*s*(.85+.3*r()),h=.95*s*(.85+.3*r());const g=new T.PlaneGeometry(w,h);g.translate(0,h*.42,0);cc.copy(Lc(0xb9d08e)).lerp(Lc(0xe6f0c4),r()*.6).multiplyScalar(.85+.3*r());
+    K.addC(g,M.moita,cc.getHex(),x+(r()-.5)*.25*s,y,z+(r()-.5)*.25*s,a,(r()-.5)*.25,(r()-.5)*.15);}
+  // saia baixa
+  for(let i=0;i<3;i++){const a=i*2.1+r();const g=new T.PlaneGeometry(.9*s,.55*s);g.translate(0,.25*s,0);cc.copy(Lc(0xa8c47c)).multiplyScalar(.85+.3*r());K.addC(g,M.moita,cc.getHex(),x+Math.cos(a)*.35*s,y,z+Math.sin(a)*.35*s,a+1.2,-.35,0);}
+  // capim e folhas largas ao redor
+  for(let i=0;i<4;i++){const a=r()*6.283,d=(.7+r()*.6)*s;i501Capim(K,M,x+Math.cos(a)*d,z+Math.sin(a)*d,y,.6+r()*.5,r);}
+  ILHA501.stats.moitas++;}
+function i501Capim(K,M,x,z,y,s,r){const T=THREE;const Lc=c=>new T.Color(c).convertSRGBToLinear();const cc=new T.Color();for(let i=0;i<3;i++){const g=new T.PlaneGeometry(.7*s,.55*s);g.translate(0,.27*s,0);cc.copy(Lc(0xd0e0a0)).lerp(Lc(0xf0f4d0),r()*.5).multiplyScalar(.85+.3*r());K.addC(g,M.capim,cc.getHex(),x,y,z,i*1.05+r()*.3,0,(r()-.5)*.2);}}
+/* ---------- lampiões pendurados e tochas de bambu (píer da Ilha das Moedas) ---------- */
+function i501Lampiao(K,M,px,pz,ytopo,dirx,dirz){ // braço de ferro saindo do poste, corrente e lampião
+  const bx=px+dirx*.42,bz=pz+dirz*.42;K.box(.55,.05,.05,M.ferro,px+dirx*.2,ytopo-.05,pz+dirz*.2,Math.atan2(dirx,dirz)+Math.PI/2);K.box(.05,.3,.05,M.ferro,px+dirx*.08,ytopo-.2,pz+dirz*.08);K.box(.26,.05,.05,M.ferro,px+dirx*.18,ytopo-.32,pz+dirz*.18,Math.atan2(dirx,dirz)+Math.PI/2,0,.8);
+  for(let i=0;i<3;i++)K.tor(.035,.012,M.ferro,bx,ytopo-.12-i*.07,bz,0,0,i%2?Math.PI/2:0,0,5,10);
+  const ly=ytopo-.33;K.cone(.12,.08,M.ferro,bx,ly-.02,bz,8);K.cyl(.015,.015,.1,M.ferro,bx,ly-.07,bz,6);K.box(.17,.24,.17,M.vidro,bx,ly-.22,bz);for(const s of [-1,1]){K.box(.19,.26,.02,M.ferro,bx,ly-.22,bz+s*.085);K.box(.02,.26,.19,M.ferro,bx+s*.085,ly-.22,bz);}
+  K.sph(.045,M.chamaN,bx,ly-.25,bz,1,1.4,1,7,5);K.sph(.07,M.chama,bx,ly-.24,bz,1,1.3,1,7,5);K.box(.19,.03,.19,M.ferro,bx,ly-.36,bz);ILHA501.stats.lanternas++;}
+function i501Tocha(K,M,x,z,y,r){const T=THREE;const lean=(r()-.5)*.12;const h=1.9;K.cyl(.035,.045,h,M.bambu,x+lean*.5,y+h/2,z,8,0,lean,0);for(const yy of [.5,1.0,1.5])K.tor(.045,.008,M.fibra,x+lean*(yy/h)*.5,y+yy,z,0,0,Math.PI/2,0,5,10);
+  K.cyl(.075,.055,.26,M.pano,x+lean*.5,y+h-.02,z,9);K.tor(.075,.012,M.fibra,x+lean*.5,y+h+.06,z,0,0,Math.PI/2,0,5,10);
+  K.sph(.07,M.brasa,x+lean*.5,y+h+.14,z,1,.6,1,7,5);K.cone(.09,.32,M.chama,x+lean*.5,y+h+.3,z,8);K.cone(.045,.2,M.chamaN,x+lean*.5,y+h+.26,z,7);
+  ILHA501.stats.tochas++;}
+/* ---------- agrupar vértices de uma malha escondida por proximidade (união-busca em grade) ---------- */
+function i501Grupos(mesh,raio){const T=THREE;const pos=mesh.geometry.attributes.position;const n=pos.count;const v=new T.Vector3();const P=new Float32Array(n*3);mesh.updateWorldMatrix(true,false);
+  for(let i=0;i<n;i++){v.fromBufferAttribute(pos,i).applyMatrix4(mesh.matrixWorld);P[i*3]=v.x;P[i*3+1]=v.y;P[i*3+2]=v.z;}
+  const par=new Int32Array(n);for(let i=0;i<n;i++)par[i]=i;const f=i=>{while(par[i]!==i){par[i]=par[par[i]];i=par[i];}return i;};
+  const cel=new Map();const key=(x,y,z)=>Math.floor(x/raio)+','+Math.floor(y/raio)+','+Math.floor(z/raio);
+  for(let i=0;i<n;i++){const k=key(P[i*3],P[i*3+1],P[i*3+2]);let L=cel.get(k);if(!L){L=[];cel.set(k,L);}L.push(i);}
+  for(const [k,L] of cel){const [a,b,c]=k.split(',').map(Number);for(let da=-1;da<=1;da++)for(let db=-1;db<=1;db++)for(let dc=-1;dc<=1;dc++){const L2=cel.get((a+da)+','+(b+db)+','+(c+dc));if(!L2)continue;const i0=L[0];for(const j of L2){const r1=f(i0),r2=f(j);if(r1!==r2)par[r1]=r2;}}}
+  const G=new Map();for(let i=0;i<n;i++){const rt=f(i);let g=G.get(rt);if(!g){g={n:0,sx:0,sz:0,ymin:1e9,ymax:-1e9,xmin:1e9,xmax:-1e9,zmin:1e9,zmax:-1e9};G.set(rt,g);}
+    const x=P[i*3],y=P[i*3+1],z=P[i*3+2];g.n++;g.sx+=x;g.sz+=z;g.ymin=Math.min(g.ymin,y);g.ymax=Math.max(g.ymax,y);g.xmin=Math.min(g.xmin,x);g.xmax=Math.max(g.xmax,x);g.zmin=Math.min(g.zmin,z);g.zmax=Math.max(g.zmax,z);}
+  for(const g of G.values()){g.cx=g.sx/g.n;g.cz=g.sz/g.n;}return [...G.values()];}
+/* ---------- apagar peças fundidas num balde por volume: os vértices dentro do cilindro (cx,cz,raio; y0..y1) colapsam num ponto ---------- */
+function i501Apaga(raizes,vols){const T=THREE;const v=new T.Vector3();let n=0;for(const raiz of raizes){if(!raiz)continue;raiz.traverse(o=>{if(!o.isMesh||!o.geometry||!o.geometry.attributes.position||o.isInstancedMesh)return;const pos=o.geometry.attributes.position;o.updateWorldMatrix(true,false);const inv=new T.Matrix4().copy(o.matrixWorld).invert();let mudou=false;
+      for(let i=0;i<pos.count;i++){v.fromBufferAttribute(pos,i).applyMatrix4(o.matrixWorld);for(const V of vols){if(v.y<V[3]||v.y>V[4])continue;if(Math.hypot(v.x-V[0],v.z-V[1])>V[2])continue;const c=new T.Vector3(V[0],V[3],V[1]).applyMatrix4(inv);pos.setXYZ(i,c.x,c.y,c.z);mudou=true;n++;break;}}
+      if(mudou){pos.needsUpdate=true;o.geometry.computeBoundingSphere();o.geometry.computeBoundingBox();}});}return n;}
+/* ---------- aplicação: a v468 remonta as ilhas com a palmeira nova; moitas e píer são desta versão ---------- */
+function i501PalmeiraV468(K,M468,mFolha,x,z,y,h,lean,ry,r,obst){const M=i501Mats();i501Palmeira(K,M,x,z,y,h,lean,ry,r);if(obst)obst(x,z,.36);}
+function i501Aplica(){if(!ILHA501.on||ILHA501.feito)return;const R=ROOMS.adv;if(!R||!R.scene)return;const T=THREE;
+  if(typeof I468==='undefined'||!I468.on||typeof ILHA294==='undefined'||!ILHA294.g||!NAV252.ilha||!NAV252.ilha.g)return;
+  const roots=R.scene.children.filter(o=>o.isGroup&&/^Ilhas · árvores, pedras e detalhes \(v468\)/.test(o.name||''));if(roots.length<2)return;ILHA501.feito=true;
+  try{
+    // 1) desfaz o que a v468 montou (grupos e os obstáculos que ela acrescentou, sempre no fim das listas) e remonta com a palmeira nova
+    for(const g of roots){R.scene.remove(g);g.traverse(o=>{if(o.isMesh&&o.geometry)o.geometry.dispose();});}
+    for(const [I,grande,lista] of [[NAV252.ilha,false,NAV253.ilhaObst||[]],[ILHA294,true,ILHA294.obst]]){const st=I468.stats&&I468.stats[grande?'grande':'pequena'];const n=st&&st.obst||0;if(n>0&&lista.length>=n)lista.splice(lista.length-n,n);I468.feitas.delete(I);}
+    i468Palmeira=i501PalmeiraV468;i468Amendoeira=i501Amendoeira;
+    i468Ilha(NAV252.ilha,false);i468Ilha(ILHA294,true);
+    // 2) moitas da v253 (bolas, dobradas no clone): apagar por volume (estão fundidas num balde de cor) e refazer com cartões de folhagem
+    const M=i501Mats();const root=new T.Group();root.name='Ilhas · moitas, lampiões e tochas (v501)';R.scene.add(root);const K=t160Kit(root.name);const r=rnd(5010);
+    const chaoDe=(x,z)=>{const grande=Math.hypot(x-ILHA294.x,z-ILHA294.z)<Math.hypot(x-NAV252.ilha.x,z-NAV252.ilha.z);return grande?i294Floor(x,z):nav252ChaoIlha(x,z);};
+    const locais=[[-6.2,-1.0,1.0],[4.0,5.6,.8],[-2.6,-7.2,.9]];const vols=[];const moitas=[];
+    for(const [I,G,esc] of [[NAV252.ilha,NAV252.ilha.g,1],[ILHA294,ILHA294.g,2]]){if(!G)continue;const m4=G.matrixWorld;G.updateWorldMatrix(true,false);
+      for(const [lx,lz,ls] of locais){const w=new T.Vector3(lx,0,lz).applyMatrix4(m4);const s=ls*esc;const y0=chaoDe(w.x,w.z);vols.push([w.x,w.z,.42*s*1.15+.35*s,y0-.3,y0+.3*s+.12+.42*s+.4]);moitas.push([w.x,w.z,s]);}}
+    ILHA501.stats.apagados=i501Apaga([NAV252.ilha.g,ILHA294.g],vols);
+    for(const [x,z,s] of moitas)i501Moita(K,M,x,z,chaoDe(x,z)-.02,Math.max(.9,Math.min(2.2,s*1.15)),r);
+    // 3) lanternas do píer: esconder as caixas soltas, pendurar lampiões nos postes e fincar tochas na cabeça do píer
+    try{const cx0=ILHA294.x,cz0=ILHA294.z,a0=.6;const [ex0,ez0]=[cx0+Math.cos(a0)*20,cz0+Math.sin(a0)*20];const lx0=-Math.sin(a0),lz0=Math.cos(a0);const [bx0,bz0]=[cx0+Math.cos(a0)*12.6,cz0+Math.sin(a0)*12.6];const deck0=i294Floor(bx0,bz0)+.28;
+      const raizes=[ILHA294.g];R.scene.children.forEach(o=>{if(o!==ILHA294.g&&/Ilha das Moedas/.test(o.name||''))raizes.push(o);});
+      const vl=[];for(const s of [-1,1])vl.push([ex0+lx0*s*.8,ez0+lz0*s*.8,.24,deck0+.58,deck0+1.1]);const esc=i501Apaga(raizes,vl);
+      const cx=ILHA294.x,cz=ILHA294.z,a=.6,ux=Math.cos(a),uz=Math.sin(a),lx=-uz,lz=ux;const P=(rr)=>[cx+ux*rr,cz+uz*rr];const [bx,bz]=P(12.6);const deck=i294Floor(bx,bz)+.28;
+      const [ex,ez]=P(20);for(const s of [-1,1]){const px=ex+lx*s*.8,pz=ez+lz*s*.8;K.cyl(.09,.11,.5,M.ferro,px,deck+.8,pz,8);i501Lampiao(K,M,px,pz,deck+1.0,lx*s,lz*s);}
+      const [hx,hz]=P(11.2);for(const s of [-1,1]){const tx=hx+lx*s*1.35,tz=hz+lz*s*1.35;i501Tocha(K,M,tx,tz,i294Floor(tx,tz)-.05,r);ILHA294.obst.push([tx,tz,.22]);}
+      ILHA501.stats.lanternasEscondidas=esc;}catch(e){i501Erro('píer',e);}
+    const meshes=K.fim(root,{sombra:true,juntar:false});let tri=0;for(const m of meshes){m.userData.noCam=true;m.userData.papelKeepGeo=true;const g=m.geometry;tri+=(g.index?g.index.count:g.attributes.position.count)/3;}ILHA501.stats.triangulos=Math.round(tri);
+    try{ILHA501.stats.v468=JSON.parse(JSON.stringify(I468.stats));}catch(e){}
+  }catch(e){i501Erro('aplica',e);}}
+if(ILHA501.on){
+  {const fr=finishRoom;finishRoom=function(key){const r=fr.apply(this,arguments);if(key==='adv')setTimeout(()=>{try{i501Aplica();}catch(e){i501Erro('finishRoom',e);}},0);return r;};}
+  try{i501Aplica();}catch(e){}
+}
+window.__ilha501={estado:ILHA501,aplica:i501Aplica,refaz:()=>{ILHA501.feito=false;i501Aplica();}};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
