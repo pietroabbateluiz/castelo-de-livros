@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v479</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v488</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -59123,6 +59123,273 @@ if(CT479.on){
   try{const finish=finishRoom;finishRoom=function(key){const r=finish.apply(this,arguments);if(key==='pessoal')try{c479Inicial();}catch(e){c479Erro('finish',e);}return r;};if(DEC128.rooms.pessoal)c479Inicial();}catch(e){c479Erro('instalar inicial',e);}
 }
 window.__catalogo479={estado:CT479,ui:c479UI,itens:c479AcumItens,inicial:c479Inicial};
+
+/* ===================== v480 · RODADA 1 — VIDA POR SALA (MOTOR) + 1.º ANDAR + PERSONALIDADES DE COMBATE (bloco `VD480`) =====================
+   · Pedido do Luiz: «Siga melhorando tudo, sala por sala, gráfico, inimigos, tudo. Faça isso 10x seguidas.» Esta é a rodada 1.
+   · MOTOR DE VIDA (`vd480Efeitos`): efeitos leves e aditivos que seguem o leitor (campo de partículas em caixa ao redor dele, com
+     dobra nas bordas — não precisam conhecer a geometria da sala): `vagalumes` (pontos que piscam por cor de vértice),
+     `poeira`, `polen`, `brasas` (sobem), `folhas` (caem balançando, textura LEAF), `neve`, `neblina` (planos SMOKE rasteiros
+     que derivam), `morcegos`/`passaros` (sprites em elipses com batida de asa), e dois efeitos de sala: `velas` (cintilação
+     das luzes pontuais quentes e fracas, só quando não estão em fade da L226) e `holo` (cintilação dos materiais emissivos
+     frios). Tabela `VD480.salas[chave] = {efeitos:[...]}` aplicada na entrada da cena (`setActive`), uma vez por sala; as
+     rodadas seguintes só acrescentam entradas. Tudo na camada 1 (sem SAO), `userData.fx`; no Leve/Papel os objetos ficam invisíveis e nada anima.
+   · 1.º ANDAR: Histórica (velas + poeira quente), Terror (névoa rasteira, morcegos, velas), Ficção científica (hologramas que
+     cintilam, poeira fria), Fantasia (vagalumes, pólen dourado, folhas), Aventura (gaivotas, bruma do mar, poeira).
+   · PERSONALIDADES DE COMBATE (`VD480.inimigos`, por cima da v474): `recuar` (robô: mantém 3,6 m, recua se o leitor chega),
+     `investir` (dragãozinho: a cada 5–8 s arma 0,35 s com os olhos acesos e investe 0,5 s a 2,6× a velocidade),
+     `perto` (pirata: fecha a distância até 3,2 m), `fantasma` (espectro: opacidade pulsa 0,45–1 e a cada 7–10 s some por 0,5 s
+     e reaparece noutro ângulo da órbita, com fagulhas), `zigue` (caveira: troca o sentido da órbita a cada 1,2–2 s).
+     Obstáculos, clamp e colegas respeitados como na v474; chefes e aliados de fora (`n474Fora`).
+   · ?vida480=0 desliga. Gancho: `window.__vida480`. */
+const VD480={on:!/[?&#]vida480=0/i.test(location.search+location.hash),erros:[],feitas:new WeakMap(),stats:{salas:0,efeitos:0},t:0,builders:{}, // rodadas seguintes registram tipos novos aqui
+  salas:{
+    cat:{efeitos:[{tipo:'velas',amp:.1},{tipo:'poeira',n:360,cor:0xffe2b0,w:22,h:6,d:22,s:.05,op:.26}]},
+    lib:{efeitos:[{tipo:'neblina',n:6,cor:0x9a90b8,op:.13,y:.35,w:26},{tipo:'morcegos',n:5},{tipo:'velas',amp:.14},{tipo:'poeira',n:200,cor:0xb8c0d8,w:20,h:5,d:20,s:.04,op:.18}]},
+    sci:{efeitos:[{tipo:'holo',amp:.22},{tipo:'poeira',n:220,cor:0x80d8ff,w:22,h:6,d:22,s:.035,op:.2}]},
+    fant:{efeitos:[{tipo:'vagalumes',n:44,cor:0xc0ff70,w:24,h:3.2,d:24},{tipo:'polen',n:260,cor:0xffe090,w:22,h:5,d:22,s:.05,op:.28},{tipo:'folhas',n:36,cor:0x8fbf5a,w:22,h:7,d:22}]},
+    adv:{efeitos:[{tipo:'passaros',n:4},{tipo:'neblina',n:5,cor:0xdfe8ee,op:.1,y:.3,w:30},{tipo:'poeira',n:200,cor:0xfff4e0,w:24,h:6,d:24,s:.045,op:.2}]}
+  },
+  inimigos:{robo:{estilo:'recuar',dist:3.6},dragao:{estilo:'investir',cd:[5,8]},pirata:{estilo:'perto',dist:3.2},espectro:{estilo:'fantasma'},caveira:{estilo:'zigue'}}};
+function vd480Erro(o,e){if(VD480.erros.length<12)VD480.erros.push(o+': '+(e&&e.message||e));console.warn('v480',o,e);}
+function vd480Leitor(){const p=cavPos();return [p.x,(p.fy||0),p.z];}
+/* ---- campo de partículas que segue o leitor ---- */
+function vd480Campo(sc,c,modo){const T=THREE,N=c.n||200,w=c.w||20,h=c.h||5,d=c.d||w,r=rnd(4800+N+(c.cor||0)%977),pos=new Float32Array(N*3),col=new Float32Array(N*3),ph=new Float32Array(N),vel=new Float32Array(N);const C=new T.Color(c.cor||0xffffff);
+  const pal=(c.cores||[]).map(x=>new T.Color(x));for(let i=0;i<N;i++){pos[i*3]=(r()-.5)*w;pos[i*3+1]=r()*h;pos[i*3+2]=(r()-.5)*d;const cc=pal.length?pal[i%pal.length]:C;col[i*3]=cc.r;col[i*3+1]=cc.g;col[i*3+2]=cc.b;ph[i]=r()*6.283;vel[i]=.6+r()*.8;}
+  const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(pos,3));g.setAttribute('color',new T.BufferAttribute(col,3));
+  const m=new T.Points(g,new T.PointsMaterial({map:modo==='folhas'?LEAF:GLOW,vertexColors:true,size:c.s||(modo==='vagalumes'?.16:modo==='folhas'?.22:modo==='neve'?.09:.05),transparent:true,opacity:c.op||(modo==='vagalumes'?.9:modo==='folhas'?.85:.3),blending:modo==='folhas'||modo==='neve'?T.NormalBlending:T.AdditiveBlending,depthWrite:false,sizeAttenuation:true}));
+  m.layers.set(1);m.userData.fx=true;m.userData.noFade=true;m.raycast=()=>{};m.frustumCulled=false;m.name='480 '+modo;const [px,py,pz]=vd480Leitor();m.position.set(px,py,pz);sc.add(m);
+  const E={m,modo,N,w,h,d,ph,vel,C,pal,base:[px,py,pz],t:0};
+  E.tick=(dt,t)=>{const [lx,ly,lz]=vd480Leitor();const dx=lx-E.base[0],dz=lz-E.base[2],dy=ly-E.base[1];const P=g.attributes.position.array;
+    if(Math.abs(dx)>w*.2||Math.abs(dz)>d*.2||Math.abs(dy)>.5){for(let i=0;i<N;i++){let x=P[i*3]-dx,z=P[i*3+2]-dz;x=((x+w/2)%w+w)%w-w/2;z=((z+d/2)%d+d)%d-d/2;P[i*3]=x;P[i*3+2]=z;}E.base=[lx,ly,lz];m.position.set(lx,ly,lz);}
+    const A=g.attributes.color.array;
+    if(modo==='vagalumes'){for(let i=0;i<N;i++){const f=Math.max(0,Math.sin(t*(1.1+vel[i]*.6)+ph[i]));const b=f*f;const cc=E.pal.length?E.pal[i%E.pal.length]:C;A[i*3]=cc.r*b;A[i*3+1]=cc.g*b;A[i*3+2]=cc.b*b;P[i*3]+=Math.sin(t*.7+ph[i])*dt*.5;P[i*3+1]=Math.max(.2,Math.min(h,P[i*3+1]+Math.cos(t*.9+ph[i]*2)*dt*.3));P[i*3+2]+=Math.cos(t*.6+ph[i])*dt*.5;}g.attributes.color.needsUpdate=true;}
+    else if(modo==='brasas'){for(let i=0;i<N;i++){P[i*3+1]+=dt*vel[i]*1.1;P[i*3]+=Math.sin(t*2+ph[i])*dt*.3;if(P[i*3+1]>h){P[i*3+1]=0;P[i*3]=(Math.random()-.5)*w;P[i*3+2]=(Math.random()-.5)*d;}const b=.4+.6*Math.max(0,1-P[i*3+1]/h);const cc=E.pal.length?E.pal[i%E.pal.length]:C;A[i*3]=cc.r*b;A[i*3+1]=cc.g*b;A[i*3+2]=cc.b*b;}g.attributes.color.needsUpdate=true;}
+    else if(modo==='folhas'||modo==='neve'){const q=modo==='neve'?.45:.75;for(let i=0;i<N;i++){P[i*3+1]-=dt*vel[i]*q;P[i*3]+=Math.sin(t*1.3+ph[i])*dt*.9;P[i*3+2]+=Math.cos(t*1.1+ph[i])*dt*.6;if(P[i*3+1]<0){P[i*3+1]=h;P[i*3]=(Math.random()-.5)*w;P[i*3+2]=(Math.random()-.5)*d;}}}
+    else{for(let i=0;i<N;i++){P[i*3]+=Math.sin(t*.35+ph[i])*dt*.12;P[i*3+1]+=Math.cos(t*.3+ph[i]*1.7)*dt*.08;if(P[i*3+1]<.1)P[i*3+1]=h;else if(P[i*3+1]>h)P[i*3+1]=.1;}}
+    g.attributes.position.needsUpdate=true;};
+  return E;}
+function vd480Neblina(sc,c){const T=THREE,n=c.n||5,L=[],w=c.w||24;const mat=new T.MeshBasicMaterial({map:SMOKE,color:c.cor||0xc0c0d0,transparent:true,opacity:c.op||.12,depthWrite:false,blending:T.NormalBlending,side:T.DoubleSide});const r=rnd(4801+n);
+  for(let i=0;i<n;i++){const m=new T.Mesh(new T.PlaneGeometry(w*.55,w*.55),mat);m.rotation.x=-Math.PI/2;m.rotation.z=r()*6.28;m.userData.f=[r()*6.28,(r()-.5)*w*.5,(r()-.5)*w*.5];m.layers.set(1);m.userData.fx=true;m.userData.noFade=true;m.raycast=()=>{};m.frustumCulled=false;m.name='480 neblina';sc.add(m);L.push(m);}
+  const E={L,tick:(dt,t)=>{const [lx,ly,lz]=vd480Leitor();for(const m of L){const f=m.userData.f;m.position.set(lx+f[1]+Math.sin(t*.05+f[0])*3,ly+(c.y||.35)+Math.sin(t*.2+f[0])*.06,lz+f[2]+Math.cos(t*.04+f[0])*3);m.rotation.z+=dt*.015;}}};return E;}
+function vd480Voadores(sc,c,modo){const T=THREE,n=c.n||5,L=[],r=rnd(4802+n);const mat=new T.SpriteMaterial({map:GLOW,color:modo==='morcegos'?0x120c18:0xf4f0e6,transparent:true,opacity:modo==='morcegos'?.95:.9,depthWrite:false});
+  for(let i=0;i<n;i++){const s=new T.Sprite(mat);const k=modo==='morcegos'?.42:.5;s.scale.set(k,k*.35,1);s.userData.f=[r()*6.28,3+r()*5,modo==='morcegos'?3.2+r()*1.3:5+r()*3,.5+r()*.5];s.layers.set(1);s.userData.fx=true;s.userData.noFade=true;s.raycast=()=>{};s.name='480 '+modo;sc.add(s);L.push(s);}
+  const E={L,tick:(dt,t)=>{const [lx,ly,lz]=vd480Leitor();for(const s of L){const f=s.userData.f,a=t*f[3]*(modo==='morcegos'?1.4:.5)+f[0];s.position.set(lx+Math.cos(a)*f[1]+Math.sin(t*1.7+f[0])*.8,ly+f[2]+Math.sin(t*2.3+f[0])*.5,lz+Math.sin(a*1.3)*f[1]);const bat=Math.abs(Math.sin(t*(modo==='morcegos'?16:7)+f[0]));s.scale.set(s.scale.x,(modo==='morcegos'?.42:.5)*(.15+.3*bat),1);}}};return E;}
+function vd480Velas(sc,c){const L=[];sc.traverse(o=>{if(!o.isPointLight)return;const i0=o.userData.i0!==undefined?o.userData.i0:o.intensity;const h=o.color.getHSL({h:0,s:0,l:0});if(i0>0&&i0<1.3&&(o.distance||12)<=12&&(h.h<.13||h.h>.9)&&h.s>.2){o.userData.f480=Math.random()*6.28;L.push(o);}});
+  const E={L,tick:(dt,t)=>{for(const o of L){if(!o.visible)continue;const i0=o.userData.i0!==undefined?o.userData.i0:o.intensity;if(Math.abs(o.intensity-i0)>i0*.35)continue;const f=o.userData.f480;o.intensity=i0*(1+(c.amp||.1)*(Math.sin(t*9.1+f)*.5+Math.sin(t*23.7+f*2)*.3+Math.sin(t*3.3+f)*.2));}}};return E;}
+function vd480Holo(sc,c){const L=[];const seen=new Set();sc.traverse(o=>{if(!o.isMesh||!o.material)return;const ms=Array.isArray(o.material)?o.material:[o.material];for(const m of ms){if(!m||!m.emissive||seen.has(m)||!(m.emissiveIntensity>0))continue;const h=m.emissive.getHSL({h:0,s:0,l:0});if(h.s>.3&&h.h>.4&&h.h<.75){seen.add(m);m.userData.e480=m.emissiveIntensity;m.userData.f480=Math.random()*6.28;L.push(m);}}});
+  const E={L,tick:(dt,t)=>{for(const m of L){const f=m.userData.f480,e0=m.userData.e480;m.emissiveIntensity=e0*(1+(c.amp||.2)*(Math.sin(t*13+f)*.5+(Math.sin(t*41+f*3)>.92?-.8:0)+Math.sin(t*2.1+f)*.3));}}};return E;}
+function vd480Aplica(sc,key){if(!sc||VD480.feitas.has(sc))return;const c=VD480.salas[key];if(!c)return;const lista=[];VD480.feitas.set(sc,lista);try{
+    for(const e of (c.efeitos||[])){let E=null;try{
+        if(VD480.builders[e.tipo])E=VD480.builders[e.tipo](sc,e);else if(e.tipo==='neblina')E=vd480Neblina(sc,e);else if(e.tipo==='morcegos'||e.tipo==='passaros')E=vd480Voadores(sc,e,e.tipo);else if(e.tipo==='velas')E=vd480Velas(sc,e);else if(e.tipo==='holo')E=vd480Holo(sc,e);else E=vd480Campo(sc,e,e.tipo);
+      }catch(x){vd480Erro(key+' '+e.tipo,x);}if(E){E.tipo=e.tipo;lista.push(E);VD480.stats.efeitos++;}}
+    VD480.stats.salas++;}catch(e){vd480Erro(key,e);}}
+function vd480Vis(L,on){for(const E of L){if(E.m)E.m.visible=on;if(E.L&&E.tipo!=='velas'&&E.tipo!=='holo')for(const o of E.L)o.visible=on;}}
+function vd480Tick(dt){const sc=ACTIVE;if(!sc)return;const L=VD480.feitas.get(sc);if(!L||!L.length)return;const leve=!!(Q.lite||Q.papel);if(leve!==!!L.leve){L.leve=leve;vd480Vis(L,!leve);}if(leve)return;const d0=Math.min(.05,dt||.016);VD480.t+=d0;for(const E of L)try{E.tick(d0,VD480.t);}catch(e){vd480Erro('tick '+E.tipo,e);}}
+/* ---- personalidades ---- */
+function vd480Move(k,nx,nz,S){const obst=(WORLD&&WORLD.obst)||[];for(let q=0;q<obst.length;q++){const ob=obst[q];const ox=nx-ob[0],oz=nz-ob[1],od=Math.hypot(ox,oz),rr=(ob[2]||.5)+.3;if(od<rr&&od>1e-3){nx=ob[0]+ox/od*rr;nz=ob[1]+oz/od*rr;}}
+  if(WORLD&&WORLD.clamp){const c=WORLD.clamp(nx,nz,.35);nx=Array.isArray(c)?c[0]:c.x;nz=Array.isArray(c)?c[1]:c.z;}
+  for(const o of S.lista){if(o===k||!o.viva)continue;if(Math.hypot(nx-o.x,nz-o.z)<1.0)return false;}k.x=nx;k.z=nz;k.g.position.x=nx;k.g.position.z=nz;return true;}
+function vd480Personalidade(dt){const room=cavRoom();const S=room&&CAV.salas[room];if(!S||!S.lista)return;const pl=cavPos(),d0=Math.min(.05,dt||.016);
+  for(const k of S.lista){if(!k.viva||!k.g||k.sono>0||CAV.morto||(typeof n474Fora==='function'&&n474Fora(k)))continue;const P=VD480.inimigos[k.tipo];if(!P)continue;const st=k.vd480||(k.vd480={t:2+Math.random()*4,fase:0,op:0});const dx=pl.x-k.x,dz=pl.z-k.z,d=Math.hypot(dx,dz)||1e-3,vel=k.vel||2.5;
+    if(P.estilo==='recuar'){if(d<P.dist){vd480Move(k,k.x-dx/d*vel*.6*d0,k.z-dz/d*vel*.6*d0,S);}}
+    else if(P.estilo==='perto'){if(d>P.dist&&d<14){vd480Move(k,k.x+dx/d*vel*.3*d0,k.z+dz/d*vel*.3*d0,S);}}
+    else if(P.estilo==='zigue'){if(k.n474&&k.n474.tOrb>2)k.n474.tOrb=1.2+Math.random()*.8;}
+    else if(P.estilo==='investir'){st.t-=d0;if(st.fase===0&&st.t<=0&&d<12&&d>2.5){st.fase=1;st.t=.35;for(const o of k.g.userData.olhos||[])if(o.material)o.material.emissiveIntensity=9;try{sfx('arme477',{tipo:k.tipo,d});}catch(e){}}
+      else if(st.fase===1&&st.t<=0){st.fase=2;st.t=.5;}
+      else if(st.fase===2){vd480Move(k,k.x+dx/d*vel*2.6*d0,k.z+dz/d*vel*2.6*d0,S);if(st.t<=0||d<1.6){st.fase=0;st.t=P.cd[0]+Math.random()*(P.cd[1]-P.cd[0]);for(const o of k.g.userData.olhos||[])if(o.material)o.material.emissiveIntensity=2.2;}}}
+    else if(P.estilo==='fantasma'){if(!st.mats){st.mats=[];k.g.traverse(o=>{if(o.isMesh&&o.material&&o.material.isMeshStandardMaterial&&!o.userData.barra){if(!o.material.userData.v480c){o.material=o.material.clone();o.material.userData.v480c=true;o.material.transparent=true;}st.mats.push(o.material);}});st.f=Math.random()*6.28;}
+      st.t-=d0;if(st.fase===0){const op=.72+.28*Math.sin(VD480.t*2.6+st.f);for(const m of st.mats)m.opacity=op;if(st.t<=0){st.fase=1;st.t=.5;k.g.visible=false;try{const sc=ROOMS[k.room].scene;for(let i=0;i<8;i++)cavFaisca(sc,k.x+(Math.random()-.5)*.8,k.g.position.y+Math.random()*.8,k.z+(Math.random()-.5)*.8,0xb090ff,.3,.5);}catch(e){}}}
+      else if(st.fase===1&&st.t<=0){const a=Math.atan2(k.x-pl.x,k.z-pl.z)+(Math.random()<.5?1:-1)*(1.2+Math.random()*.8),rr=Math.max(3,Math.min(d,7));const nx=pl.x+Math.sin(a)*rr,nz=pl.z+Math.cos(a)*rr;vd480Move(k,nx,nz,S);k.g.visible=true;st.fase=0;st.t=7+Math.random()*3;for(const m of st.mats)m.opacity=.45;try{const sc=ROOMS[k.room].scene;for(let i=0;i<8;i++)cavFaisca(sc,k.x+(Math.random()-.5)*.8,k.g.position.y+Math.random()*.8,k.z+(Math.random()-.5)*.8,0xd0c0ff,.3,.5);}catch(e){}}}
+  }}
+if(VD480.on){
+  {const old=setActive;setActive=function(sc){const r=old.apply(this,arguments);try{const key=Object.keys(ROOMS).find(k=>ROOMS[k]&&ROOMS[k].scene===sc);if(key)vd480Aplica(sc,key);}catch(e){vd480Erro('ativa',e);}return r;};}
+  try{const d0=draw;draw=function(dt){try{vd480Tick(dt);}catch(e){vd480Erro('tick',e);}return d0.apply(this,arguments);};}catch(e){vd480Erro('instalar',e);}
+  try{const old=caveirasTick;caveirasTick=function(dt){const r=old.apply(this,arguments);try{vd480Personalidade(dt);}catch(e){vd480Erro('personalidade',e);}return r;};}catch(e){vd480Erro('instalar p',e);}
+  try{if(typeof ACTIVE!=='undefined'&&ACTIVE){const key=Object.keys(ROOMS).find(k=>ROOMS[k]&&ROOMS[k].scene===ACTIVE);if(key)vd480Aplica(ACTIVE,key);}}catch(e){}
+}
+window.__vida480={estado:VD480,aplicar:vd480Aplica};
+
+/* ===================== v481 · RODADA 2 — 2.º ANDAR: VIDA POR SALA E PERSONALIDADES (bloco `RD481`) =====================
+   · Rodada 2 do pedido «sala por sala, gráfico, inimigos, tudo». Usa o motor da v480 (`VD480`) e acrescenta dois tipos:
+     `chuva` (gotas finas caindo depressa — fica para a chuva de código da Ficção digital; dentro do Mistério e do Noir a chuva é só som) e `estrelas` (cintilação multicor, miúda).
+   · Mistério: névoa baixa e velas (a chuva lá fora já é som); Romance/Vila: pétalas caindo (folhas cor-de-rosa), poeira quente, velas;
+     Distopia/Guerra: faíscas elétricas (brasas azuladas, curtas), fumaça escura, hologramas; Paranormal: névoa violeta,
+     morcegos, velas fortes; Quadrinhos: estrelas multicores e confete (neve colorida).
+   · Personalidades: vulto `fantasma`, cupido `zigue` (rápido), drone `recuar` (4,5 m), espantalho-abóbora `investir`
+     (lento e pesado, 6–9 s), onomatopeia `perto`.
+   · ?rodada481=0 desliga só esta rodada. Gancho: `window.__rodada481`. */
+const RD481={on:!/[?&#]rodada481=0/i.test(location.search+location.hash),erros:[]};
+function rd481Chuva(sc,c){const T=THREE,N=c.n||400,w=c.w||24,h=c.h||9,d=c.d||w,r=rnd(4811+N),pos=new Float32Array(N*3),vel=new Float32Array(N);for(let i=0;i<N;i++){pos[i*3]=(r()-.5)*w;pos[i*3+1]=r()*h;pos[i*3+2]=(r()-.5)*d;vel[i]=7+r()*4;}
+  const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(pos,3));const m=new T.Points(g,new T.PointsMaterial({map:GLOW,color:c.cor||0xbfd0e0,size:c.s||.06,transparent:true,opacity:c.op||.35,blending:T.AdditiveBlending,depthWrite:false}));
+  m.layers.set(1);m.userData.fx=true;m.userData.noFade=true;m.raycast=()=>{};m.frustumCulled=false;m.name='481 chuva';const [px,py,pz]=vd480Leitor();m.position.set(px,py,pz);sc.add(m);const E={m,base:[px,py,pz]};
+  E.tick=(dt,t)=>{const [lx,ly,lz]=vd480Leitor();const dx=lx-E.base[0],dz=lz-E.base[2];const P=g.attributes.position.array;if(Math.abs(dx)>w*.2||Math.abs(dz)>d*.2){for(let i=0;i<N;i++){let x=P[i*3]-dx,z=P[i*3+2]-dz;x=((x+w/2)%w+w)%w-w/2;z=((z+d/2)%d+d)%d-d/2;P[i*3]=x;P[i*3+2]=z;}E.base=[lx,ly,lz];m.position.set(lx,ly,lz);}
+    for(let i=0;i<N;i++){P[i*3+1]-=dt*vel[i];P[i*3]+=dt*(c.vento||.6);if(P[i*3+1]<0){P[i*3+1]=h;P[i*3]=(Math.random()-.5)*w;P[i*3+2]=(Math.random()-.5)*d;}}g.attributes.position.needsUpdate=true;};return E;}
+if(RD481.on){try{
+  VD480.builders.chuva=rd481Chuva;
+  VD480.builders.estrelas=(sc,c)=>vd480Campo(sc,Object.assign({s:.09,op:.9,cores:c.cores||[0xff5577,0xffd040,0x50c8ff,0x80ff80,0xff90ff]},c),'vagalumes');
+  Object.assign(VD480.salas,{
+    mys:{efeitos:[{tipo:'neblina',n:4,cor:0xb8b0a0,op:.1,y:.3,w:22},{tipo:'velas',amp:.12},{tipo:'poeira',n:200,cor:0xffe0b0,w:18,h:4,d:18,s:.04,op:.22}]},
+    vila:{efeitos:[{tipo:'folhas',n:44,cor:0xf4a6c0,w:20,h:6,d:20,s:.16},{tipo:'poeira',n:240,cor:0xffe4c8,w:20,h:5,d:20,s:.045,op:.24},{tipo:'velas',amp:.1}]},
+    guerra:{efeitos:[{tipo:'brasas',n:70,cor:0x8fd0ff,w:20,h:2.4,d:20,s:.05,op:.6},{tipo:'neblina',n:4,cor:0x4a4a52,op:.14,y:2.4,w:26},{tipo:'holo',amp:.3},{tipo:'poeira',n:220,cor:0xb0b4c0,w:22,h:5,d:22,s:.045,op:.18}]},
+    outono:{efeitos:[{tipo:'neblina',n:6,cor:0xa08cc0,op:.12,y:.35,w:26},{tipo:'morcegos',n:3},{tipo:'velas',amp:.16},{tipo:'poeira',n:200,cor:0xd8c8ff,w:20,h:5,d:20,s:.04,op:.2}]},
+    quadrinhos:{efeitos:[{tipo:'estrelas',n:60,w:22,h:5,d:22},{tipo:'neve',n:90,cores:[0xff5577,0xffd040,0x50c8ff,0x80ff80],w:20,h:6,d:20,s:.12,op:.9}]}
+  });
+  Object.assign(VD480.inimigos,{vulto:{estilo:'fantasma'},cupido:{estilo:'zigue'},drone:{estilo:'recuar',dist:4.5},abobora:{estilo:'investir',cd:[6,9]},onomatopeia:{estilo:'perto',dist:3.4}});
+}catch(e){RD481.erros.push(String(e&&e.message||e));console.warn('v481',e);}}
+window.__rodada481={estado:RD481};
+
+/* ===================== v482 · RODADA 3 — 3.º ANDAR: VIDA POR SALA E PERSONALIDADES (bloco `RD482`) =====================
+   · Rodada 3 do pedido «sala por sala, gráfico, inimigos, tudo», sobre o motor da v480 (`VD480`).
+   · Bosque: vagalumes, folhas e pólen; Drama (Acrópole): poeira quente de palco e velas; Fazenda: pássaros, palha no ar e
+     borboletas (estrelas pastel); Super-heróis (Arena): faíscas de holofote e hologramas; Ficção digital: chuva de código
+     verde, hologramas e estrelas ciano.
+   · Personalidades: lobo mau `investir` (4–6 s), máscaras do teatro `fantasma`, galinha de guerra `zigue`, vilão mascarado
+     `perto` (3 m), bug de pixels `recuar` (3,8 m).
+   · ?rodada482=0 desliga só esta rodada. Gancho: `window.__rodada482`. */
+const RD482={on:!/[?&#]rodada482=0/i.test(location.search+location.hash),erros:[]};
+if(RD482.on){try{
+  Object.assign(VD480.salas,{
+    bosque:{efeitos:[{tipo:'vagalumes',n:40,cor:0xd0ff80,w:24,h:3.5,d:24},{tipo:'folhas',n:40,cor:0x9ccf60,w:22,h:7,d:22},{tipo:'polen',n:220,cor:0xfff0a0,w:22,h:5,d:22,s:.045,op:.26}]},
+    acropole:{efeitos:[{tipo:'poeira',n:260,cor:0xffd8a8,w:22,h:7,d:22,s:.05,op:.24},{tipo:'velas',amp:.12}]},
+    fazenda:{efeitos:[{tipo:'passaros',n:4},{tipo:'poeira',n:260,cor:0xf6e2a8,w:22,h:5,d:22,s:.055,op:.26},{tipo:'estrelas',n:30,cores:[0xffd0e8,0xfff0a0,0xc8e8ff,0xffffff],w:20,h:3,d:20,s:.12,op:.9}]},
+    arena:{efeitos:[{tipo:'estrelas',n:40,cores:[0xffffff,0xffd040,0x60a0ff],w:22,h:7,d:22,s:.1,op:.9},{tipo:'holo',amp:.25},{tipo:'poeira',n:180,cor:0xd0d8ff,w:22,h:6,d:22,s:.04,op:.18}]},
+    digital:{efeitos:[{tipo:'chuva',n:360,w:24,h:8,cor:0x40ff80,op:.5,s:.07,vento:0},{tipo:'holo',amp:.3},{tipo:'estrelas',n:40,cores:[0x40e0ff,0xff40c0,0x80ff80],w:22,h:6,d:22,s:.1,op:.9}]}
+  });
+  Object.assign(VD480.inimigos,{lobo:{estilo:'investir',cd:[4,6]},mascara:{estilo:'fantasma'},galinha:{estilo:'zigue'},vilao:{estilo:'perto',dist:3.0},bug:{estilo:'recuar',dist:3.8}});
+}catch(e){RD482.erros.push(String(e&&e.message||e));console.warn('v482',e);}}
+window.__rodada482={estado:RD482};
+
+/* ===================== v483 · RODADA 4 — 4.º ANDAR: VIDA POR SALA E PERSONALIDADES (bloco `RD483`) =====================
+   · Rodada 4 do pedido «sala por sala, gráfico, inimigos, tudo», sobre o motor da v480 (`VD480`).
+   · Poesia: vagalumes azulados da noite, bruma fina, poeira lunar; Mitologia: brasas dos braseiros e poeira; Infantojuvenil:
+     estrelas pastel e balões (neve pastel lenta); Clássicos: poeira quente e velas; Autoajuda: pétalas de cerejeira,
+     incenso (névoa fina) e poeira.
+   · Personalidades: corvo `zigue`, minotauro `investir` (5–7 s), soldadinho `perto` (2,8 m), armadura `perto` (2,6 m),
+     máscara oni `fantasma`.
+   · ?rodada483=0 desliga só esta rodada. Gancho: `window.__rodada483`. */
+const RD483={on:!/[?&#]rodada483=0/i.test(location.search+location.hash),erros:[]};
+if(RD483.on){try{
+  Object.assign(VD480.salas,{
+    poesia:{efeitos:[{tipo:'vagalumes',n:36,cor:0xb0c8ff,w:24,h:3.5,d:24},{tipo:'neblina',n:4,cor:0x9aa8c8,op:.08,y:.3,w:26},{tipo:'poeira',n:200,cor:0xd8e0ff,w:22,h:5,d:22,s:.04,op:.2}]},
+    mitologia:{efeitos:[{tipo:'brasas',n:60,cor:0xffa040,w:22,h:3,d:22,s:.06,op:.7},{tipo:'poeira',n:220,cor:0xffe0b0,w:22,h:6,d:22,s:.05,op:.22},{tipo:'velas',amp:.12}]},
+    infantil:{efeitos:[{tipo:'estrelas',n:40,cores:[0xffd0e8,0xfff0a0,0xc8e8ff,0xd0ffd0],w:22,h:5,d:22,s:.12,op:.9},{tipo:'neve',n:40,cores:[0xff8aa8,0xffd060,0x70c0ff,0x90e890],w:20,h:7,d:20,s:.2,op:.95}]},
+    classicos:{efeitos:[{tipo:'poeira',n:260,cor:0xffe2b8,w:22,h:6,d:22,s:.05,op:.24},{tipo:'velas',amp:.1}]},
+    autoajuda:{efeitos:[{tipo:'folhas',n:40,cor:0xffc0d0,w:22,h:6,d:22,s:.15},{tipo:'neblina',n:3,cor:0xe8e0d0,op:.07,y:1.6,w:20},{tipo:'poeira',n:180,cor:0xfff0dc,w:20,h:5,d:20,s:.04,op:.2}]}
+  });
+  Object.assign(VD480.inimigos,{corvo:{estilo:'zigue'},minotauro:{estilo:'investir',cd:[5,7]},soldadinho:{estilo:'perto',dist:2.8},armadura:{estilo:'perto',dist:2.6},oni:{estilo:'fantasma'}});
+}catch(e){RD483.erros.push(String(e&&e.message||e));console.warn('v483',e);}}
+window.__rodada483={estado:RD483};
+
+/* ===================== v484 · RODADA 5 — 5.º ANDAR: VIDA POR SALA E PERSONALIDADES (bloco `RD484`) =====================
+   · Rodada 5 do pedido «sala por sala, gráfico, inimigos, tudo», sobre o motor da v480 (`VD480`).
+   · Biografia: poeira de arquivo e velas; Crônica: poeira e velas da redação; Ciência: hologramas, faíscas azuis e poeira;
+     Filosofia: bruma branca fina do mármore e poeira clara; Cordel: luzinhas da festa (estrelas quentes), brasas da fogueira
+     e poeira de terra.
+   · Personalidades: moldura `fantasma`, gazeteiro `zigue`, besouro `recuar` (3,8 m), esfinge `investir` (6–9 s), saci `fantasma`.
+   · ?rodada484=0 desliga só esta rodada. Gancho: `window.__rodada484`. */
+const RD484={on:!/[?&#]rodada484=0/i.test(location.search+location.hash),erros:[]};
+if(RD484.on){try{
+  Object.assign(VD480.salas,{
+    biografia:{efeitos:[{tipo:'poeira',n:240,cor:0xffe6c0,w:20,h:5,d:20,s:.05,op:.24},{tipo:'velas',amp:.1}]},
+    cronica:{efeitos:[{tipo:'poeira',n:220,cor:0xf0e8d8,w:22,h:5,d:22,s:.045,op:.22},{tipo:'velas',amp:.08}]},
+    ciencia:{efeitos:[{tipo:'holo',amp:.22},{tipo:'brasas',n:40,cor:0x90c8ff,w:18,h:2,d:18,s:.045,op:.6},{tipo:'poeira',n:200,cor:0xe0f0ff,w:22,h:5,d:22,s:.04,op:.2}]},
+    filosofia:{efeitos:[{tipo:'neblina',n:3,cor:0xffffff,op:.06,y:.3,w:24},{tipo:'poeira',n:200,cor:0xffffff,w:22,h:6,d:22,s:.045,op:.18}]},
+    cordel:{efeitos:[{tipo:'estrelas',n:40,cores:[0xffd060,0xff8040,0xffffa0],w:22,h:6,d:22,s:.11,op:.9},{tipo:'brasas',n:50,cor:0xff9040,w:14,h:3,d:14,s:.06,op:.7},{tipo:'poeira',n:220,cor:0xe8c890,w:22,h:5,d:22,s:.05,op:.22}]}
+  });
+  Object.assign(VD480.inimigos,{moldura:{estilo:'fantasma'},gazeteiro:{estilo:'zigue'},besouro:{estilo:'recuar',dist:3.8},esfinge:{estilo:'investir',cd:[6,9]},saci:{estilo:'fantasma'}});
+}catch(e){RD484.erros.push(String(e&&e.message||e));console.warn('v484',e);}}
+window.__rodada484={estado:RD484};
+
+/* ===================== v485 · RODADA 6 — 6.º ANDAR: VIDA POR SALA E PERSONALIDADES (bloco `RD485`) =====================
+   · Rodada 6 do pedido «sala por sala, gráfico, inimigos, tudo», sobre o motor da v480 (`VD480`).
+   · Realismo: poeira de domingo e velas; Steampunk: faíscas de latão, fumaça e manômetros cintilando; Solarpunk: borboletas
+     (estrelas pastel), folhas e pólen; Noir: névoa, poeira fria e velas; Surrealismo: bolhas pastel subindo e estrelas.
+   · Personalidades: peixe dos domingos `zigue`, caldeira `investir` (7–10 s), louva-a-deus `perto` (3 m), detetive da névoa
+     `recuar` (4 m), olho dos sonhos `fantasma`.
+   · ?rodada485=0 desliga só esta rodada. Gancho: `window.__rodada485`. */
+const RD485={on:!/[?&#]rodada485=0/i.test(location.search+location.hash),erros:[]};
+if(RD485.on){try{
+  Object.assign(VD480.salas,{
+    realismo:{efeitos:[{tipo:'poeira',n:240,cor:0xffe4c0,w:20,h:5,d:20,s:.05,op:.24},{tipo:'velas',amp:.1}]},
+    steampunk:{efeitos:[{tipo:'brasas',n:60,cor:0xffb050,w:20,h:3,d:20,s:.05,op:.7},{tipo:'neblina',n:4,cor:0x6a6058,op:.12,y:2.2,w:24},{tipo:'holo',amp:.2},{tipo:'poeira',n:200,cor:0xd8c0a0,w:22,h:5,d:22,s:.045,op:.2}]},
+    solarpunk:{efeitos:[{tipo:'estrelas',n:34,cores:[0xffd0e8,0xfff0a0,0xc8e8ff,0xd0ffd0],w:22,h:4,d:22,s:.12,op:.9},{tipo:'folhas',n:36,cor:0x9ccf60,w:22,h:7,d:22},{tipo:'polen',n:200,cor:0xfff0a0,w:22,h:5,d:22,s:.045,op:.24}]},
+    noir:{efeitos:[{tipo:'neblina',n:5,cor:0x8a8a98,op:.13,y:.35,w:26},{tipo:'velas',amp:.1},{tipo:'poeira',n:180,cor:0xc8ccd8,w:22,h:5,d:22,s:.04,op:.18}]},
+    surrealismo:{efeitos:[{tipo:'brasas',n:50,cores:[0xffb0d0,0xb0d0ff,0xfff0a0,0xd0ffd0],w:22,h:5,d:22,s:.14,op:.5},{tipo:'estrelas',n:40,cores:[0xff80c0,0x80c0ff,0xfff080],w:22,h:6,d:22,s:.1,op:.9}]}
+  });
+  Object.assign(VD480.inimigos,{peixe_relogio:{estilo:'zigue'},caldeira_viva:{estilo:'investir',cd:[7,10]},louva_solar:{estilo:'perto',dist:3.0},detetive_nevoa:{estilo:'recuar',dist:4.0},olho_onirico:{estilo:'fantasma'}});
+}catch(e){RD485.erros.push(String(e&&e.message||e));console.warn('v485',e);}}
+window.__rodada485={estado:RD485};
+
+/* ===================== v486 · RODADA 7 — 7.º ANDAR: VIDA POR SALA E PERSONALIDADES (bloco `RD486`) =====================
+   · Rodada 7 do pedido «sala por sala, gráfico, inimigos, tudo», sobre o motor da v480 (`VD480`).
+   · Epistolar: cartas voando (folhas brancas) e poeira; Viagens: gaivotas, bruma do mar e poeira; Faroeste: poeira de
+     tempestade (grossa, marrom) e brasas da fogueira; Teatro: poeira de palco, velas e brilhos dourados; Utopia: estrelas
+     pastel e luzes subindo devagar.
+   · Personalidades: carta sem remetente `zigue`, caranguejo-bússola `perto` (3,2 m), pistoleiro `recuar` (4,2 m),
+     marionete rebelde `investir` (5–8 s).
+   · ?rodada486=0 desliga só esta rodada. Gancho: `window.__rodada486`. */
+const RD486={on:!/[?&#]rodada486=0/i.test(location.search+location.hash),erros:[]};
+if(RD486.on){try{
+  Object.assign(VD480.salas,{
+    epistolar:{efeitos:[{tipo:'folhas',n:30,cor:0xf8f0e0,w:22,h:7,d:22,s:.2},{tipo:'poeira',n:200,cor:0xffe8c8,w:20,h:5,d:20,s:.045,op:.22}]},
+    viagens:{efeitos:[{tipo:'passaros',n:4},{tipo:'neblina',n:4,cor:0xdfe8ee,op:.09,y:.3,w:26},{tipo:'poeira',n:200,cor:0xfff4e0,w:22,h:5,d:22,s:.045,op:.2}]},
+    western:{efeitos:[{tipo:'poeira',n:320,cor:0xd8b888,w:26,h:4,d:26,s:.08,op:.22},{tipo:'brasas',n:40,cor:0xff9040,w:12,h:3,d:12,s:.06,op:.7}]},
+    teatro:{efeitos:[{tipo:'poeira',n:240,cor:0xffd8b0,w:22,h:7,d:22,s:.05,op:.24},{tipo:'velas',amp:.12},{tipo:'estrelas',n:30,cores:[0xffe080,0xffffff],w:22,h:6,d:22,s:.09,op:.8}]},
+    utopia:{efeitos:[{tipo:'estrelas',n:40,cores:[0xffd0e8,0xfff0a0,0xc8e8ff,0xd0ffd0],w:24,h:6,d:24,s:.12,op:.9},{tipo:'brasas',n:50,cores:[0xffe0f0,0xe0f0ff,0xfffff0],w:24,h:6,d:24,s:.12,op:.45}]}
+  });
+  Object.assign(VD480.inimigos,{carta_alada:{estilo:'zigue'},caranguejo_bussola:{estilo:'perto',dist:3.2},pistoleiro:{estilo:'recuar',dist:4.2},marionete:{estilo:'investir',cd:[5,8]}});
+}catch(e){RD486.erros.push(String(e&&e.message||e));console.warn('v486',e);}}
+window.__rodada486={estado:RD486};
+
+/* ===================== v487 · RODADA 8 — HALLS: VIDA POR ANDAR (bloco `RD487`) =====================
+   · Rodada 8 do pedido «sala por sala, gráfico, inimigos, tudo». O motor da v480 passa a aceitar as cenas dos halls
+     (chave `hallN`, wrapper de `setActive` que procura em `HALLS`), e cada andar ganha a sua camada:
+     1.º (lustres e mármore): velas cintilando e brilhos dourados miúdos; 2.º: poeira quente e velas; 3.º (madeira): velas;
+     4.º (Observatório): estrelas que piscam, vagalumes azuis e hologramas da luneta; 5.º: poeira e velas; 6.º (jardim):
+     vagalumes, folhas e pássaros; 7.º (atlas): poeira e brilhos dourados.
+   · ?rodada487=0 desliga só esta rodada. Gancho: `window.__rodada487`. */
+const RD487={on:!/[?&#]rodada487=0/i.test(location.search+location.hash),erros:[]};
+if(RD487.on){try{
+  Object.assign(VD480.salas,{
+    hall1:{efeitos:[{tipo:'velas',amp:.08},{tipo:'estrelas',n:26,cores:[0xffe8a0,0xfff6d0],w:30,h:7,d:30,s:.07,op:.6}]},
+    hall2:{efeitos:[{tipo:'poeira',n:220,cor:0xffe0b8,w:28,h:6,d:28,s:.05,op:.22},{tipo:'velas',amp:.1}]},
+    hall3:{efeitos:[{tipo:'velas',amp:.1}]},
+    hall4:{efeitos:[{tipo:'estrelas',n:50,cores:[0xffffff,0xc0d8ff,0xfff0c0],w:30,h:8,d:30,s:.08,op:.9},{tipo:'vagalumes',n:20,cor:0x90b8ff,w:26,h:4,d:26},{tipo:'holo',amp:.2}]},
+    hall5:{efeitos:[{tipo:'poeira',n:200,cor:0xffe6c8,w:28,h:6,d:28,s:.05,op:.2},{tipo:'velas',amp:.1}]},
+    hall6:{efeitos:[{tipo:'vagalumes',n:30,cor:0xc8ff80,w:28,h:3.5,d:28},{tipo:'folhas',n:30,cor:0x9ccf60,w:26,h:7,d:26},{tipo:'passaros',n:3}]},
+    hall7:{efeitos:[{tipo:'poeira',n:200,cor:0xffe8c8,w:28,h:6,d:28,s:.05,op:.2},{tipo:'estrelas',n:24,cores:[0xffe0a0,0xffffff],w:28,h:7,d:28,s:.07,op:.6}]}
+  });
+  {const old=setActive;setActive=function(sc){const r=old.apply(this,arguments);try{for(const n in HALLS)if(HALLS[n]&&HALLS[n].scene===sc)vd480Aplica(sc,'hall'+n);}catch(e){RD487.erros.push('ativa: '+(e&&e.message||e));}return r;};}
+  try{if(typeof ACTIVE!=='undefined'&&ACTIVE)for(const n in HALLS)if(HALLS[n]&&HALLS[n].scene===ACTIVE)vd480Aplica(ACTIVE,'hall'+n);}catch(e){}
+}catch(e){RD487.erros.push(String(e&&e.message||e));console.warn('v487',e);}}
+window.__rodada487={estado:RD487};
+
+/* ===================== v488 · RODADA 9 — INIMIGOS (2): DESPERTAR, NÚMEROS DE DANO E FESTA DA SALA LIMPA (bloco `RD488`) =====================
+   · Rodada 9 do pedido «sala por sala, gráfico, inimigos, tudo». Três sinais que faltavam ao combate:
+   · (1) DESPERTAR: quando uma criatura acorda (`sono` chega a 0), além dos olhos e das fagulhas da v155, a peça dá um salto
+     de escala (1,25 → 1 em 0,3 s), toca o som de arme na família do tipo e a luz da sala (v474) pisca na cor do tipo por 0,4 s.
+   · (2) NÚMEROS DE DANO: cada acerto numa criatura (`cavFerir` com vida perdida) solta um «−N» (sprite com `txtTex`, fundo
+     transparente) que sobe 0,8 m e some em 0,7 s — branco, dourado quando ≥ 5; dano no leitor (`cavDano`) solta um «−N»
+     vermelho sobre ele. Piscina de 14 sprites por cena, camada 1.
+   · (3) SALA LIMPA: ao cair a última criatura da sala, 4 s de confete (neve multicor do motor da v480) ao redor do leitor.
+   · ?rodada488=0 desliga. Gancho: `window.__rodada488`. */
+const RD488={on:!/[?&#]rodada488=0/i.test(location.search+location.hash),erros:[],pool:[],vivos:[],stats:{despertos:0,numeros:0,festas:0},festa:null};
+function rd488Erro(o,e){if(RD488.erros.length<12)RD488.erros.push(o+': '+(e&&e.message||e));console.warn('v488',o,e);}
+function rd488Numero(sc,x,y,z,txt,cor){try{const T=THREE;let s=RD488.pool.find(q=>!q.userData.vivo);if(!s){if(RD488.pool.length>=14)return;s=new T.Sprite(new T.SpriteMaterial({transparent:true,depthWrite:false,depthTest:false}));s.layers.set(1);s.userData.fx=true;s.userData.noFade=true;s.raycast=()=>{};s.name='488 número';RD488.pool.push(s);}
+    if(s.material.map)s.material.map.dispose();const tex=new T.CanvasTexture(txtTex(txt,{w:192,h:96,bg:'none',fg:cor||'#ffffff',fs:62,shadow:'rgba(0,0,0,.9)',font:'Georgia,serif'}));tex.encoding=T.sRGBEncoding;s.material.map=tex;s.material.needsUpdate=true;s.material.opacity=1;s.scale.set(.9,.45,1);s.position.set(x,y,z);s.userData.vivo=true;s.userData.t=0;s.userData.y0=y;if(s.parent!==sc){if(s.parent)s.parent.remove(s);sc.add(s);}s.visible=true;RD488.vivos.push(s);RD488.stats.numeros++;}catch(e){rd488Erro('número',e);}}
+function rd488Tick(dt){const d0=Math.min(.05,dt||.016);for(let i=RD488.vivos.length-1;i>=0;i--){const s=RD488.vivos[i];s.userData.t+=d0;const p=s.userData.t/.7;if(p>=1){s.userData.vivo=false;s.visible=false;RD488.vivos.splice(i,1);continue;}s.position.y=s.userData.y0+.8*(1-(1-p)*(1-p));s.material.opacity=p<.6?1:1-(p-.6)/.4;}
+  if(RD488.festa){RD488.festa.t+=d0;try{RD488.festa.E.tick(d0,VD480.t);}catch(e){}if(RD488.festa.t>4){try{const m=RD488.festa.E.m;m.parent&&m.parent.remove(m);m.geometry.dispose();m.material.dispose();}catch(e){}RD488.festa=null;}}
+  // despertar
+  try{const room=cavRoom();const S=room&&CAV.salas[room];if(S&&S.lista)for(const k of S.lista){if(!k.g)continue;const st=k.rd488||(k.rd488={dormia:k.sono>0,pop:0});const dorme=k.sono>0;
+      if(st.dormia&&!dorme&&k.viva&&!(typeof n474Fora==='function'&&n474Fora(k))){st.pop=.3;RD488.stats.despertos++;try{const pl=cavPos();sfx('arme477',{tipo:k.tipo,d:Math.hypot(pl.x-k.x,pl.z-k.z)*.6});}catch(e){}try{const sc=ROOMS[k.room]&&ROOMS[k.room].scene,L=sc&&sc.userData.luz474;if(L){const I=INI155[k.tipo]||INI155.caveira;L.color.set(I.faisca?I.faisca[1]:0xffd080);L.position.set(k.x,k.g.position.y+.6,k.z);L.intensity=Math.max(L.intensity,1.6);}}catch(e){}}
+      st.dormia=dorme;if(st.pop>0){st.pop-=d0;const q=Math.max(0,st.pop/.3);const e=1+.25*q;if(!(k.n474&&k.n474.squash>0))k.g.scale.set(e,e,e);if(st.pop<=0)k.g.scale.set(1,1,1);}}}catch(e){rd488Erro('despertar',e);}}
+if(RD488.on){
+  try{const old=cavFerir;cavFerir=function(k,n){const viva=k&&k.viva,hp0=k?k.hp:0;const r=old.apply(this,arguments);try{if(viva&&k&&k.g&&k.hp<hp0&&!(typeof n474Fora==='function'&&n474Fora(k))){const sc=ROOMS[k.room]&&ROOMS[k.room].scene;const dano=Math.round((hp0-k.hp)*10)/10;if(sc&&!Q.papel)rd488Numero(sc,k.x+(Math.random()-.5)*.4,k.g.position.y+.9,k.z,'−'+dano,dano>=5?'#ffd25a':'#ffffff');}}catch(e){rd488Erro('ferir',e);}return r;};if(window.__cav)window.__cav.ferir=cavFerir;}catch(e){rd488Erro('instalar ferir',e);}
+  try{const old=cavDano;cavDano=function(n){const hp0=CAV.hp;const r=old.apply(this,arguments);try{if(CAV.hp<hp0&&ACTIVE&&!Q.papel){const p=cavPos();rd488Numero(ACTIVE,p.x,(p.fy||0)+2.1,p.z,'−'+Math.round((hp0-CAV.hp)*10)/10,'#ff6a5a');}}catch(e){rd488Erro('dano',e);}return r;};if(window.__cav)window.__cav.dano=cavDano;}catch(e){rd488Erro('instalar dano',e);}
+  try{const old=cavMatar;cavMatar=function(k){const r=old.apply(this,arguments);try{const S=k&&CAV.salas[k.room];if(S&&S.lista&&!S.lista.some(q=>q.viva)&&!RD488.festa&&ACTIVE&&!Q.lite&&!Q.papel){const E=vd480Campo(ACTIVE,{n:160,cores:[0xff5577,0xffd040,0x50c8ff,0x80ff80,0xff90ff,0xffffff],w:10,h:5,d:10,s:.16,op:.95},'neve');RD488.festa={E,t:0};RD488.stats.festas++;}}catch(e){rd488Erro('festa',e);}return r;};if(window.__cav)window.__cav.matar=cavMatar;}catch(e){rd488Erro('instalar matar',e);}
+  try{const d0=draw;draw=function(dt){try{rd488Tick(dt);}catch(e){rd488Erro('tick',e);}return d0.apply(this,arguments);};}catch(e){rd488Erro('instalar tick',e);}
+}
+window.__rodada488={estado:RD488,numero:rd488Numero};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
