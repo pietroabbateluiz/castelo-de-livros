@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v499</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v500</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -59951,6 +59951,36 @@ if(MS499.on){
   try{const inp=document.getElementById('retNome');if(inp)inp.addEventListener('change',()=>setTimeout(ms499Placa,50));}catch(e){}
 }
 window.__minha499={estado:MS499,revisar:ms499Revisa,placa:ms499Placa};
+
+/* ===================== v500 · HISTÓRICA — AS CASAS DA VILA VISTAS DO PÁTIO DO EGITO (bloco `HIST500`) =====================
+   Pedido do Luiz (foto): «vendo essa parte da sala medieval a partir do Egito, as casas só estão no esqueleto».
+   · CAUSA: a cunha da porta (v217, refeita na v255) só desenha as células do OUTRO pátio quando elas cabem no vão da porta da
+     catedral, partindo de onde a câmera está. Isso valia quando os pátios só se viam pela porta; com o terreno contínuo entre o
+     Egito e a Vila, dá para olhar a Vila por fora da catedral — e aí as células das casas (paredes, telhados) somem, enquanto as
+     vigas escuras continuam aparecendo (são cópias fundidas pela fusão de malhas, que não acompanha o `visible` das células).
+   · CORREÇÃO: (1) a cunha do OUTRO pátio só vale com a câmera dentro da nave (|x| < porta + 1,2 m e |z| < 29 m); de um pátio,
+     ou do terreno aberto, os dois pátios ficam inteiros. A cunha da nave (vista de dentro de um pátio) continua como na v255.
+     (2) As células dos pátios (`userData.cat217`) deixam de entrar na fusão de malhas: já são blocos por material × faixa, e
+     uma cópia fundida que fica visível enquanto a célula está escondida é exatamente o «esqueleto».
+   · ?hist500=0 desliga. Gancho: `window.__hist500`. */
+const HIST500={on:!/[?&#]hist500=0/i.test(location.search+location.hash),erros:[],stats:{quadros:0,ocultos:0,foraDaNave:0}};
+function h500Erro(o,e){if(HIST500.erros.length<12)HIST500.erros.push(o+': '+(e&&e.message||e));console.warn('v500',o,e);}
+if(HIST500.on){
+  try{
+    cat217Cull=function(cam){const C=CAT217;if(!C.prontas)return;const p=cam.position;const livre=!(PERF130.busy||fadeOnAt);let oc=0;HIST500.stats.quadros++;
+      const zona=cat217Zona225(C,p.x);const D=C.PORTA.x;const ax=Math.abs(p.x);const naNave=ax<D+1.2;const dentroDaNave=naNave&&Math.abs(p.z)<29;if(!dentroDaNave)HIST500.stats.foraDaNave++;
+      for(const lado of [-1,1]){let pl=null;const noPatio=p.x*lado>D-1.2;if(livre&&zona!==lado&&!noPatio&&dentroDaNave)pl=cat217Cunha(lado,p);
+        for(const c of C.celulas){if(c.lado!==lado)continue;const vis=!pl||cat217CaixaNaCunha(c.caixa,pl);if(c.m.visible!==vis)c.m.visible=vis;if(!vis)oc++;}}
+      {let pl=null;if(livre&&zona!==0&&!naNave)pl=cat217Cunha(-zona,p);
+        for(const c of C.nave){const vis=!pl||cat217CaixaNaCunha(c.caixa,pl);if(c.m.visible!==vis)c.m.visible=vis;if(!vis)oc++;}}
+      C.ocultos=oc;HIST500.stats.ocultos=oc;};
+    try{if(window.__catedral217)window.__catedral217.cull=cat217Cull;}catch(e){}
+  }catch(e){h500Erro('cunha',e);}
+  try{const el=fusaoElegivel;fusaoElegivel=function(o,sc){if(o&&o.userData&&o.userData.cat217)return false;return el.apply(this,arguments);};}catch(e){h500Erro('fusão',e);}
+  // o que já estava fundido na Histórica é desfeito, para refundir sem as células
+  try{if(ROOMS.cat&&ROOMS.cat.scene&&typeof fusaoLimpar==='function')fusaoLimpar(ROOMS.cat.scene);}catch(e){}
+}
+window.__hist500={estado:HIST500};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
