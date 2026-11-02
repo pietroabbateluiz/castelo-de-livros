@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v505</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v506</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -60589,6 +60589,111 @@ if(AG505.on){
   try{ag505Aplica();}catch(e){}
 }
 window.__agua505={estado:AG505,aplica:ag505Aplica,mar:ag505Mar,andar:ag505Andar};
+
+/* ===================== v506 · O PRADO DA CLAREIRA: RELEVO, RELVA SEM QUADRICULADO, MAIS VEGETAÇÃO E FAUNA (bloco `PR506`) =====================
+   Pedido do Luiz (foto): «no prado da Fantasia o terreno é quadriculado e simples: inclua depressões e relevos, tire esse quadriculado
+   e acrescente mais vegetação e fauna».
+   · RELVA: a malha do prado («Mansão · prado contínuo integrado ao bosque», v367) usava a textura da clareira em azulejos de 6 m — e
+     a repetição via-se como um quadriculado. Ganha um material próprio (clone do antigo, com as cores por vértice) com uma relva
+     nova sem emendas (512², ruído em toro — as quatro amostras deslocadas misturadas bilinearmente — com manchas largas, fios curtos
+     desenhados com cópias nas bordas, e um gradiente de tons), em azulejos de 4 m.
+   · RELEVO: `pr506Relevo(x,z)` — dois ruídos (`p456Ruido`, 14 m e 6 m) somam lombas de até +0,8 m e depressões de −0,8 m, só na
+     zona do prado (|x| de 4,5 a 36 m, z de −74 a −102, com bordas suaves): o caminho de pedras (|x| < 4,5), a casa, os círculos de
+     salto e o Grande Rubi ficam no plano. Os vértices da malha do chão, das plantas e pedras da v456 e dos prados dos saltos (v433)
+     sobem/descem com o relevo (normais recalculadas no chão); `R.floorY` soma o relevo (o leitor anda pelas lombas; o limite e os
+     obstáculos não mudam).
+   · VEGETAÇÃO NOVA (kit «Prado 506», no estilo da floresta — casca e relevo de folhas da v503): 9 árvores jovens (tronco com casca,
+     2–3 copas lisas), 14 moitas (`i503Moita`), 48 canteiros de flores silvestres (margaridas, papoilas, lavanda, botões-de-ouro),
+     160 tufos de relva alta, 14 samambaias, 7 cogumelos, 3 troncos caídos, 8 pedras com musgo — nada no caminho, nos círculos, no
+     rubi ou em cima dos obstáculos; árvores, moitas, troncos e pedras entram nos obstáculos (`COZY355.obstacles` + lista viva).
+   · FAUNA: dois bandos de pássaros (`at437Bando`: 5 pardais e 4 pombas brancas) a voar em círculos sobre o prado; 5 coelhos que
+     saltam entre pontos à volta da sua toca e param a pastar (orelhas, rabo branco; salto parabólico); 1 cervo que anda devagar por
+     um circuito de pontos livres, pára a pastar (cabeça baixa) e levanta a cabeça — pernas balançam ao andar, galhada em tubos.
+     As borboletas da v433 continuam. Tudo anima no `R.tick` da Fantasia.
+   ?prado506=0 desliga. Gancho: `window.__prado506`. */
+const PR506={on:!/[?&#]prado506=0/i.test(location.search+location.hash),feito:false,erros:[],stats:{},zona:{x0:4.5,x1:36,z0:-74,z1:-102},aves:[],coelhos:[],cervo:null,t:0,tex:null};
+function pr506Erro(o,e){if(PR506.erros.length<16)PR506.erros.push(o+': '+(e&&e.message||e));console.warn('v506',o,e);}
+const pr506S=u=>{u=Math.max(0,Math.min(1,u));return u*u*(3-2*u);};
+function pr506Mask(x,z){const Z=PR506.zona;const ax=Math.abs(x);const mx=pr506S((ax-Z.x0)/3)*(1-pr506S((ax-Z.x1)/3));const mz=pr506S((-z+Z.z0)/3)*(1-pr506S((-z+Z.z1)/5));return mx*mz;}
+function pr506Relevo(x,z){const m=pr506Mask(x,z);if(m<=0)return 0;const h=(p456Ruido(x/14+.3,z/14+.7)-.5)*1.6+(p456Ruido(x/6+9,z/6+4)-.5)*.5;return h*m;}
+/* ---------- relva sem emendas ---------- */
+function pr506TexRelva(){if(PR506.tex)return PR506.tex;const S=512;const fbm=mkNoise(5061);const c=can(S,S),x=c.getContext('2d');const img=x.createImageData(S,S);const d=img.data;
+  const toro=(px,py,esc,oct)=>{const u=px/S,v=py/S;const a=fbm(px*esc,py*esc,oct),b=fbm((px-S)*esc,py*esc,oct),cc=fbm(px*esc,(py-S)*esc,oct),dd=fbm((px-S)*esc,(py-S)*esc,oct);return (a*(1-u)*(1-v)+b*u*(1-v)+cc*(1-u)*v+dd*u*v);};
+  for(let py=0;py<S;py++)for(let px=0;px<S;px++){const n1=toro(px,py,.012,3),n2=toro(px,py,.05,2),n3=toro(px,py,.2,1);const k=.5+(n1-.5)*.9+(n2-.5)*.5+(n3-.5)*.35;const i=(py*S+px)*4;
+    const r=96+k*60,g=140+k*70,b=52+k*38;d[i]=r;d[i+1]=g;d[i+2]=b;d[i+3]=255;}
+  x.putImageData(img,0,0);const rr=rnd(5062);for(let i=0;i<5200;i++){const px=rr()*S,py=rr()*S,L=3+rr()*7,a=-.35+rr()*.7;x.strokeStyle=i%3?'rgba(168,196,92,.35)':'rgba(60,92,36,.35)';x.lineWidth=1;
+    for(const [ox,oy] of [[0,0],[-S,0],[S,0],[0,-S],[0,S]]){x.beginPath();x.moveTo(px+ox,py+oy);x.lineTo(px+ox+Math.sin(a)*L,py+oy-Math.cos(a)*L);x.stroke();}}
+  const t=tex(c,[36,36]);t.encoding=THREE.sRGBEncoding;t.anisotropy=8;PR506.tex=t;return t;}
+/* ---------- fauna ---------- */
+function pr506Coelho(R,x,z,r){const T=THREE;const g=new T.Group();g.name='506 coelho';R.scene.add(g);const K=t160Kit('506 coelho');const pele=t160Std('506 pelo coelho',[0xb08a62,0x8a6a4a,0xd8c8b0][(r()*3)|0],.9),claro=t160Std('506 pelo claro',0xf0e8dc,.9),olho=t160Std('506 olho',0x1a1410,.4);
+  K.sph(.17,pele,0,.17,0,1,.8,1.25,10,7);K.sph(.11,pele,0,.3,.17,1,1,1,9,6);K.sph(.045,claro,0,.14,-.2,1,1,1,6,5);
+  for(const s of [-1,1]){K.sph(.035,pele,s*.05,.36,.2,1,1.6,.5,6,5);K.sph(.018,olho,s*.08,.32,.25,1,1,1,5,4);}
+  K.fim(g,{sombra:true});g.traverse(o=>{o.userData.noCam=true;o.userData.papelKeepGeo=true;o.__fusaoMoveu=9;});
+  const C={g,x,z,hx:x,hz:z,tx:x,tz:z,t:r()*3,fase:'pasta',ph:r()*6,salto:0,r};g.position.set(x,R.floorY(x,z),z);return C;}
+function pr506CoelhoTick(R,C,dt){C.t-=dt;const g=C.g;
+  if(C.fase==='pasta'){g.position.y=R.floorY(C.x,C.z)+.02*Math.abs(Math.sin(PR506.t*6+C.ph));if(C.t<=0){const a=C.r()*6.283,d=1.5+C.r()*4;C.tx=C.hx+Math.cos(a)*d;C.tz=C.hz+Math.sin(a)*d;if(!pr506LivreAnimal(R,C.tx,C.tz,.5)){C.t=.6;return;}C.fase='salta';C.salto=0;g.rotation.y=Math.atan2(C.tx-C.x,C.tz-C.z);}return;}
+  C.salto+=dt*2.2;const u=Math.min(1,C.salto);const dx=C.tx-C.x,dz=C.tz-C.z,L=Math.hypot(dx,dz)||1;const passo=Math.min(L,.6);const px=C.x+dx/L*passo*u,pz=C.z+dz/L*passo*u;g.position.set(px,R.floorY(px,pz)+.32*Math.sin(u*Math.PI),pz);g.rotation.x=-.3*Math.sin(u*Math.PI);
+  if(u>=1){C.x+=dx/L*passo;C.z+=dz/L*passo;C.salto=0;if(Math.hypot(C.tx-C.x,C.tz-C.z)<.3){C.fase='pasta';C.t=1.5+C.r()*3;g.rotation.x=0;}}}
+function pr506Cervo(R,pts,r){const T=THREE;const g=new T.Group();g.name='506 cervo';R.scene.add(g);const pele=t160Std('506 pelo cervo',0x9a6e46,.9),escuro=t160Std('506 pelo escuro',0x5a3e2a,.9),claro=t160Std('506 barriga',0xe0cdb0,.9),chifre=t160Std('506 galhada',0x6a5236,.8),olho=t160Std('506 olho',0x1a1410,.4);
+  const K=t160Kit('506 cervo corpo');K.sph(.36,pele,0,1.05,0,1,.75,1.9,12,8);K.sph(.3,claro,0,.95,.1,1,.5,1.5,10,6);K.cyl(.11,.16,.62,pele,0,1.35,.62,8,0,.9,0);K.sph(.14,pele,0,1.68,.86,1,.85,1.2,10,7);K.box(.12,.1,.2,escuro,0,1.62,1.03);
+  for(const s of [-1,1]){K.sph(.05,pele,s*.1,1.8,.78,1,1.6,.5,6,5);K.sph(.02,olho,s*.09,1.72,.92,1,1,1,5,4);const b=s*.08;K.tube([[b,1.82,.8],[b*2,2.15,.7],[b*2.6,2.45,.6]],.02,chifre,8,5);K.tube([[b*2,2.15,.7],[b*3.2,2.3,.85]],.015,chifre,6,4);K.tube([[b*1.3,2.0,.75],[b*1.1,2.25,.95]],.013,chifre,6,4);}
+  K.sph(.06,claro,0,1.12,-.7,1,1,1.6,6,5);K.fim(g,{sombra:true});
+  const pernas=[];for(const [sx,sz] of [[-.16,.55],[.16,.55],[-.16,-.5],[.16,-.5]]){const p=new T.Group();p.position.set(sx,.95,sz);g.add(p);const Kp=t160Kit('506 perna');Kp.cyl(.05,.04,.95,sz>0?pele:pele,0,-.47,0,7);Kp.sph(.045,escuro,0,-.95,0,1,.6,1.2,6,5);Kp.fim(p,{sombra:true});pernas.push(p);}
+  g.traverse(o=>{o.userData.noCam=true;o.userData.papelKeepGeo=true;o.__fusaoMoveu=9;});
+  const D={g,pernas,pts,i:0,x:pts[0][0],z:pts[0][1],fase:'anda',t:0,vel:.75,ph:0};g.position.set(D.x,R.floorY(D.x,D.z),D.z);return D;}
+function pr506CervoTick(R,D,dt){const g=D.g;if(D.fase==='pasta'){D.t-=dt;g.position.y=R.floorY(D.x,D.z);g.rotation.x=-.12;if(D.t<=0){D.fase='anda';g.rotation.x=0;}return;}
+  const [tx,tz]=D.pts[D.i];const dx=tx-D.x,dz=tz-D.z,L=Math.hypot(dx,dz);if(L<.4){D.i=(D.i+1)%D.pts.length;if(Math.random()<.6){D.fase='pasta';D.t=3+Math.random()*5;}return;}
+  const passo=Math.min(L,D.vel*dt);D.x+=dx/L*passo;D.z+=dz/L*passo;D.ph+=dt*5.5;g.position.set(D.x,R.floorY(D.x,D.z),D.z);const alvo=Math.atan2(dx,dz);let da=alvo-g.rotation.y;da=Math.atan2(Math.sin(da),Math.cos(da));g.rotation.y+=da*Math.min(1,dt*3);
+  for(let k=0;k<4;k++)D.pernas[k].rotation.x=Math.sin(D.ph+(k%2?Math.PI:0)+(k>1?Math.PI/2:0))*.35;}
+function pr506LivreAnimal(R,x,z,m){try{if(pr506Mask(x,z)<.02&&!(Math.abs(x)>3.8&&z<-74&&z>-104&&Math.abs(x)<38))return false;const W=R.world;for(const o of (W.obst||[]))if(Math.hypot(x-o[0],z-o[1])<o[2]+m)return false;if(Math.abs(x)<4.2&&z<-99)return false;const p=W.clamp(x,z,.3);return Math.hypot(p[0]-x,p[1]-z)<.05;}catch(e){return false;}}
+/* ---------- a montagem ---------- */
+function pr506Aplica(){if(!PR506.on||PR506.feito)return;const R=ROOMS.fant;const S=(typeof COZY355!=='undefined')?COZY355:null;if(!R||!R.scene||!S||!S.ready)return;PR506.feito=true;const T=THREE,sc=R.scene,W=R.world;const st=PR506.stats;const r=rnd(5060);
+  // 1) relva nova
+  try{const chao=S.ground367&&S.ground367.mesh;if(chao){const m=chao.material.clone();m.map=pr506TexRelva();m.vertexColors=true;m.roughness=.95;m.needsUpdate=true;m.userData.papelKeep=true;m.name='506 relva do prado';chao.material=m;st.relva=true;}}catch(e){pr506Erro('relva',e);}
+  // 2) relevo: chão, plantas da v456, prados dos saltos
+  try{const alvos=[];sc.traverse(o=>{if(!o.isMesh||!o.geometry||!o.geometry.attributes.position||o.isInstancedMesh)return;let p=o,ok=false;for(;p;p=p.parent){const n=p.name||'';if(/prado contínuo integrado|Prado da Clareira · relva|prados dos saltos|relva contínua/.test(n)){ok=true;break;}}if(ok)alvos.push(o);});
+    const v=new T.Vector3();let nv=0;for(const o of alvos){o.updateWorldMatrix(true,false);const inv=new T.Matrix4().copy(o.matrixWorld).invert();const pos=o.geometry.attributes.position;let mudou=false;
+      for(let i=0;i<pos.count;i++){v.fromBufferAttribute(pos,i).applyMatrix4(o.matrixWorld);const h=pr506Relevo(v.x,v.z);if(h===0)continue;v.y+=h;v.applyMatrix4(inv);pos.setXYZ(i,v.x,v.y,v.z);mudou=true;nv++;}
+      if(mudou){pos.needsUpdate=true;if(/prado contínuo/.test(o.name||''))o.geometry.computeVertexNormals();o.geometry.computeBoundingSphere();o.geometry.computeBoundingBox();}}
+    st.relevo={malhas:alvos.length,vertices:nv};
+    const f0=R.floorY;R.floorY=function(x,z){const y=f0.apply(this,arguments);return y+pr506Relevo(x,z);};}catch(e){pr506Erro('relevo',e);}
+  // 3) vegetação nova
+  const novos=[];const livre=(x,z,m)=>{const Z=PR506.zona;if(Math.abs(x)>38||z>-74.5||z<-104)return false;if(Math.abs(x)<4.2&&z<-99)return false;if(Math.hypot(x-5.5,z+106.5)<3.6||Math.hypot(x,z+109)<3.2||Math.hypot(x,z+90)<2.6||Math.hypot(x-3,z+47)<5.5)return false;
+    for(const o of (W.obst||[]))if(Math.hypot(x-o[0],z-o[1])<o[2]+m)return false;for(const o of novos)if(Math.hypot(x-o[0],z-o[1])<o[2]+m)return false;try{const p=W.clamp(x,z,.3);if(Math.hypot(p[0]-x,p[1]-z)>.05)return false;}catch(e){}return true;};
+  const acha=(tent,m,fn)=>{for(let i=0;i<tent;i++){const x=(r()-.5)*76,z=-74.5-r()*29.5;if(!livre(x,z,m))continue;fn(x,z);return true;}return false;};
+  const obst=(x,z,rr)=>{novos.push([x,z,rr]);};
+  try{const M=i503Mats(),M468=i468Mats();const K=t160Kit('Prado 506');const Y=(x,z)=>R.floorY(x,z);
+    // árvores jovens: tronco com casca + 2–3 copas lisas
+    const arvore=(x,z)=>{const y=Y(x,z),h=3.2+r()*1.6,ry=r()*6.283,lean=(r()-.5)*.2;const P0=new T.Vector3(x,y-.2,z),P1=new T.Vector3(x+Math.cos(ry)*lean*h*.5,y+h*.55,z+Math.sin(ry)*lean*h*.5),P2=new T.Vector3(x+Math.cos(ry)*lean*h,y+h,z+Math.sin(ry)*lean*h);
+      const curva=new T.CatmullRomCurve3([P0,P1,P2]);const N=8,RS=8;const geo=new T.TubeGeometry(curva,N,1,RS,false);const p=geo.attributes.position;const col=new Float32Array(p.count*3);const c=new T.Color();
+      for(let i=0;i<=N;i++){const t=i/N;const C=curva.getPointAt(t);let rad=.15*(1-.45*t);if(t<.12)rad*=1+1.1*(.12-t)/.12;for(let j=0;j<=RS;j++){const k=i*(RS+1)+j;p.setXYZ(k,C.x+(p.getX(k)-C.x)*rad,C.y+(p.getY(k)-C.y)*rad,C.z+(p.getZ(k)-C.z)*rad);c.setScalar(.7+.15*i503H3(i,j,3));col[k*3]=c.r;col[k*3+1]=c.g;col[k*3+2]=c.b;}}
+      geo.setAttribute('color',new T.BufferAttribute(col,3));geo.computeVertexNormals();K.add(geo,M.tronco);
+      const cores=[[0x2f6a2a,0x9bc45a],[0x3a7a30,0xb8d060],[0x35702c,0xa0c850]];const nC=2+((r()*2)|0);for(let i=0;i<nC;i++){const a=r()*6.283,d=i?.6+r()*.5:0;const [ca,cb]=cores[(i+((r()*3)|0))%3];K.add(i503Bloco(1.0+r()*.5,i*7+x*3+z,.8,ca,cb),M.copa,P2.x+Math.cos(a)*d,P2.y+.3+(i?-.2:0)+r()*.3,P2.z+Math.sin(a)*d,r()*6);}
+      obst(x,z,.4);};
+    let n=0;for(let i=0;i<9;i++)if(acha(60,2.6,arvore))n++;st.arvores=n;
+    n=0;for(let i=0;i<14;i++)if(acha(60,1.2,(x,z)=>{i503Moita(K,M,x,z,Y(x,z)-.03,.8+r()*.9,r,obst);}))n++;st.moitas=n;
+    // flores silvestres: margaridas, papoilas, lavanda, botões-de-ouro — em canteiros de 5–9
+    const flores=[t160Std('506 margarida',0xf4f0ea,.9),t160Std('506 papoila',0xd83a2a,.8),t160Std('506 lavanda',0x9a7ad8,.85),t160Std('506 botão-de-ouro',0xf0c030,.8)];n=0;
+    for(let i=0;i<48;i++)if(acha(40,.5,(x,z)=>{const mat=flores[i%4];const q=5+((r()*5)|0);for(let k=0;k<q;k++){const a=r()*6.283,d=r()*.7;const px=x+Math.cos(a)*d,pz=z+Math.sin(a)*d;bot368Flower(K,mat,px,Y(px,pz)+.14+r()*.08,pz,.05+r()*.035,r()*6,i%4===1?4:5);}}))n++;st.flores=n;
+    n=0;for(let i=0;i<160;i++)if(acha(25,.2,(x,z)=>{forest433Grass(K,x,Y(x,z)+.01,z,.18+r()*.26,i+506);}))n++;st.capim=n;
+    n=0;for(let i=0;i<14;i++)if(acha(30,.6,(x,z)=>{const y=Y(x,z),b=r()*6.283;for(let k=0;k<6;k++)bot368LeafAt(K,M468.samambaia,x,y+.02,z,.3+r()*.2,b+k*1.05,.6,.3);}))n++;st.samambaias=n;
+    const cogu=t160Std('506 cogumelo',0xe8dcc0,.8),chapeu=t160Std('506 chapéu',0xb0402a,.7);n=0;for(let i=0;i<7;i++)if(acha(30,.4,(x,z)=>{const y=Y(x,z);for(let k=0;k<3+((r()*3)|0);k++){const px=x+(r()-.5)*.6,pz=z+(r()-.5)*.6,h=.08+r()*.1;K.cyl(.02,.03,h,cogu,px,y+h/2,pz,6);K.sph(.05+r()*.03,chapeu,px,y+h,pz,1,.55,1,8,5);}}))n++;st.cogumelos=n;
+    n=0;for(let i=0;i<3;i++)if(acha(40,1.4,(x,z)=>{i503Tronco(K,M,x,z,Y(x,z),r()*6.283,r);obst(x,z,1.0);}))n++;st.troncos=n;
+    n=0;for(let i=0;i<8;i++)if(acha(40,1.0,(x,z)=>{const s=.35+r()*.4;forest433Rock(K,x,Y(x,z)-.05,z,s,i+77);obst(x,z,s*.9);}))n++;st.pedras=n;
+    const root=new T.Group();root.name='Prado da Clareira · vegetação nova (v506)';sc.add(root);const meshes=K.fim(root,{sombra:true});for(const o of meshes){o.userData.noCam=true;o.userData.papelKeepGeo=true;o.userData.papelKeep=true;if(o.material&&o.material.userData)o.material.userData.papelKeep=true;o.__fusaoMoveu=9;}st.malhas=meshes.length;
+    try{for(const o of novos)S.obstacles.push(o);const cur=W.obst;if(Array.isArray(cur))for(const o of novos)cur.push(o);W.__nav=null;W.__cl=null;}catch(e){pr506Erro('obstáculos',e);}st.obstaculos=novos.length;}catch(e){pr506Erro('vegetação',e);}
+  // 4) fauna
+  try{PR506.aves=[].concat(at437Bando(R,'Pardal do prado',5,0x8a6a48,0xb09070,.8,0,-88,14,7.5,2.0),at437Bando(R,'Pomba do prado',4,0xf4f4f4,0xd8d8d8,.9,8,-92,11,9,1.6));for(const a of PR506.aves){a.traverse(o=>{o.userData.noCam=true;o.__fusaoMoveu=9;});}st.aves=PR506.aves.length;
+    let nc=0;for(let i=0;i<5&&nc<5;i++){for(let k=0;k<40;k++){const x=(r()-.5)*66,z=-76-r()*26;if(!pr506LivreAnimal(R,x,z,1.2))continue;PR506.coelhos.push(pr506Coelho(R,x,z,r));nc++;break;}}st.coelhos=nc;
+    const pts=[];for(let k=0;k<80&&pts.length<5;k++){const x=(r()-.5)*60,z=-77-r()*24;if(pr506LivreAnimal(R,x,z,1.6))pts.push([x,z]);}if(pts.length>=3){PR506.cervo=pr506Cervo(R,pts,r);st.cervo=pts.length;}}catch(e){pr506Erro('fauna',e);}
+  // 5) relógio
+  try{const tk=R.tick;R.tick=function(dt){const rv=tk?tk.apply(this,arguments):undefined;try{const d=Math.min(.05,dt||.016);PR506.t+=d;if(CUR==='room'&&ROOM===R){if(PR506.aves.length)at437Voo(PR506.aves,d,PR506.t);for(const C of PR506.coelhos)pr506CoelhoTick(R,C,d);if(PR506.cervo)pr506CervoTick(R,PR506.cervo,d);}}catch(e){pr506Erro('tick',e);}return rv;};}catch(e){pr506Erro('relógio',e);}
+}
+if(PR506.on){
+  {const fr=finishRoom;finishRoom=function(key){const r=fr.apply(this,arguments);if(key==='fant')setTimeout(()=>{try{pr506Aplica();}catch(e){pr506Erro('finishRoom',e);}},0);return r;};}
+  try{pr506Aplica();}catch(e){}
+}
+window.__prado506={estado:PR506,aplica:pr506Aplica,relevo:pr506Relevo,mascara:pr506Mask};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
