@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v517</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v518</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -62025,6 +62025,19 @@ if(AL517.on){
 }
 window.__alas517={estado:AL517,construir:al517Construir};
 
+/* ===================== v518 · ESTANTE: CAPAS AUTOMÁTICAS (bloco `ES518`) =====================
+   Pergunta do Luiz: «pq não tem as fotos das capas na estante?» — a capa só aparecia quando o livro tinha a URL (busca na internet ao
+   adicionar, catálogo, ou preenchimento por ISBN da v418); os nacionais da v515 entraram sem ISBN nem capa. Agora o painel da Estante
+   (código em `estante518-ui.js`, injetado pelo patch518 a seguir à v516) procura em segundo plano, ao abrir, a capa de cada livro sem
+   capa — Google Books (edições em português primeiro) e depois Open Library, por título + autor, aceitando só resultados cujo título
+   bate (igual ou com subtítulo) e, havendo autor, cujo autor confere —, guarda-a no livro (`capa`, `capaAuto518`) e marca os que não
+   acharam (`capaBusca518`, nova tentativa passado um mês). Botão «🖼 Capas» na barra (procura todas de uma vez, com contagem e aviso
+   final) e «🖼 Buscar capa» ao lado do campo Capa do livro (preenche e mostra a prévia). ?capas518=0 não desliga o painel: a procura
+   automática só não corre nas visitas (`window.VISITA`) nem sem rede. Gancho: `window.__estante518` (`estado.fila/achadas/falhas/log`,
+   `procurar(b)`, `enfileirar(todos)`, `drenar()`). */
+const ES518={on:true,versao:518};
+window.__es518=ES518;
+
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
    familias:()=>SALA_FAM,famModelos:(f)=>SALA_FAM[f]?SALA_FAM[f].lista():null,
@@ -62487,6 +62500,45 @@ E516.aposRender=function(){try{const L=EST.livros();const sp=$('sPaginas516')||(
 }catch(e){console.warn('v516 render',e);}};
 E516.aposRender();
 })();}catch(e){console.warn('v516',e);}
+/* v518: capas automáticas — todo livro sem capa procura a sua (Google Books, depois Open Library) por título + autor, em segundo plano,
+   ao abrir a estante; botão «🖼 Capas» na barra para procurar todas de uma vez; botão «Buscar capa» ao lado do campo Capa do livro.
+   Corre dentro do painel da Estante (fecho de `API`, `EST`, `render`, `previewCapa`). Pergunta do Luiz: «pq não tem as fotos das capas na estante?» */
+try{(function(){
+const T=(pt,en,es)=>{const l=(document.documentElement.lang||'pt').toLowerCase();return l.startsWith('en')?en:l.startsWith('es')?(es||pt):pt;};
+const E518={fila:[],ativo:false,achadas:0,falhas:0,quota:false,ultimo:null,log:[]};window.__estante518={estado:E518};
+const hoje=()=>EST.library421.day();const normT=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+const semArtigo=t=>normT(t).replace(/^(o|a|os|as|um|uma|the|an|el|la|los|las|le|les|un|une)\s+/,'');
+const gravar=()=>{try{localStorage.setItem(EST.KEY,JSON.stringify(EST.DB));}catch(e){}};
+const diasDesde=d=>{if(!d)return 1e9;const n=(Date.parse(hoje()+'T12:00:00')-Date.parse(d+'T12:00:00'))/864e5;return isFinite(n)?n:1e9;};
+// o resultado serve se o título bate (igual, ou um começa pelo outro — subtítulos) e, havendo autor no livro, uma palavra do autor aparece no resultado
+const bate=(b,it)=>{const t1=semArtigo(b.titulo),t2=semArtigo(it&&it.titulo);if(!t1||!t2)return false;const tit=t1===t2||t2.startsWith(t1+' ')||t1.startsWith(t2+' ')||t2.startsWith(t1+':');if(!tit)return false;const a=normT(b.autor);if(!a)return t1===t2||((t1.length>=8||t1.split(' ').length>=2)&&t2.startsWith(t1+' '));const a2=normT(it.autor);const pal=a.split(' ').filter(w=>w.length>2);return !pal.length||pal.some(w=>a2.includes(w));};
+async function procurar(b){const t=String(b.titulo||'').replace(/"/g,'').trim(),a=String(b.autor||'').replace(/"/g,'').trim();if(!t)return '';
+  const tenta=async(p)=>{try{const L=await p;for(const it of L)if(it&&it.capa&&bate(b,it))return it.capa;}catch(e){if(e&&e.status===429)throw e;}return '';};
+  let capa=await tenta(API.google('intitle:"'+t+'"'+(a?'+inauthor:"'+a+'"':''),'pt',8));
+  if(!capa&&a)capa=await tenta(API.google('intitle:"'+t+'"+inauthor:"'+a+'"',null,8));
+  if(!capa)capa=await tenta(API.openlib(t,a,8));
+  if(!capa&&!a)capa=await tenta(API.google('intitle:"'+t+'"',null,8));
+  return capa;}
+let botao=null;const estadoBotao=()=>{if(!botao)return;const n=E518.fila.length;botao.textContent=E518.ativo?'🖼 '+n:'🖼 '+T('Capas','Covers','Portadas');botao.disabled=E518.ativo;};
+async function drenar(aviso){if(E518.ativo)return;E518.ativo=true;estadoBotao();let ach=0,fal=0;try{while(E518.fila.length&&!window.VISITA){const id=E518.fila.shift();estadoBotao();const b=EST.DB.livros.find(x=>x.id===id);if(!b||b.capa)continue;let capa='';
+      try{capa=await procurar(b);}catch(e){if(e&&e.status===429){E518.quota=true;E518.fila.length=0;break;}}
+      const agora=EST.DB.livros.find(x=>x.id===id);if(!agora||agora.capa)continue;E518.ultimo=agora.titulo;
+      if(capa){EST.upsert(Object.assign({},agora,{capa,capaAuto518:hoje()}));ach++;E518.achadas++;E518.log.push([agora.titulo,capa]);}else{agora.capaBusca518=hoje();fal++;E518.falhas++;gravar();}
+      await new Promise(r=>setTimeout(r,700));}}finally{E518.ativo=false;estadoBotao();}
+  if(aviso||ach){const m=E518.quota?T('O Google Books atingiu a cota de hoje — tente de novo amanhã.','Google Books hit today’s quota — try again tomorrow.','Google Books alcanzó la cuota de hoy.'):(ach+' '+T('capa(s) encontrada(s)','cover(s) found','portada(s) encontrada(s)')+(fal?' · '+fal+' '+T('sem capa nos catálogos (cole a URL no livro)','without a cover in the catalogues (paste a URL in the book)','sin portada en los catálogos'):''));try{toast(m);}catch(e){}}}
+function enfileirar(todos){if(window.VISITA)return 0;const ids=[];for(const b of EST.DB.livros){if(b.capa||b.exemplo||!b.titulo)continue;if(!todos&&diasDesde(b.capaBusca518)<30)continue;if(E518.fila.includes(b.id))continue;ids.push(b.id);}E518.fila.push(...ids);return ids.length;}
+window.__estante518.procurar=procurar;window.__estante518.enfileirar=enfileirar;window.__estante518.drenar=drenar;
+// ---- botão na barra de ferramentas
+try{const tools=$('btnNovo')?$('btnNovo').parentElement:null;if(tools&&!window.VISITA){botao=document.createElement('button');botao.type='button';botao.id='e518Capas';botao.title=T('Procurar na internet as capas dos livros que ainda não têm (Google Books e Open Library, por título e autor)','Look up covers for the books that still have none (Google Books and Open Library, by title and author)','Buscar portadas de los libros sin portada');tools.appendChild(botao);estadoBotao();
+    botao.addEventListener('click',()=>{const n=enfileirar(true);if(!n){toast(T('Todos os livros já têm capa.','Every book already has a cover.','Todos los libros ya tienen portada.'));return;}toast(T('Procurando capas de '+n+' livro(s)…','Looking up covers for '+n+' book(s)…','Buscando portadas de '+n+' libro(s)…'));drenar(true);});}}catch(e){console.warn('v518 botão',e);}
+// ---- botão «Buscar capa» junto ao campo Capa do editor
+try{const inp=$('fCapa');if(inp&&!window.VISITA){const bt=document.createElement('button');bt.type='button';bt.id='e518Uma';bt.className='btn';bt.style.cssText='margin:4px 0 0;font-size:12px;padding:4px 8px';bt.textContent='🖼 '+T('Buscar capa','Find cover','Buscar portada');bt.title=T('Procura a capa pelo título e autor preenchidos acima','Finds the cover from the title and author above','Busca la portada por título y autor');
+    (inp.closest('label')||inp.parentElement).appendChild(bt);
+    bt.addEventListener('click',async(ev)=>{ev.preventDefault();ev.stopPropagation();const seed={titulo:$('fTitulo').value.trim(),autor:$('fAutor').value.trim()};if(!seed.titulo){toast(T('Preencha o título antes.','Fill in the title first.','Rellene el título antes.'));return;}bt.disabled=true;const txt=bt.textContent;bt.textContent='…';try{const capa=await procurar(seed);if(capa){inp.value=capa;try{previewCapa();}catch(e){}toast(T('Capa encontrada — confira a imagem e grave o livro.','Cover found — check the image and save the book.','Portada encontrada — compruebe y guarde.'));}else toast(T('Nenhuma capa encontrada nos catálogos — cole a URL de uma imagem.','No cover found in the catalogues — paste an image URL.','No se encontró portada — pegue una URL.'));}catch(e){toast(T('A consulta não respondeu.','The lookup did not respond.','La consulta no respondió.'));}finally{bt.disabled=false;bt.textContent=txt;}});}}catch(e){console.warn('v518 editor',e);}
+// ---- ao abrir: procura, em segundo plano, as capas que faltam (uma vez por mês por livro)
+try{if(!window.VISITA&&navigator.onLine!==false)setTimeout(()=>{try{const n=enfileirar(false);if(n)drenar(false);}catch(e){}},5000);}catch(e){}
+})();}catch(e){console.warn('v518',e);}
+
 
 // Save immediately, then complete missing edition fields without overwriting later edits.
 const BOOK418={queue:[],queued:new Set(),running:false,completed:0,unavailable:0};
