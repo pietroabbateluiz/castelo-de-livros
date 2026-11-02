@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v504</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v505</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -60500,6 +60500,95 @@ if(CL504.on){
   try{cl504Aplica();}catch(e){}
 }
 window.__clareira504={estado:CL504,aplica:cl504Aplica,livre:cl504Livre};
+
+/* ===================== v505 · A ÁGUA DA AVENTURA REFEITA E «UM GOLPE» NOS DOIS PRIMEIROS ANDARES (bloco `AG505`) =====================
+   Pedidos do Luiz: «melhore a qualidade da água; quando acontece o voo a água está se comportando de forma estranha, deixe mais
+   natural» · «primeiro e segundo andar os inimigos devem ser eliminados apenas com um golpe».
+   · O MAR (shader `seaMat` da Aventura, trocado em tempo de execução — vértices e fragmentos novos, uniformes `ilhaA`/`ilhaB`):
+     – RASO E REBENTAÇÃO NO PRÓPRIO SHADER: perto das duas ilhas a água clareia para turquesa (areia por baixo) até ~15 m da
+       linha-d'água, e uma faixa branca de rebentação respira na linha-d'água (ruído + seno lento). Os discos de laguna (v468/v503,
+       um plano chapado ao nível do mar que as ondas atravessavam — era o que piscava e «se comportava de forma estranha» visto de
+       cima, no voo) ficam escondidos.
+     – CALMARIA NAS DUAS ILHAS: as ondas (Gerstner) amortecem perto de cada ilha (antes só da pequena; na Ilha das Moedas as ondas
+       de 0,55 m entravam pela praia e pelo disco da laguna).
+     – MENOS RABISCOS: as ondulações finas do fragmento (fbm) ficam mais largas e com um terço da força, e somem até 36 m
+       (antes 48); o brilho do sol é mais largo e menos estourado; a espuma das cristas só no mar aberto, mais rara e suave;
+       amplitudes das quatro ondas um pouco menores; três tons de água (fundo, meio, raso).
+     – O PLANO DO MAR ACOMPANHA A CÂMERA EM PASSOS DA GRELHA (1,2 m): a malha de 240 m segue a câmera (v252), e durante o voo os
+       vértices mudavam de sítio a cada quadro — o padrão das ondas «nadava» com a câmera; agora o plano só anda em múltiplos do
+       passo da grelha, e os vértices ficam fixos no mundo. (O nav252Quadro deixa de mexer no mar: `NAV252.ceu.mar` passa a null.)
+   · UM GOLPE: `cavFerir` (o dano genérico dos inimigos) embrulhado — no Hall 1 e 2 e nas salas dos andares 1 e 2 (`GENRE_FLOOR`),
+     qualquer golpe tira a vida inteira. Os duelos com chefes (robô v315, bruxa v318, javali/divindade v428) têm o próprio dano
+     e ficam como estão.
+   ?agua505=0 desliga a água; ?golpe505=0 desliga o golpe único. Gancho: `window.__agua505`. */
+const AG505={on:!/[?&#]agua505=0/i.test(location.search+location.hash),golpe:!/[?&#]golpe505=0/i.test(location.search+location.hash),feito:false,erros:[],stats:{golpes:0},mar:null,mat:null,PASSO:1.2};
+function ag505Erro(o,e){if(AG505.erros.length<12)AG505.erros.push(o+': '+(e&&e.message||e));console.warn('v505',o,e);}
+function ag505Andar(){try{if(CUR==='hall')return +HALLN||1;if(CUR==='room'){if(CUR_GENRE==='minha'||CUR_GENRE==='pessoal')return 1;return GENRE_FLOOR(CUR_GENRE)||1;}}catch(e){}return 1;}
+/* ---------- um golpe ---------- */
+if(AG505.golpe){try{const cf=cavFerir;cavFerir=function(k,n){try{if(k&&k.viva&&Number.isFinite(n)&&n>0&&ag505Andar()<=2){n=Math.max(n,(k.hp||0)+1);AG505.stats.golpes++;}}catch(e){}return cf.call(this,k,n);};}catch(e){ag505Erro('golpe',e);}}
+/* ---------- o mar ---------- */
+const AG505_VS=`uniform float t;uniform vec3 ilha;uniform vec3 ilhaA,ilhaB;varying vec3 vP;varying vec3 vN;varying float vH;varying float vCalma;
+  void main(){vec3 wp=(modelMatrix*vec4(position,1.)).xyz;vec2 p0=wp.xz-vec2(0.,t*2.8);vec3 d=vec3(0.);vec3 n=vec3(0.,1.,0.);
+   float dA=length(wp.xz-ilhaA.xy),dB=length(wp.xz-ilhaB.xy);float calma=0.08+0.92*min(smoothstep(ilhaA.z+1.5,ilhaA.z+16.,dA),smoothstep(ilhaB.z+1.5,ilhaB.z+16.,dB));
+   vec2 dirs[4];float amp[4];float wl[4];float sp[4];
+   dirs[0]=normalize(vec2(0.7,0.7));amp[0]=0.22;wl[0]=12.0;sp[0]=1.05;dirs[1]=normalize(vec2(-0.6,0.8));amp[1]=0.13;wl[1]=6.8;sp[1]=0.9;
+   dirs[2]=normalize(vec2(0.9,-0.3));amp[2]=0.06;wl[2]=3.7;sp[2]=0.75;dirs[3]=normalize(vec2(0.2,-0.95));amp[3]=0.035;wl[3]=2.0;sp[3]=0.6;
+   for(int i=0;i<4;i++){float k=6.2831/wl[i];float f=k*dot(dirs[i],p0)-sp[i]*k*t;float q=0.55/(k*amp[i]*4.0);float c=cos(f),s=sin(f);
+     d.x+=q*amp[i]*dirs[i].x*c;d.z+=q*amp[i]*dirs[i].y*c;d.y+=amp[i]*s;n.x-=dirs[i].x*k*amp[i]*c;n.z-=dirs[i].y*k*amp[i]*c;n.y-=q*k*amp[i]*s;}
+   d*=calma;n.xz*=calma;wp+=d;vP=wp;vN=normalize(n);vH=d.y/0.45;vCalma=calma;gl_Position=projectionMatrix*viewMatrix*vec4(wp,1.);}`;
+function ag505FS(noise){return `uniform float t;uniform vec3 sunDir,camPos;uniform vec3 ilhaA,ilhaB;varying vec3 vP;varying vec3 vN;varying float vH;varying float vCalma;${noise}
+  float hwz(float z){float u=(z+24.8)/47.2;float hw=14.0*min(1.,pow(max(u,0.)/0.3,0.62));if(u>0.84)hw*=1.-(u-0.84)/0.16*0.16;return max(.05,hw)*.88;}
+  void main(){vec3 v=normalize(camPos-vP);float dist=length(camPos-vP);float fade=1.-smoothstep(3.,36.,dist);
+   float rip=fbm((vP.xz-vec2(0.,t*2.8))*0.9+vec2(t*.06,0.))-0.5;float rip2=fbm((vP.xz-vec2(0.,t*2.8))*2.2-vec2(t*.1,0.))-0.5;
+   vec3 n=normalize(vN+vec3(rip*0.16+rip2*0.09,0.,rip2*0.16-rip*0.09)*fade);
+   float ndv=max(dot(n,v),0.);float fres=0.04+0.96*pow(1.-ndv,5.);vec3 r=reflect(-v,n);
+   vec3 skyH=vec3(0.82,0.89,0.94),skyZ=vec3(0.30,0.56,0.88);vec3 sky=mix(skyH,skyZ,clamp(r.y*1.5,0.,1.));
+   float sd=max(dot(r,sunDir),0.);vec3 sunC=vec3(1.0,0.94,0.80);vec3 spec=sunC*(pow(sd,180.)*1.4+pow(sd,22.)*0.12);
+   float dA=length(vP.xz-ilhaA.xy),dB=length(vP.xz-ilhaB.xy);
+   float raso=max(1.-smoothstep(ilhaA.z-2.,ilhaA.z+15.,dA),1.-smoothstep(ilhaB.z-2.,ilhaB.z+15.,dB));
+   vec3 deep=vec3(0.03,0.21,0.36),mid=vec3(0.07,0.45,0.56),shal=vec3(0.40,0.80,0.75);
+   float h=clamp(vH*0.5+0.5,0.,1.);vec3 water=mix(deep,mid,h*0.6+0.12*max(0.,1.-dist/9.));water=mix(water,shal,raso*raso*0.85);
+   vec3 col=mix(water,sky,fres*(1.-0.45*raso))+spec*(1.-0.5*raso);
+   float fo=smoothstep(0.55,0.98,vH)*smoothstep(0.45,0.8,fbm(vP.xz*1.1+vec2(t*0.22,t*0.09)))*vCalma;col=mix(col,vec3(0.94,0.97,0.98),fo*0.7);
+   float sA=1.-smoothstep(0.,2.6,abs(dA-(ilhaA.z+0.8)-0.5*sin(t*0.9)));float sB=1.-smoothstep(0.,2.6,abs(dB-(ilhaB.z+0.8)-0.5*sin(t*0.9+1.7)));
+   float surf=max(sA,sB)*smoothstep(0.35,0.7,fbm(vP.xz*0.9+vec2(t*0.3,-t*0.2)));col=mix(col,vec3(0.95,0.98,0.99),surf*0.75);
+   float inZ=smoothstep(-24.8,-22.,vP.z)*(1.-smoothstep(21.,23.,vP.z));float dh=abs(vP.x)-hwz(vP.z);float dsh=abs(vP.x-0.9)-hwz(vP.z-0.5);
+   col*=1.-(1.-smoothstep(-.3,2.4,dsh))*inZ*.40;
+   vec2 flow=vP.xz-vec2(0.,t*3.6);
+   float churn=fbm(flow*2.2)+.24*sin(flow.y*4.+vP.x*5.);
+   float foam2=(1.-smoothstep(.12,.90,abs(dh-.12)))*inZ*smoothstep(.20,.68,churn);
+   float aft=max(0.,vP.z-21.5),width=2.5+aft*.24;
+   float trail=smoothstep(21.5,24.5,vP.z)*(1.-smoothstep(48.,59.,vP.z));
+   float center=(1.-smoothstep(width*.4,width,abs(vP.x)))*trail;
+   float vee=(1.-smoothstep(.12,1.3,abs(abs(vP.x)-(4.8+aft*.23))))*trail;
+   float wake=(center*.60+vee*.85)*smoothstep(.19,.74,churn);
+   float bow=(1.-smoothstep(.2,1.15,abs(dh-.65)))*smoothstep(-25.,-22.,vP.z)*(1.-smoothstep(-18.,-12.,vP.z));
+   col=mix(col,vec3(.77,.94,.93),clamp(center*.21+foam2*.92+wake*.88+bow*.65,0.,.96));
+   vec3 hz=vec3(0.80,0.86,0.90);col=mix(col,hz,smoothstep(65.,115.,dist));
+   gl_FragColor=vec4(col,1.);
+   #include <tonemapping_fragment>
+   #include <encodings_fragment>
+  }`;}
+function ag505Mar(){const R=ROOMS.adv;if(!R||!R.scene)return null;if(AG505.mar&&AG505.mar.parent)return AG505.mar;let m=null;R.scene.traverse(o=>{if(!m&&o.isMesh&&o.material&&o.material.uniforms&&o.material.uniforms.sunDir&&o.geometry&&o.geometry.type==='PlaneGeometry'&&o.geometry.parameters&&o.geometry.parameters.width>=200)m=o;});AG505.mar=m;return m;}
+function ag505Ilhas(){const T=THREE;const F=NAV252.ilha,I=ILHA294;const agua=(typeof ILHA503!=='undefined'&&ILHA503.AGUA)||12.56;const kF=(typeof ILHA503!=='undefined'&&ILHA503.on)?ILHA503.K:1;const kI=(I&&I.scale)||2;
+  return [new T.Vector3(F.x,F.z,agua*kF),new T.Vector3(I?I.x:0,I?I.z:0,I?agua*kI:0)];}
+function ag505Aplica(){if(!AG505.on||AG505.feito)return;const R=ROOMS.adv;if(!R||!R.scene)return;const mar=ag505Mar();if(!mar)return;AG505.feito=true;const T=THREE;
+  try{const mat=mar.material;const [A,B]=ag505Ilhas();mat.uniforms.ilhaA={value:A};mat.uniforms.ilhaB={value:B};mat.vertexShader=AG505_VS;mat.fragmentShader=ag505FS(NOISE_GLSL);mat.needsUpdate=true;AG505.mat=mat;AG505.stats.ilhas=[A.toArray(),B.toArray()];
+    const geo=mar.geometry;const p=geo.parameters;if(p&&p.widthSegments)AG505.PASSO=p.width/p.widthSegments;}catch(e){ag505Erro('shader',e);}
+  // os discos de laguna saem (o raso agora é do shader)
+  try{let n=0;R.scene.traverse(o=>{if(o.isMesh&&o.material&&o.material.name==='468 laguna'&&o.visible){o.visible=false;n++;}});AG505.stats.lagunas=n;}catch(e){}
+  // o plano anda em passos da grelha; o nav252Quadro deixa de o mover
+  try{const tk=R.tick;R.tick=function(dt){const r=tk?tk.apply(this,arguments):undefined;try{ag505Passo();}catch(e){}return r;};}catch(e){ag505Erro('tick',e);}
+}
+function ag505Passo(){const m=AG505.mar;if(!m||!m.parent)return;try{if(NAV252.ceu&&NAV252.ceu.mar){NAV252.ceu.mar=null;}}catch(e){}
+  const c=camera.position,s=AG505.PASSO||1.2;const x=Math.round(c.x/s)*s,z=Math.round(c.z/s)*s;if(m.position.x!==x||m.position.z!==z){m.position.x=x;m.position.z=z;}
+  // as ilhas podem ter mudado (v503 corre no mesmo quadro): mantém os uniformes em dia
+  const u=AG505.mat&&AG505.mat.uniforms;if(u&&u.ilhaA&&(AG505.stats.q=(AG505.stats.q||0)+1)%60===0){try{const [A,B]=ag505Ilhas();u.ilhaA.value.copy(A);u.ilhaB.value.copy(B);}catch(e){}}}
+if(AG505.on){
+  {const fr=finishRoom;finishRoom=function(key){const r=fr.apply(this,arguments);if(key==='adv')setTimeout(()=>{try{ag505Aplica();}catch(e){ag505Erro('finishRoom',e);}},0);return r;};}
+  try{ag505Aplica();}catch(e){}
+}
+window.__agua505={estado:AG505,aplica:ag505Aplica,mar:ag505Mar,andar:ag505Andar};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
