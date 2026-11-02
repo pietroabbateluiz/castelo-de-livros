@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v506</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v507</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -60694,6 +60694,152 @@ if(PR506.on){
   try{pr506Aplica();}catch(e){}
 }
 window.__prado506={estado:PR506,aplica:pr506Aplica,relevo:pr506Relevo,mascara:pr506Mask};
+
+/* ===================== v507 · TERROR E HORROR: A PORTA SECRETA NA ESTANTE E A SALA DE HALLOWEEN (bloco `TR507`) =====================
+   Pedido do Luiz: «crie uma porta e uma nova sala em Terror, com decoração de Halloween».
+   · A PORTA: na parede do fundo da biblioteca gótica (z = −21,35), no trecho de madeira escura à esquerda da lareira (x −17,6…−15,4),
+     abre-se um vão de 2,2 × 3,0 m: a caixa da parede (BoxGeometry de 39,6 m) fica invisível e volta em três pedaços (esquerda,
+     direita, verga) com o mesmo material; a madeira/estante que havia no vão é apagada (triângulos com algum vértice dentro do
+     volume do vão ficam degenerados). No vão, uma ESTANTE-PORTA: um painel de estante cheio de livros (2,2 × 3,0 × 0,35) com
+     dobradiça na ombreira esquerda, que gira 100° para dentro da sala nova quando o leitor chega a 3,2 m e fecha quando se afasta
+     (`R.tick`), com placa «Sala de Halloween» em cima. Ombreiras, verga e um painel de madeira por cima até ao forro.
+   · A SALA NOVA (11,2 × 11,2 × 4,2 m, atrás da parede, z −21,9…−33,1, x −17,6…−6,4): chão de tábuas escuras (parquê da casa, mais
+     escuro), paredes de pedra (textura da casa, tingida de roxo-escuro), forro preto com vigas, rodapé. Decoração de Halloween:
+     9 abóboras-lanterna (lathe de 10 gomos, cara recortada numa textura luminosa, três com luz laranja dentro); teias de aranha nos
+     cantos (textura de canvas com alfa) e uma aranha pendurada num fio; 6 morcegos a voar em círculos (asas batem); 3 fantasmas de
+     lençol (lathe translúcido, olhos) a flutuar e a derivar; caldeirão com caldo verde, bolhas e a chama da v502 (`rt502Chama`);
+     caixão com a tampa entreaberta e um gato preto sentado em cima; mesa com caveira, candelabro de três velas (chamas e luz), tigela
+     de doces e uma vela; três lápides «RIP» com montes de terra num canto; chapéu de bruxa num banquinho e vassoura encostada;
+     bandeirinhas laranja e roxas no forro; faixa «FELIZ HALLOWEEN» na parede do fundo; luz laranja (abóboras), roxa (fundo) e verde
+     (caldeirão), todas com tremeluzir. Obstáculos no `OBST` da sala.
+   · ANDAR: `ROOM_WORLD.clamp` passa a ser o mais próximo de três caixas (biblioteca, vão, sala nova); `W.ext` cresce para a malha
+     de caminhos cobrir a sala nova; a câmera continua a bater nas malhas (paredes novas incluídas).
+   ?terror507=0 desliga. Gancho: `window.__terror507`. */
+const TR507={on:!/[?&#]terror507=0/i.test(location.search+location.hash),feito:false,erros:[],stats:{},
+  P:{x0:-17.6,x1:-15.4,zw:-21.35,h:3.0},S:{x0:-17.6,x1:-6.4,z0:-33.1,z1:-21.9,h:4.2},porta:null,morcegos:[],fantasmas:[],luzes:[],chamas:[],t:0,aranha:null};
+function tr507Erro(o,e){if(TR507.erros.length<16)TR507.erros.push(o+': '+(e&&e.message||e));console.warn('v507',o,e);}
+/* ---------- texturas ---------- */
+function tr507TexTeia(){return t160Tex('507 teia',256,256,(x,w,h)=>{x.clearRect(0,0,w,h);x.strokeStyle='rgba(235,235,245,.85)';x.lineWidth=1.3;const cx=0,cy=0;for(let i=0;i<=8;i++){const a=i/8*Math.PI/2;x.beginPath();x.moveTo(cx,cy);x.lineTo(cx+Math.cos(a)*w*1.05,cy+Math.sin(a)*h*1.05);x.stroke();}
+  for(let r=18;r<w*1.05;r*=1.28){x.beginPath();for(let i=0;i<=16;i++){const a=i/16*Math.PI/2;const rr=r*(1-.06*Math.sin(i*2.3));x.lineTo(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr);}x.stroke();}});}
+function tr507TexCara(){return t160Tex('507 cara da abóbora',128,128,(x,w,h)=>{x.clearRect(0,0,w,h);x.fillStyle='#ffd560';const tri=(ax,ay,bx,by,cx,cy)=>{x.beginPath();x.moveTo(ax,ay);x.lineTo(bx,by);x.lineTo(cx,cy);x.closePath();x.fill();};tri(22,54,46,30,52,56);tri(106,54,82,30,76,56);
+  x.beginPath();x.moveTo(20,76);x.lineTo(34,90);x.lineTo(44,80);x.lineTo(54,96);x.lineTo(64,80);x.lineTo(74,96);x.lineTo(84,80);x.lineTo(94,90);x.lineTo(108,76);x.lineTo(96,100);x.lineTo(32,100);x.closePath();x.fill();});}
+function tr507TexFaixa(){return txtTex(['FELIZ HALLOWEEN'],{w:1024,h:192,bg:'#2a0f3a',fg:'#ff9a2a',fs:96,weight:'bold',pad:16});}
+/* ---------- peças ---------- */
+function tr507Abobora(K,M,x,y,z,s,ry,cara){const pf=[[0,0],[.3,0],[.42,.1],[.47,.3],[.43,.48],[.28,.58],[.1,.61],[0,.61]].map(p=>[p[0]*s,p[1]*s]);K.lathe(pf,M.abobora,x,y,z,10,1,1,1,ry||0);K.cyl(.04*s,.06*s,.16*s,M.talo,x,y+.66*s,z,6,0,0,.25);
+  if(cara){K.plane(.5*s,.5*s,M.cara,x+Math.sin(ry||0)*.44*s,y+.3*s,z+Math.cos(ry||0)*.44*s,ry||0,0,0);}}
+function tr507Fantasma(R,M,x,y,z){const T=THREE;const g=new T.Group();g.name='507 fantasma';R.scene.add(g);const K=t160Kit('507 fantasma');const pf=[[0,1.15],[.18,1.1],[.3,.95],[.33,.65],[.37,.35],[.44,.08],[.5,0]];K.lathe(pf,M.lencol,0,0,0,14);
+  for(const s of [-1,1])K.sph(.045,M.olho,s*.1,.92,.29,1,1.3,.6,8,6);K.sph(.05,M.olho,0,.78,.31,1,.7,.5,8,6);K.fim(g,{sombra:false,juntar:false});g.traverse(o=>{o.userData.noCam=true;o.__fusaoMoveu=9;});
+  const F={g,x,y,z,ph:Math.random()*6,t:Math.random()*4,a:Math.random()*6.28,r:1.2+Math.random()*1.4};g.position.set(x,y,z);return F;}
+function tr507Morcego(R,M,cx,cz,y,r,vel,ph){const T=THREE;const g=new T.Group();g.name='507 morcego';R.scene.add(g);const K=t160Kit('507 morcego');K.sph(.07,M.preto,0,0,0,1,.8,1.4,8,6);K.sph(.045,M.preto,0,.03,.1,1,1,1,7,5);for(const s of [-1,1])K.cone(.015,.05,M.preto,s*.03,.08,.1,4);K.fim(g,{sombra:false});
+  const asas=[];for(const s of [-1,1]){const w=new T.Group();w.position.set(s*.05,0,0);g.add(w);const Kw=t160Kit('507 asa');const sh=new T.Shape();sh.moveTo(0,0);sh.lineTo(s*.14,.06);sh.lineTo(s*.3,.0);sh.lineTo(s*.26,-.06);sh.lineTo(s*.16,-.04);sh.lineTo(s*.08,-.08);sh.closePath();const geo=new T.ShapeGeometry(sh);geo.rotateX(-Math.PI/2);Kw.add(geo,M.asa,0,0,0);Kw.fim(w,{sombra:false});asas.push(w);}
+  g.traverse(o=>{o.userData.noCam=true;o.__fusaoMoveu=9;});return {g,asas,cx,cz,y,r,vel,a:ph,ph,bob:.25};}
+/* ---------- a montagem ---------- */
+function tr507Aplica(){if(!TR507.on||TR507.feito)return;const R=ROOMS.lib;if(!R||!R.scene||!R.world)return;TR507.feito=true;const T=THREE,sc=R.scene,W=R.world,P=TR507.P,S=TR507.S;const st=TR507.stats;const r=rnd(5070);
+  const M={madeira:t160Std('507 madeira escura',0x3a2618,.85),mad2:t160Std('507 madeira',0x5a3c26,.8),ferro:t160Std('507 ferro',0x24201e,.6,.5),abobora:t160Std('507 abóbora',0xe8741c,.65),talo:t160Std('507 talo',0x5a6a2a,.8),
+    cara:t160Mat('507 cara',()=>{const m=new T.MeshBasicMaterial({map:tr507TexCara(),transparent:true,depthWrite:false,toneMapped:false});m.userData.papelKeep=true;return m;}),
+    teia:t160Mat('507 teia',()=>{const m=new T.MeshBasicMaterial({map:tr507TexTeia(),transparent:true,depthWrite:false,side:T.DoubleSide,opacity:.9});m.userData.papelKeep=true;return m;}),
+    lencol:t160Mat('507 lençol',()=>{const m=new T.MeshStandardMaterial({color:0xf4f4ff,transparent:true,opacity:.72,roughness:.9,emissive:0x8888aa,emissiveIntensity:.25,side:T.DoubleSide,depthWrite:false});m.userData.papelKeep=true;return m;}),
+    olho:t160Std('507 olho',0x0a0a12,.5),preto:t160Std('507 preto',0x121014,.9),asa:t160Std('507 asa',0x1a161c,.9,0,{side:T.DoubleSide}),osso:t160Std('507 osso',0xe8e0cc,.8),pedra:t160Std('507 lápide',0x7a7a80,.9),terra:t160Std('507 terra',0x3a2a1c,1),
+    vela:t160Std('507 vela',0xf0e8d0,.8),chama:t160Brilho('507 chama',0xffb040,1.6),laranja:t160Std('507 papel laranja',0xff8a1c,.9,0,{side:T.DoubleSide}),roxo:t160Std('507 papel roxo',0x7a2ea8,.9,0,{side:T.DoubleSide}),caldo:t160Brilho('507 caldo',0x7cff50,1.2),
+    bolha:t160Brilho('507 bolha',0xc8ffa0,1.4),palha:t160Std('507 palha',0xc8a050,.9),chapeu:t160Std('507 chapéu',0x1a1020,.8),fivela:t160Std('507 fivela',0xd0a030,.4,.7),doce:[0xe83a4a,0xf0c030,0x3a8ae8,0xf0f0f0,0x8a3ae8].map(c=>t160Std('507 doce '+c.toString(16),c,.4))};
+  // 1) a parede do fundo: a caixa some e volta em três pedaços; o que estava no vão é apagado
+  try{let parede=null;const b=new T.Box3();sc.traverse(o=>{if(parede||!o.isMesh||!o.geometry||o.geometry.type!=='BoxGeometry')return;b.setFromObject(o);if(b.max.z<-21.1&&b.min.z>-21.6&&b.min.x<-19&&b.max.x>19&&b.max.y>9)parede=o;});
+    if(parede){parede.visible=false;parede.userData.tr507Escondida=true;const mat=parede.material;const K=t160Kit('507 parede');const z=(b.min.z+b.max.z)/2,d=b.max.z-b.min.z,H=b.max.y;
+      K.box(P.x0-b.min.x,H,d,mat,(b.min.x+P.x0)/2,H/2,z);K.box(b.max.x-P.x1,H,d,mat,(P.x1+b.max.x)/2,H/2,z);K.box(P.x1-P.x0,H-P.h,d,mat,(P.x0+P.x1)/2,(P.h+H)/2,z);
+      const ms=K.fim(sc,{sombra:true,juntar:false});for(const m of ms){m.userData.papelKeepGeo=true;m.userData.tr507=true;}st.parede=true;}
+    // o que estava no vão: triângulos com algum vértice dentro do volume ficam degenerados
+    const V={x0:P.x0-.1,x1:P.x1+.1,y0:-.05,y1:P.h+.4,z0:P.zw-.25,z1:P.zw+1.3};const v=new T.Vector3();let nt=0;const dentro=(i,pos,o)=>{v.fromBufferAttribute(pos,i).applyMatrix4(o.matrixWorld);return v.x>V.x0&&v.x<V.x1&&v.y>V.y0&&v.y<V.y1&&v.z>V.z0&&v.z<V.z1;};
+    sc.traverse(o=>{if(!o.isMesh||!o.geometry||o.isInstancedMesh||o.userData.tr507Escondida||o.userData.tr507)return;const g=o.geometry,pos=g.attributes.position;if(!pos)return;b.setFromObject(o);if(b.max.x<V.x0||b.min.x>V.x1||b.max.z<V.z0||b.min.z>V.z1||b.max.y<V.y0||b.min.y>V.y1)return;if((b.max.x-b.min.x)>30&&(b.max.y-b.min.y)<.3)return;
+      o.updateWorldMatrix(true,false);let mudou=false;const idx=g.index;if(idx){const a=idx.array;for(let t=0;t+2<a.length;t+=3){if(dentro(a[t],pos,o)||dentro(a[t+1],pos,o)||dentro(a[t+2],pos,o)){a[t+1]=a[t];a[t+2]=a[t];mudou=true;nt++;}}if(mudou)idx.needsUpdate=true;}
+      else{const arr=pos.array;for(let t=0;t+2<pos.count;t+=3){if(dentro(t,pos,o)||dentro(t+1,pos,o)||dentro(t+2,pos,o)){for(const i of [t+1,t+2]){arr[i*3]=arr[t*3];arr[i*3+1]=arr[t*3+1];arr[i*3+2]=arr[t*3+2];}mudou=true;nt++;}}if(mudou)pos.needsUpdate=true;}
+      if(mudou){g.computeBoundingSphere();g.computeBoundingBox();}});st.triangulosApagados=nt;}catch(e){tr507Erro('parede',e);}
+  // 2) a sala nova: chão, paredes, forro, rodapé, vigas
+  try{const K=t160Kit('507 sala');const piso=t160Mat('507 piso',()=>{const m=new T.MeshStandardMaterial({map:clonedTex(PARQ.map,5,5),color:0x6a5240,roughness:.9});m.userData.papelKeep=true;return m;});
+    const pedra=t160Mat('507 pedra',()=>{const m=new T.MeshStandardMaterial({map:clonedTex(STONE.map,3,1.2),color:0x6a5a78,roughness:.95});m.userData.papelKeep=true;return m;});const forro=t160Std('507 forro',0x0e0a12,.95);
+    const cx=(S.x0+S.x1)/2,cz=(S.z0+S.z1)/2,w=S.x1-S.x0,d=S.z1-S.z0,H=S.h;
+    K.box(w+.6,.2,d+.6,piso,cx,-.1,cz);K.box(w+.6,.2,d+.6,forro,cx,H+.1,cz);
+    K.box(.3,H,d+.6,pedra,S.x0-.15,H/2,cz);K.box(.3,H,d+.6,pedra,S.x1+.15,H/2,cz);K.box(w+.6,H,.3,pedra,cx,H/2,S.z0-.15);
+    // a parede de ligação (z1), com o vão: dois pedaços e a verga
+    K.box(P.x0-S.x0+.3,H,.3,pedra,(S.x0-.3+P.x0)/2,H/2,S.z1+.15);K.box(S.x1+.3-P.x1,H,.3,pedra,(P.x1+S.x1+.3)/2,H/2,S.z1+.15);K.box(P.x1-P.x0,H-P.h,.3,pedra,(P.x0+P.x1)/2,(P.h+H)/2,S.z1+.15);
+    for(const zz of [S.z0,S.z1])K.box(w,.12,.08,M.madeira,cx,.06,zz+(zz===S.z0?.04:-.04));for(const xx of [S.x0,S.x1])K.box(.08,.12,d,M.madeira,xx+(xx===S.x0?.04:-.04),.06,cz);
+    for(let i=0;i<5;i++){const zz=S.z0+(i+.5)*d/5;K.box(w,.22,.18,M.madeira,cx,H-.11,zz);}
+    // ombreiras, verga, painel por cima da porta (lado da biblioteca) e o túnel do vão
+    K.box(.16,P.h+.1,1.0,M.madeira,P.x0-.08,(P.h+.1)/2,P.zw+.3);K.box(.16,P.h+.1,1.0,M.madeira,P.x1+.08,(P.h+.1)/2,P.zw+.3);K.box(P.x1-P.x0+.32,.22,1.0,M.madeira,(P.x0+P.x1)/2,P.h+.11,P.zw+.3);
+    K.box(P.x1-P.x0+.4,9.5-P.h-.2,.12,M.mad2,(P.x0+P.x1)/2,(P.h+.2+9.5)/2,P.zw+.3);
+    K.box(P.x1-P.x0,.04,S.z1-P.zw+.6,piso,(P.x0+P.x1)/2,0,(P.zw+S.z1)/2);
+    const ms=K.fim(sc,{sombra:true});for(const m of ms){m.userData.papelKeepGeo=true;m.userData.tr507=true;}st.sala=true;}catch(e){tr507Erro('sala',e);}
+  // 3) a estante-porta (gira na ombreira esquerda) e a placa
+  try{const g=new T.Group();g.name='507 estante-porta';g.position.set(P.x0,0,P.zw);sc.add(g);const K=t160Kit('507 estante-porta');const Wp=P.x1-P.x0,Hp=P.h-.06;
+    K.box(Wp,Hp,.35,M.madeira,Wp/2,Hp/2,0);K.box(Wp-.1,Hp-.1,.06,M.mad2,Wp/2,Hp/2,-.17);for(let j=0;j<5;j++)K.box(Wp-.12,.05,.3,M.mad2,Wp/2,.12+j*.58,0);
+    const cores=[0x7a2a2a,0x2a4a7a,0x4a6a2a,0x7a6a2a,0x3a2a4a,0x8a4a2a,0x2a5a5a];for(let j=0;j<5;j++){let x=.1;while(x<Wp-.2){const lw=.05+r()*.05,lh=.3+r()*.2;K.addC(new T.BoxGeometry(lw,lh,.24),t160Std('507 livro vc',0xffffff,.8,0,{vertexColors:true}),cores[(r()*7)|0],x+lw/2,.145+j*.58+lh/2,.02);x+=lw+.012;}}
+    K.sph(.04,M.fivela,Wp-.2,1.1,.2,1,1,1,8,6);K.fim(g,{sombra:true});g.traverse(o=>{o.userData.papelKeepGeo=true;o.__fusaoMoveu=9;});TR507.porta={g,ang:0,alvo:0};
+    const pl=rkPlate(1.6,.36,txtTex(['Sala de Halloween'],{w:768,h:160,bg:'#1a0a22',fg:'#ffb060',fs:60,weight:'bold',pad:10}),M.ferro);pl.position.set((P.x0+P.x1)/2,P.h+.45,P.zw+.45);sc.add(pl);pl.userData.noCam=true;
+    const pl2=rkPlate(2.6,.5,tr507TexFaixa(),M.ferro,{emis:.4});pl2.position.set((S.x0+S.x1)/2,3.3,S.z0+.07);sc.add(pl2);pl2.userData.noCam=true;st.porta=true;}catch(e){tr507Erro('porta',e);}
+  // 4) a decoração
+  const obst=[];const ob=(x,z,rr)=>obst.push([x,z,rr]);
+  try{const K=t160Kit('507 halloween');const cx=(S.x0+S.x1)/2;
+    // abóboras: um cacho ao pé da porta, outras pela sala
+    const abob=[[S.x0+1.1,S.z1-1.2,.9,.4],[S.x0+2.0,S.z1-.8,.7,.2],[S.x0+1.4,S.z1-2.0,.55,.9],[S.x1-1.0,S.z1-1.1,.85,-.5],[S.x1-1.8,S.z1-.8,.6,-.2],[S.x1-1.2,S.z0+1.2,.8,2.8],[S.x0+1.0,S.z0+1.3,.75,3.5],[cx+.3,S.z0+.9,.6,3.1],[S.x0+4.2,S.z0+1.0,.7,3.3]];
+    abob.forEach(([x,z,s,ry],i)=>{tr507Abobora(K,M,x,0,z,s,ry,true);ob(x,z,.5*s);if(i<3||i===5){const L=new T.PointLight(0xff8a20,0,4.5,2);L.position.set(x,.35*s,z);sc.add(L);L.userData.i0=i===0?1.1:.6;TR507.luzes.push({L,i0:L.userData.i0,ph:r()*6});}});
+    // teias nos cantos (três no forro, duas em pé) e a aranha
+    for(const [x,z,ry] of [[S.x0+.02,S.z0+.02,0],[S.x1-.02,S.z0+.02,-Math.PI/2],[S.x0+.02,S.z1-.02,Math.PI/2]]){K.push(x,S.h-.02,z,ry);K.plane(1.6,1.6,M.teia,.8,0,.8,0,-Math.PI/2,0);K.pop();}
+    K.push(S.x1-.02,2.6,S.z0+.02,0);K.plane(1.5,1.5,M.teia,-.75,.75,0,0,0,Math.PI);K.pop();K.push(S.x0+.02,1.4,S.z0+.02,0);K.plane(1.2,1.2,M.teia,.6,.6,0,0,0,Math.PI/2);K.pop();
+    {const ax=S.x0+3.2,az=S.z0+2.4;const ag=new T.Group();ag.name='507 aranha';ag.position.set(ax,S.h,az);sc.add(ag);const Ka=t160Kit('507 aranha');Ka.cyl(.004,.004,1.4,M.osso,0,-.7,0,4);Ka.sph(.09,M.preto,0,-1.45,0,1,.8,1.2,8,6);Ka.sph(.06,M.preto,0,-1.42,.12,1,1,1,7,5);
+      for(let k=0;k<8;k++){const s=k<4?-1:1,q=(k%4);const a=.5+q*.5;Ka.tube([[s*.08,-1.45,.08-q*.06],[s*.22,-1.3,.1-q*.08],[s*.3,-1.55,.12-q*.1]],.008,M.preto,6,4);}Ka.fim(ag,{sombra:false});ag.traverse(o=>{o.userData.noCam=true;o.__fusaoMoveu=9;});TR507.aranha={g:ag,y0:S.h,ph:0};}
+    // caldeirão com a chama da v502
+    {const x=S.x1-2.6,z=S.z0+2.6;for(let k=0;k<8;k++){const a=k/8*6.283;K.sph(.17,M.pedra,x+Math.cos(a)*.62,.1,z+Math.sin(a)*.62,1,.6,1,7,5);}
+      K.lathe([[.001,.55],[.34,.55],[.44,.7],[.5,.95],[.46,1.2],[.5,1.3],[.001,1.3]],M.ferro,x,0,z,18);for(let k=0;k<3;k++){const a=k/3*6.283+.5;K.cyl(.035,.045,.6,M.ferro,x+Math.cos(a)*.3,.3,z+Math.sin(a)*.3,6,0,Math.cos(a)*.35,-Math.sin(a)*.35);}
+      K.disc(.44,M.caldo,x,1.22,z,20);for(let k=0;k<7;k++){const a=k*.9,dd=r()*.3;K.sph(.03+r()*.025,M.bolha,x+Math.cos(a)*dd,1.25+r()*.1,z+Math.sin(a)*dd,1,1,1,6,5);}
+      K.tor(.5,.03,M.ferro,x,1.3,z,Math.PI*2,0,Math.PI/2);ob(x,z,.75);TR507.caldeirao=[x,.18,z];const L=new T.PointLight(0x70ff40,0,5,2);L.position.set(x,1.6,z);sc.add(L);TR507.luzes.push({L,i0:.8,ph:1.3});}
+    // caixão com a tampa entreaberta e o gato preto
+    {const x=S.x0+2.2,z=S.z0+5.5;K.push(x,0,z,.35);K.box(.8,.5,2.1,M.madeira,0,.25,0);K.box(.86,.06,2.16,M.mad2,0,.03,0);K.box(.78,.08,2.06,M.mad2,.0,.52,-.2,0,0,0);K.push(0,.56,0,0);K.box(.78,.06,2.06,M.madeira,.22,.2,.05,0,0,.5);K.pop();
+      K.sph(.12,M.preto,.1,.68,.55,1,.9,1.3,9,7);K.sph(.08,M.preto,.1,.84,.68,1,1,1,8,6);for(const s of [-1,1])K.cone(.025,.07,M.preto,.1+s*.05,.93,.68,4);K.tube([[.1,.6,.4],[.3,.75,.2],[.42,.95,.1]],.02,M.preto,8,5);for(const s of [-1,1])K.sph(.012,t160Brilho('507 olho de gato',0xb0ff40,1.4),.1+s*.03,.86,.76,1,1,1,5,4);K.pop();ob(x,z,1.1);}
+    const ms=K.fim(sc,{sombra:true});for(const m of ms){m.userData.papelKeepGeo=true;m.userData.tr507=true;}
+  }catch(e){tr507Erro('decoração A',e);}
+  try{const K=t160Kit('507 halloween B');const cx=(S.x0+S.x1)/2,cz=(S.z0+S.z1)/2;
+    {const x=cx+.8,z=cz+.6;K.box(1.6,.08,.9,M.madeira,x,.78,z);for(const a of [-.7,.7])for(const b of [-.35,.35])K.box(.08,.76,.08,M.madeira,x+a,.38,z+b);ob(x,z,.95);
+      K.sph(.13,M.osso,x-.45,.95,z,1,1.1,1.15,12,9);K.box(.16,.07,.12,M.osso,x-.45,.82,z+.03);for(const s of [-1,1])K.sph(.03,M.olho,x-.45+s*.05,.97,z+.11,1,1.2,.6,6,5);K.cone(.012,.025,M.olho,x-.45,.92,z+.13,4,0,Math.PI/2,0);
+      K.cyl(.12,.14,.05,M.ferro,x+.3,.84,z,10);K.cyl(.02,.02,.3,M.ferro,x+.3,1.0,z,6);for(const dx of [-.16,0,.16]){K.cyl(.02,.02,.14,M.ferro,x+.3+dx,1.15,z,6);K.cyl(.025,.028,.22,M.vela,x+.3+dx,1.33,z,8);K.sph(.03,M.chama,x+.3+dx,1.48,z,1,1.6,1,6,5);}
+      const L=new T.PointLight(0xffb050,0,4,2);L.position.set(x+.3,1.6,z);sc.add(L);TR507.luzes.push({L,i0:.7,ph:2.1});
+      K.lathe([[.001,0],[.16,0],[.2,.06],[.22,.14],[.001,.14]],M.ferro,x-.05,.82,z-.3,14);for(let k=0;k<12;k++){const a=r()*6.28,dd=r()*.14;K.sph(.025,M.doce[k%5],x-.05+Math.cos(a)*dd,.92+r()*.04,z-.3+Math.sin(a)*dd,1,1,1,6,5);}
+      K.cyl(.03,.035,.18,M.vela,x+.6,.91,z-.3,8);K.sph(.025,M.chama,x+.6,1.03,z-.3,1,1.6,1,6,5);}
+    // lápides e montes de terra
+    {const base=[[S.x1-1.4,S.z0+4.6,.2],[S.x1-2.3,S.z0+5.9,-.15],[S.x1-1.2,S.z0+7.0,.3]];base.forEach(([x,z,ry],i)=>{K.push(x,0,z,ry);K.rbox(.7,.9,.14,.1,M.pedra,0,.45,0);K.box(.9,.1,.3,M.pedra,0,.05,0);const tx=txtTex(['R.I.P.'],{w:256,h:128,bg:'#5a5a62',fg:'#1a1a1e',fs:70,weight:'bold',pad:8});K.plane(.42,.22,new T.MeshStandardMaterial({map:tx,roughness:.9}),0,.6,.075,0,0,0);
+        K.lathe([[.001,0],[.5,0],[.45,.12],[.25,.22],[.001,.25]],M.terra,0,0,-.55,12);K.pop();ob(x,z,.5);});}
+    // chapéu de bruxa num banquinho, vassoura encostada
+    {const x=S.x0+1.2,z=S.z0+8.0;K.cyl(.22,.2,.05,M.mad2,x,.44,z,12);for(let k=0;k<3;k++){const a=k/3*6.283;K.cyl(.025,.03,.44,M.mad2,x+Math.cos(a)*.15,.22,z+Math.sin(a)*.15,6);}
+      K.cyl(.32,.34,.04,M.chapeu,x,.49,z,16);K.cone(.2,.62,M.chapeu,x+.03,.8,z,12,0,0,.18);K.tor(.2,.03,M.fivela,x,.56,z,Math.PI*2,0,Math.PI/2);ob(x,z,.4);
+      const bx=S.x0+.35,bz=S.z0+9.2;K.cyl(.02,.025,1.7,M.mad2,bx+.12,.9,bz,6,0,0,.28);for(let k=0;k<14;k++){const a=k/14*6.283;K.cyl(.012,.004,.5,M.palha,bx-.1+Math.cos(a)*.07,.26,bz+Math.sin(a)*.07,4,0,Math.cos(a)*.25,.28+Math.sin(a)*.2);}K.tor(.09,.015,M.ferro,bx-.03,.52,bz,Math.PI*2,0,0,.28);}
+    // bandeirinhas no forro (dois cordões que descaem no meio)
+    for(const zz of [cz-2.4,cz+2.4]){const n=16;for(let k=0;k<=n;k++){const u=k/n;const x=S.x0+.6+u*(S.x1-S.x0-1.2),y=S.h-.15-Math.sin(u*Math.PI)*.45;if(k<n){const x2=S.x0+.6+(k+1)/n*(S.x1-S.x0-1.2),y2=S.h-.15-Math.sin((k+1)/n*Math.PI)*.45;K.tube([[x,y,zz],[x2,y2,zz]],.006,M.ferro,2,4);}
+        if(k<n){const sh=new T.Shape();sh.moveTo(-.16,0);sh.lineTo(.16,0);sh.lineTo(0,-.3);sh.closePath();const geo=new T.ShapeGeometry(sh);K.add(geo,k%2?M.laranja:M.roxo,x+.2,y-.02,zz,0,0,0);}}}
+    const ms=K.fim(sc,{sombra:true});for(const m of ms){m.userData.papelKeepGeo=true;m.userData.tr507=true;}}catch(e){tr507Erro('decoração B',e);}
+  // chama do caldeirão (v502), fantasmas e morcegos
+  try{if(typeof rt502Chama==='function'&&TR507.caldeirao){const [x,y,z]=TR507.caldeirao;rt502Chama(R,x,y,z,.85);}}catch(e){tr507Erro('chama',e);}
+  try{const cx=(S.x0+S.x1)/2,cz=(S.z0+S.z1)/2;for(const [x,z] of [[cx-2.5,cz-1.5],[cx+2.2,cz+1.8],[cx-.5,cz+3.6]])TR507.fantasmas.push(tr507Fantasma(R,M,x,1.4,z));
+    for(let i=0;i<6;i++)TR507.morcegos.push(tr507Morcego(R,M,cx+(i%2?1.5:-1.5),cz+(i%3-1)*1.5,3.2+(i%3)*.3,1.6+(i%2)*.9,1.4+(i%3)*.4,i*1.05));
+    const L=new T.PointLight(0x8a3ae8,0,9,2);L.position.set(cx,3.4,S.z0+2);sc.add(L);TR507.luzes.push({L,i0:.9,ph:.4});st.fantasmas=TR507.fantasmas.length;st.morcegos=TR507.morcegos.length;}catch(e){tr507Erro('fauna',e);}
+  // 5) andar: união das três caixas; obstáculos; malha de caminhos maior
+  try{const c0=W.clamp;const Wm=19.8,Dm=21.2;W.clamp=function(x,z,m){m=m||0;const A=[Math.max(-Wm+m,Math.min(Wm-m,x)),Math.max(-Dm+m,Math.min(Dm-m,z))];
+      const Bx0=P.x0+m,Bx1=P.x1-m,Bz0=S.z1-.6,Bz1=P.zw+1.2;const B=[Math.max(Bx0,Math.min(Bx1,x)),Math.max(Bz0,Math.min(Bz1,z))];
+      const C=[Math.max(S.x0+m,Math.min(S.x1-m,x)),Math.max(S.z0+m,Math.min(S.z1-m,z))];
+      const dA=Math.hypot(A[0]-x,A[1]-z),dB=Math.hypot(B[0]-x,B[1]-z),dC=Math.hypot(C[0]-x,C[1]-z);if(dA<=dB&&dA<=dC)return A;if(dB<=dC)return B;return C;};
+    W.ext=Math.max(W.ext||0,36);const lista=W.obst;if(Array.isArray(lista))for(const o of obst)lista.push(o);W.__nav=null;W.__cl=null;st.obstaculos=obst.length;}catch(e){tr507Erro('andar',e);}
+  // 6) o relógio: porta, luzes, fantasmas, morcegos, aranha
+  try{const tk=R.tick;R.tick=function(dt){const rv=tk?tk.apply(this,arguments):undefined;try{tr507Tick(R,Math.min(.05,dt||.016));}catch(e){tr507Erro('tick',e);}return rv;};}catch(e){tr507Erro('relógio',e);}
+}
+function tr507Tick(R,dt){const T=TR507;T.t+=dt;const ativa=CUR==='room'&&ROOM===R;
+  for(const l of T.luzes){l.L.intensity=ativa?l.i0*(.85+.15*Math.sin(T.t*9+l.ph)+.08*Math.sin(T.t*23+l.ph*2)):0;}
+  if(!ativa)return;
+  if(T.porta){const p=asaPos();const d=Math.hypot(p.x-(T.P.x0+T.P.x1)/2,p.z-T.P.zw);T.porta.alvo=d<3.2?1.75:0;const da=T.porta.alvo-T.porta.ang;const passo=Math.min(Math.abs(da),dt*1.6);T.porta.ang+=Math.sign(da)*passo;T.porta.g.rotation.y=T.porta.ang;}
+  for(const F of T.fantasmas){F.t+=dt;F.a+=dt*.25;F.g.position.set(F.x+Math.cos(F.a)*F.r,F.y+.18*Math.sin(T.t*1.3+F.ph),F.z+Math.sin(F.a)*F.r*.7);F.g.rotation.y=-F.a+Math.PI/2;F.g.rotation.z=.06*Math.sin(T.t*1.7+F.ph);}
+  for(const B of T.morcegos){B.a+=dt*B.vel/B.r;const x=B.cx+Math.cos(B.a)*B.r,z=B.cz+Math.sin(B.a)*B.r;B.g.position.set(x,B.y+Math.sin(T.t*2.2+B.ph)*B.bob,z);B.g.rotation.y=Math.atan2(-Math.sin(B.a),Math.cos(B.a))+Math.PI/2;const bat=Math.sin(T.t*14+B.ph)*.7;B.asas[0].rotation.z=bat;B.asas[1].rotation.z=-bat;}
+  if(T.aranha){T.aranha.ph+=dt;T.aranha.g.position.y=T.aranha.y0+.25*Math.sin(T.aranha.ph*.6);}}
+if(TR507.on){
+  {const fr=finishRoom;finishRoom=function(key){const r=fr.apply(this,arguments);if(key==='lib')setTimeout(()=>{try{tr507Aplica();}catch(e){tr507Erro('finishRoom',e);}},0);return r;};}
+  try{if(ROOMS.lib&&ROOMS.lib.ready)tr507Aplica();}catch(e){}
+}
+window.__terror507={estado:TR507,aplica:tr507Aplica};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
