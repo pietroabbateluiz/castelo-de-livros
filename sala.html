@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v514</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v515</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -4430,7 +4430,7 @@ global.ForestWorkshop={forestVillage,treeHome,sculptTrunk,livingCrown,greatTreeR
 /* ===== Visita: um link «#visita=…» abre a sala e a estante de outro leitor. Este bloco roda ANTES de o jogo ler a memória
    do navegador: sobrepõe (só na leitura) a decoração da Minha Sala, a estante e os contos lidos do anfitrião, e bloqueia
    qualquer gravação das chaves do jogo — quem visita não perde nada do que é seu e não deixa rastro. ===== */
-window.publicBook401=function(b){if(!b||b.livroPrivado===true)return null;const o={t:String(b.titulo||'').slice(0,200),a:String(b.autor||'').slice(0,120),g:b.genero,s:b.subgenero,e:b.status||'lido',f:b.favorito?1:0,p:b.progresso||0,pg:+b.paginas||0};if(b.opiniaoPrivada!==true){if(b.nota)o.n=b.nota;if(b.resenha)o.r=String(b.resenha).slice(0,20000);}else o.private=1;return o;};
+window.publicBook401=function(b){if(!b||b.livroPrivado===true)return null;const o={t:String(b.titulo||'').slice(0,200),a:String(b.autor||'').slice(0,120),g:b.genero,s:b.subgenero,e:b.status||'lido',f:b.favorito?1:0,p:b.progresso||0,pg:+b.paginas||0};if(b.ritmo)o.rt=String(b.ritmo).slice(0,12);if(b.opiniaoPrivada!==true){if(b.nota)o.n=b.nota;if(b.resenha)o.r=String(b.resenha).slice(0,20000);}else o.private=1;return o;};
 
 window.VISITA=null;
 (function(){try{
@@ -4462,7 +4462,7 @@ function inflateRawMini(src){
   if(tipo==='d.')bytes=inflateRawMini(bytes);else if(tipo!=='j.')throw new Error('formato desconhecido');
   const p=JSON.parse(new TextDecoder().decode(bytes));if(!p||typeof p!=='object'||p.v!==1)throw new Error('versão do link');
   const nome=String(p.n||'').slice(0,40);
-  const livros=(Array.isArray(p.est)?p.est:[]).filter(o=>o&&o.livroPrivado!==true&&o.hidden!==true).slice(0,20000).map((o,i)=>({id:'visita'+i,titulo:String((o&&o.t)||'').slice(0,200),autor:String((o&&o.a)||'').slice(0,120),genero:o&&o.g,subgenero:o&&o.s,status:(o&&o.e)||'lido',nota:o?.private?0:+(o&&o.n)||0,resenha:o?.private?'':String(o?.r||'').slice(0,20000),opiniaoPrivada:!!o?.private,paginas:Math.max(0,Math.min(100000,+o?.pg||0)),favorito:!!(o&&o.f),progresso:(o&&o.p)||0})).filter(b=>b.titulo);
+  const livros=(Array.isArray(p.est)?p.est:[]).filter(o=>o&&o.livroPrivado!==true&&o.hidden!==true).slice(0,20000).map((o,i)=>({id:'visita'+i,titulo:String((o&&o.t)||'').slice(0,200),autor:String((o&&o.a)||'').slice(0,120),genero:o&&o.g,subgenero:o&&o.s,status:(o&&o.e)||'lido',nota:o?.private?0:+(o&&o.n)||0,resenha:o?.private?'':String(o?.r||'').slice(0,20000),opiniaoPrivada:!!o?.private,paginas:Math.max(0,Math.min(100000,+o?.pg||0)),favorito:!!(o&&o.f),progresso:(o&&o.p)||0,ritmo:String(o?.rt||'').slice(0,12)})).filter(b=>b.titulo);
   const dec=(p.dec&&typeof p.dec==='object'&&!Array.isArray(p.dec))?p.dec:{};
   const lidos={};for(const g of (Array.isArray(p.lidos)?p.lidos:[]))if(typeof g==='string')lidos[g]={t:0,seg:1};
   const room=p.room==='pessoal'?'pessoal':'minha';const OVER={[room==='pessoal'?'mundo.sala.decor.pessoal':'mundo.sala.decor']:JSON.stringify(dec),'mundo.estante.v1':JSON.stringify({perfil:{nome},livros}),'mundo.contos.v1':JSON.stringify({lidos,pos:{},ver:1})};
@@ -61761,6 +61761,59 @@ if(QA514.on){
 }
 window.__qualidade514={estado:QA514,env:qa514Env};
 
+/* ===================== v515 · ESTANTE: RITMO DE LEITURA, LIVRO OCULTO À VISTA E OS NACIONAIS DO LUIZ (bloco `ES515`) =====================
+   Pedidos do Luiz: «inserir ritmo de leitura — devagar, normal, rápido, leitura dinâmica» · «opção de deixar o livro oculto para o
+   público, assim só você vê a nota atribuída e resenha» · «adicione tudo isso na minha conta; ao recarregar no navegador não deve-se
+   perder, acrescente no meu Webmaster».
+   · RITMO: campo novo `ritmo` no livro (`devagar`, `normal`, `rapido`, `dinamica`). No editor da Estante, o seletor «Ritmo de leitura»
+     logo a seguir à prateleira (o `patch515.py` insere-o dentro do painel da Estante, onde vivem `editor` e o formulário); grava-se no
+     mesmo `salvar` do livro; aparece como etiqueta no cartão do livro; vai no pacote público das visitas (`rt`) e volta na leitura.
+   · OCULTO: as duas opções já existiam desde a v401/v418 («Ocultar minha avaliação e resenha nas visitas» = `opiniaoPrivada`;
+     «Ocultar este livro inteiro nas visitas e na estante pública» = `livroPrivado`). Agora ganham destaque: um cadeado 🔒 no cartão
+     do livro oculto e um olho fechado 🙈 no livro com a opinião privada, e um título «Privacidade» por cima das duas caixas.
+   · OS NACIONAIS: no Webmaster (`window.__WEBMASTER` ou `?wm`), os 17 livros da lista entram na estante ao carregar (uma vez: a marca
+     `v515` no livro impede que uma edição posterior do Luiz seja desfeita; livros já existentes com o mesmo título só recebem os
+     campos novos na primeira vez). Guardados em `wm.mundo.estante.v1`, por isso sobrevivem ao recarregar.
+   ?estante515=0 desliga. Gancho: `window.__estante515`. */
+const ES515={on:!/[?&#]estante515=0/i.test(location.search+location.hash),feito:false,erros:[],stats:{},
+  RITMOS:{devagar:['Devagar','Slow','Despacio'],normal:['Normal','Normal','Normal'],rapido:['Rápido','Fast','Rápido'],dinamica:['Leitura dinâmica','Speed reading','Lectura dinámica']},
+  LIVROS:[
+    {titulo:'Ordem Vermelha',status:'quero',genero:'castelo',subgenero:'alta'},
+    {titulo:'Deuses Caídos',status:'quero',genero:'castelo',subgenero:'alta'},
+    {titulo:'Anardeus',status:'lido',nota:2,livroPrivado:true,genero:'castelo',subgenero:'alta'},
+    {titulo:'A Ilha de Loritch',status:'lido',nota:1,ritmo:'dinamica',livroPrivado:true,genero:'castelo',subgenero:'salao'},
+    {titulo:'Giovana de León Denis',status:'relendo',genero:'castelo',subgenero:'salao'},
+    {titulo:'Heróis de Novigrath',status:'lido',nota:2,ritmo:'dinamica',genero:'castelo',subgenero:'alta'},
+    {titulo:'A Batalha das 20 Noites',status:'lido',nota:0,ritmo:'dinamica',livroPrivado:true,genero:'castelo',subgenero:'alta'},
+    {titulo:'O Primeiro Filho do Homem',status:'lido',nota:1,ritmo:'dinamica',livroPrivado:true,genero:'castelo',subgenero:'salao'},
+    {titulo:'Inesquecível — Uma Aventura no Olimpo',status:'quero',genero:'mitologia',subgenero:'principal'},
+    {titulo:'Sem Rumo na Copa',status:'quero',genero:'navegacoes',subgenero:'jornadas'},
+    {titulo:'O Lago Negro',autor:'Juliana Daglio',status:'quero',genero:'charneca',subgenero:'sobrenatural'},
+    {titulo:'Mar de Pedras',status:'quero',genero:'castelo',subgenero:'alta'},
+    {titulo:'O Povo da Montanha',status:'quero',genero:'castelo',subgenero:'alta'},
+    {titulo:'O Segredo de Paulo',autor:'Miguel Júnior',status:'lido',nota:2,genero:'castelo',subgenero:'salao'},
+    {titulo:'Quam e os Indícios Mortais',status:'quero',genero:'ilha',subgenero:'farol'},
+    {titulo:'Rio dos Ventos',status:'quero',genero:'castelo',subgenero:'alta'},
+    {titulo:'Roverandom',autor:'J. R. R. Tolkien',status:'lido',nota:4,genero:'castelo',subgenero:'fadas'}
+  ]};
+function es515Erro(o,e){if(ES515.erros.length<16)ES515.erros.push(o+': '+(e&&e.message||e));console.warn('v515',o,e);}
+function es515Lang(){const l=(document.documentElement.lang||'pt').toLowerCase();return l.startsWith('en')?1:l.startsWith('es')?2:0;}
+function es515T(pt,en,es){return [pt,en,es][es515Lang()]||pt;}
+function es515RitmoNome(k){const r=ES515.RITMOS[k];return r?r[es515Lang()]||r[0]:'';}
+function es515Normaliza(t){return String(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,' ').trim();}
+function es515Webmaster(){return !!(window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(location.search+location.hash));}
+function es515Semear(){if(ES515.feito||!es515Webmaster()||typeof EST==='undefined'||!EST.DB)return;ES515.feito=true;const st=ES515.stats;let novos=0,atualizados=0;
+  try{const porTitulo=new Map();for(const b of EST.DB.livros)if(b&&b.titulo)porTitulo.set(es515Normaliza(b.titulo),b);const agora=new Date().toISOString();
+    for(const q of ES515.LIVROS){const k=es515Normaliza(q.titulo);const b=porTitulo.get(k);
+      if(!b){const G=EST.GENEROS[q.genero]?q.genero:'castelo';const sub=(EST.GENEROS[G]&&EST.GENEROS[G].subs.some(s=>s[0]===q.subgenero))?q.subgenero:EST.GENEROS[G].subs[0][0];
+        EST.upsert({id:'v515-'+k.replace(/ /g,'-'),titulo:q.titulo,autor:q.autor||'',genero:G,subgenero:sub,status:q.status||'quero',progresso:q.status==='lido'?100:0,nota:q.nota||0,paginas:0,capa:'',resenha:'',favorito:false,ritmo:q.ritmo||'',livroPrivado:!!q.livroPrivado,opiniaoPrivada:false,nacional:true,v515:true,criadoEm:agora});novos++;}
+      else if(!b.v515){const c=Object.assign({},b);c.status=q.status||c.status;if(q.nota!==undefined)c.nota=q.nota;if(q.ritmo)c.ritmo=q.ritmo;if(q.livroPrivado)c.livroPrivado=true;if(q.autor&&!c.autor)c.autor=q.autor;if(c.status==='lido')c.progresso=100;c.nacional=true;c.v515=true;EST.upsert(c);atualizados++;}}
+    if(novos||atualizados){try{typeof nuvemSuja==='function'&&nuvemSuja();}catch(e){}}
+    st.novos=novos;st.atualizados=atualizados;st.total=EST.DB.livros.length;}catch(e){es515Erro('semear',e);}}
+window.__ritmo515={nome:es515RitmoNome,t:es515T,RITMOS:ES515.RITMOS};
+window.__estante515={estado:ES515,semear:es515Semear};
+if(ES515.on){try{es515Semear();}catch(e){es515Erro('início',e);}}
+
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
    familias:()=>SALA_FAM,famModelos:(f)=>SALA_FAM[f]?SALA_FAM[f].lista():null,
@@ -61801,7 +61854,7 @@ function render(){
   listPage=Math.max(0,Math.min(listPage,Math.ceil(lista.length/LIST_PAGE_SIZE)-1));
   const fragment=document.createDocumentFragment();
   for(const b of lista.slice(listPage*LIST_PAGE_SIZE,(listPage+1)*LIST_PAGE_SIZE)){const el=document.createElement('button');el.type='button';el.className='livro'+(editing&&editing.id===b.id?' sel':'');el.dataset.id=b.id;
-    el.innerHTML=capa(b)+'<span class="inf"><b>'+esc(b.titulo)+'</b><small>'+esc(b.autor||'')+'</small><span class="meta"><em class="pill '+esc(b.status)+'">'+esc(EST.STATUS[b.status]||b.status)+(b.status==='lendo'&&b.progresso?' · '+b.progresso+'%':'')+'</em>'+stars(b.nota)+(b.favorito?'<span class="fav">★</span>':'')+(b.exemplo?'<em class="pill ex">exemplo</em>':'')+(b.generoIncerto?'<em class="pill ex" title="O gênero não foi reconhecido na importação: abra o livro e escolha">gênero a confirmar</em>':'')+'</span></span>';
+    el.innerHTML=capa(b)+'<span class="inf"><b>'+esc(b.titulo)+'</b><small>'+esc(b.autor||'')+'</small><span class="meta"><em class="pill '+esc(b.status)+'">'+esc(EST.STATUS[b.status]||b.status)+(b.status==='lendo'&&b.progresso?' · '+b.progresso+'%':'')+'</em>'+stars(b.nota)+(b.favorito?'<span class="fav">★</span>':'')+(b.ritmo&&window.__ritmo515?'<em class="pill ritmo515" style="background:#2a3a5a;color:#dbe6ff" title="'+esc(window.__ritmo515.t('Ritmo de leitura','Reading pace','Ritmo de lectura'))+'">'+esc(window.__ritmo515.nome(b.ritmo))+'</em>':'')+(b.livroPrivado?'<em class="pill oculto515" style="background:#3a2a2a;color:#ffd0c0" title="'+esc(window.__ritmo515?window.__ritmo515.t('Oculto para os visitantes','Hidden from visitors','Oculto a los visitantes'):'')+'">🔒</em>':(b.opiniaoPrivada?'<em class="pill oculto515" style="background:#3a2a2a;color:#ffd0c0" title="'+esc(window.__ritmo515?window.__ritmo515.t('Nota e resenha ocultas para os visitantes','Rating and review hidden from visitors','Nota y reseña ocultas a los visitantes'):'')+'">🙈</em>':''))+(b.exemplo?'<em class="pill ex">exemplo</em>':'')+(b.generoIncerto?'<em class="pill ex" title="O gênero não foi reconhecido na importação: abra o livro e escolha">gênero a confirmar</em>':'')+'</span></span>';
     el.addEventListener('click',()=>editor(b));fragment.appendChild(el);}
   U.appendChild(fragment);
   if(lista.length>LIST_PAGE_SIZE){const nav=document.createElement('div');nav.className='est-pages';nav.style.cssText='display:flex;align-items:center;justify-content:center;gap:14px;padding:14px;grid-column:1/-1';
@@ -61827,7 +61880,7 @@ $('estBusca').addEventListener('input',e=>{busca=e.target.value;clearTimeout(sea
 $('fGenero').addEventListener('change',()=>fillSubs($('fGenero'),$('fSub')));
 $('editor').addEventListener('submit',e=>{e.preventDefault();const t=$('fTitulo').value.trim();if(!t){toast('Dê um título ao livro');$('fTitulo').focus();return;}
   const b=Object.assign(editing||{},{titulo:t,autor:$('fAutor').value.trim(),genero:$('fGenero').value,subgenero:$('fSub').value,status:$('fStatus').value,nota,progresso:$('fProgresso').value?Math.max(0,Math.min(100,+$('fProgresso').value)):null,paginas:$('fPaginas').value?+$('fPaginas').value:null,capa:$('fCapa').value.trim(),resenha:$('fResenha').value.trim(),generoIncerto:false,favorito:$('fFavorito').checked,ano:$('fAno')&&$('fAno').value.trim()?$('fAno').value.trim():null,isbn:$('fIsbn')&&$('fIsbn').value.trim()?$('fIsbn').value.replace(/[-\s]/g,''):null},sugExtra?{editora:sugExtra.editora||null,sinopse:sugExtra.sinopse||null,fonte:sugExtra.fonte||null,cats:sugExtra.cats&&sugExtra.cats.length?sugExtra.cats:null,original:sugExtra.original||null,idioma:sugExtra.idioma||null}:{});
-  b.livroPrivado=$('fLivroPrivado418').checked;b.opiniaoPrivada=$('fPrivado401').checked;b.editora=$('fEditora401').value.trim();b.sinopse=$('fSinopse401').value.trim();b.idioma=$('fIdioma401').value.trim();if(b.status==='lido')b.progresso=100;try{book421ReadFields(b);}catch(e){toast(e.message);return;}const saved=EST.upsert(b);editing=null;$('editor').hidden=true;render();toast('“'+saved.titulo+'” salvo na prateleira '+(EST.STATUS[saved.status]||''));});
+  b.livroPrivado=$('fLivroPrivado418').checked;try{const s5=$('fRitmo515');b.ritmo=s5&&s5.value?s5.value:'';}catch(e){}b.opiniaoPrivada=$('fPrivado401').checked;b.editora=$('fEditora401').value.trim();b.sinopse=$('fSinopse401').value.trim();b.idioma=$('fIdioma401').value.trim();if(b.status==='lido')b.progresso=100;try{book421ReadFields(b);}catch(e){toast(e.message);return;}const saved=EST.upsert(b);editing=null;$('editor').hidden=true;render();toast('“'+saved.titulo+'” salvo na prateleira '+(EST.STATUS[saved.status]||''));});
 $('btnExcluir').addEventListener('click',()=>{if(!editing||editing.exemplo)return;if(!confirm('Tirar “'+editing.titulo+'” da estante?'))return;try{EST.remover(editing.id);}catch(e){toast(e.message);return;}fecharEditor();toast('Livro removido');});
 $('btnExp').addEventListener('click',async()=>{const json=EST.exportar();const name='estante-'+((EST.DB.perfil&&EST.DB.perfil.nome)||'luiz').toLowerCase()+'-'+new Date().toISOString().slice(0,10)+'.json';
   // na página do claude.ai o arquivo é entregue pela plataforma; no site, download comum
@@ -62114,6 +62167,11 @@ window.__bookData401={isbn:metadata401ISBN,same:metadata401Same,fetch:metadata40
 /* Independent privacy for the whole book and for its review/rating. Owner data stays intact. */
 const book418Label=document.createElement('label'),book418Input=document.createElement('input');book418Input.type='checkbox';book418Input.id='fLivroPrivado418';book418Label.appendChild(book418Input);book418Label.appendChild(document.createTextNode(' Ocultar este livro inteiro nas visitas e na estante pública'));$('fPrivado401').parentElement.parentElement.insertBefore(book418Label,$('fPrivado401').parentElement);
 {const old=editor;editor=function(b){const r=old.apply(this,arguments);$('fLivroPrivado418').checked=b?.livroPrivado===true;return r;};}
+/* v515: ritmo de leitura no editor + título «Privacidade» sobre as duas caixas de ocultar */
+try{const R5=window.__ritmo515;if(R5&&$('fStatus')&&!$('fRitmo515')){const lab=document.createElement('label');lab.appendChild(document.createTextNode(R5.t('Ritmo de leitura','Reading pace','Ritmo de lectura')));const sel=document.createElement('select');sel.id='fRitmo515';
+  for(const [k,v] of [['',R5.t('— não informado —','— not set —','— sin informar —')]].concat(Object.keys(R5.RITMOS).map(k=>[k,R5.nome(k)]))){const o=document.createElement('option');o.value=k;o.textContent=v;sel.appendChild(o);}lab.appendChild(sel);const anc=$('fStatus').parentElement;anc.parentNode.insertBefore(lab,anc.nextSibling);
+  const priv=$('fLivroPrivado418');if(priv&&priv.parentElement){const h=document.createElement('div');h.id='priv515';h.style.cssText='grid-column:1/-1;margin-top:6px;font-weight:600;opacity:.85';h.textContent=R5.t('Privacidade — o que os visitantes veem','Privacy — what visitors see','Privacidad — lo que ven los visitantes');priv.parentElement.parentNode.insertBefore(h,priv.parentElement);}
+  const old2=editor;editor=function(b){const r=old2.apply(this,arguments);try{$('fRitmo515').value=(b&&b.ritmo&&R5.RITMOS[b.ritmo])?b.ritmo:'';}catch(e){}return r;};}}catch(e){console.warn('v515 ui',e);}
 // Save immediately, then complete missing edition fields without overwriting later edits.
 const BOOK418={queue:[],queued:new Set(),running:false,completed:0,unavailable:0};
 function book418Queue(book){if(window.VISITA||!book?.id||book.exemplo||!book.isbn||BOOK418.queued.has(book.id))return;const fields=['paginas','editora','sinopse','capa','ano','idioma'];if(fields.every(k=>book[k]))return;BOOK418.queued.add(book.id);BOOK418.queue.push(book.id);book418Drain();}
