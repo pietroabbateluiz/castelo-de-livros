@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v523</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v524</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -8433,7 +8433,7 @@ async function prepareScene130(revision=PERF130.revision){
   prepCheck131(revision);loading424Show('environment');await breathe130();prepCheck131(revision);tick(0);lightBudget(scene);
   try{if(WORLD&&WORLD.obst)navComp190(navFor(WORLD));}catch(e){}
   camera.updateMatrixWorld();camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
-  const views=[],todas=[];for(const p of PORTALS){if(p.sceneA!==scene||!p.sceneB)continue;todas.push(p);const bb=portalBBox(p);if(bb)views.push({p,bb});}
+  const views=[],todas=[];for(const p of PORTALS){if(p.sceneA!==scene||!p.sceneB||(window.__ab524&&window.__ab524.adiaPortal(p)))continue;todas.push(p);const bb=portalBBox(p);if(bb)views.push({p,bb});}
   const ocultas=todas.filter(p=>!views.some(v=>v.p===p)),key=prepRenderKey133();
   for(const p of todas){if(p.sceneB!==scene&&PORTAL_AQ190.get(p)!==key)try{lightBudget(p.sceneB);}catch(e){}}
   const sources=new Set([scene,...todas.map(p=>p.sceneB)]);
@@ -42649,7 +42649,7 @@ function leve6MatLeve(o){if(historicalPaper209(o))return o.material;const conv=m
   const ms=o.material;return Array.isArray(ms)?ms.map(conv):conv(ms);}
 function leve6GeoLeve(o){try{const r=PAPEL_GEO.get(o);if(r&&r.amplo)return r.g;}catch(e){}return o.geometry;}
 const LEVE6_TEX=['map','emissiveMap','alphaMap','aoMap','lightMap','normalMap','roughnessMap','metalnessMap','bumpMap','displacementMap','specularMap','gradientMap','clearcoatNormalMap','envMap'];
-function leve6IniciaColeta(sc){LEVE6.cena=sc;LEVE6.itens=[];LEVE6.ik=0;LEVE6.esp=[];LEVE6.tex=[];LEVE6.ti=0;LEVE6.sur=[];LEVE6.si=0;LEVE6.vistos=new Set();LEVE6.texV=new Set();LEVE6.geoV=new Set();
+function leve6IniciaColeta(sc){const inc=!!(window.__ab524&&window.__ab524.incremental(sc));LEVE6.cena=sc;if(!inc){LEVE6.itens=[];LEVE6.ik=0;LEVE6.esp=[];LEVE6.tex=[];LEVE6.ti=0;LEVE6.sur=[];LEVE6.si=0;LEVE6.vistos=new Set();LEVE6.texV=new Set();LEVE6.geoV=new Set();}
   const fontes=[{raiz:sc,sc,mask:0}];try{for(const p of PORTALS){if(p.sceneA===sc&&p.sceneB&&p.sceneB!==sc&&!fontes.some(f=>f.raiz===p.sceneB))fontes.push({raiz:p.sceneB,sc:p.sceneB,mask:3});}}catch(e){}
   try{if(PRI6.chefe&&!PRI6.chefe.parent&&ROOMS.fant&&sc===ROOMS.fant.scene)fontes.push({raiz:PRI6.chefe,sc,mask:0});}catch(e){}
   try{if(typeof READER!=='undefined'&&READER.g&&READER.g.parent!==sc)fontes.push({raiz:READER.g,sc,mask:0});}catch(e){}
@@ -54306,9 +54306,9 @@ function flow417Stable(){const s=START344.state;return s.stableSince>0&&performa
 {const old=startup344Sample;startup344Sample=function(dt,now=performance.now()){FLOW417.lastDt=dt;FLOW417.stats.frames++;if(dt>.028){startup344Reset('pico recente de quadro');FLOW417.stats.slowFrames++;FLOW417.cooldown=Math.max(FLOW417.cooldown,now+(dt>.05?1200:160));}if(!Q.papel&&FLOW417.started){FLOW417.health.frames++;FLOW417.health.maxMs=Math.max(FLOW417.health.maxMs,dt*1000);if(dt>.05)FLOW417.health.over50++;}const r=old.apply(this,arguments);if(!FLOW417.started&&Q.papel&&AQ.liberado&&!Q.startup&&!AUTO_MANUAL&&!PAPEL_AUTO.desligado&&!LEVE6.desligado&&AQ2.alvo==='leve'&&now-START344.state.readyAt>1500&&!startup344Pending()&&dt<.022){FLOW417.started=true;leve6Pedir({auto:true});}return r;};}
 {const old=leve6Pedir;leve6Pedir=function(op){op=op||{};if(!Q.papel)return false;if(LEVE6.desligado||!leve6Khr()){LEVE6.fase='espera';LEVE6.manual=!!op.manual;leve6Botao();if(op.manual)showToast('O modo Papel será mantido: este navegador não oferece a preparação gráfica em segundo plano necessária para uma troca estável.');return true;}if(LEVE6.fase==='espera'||LEVE6.fase==='feita'||LEVE6.est.falhas)LEVE6.fase='ociosa';if(LEVE6.fase!=='preparando'){LEVE6.est.falhas=0;LEVE6.pendGL.clear();flow417FenceClear();}const r=old.apply(this,arguments);FLOW417.started=true;return r;};}
 {const old=leve6Cancelar;leve6Cancelar=function(){const r=old.apply(this,arguments);FLOW417.verifying=false;FLOW417.signature='';FLOW417.verifiedAt=0;flow417FenceClear();return r;};}
-leve6Passo=function(){if(LEVE6.fase!=='preparando')return;if(!Q.papel){LEVE6.fase='ociosa';leve6Botao();return;}const now=performance.now();if(PERF130.busy||fadeOnAt||buildBusy||buildIt||BUILD_Q.length||warmQ.length||WARM210.waiting||WARM210.programas.size||document.hidden||uiBlocked()||now<FLOW417.cooldown||FLOW417.lastDt>.024){FLOW417.stats.skipped++;return;}if(renderer.getContext().isContextLost?.()){if(!FLOW417.contextLost){FLOW417.contextLost=true;flow417FenceClear();startup344Reset('contexto gráfico perdido');}return;}const sc=ACTIVE;if(FLOW417.contextLost){FLOW417.contextLost=false;LEVE6.pendGL.clear();LEVE6.est.falhas=0;leve6IniciaColeta(sc);startup344Reset('contexto gráfico restaurado');}if(!sc)return;const deadline=now+1.25;LEVE207.consultasNoQuadro=0;LEVE6.est.quadros++;
+leve6Passo=function(){if(LEVE6.fase!=='preparando')return;if(!Q.papel){LEVE6.fase='ociosa';leve6Botao();return;}const now=performance.now();if(PERF130.busy||fadeOnAt||buildBusy||buildIt||BUILD_Q.length||warmQ.length||WARM210.waiting||WARM210.programas.size||document.hidden||uiBlocked()||now<FLOW417.cooldown||FLOW417.lastDt>.024){FLOW417.stats.skipped++;return;}if(renderer.getContext().isContextLost?.()){if(!FLOW417.contextLost){FLOW417.contextLost=true;flow417FenceClear();startup344Reset('contexto gráfico perdido');}return;}const sc=ACTIVE;if(FLOW417.contextLost){FLOW417.contextLost=false;LEVE6.pendGL.clear();LEVE6.est.falhas=0;leve6IniciaColeta(sc);startup344Reset('contexto gráfico restaurado');}if(!sc)return;const deadline=now+(window.__ab524?window.__ab524.fatia():1.25);LEVE207.consultasNoQuadro=0;LEVE6.est.quadros++;
  try{if(LEVE6.cena!==sc||START344.state.preparedRevision!==START344.state.revision){leve6IniciaColeta(sc);FLOW417.stats.restarts++;}
-  if(LEVE6.walk){if(!leve6Coleta(deadline))return;if(FLOW417.verifying){const signature=flow417Signature();FLOW417.verifying=false;if(signature===FLOW417.signature&&flow417ImagesReady()){LEVE6.ik=LEVE6.itens.length;LEVE6.ti=LEVE6.tex.length;LEVE6.si=LEVE6.sur.length;FLOW417.verifiedAt=performance.now();}else{FLOW417.signature='';FLOW417.verifiedAt=0;flow417FenceClear();startup344Reset('novos recursos');}}return;}
+  if(LEVE6.walk){if(!leve6Coleta(deadline))return;if(FLOW417.verifying){const signature=flow417Signature();FLOW417.verifying=false;if((window.__ab524?window.__ab524.verifica(signature):signature===FLOW417.signature)&&flow417ImagesReady()){LEVE6.ik=LEVE6.itens.length;LEVE6.ti=LEVE6.tex.length;LEVE6.si=LEVE6.sur.length;FLOW417.verifiedAt=performance.now();}else{FLOW417.signature='';FLOW417.verifiedAt=0;flow417FenceClear();startup344Reset('novos recursos');}}return;}
   for(const p of LEVE6.pendGL){if(LEVE207.consultasNoQuadro>=2||performance.now()>=deadline)break;leve6Pronto(p);}if(performance.now()>=deadline)return;
   if(LEVE6.esp.length){const i=(LEVE6.ei||0)%LEVE6.esp.length,it=LEVE6.esp[i];LEVE6.ei=i+1;if(!it.prog||leve6Pronto(it.prog)){const result=leve6Compila(it,true,false);if(result!=='pend'){LEVE6.esp.splice(i,1);LEVE6.est.fin++;}}return;}
   if(LEVE6.pendGL.size)return;
@@ -54322,7 +54322,7 @@ leve6Passo=function(){if(LEVE6.fase!=='preparando')return;if(!Q.papel){LEVE6.fas
   if(!flow417Stable())return;
   if(now-FLOW417.verifiedAt>=2000){const signature=FLOW417.signature,samples=START344.state.samples.slice(),since=START344.state.stableSince,fenceReady=FLOW417.fenceReady;leve6IniciaColeta(sc);FLOW417.signature=signature;FLOW417.verifying=true;FLOW417.fenceReady=fenceReady;START344.state.samples=samples;START344.state.stableSince=since;FLOW417.stats.rechecks++;return;}
   leve6Trocar();
- }finally{const cost=performance.now()-now;FLOW417.stats.maxWorkMs=Math.max(FLOW417.stats.maxWorkMs,cost);LEVE6.est.msMaxQuadro=Math.max(LEVE6.est.msMaxQuadro,cost);if(cost>2.5){FLOW417.cooldown=performance.now()+Math.min(1500,cost*30);startup344Reset('preparação aguardando folga');}}
+ }finally{const cost=performance.now()-now;FLOW417.stats.maxWorkMs=Math.max(FLOW417.stats.maxWorkMs,cost);LEVE6.est.msMaxQuadro=Math.max(LEVE6.est.msMaxQuadro,cost);if(cost>((window.__ab524&&window.__ab524.estado.fatia)||1.25)+1.5){FLOW417.cooldown=performance.now()+Math.min(1500,cost*30);startup344Reset('preparação aguardando folga');}}
 };
 // Only the visible, already prepared scenes need their materials restored in the commit frame.
 // Every other scene receives the same quality during its normal loading transition.
@@ -54439,7 +54439,7 @@ async function liberarAbertura(){
  if(LOAD424.finished||LOAD424.failed||LOAD424.preparing)return;
  if(window.__loadErr){loading424Fail(window.__loadErr);return;}
  const done=FLOOR1_ORDER.filter(k=>ROOMS[k]?.ready).length;
- const floor1Ready=done===FLOOR1_ORDER.length&&!!ROOMS.fant?.ready&&!buildBusy&&!buildIt&&!BUILD_Q.length;
+ const floor1Ready=(window.__ab524?window.__ab524.pronto(done):(done===FLOOR1_ORDER.length&&!!ROOMS.fant?.ready&&!buildBusy&&!buildIt&&!BUILD_Q.length));
  if(!floor1Ready){
   if(!buildBusy&&!buildIt&&!BUILD_Q.length){loading424Fail(loading424Text('A montagem de um dos mundos falhou.','A world could not be built.'));return;}
   loading424Show('rooms',done,FLOOR1_ORDER.length);setTimeout(liberarAbertura,180);return;
@@ -62821,7 +62821,7 @@ function esc523Andar(){try{return CUR==='hall'?HALLN:(GENRE_FLOOR(CUR_GENRE)||1)
 function esc523Chaves(n){let L=[];try{L={1:FLOOR1_ORDER,2:FLOOR2_ORDER,3:FLOOR3_ORDER,4:FLOOR4_ORDER,5:FLOOR5_ORDER}[n]||(n===6?GEN_KEYS6:n===7?GEN_KEYS7:[]);}catch(e){}
   return (L||[]).map(k=>ROOM_BUILDERS[k]?k:(GENRE_ROOM[k]&&ROOM_BUILDERS[GENRE_ROOM[k]]?GENRE_ROOM[k]:null)).filter(Boolean);}
 function esc523Falta(k){return !!ROOM_BUILDERS[k]&&!(ROOMS[k]&&ROOMS[k].ready)&&!ESC523.ruins[k];}
-function esc523Fatia(){const dt=ESC523.ultimoDt;if(QUIET434.job||PERF130.busy||fadeOnAt)return 0;if(ESC523.fatiaFixa)return ESC523.fatiaFixa;if(dt<1/50)return 6;if(dt<1/35)return 3;return 1;}
+function esc523Fatia(){const dt=ESC523.ultimoDt;if(QUIET434.job||PERF130.busy||fadeOnAt)return 0;if(ESC523.fatiaFixa)return ESC523.fatiaFixa;if(dt<1/50)return 6;if(dt<1/35)return 3;return 2;}
 function esc523Proxima(){const E=ESC523;const n=esc523Andar();
   const pedidos=E.fila.filter(esc523Falta);if(pedidos.length)return pedidos[0];
   let lista=esc523Chaves(n).filter(esc523Falta);
@@ -62837,7 +62837,7 @@ function esc523Passo(dt){const E=ESC523;E.ultimoDt=dt||.016;if(!E.on||!LOADED||!
   if(!buildIt){const k=esc523Proxima();if(!k)return;
     try{buildIt=ROOM_BUILDERS[k]();buildKey=k;E.chave=k;E.ms[k]=0;}catch(e){co523Erro('sala '+k,e);E.ruins[k]=true;buildIt=null;buildKey=null;return;}
     buildBusy=true;}
-  if(buildKey!==E.chave)return; // outra montagem (ensureRoom130 / buildStep) está no comando
+  if(buildKey!==E.chave){if(window.__ab524&&window.__ab524.orfao()){E.chave=buildKey;E.ms[buildKey]=E.ms[buildKey]||0;E.stats.adotados=(E.stats.adotados||0)+1;}else return;}
   const t0=performance.now();let done=false;
   try{do{const r=buildIt.next();if(r.done){done=true;break;}}while(performance.now()-t0<fatia);}catch(e){co523Erro('montagem '+buildKey,e);done=true;E.ruins[buildKey]=true;}
   E.ms[buildKey]=(E.ms[buildKey]||0)+(performance.now()-t0);
@@ -62910,6 +62910,48 @@ if(TOME523.on){
 }
 window.__tome523={estado:TOME523,e:tome523E,resumo:tome523Resumo,pend:tome523Pend,falas:TOME523_FALAS,erros:CO523.erros};
 try{if(typeof NOVIDADES198!=='undefined')NOVIDADES198.v523=co523T('🥚 A placa do ovo do dragão ficou legível e o ovo responde à tecla E · as escadas do Hall não esperam mais (as salas montam-se nos bastidores) · Tomé, o Viajante agora é o guia do castelo','🥚 The dragon egg sign is readable and the egg answers the E key · the Hall stairs no longer wait (rooms are built backstage) · Tomé the Traveller is now the castle guide','🥚 El cartel del huevo del dragón se lee bien y el huevo responde a la tecla E · las escaleras ya no esperan · Tomé el Viajero es ahora el guía del castillo');}catch(e){}
+
+/* ===== v524 — abertura rápida e a troca Papel → Leve que acontece de verdade =====
+   Pedido do Luiz: «Agora otimize o jogo, quero carregamentos mais rápidos sem perder detalhes e sem piorar o gráfico. Deve começar no
+   papel e ir carregando o próximo modo nos bastidores, só alterar para o próximo modo quando tudo estiver estável.»
+   Medido no Chrome do Luiz (Intel UHD) com a v522: abertura 60 s — 10,5 s até o 1.º quadro, as 4 salas do 1.º andar até 30 s, 2.598
+   materiais (Hall + as 4 salas atrás das portas) até 55 s, vistas das portas até 60 s; a preparação do Leve (2.564 materiais + 675
+   texturas + 6.666 superfícies, 1,25 ms por quadro) levava ~4 min e a verificação final (assinatura de `flow417Signature`) nunca batia
+   (a `version` dos materiais restaurados muda com as animações; `sur` 6.666 → 6.671) → recomeçava do zero para sempre: 11 min em Papel.
+   (1) ABERTURA: a tela de carregamento só espera o Hall (e a Fantasia quando o prólogo vai correr): `liberarAbertura` sai assim que o Hall
+       está preparado; as salas do 1.º andar montam-se nos bastidores (ESC523, porta mais perto primeiro; a fila antiga `BUILD_Q` e um
+       iterador órfão do `buildStep` são adotados) e aquecem-se (`travel434Prepare`) antes de os portais as desenharem; `prepareScene130`
+       não prepara mais as cenas atrás das portas na abertura (`ab524AdiaPortal`): só o Hall. (2) LEVE: fatia por quadro adaptativa
+       (4 / 2,5 / 1,25 ms conforme a folga do quadro anterior) e a verificação INCREMENTAL — a recolha de verificação não zera a lista:
+       guarda os conjuntos `vistos/texV/geoV`, acrescenta só o que apareceu depois e compila só isso; o que bate não é mais a assinatura,
+       é «nada novo apareceu»; também quando uma sala termina nos bastidores no meio da preparação (revisão muda) a recolha é incremental.
+       Nunca passa do Leve sozinho (decisão da v434: Clássico/Alto/Ultra só por clique).
+   Interruptor: ?v524=0. Gancho: window.__ab524. */
+const AB524={on:!/[?&#]v524=0/i.test(location.search+location.hash),erros:[],fatia:1.25,perdeuContexto:false,
+  stats:{aberturaMs:0,salasNaAbertura:0,portaisAdiados:0,adotados:0,recolhasInc:0,recolhasCheias:0,verificacoes:0,novosItens:0,prologo:false}};
+function ab524Erro(k,e){AB524.erros.push(k+': '+(e&&e.message||e));try{console.warn('v524',k,e);}catch(x){}}
+// (1) a abertura: pronta quando o Hall está pronto; com o prólogo («kit») espera a Fantasia
+function ab524Pronto(done){try{if(!AB524.on)return done===FLOOR1_ORDER.length&&!!(ROOMS.fant&&ROOMS.fant.ready)&&!buildBusy&&!buildIt&&!BUILD_Q.length;
+  const kit=(typeof proFase==='function'&&proFase()==='kit');AB524.stats.prologo=kit;AB524.stats.salasNaAbertura=done;
+  if(kit)return !!(ROOMS.fant&&ROOMS.fant.ready);return true;}catch(e){ab524Erro('pronto',e);return done===FLOOR1_ORDER.length;}}
+// os portais das salas não entram na preparação da abertura: as salas aquecem depois, nos bastidores (ESC523.aquecer)
+function ab524AdiaPortal(p){try{if(!AB524.on||!LOAD424.startup||!p||!p.roomKey)return false;const E=window.__esc523&&window.__esc523.estado;if(E&&!E.aquecer.includes(p.roomKey))E.aquecer.push(p.roomKey);AB524.stats.portaisAdiados++;return true;}catch(e){ab524Erro('portal',e);return false;}}
+// a fila antiga (BUILD_Q, da tela de carregamento) e um iterador órfão do buildStep passam para os bastidores
+function ab524Orfao(){try{return !!(AQ.liberado&&buildIt&&window.__esc523&&window.__esc523.estado.chave===null);}catch(e){return false;}}
+function ab524Fila(){try{if(!AQ.liberado)return;const E=window.__esc523&&window.__esc523.estado;if(!E)return;
+  for(let i=BUILD_Q.length-1;i>=0;i--){const k=BUILD_Q[i];if((ROOMS[k]&&ROOMS[k].ready)||E.ruins[k]||!ROOM_BUILDERS[k])BUILD_Q.splice(i,1);}}catch(e){ab524Erro('fila',e);}} // as salas da fila antiga são as do andar atual: esc523Proxima já as escolhe (porta mais perto primeiro)
+// (2) o Leve: fatia adaptativa e recolha incremental
+function ab524Fatia(){const dt=(typeof FLOW417!=='undefined'&&FLOW417.lastDt)||.016;AB524.fatia=!AB524.on?1.25:(dt<.012?4:dt<.017?2.5:1.25);return AB524.fatia;}
+function ab524Incremental(sc){try{if(!AB524.on)return false;if(AB524.perdeuContexto){AB524.perdeuContexto=false;AB524.stats.recolhasCheias++;return false;}
+  const inc=LEVE6.cena===sc&&LEVE6.itens.length>0&&!LEVE6.est.falhas&&LEVE6.vistos&&LEVE6.texV&&LEVE6.geoV;if(inc)AB524.stats.recolhasInc++;else AB524.stats.recolhasCheias++;return !!inc;}catch(e){ab524Erro('incremental',e);return false;}}
+function ab524Verifica(sig){try{AB524.stats.verificacoes++;if(!AB524.on)return sig===FLOW417.signature;const L=LEVE6;const novos=Math.max(0,L.itens.length-L.ik)+Math.max(0,L.tex.length-L.ti)+Math.max(0,L.sur.length-L.si)+L.esp.length;if(novos>0){AB524.stats.novosItens+=novos;return false;}return true;}catch(e){ab524Erro('verifica',e);return false;}}
+try{renderer.domElement.addEventListener('webglcontextrestored',()=>{AB524.perdeuContexto=true;});}catch(e){}
+if(AB524.on){
+  try{const tk0=tick;tick=function(dt){const r=tk0.apply(this,arguments);try{ab524Fila();}catch(e){}return r;};}catch(e){ab524Erro('tick',e);}
+  try{const f0=fecharAbertura220;if(typeof f0==='function')window.fecharAbertura220=function(){try{AB524.stats.aberturaMs=Math.round(performance.now());}catch(e){}return f0.apply(this,arguments);};}catch(e){}
+}
+window.__ab524={estado:AB524,pronto:ab524Pronto,adiaPortal:ab524AdiaPortal,orfao:ab524Orfao,fatia:ab524Fatia,incremental:ab524Incremental,verifica:ab524Verifica,erros:AB524.erros};
+try{if(typeof NOVIDADES198!=='undefined')NOVIDADES198.v524=co523T('⚡ Abertura mais rápida: o castelo abre com o Hall pronto e as salas montam-se nos bastidores · a passagem do Papel ao Leve acontece quando o quadro está estável','⚡ Faster opening: the castle opens with the Hall ready and the rooms are built backstage · the Papel → Light switch happens once the frame is stable','⚡ Apertura más rápida: el castillo abre con el Hall listo y las salas se montan entre bastidores · el paso de Papel a Ligero ocurre cuando el cuadro es estable');}catch(e){}
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
