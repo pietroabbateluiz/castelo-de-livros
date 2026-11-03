@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v529</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v530</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -24576,7 +24576,7 @@ function cavFaisca(scene,x,y,z,cor,s0,vida){const sp=new THREE.Sprite(new THREE.
 function cavFerir(k,n){if(!k.viva)return;k.hp-=n;k.ferida=0.25;cavBarra(k);for(const o of k.g.userData.olhos)o.material.emissiveIntensity=5;if(k.hp<=0)cavMatar(k);}
 function cavMatar(k){k.viva=false;k.hp=0;const R=ROOMS[k.room];const p=k.g.position;for(let i=0;i<10;i++)cavFaisca(R.scene,p.x+(Math.random()-0.5)*0.5,p.y+(Math.random()-0.5)*0.5,p.z+(Math.random()-0.5)*0.5,i%3?0xe6dcc4:0xff6040,0.25+Math.random()*0.3,0.6+Math.random()*0.4);
   k.g.visible=false;(CAV.estado.mortas[k.room]=CAV.estado.mortas[k.room]||{})[k.id]=true;
-  const S=CAV.salas[k.room];const vivas=S.lista.filter(q=>q.viva).length;try{logAdd('💀 Caveira derrubada em '+roomTitle(chestGenre(k.room)).replace('Sala · ','')+(vivas?' — faltam '+vivas:''));}catch(e){}
+  const S=CAV.salas[k.room];const vivas=S.lista.filter(q=>q.viva&&!q.rival530).length;try{logAdd('💀 Caveira derrubada em '+roomTitle(chestGenre(k.room)).replace('Sala · ','')+(vivas?' — faltam '+vivas:''));}catch(e){}
   if(!vivas){const nova=!CAV.estado.limpas[k.room];CAV.estado.limpas[k.room]=true;const n=cavLimpasN(),tot=cavSalasTotal();
     if(n>=tot&&!CAV.estado.fogo){CAV.estado.fogo=true;showToast('🔥 O Livro acordou! Todas as salas estão limpas: a BOLA DE FOGO AZUL agora sai das páginas — Espaço ou G (no toque, o botão ⚔ usa o poder maior).',{big:true,ms:9000,queue:true});}
     else showToast((nova?'🏆 Sala limpa! ':'✔ Sala limpa de novo. ')+n+' de '+tot+' salas'+(CAV.estado.fogo?'':' — limpe todas para acordar a bola de fogo azul do Livro'),{ms:6000,queue:true});}
@@ -24602,7 +24602,7 @@ function caveirasTick(dt){CAV.recVento=Math.max(0,CAV.recVento-dt);CAV.recFogo=M
     if(o.t>=o.vida||o.y<fy-0.5){o.scene.remove(o.g);CAV.ossos.splice(i,1);}}
   if(!S||CAV.morto||(typeof uiBlocked==='function'&&uiBlocked())||CH.sitting)return;
   const px=CH.x,pz=CH.z;
-  for(const k of S.lista){if(!k.viva||k.robot315||k.para318||k.ally428)continue;if(k.ship316&&!ship316PlayerAboard()){ship316Idle(k,dt);continue;}const dx=px-k.x,dz=pz-k.z,d=Math.hypot(dx,dz);k.bob+=dt;k.tPath-=dt;
+  for(const k of S.lista){if(!k.viva||k.robot315||k.para318||k.ally428||k.rival530)continue;if(k.ship316&&!ship316PlayerAboard()){ship316Idle(k,dt);continue;}const dx=px-k.x,dz=pz-k.z,d=Math.hypot(dx,dz);k.bob+=dt;k.tPath-=dt;
     if(k.ferida>0){k.ferida-=dt;if(k.ferida<=0)for(const o of k.g.userData.olhos)o.material.emissiveIntensity=2.2;}
     if(d>CAV.distMin){if((k.tPath<=0||!k.path)&&caminhoVez190()){k.tPath=0.55+Math.random()*0.35;try{k.path=findPath(k.x,k.z,px,pz);}catch(e){k.path=null;}k.pi=0;}
       let tx=px,tz=pz;if(k.path&&k.path.length){while(k.pi<k.path.length-1&&Math.hypot(k.path[k.pi][0]-k.x,k.path[k.pi][1]-k.z)<0.4)k.pi++;tx=k.path[k.pi][0];tz=k.path[k.pi][1];}
@@ -24778,7 +24778,7 @@ function caveirasTick(dt){CAV.recVento=Math.max(0,CAV.recVento-dt);CAV.recFogo=M
     if(o.t>=o.vida||o.y<fy-0.5){o.scene.remove(o.g);CAV.ossos.splice(i,1);}}
   if(!S||CAV.morto||(typeof uiBlocked==='function'&&uiBlocked())||CH.sitting)return;
   const px=pl.x,pz=pl.z;
-  for(const k of S.lista){if(!k.viva||k.robot315||k.para318||k.ally428)continue;if(k.ship316&&!ship316PlayerAboard()){ship316Idle(k,dt);continue;}const dx=px-k.x,dz=pz-k.z,d=Math.hypot(dx,dz);k.bob+=dt;k.tPath-=dt;
+  for(const k of S.lista){if(!k.viva||k.robot315||k.para318||k.ally428||k.rival530)continue;if(k.ship316&&!ship316PlayerAboard()){ship316Idle(k,dt);continue;}const dx=px-k.x,dz=pz-k.z,d=Math.hypot(dx,dz);k.bob+=dt;k.tPath-=dt;
     if(k.sono===undefined){k.sono=CAV.sono+(k.id||0)*1.3;for(const o of k.g.userData.olhos)o.material.emissiveIntensity=0.5;} // registrada com você já na sala: dorme também
     if(k.sono>0){ // dormente no fundo da sala: só flutua devagar; ao acordar os olhos acendem
       k.sono-=dt;k.g.position.set(k.x,cavY(ROOM,k.x,k.z)+Math.sin(k.bob*1.1)*0.05,k.z);k.g.rotation.y=Math.atan2(dx,dz);
@@ -25015,7 +25015,7 @@ function cavArremessar(k){cavPoolPronto();const R=ROOM;const pl=cavPos();const p
 // ---- queda: texto e faíscas do tipo ----
 function cavMatar(k){k.viva=false;k.hp=0;const R=ROOMS[k.room];const p=k.g.position;const I=INI155[k.tipo]||INI155.caveira;for(let i=0;i<12;i++)cavFaisca(R.scene,p.x+(Math.random()-0.5)*0.6,p.y+(Math.random()-0.5)*0.6,p.z+(Math.random()-0.5)*0.6,i%3?I.faisca[0]:I.faisca[1],0.25+Math.random()*0.3,0.6+Math.random()*0.4);
   k.g.visible=false;(CAV.estado.mortas[k.room]=CAV.estado.mortas[k.room]||{})[k.id]=true;
-  const S=CAV.salas[k.room];const vivas=S.lista.filter(q=>q.viva).length;try{logAdd('💀 '+I.caiu+' em '+roomTitle(chestGenre(k.room)).replace('Sala · ','')+(vivas?' — faltam '+vivas:''));}catch(e){}
+  const S=CAV.salas[k.room];const vivas=S.lista.filter(q=>q.viva&&!q.rival530).length;try{logAdd('💀 '+I.caiu+' em '+roomTitle(chestGenre(k.room)).replace('Sala · ','')+(vivas?' — faltam '+vivas:''));}catch(e){}
   if(!vivas){const nova=!CAV.estado.limpas[k.room];CAV.estado.limpas[k.room]=true;const n=cavLimpasN(),tot=cavSalasTotal();
     if(n>=tot&&!CAV.estado.fogo){CAV.estado.fogo=true;showToast('🔥 O Livro acordou! Todas as salas estão limpas: a BOLA DE FOGO AZUL agora sai das páginas — Espaço ou G (no toque, o botão ⚔ usa o poder maior).',{big:true,ms:9000,queue:true});}
     else showToast((nova?'🏆 Sala limpa! ':'✔ Sala limpa de novo. ')+n+' de '+tot+' salas'+(CAV.estado.fogo?'':' — limpe todas para acordar a bola de fogo azul do Livro'),{ms:6000,queue:true});}
@@ -25046,7 +25046,7 @@ function caveirasTick(dt){CAV.recVento=Math.max(0,CAV.recVento-dt);CAV.recFogo=M
     if(o.t>=o.vida||o.y<fy-0.5){o.scene.remove(o.g);CAV.ossos.splice(i,1);}}
   if(!S||CAV.morto||(typeof uiBlocked==='function'&&uiBlocked())||CH.sitting)return;
   const px=pl.x,pz=pl.z;
-  for(const k of S.lista){if(!k.viva||k.robot315||k.para318||k.ally428)continue;if(k.ship316&&!ship316PlayerAboard()){ship316Idle(k,dt);continue;}const dx=px-k.x,dz=pz-k.z,d=Math.hypot(dx,dz);k.bob+=dt;k.tPath-=dt;
+  for(const k of S.lista){if(!k.viva||k.robot315||k.para318||k.ally428||k.rival530)continue;if(k.ship316&&!ship316PlayerAboard()){ship316Idle(k,dt);continue;}const dx=px-k.x,dz=pz-k.z,d=Math.hypot(dx,dz);k.bob+=dt;k.tPath-=dt;
     if(k.sono===undefined){k.sono=CAV.sono+(k.id||0)*1.3;for(const o of k.g.userData.olhos)o.material.emissiveIntensity=0.5;}
     const anim=k.g.userData.anim;
     if(k.sono>0){k.sono-=dt;k.g.position.set(k.x,cavY(ROOM,k.x,k.z)+Math.sin(k.bob*1.1)*0.05,k.z);k.g.rotation.y=Math.atan2(dx,dz);if(anim)try{anim(dt,k,t,true);}catch(e){}
@@ -55199,7 +55199,7 @@ function ruby422BabyTick(g,dt){const r=g.userData.ruby422;dt=Math.min(.05,Math.m
  if(r.cd>0)return;const S=CAV.salas[cavRoom()];let enemy=null,dist=dr529Alcance(stage);for(const k of S?.lista||[]){if(!k.viva||k.sono)continue;const d=Math.hypot(k.x-CH.x,k.z-CH.z);if(d<dist&&ruby422Sight(CH.x,CH.z,k.x,k.z)){enemy=k;dist=d;}}if(!enemy){r.cd=.25;return;}if(!r.fire){const m=new THREE.MeshBasicMaterial({color:0xffbb57,transparent:true,opacity:.8,depthWrite:false,side:THREE.DoubleSide});r.fire=new THREE.Mesh(new THREE.CylinderGeometry(.23,.03,1,12,1,true),m);r.fire.name='Dragão dos rubis · sopro de fogo';r.fire.userData.noCam=true;r.fire.userData.papelKeepGeo=true;r.fire.raycast=()=>{};ACTIVE.add(r.fire);}g.updateWorldMatrix(true,true);r.mouth.set(0,.18,.65);g.localToWorld(r.mouth);r.target.set(enemy.x,(CUR==='room'?(ROOM?.floorY?.(enemy.x,enemy.z)||0):0)+.9,enemy.z);r.dir.subVectors(r.target,r.mouth);const len=r.dir.length();r.fire.position.copy(r.mouth).addScaledVector(r.dir,.5);r.fire.scale.set(1,len,1);r.fire.quaternion.setFromUnitVectors(r.up,r.dir.normalize());r.fire.visible=true;r.burn=.3;r.cd=dr529Recarga(stage);const hit=k=>{cavFerir(k,dr529Dano(stage,k));if(stage>=2&&k.viva){const old=r.burns.find(b=>b.k===k);if(old){old.left=3;old.time=1;}else r.burns.push({k,scene:ACTIVE,time:1,left:3});}};hit(enemy);if(stage>=3){const angle=Math.atan2(enemy.x-CH.x,enemy.z-CH.z);let count=1;for(const k of S.lista){if(k===enemy||!k.viva||k.sono||count>=dr529Cone(stage))continue;const a=Math.atan2(k.x-CH.x,k.z-CH.z),da=Math.abs(Math.atan2(Math.sin(a-angle),Math.cos(a-angle)));if(da<dr529Angulo(stage)&&Math.hypot(k.x-CH.x,k.z-CH.z)<dr529Alcance(stage)+1.8&&ruby422Sight(CH.x,CH.z,k.x,k.z)){hit(k);count++;}}}}
 function ruby422PetInstall(){const it={id:'dragon422',nome:ruby422Text('Dragão prismático dos rubis','Prismatic ruby dragon'),slot:'pet',cat:'Companheiros',preco:0,premioBau:true,desc:ruby422Text('Nasce do ovo de Fantasia após receber 1000 rubis. Acompanha e cospe fogo.','Hatches from the Fantasy egg after 1000 rubies. Follows and breathes fire.'),ico:'🐉'};LOJA_ITENS.push(it);LOJA_BY[it.id]=it;const owned=lojaOwned;lojaOwned=function(item){return item?.id==='dragon422'?(RUBY422.data.donated>=1000||WEBMASTER||PAC.on):owned.apply(this,arguments);};const click=lojaClick;lojaClick=function(id){if(id==='dragon422'&&!lojaOwned(it)){showToast(ruby422Text('Entregue 1000 rubis ao ovo ao lado da porta de Fantasia.','Donate 1000 rubies to the egg beside the Fantasy door.'));return;}return click.apply(this,arguments);};const build=buildPet;buildPet=function(id){return id==='dragon422'?ruby422Baby():build.apply(this,arguments);};const gear=gearTick;gearTick=function(dt){const p=GEAR.pet,b=GEAR.bicho,ep=LOJA.equip.pet,eb=LOJA.equip.bicho,ip=GEAR.petId,ib=GEAR.bichoId,hideP=!!p&&!companion422Allowed(p),hideB=!!b&&!companion422Allowed(b);if(p)p.visible=!hideP;if(b)b.visible=!hideB;if(hideP||p?.userData.ruby422)GEAR.pet=null;if(hideB)GEAR.bicho=null;try{gear.apply(this,arguments);}finally{if(hideP||p?.userData.ruby422)companion434Restore('pet',p,ep,ip);if(hideB)companion434Restore('bicho',b,eb,ib);}if(p?.userData.ruby422&&GEAR.pet===p&&p.visible)ruby422BabyTick(p,dt);garden422Recover();};
  const apply=applyGear;applyGear=function(){const old=GEAR.pet;if(old?.userData.ruby422&&LOJA.equip.pet!=='dragon422'){const f=old.userData.ruby422.fire;f?.parent?.remove(f);f?.geometry.dispose();f?.material.dispose();}const r=apply.apply(this,arguments);for(const g of [GEAR.pet,GEAR.bicho])if(g)g.visible=companion422Allowed(g);return r;};
- const active=setActive;setActive=function(){const pet=GEAR.pet?.userData.ruby422;if(pet){pet.burns.length=0;pet.burn=0;if(pet.fire)pet.fire.visible=false;}const r=active.apply(this,arguments);companion422Seal();for(const g of [GEAR.pet,GEAR.bicho])if(g)g.visible=companion422Allowed(g);return r;};const use=drgpUsar,effect=drgpEfeito,shot=c191Tiro;drgpUsar=function(){if(floor421Current()===7)return false;return use.apply(this,arguments);};drgpEfeito=function(){if(floor421Current()===7)return 0;return effect.apply(this,arguments);};c191Tiro=function(){if(floor421Current()===7)return;return shot.apply(this,arguments);};const hurt=cavDano;cavDano=function(n){const g=GEAR.pet,r=g?.userData.ruby422;if(n>0&&r&&ruby422Stage()>=4&&r.shield<=0&&!CAV.morto&&CAV.invul<=0&&!PAC.on){r.shield=20;showToast(ruby422Text('O dragão dos rubis bloqueou o golpe!','Your ruby dragon blocked the hit!'));return;}return hurt.apply(this,arguments);};ruby422Reward(false);if(LOJA.equip.pet==='dragon422')applyGear();}
+ const active=setActive;setActive=function(){const pet=GEAR.pet?.userData.ruby422;if(pet){pet.burns.length=0;pet.burn=0;if(pet.fire)pet.fire.visible=false;}const r=active.apply(this,arguments);companion422Seal();for(const g of [GEAR.pet,GEAR.bicho])if(g)g.visible=companion422Allowed(g);return r;};const use=drgpUsar,effect=drgpEfeito,shot=c191Tiro;drgpUsar=function(){if(floor421Current()===7)return false;return use.apply(this,arguments);};drgpEfeito=function(){if(floor421Current()===7)return 0;return effect.apply(this,arguments);};c191Tiro=function(){if(floor421Current()===7)return;return shot.apply(this,arguments);};const hurt=cavDano;cavDano=function(n){const g=(GEAR.pet&&GEAR.pet.userData.ruby422)?GEAR.pet:GEAR.rubi530,r=g?.userData.ruby422;if(n>0&&r&&ruby422Stage()>=4&&r.shield<=0&&!CAV.morto&&CAV.invul<=0&&!PAC.on){r.shield=20;showToast(ruby422Text('O dragão dos rubis bloqueou o golpe!','Your ruby dragon blocked the hit!'));return;}return hurt.apply(this,arguments);};ruby422Reward(false);if(LOJA.equip.pet==='dragon422')applyGear();}
 
 ruby422Install();ruby422PetInstall();hallDragon381Build();ruby422ClockBuild(1,12);ruby422ClockBuild(3,4);
 /* A single cached, articulated rose knight. All ornament is merged by material. */
@@ -56130,7 +56130,7 @@ function p439T(pt,en,es){return text428(pt,en,es||en);}
 function p439Le(){try{const d=JSON.parse(localStorage.getItem(P439.KEY)||'null');if(d&&typeof d==='object'){P439.save.aberto=d.aberto===true;P439.save.legado=d.legado===true;P439.save.quando=+d.quando||0;}}catch(e){}}
 function p439Grava(){try{localStorage.setItem(P439.KEY,JSON.stringify(P439.save));}catch(e){p439Erro('gravar',e);}}
 function p439Escada(){const X=HALLS[2]&&HALLS[2].X;if(!X)return null;return (X.stairs||[X.stair]).find(s=>s&&s.to===3)||null;}
-function p439Dragao(){const d=RUBY422.data,nasceu=d.donated>=1000,estagio=nasceu?ruby422Stage():0,pet=GEAR.pet,equipado=!!pet&&pet.userData.pet==='dragon422'&&pet.visible!==false;return {nasceu,estagio,grande:nasceu&&estagio>=P439.ESTAGIO,equipado,growth:d.growth,donated:d.donated};}
+function p439Dragao(){const d=RUBY422.data,nasceu=d.donated>=1000,estagio=nasceu?ruby422Stage():0,pet=(GEAR.pet&&GEAR.pet.userData.ruby422)?GEAR.pet:GEAR.rubi530,equipado=!!pet&&pet.userData.pet==='dragon422'&&pet.visible!==false;return {nasceu,estagio,grande:nasceu&&estagio>=P439.ESTAGIO,equipado,growth:d.growth,donated:d.donated};}
 // quem já esteve do 3.º andar para cima (antes da v439) não perde o acesso
 function p439Legado(){try{for(const n of [3,4,5,6,7])for(const g of ((EST.ANDARES&&EST.ANDARES[n])||[])){const k=GENRE_ROOM[g];
     if((KEYS.tem&&(KEYS.tem[g]||KEYS.tem[k]))||(KEYS.baus&&(KEYS.baus[g]||KEYS.baus[k]))||(LEITOR.lidos&&(LEITOR.lidos[g]||LEITOR.lidos[k])))return true;
@@ -56204,7 +56204,7 @@ function p439Fogo(){if(P439.fogo)return P439.fogo;const sc=HALLS[2].scene,mk=(r,
   const F={fora:mk(.95,0xff8a2a,.72),dentro:mk(.5,0xfff0b8,.85),halo:p439Halo(),up:new THREE.Vector3(0,1,0),boca:new THREE.Vector3(),dir:new THREE.Vector3(),t:0};F.halo.scale.set(3.2,3.2,1);F.halo.visible=false;sc.add(F.halo);
   for(let i=0;i<7;i++){const g=new THREE.Mesh(new THREE.SphereGeometry(.05+Math.random()*.035,8,6),p439Mat(0x3a1a12,0xff5a14));g.name='Portão do Torreão · gota · bicho';p439Marca(g);g.visible=false;g.userData.u=Math.random();g.userData.x=.2+Math.random()*2.3;g.userData.v=.6+Math.random()*.9;sc.add(g);P439.gota.push(g);}
   P439.fogo=F;return F;}
-function p439Pet(){const p=GEAR.pet;return p&&p.userData.pet==='dragon422'&&p.userData.ruby422?p:null;}
+function p439Pet(){const p=(GEAR.pet&&GEAR.pet.userData.ruby422)?GEAR.pet:GEAR.rubi530;return p&&p.userData.pet==='dragon422'&&p.userData.ruby422?p:null;}
 function p439Mira(pet,dt,ligado){ // o dragão vira para o portão (rotação local = rumo no mundo − rumo do leitor)
   if(!pet)return;const r=pet.userData.ruby422;if(!r.__q439){r.__q439=new THREE.Quaternion();r.__e439=new THREE.Euler();r.__w439=new THREE.Vector3();}
   let alvo=0;if(ligado&&P439.gpos){pet.getWorldPosition(r.__w439);const want=Math.atan2(P439.gpos.x-r.__w439.x,P439.gpos.z-r.__w439.z);if(pet.parent){pet.parent.getWorldQuaternion(r.__q439);r.__e439.setFromQuaternion(r.__q439,'YXZ');alvo=want-r.__e439.y;}else alvo=want;}
@@ -62339,7 +62339,7 @@ function al521Porta(sc,M,x,z,ry,largura,altura,mat,nome,sentido){const g=new THR
   const p={g,ang:0,alvo:0,x,z,ry,s:sentido||1,cx:x+Math.cos(ry)*largura/2,cz:z-Math.sin(ry)*largura/2};AL521.portas.push(p);return p;}
 function al521Luz(sc,cor,i0,x,y,z,d,halo){const L=new THREE.PointLight(cor,0,d||9,2);L.position.set(x,y,z);sc.add(L);const l={L,i0,ph:Math.random()*6};AL521.luzes.push(l);if(halo){try{const sp=rkSprite(sc,cor,halo,.45,x,y,z);sp.userData.noCam=true;l.halo=sp;}catch(e){}}return L;}
 /* ---------- corte da parede direita da sala (como na v517) ---------- */
-function al521CortaParede(sc,P,st){const T=THREE;const zA=P.zA,zB=P.zB,zc=(zA+zB)/2,h=P.h;try{let parede=null;const b=new T.Box3();sc.traverse(o=>{if(parede||!o.isMesh||!o.geometry||o.geometry.type!=='BoxGeometry')return;const pr=o.geometry.parameters;if(!pr||Math.abs(pr.width-.24)>.02||pr.depth<40)return;b.setFromObject(o);if(b.min.x>19.5&&b.max.x<20.3&&b.max.y>5)parede=o;});
+function al521CortaParede(sc,P,st){const T=THREE;const zA=P.zA,zB=P.zB,zc=(zA+zB)/2,h=P.h;try{let parede=null;const b=new T.Box3();sc.traverse(o=>{if(parede||!o.isMesh||!o.geometry||o.geometry.type!=='BoxGeometry')return;const pr=o.geometry.parameters;if(!pr||Math.abs(pr.width-.24)>.06||pr.depth<40)return;b.setFromObject(o);if(b.min.x>19.5&&b.max.x<20.3&&b.max.y>4)parede=o;});
     if(parede){parede.visible=false;parede.userData.al517Escondida=true;const mat=parede.material;const Kp=t160Kit('521 parede');const x=(b.min.x+b.max.x)/2,w=b.max.x-b.min.x,Hh=b.max.y;Kp.box(w,Hh,zA-b.min.z,mat,x,Hh/2,(b.min.z+zA)/2);Kp.box(w,Hh,b.max.z-zB,mat,x,Hh/2,(zB+b.max.z)/2);Kp.box(w,Hh-h,zB-zA,mat,x,(h+Hh)/2,zc);const ms=Kp.fim(sc,{sombra:true,juntar:false});for(const m of ms){m.userData.papelKeepGeo=true;m.userData.al517=true;}st.parede=true;}
     const V={x0:19.3,x1:20.5,y0:-.05,y1:h+.3,z0:zA-.08,z1:zB+.08};const v=new T.Vector3();let nt=0;const dentro=(i,pos,o)=>{v.fromBufferAttribute(pos,i).applyMatrix4(o.matrixWorld);return v.x>V.x0&&v.x<V.x1&&v.y>V.y0&&v.y<V.y1&&v.z>V.z0&&v.z<V.z1;};
     const longos=[];sc.traverse(o=>{if(!o.isMesh||!o.geometry||o.isInstancedMesh||o.userData.al517Escondida||o.userData.al517)return;const g=o.geometry,pos=g.attributes.position;if(!pos)return;b.setFromObject(o);if(b.max.x<V.x0||b.min.x>V.x1||b.max.z<V.z0||b.min.z>V.z1||b.max.y<V.y0||b.min.y>V.y1)return;
@@ -63436,6 +63436,167 @@ if(DR529.on){
 }
 window.__dragao529={estado:DR529,reliquias:AT529,tabela:DR529.tabela,dano:dr529Dano,monta:at529Monta,pega:at529Pega,erros:DR529.erros,ruby:()=>RUBY422.data,diag:()=>({gt:DR529.gt||0,chamadas:DR529.chamadas||0,suplente:DR529.suplente||0,hidden:document.hidden,ui:uiBlocked(),aq:AQ.liberado,pet:!!GEAR.pet,ruby:!!(GEAR.pet&&GEAR.pet.userData.ruby422),vis:!!(GEAR.pet&&GEAR.pet.visible),morto:CAV.morto,pac:PAC.on}),tickDragao:dt=>ruby422BabyTick(GEAR.pet,dt||.016),loja:()=>LOJA,commit:f=>ruby422Commit(f),reward:()=>ruby422Reward(true),stage:()=>ruby422Stage(),gear:()=>GEAR,vinculo:()=>DRGP.estado.vinculo,escala:d445Escala};
 try{if(typeof NOVIDADES198!=='undefined')NOVIDADES198.v529=co523T('🐉 O dragão dos rubis cresce até 5× e a chama evolui — amarela, verde, azul e roxa (a mais forte, para os chefes); e os sopros dos dragões companheiros estão espalhados pelas salas como relíquias para apanhar','🐉 The ruby dragon grows to 5× and its flame evolves — yellow, green, blue and purple (the strongest, for bosses); and the companion dragons’ breath attacks are scattered through the rooms as relics to pick up','🐉 El dragón de rubíes crece hasta 5× y la llama evoluciona — amarilla, verde, azul y morada (la más fuerte, para los jefes); y los soplos de los dragones compañeros están repartidos por las salas como reliquias');}catch(e){}
+
+/* ===== v530 — Dragão dos rubis como 3.º companheiro (RB530) e os Campos dos Rivais no 2.º e 4.º andar (RV530) =====
+   Pedido do Luiz: «Esse dragão especial pode ficar ativado com outros companions. (…) Faça áreas com pórticos no segundo e quarto
+   andar, esses pórticos dão das salas comuns para salas com grama e árvores, mais amplas, onde surgem personagens parecidos comigo só
+   que com longas asas e com companions que tb atacam, e ao derrotá-los eu ganho os companions deles».
+   (1) RB530 — o dragão dos rubis (ovo da Fantasia) deixa de ocupar a vaga do voador: se outro companheiro está equipado, o dragão
+       monta-se numa 3.ª vaga (`GEAR.rubi530`, filho do leitor, à direita) e continua a seguir, a cuspir fogo (`ruby422BabyTick`), a
+       bloquear golpes (barreira 4×) e a derreter o portão do Torreão (TROCAS em `cavDano`, `p439Dragao` e `p439Pet`). Se o dragão é o
+       próprio voador equipado, a 3.ª vaga fica vazia. `?rubi530=0` desliga.
+   (2) RV530 — em cada uma das dez salas do 2.º e do 4.º andar (Mistério, Romance, Distopia, Paranormal, Quadrinhos; Poesia,
+       Mitologia, Infantil, Clássicos, Autoajuda) a parede direita ganha um PÓRTICO de pedra (vão escolhido onde a parede está livre:
+       `rv530Vao`) que dá para o CAMPO DOS RIVAIS: 56 × 56 m de relva ao ar livre (céu, horizonte de floresta pintado, 22 árvores,
+       pedras, tufos de relva, flores, um círculo de pedras no meio, caminho de lajes), montado com o `al521Mundo` da v521 (o mesmo
+       construtor das alas do 3.º andar — chão, céu, paredes, clamp, obstáculos, portas) e sem as luzes de grelha (quatro luzes só).
+       No campo vive um RIVAL: um leitor encapuzado como o do jogador (`rebuiltReader` com outras cores) com ASAS LONGAS (asa253Modelo
+       ×1,7, tingidas) e um COMPANHEIRO da loja (modelo de `buildPet`/`buildBicho`) que também ataca. Os dois entram na lista de
+       inimigos da sala (`CAV.salas[sala].lista`, `rival530:true`): o Livro, os poderes e o sopro do dragão acertam-lhes; a IA é própria
+       (`rv530Tick`): o rival voa ao encontro, golpeia de perto (10/13 de dano) e atira penas (projétil na lista `CAV.ossos`, dano de
+       osso); o companheiro orbita o rival e dispara raios (`CAV.ossos`); knockback, barra de vida e faíscas como os outros. Não contam
+       para «sala limpa» (TROCA no `cavMatar`). Ao derrotar o rival (`cavMatar` embrulhado) ganha-se o companheiro dele para sempre
+       (`LOJA.itens[id]=1` + `lojaSave`), com toast grande; o rival volta no dia seguinte como os outros inimigos (sem prémio novo).
+       Prémios: Corujinha (Mistério), Cachorro leal (Romance), Raposa-vermelha (Distopia), Beija-flor (Paranormal), Periquito
+       (Quadrinhos); Mariposa de prata (Poesia), Serpente Celeste (Mitologia), Coelho saltador (Infantil), Livro voador (Clássicos),
+       Capivara tranquila (Autoajuda). Save `mundo.rivais530.v1`. `?rivais530=0` desliga.
+   Gancho: window.__rivais530 (`estado`, `lista`, `campos`, `rivais`, `vao`). */
+const RB530={on:!/[?&#]rubi530=0/i.test(location.search+location.hash),erros:[]};
+function rb530Erro(k,e){if(RB530.erros.length<20)RB530.erros.push(k+': '+(e&&e.message||e));try{console.warn('v530 rubi',k,e);}catch(x){}}
+function rb530Quer(){try{if(!RB530.on)return false;if(!(RUBY422.data.donated>=1000||WEBMASTER))return false;if(LOJA.equip.pet==='dragon422')return false;return true;}catch(e){return false;}}
+function rb530Sync(){try{const quer=rb530Quer();const g=GEAR.rubi530;
+    if(!quer){if(g){try{const f=g.userData.ruby422&&g.userData.ruby422.fire;if(f){f.parent&&f.parent.remove(f);f.geometry&&f.geometry.dispose();f.material&&f.material.dispose();g.userData.ruby422.fire=null;}}catch(e){}g.parent&&g.parent.remove(g);GEAR.rubi530=null;}return;}
+    if(g&&g.parent===READER.g)return;if(g&&!g.parent){READER.g.add(g);return;}
+    const n=ruby422Baby();n.userData.rubi530=true;try{if(typeof companion434Protect==='function')companion434Protect(n);}catch(e){}READER.g.add(n);GEAR.rubi530=n;}catch(e){rb530Erro('sync',e);}}
+if(RB530.on){
+  try{const a0=applyGear;applyGear=function(){const r=a0.apply(this,arguments);try{rb530Sync();}catch(e){}return r;};}catch(e){rb530Erro('applyGear',e);}
+  try{const g0=gearTick;gearTick=function(dt){const rv=g0.apply(this,arguments);try{const g=GEAR.rubi530;if(!g){if(rb530Quer()&&(RB530.t=(RB530.t||0)+(dt||.016))>1){RB530.t=0;rb530Sync();}}
+      else{if(!rb530Quer()){rb530Sync();}else{const ok=(typeof companion422Allowed!=='function')||companion422Allowed(g);g.visible=ok;if(ok){ruby422BabyTick(g,Math.min(.05,dt||.016));g.position.set((Math.abs(g.position.x)+.2)/.7,g.position.y/.7,g.position.z/.7);g.scale.multiplyScalar(1/.7);} /* à direita do leitor, com o mesmo espaçamento (1/0,7) que a v434 dá ao voador */ else if(g.userData.ruby422&&g.userData.ruby422.fire)g.userData.ruby422.fire.visible=false;}}}catch(e){rb530Erro('tick',e);}return rv;};}catch(e){rb530Erro('gearTick',e);}
+  try{const s0=setActive;setActive=function(){const g=GEAR.rubi530,r=g&&g.userData.ruby422;if(r){r.burns.length=0;r.burn=0;if(r.fire)r.fire.visible=false;}return s0.apply(this,arguments);};}catch(e){rb530Erro('setActive',e);}
+  try{setTimeout(rb530Sync,1500);}catch(e){}
+}
+/* ===================== RV530 · os Campos dos Rivais ===================== */
+const RV530={on:!/[?&#]rivais530=0/i.test(location.search+location.hash),key:SKEY('mundo.rivais530.v1'),estado:{vencidos:{},premios:{}},campos:{},rivais:{},erros:[],stats:{campos:0,rivais:0},t:0,
+  lista:[{sala:'mys',comp:'coruja',nome:'Íris, a Detetive Alada',cor:0x2c4a86,cachecol:0xc9a24a,asa:0x9ad0ff,hp:90,chp:35,dano:10},
+    {sala:'vila',comp:'cachorro',nome:'Dom Aurélio das Asas',cor:0x7a2028,cachecol:0xe8e2d4,asa:0xffd080,hp:90,chp:35,dano:10},
+    {sala:'guerra',comp:'raposa',nome:'Capitã Serena',cor:0x2f6a3a,cachecol:0x222226,asa:0xff8a60,hp:100,chp:40,dano:11},
+    {sala:'outono',comp:'beijaflor',nome:'Madame Lúcia',cor:0x5a3a86,cachecol:0xe8e2d4,asa:0xe0a0ff,hp:90,chp:35,dano:10},
+    {sala:'quadrinhos',comp:'periquito',nome:'Zé Raio',cor:0xe8e2d4,cachecol:0x2c4a86,asa:0xffe060,hp:95,chp:35,dano:10},
+    {sala:'poesia',comp:'mariposa',nome:'Lira, a Poetisa',cor:0x5a3a86,cachecol:0xc9a24a,asa:0xc0d0ff,hp:140,chp:50,dano:13},
+    {sala:'mitologia',comp:'drg_serpente',nome:'Hélio, Guardião do Olimpo',cor:0xc9a24a,cachecol:0x7a2028,asa:0xfff0b0,hp:160,chp:60,dano:14},
+    {sala:'infantil',comp:'coelho',nome:'Nina Pequenina',cor:0xf0c0d0,cachecol:0xe8e2d4,asa:0xffffff,hp:130,chp:45,dano:12},
+    {sala:'classicos',comp:'livro',nome:'Professor Átila',cor:0x222226,cachecol:0xc9a24a,asa:0xc8a060,hp:150,chp:50,dano:13},
+    {sala:'autoajuda',comp:'capivara',nome:'Mestre Sereno',cor:0xe8d8b0,cachecol:0x2f6a3a,asa:0xa0e0c0,hp:140,chp:50,dano:13}]};
+function rv530Erro(k,e){if(RV530.erros.length<40)RV530.erros.push(k+': '+(e&&e.message||e));try{console.warn('v530 rivais',k,e);}catch(x){}}
+function rv530Le(){try{const d=JSON.parse(localStorage.getItem(RV530.key)||'null');if(d&&typeof d==='object'&&d.vencidos)RV530.estado=d;}catch(e){}}
+function rv530Grava(){try{localStorage.setItem(RV530.key,JSON.stringify(RV530.estado));}catch(e){}}
+rv530Le();
+function rv530Def(sala){return RV530.lista.find(d=>d.sala===sala)||null;}
+/* ---------- o vão: um trecho livre da parede direita ---------- */
+function rv530Vao(R){try{const sc=R.scene,W=R.world;const z0=-18.5,z1=18.5,passo=.25,n=Math.round((z1-z0)/passo);const ocup=new Uint8Array(n+1);const marca=(a,b)=>{const i0=Math.max(0,Math.floor((a-z0)/passo)),i1=Math.min(n,Math.ceil((b-z0)/passo));for(let i=i0;i<=i1;i++)ocup[i]=1;};
+    for(const o of (W.obst||[])){if(o[0]+o[2]>16.0&&o[0]-o[2]<20.4)marca(o[1]-o[2]-.4,o[1]+o[2]+.4);}
+    const bb=new THREE.Box3(),tam=new THREE.Vector3();sc.updateMatrixWorld(true);sc.traverse(o=>{if(!o.isMesh||!o.geometry||o.isSprite)return;if(o.userData&&(o.userData.fx||o.userData.portal))return;try{bb.setFromObject(o);}catch(e){return;}if(!isFinite(bb.min.x))return;bb.getSize(tam);
+      if(bb.min.x>19.4)return; // a própria parede
+      if(bb.max.x<16.0||bb.min.y>3.4||bb.max.y<.05)return;if(tam.y<.12&&(tam.x>5||tam.z>5))return; // chão/forro
+      if(tam.x>30&&tam.z>30)return;marca(bb.min.z-.4,bb.max.z+.4);});
+    const L=2.8;const livre=(c)=>{const i0=Math.floor((c-L/2-z0)/passo),i1=Math.ceil((c+L/2-z0)/passo);if(i0<0||i1>n)return false;for(let i=i0;i<=i1;i++)if(ocup[i])return false;return true;};
+    const pref=[-17.2,-14,-11,-8,-5,-2,2,5,8,11,14,17];for(const c of pref)if(livre(c))return {zA:c-L/2,zB:c+L/2,h:4.0,c,livre:true};
+    for(let c=z0+L/2;c<=z1-L/2;c+=.5)if(livre(c))return {zA:c-L/2,zB:c+L/2,h:4.0,c,livre:true};
+    return {zA:-18.6,zB:-15.8,h:4.0,c:-17.2,livre:false};}catch(e){rv530Erro('vão',e);return {zA:-18.6,zB:-15.8,h:4.0,c:-17.2,livre:false};}}
+/* ---------- o campo ---------- */
+function rv530Relva(){return t160Mat('530 relva',()=>{const c=can(256,256),x=c.getContext('2d');x.fillStyle='#5f9a3e';x.fillRect(0,0,256,256);const r=rnd(5301);for(let k=0;k<5000;k++){x.fillStyle='rgba('+(40+r()*70|0)+','+(110+r()*80|0)+','+(30+r()*40|0)+',.65)';x.fillRect(r()*256,r()*256,2,3+r()*3);}for(let k=0;k<60;k++){x.fillStyle=['#e8d060','#f0f0f0','#e070a0'][k%3];x.fillRect(r()*256,r()*256,2,2);}
+  const m=new THREE.MeshStandardMaterial({map:qa527TexMapa(c,[14,14],true),roughness:.95});m.userData.papelKeep=true;return m;});}
+function rv530Cfg(sala,P){const ceu=al521TexCeu('céu campo '+sala,'#6fb0ea','#bfe0f6','#f4ecd4');const def=rv530Def(sala);
+  return {sala,entrada:P,nome:text428('Campo dos Rivais','Field of Rivals','Campo de los Rivales'),placaBg:'#1f3320',placaFg:'#e8f0c0',luz:{cor:0xfff4e0,i0:1.0,y:3,d:1},
+    mats:T=>({chao:rv530Relva(),parede:al521TexFundoFloresta(),teto:al521Mat('530 teto',0x8a6a4a,.95),ceu,ombreira:al521TexMat('530 pedra',STONE,[2,1.4],0xc8c0b0,.95),porta:al521Mat('530 porta',0x6a4a2a,.8),pedra:al521TexMat('530 pedra',STONE,[2,1.4],0xc8c0b0,.95),
+      folha:al521Mat('530 folha a',0x3f7a3a,.9),folha2:al521Mat('530 folha b',0x5a9a48,.9),folha3:al521Mat('530 folha c',0x2f6a30,.9),casca:al521Mat('530 casca',0x5a3a22,.95),musgo:al521Mat('530 musgo',0x6a8a3a,.95)}),
+    rects:[{id:1,entrada:true,x0:20.04,x1:76,z0:-28,z1:28,h:14,ceu:'ceu',chao:'chao',parede:'parede',luz:{cor:0xfff4e0,i0:1.0,y:3,d:1},decor:(c,q,cx,cz)=>{const {K,M}=c;const r=rnd(5302+sala.length);const zc=P.c;
+        // o pórtico de pedra, do lado do campo
+        K.push(q.x0+.9,0,zc,0);for(const s of [-1,1]){K.cyl(.34,.4,4.6,M.pedra,0,2.3,s*2.1,14);K.box(1.0,.3,1.0,M.pedra,0,.15,s*2.1);K.box(1.0,.34,1.0,M.pedra,0,4.75,s*2.1);}
+          K.tor(2.1,.3,M.pedra,0,4.9,0,Math.PI,Math.PI/2,0,0,8,24);K.box(.9,.5,5.4,M.pedra,0,5.0,0);
+          for(let i=0;i<14;i++){const a=i/13*Math.PI;K.sph(.16+(i%3)*.05,M.musgo,.2,4.9+Math.sin(a)*2.1,Math.cos(a)*2.1,1,.8,1,7,5);}
+          for(const s of [-1,1])for(let k=0;k<4;k++)try{bot368Flower(K,[al521Mat('530 flor a',0xf04060,.6),al521Mat('530 flor b',0xf0d030,.6)][k%2],.5+k*.22,.04,s*2.1+(k-1.5)*.18,.09,k,5);}catch(e){}K.pop();
+        // caminho de lajes até o círculo de pedras
+        for(let k=0;k<12;k++)K.cyl(.45,.45,.05,M.pedra,q.x0+2.2+k*1.5,.02,zc+Math.sin(k*.9)*.5,9);
+        // o círculo de pedras (a arena)
+        const ax=cx+2,az=cz;for(let i=0;i<10;i++){const a=i/10*6.283;const x=ax+Math.cos(a)*9,z=az+Math.sin(a)*9;K.box(1.0+r()*.6,.6+r()*.8,.8,M.pedra,x,.4,z,a);c.ob(x,z,.8);}
+        // árvores, pedras, relva e flores
+        const folhas=[M.folha,M.folha2,M.folha3];let na=0;for(let k=0;k<60&&na<22;k++){const x=q.x0+4+r()*(q.x1-q.x0-8),z=q.z0+3+r()*(q.z1-q.z0-6);if(Math.hypot(x-ax,z-az)<12.5)continue;if(Math.abs(z-zc)<4&&x<q.x0+16)continue;
+          try{a6Arvore(K,x,z,4+r()*3,folhas,M.casca,rnd(5310+k),{esc:.8+r()*.5});}catch(e){K.cyl(.3,.4,5,M.casca,x,2.5,z,8);K.sph(2.4,folhas[k%3],x,6.5,z,1,.8,1,10,7);}c.ob(x,z,.75);na++;}
+        for(let k=0;k<40;k++){const x=q.x0+3+r()*(q.x1-q.x0-6),z=q.z0+2+r()*(q.z1-q.z0-4);if(Math.abs(z-zc)<3&&x<q.x0+14)continue;try{forest433Grass(K,x,0,z,.6+r()*.5,k);}catch(e){}}
+        for(let k=0;k<26;k++){const x=q.x0+3+r()*(q.x1-q.x0-6),z=q.z0+2+r()*(q.z1-q.z0-4);try{bot368Flower(K,[al521Mat('530 flor a',0xf04060,.6),al521Mat('530 flor b',0xf0d030,.6),al521Mat('530 flor c',0xf0f0f0,.6)][k%3],x,.04,z,.1,k,6);}catch(e){}}
+        for(let k=0;k<9;k++){const x=q.x0+5+r()*(q.x1-q.x0-10),z=q.z0+3+r()*(q.z1-q.z0-6);if(Math.hypot(x-ax,z-az)<11)continue;K.sph(.5+r()*.6,M.pedra,x,.25,z,1,.6,1.2,9,6);c.ob(x,z,.8);}
+        // quatro luzes (as da grelha saem)
+        for(const [x,z] of [[q.x0+10,zc],[ax,az],[q.x0+40,q.z0+10],[q.x0+40,q.z1-10]])c.luz(0xfff0d8,1.4,x,9,z,34);
+        c.placa(text428('Campo dos Rivais','Field of Rivals','Campo de los Rivales'),ax,3.2,az-9.6,0);}}],
+    lig:[]};}
+function rv530Campo(R,key){try{if(!RV530.on||RV530.campos[key]||!R||!R.scene||!R.world)return;const def=rv530Def(key);if(!def)return;if(typeof al521Mundo!=='function'||!AL521||AL521.feitas[key])return;RV530.campos[key]={pendente:true};
+    const P=rv530Vao(R);const cfg=rv530Cfg(key,P);al521Mundo(R,cfg);const sc=R.scene;
+    // sem as portas duplas (o pórtico é aberto) e sem as luzes de grelha do campo
+    for(const nome of ['521 porta '+key+' a','521 porta '+key+' b']){const g=sc.getObjectByName(nome);if(g&&g.parent)g.parent.remove(g);}
+    try{for(const l of AL521.luzes){if(l.L.parent===sc&&l.L.position.x>21&&l.L.position.y<4&&l.i0===1.0&&l.L.distance===1){l.L.parent.remove(l.L);l.i0=0;}}}catch(e){}
+    RV530.campos[key]={P,cfg,ax:(cfg.rects[0].x0+cfg.rects[0].x1)/2+2,az:0};RV530.stats.campos++;}catch(e){rv530Erro('campo '+key,e);}}
+/* ---------- os rivais ---------- */
+function rv530Barra(g,y){const c=document.createElement('canvas');c.width=128;c.height=20;const bt=new THREE.CanvasTexture(c);const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:bt,transparent:true,depthTest:false,depthWrite:false}));sp.scale.set(.9,.14,1);sp.position.y=y;sp.layers.set(1);sp.renderOrder=20;g.add(sp);g.userData.barra={c,bt,sp};}
+function rv530Rival(def){const T=THREE;const g=new T.Group();g.name='Rival · '+def.nome;const rig=rebuiltReader({name:def.nome});rig.g.scale.setScalar(rig.modelScale*.7);g.add(rig.g);
+  try{rig.mats.sweater.color.set(def.cor);rig.mats.scarf.color.set(def.cachecol);rig.mats.shoe.color.set(0x2a1a12);}catch(e){}
+  let asas=null;try{asas=asa253Modelo();asas.scale.setScalar(1.7);asas.traverse(o=>{if(o.isMesh&&o.material){o.material=o.material.clone();o.material.color.set(def.asa);o.material.emissive.set(def.asa);o.material.emissiveIntensity=.18;o.material.userData.papelKeep=true;}});if(asas.userData.brilho){asas.userData.brilho.material.color.set(def.asa);asas.userData.brilho.material.opacity=.2;}rig.g.add(asas);}catch(e){rv530Erro('asas',e);}
+  g.userData.olhos=[];g.userData.mand={rotation:{x:0}};rv530Barra(g,2.1);g.traverse(o=>{if(o.isMesh)o.raycast=()=>{};});g.userData.rival530={rig,asas,fase:0};return g;}
+function rv530Companheiro(def){const T=THREE;const g=new T.Group();const it=LOJA_BY[def.comp];let m=null;try{m=(it&&it.slot==='bicho')?buildBicho(def.comp):buildPet(def.comp);}catch(e){rv530Erro('companheiro '+def.comp,e);}
+  if(!m){m=new T.Mesh(new T.SphereGeometry(.3,10,8),t160Std('530 comp',0xc0c0ff,.6));}try{m.position.set(0,0,0);}catch(e){}g.add(m);g.name='Rival · companheiro '+def.comp;
+  g.userData.olhos=[];g.userData.mand={rotation:{x:0}};rv530Barra(g,(it&&it.slot==='bicho')?1.1:.9);g.traverse(o=>{if(o.isMesh)o.raycast=()=>{};});g.userData.comp530={modelo:m,voa:!(it&&it.slot==='bicho'),t:0};return g;}
+function rv530Registra(key){try{if(!RV530.on||RV530.rivais[key])return;const C=RV530.campos[key],R=ROOMS[key],S=CAV.salas[key];if(!C||!R||!S)return;const def=rv530Def(key);if(!def)return;
+    const mortas=CAV.estado.mortas[key]||{};const x0=C.ax+7,z0=C.az-2;
+    const g=rv530Rival(def);const k={id:1000,room:key,g,hp:def.hp,max:def.hp,x:x0,z:z0,x0,z0,viva:!mortas[1000],rec:2,path:null,pi:0,tPath:0,bob:0,knock:{x:0,z:0},ferida:0,rival530:true,tipo:'rival530',nome:def.nome,def,ativo:false,voo:0,golpe:0,pena:3,hpMax:def.hp};
+    g.position.set(k.x,(R.floorY?R.floorY(k.x,k.z):0),k.z);g.visible=k.viva;R.scene.add(g);cavBarra(k);S.lista.push(k);
+    const g2=rv530Companheiro(def);const k2={id:1001,room:key,g:g2,hp:def.chp,max:def.chp,x:x0+1.5,z:z0+1.2,x0:x0+1.5,z0:z0+1.2,viva:!mortas[1001],rec:2.5,path:null,pi:0,tPath:0,bob:Math.random()*6,knock:{x:0,z:0},ferida:0,rival530:true,tipo:'comp530',def,dono:k,tiro:2.5,hpMax:def.chp};
+    g2.position.set(k2.x,(R.floorY?R.floorY(k2.x,k2.z):0)+(g2.userData.comp530.voa?1.4:0),k2.z);g2.visible=k2.viva;R.scene.add(g2);cavBarra(k2);S.lista.push(k2);
+    RV530.rivais[key]={k,k2,def};RV530.stats.rivais++;}catch(e){rv530Erro('registra '+key,e);}}
+function rv530Pena(k,def,cor,tam){try{const R=ROOM;const T=THREE;const g=new T.Group();const m=new T.Mesh(new T.ConeGeometry(tam||.09,.5,6),t160Brilho('530 pena '+cor,cor,1.4));m.rotation.x=Math.PI/2;g.add(m);const sp=rkSprite(g,cor,.6,.5,0,0,0);g.traverse(o=>{if(o.isMesh)o.raycast=()=>{};});
+    const y0=k.g.position.y+1.1;g.position.set(k.x,y0,k.z);R.scene.add(g);const ty=(CH.fy||0)+1.0;let dx=CH.x-k.x,dz=CH.z-k.z,d=Math.hypot(dx,dz);const vel=9;const Tt=Math.max(.3,d/vel);const lx=CH.x+(CH.vx||0)*Tt*.7,lz=CH.z+(CH.vz||0)*Tt*.7;dx=lx-k.x;dz=lz-k.z;d=Math.hypot(dx,dz);const T2=Math.max(.3,d/vel);
+    g.rotation.y=Math.atan2(dx,dz);CAV.ossos.push({g,x:k.x,y:y0,z:k.z,vx:dx/T2,vy:(ty-y0)/T2,vz:dz/T2,t:0,vida:T2+.6,grav:0,scene:R.scene});}catch(e){rv530Erro('pena',e);}}
+function rv530Tick(dt){try{if(!RV530.on||CUR!=='room'||!ROOM)return;const key=Object.keys(ROOMS).find(k=>ROOMS[k]===ROOM);if(!key)return;
+    if(RV530.campos[key]&&!RV530.rivais[key]&&CAV.salas[key])rv530Registra(key);const RV=RV530.rivais[key];if(!RV)return;RV530.t+=dt;const t=RV530.t;
+    const k=RV.k,k2=RV.k2,def=RV.def,R=ROOM,W=R.world;const fy=(x,z)=>(R.floorY?R.floorY(x,z):0);const bloq=CAV.morto||uiBlocked()||CH.sitting||document.hidden;
+    const pl=cavPos();const px=pl.x,pz=pl.z;const noCampo=px>20.6;
+    if(k.viva){const D=k.g.userData.rival530;const dx=px-k.x,dz=pz-k.z,d=Math.hypot(dx,dz);
+      if(!k.ativo&&noCampo&&!bloq){k.ativo=true;k.fase='sobe';k.faseT=0;try{showToast('⚔ '+co523T(def.nome+' levanta voo com o seu companheiro: vença os dois e o companheiro é seu!',def.nome+' takes flight with a companion: beat them both and the companion is yours!',def.nome+' alza el vuelo con su compañero: ¡véncelos y el compañero es tuyo!'),{big:true,ms:6000});}catch(e){}try{if(window.__mus199)window.__mus199.sfx('conquista');}catch(e){}}
+      // o rival VOA em combate: circula alto à volta do leitor, mergulha para golpear e volta a subir; atira penas do ar
+      let vel=0,altAlvo=.05;const rapido=def.hp>=130;const vAr=rapido?5.2:4.4,vMerg=rapido?8.5:7.2;
+      if(k.ativo&&!bloq){k.faseT=(k.faseT||0)+dt;
+        if(k.fase==='circula'){altAlvo=3.0+.4*Math.sin(t*1.3);const raio=5.2;k.ang=(k.ang||Math.atan2(k.z-pz,k.x-px))+dt*(rapido?.75:.6)*(k.sentido||1);const tx=px+Math.cos(k.ang)*raio,tz=pz+Math.sin(k.ang)*raio;const ddx=tx-k.x,ddz=tz-k.z,dd=Math.hypot(ddx,ddz);if(dd>.05){const v=Math.min(vAr*dt,dd);k.x+=ddx/dd*v;k.z+=ddz/dd*v;vel=vAr;}
+          k.pena-=dt;if(k.pena<=0){k.pena=2.4;rv530Pena(k,def,def.asa,.1);}
+          if(k.faseT>(rapido?3.2:4.2)){k.fase='mergulha';k.faseT=0;}}
+        else if(k.fase==='mergulha'){altAlvo=1.0;const v=vMerg*dt;if(d>.05){k.x+=dx/d*Math.min(v,d);k.z+=dz/d*Math.min(v,d);}vel=vMerg;
+          if(d<1.7&&k.alt<1.9){cavDano(def.dano);try{for(let i=0;i<10;i++)cavFaisca(R.scene,px+(Math.random()-.5)*.7,(CH.fy||0)+1+(Math.random()-.5)*.7,pz+(Math.random()-.5)*.7,i%2?def.asa:0xffffff,.45,.4);}catch(e){}k.fase='sobe';k.faseT=0;k.sentido=(Math.random()<.5?-1:1);}
+          else if(k.faseT>2.6){k.fase='sobe';k.faseT=0;}}
+        else{altAlvo=3.4;const ax=k.x-px,az=k.z-pz,ad=Math.hypot(ax,az)||1;if(ad<5){const v=vAr*.8*dt;k.x+=ax/ad*v;k.z+=az/ad*v;vel=vAr*.8;}if(k.faseT>1.2&&k.alt>2.8){k.fase='circula';k.faseT=0;k.ang=Math.atan2(k.z-pz,k.x-px);}}}
+      else{k.x+=Math.sin(t*.4)*.004;}
+      if(k2&&k2.viva){const ox=k.x-k2.x,oz=k.z-k2.z,od=Math.hypot(ox,oz);if(od<1.2&&od>1e-3){k.x+=ox/od*(1.2-od)*.5;k.z+=oz/od*(1.2-od)*.5;}}
+      k.x+=k.knock.x*dt;k.z+=k.knock.z*dt;k.knock.x*=Math.exp(-6*dt);k.knock.z*=Math.exp(-6*dt);
+      if(k.x<20.9)k.x=20.9;const c=W.clamp(k.x,k.z,.6);k.x=Array.isArray(c)?c[0]:c.x;k.z=Array.isArray(c)?c[1]:c.z;
+      const a0=(k.alt===undefined||!isFinite(k.alt))?.05:k.alt;k.alt=a0+(altAlvo-a0)*(1-Math.exp(-dt*(k.fase==='mergulha'?3.2:1.8)));k.bob+=dt;const hover=k.alt+(k.ativo?.12*Math.sin(k.bob*2.4):0);
+      k.g.position.set(k.x,fy(k.x,k.z)+hover,k.z);if(d>.01)k.g.rotation.y=Math.atan2(dx,dz);k.g.rotation.x=k.fase==='mergulha'?.35:(k.fase==='sobe'?-.2:0);
+      if(k.ferida>0)k.ferida-=dt;try{D.rig.update(Math.min(.05,dt),k.ativo?.4:0,0,.5,t);}catch(e){}
+      try{const A=D.asas;if(A){const voando=k.ativo&&k.alt>.6;D.fase=(D.fase||0)+dt*(voando?(k.fase==='mergulha'?3.6:2.6):1.1)*Math.PI*2;const f=Math.sin(D.fase),f1=Math.sin(D.fase-.55),f2=Math.sin(D.fase-1.1);const amp=voando?.58:.12;for(const Ld of A.userData.lados253){const s=Ld.s;Ld.omb.rotation.set(-.1+.06*f1,s*(voando?.12:.5),s*((voando?.1:.34)+amp*f));Ld.ante.rotation.set(0,s*(voando?.1:.3),s*((voando?-.05:-.12)+.35*amp*f1));Ld.mao.rotation.set(voando?-.3*f2:-.08*f2,s*(voando?.05:.22),s*((voando?.3:.22)+.6*amp*f2));}if(A.userData.brilho)A.userData.brilho.material.opacity=voando?.3:.1;}}catch(e){}}
+    if(k2&&k2.viva){const Cc=k2.g.userData.comp530;Cc.t+=dt;let tx,tz;if(k.viva){const a=t*.9;tx=k.x+Math.cos(a)*2.2;tz=k.z+Math.sin(a)*2.2;}else{const a=t*.7;tx=px+Math.cos(a)*3.2;tz=pz+Math.sin(a)*3.2;}
+      if(k.ativo&&!bloq){const ddx=tx-k2.x,ddz=tz-k2.z,dd=Math.hypot(ddx,ddz);if(dd>.05){const v=Math.min(3.4*dt,dd);k2.x+=ddx/dd*v;k2.z+=ddz/dd*v;}
+        const d2=Math.hypot(px-k2.x,pz-k2.z);k2.tiro-=dt;if(d2<13&&k2.tiro<=0){k2.tiro=2.8;rv530Pena(k2,def,0x80c0ff,.07);}}
+      k2.x+=k2.knock.x*dt;k2.z+=k2.knock.z*dt;k2.knock.x*=Math.exp(-6*dt);k2.knock.z*=Math.exp(-6*dt);if(k2.x<20.9)k2.x=20.9;const c2=W.clamp(k2.x,k2.z,.5);k2.x=Array.isArray(c2)?c2[0]:c2.x;k2.z=Array.isArray(c2)?c2[1]:c2.z;
+      k2.bob+=dt;const h2=Cc.voa?(k.viva&&k.ativo?Math.max(1.4,(k.alt||0)+.6):1.5)+.2*Math.sin(k2.bob*3):Math.abs(Math.sin(k2.bob*5))*.12;k2.g.position.set(k2.x,fy(k2.x,k2.z)+h2,k2.z);k2.g.rotation.y=Math.atan2(px-k2.x,pz-k2.z);if(k2.ferida>0)k2.ferida-=dt;}}catch(e){rv530Erro('tick',e);}}
+function rv530Premio(k){try{const def=k.def;if(!def)return;const E=RV530.estado;E.vencidos[def.sala]=(E.vencidos[def.sala]||0)+1;const it=LOJA_BY[def.comp];const nome=it?it.nome:def.comp;
+    if(!E.premios[def.comp]){E.premios[def.comp]=Date.now();const tinha=!!(LOJA.itens&&LOJA.itens[def.comp]);LOJA.itens[def.comp]=1;try{lojaSave();}catch(e){}if(tinha){showToast('🏆 '+co523T(def.nome+' caiu! '+nome+' já era seu — fica a honra da vitória.',def.nome+' is down! '+nome+' was already yours — the honour is yours too.',def.nome+' cayó. '+nome+' ya era tuyo — queda el honor de la victoria.'),{big:true,ms:7000,queue:true});}else
+      showToast('🏆 '+co523T(def.nome+' caiu! O companheiro dele agora é seu: '+nome+' (painel 👤 Visual › Companheiros).',def.nome+' is down! Their companion is now yours: '+nome+' (👤 Look panel › Companions).',def.nome+' cayó. ¡Su compañero ahora es tuyo: '+nome+' (panel 👤 Visual › Compañeros)!'),{big:true,ms:9000,queue:true});try{if(typeof MEV==='function')MEV('rival530',{sala:def.sala,comp:def.comp});}catch(e){}}
+    else showToast('⚔ '+co523T(def.nome+' caiu de novo — '+nome+' já é seu.',def.nome+' is down again — '+nome+' is already yours.',def.nome+' cayó de nuevo — '+nome+' ya es tuyo.'),{ms:5000,queue:true});
+    rv530Grava();try{if(window.__mus199)window.__mus199.sfx('conquista');}catch(e){}}catch(e){rv530Erro('prémio',e);}}
+if(RV530.on&&typeof al521Mundo==='function'){
+  try{const fin0=finishRoom;finishRoom=function(key){const r=fin0.apply(this,arguments);try{if(rv530Def(key))setTimeout(()=>{try{rv530Campo(ROOMS[key],key);}catch(e){rv530Erro('finish '+key,e);}},120);}catch(e){}return r;};}catch(e){rv530Erro('finish',e);}
+  try{for(const d of RV530.lista){const R=ROOMS[d.sala];if(R&&R.ready)rv530Campo(R,d.sala);}}catch(e){}
+  try{const m0=cavMatar;cavMatar=function(k){const viva=!!(k&&k.viva);const r=m0.apply(this,arguments);try{if(viva&&k&&k.rival530&&k.tipo==='rival530'&&!k.viva)rv530Premio(k);}catch(e){rv530Erro('matar',e);}return r;};try{if(window.__cav)window.__cav.matar=cavMatar;}catch(e){}}catch(e){rv530Erro('cavMatar',e);}
+  try{const tk0=tick;tick=function(dt){const r=tk0.apply(this,arguments);try{rv530Tick(Math.min(.05,dt||.016));}catch(e){}return r;};}catch(e){rv530Erro('tick instalar',e);}
+}
+window.__rivais530={estado:RV530,rubi:RB530,lista:RV530.lista,campos:RV530.campos,rivais:RV530.rivais,vao:rv530Vao,registra:rv530Registra,campo:rv530Campo,erros:RV530.erros};
+try{if(typeof NOVIDADES198!=='undefined')NOVIDADES198.v530=co523T('🏹 Campos dos Rivais: pórticos no 2.º e no 4.º andar dão para campos de relva onde rivais alados lutam ao lado dos seus companheiros — vença-os e o companheiro é seu · o dragão dos rubis agora anda junto com os outros companheiros','🏹 Fields of Rivals: porticos on the 2nd and 4th floors open onto grassy fields where winged rivals fight beside their companions — beat them and the companion is yours · the ruby dragon now travels alongside your other companions','🏹 Campos de los Rivales: pórticos en el 2.º y 4.º piso dan a campos de hierba donde rivales alados luchan junto a sus compañeros — véncelos y el compañero es tuyo · el dragón de rubíes ahora va junto a los demás compañeros');}catch(e){}
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
