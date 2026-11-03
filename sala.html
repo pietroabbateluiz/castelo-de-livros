@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v524</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v525</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -43299,7 +43299,7 @@ window.__patios220={PAT220};
    não muda em nada. Nada de tela preta, cartão ou salto de câmera. Enquanto o leitor passeia, as salas do andar são preparadas em
    segundo plano (montagem, shaders, texturas, portais e colisão da câmera); se uma sala ainda não estiver pronta ao cruzar, vale o
    caminho antigo (carregamento) — nunca uma tela quebrada. Interruptor: ?vestibulos=0. */
-const V222={on:!/[?&#]vestibulos=0/i.test(location.search+location.hash),L:3.3,CAM:2.6,W:2.2,PH:2.55,PA:2.85,
+const V222={on:!/[?&#]vestibulos=0/i.test(location.search+location.hash),L:3.3,LH:4.0,LR:0.6,LS:3.0,CAM:2.6,W:2.2,PH:2.55,PA:2.85,
   hall:{},jog:false,last:null,cool:0,ramp:null,t0:performance.now(),okN:0,okKey:'',
   estat:{trocas:0,fallback:0,prep:{},tuneis:0,cortes:0,cavas:0},prep:{atual:null,pronto:{},falhou:{},building:null,promise:null,adiado:0,log:[]},tex:null,mats:null,rt:null,camOculta:null};
 window.__vest222=V222;
@@ -43354,14 +43354,14 @@ function v222Tapete(hue){let m=V222_TAPETES[hue];if(m)return m;const T=THREE;con
   m=new T.MeshBasicMaterial({map:t,fog:false,toneMapped:false});m.name='v222 passadeira';V222_TAPETES[hue]=m;return m;}
 function v222Placa(texto){const n=(texto||'').length;const fs=Math.min(46,Math.max(22,(512-70)/Math.max(6,n*0.62)));const map=txtTex(texto,{w:512,h:128,bg:'#1e2e3a',fg:'#eddfbd',border:'#a68b58',bw:5,fs,ls:'3px'});map.encoding=THREE.sRGBEncoding;
   return new THREE.MeshBasicMaterial({map,fog:false,toneMapped:false});}
-function v222Tunel(opt){const T=THREE,L=V222.L,S=opt.secao,len=2*L,prof=Math.max(0.02,Math.min(0.7,opt.prof||0.03));v222Texturas();const M=V222.mats;const g=new T.Group();g.name='Vestíbulo v222 · '+(opt.nome||'');g.userData.prof222=prof;
+function v222Tunel(opt){const T=THREE,L=opt.La||V222.L,Lb=opt.Lb||L,S=opt.secao,len=L+Lb,prof=Math.max(0.02,Math.min(0.7,opt.prof||0.03));v222Texturas();const M=V222.mats;const g=new T.Group();g.name='Vestíbulo v222 · '+(opt.nome||'');g.userData.prof222=prof;
   const marca=o=>{o.userData.portalKeep=true;o.userData.vest222=true;o.castShadow=false;o.receiveShadow=false;return o;};
   const per=2.4; // período da textura das paredes ao longo do corredor (m); o chão repete a cada 2,2 m
   // chão (três fileiras de vértices: 0, L, 2L — a textura é espelhada em torno do portal, igual dos dois lados)
-  { const geo=new T.PlaneGeometry(S.w,len,1,2);const uv=geo.attributes.uv,pos=geo.attributes.position;for(let i=0;i<pos.count;i++){const zw=len/2-pos.getY(i);uv.setXY(i,(pos.getX(i)+S.w/2)/2.2,Math.abs(zw-L)/2.2);}
+  { const geo=new T.PlaneGeometry(S.w,len,1,2);const uv=geo.attributes.uv,pos=geo.attributes.position;for(let i=0;i<pos.count;i++){let zw=len/2-pos.getY(i);if(Math.abs(zw-len/2)<1e-3){zw=L;pos.setY(i,len/2-L);}uv.setXY(i,(pos.getX(i)+S.w/2)/2.2,Math.abs(zw-L)/2.2);}
     const o=new T.Mesh(geo,M.chao);o.rotation.x=-Math.PI/2;o.position.set(0,0.01,len/2);g.add(marca(o));}
   // paredes (face virada para dentro)
-  for(const s of [-1,1]){const geo=new T.PlaneGeometry(len,S.h,2,1);const uv=geo.attributes.uv,pos=geo.attributes.position;for(let i=0;i<pos.count;i++){let zw=len/2+s*pos.getX(i);if(zw<L/2)zw=prof;if(zw>L/2&&zw<L*1.5)zw=L;pos.setX(i,s*(zw-len/2));uv.setXY(i,Math.abs(zw-L)/per,(pos.getY(i)+S.h/2)/3.0);}
+  for(const s of [-1,1]){const geo=new T.PlaneGeometry(len,S.h,2,1);const uv=geo.attributes.uv,pos=geo.attributes.position;for(let i=0;i<pos.count;i++){let zw=len/2+s*pos.getX(i);if(zw<len*0.25)zw=prof;else if(zw<len*0.75)zw=L;pos.setX(i,s*(zw-len/2));uv.setXY(i,Math.abs(zw-L)/per,(pos.getY(i)+S.h/2)/3.0);}
     const o=new T.Mesh(geo,M.parede);o.position.set(s*S.w/2,S.h/2,len/2);o.rotation.y=s>0?-Math.PI/2:Math.PI/2;g.add(marca(o));}
   // abóbada: a curva do arco extrudada (fileiras em 0, L e 2L)
   { const N=12,rows=[prof,L,len],P=[],U=[],I=[];for(let ri=0;ri<rows.length;ri++){const z=rows[ri];for(let k=0;k<=N;k++){const [x,y]=v222Arco(S,k/N);P.push(x,y,z);U.push(k/N*1.0,Math.abs(z-L)/per);}}
@@ -43373,7 +43373,7 @@ function v222Tunel(opt){const T=THREE,L=V222.L,S=opt.secao,len=2*L,prof=Math.max
   v222Moldura(g,S,opt.ow,opt.oh,prof);
   // lampiões de parede (dois de cada lado: a 0,5 L e a 1,5 L — simétricos em torno do portal) e o brilho
   const estreito=S.w<1.6,ly=estreito?S.h-0.22:Math.min(1.95,S.h-0.35),esc=estreito?0.7:1;
-  for(const s of [-1,1])for(const fz of [L*0.5,L*1.5]){const bx=s*(S.w/2-0.09*esc);const lamp=new T.Group();lamp.position.set(0,0,0);g.add(lamp);
+  for(const s of [-1,1])for(const fz of (L<1.4?[L+Lb*0.5]:[L*0.5,L+Lb*0.5])){const bx=s*(S.w/2-0.09*esc);const lamp=new T.Group();lamp.position.set(0,0,0);g.add(lamp);
     const pc=(w,h,d,m,x,y,z)=>{const o=new T.Mesh(new T.BoxGeometry(w*esc,h*esc,d*esc),m);o.position.set(x,y,z);lamp.add(marca(o));return o;};
     pc(0.05,0.05,0.26,M.ferro,s*(S.w/2-0.1*esc),ly-0.19*esc,fz);
     pc(0.13,0.22,0.13,M.vidro,bx,ly,fz);
@@ -43381,13 +43381,13 @@ function v222Tunel(opt){const T=THREE,L=V222.L,S=opt.secao,len=2*L,prof=Math.max
     pc(0.17,0.03,0.17,M.ferro,bx,ly-0.125*esc,fz);pc(0.19,0.035,0.19,M.ferro,bx,ly+0.125*esc,fz);pc(0.08,0.06,0.08,M.ferro,bx,ly+0.17*esc,fz);
     const sp=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:0xffb060,blending:T.AdditiveBlending,depthWrite:false,opacity:0.6,fog:false,toneMapped:false}));sp.position.set(bx-s*0.16*esc,ly,fz);sp.scale.set(1.1*esc,1.1*esc,1);sp.userData.fx=true;sp.userData.portalKeep=true;sp.userData.vest222=true;lamp.add(sp);}
   // passadeira na cor do gênero (igual nos dois lados do portal)
-  if(opt.hue!==undefined&&opt.hue!==null){const tw=Math.min(1.0,S.w-0.7);const geo=new T.PlaneGeometry(tw,len-2*prof-0.3,1,2);const uv=geo.attributes.uv,pos=geo.attributes.position;for(let i=0;i<pos.count;i++){const zw=len/2-pos.getY(i);uv.setXY(i,(pos.getX(i)+tw/2)/tw,Math.abs(zw-L)/1.6);}
+  if(opt.hue!==undefined&&opt.hue!==null){const tw=Math.min(1.0,S.w-0.7);const geo=new T.PlaneGeometry(tw,len-2*prof-0.3,1,2);const uv=geo.attributes.uv,pos=geo.attributes.position;for(let i=0;i<pos.count;i++){let zw=len/2-pos.getY(i);if(Math.abs(pos.getY(i))<1e-3){zw=L;pos.setY(i,len/2-L);}uv.setXY(i,(pos.getX(i)+tw/2)/tw,Math.abs(zw-L)/1.6);}
     const o=new T.Mesh(geo,v222Tapete(opt.hue));o.rotation.x=-Math.PI/2;o.position.set(0,0.018,len/2);g.add(marca(o));}
   // placas: no trecho real, na parede à direita de quem sai (x local negativo), a 0,5 L; na extensão, o espelho da placa do outro lado
   const py=Math.min(2.12,S.h-0.2);
-  if(opt.textoA){const o=new T.Mesh(new T.PlaneGeometry(1.1,0.27),v222Placa(opt.textoA));o.position.set(-(S.w/2-0.015),py,L*0.5);o.rotation.y=Math.PI/2;g.add(marca(o));}
-  if(opt.textoB){const o=new T.Mesh(new T.PlaneGeometry(1.1,0.27),v222Placa(opt.textoB));o.position.set((S.w/2-0.015),py,L*1.5);o.rotation.y=-Math.PI/2;g.add(marca(o));}
-  g.traverse(o=>{if(o.isMesh)o.frustumCulled=true;});V222.estat.tuneis++;return g;}
+  if(opt.textoA&&L>=1.4){const o=new T.Mesh(new T.PlaneGeometry(1.1,0.27),v222Placa(opt.textoA));o.position.set(-(S.w/2-0.015),py,L*0.5);o.rotation.y=Math.PI/2;g.add(marca(o));}
+  if(opt.textoB&&Lb>=1.4){const o=new T.Mesh(new T.PlaneGeometry(1.1,0.27),v222Placa(opt.textoB));o.position.set((S.w/2-0.015),py,L+Lb*0.5);o.rotation.y=-Math.PI/2;g.add(marca(o));}
+  g.traverse(o=>{if(o.isMesh)o.frustumCulled=true;});g.userData.La222=L;g.userData.Lb222=Lb;V222.estat.tuneis++;return g;}
 // a moldura da boca: um aro de cantaria (iluminado pela cena) com a espessura até a superfície da parede — a face, o intradorso do arco e nada de frestas
 function v222Moldura(g,S,ow,oh,prof){const T=THREE;const M=V222.mats;const old=g.children.find(o=>o.userData.moldura222);if(old){g.remove(old);old.geometry.dispose();}
   const sh=new T.Shape();sh.moveTo(-ow,-0.03);sh.lineTo(ow,-0.03);sh.lineTo(ow,oh);sh.lineTo(-ow,oh);sh.closePath();
@@ -43396,10 +43396,10 @@ function v222Moldura(g,S,ow,oh,prof){const T=THREE;const M=V222.mats;const old=g
   for(let i=0;i<pos.count;i++){const nz=Math.abs(nrm.getZ(i));if(nz>0.5)uv.setXY(i,pos.getX(i)*0.55,pos.getY(i)*0.55);else uv.setXY(i,(pos.getX(i)+pos.getY(i))*0.55,pos.getZ(i)*0.55);}
   const o=new T.Mesh(geo,M.moldura);o.receiveShadow=true;o.castShadow=false;o.userData.portalKeep=true;o.userData.vest222=true;o.userData.moldura222=true;g.add(o);return o;}
 /* ---- cavar: tudo o que a cena já tinha dentro do volume do corredor (paredes, chão, árvores…) deixa de ser desenhado ali — planos de recorte ---- */
-function v222Cavar(scene,T,ow,oh,ignorar){const TH=THREE;renderer.localClippingEnabled=true;const L=V222.L;
+function v222Cavar(scene,T,ow,oh,ignorar){const TH=THREE;renderer.localClippingEnabled=true;const L=V222.L,LEN=v222Len(T);
   const ex=new TH.Vector3(Math.cos(T.ry),0,-Math.sin(T.ry)),ez=new TH.Vector3(Math.sin(T.ry),0,Math.cos(T.ry)),o=new TH.Vector3(T.ox,0,T.oz);
   const planos=[new TH.Plane(ex.clone(),-ex.dot(o)-ow),new TH.Plane(ex.clone().negate(),ex.dot(o)-ow),new TH.Plane(new TH.Vector3(0,1,0),-oh),new TH.Plane(new TH.Vector3(0,-1,0),-0.45),
-    new TH.Plane(ez.clone().negate(),ez.dot(o)-0.20),new TH.Plane(ez.clone(),-ez.dot(o)-(2*L+0.4))];
+    new TH.Plane(ez.clone().negate(),ez.dot(o)-0.20),new TH.Plane(ez.clone(),-ez.dot(o)-(LEN+0.4))];
   const clones=new Map();const bb=new TH.Box3(),v=new TH.Vector3();let n=0;const lista=[];
   scene.traverse(m=>{if(!m.isMesh||!m.geometry||m.userData.vest222||m.userData.cavado222||m.userData.portal||m.isSkinnedMesh||m.isSprite||m.isReflector)return;if(ignorar&&ignorar.has(m))return;if(m.userData.fx||m.userData.hitProxy||m.userData.camProxy)return;
     const mats=Array.isArray(m.material)?m.material:[m.material];if(!mats.length||mats.some(x=>!x||x.isShaderMaterial||x.isRawShaderMaterial||x.isSpriteMaterial||x.isPointsMaterial))return;
@@ -43410,7 +43410,7 @@ function v222Cavar(scene,T,ow,oh,ignorar){const TH=THREE;renderer.localClippingE
     if(bb.isEmpty())return;const alt=bb.max.y-bb.min.y;if(alt<0.12&&bb.min.y<0.3)return; // chãos e tapetes (ficam sob o piso do corredor)
     if(bb.max.y<-0.45||bb.min.y>oh)return;
     let umin=1e9,umax=-1e9,fmin=1e9,fmax=-1e9;for(const cx of [bb.min.x,bb.max.x])for(const cz of [bb.min.z,bb.max.z]){const dx=cx-T.ox,dz=cz-T.oz;const u=dx*ex.x+dz*ex.z,f=dx*ez.x+dz*ez.z;umin=Math.min(umin,u);umax=Math.max(umax,u);fmin=Math.min(fmin,f);fmax=Math.max(fmax,f);}
-    if(umax<-ow||umin>ow||fmax<-.20||fmin>2*L+0.4)return;
+    if(umax<-ow||umin>ow||fmax<-.20||fmin>LEN+0.4)return;
     // peças finas do próprio portal (ombreiras, arco, soleira) ficam: só o que vai fundo ou é largo (parede, muro, chão alto, árvore) é cavado
     if(fmax<0.25&&(umax-umin)<ow*2+1.0)return;
     const novo=mats.map(x=>{let c=clones.get(x);if(!c){c=x.clone();c.clippingPlanes=planos;c.clipIntersection=true;c.needsUpdate=true;c.userData.cava222=true;c.userData.cavaDe222=x;clones.set(x,c);}return c;});
@@ -43419,10 +43419,11 @@ function v222Cavar(scene,T,ow,oh,ignorar){const TH=THREE;renderer.localClippingE
 function v222Prof(T,lista,minimo){let p=1e9;const TH=THREE,bb=new TH.Box3();const ez=[Math.sin(T.ry),Math.cos(T.ry)];for(const m of lista){const g=m.geometry;if(!g.boundingBox)g.computeBoundingBox();bb.copy(g.boundingBox).applyMatrix4(m.matrixWorld);const alt=bb.max.y-bb.min.y;if(alt<0.5)continue;let fmin=1e9;for(const cx of [bb.min.x,bb.max.x])for(const cz of [bb.min.z,bb.max.z]){const f=(cx-T.ox)*ez[0]+(cz-T.oz)*ez[1];fmin=Math.min(fmin,f);}if(fmin>0.005&&fmin<p)p=fmin;}
   return Math.max(minimo||0.03,Math.min(0.7,p===1e9?(minimo||0.03):p+0.005));}
 /* ---- coordenadas locais do corredor: u (lateral, +x local) e f (ao longo, +z local = para fora) ---- */
+function v222Len(T){return ((T&&T.La)||V222.L)+((T&&T.Lb)||V222.L);}
 function v222Loc(T,x,z){const dx=x-T.ox,dz=z-T.oz;return {u:dx*T.cx-dz*T.sx,f:dx*T.sx+dz*T.cx};}
 function v222Mundo(T,u,f){return [T.ox+u*T.cx+f*T.sx,T.oz-u*T.sx+f*T.cx];}
 function v222TuneisAtivos(){if(!V222.on)return null;if(CUR==='hall')return V222.hall[HALLN]||null;if(CUR==='room'&&ROOM&&ROOM.vest222)return [ROOM.vest222];return null;}
-function v222Onde(x,z){const Ts=v222TuneisAtivos();if(!Ts)return null;for(const T of Ts){const l=v222Loc(T,x,z);if(Math.abs(l.u)<T.secao.w/2+0.6&&l.f>-2.2&&l.f<2*V222.L+0.5)return {T,u:l.u,f:l.f};}return null;}
+function v222Onde(x,z){const Ts=v222TuneisAtivos();if(!Ts)return null;for(const T of Ts){const l=v222Loc(T,x,z);if(Math.abs(l.u)<T.secao.w/2+0.6&&l.f>-2.2&&l.f<v222Len(T)+0.5)return {T,u:l.u,f:l.f};}return null;}
 /* ---- o Hall: mover os quads, cortar a parede circular e construir os corredores ---- */
 function v222CortaParede(sc,HR,th,G){const HHl=HH;const norm=a=>{a=a%(Math.PI*2);return a<0?a+Math.PI*2:a;};const cands=[];
   sc.traverse(o=>{if(!o.isMesh||!o.geometry||o.geometry.type!=='CylinderGeometry'||o.userData.vest222Lintel)return;const P=o.geometry.parameters;if(Math.abs(P.radiusTop-HR)<0.02&&P.height>6&&Math.abs(o.position.y-HHl/2)<0.2)cands.push(o);});
@@ -43442,13 +43443,13 @@ function v222Hall(n){if(!V222.on)return;const H=HALLS[n];if(!H)return;const sc=H
   for(const g of H.doors){const genre=g.userData.genre;const key=GENRE_ROOM[genre];if(g.userData.vest222||!key||g.userData.locked||!roomExists(genre)||!g.userData.quad)continue;
     try{
       const th=g.userData.angle;const ry=Math.atan2(Math.cos(th),Math.sin(th));const ox=Math.cos(th)*(HRn-0.12),oz=Math.sin(th)*(HRn-0.12);
-      const T={lado:'hall',n,g,genre,key,ox,oz,ry,sx:Math.sin(ry),cx:Math.cos(ry),secao:v222Secao(V222_OPS[key]||null),ow:1.62,oh:3.55,pa:null,pb:null};
+      const T={lado:'hall',n,g,genre,key,ox,oz,ry,sx:Math.sin(ry),cx:Math.cos(ry),secao:v222Secao(V222_OPS[key]||null),ow:1.62,oh:3.55,pa:null,pb:null,La:V222.LH||V222.L,Lb:V222.LS||V222.L};
       // a seção depende da porta da sala (se a sala já existe); senão, o padrão — e a sala, ao nascer, adota a mesma (v222Sala lê daqui)
       const nome=(EST.GENEROS[genre]&&EST.GENEROS[genre].nome)||genre;
-      const tun=v222Tunel({secao:T.secao,ow:T.ow,oh:T.oh,prof:0.14,hue:(GEN_HUES[genre]!==undefined?GEN_HUES[genre]:40),nome:'hall '+n+' · '+genre,textoA:(V222_EN?'ROOM · ':'SALA · ')+nome.toUpperCase(),textoB:v222HallNome(n)});
+      const tun=v222Tunel({La:T.La,Lb:T.Lb,secao:T.secao,ow:T.ow,oh:T.oh,prof:0.14,hue:(GEN_HUES[genre]!==undefined?GEN_HUES[genre]:40),nome:'hall '+n+' · '+genre,textoA:(V222_EN?'ROOM · ':'SALA · ')+nome.toUpperCase(),textoB:v222HallNome(n)});
       tun.rotation.y=Math.PI;tun.position.set(0,0,0.06);g.add(tun);T.tunel=tun;
       // o quad vai para o meio do corredor e toma a forma da seção
-      const q=g.userData.quad;q.position.z=0.06-V222.L;q.geometry.dispose();q.geometry=new THREE.ShapeGeometry(v222Forma(T.secao),20);q.geometry.computeBoundingBox();const b=q.geometry.boundingBox;q.userData.op={x0:b.min.x,x1:b.max.x,y0:b.min.y,y1:b.max.y};q.userData.noCam=true;
+      const q=g.userData.quad;q.position.z=0.06-T.La;q.geometry.dispose();q.geometry=new THREE.ShapeGeometry(v222Forma(T.secao),20);q.geometry.computeBoundingBox();const b=q.geometry.boundingBox;q.userData.op={x0:b.min.x,x1:b.max.x,y0:b.min.y,y1:b.max.y};q.userData.noCam=true;
       g.userData.vest222=T;V222.hall[n].push(T);novos.push(T);
       for(const ob of obst){const l=v222Loc(T,ob[0],ob[1]);if(Math.abs(l.u)<ob[2]+0.6&&l.f>-1.8&&l.f<0.8)ob.porta222=true;}
     }catch(e){console.error('vestíbulo do hall',n,genre,e);}}
@@ -43462,25 +43463,25 @@ function v222Sala(genre){const key=GENRE_ROOM[genre];const R=ROOMS[key];const n=
   const q=R.portalQuad;R.scene.updateMatrixWorld(true);q.updateMatrixWorld(true);
   const o=new THREE.Vector3().setFromMatrixPosition(q.matrixWorld);const nrm=new THREE.Vector3(0,0,1).transformDirection(q.matrixWorld);nrm.y=0;nrm.normalize();
   const ry=Math.atan2(-nrm.x,-nrm.z);
-  const T={lado:'sala',n,key,genre,ox:o.x,oz:o.z,ry,sx:Math.sin(ry),cx:Math.cos(ry),secao:v222Secao(q.userData.op),pa:null,pb:null};
+  const T={lado:'sala',n,key,genre,ox:o.x,oz:o.z,ry,sx:Math.sin(ry),cx:Math.cos(ry),secao:v222Secao(q.userData.op),pa:null,pb:null,La:V222.LR||V222.L,Lb:V222.LH||V222.L};
   // a moldura da sala cobre a abertura original da porta (pode ser maior que a seção: catedral, biblioteca) e nunca é menor que a seção
   T.ow=T.secao.w/2+0.04;T.oh=T.secao.apex+0.08;{const opy=q.userData.op&&q.userData.op.y1;if(opy&&opy>T.secao.apex&&opy-T.secao.apex<=0.5)T.oh=opy+0.04;}
   // a seção do túnel do Hall deve ser igual: se a sala pede uma seção menor, o túnel do Hall é refeito com ela
   if(Math.abs(TH.secao.w-T.secao.w)>0.01||Math.abs(TH.secao.apex-T.secao.apex)>0.01){TH.secao=T.secao;const g0=TH.g;g0.remove(TH.tunel);TH.tunel.traverse(x=>{if(x.geometry&&x.userData.vest222&&!x.isSprite)x.geometry.dispose();});
-    const nome=(EST.GENEROS[genre]&&EST.GENEROS[genre].nome)||genre;const tun=v222Tunel({secao:T.secao,ow:TH.ow,oh:TH.oh,prof:TH.prof||0.14,hue:(GEN_HUES[genre]!==undefined?GEN_HUES[genre]:40),nome:'hall '+n+' · '+genre,textoA:(V222_EN?'ROOM · ':'SALA · ')+nome.toUpperCase(),textoB:v222HallNome(n)});tun.rotation.y=Math.PI;tun.position.set(0,0,0.06);g0.add(tun);TH.tunel=tun;
+    const nome=(EST.GENEROS[genre]&&EST.GENEROS[genre].nome)||genre;const tun=v222Tunel({La:TH.La,Lb:TH.Lb,secao:T.secao,ow:TH.ow,oh:TH.oh,prof:TH.prof||0.14,hue:(GEN_HUES[genre]!==undefined?GEN_HUES[genre]:40),nome:'hall '+n+' · '+genre,textoA:(V222_EN?'ROOM · ':'SALA · ')+nome.toUpperCase(),textoB:v222HallNome(n)});tun.rotation.y=Math.PI;tun.position.set(0,0,0.06);g0.add(tun);TH.tunel=tun;
     const hq=g0.userData.quad;hq.geometry.dispose();hq.geometry=new THREE.ShapeGeometry(v222Forma(T.secao),20);hq.geometry.computeBoundingBox();const b=hq.geometry.boundingBox;hq.userData.op={x0:b.min.x,x1:b.max.x,y0:b.min.y,y1:b.max.y};H.scene.updateMatrixWorld(true);}
   // cava primeiro (a profundidade da moldura é a distância até a superfície da parede), depois o corredor
   let lista=[];try{const skip=new Set();if(R.door)R.door.traverse(x=>skip.add(x));lista=v222Cavar(R.scene,T,T.ow,T.oh,skip);}catch(e){console.error('cava da sala',key,e);}
   T.prof=v222Prof(T,lista,0.03);
   const nome=(EST.GENEROS[genre]&&EST.GENEROS[genre].nome)||genre;
-  const tun=v222Tunel({secao:T.secao,ow:T.ow,oh:T.oh,prof:T.prof,hue:(GEN_HUES[genre]!==undefined?GEN_HUES[genre]:40),nome:'sala '+key,textoA:v222HallNome(n),textoB:(V222_EN?'ROOM · ':'SALA · ')+nome.toUpperCase()});
+  const tun=v222Tunel({La:T.La,Lb:T.Lb,secao:T.secao,ow:T.ow,oh:T.oh,prof:T.prof,hue:(GEN_HUES[genre]!==undefined?GEN_HUES[genre]:40),nome:'sala '+key,textoA:v222HallNome(n),textoB:(V222_EN?'ROOM · ':'SALA · ')+nome.toUpperCase()});
   // o corredor entra no grupo da porta (R.door): apontar/clicar nele vale como apontar para a porta
   let pai=R.scene;try{const dg=R.door;if(dg&&dg.isObject3D&&!dg.isMesh&&!dg.userData.portal&&dg!==q){dg.updateMatrixWorld(true);const sc=new THREE.Vector3();dg.getWorldScale(sc);if(Math.abs(sc.x-1)<1e-3&&Math.abs(sc.y-1)<1e-3&&Math.abs(sc.z-1)<1e-3)pai=dg;}}catch(e){}
   if(pai!==R.scene){const pq=new THREE.Quaternion();pai.getWorldQuaternion(pq);const want=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),ry);tun.quaternion.copy(pq.invert()).multiply(want);tun.position.copy(pai.worldToLocal(new THREE.Vector3(o.x,0,o.z)));}
   else{tun.position.set(o.x,0,o.z);tun.rotation.y=ry;}
   pai.add(tun);tun.updateMatrixWorld(true);T.tunel=tun;
   // o quad vai L para fora (em coordenadas do pai) e toma a forma da seção
-  const alvo=new THREE.Vector3(o.x,o.y,o.z).addScaledVector(nrm,-V222.L);q.position.copy(q.parent.worldToLocal(alvo));
+  const alvo=new THREE.Vector3(o.x,o.y,o.z).addScaledVector(nrm,-T.La);q.position.copy(q.parent.worldToLocal(alvo));
   q.geometry.dispose();q.geometry=new THREE.ShapeGeometry(v222Forma(T.secao),20);q.geometry.computeBoundingBox();const b=q.geometry.boundingBox;q.userData.op={x0:b.min.x,x1:b.max.x,y0:b.min.y,y1:b.max.y};q.userData.noCam=true;
   R.scene.updateMatrixWorld(true);
   // obstáculos da porta não valem para o leitor dentro do corredor
@@ -43492,13 +43493,13 @@ registerPortal=function(genre){let T=null;if(V222.on)try{T=v222Sala(genre);}catc
   if(T&&PORTALS.length>=n0+2){const pa=PORTALS[n0],pb=PORTALS[n0+1];T.pa=pa;T.pb=pb;if(T.hall){T.hall.pa=pa;T.hall.pb=pb;}pa.quad.userData.noCam=true;pb.quad.userData.noCam=true;}
   return r;};
 /* ---- andar pelo corredor: o leitor pode sair do disco do Hall (ou da caixa da sala) pela faixa do corredor; câmera idem ---- */
-function v222ClampFaixa(T,x,z,m){const S=T.secao;const uw=Math.max(0.12,S.w/2-Math.min(m,0.55));const l=v222Loc(T,x,z);const u=Math.max(-uw,Math.min(uw,l.u)),f=Math.max(-1.3,Math.min(2*V222.L-0.7,l.f));return v222Mundo(T,u,f);}
+function v222ClampFaixa(T,x,z,m){const S=T.secao;const uw=Math.max(0.12,S.w/2-Math.min(m,0.55));const l=v222Loc(T,x,z);const u=Math.max(-uw,Math.min(uw,l.u)),f=Math.max(-1.3,Math.min(v222Len(T)-0.7,l.f));return v222Mundo(T,u,f);}
 function v222Clamp(orig,x,z,m,extra){const base=orig(x,z,m,extra);if(!V222.jog)return base;const Ts=v222TuneisAtivos();if(!Ts||!Ts.length)return base;
   const bx=Array.isArray(base)?base[0]:base.x,bz=Array.isArray(base)?base[1]:base.z;let best=base,bd=Math.hypot(bx-x,bz-z);
-  for(const T of Ts){const l=v222Loc(T,x,z);if(l.f<-2.5||l.f>2*V222.L+0.5||Math.abs(l.u)>T.secao.w/2+1.2)continue;const p=v222ClampFaixa(T,x,z,m);const d=Math.hypot(p[0]-x,p[1]-z);if(d<bd-1e-6){bd=d;best=p;}}
+  for(const T of Ts){const l=v222Loc(T,x,z);if(l.f<-2.5||l.f>v222Len(T)+0.5||Math.abs(l.u)>T.secao.w/2+1.2)continue;const p=v222ClampFaixa(T,x,z,m);const d=Math.hypot(p[0]-x,p[1]-z);if(d<bd-1e-6){bd=d;best=p;}}
   return best;}
 function v222Dentro(world,x,y,z,alt){ // ponto permitido para a câmera: dentro do mundo (clamp sem mudança) ou dentro da faixa do corredor
-  const Ts=v222TuneisAtivos();if(Ts)for(const T of Ts){const l=v222Loc(T,x,z);const S=T.secao;if(l.f>-0.05&&l.f<2*V222.L-0.22&&Math.abs(l.u)<S.w/2-0.22)return y>0.18&&y<S.apex-0.22;}
+  const Ts=v222TuneisAtivos();if(Ts)for(const T of Ts){const l=v222Loc(T,x,z);const S=T.secao;if(l.f>-0.05&&l.f<v222Len(T)-0.22&&Math.abs(l.u)<S.w/2-0.22)return y>0.18&&y<S.apex-0.22;}
   if(y>alt)return false;const c=world.clamp(x,z,0.6);const cx=Array.isArray(c)?c[0]:c.x,cz=Array.isArray(c)?c[1]:c.z;return Math.abs(cx-x)<0.02&&Math.abs(cz-z)<0.02;}
 function v222CamT(world,orig,ox,oy,oz,dx,dy,dz,dist){const o=v222Onde(ox,oz);if(!o)return orig(ox,oy,oz,dx,dy,dz,dist);
   const alt=CUR==='room'?((ROOM&&ROOM.H)||9)-0.6:HH+4.5;const limite=V222.CAM+Math.max(0,-o.f)*2.2;const dmax=Math.min(dist,limite);
@@ -43511,7 +43512,7 @@ function v222EmbrulhaMundo(R){const w=R.world;if(!w||w.vest222)return;w.vest222=
 const moveTP0=moveTP;moveTP=function(dt){V222.jog=true;try{return moveTP0.apply(this,arguments);}finally{V222.jog=false;}};
 const move0=move;move=function(dt){V222.jog=true;try{return move0.apply(this,arguments);}finally{V222.jog=false;}};
 function v222ArcoY(S,u){const hw=S.w/2;const q=Math.max(0,Math.min(1,(1-u/hw)/2));return S.h*(1-q)*(1-q)+(2*S.apex-S.h)*2*(1-q)*q+S.h*q*q;}
-function v222NoInterior(x,y,z){const Ts=v222TuneisAtivos();if(!Ts)return false;for(const T of Ts){const l=v222Loc(T,x,z);const S=T.secao;if(l.f>-0.02&&l.f<2*V222.L+0.4&&Math.abs(l.u)<S.w/2-0.2&&y>-0.4&&y<v222ArcoY(S,l.u)-0.06)return true;}return false;}
+function v222NoInterior(x,y,z){const Ts=v222TuneisAtivos();if(!Ts)return false;for(const T of Ts){const l=v222Loc(T,x,z);const S=T.secao;if(l.f>-0.02&&l.f<v222Len(T)+0.4&&Math.abs(l.u)<S.w/2-0.2&&y>-0.4&&y<v222ArcoY(S,l.u)-0.06)return true;}return false;}
 // o raio da câmera: um acerto numa parede cavada (que continua existindo para a colisão, só não é desenhada ali) é ignorado e o raio segue
 const camHit0=camHit;
 camHit=function(ox,oy,oz,dx,dy,dz,dist){let d=camHit0(ox,oy,oz,dx,dy,dz,dist);if(!V222.on||d>=dist-1e-6)return d;const Ts=v222TuneisAtivos();if(!Ts||!Ts.length)return d;
@@ -43551,7 +43552,7 @@ function v222Trocar(modo,T){const t0=performance.now();const key=T.key,genre=T.g
   try{updateFocus();}catch(e){}}
 function v222Cruzar(px,pz){ // chamado do laço (tick) depois do passo: devolve true se o leitor está num corredor (o teste antigo da porta não vale)
   if(!V222.on)return false;const o=v222Onde(px,pz);if(!o){V222.last=null;return false;}
-  const {T,u,f}=o;const L=V222.L;const prev=(V222.last&&V222.last.T===T)?V222.last.f:null;V222.last={T,f};
+  const {T,u,f}=o;const L=T.La||V222.L;const prev=(V222.last&&V222.last.T===T)?V222.last.f:null;V222.last={T,f};
   if(prev===null||V222.cool>0||Math.abs(u)>T.secao.w/2+0.2)return true;
   const Lx=(V222.cort223&&V222.cort223(T))?L-0.3:L;if(prev<Lx&&f>=Lx){ // saiu pelo portal (v223: cortina fechada → 30 cm antes)
     if(T.lado==='hall'){if(v222Pronto(T.key)){try{v222Trocar('sala',T);}catch(e){console.error('travessia',e);V222.estat.fallback++;enterRoom(T.genre);}}else{V222.estat.fallback++;V222.cool=1;enterRoom(T.genre);}}
@@ -43559,10 +43560,10 @@ function v222Cruzar(px,pz){ // chamado do laço (tick) depois do passo: devolve 
   return true;}
 /* ---- clicar na porta: o leitor caminha até a frente dela e atravessa o corredor por conta própria ---- */
 const act0=act;
-act=function(tg){if(V222.on&&tg&&tg.kind==='hdoor'&&tg.g&&tg.g.userData.vest222&&!tg.g.userData.locked){const T=tg.g.userData.vest222;const [fx,fz]=doorFront(tg.g,1.4);const [tx,tz]=v222Mundo(T,0,2*V222.L+1.2);
+act=function(tg){if(V222.on&&tg&&tg.kind==='hdoor'&&tg.g&&tg.g.userData.vest222&&!tg.g.userData.locked){const T=tg.g.userData.vest222;const [fx,fz]=doorFront(tg.g,1.4);const [tx,tz]=v222Mundo(T,0,v222Len(T)+1.2);
     const o=v222Onde(CH.x,CH.z);if(o&&o.T===T&&o.f>-0.6){standUp();goVia([[tx,tz]],null,false);return;} // já no corredor: segue direto
     walkTo(fx,fz,()=>{CH.dir=Math.atan2(tx-CH.x,tz-CH.z);goVia([[tx,tz]],null,false);});return;}
-  if(V222.on&&tg&&tg.kind==='door'&&CUR==='room'&&ROOM&&ROOM.vest222){const T=ROOM.vest222;const [dx,dz]=ROOM.doorFront;const [tx,tz]=v222Mundo(T,0,2*V222.L+1.2);
+  if(V222.on&&tg&&tg.kind==='door'&&CUR==='room'&&ROOM&&ROOM.vest222){const T=ROOM.vest222;const [dx,dz]=ROOM.doorFront;const [tx,tz]=v222Mundo(T,0,v222Len(T)+1.2);
     const o=v222Onde(CH.x,CH.z);if(o&&o.T===T&&o.f>-0.6){standUp();goVia([[tx,tz]],null,false);return;}
     walkTo(dx,dz,()=>{CH.dir=Math.atan2(tx-CH.x,tz-CH.z);goVia([[tx,tz]],null,false);});return;}
   return act0.apply(this,arguments);};
@@ -43577,7 +43578,7 @@ rtSize=function(bb){const r=rtSize0(bb);if(!V222.on||!bb||bb.frac<0.3||V222.ensa
 // o ensaio dos vãos (câmera de mentira colada no arco) continua no tamanho de sempre
 const portalEnsaio190_0=portalEnsaio190;portalEnsaio190=function(p){V222.ensaio=true;try{return portalEnsaio190_0.apply(this,arguments);}finally{V222.ensaio=false;}};
 function v222Rampa(){V222.ramp=null;if(!V222.on||PERF130.busy)return;const px=MODE==='fp'?P.x:CH.x,pz=MODE==='fp'?P.z:CH.z;const o=v222Onde(px,pz);if(!o||o.f<0)return;
-  const T=o.T,L=V222.L;const s=Math.max(0,Math.min(1,o.f/(2*L)));const R=ROOMS[T.key];if(!R)return;const eSala=R.exposure||1.08,eHall=1.08;
+  const T=o.T,L=T.La||V222.L;const s=Math.max(0,Math.min(1,o.f/(2*L)));const R=ROOMS[T.key];if(!R)return;const eSala=R.exposure||1.08,eHall=1.08;
   const valor=T.lado==='hall'?eHall+(eSala-eHall)*s:eSala+(eHall-eSala)*s;renderer.toneMappingExposure=valor;const q=T.lado==='hall'?T.g.userData.quad:R.portalQuad;V222.ramp={quad:q,valor};}
 /* ---- a luz sobre o leitor: a iluminação das duas cenas é estimada no ponto onde ele está (e no ponto correspondente da outra cena);
    dentro do corredor, a cor dos materiais do manto é corrigida aos poucos para que o brilho não salte no momento da troca ---- */
@@ -43617,7 +43618,7 @@ function v222MedirLuz(T){try{const TH=THREE;const g=READER&&READER.g;if(!g)retur
     renderer.setRenderTarget(rt);renderer.setClearColor(0x000000,0);renderer.autoClear=true;renderer.clear();renderer.render(sc,cam);renderer.readRenderTargetPixels(rt,0,0,24,24,buf);
     let sum=0,n=0;for(let i=0;i<buf.length;i+=4){if(buf[i+3]<128)continue;sum+=buf[i]*0.30+buf[i+1]*0.59+buf[i+2]*0.11;n++;}return n>8?sum/n:null;};
   let aqui=null,outra=null;PORTAL_ON=true;renderer.shadowMap.autoUpdate=false;
-  try{const L=V222.L;const [px,pz]=v222Mundo(T,0,L);const dir=(MODE==='fp')?(P.yaw+Math.PI):CH.dir; // o leitor no portal, olhando para onde olha agora (a câmera vê as costas dele)
+  try{const L=T.La||V222.L;const [px,pz]=v222Mundo(T,0,L);const dir=(MODE==='fp')?(P.yaw+Math.PI):CH.dir; // o leitor no portal, olhando para onde olha agora (a câmera vê as costas dele)
     const M=T.lado==='hall'?(T.pa&&T.pa.M):(T.pb&&T.pb.M);const outraSc=T.lado==='hall'?ROOMS[T.key].scene:HALLS[T.n].scene;if(!M||!outraSc)return null;
     aqui=medir(ACTIVE,px,pz,dir);
     const q=new TH.Vector3(px,0,pz).applyMatrix4(M);const v=new TH.Vector3(0,0,1).transformDirection(M);const dir2=dir+Math.atan2(v.x,v.z);
@@ -43628,7 +43629,7 @@ function v222MedirLuz(T){try{const TH=THREE;const g=READER&&READER.g;if(!g)retur
 function v222ExpLuz(T,plano,dupla){const TH=THREE;const g=READER.g;const rt=V222.rtLuz||(V222.rtLuz=new TH.WebGLRenderTarget(24,24,{minFilter:TH.LinearFilter,magFilter:TH.LinearFilter,format:TH.RGBAFormat,stencilBuffer:false}));
   const cam=V222.camLuz||(V222.camLuz=new TH.OrthographicCamera(-0.6,0.6,1.15,-0.65,0.05,8));cam.layers.enableAll();const pai=g.parent,pos0=g.position.clone(),rot0=g.rotation.y;const buf=new Uint8Array(24*24*4);const out=[];
   const rt0=renderer.getRenderTarget(),cc=renderer.getClearColor(new TH.Color()),ca=renderer.getClearAlpha(),au=renderer.shadowMap.autoUpdate,ac=renderer.autoClear;PORTAL_ON=true;renderer.shadowMap.autoUpdate=false;
-  try{const L=V222.L;const [px,pz]=v222Mundo(T,0,L);const dir=T.ry;const M=T.lado==='hall'?T.pa.M:T.pb.M;const q=new TH.Vector3(px,0,pz).applyMatrix4(M);const v=new TH.Vector3(0,0,1).transformDirection(M);const dir2=dir+Math.atan2(v.x,v.z);
+  try{const L=T.La||V222.L;const [px,pz]=v222Mundo(T,0,L);const dir=T.ry;const M=T.lado==='hall'?T.pa.M:T.pb.M;const q=new TH.Vector3(px,0,pz).applyMatrix4(M);const v=new TH.Vector3(0,0,1).transformDirection(M);const dir2=dir+Math.atan2(v.x,v.z);
     const hallSc=HALLS[T.n].scene,roomSc=ROOMS[T.key].scene;
     for(const nome of plano){const real=nome.endsWith('Real');const base=nome.startsWith('hall')?hallSc:roomSc;const sc=real?base:v222CenaLuz(base);const emHall=(T.lado==='hall')===nome.startsWith('hall');const x=emHall?px:q.x,z=emHall?pz:q.z,d=emHall?dir:dir2;
       if(g.parent!==sc)sc.add(g);g.visible=true;g.position.set(x,0,z);g.rotation.y=d;g.updateMatrixWorld(true);cam.position.set(x-Math.sin(d)*2.4,1.0,z-Math.cos(d)*2.4);cam.lookAt(x,1.0,z);cam.updateMatrixWorld();
@@ -43639,8 +43640,8 @@ function v222ExpLuz(T,plano,dupla){const TH=THREE;const g=READER.g;const rt=V222
 function v222LuzLeitor(o){ // o = v222Onde(...) com T e f; aplica (ou desfaz) o fator de compensação
   const C=V222.cor||(V222.cor={ativa:false,orig:new Map(),ultimo:new Map()});
   const desfaz=()=>{if(!C.ativa)return;for(const [m,c0] of C.orig){try{if(m.color&&C.ultimo.get(m)&&m.color.equals(C.ultimo.get(m)))m.color.copy(c0);}catch(e){}}C.orig.clear();C.ultimo.clear();C.ativa=false;};
-  if(!o||o.f<0||o.f>2*V222.L||!READER||!READER.g){desfaz();return;}
-  const T=o.T,L=V222.L;const R=ROOMS[T.key];if(!R||!R.scene)return;const s=Math.max(0,Math.min(1,o.f/(2*L)));
+  if(!o||o.f<0||o.f>v222Len(o.T)||!READER||!READER.g){desfaz();return;}
+  const T=o.T,L=T.La||V222.L;const R=ROOMS[T.key];if(!R||!R.scene)return;const s=Math.max(0,Math.min(1,o.f/(2*L)));
   const px=MODE==='fp'?P.x:CH.x,pz=MODE==='fp'?P.z:CH.z,py=1.0+(CH.fy||0);
   const aqui=ACTIVE;const M=T.lado==='hall'?(T.pa&&T.pa.M):(T.pb&&T.pb.M);if(!M)return;const outra=T.lado==='hall'?R.scene:HALLS[T.n].scene;
   // medição exata (uma vez por entrada no corredor, refeita a cada 2 s); se falhar, a estimativa pelas luzes
@@ -43740,7 +43741,7 @@ function v223Ouro(){if(V223.ouro)return V223.ouro;V223.ouro=Object.assign(new TH
 function v223Latao(){if(V223.latao)return V223.latao;V223.latao=Object.assign(new THREE.MeshBasicMaterial({color:0x8e7340,fog:false,toneMapped:false}),{name:'v223 latão'});return V223.latao;}
 /* ---- a cortina de um túnel: duas metades (da parede ao meio), varão no arco, cordões de amarrar; e=0 fechada, e=1 recolhida junto às paredes ---- */
 function v223Montar(g,S,hue){if(!g||!S)return null;if(g.userData.cortina223)return g.userData.cortina223;
-  const T=THREE,L=V222.L,hw=S.w/2;const cg=new T.Group();cg.name='Cortina v223';cg.position.set(0,0,L-V223.RECUO);g.add(cg);
+  const T=THREE,L=(g.userData&&g.userData.La222)||V222.L,hw=S.w/2;const cg=new T.Group();cg.name='Cortina v223';cg.position.set(0,0,L-V223.RECUO);g.add(cg);
   const marca=o=>{o.userData.portalKeep=true;o.userData.vest222=true;o.userData.noCam=true;o.userData.cortina223=true;o.castShadow=false;o.receiveShadow=false;o.frustumCulled=true;return o;};
   // varão de latão acompanhando o arco (5 cm abaixo da abóbada) e os dois suportes: UMA malha
   { const pts=[];for(let k=0;k<=16;k++){const [x,y]=v222Arco(S,k/16);pts.push(new T.Vector3(x,y-0.05,0));}const curve=new T.CatmullRomCurve3(pts);curve.curveType='centripetal';
@@ -43778,7 +43779,7 @@ function v223Som(abre){try{if(typeof SET==='undefined'||!SET.sound||typeof c191A
   const g=ac.createGain();g.gain.value=0.07;src.connect(f).connect(g).connect(ac.destination);src.start(t0);src.stop(t0+dur);src.onended=()=>{try{src.disconnect();f.disconnect();g.disconnect();}catch(e){}};}catch(e){}}
 function v223Tick(dt){if(!V223.on)return;const Ts=v222TuneisAtivos();if(!Ts||!Ts.length)return;const px=MODE==='fp'?P.x:CH.x,pz=MODE==='fp'?P.z:CH.z;const busy=PERF130.busy||fadeOnAt;
   for(const T of Ts){const C=v223Estado(T);if(!C)continue;const TH=T.lado==='hall'?T:T.hall;
-    if(!busy){const l=v222Loc(T,px,pz),S=T.secao;const perto=l.f>-V223.PERTO&&l.f<2*V222.L+0.6&&Math.abs(l.u)<S.w/2+1.2,longe=l.f<-V223.LONGE||l.f>2*V222.L+1.4||Math.abs(l.u)>S.w/2+2.0;
+    if(!busy){const l=v222Loc(T,px,pz),S=T.secao;const perto=l.f>-V223.PERTO&&l.f<v222Len(T)+0.6&&Math.abs(l.u)<S.w/2+1.2,longe=l.f<-V223.LONGE||l.f>v222Len(T)+1.4||Math.abs(l.u)>S.w/2+2.0;
       if(C.alvo===0&&perto){const pronto=T.lado==='hall'?v222Pronto(T.key):(!!T.pb&&v222HallPronto(T.n));if(pronto){C.alvo=1;V223.estat.aberturas++;v223Som(true);}}
       else if(C.alvo===1&&longe){C.alvo=0;V223.estat.fechamentos++;v223Som(false);}}
     const v0=C.v;if(C.alvo===1&&C.v<1)C.v=Math.min(1,C.v+dt/V223.ABRE);else if(C.alvo===0&&C.v>0)C.v=Math.max(0,C.v-dt/V223.FECHA);
@@ -54876,7 +54877,7 @@ window.__halls322={
  }),
  navigation:()=>({floor:HALLN,extent:HALL_WORLD.ext,grid:navFor(HALL_WORLD).H}),
  clamp:(x,z,m)=>HALL_WORLD.clamp(x,z,m),
- tunnels:n=>(V222.hall[n]||[]).map(t=>({genre:t.genre,origin:[t.ox,t.oz],entry:v222Mundo(t,0,-.8),exit:v222Mundo(t,0,V222.L),width:t.secao.w})),
+ tunnels:n=>(V222.hall[n]||[]).map(t=>({genre:t.genre,origin:[t.ox,t.oz],entry:v222Mundo(t,0,-.8),exit:v222Mundo(t,0,t.La||V222.L),width:t.secao.w})),
  stand:n=>{const s=STANDS[n===1?'hall':'hall'+n];return s?{x:s.x,z:s.z,approach:[s.ax,s.az]}:null;},
  shop:()=>({position:HALLS[1].X.shop.position.toArray(),obstacles:HOBST.slice(0,6)})
 };
@@ -62952,6 +62953,20 @@ if(AB524.on){
 }
 window.__ab524={estado:AB524,pronto:ab524Pronto,adiaPortal:ab524AdiaPortal,orfao:ab524Orfao,fatia:ab524Fatia,incremental:ab524Incremental,verifica:ab524Verifica,erros:AB524.erros};
 try{if(typeof NOVIDADES198!=='undefined')NOVIDADES198.v524=co523T('⚡ Abertura mais rápida: o castelo abre com o Hall pronto e as salas montam-se nos bastidores · a passagem do Papel ao Leve acontece quando o quadro está estável','⚡ Faster opening: the castle opens with the Hall ready and the rooms are built backstage · the Papel → Light switch happens once the frame is stable','⚡ Apertura más rápida: el castillo abre con el Hall listo y las salas se montan entre bastidores · el paso de Papel a Ligero ocurre cuando el cuadro es estable');}catch(e){}
+
+/* ===== v525 — vestíbulos assimétricos: depois da cortina, a entrada da sala =====
+   Pedido do Luiz: «melhore as portas que fazem a passagem do hall para as salas, pois depois da cortina já deve ser a entrada da sala em vez
+   de uma segunda porta». O vestíbulo (v222) era simétrico: 3,3 m de corredor no Hall, o portal com a cortina (v223), mais 3,3 m de
+   corredor na sala e só então a porta da sala — «uma segunda porta». Agora cada túnel tem dois comprimentos: o trecho real `La` (do vão ao
+   plano do portal) e a extensão de mentira `Lb` (atrás do portal, só para a câmera): no Hall La = 4,0 m e Lb = 3,0 m (a câmera, 2,6 m atrás
+   do leitor, continua a caber na travessia de volta); na sala La = 0,6 m (a porta da sala fica logo depois da cortina) e Lb = 4,0 m (espelho
+   do corredor do Hall: na travessia de ida a câmera entra na extensão da sala e vê exatamente o que via no Hall). Do Hall ao vão da sala
+   passam a ser 4,6 m (eram 6,6). As trocas são TROCAs no v222/v223 (as funções de corredor passam a ler `T.La`/`T.Lb` por `v222Len(T)`;
+   o quad do portal fica a `La` do vão; a cortina a `La − 3,5 cm`; a rampa de exposição e a cor do manto usam `2·La` (meio da rampa no
+   portal dos dois lados); lampiões e placas só nos trechos com ≥ 1,4 m). `?vestibulos=0` continua a desligar tudo. Gancho: window.__vest525. */
+const VE525={on:true,LH:4.0,LR:0.6,LS:3.0};
+window.__vest525={estado:VE525,len:t=>v222Len(t),tuneis:()=>{const out=[];for(const n in V222.hall)for(const T of V222.hall[n])out.push({n:+n,genre:T.genre,La:T.La,Lb:T.Lb,sala:T.sala?{La:T.sala.La,Lb:T.sala.Lb}:null});return out;}};
+try{if(typeof NOVIDADES198!=='undefined')NOVIDADES198.v525=co523T('🚪 As portas do Hall: depois da cortina já é a entrada da sala (corredor de 4,6 m em vez de 6,6, sem a segunda porta)','🚪 Hall doors: after the curtain you are at the room entrance (4.6 m corridor instead of 6.6, no second doorway)','🚪 Las puertas del Hall: tras la cortina ya está la entrada de la sala (pasillo de 4,6 m en vez de 6,6, sin segunda puerta)');}catch(e){}
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
