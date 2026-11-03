@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v525</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v526</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -40285,7 +40285,7 @@ function t199Obstaculos(w){const A=A195,T=A.terr,zc=A.pzc;const O=[];
   O.push([A.x0-0.45,A.porta.z0-0.12,0.26]);O.push([A.x0-0.45,A.porta.z1+0.12,0.26]);                         // as duas folhas abertas da porta
   const L=w.obst;for(const e of O){e.t199=true;L.push(e);}
   // a sala guarda a mesma lista? se não, repete nela (o jogador e o mapa leem listas diferentes em algumas versões)
-  try{const R=NR&&NR.minha;if(R&&R.obst&&R.obst!==L)for(const e of O)R.obst.push(e);}catch(e){}
+  try{const R=NR&&NR.minha;if(R&&R.obst&&R.obst!==L&&!window.__ms526Montando)for(const e of O)R.obst.push(e);}catch(e){}
   return O.length;}
 const _a195Mundo199=a195Mundo;
 a195Mundo=function(RM){const ja=!!(RM&&RM.world&&RM.world.a195);_a195Mundo199(RM);if(!RM||!RM.world||ja||RM.world.t199)return;const w=RM.world;
@@ -62967,6 +62967,102 @@ try{if(typeof NOVIDADES198!=='undefined')NOVIDADES198.v524=co523T('⚡ Abertura 
 const VE525={on:true,LH:4.0,LR:0.6,LS:3.0};
 window.__vest525={estado:VE525,len:t=>v222Len(t),tuneis:()=>{const out=[];for(const n in V222.hall)for(const T of V222.hall[n])out.push({n:+n,genre:T.genre,La:T.La,Lb:T.Lb,sala:T.sala?{La:T.sala.La,Lb:T.sala.Lb}:null});return out;}};
 try{if(typeof NOVIDADES198!=='undefined')NOVIDADES198.v525=co523T('🚪 As portas do Hall: depois da cortina já é a entrada da sala (corredor de 4,6 m em vez de 6,6, sem a segunda porta)','🚪 Hall doors: after the curtain you are at the room entrance (4.6 m corridor instead of 6.6, no second doorway)','🚪 Las puertas del Hall: tras la cortina ya está la entrada de la sala (pasillo de 4,6 m en vez de 6,6, sin segunda puerta)');}catch(e){}
+
+/* ===== v526 — Minha Sala = Sala do Acumulador (mesma planta e espaços internos), vazia para decorar =====
+   Pedido do Luiz: «a Minha Sala deve ser exatamente igual a Sala do Acumulador, incluindo os espaços internos, mas deve estar vazia para ser
+   decorada». A Minha Sala (`pessoal`, v377) era o salão de 28 × 60 m com um pátio vazio de pedra a oeste. Agora nasce do mesmo `mkRoom` do
+   Acumulador (materiais, névoa, exposição, luzes, janelões, placa da porta) e recebe CÓPIAS da arquitetura dele — geometrias e materiais
+   partilhados (`ms526Clona`: malhas, instâncias e luzes; nem sprites, nem pontos, nem o céu de 256 m, nem peças animadas): o Jardim de
+   Inverno (ala 195) com o arco revestido, o Jardim das Letras (201), os jardins de flores e cantaria (376), as bordaduras, o jardim além das
+   janelas, as pilastras, cornija, arandelas, frisos do parquet, a rosácea do forro, a luz das janelas e a marcenaria do Ateliê; o
+   jardim das brisas (396) continua a ser o dela. Sem a estante, a mesa, a poltrona, a vela, o tapete, os vasos, as lanternas, a lareira,
+   o museu nem nenhuma das peças do Acumulador (`R.marcos`): tudo isso é para o leitor pôr pelo Decorar (a lareira e os apetrechos estão
+   no catálogo, em «Sala do Acumulador»). A mobília inicial da v479 (19 peças postas na 1.ª visita) deixa de ser posta e, se já estava
+   lá, sai uma vez (`ms526Vazia`; cópia em `mundo.sala.pessoal.inicial479.copia526`); o que o leitor pôs por si fica. O mundo (andar,
+   câmera, alcance) é o do Acumulador (`a195Mundo` + t199 + j201); os obstáculos da arquitetura de fora do salão são copiados (os das
+   peças, `R.obm`, não). A Sala do Acumulador passa a montar-se nos bastidores depois do 1.º andar (ESC523), para a Minha Sala não ter
+   de esperá-la.
+   ?minhasala526=0 volta ao pátio vazio da v377. Gancho: window.__minhasala526. */
+const MS526={on:!/[?&#]minhasala526=0/i.test(location.search+location.hash),erros:[],stats:{grupos:0,malhas:0,luzes:0,obst:0,pulados:0,ms:0,tiradas:0}};
+function ms526Erro(k,e){MS526.erros.push(k+': '+(e&&e.message||e));try{console.warn('v526',k,e);}catch(x){}}
+const MS526_NOMES=[/Jardim de Inverno/,/revestimento do arco/,/Jardim das Letras/,/^Jardins · flores e cantaria/,/^Jardim · bordaduras/,/jardim além das janelas/,
+  /pilastras e pórtico/,/bases e capitéis/,/^Minha Sala · cornija/,/filete dourado/,/^Minha Sala · arandelas/,/velas das arandelas/,/brilho das arandelas/,/chamas das arandelas/,/friso do parquet/,/filete do parquet/,/rosácea do forro/,/A luz das janelas/,/marcenaria Ateliê/];
+function ms526Quer(o){const n=o.name||'';return MS526_NOMES.some(r=>r.test(n));}
+function ms526Clona(o){ // cópia leve de um objeto do Acumulador
+  if(!o||o.isSprite||o.isLine||o.isSkinnedMesh||o.isReflector)return null;
+  if(o.isPoints&&!/chamas/.test(o.name||''))return null; // só as chamas das arandelas
+  if(o.userData&&(o.userData.portal||(o.userData.fx&&!/arandelas/.test(o.name||''))))return null; // efeitos: só o brilho e as chamas das arandelas
+  let c=null;
+  if(o.isPoints){c=new THREE.Points(o.geometry,o.material);MS526.stats.malhas++;}
+  else if(o.isLight){if(o.isPointLight)c=new THREE.PointLight(o.color,o.intensity,o.distance,o.decay);else if(o.isSpotLight){c=new THREE.SpotLight(o.color,o.intensity,o.distance,o.angle,o.penumbra,o.decay);c.target.position.copy(o.target.position);}else if(o.isRectAreaLight)c=new THREE.RectAreaLight(o.color,o.intensity,o.width,o.height);else return null;
+    c.visible=o.visible;for(const k of ['i0','lodLite','liteOff','cs0','padLight'])if(o.userData[k]!==undefined)c.userData[k]=o.userData[k];MS526.stats.luzes++;}
+  else if(o.isInstancedMesh){c=new THREE.InstancedMesh(o.geometry,o.material,o.count);c.instanceMatrix.copy(o.instanceMatrix);c.instanceMatrix.needsUpdate=true;if(o.instanceColor){c.instanceColor=o.instanceColor.clone();}MS526.stats.malhas++;}
+  else if(o.isMesh){const g=o.geometry;if(g){if(!g.boundingSphere)g.computeBoundingSphere();if(g.boundingSphere&&g.boundingSphere.radius>110){MS526.stats.pulados++;return null;}} // o céu/domo
+    c=new THREE.Mesh(o.geometry,o.material);MS526.stats.malhas++;}
+  else if(o.isGroup||o.type==='Object3D'){c=new THREE.Group();MS526.stats.grupos++;}
+  else return null;
+  c.name=o.name;c.position.copy(o.position);c.quaternion.copy(o.quaternion);c.scale.copy(o.scale);c.visible=o.visible;c.castShadow=!!o.castShadow;c.receiveShadow=!!o.receiveShadow;c.renderOrder=o.renderOrder;c.frustumCulled=o.frustumCulled;c.layers.mask=o.layers.mask;
+  if(o.matrixAutoUpdate===false){c.matrixAutoUpdate=false;c.matrix.copy(o.matrix);}
+  for(const k of ['noCam','portalKeep','papelKeep','papelKeepGeo','castelo152','dynamic434','lodLite','lodPages','liteOff','portalFineRigging','hitProxy','camProxy','vest222','semPortal'])if(o.userData&&o.userData[k]!==undefined)c.userData[k]=o.userData[k];
+  if(o.isMesh&&o.raycast!==THREE.Mesh.prototype.raycast)c.raycast=o.raycast;
+  if(!o.isLight)for(const ch of o.children){const cc=ms526Clona(ch);if(cc)c.add(cc);}
+  return c;}
+// a sala nasce vazia: a mobília inicial da v479 não é posta; as 19 peças automáticas de uma visita anterior saem uma vez (o resto fica)
+function ms526Vazia(){try{const R=DEC128.rooms.pessoal;if(!R)return;try{if(!localStorage.getItem('mundo.sala.pessoal.inicial479'))localStorage.setItem('mundo.sala.pessoal.inicial479','vazia526');}catch(e){}
+  const chave='mundo.sala.pessoal.vazia526';if(localStorage.getItem(chave))return;const map=salaMapa128(R);const tiradas={};let n=0;
+  for(const id in map){if(/^item402_inicial479_/.test(id)){tiradas[id]=map[id];delete map[id];n++;}}
+  if(n){try{localStorage.setItem('mundo.sala.pessoal.inicial479.copia526',JSON.stringify(tiradas));}catch(e){}salaSalvar(R);}
+  localStorage.setItem(chave,String(Date.now()));MS526.stats.tiradas=n;}catch(e){ms526Erro('vazia',e);}}
+function* build_pessoal526(){const t0=performance.now();const T=THREE;
+  let SRC=null;try{SRC=ROOMS.minha||ensureRoom('minha');}catch(e){ms526Erro('acumulador',e);}
+  yield;
+  const PED=STONE,TAC=PARQ;
+  const mt={floor:new T.MeshStandardMaterial({map:clonedTex(TAC.map,6,6),normalMap:clonedTex(TAC.normalMap,6,6),roughnessMap:clonedTex(TAC.roughnessMap,6,6),color:0xb98f63,roughness:0.88,normalScale:new T.Vector2(0.5,0.5)}),
+    wall:new T.MeshStandardMaterial({map:clonedTex(PED.map,3,1.4),normalMap:clonedTex(PED.normalMap,3,1.4),color:0x9a9184,roughness:0.96}),
+    ceil:rkSolid(0x2a2320,0.95),base:rkSolid(0x3a2a1e,0.8),crown:rkSolid(0x4a3a2a,0.9),wood:rkSolid(0x7a5233,0.75),trim:rkSolid(0x5a3a26,0.7),metal:M.brass,
+    fabric:rkSolid(0x243b35,0.96),cushion:rkSolid(0xb8a385,0.98),tableTop:rkSolid(0x8a6240,0.6),tableLeg:rkSolid(0x3a2a20,0.6),door:rkSolid(0x6a3a2a,0.7),knob:M.brass};
+  const W=28,D=60,H=5.4,WXS=[-10,-3.4,3.4,10],WW=2.6,Y0=1.2,Y1=4.3;
+  yield* mkRoom('pessoal',{W,D,H,seed:7101,emptyPersonal377:true,mats:mt,fog:[0x141010,0.005],exposure:1.14,
+    hemi:[0xd8cbb4,0x3a2e24,0.80],sun:{col:0xffe6bc,int:1.35,pos:[0,6.0,-D/2-9],target:[0,0.8,1.5]},
+    doorSign:'← HALL DOS GÊNEROS',signBg:'#2a1c12',signFg:'#e6c878',doorLight:0xffc890,win:{xs:WXS,w:WW,y0:Y0,y1:Y1},
+    lights:[[0,4.6,-10,0xffd2a0,1.05,19],[-9,4.0,-11,0xffc890,0.85,17],[9,4.0,-11,0xffc890,0.85,17],[-9,4.0,-3,0xffc890,0.85,17],[9,4.0,-3,0xffc890,0.85,17],[0,4.6,-2,0xffd2a0,0.95,19],[-9,4.0,7,0xffc890,0.85,17],[9,4.0,7,0xffc890,0.85,17],[0,4.4,11,0xffd0a0,1.0,18]],
+    deco:function({R,B,sc}){
+      // os janelões: céu lá fora, vidro, caixilho e a luz que entra (como no Acumulador)
+      const ceu=new T.Mesh(new T.PlaneGeometry(52,22),new T.MeshBasicMaterial({map:gradTex([[0,'#20325e'],[0.42,'#6e7fae'],[0.72,'#d3b48c'],[1,'#f6e6c4']],64,256,false,true),fog:false}));ceu.position.set(0,6.0,-D/2-9);sc.add(ceu);
+      for(const wx of WXS){const gl=new T.Mesh(new T.PlaneGeometry(WW,Y1-Y0),rkSolid(0xbfd8ff,0.05,0.1,{transparent:true,opacity:0.10,side:T.DoubleSide,depthWrite:false}));gl.position.set(wx,(Y0+Y1)/2,-D/2-0.02);sc.add(gl);
+        const gj=new T.Group();gj.position.set(wx,0,-D/2+0.02);sc.add(gj);
+        for(const sx of [-1,1])B(0.12,Y1-Y0+0.3,0.26,mt.trim,sx*(WW/2+0.04),(Y0+Y1)/2,0,gj,{nocast:true});
+        B(WW+0.24,0.12,0.26,mt.trim,0,Y1+0.08,0,gj,{nocast:true});B(WW+0.40,0.10,0.40,mt.trim,0,Y0-0.04,0.08,gj,{nocast:true});B(0.05,Y1-Y0,0.05,mt.trim,0,(Y0+Y1)/2,0,gj,{nocast:true});B(WW,0.05,0.05,mt.trim,0,(Y0+Y1)*0.52,0,gj,{nocast:true});
+        if(Math.abs(wx)<6){const wl=new T.RectAreaLight(0xffe2b8,2.4,WW,Y1-Y0);wl.position.set(wx,(Y0+Y1)/2,-D/2+0.1);wl.lookAt(wx,0.9,2.5);wl.userData.lodLite=true;sc.add(wl);}
+        else{const pl=new T.PointLight(0xffe2b8,0.7,10,2);pl.position.set(wx,2.4,-D/2+1.3);sc.add(pl);}}
+      // a arquitetura do Acumulador, copiada
+      if(SRC&&SRC.scene){const raiz=new T.Group();raiz.name='Minha Sala · arquitetura do Acumulador (v526)';sc.add(raiz);
+        for(const o of SRC.scene.children){let quer=ms526Quer(o);
+          if(!quer&&o.isLight&&!o.isHemisphereLight&&!o.isDirectionalLight&&!o.isAmbientLight&&o.position.x<-14.5)quer=true; // luzes da ala e dos jardins
+          if(!quer)continue;try{const c=ms526Clona(o);if(c)raiz.add(c);}catch(e){ms526Erro('clone '+(o.name||o.type),e);}}
+        raiz.traverse(o=>{if(o.isMesh)o.frustumCulled=true;});}
+      else ms526Erro('sem Acumulador','a Sala do Acumulador não estava montada');
+    }});
+  yield;registerKitRoom('pessoal');const room=ROOMS.pessoal,N=NR.pessoal;room.emptyPersonal377=true;room.portalAt={x:0,z:30};room.far=160;room.ms526=true;
+  // o mundo do Acumulador: salão + arco + estufa + terraço + jardins (clamp, câmera, alcance, obstáculos do terraço e do jardim)
+  try{window.__ms526Montando=true;a195Mundo(room);}catch(e){ms526Erro('mundo',e);}finally{window.__ms526Montando=false;}
+  try{if(SRC&&typeof SRC.floorY==='function'){const f=SRC.floorY;room.floorY=(x,z)=>{try{return f(x,z);}catch(e){return 0;}};}else room.floorY=()=>0;}catch(e){room.floorY=()=>0;}
+  try{room.world.navKey=()=>'pessoal526';room.world.__nav=null;}catch(e){}
+  // os obstáculos da arquitetura de fora do salão (não os das peças)
+  try{if(SRC&&SRC.world&&SRC.world.obst){const pecas=new Set();try{for(const id in (SRC.obm||{}))for(const q of SRC.obm[id])pecas.add(q.e);}catch(e){}
+      const L=room.world.obst;let n=0;for(const e of SRC.world.obst){if(!e||pecas.has(e)||e.t199||e.j201)continue;if(e[0]>-13.5)continue;if(L.some(q=>Math.abs(q[0]-e[0])<.01&&Math.abs(q[1]-e[1])<.01))continue;L.push([e[0],e[1],e[2]]);n++;}MS526.stats.obst=n;}}catch(e){ms526Erro('obstáculos',e);}
+  room.scene.userData.personalRoom377={emptyByDefault:true,dimensions:[28,60,5.4],garden:[-62.5,-14.24,-19.5,15.24],storage:'mundo.sala.decor.pessoal'};
+  MS526.stats.ms=Math.round(performance.now()-t0);}
+if(MS526.on){ROOM_BUILDERS.pessoal=build_pessoal526;
+  // o Acumulador monta-se nos bastidores logo depois do 1.º andar (a Minha Sala copia dele)
+  try{const ch0=esc523Chaves;esc523Chaves=function(n){const L=ch0.apply(this,arguments);if(n===1&&ROOM_BUILDERS.minha&&!L.includes('minha'))return L.concat(['minha']);return L;};}catch(e){ms526Erro('fila',e);}
+  // sem a mobília inicial da v479 (c479Inicial corre no finishRoom('pessoal'), antes da restauração das peças salvas)
+  try{if(typeof c479Inicial==='function')c479Inicial=function(){ms526Vazia();};}catch(e){ms526Erro('inicial',e);}
+  // as chamas das arandelas tremem como no Acumulador (o tique s199 é o mesmo: o material da nuvem é partilhado)
+  try{const fin0=finishRoom;finishRoom=function(key){const r=fin0.apply(this,arguments);if(key==='pessoal')try{const RR=DEC128.rooms.pessoal,SR=NR.minha;if(RR&&SR&&SR.s199tick&&ROOMS.pessoal&&ROOMS.pessoal.ms526){RR.m164anim=RR.m164anim||{};RR.s199tick=SR.s199tick;}}catch(e){ms526Erro('chamas',e);}return r;};}catch(e){ms526Erro('finish',e);}
+}
+window.__minhasala526={estado:MS526,clona:ms526Clona,vazia:ms526Vazia,nomes:MS526_NOMES,erros:MS526.erros};
+try{if(typeof NOVIDADES198!=='undefined')NOVIDADES198.v526=co523T('🏠 A Minha Sala agora tem a mesma planta da Sala do Acumulador — salão, Jardim de Inverno, terraço e jardins — vazia para você decorar','🏠 My Room now has the Hoarder’s Room layout — hall, Winter Garden, terrace and gardens — empty for you to decorate','🏠 Mi Sala ahora tiene la misma planta que la Sala del Acumulador — salón, Jardín de Invierno, terraza y jardines — vacía para decorar');}catch(e){}
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
