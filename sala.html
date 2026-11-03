@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v532</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v533</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -63627,8 +63627,8 @@ const rv532Sm=t=>t<=0?0:t>=1?1:t*t*(3-2*t);
 function rv532Terreno(sala,P,q,mur,ax,az){const n=mkNoise(5320+hashStr(sala));const zc=P.c;
   return function(x,z){let v=(n(x*.052+3.1,z*.052+7.3,3)-.43)*5.4+(n(x*.21+1.7,z*.21+5.2,2)-.5)*.45;if(v<0)v=0;
     const d=Math.hypot(x-ax,z-az);const fa=rv532Sm((d-8.8)/4.6);let out=.5*(1-fa)+v*fa; // arena: planalto a 0,5 m
-    const fora=Math.max(rv532Sm((x-(mur.x1+1.2))/3.5),rv532Sm(((mur.z0-1.2)-z)/3.5),rv532Sm((z-(mur.z1+1.2))/3.5));out+=1.7*fora; // atrás da muralha a terra sobe 1,7 m
-    const fc=Math.max(rv532Sm((x-q.x0-3)/8),rv532Sm((Math.abs(z-zc)-3.2)/3.4));out*=fc; // corredor da entrada: plano
+    const fora=Math.max(rv532Sm((x-(mur.x1+1.2))/3.5),rv532Sm(((mur.z0-1.2)-z)/3.5),rv532Sm((z-(mur.z1+1.2))/3.5));out+=2.4*fora; // atrás da muralha a terra sobe 1,7 m
+    const fc=Math.max(rv532Sm((x-q.x0-3)/8),rv532Sm((Math.abs(z-zc)-3.2)/6.5));out*=fc; // corredor da entrada: plano
     return out<.03?.03:out;};}
 function rv532Malha(sc,q,h,sala){try{const T=THREE;const nx=84,nz=84,W=q.x1-q.x0,D=q.z1-q.z0;const pos=new Float32Array((nx+1)*(nz+1)*3),col=new Float32Array((nx+1)*(nz+1)*3),uv=new Float32Array((nx+1)*(nz+1)*2);const idx=[];const r=rnd(5325);
     for(let j=0;j<=nz;j++)for(let i=0;i<=nx;i++){const k=j*(nx+1)+i;const x=q.x0+W*i/nx,z=q.z0+D*j/nz;const y=h(x,z);pos[k*3]=x;pos[k*3+1]=y;pos[k*3+2]=z;uv[k*2]=i/nx;uv[k*2+1]=1-j/nz;
@@ -63708,22 +63708,22 @@ function rv532Cidade(K,M,q,mur,h,tipo,noite,sala){const r=rnd(5370+hashStr(sala)
   return n;}
 /* ---------- a muralha ---------- */
 function rv532Muralha(c,q,mur,h,zc,def,M){const {K}=c;const esp=mur.esp,alt=mur.alt;let pecas=0;
-  const tramo=(x0,z0,x1,z1,horiz)=>{const L=Math.hypot(x1-x0,z1-z0);const n=Math.max(1,Math.round(L/4.5));for(let i=0;i<n;i++){const ax=x0+(x1-x0)*i/n,az=z0+(z1-z0)*i/n,bx=x0+(x1-x0)*(i+1)/n,bz=z0+(z1-z0)*(i+1)/n;const mx=(ax+bx)/2,mz=(az+bz)/2;const len=L/n;
+  const tramo=(x0,z0,x1,z1,horiz,semObs)=>{const L=Math.hypot(x1-x0,z1-z0);const n=Math.max(1,Math.round(L/4.5));for(let i=0;i<n;i++){const ax=x0+(x1-x0)*i/n,az=z0+(z1-z0)*i/n,bx=x0+(x1-x0)*(i+1)/n,bz=z0+(z1-z0)*(i+1)/n;const mx=(ax+bx)/2,mz=(az+bz)/2;const len=L/n;
       const hs=[h(ax,az),h(mx,mz),h(bx,bz)];const lo=Math.min.apply(null,hs)-1.0,hi=Math.max.apply(null,hs)+alt;const ry=horiz?0:Math.PI/2;
       K.boxW(len+.05,hi-lo,esp,M.muralha,mx,(lo+hi)/2,mz,ry,0,0,3);K.boxW(len+.05,.35,esp+.5,M.torre,mx,hi+.17,mz,ry,0,0,3);
       const nm=Math.max(1,Math.round(len/1.6));for(let k=0;k<nm;k++){const u=(k+.5)/nm;const px=ax+(bx-ax)*u,pz=az+(bz-az)*u;K.boxW(.8,.85,esp+.4,M.muralha,px,hi+.75,pz,ry,0,0,3);}
-      const no=Math.max(1,Math.round(len/1.8));for(let k=0;k<=no;k++){const u=k/no;const px=ax+(bx-ax)*u,pz=az+(bz-az)*u;const nx=horiz?0:(mx<q.x0+10?1:-1),nz=horiz?(mz<0?1:-1):0;c.ob(px+nx*(esp/2+.3),pz+nz*(esp/2+.3),1.25);}pecas++;}};
+      const no=Math.max(1,Math.round(len/1.8));for(let k=0;k<=no;k++){const u=k/no;if(semObs==='b'&&i===n-1&&u>.5)continue;if(semObs==='a'&&i===0&&u<.5)continue;const px=ax+(bx-ax)*u,pz=az+(bz-az)*u;const nx=horiz?0:(mx<q.x0+10?1:-1),nz=horiz?(mz<0?1:-1):0;c.ob(px+nx*(esp/2+.3),pz+nz*(esp/2+.3),1.25);}pecas++;}};
   tramo(mur.x0,mur.z0,mur.x1,mur.z0,true);tramo(mur.x0,mur.z1,mur.x1,mur.z1,true);tramo(mur.x1,mur.z0,mur.x1,mur.z1,false);
-  tramo(mur.x0,mur.z0,mur.x0,zc-3.3,false);tramo(mur.x0,zc+3.3,mur.x0,mur.z1,false);
+  tramo(mur.x0,mur.z0,mur.x0,zc-2.4,false,'b');tramo(mur.x0,zc+2.4,mur.x0,mur.z1,false,'a');
   const torre=(x,z,rr,hh,cone)=>{const b=h(x,z)-1;K.cylW(rr,rr*1.06,hh,M.torre,x,b+hh/2,z,14,3);K.cyl(rr+.4,rr+.4,.5,M.torre,x,b+hh-.1,z,14);for(let i=0;i<12;i++){const a=i/12*6.28;K.box(.55,.8,.55,M.torre,x+Math.cos(a)*(rr+.15),b+hh+.5,z+Math.sin(a)*(rr+.15),-a);}
     if(cone){K.cone(rr+.55,3.2,M.ardosia,x,b+hh+2.3,z,14);K.cyl(.04,.04,1.8,M.torre,x,b+hh+4.6,z,5);K.box(1.1,.6,.04,M.bandeira,x+.55,b+hh+5.1,z);}for(let i=0;i<3;i++){const a=i*2.09+.4;K.box(.4,.6,.06,M.janela,x+Math.cos(a)*(rr+.01),b+hh*.55+i*.9,z+Math.sin(a)*(rr+.01),-a);}c.ob(x,z,rr+.9);};
-  torre(mur.x1,mur.z0,2.6,8.5,true);torre(mur.x1,mur.z1,2.6,8.5,true);torre(mur.x0,mur.z0,2.4,8,false);torre(mur.x0,mur.z1,2.4,8,false);torre(mur.x1,0,2.2,7.5,false);
+  torre(mur.x1,mur.z0,2.6,8.5,true);torre(mur.x1,mur.z1,2.6,8.5,true);torre(mur.x0+1.8,mur.z0,2.4,8,false);torre(mur.x0+1.8,mur.z1,2.4,8,false);torre(mur.x1,0,2.2,7.5,false);
   // o portão: duas torres quadradas ao lado do pórtico
   for(const s of [-1,1]){const gx=mur.x0+1.0,gz=zc+s*4.9;const b=h(gx,gz)-1;K.boxW(3,9,3,M.torre,gx,b+4.5,gz,0,0,0,3);for(let i=0;i<8;i++){const a=i/8*6.28;K.box(.5,.7,.5,M.torre,gx+Math.cos(a)*1.6,b+9.3,gz+Math.sin(a)*1.6,-a);}K.cone(2.2,2.4,M.ardosia,gx,b+10.6,gz,4,Math.PI/4);c.ob(gx,gz,2.1);}
-  K.box(.3,.3,6.6,M.torre,mur.x0+1,h(mur.x0,zc)+5.5,zc);return pecas;}
+  {const gb=h(mur.x0,zc);const topo=gb+alt+1.3;K.boxW(esp,topo-5.1,5.4,M.muralha,mur.x0,(5.1+topo)/2,zc,0,0,0,3);K.boxW(esp+.5,.35,5.9,M.torre,mur.x0,topo+.17,zc,0,0,0,3);for(let k=0;k<3;k++)K.boxW(esp+.4,.85,.8,M.muralha,mur.x0,topo+.75,zc+(k-1)*1.8,0,0,0,3);}return pecas;}
 /* ---------- o campo (substitui rv530Cfg) ---------- */
-function rv532Cfg(sala,P){const def=rv530Def(sala);const S=RV532.salas[sala]||{ceu:'dia',cidade:null};const tipo=S.ceu,noite=tipo==='noite';const q0={x0:20.04,x1:76,z0:-28,z1:28,h:30};
-  const mur={x0:q0.x0+1.4,x1:q0.x1-8.5,z0:q0.z0+8.5,z1:q0.z1-8.5,esp:1.4,alt:5.4};const ax=(mur.x0+mur.x1)/2+1.5,az=0;const h=rv532Terreno(sala,P,q0,mur,ax,az);const lados=rv532CeuLados(sala,tipo);const extra=rv532Materiais(sala,tipo);
+function rv532Cfg(sala,P){const def=rv530Def(sala);const S=RV532.salas[sala]||{ceu:'dia',cidade:null};const tipo=S.ceu,noite=tipo==='noite';const q0={x0:20.04,x1:84,z0:-33,z1:33,h:30};
+  const mur={x0:q0.x0+.7,x1:q0.x1-8.5,z0:q0.z0+8.5,z1:q0.z1-8.5,esp:1.4,alt:5.4};const ax=(mur.x0+mur.x1)/2+1.5,az=0;const h=rv532Terreno(sala,P,q0,mur,ax,az);const lados=rv532CeuLados(sala,tipo);const extra=rv532Materiais(sala,tipo);
   const cfg={sala,entrada:P,nome:text428('Campo dos Rivais','Field of Rivals','Campo de los Rivales'),placaBg:'#1f3320',placaFg:'#e8f0c0',luz:{cor:0xfff4e0,i0:1.0,y:3,d:1},rv532:{h,mur,ax,az,tipo},
     mats:T=>Object.assign({chao:rv530Relva(),parede:al521TexCeu('céu liso '+sala,noite?'#03071a':tipo==='poente'?'#2b2f6e':'#2f72cc',noite?'#0a1430':tipo==='poente'?'#c96a4e':'#86b7e6',noite?'#172546':tipo==='poente'?'#f4cf93':'#dcecf8'),teto:al521Mat('530 teto',0x8a6a4a,.95),ceu:rv532CeuTopo(sala,tipo),
       ombreira:al521TexMat('530 pedra',STONE,[2,1.4],0xc8c0b0,.95),porta:al521Mat('530 porta',0x6a4a2a,.8),pedra:al521TexMat('530 pedra',STONE,[2,1.4],0xc8c0b0,.95),flora:al521Mat('530 flor a',0xf04060,.6),florb:al521Mat('530 flor b',0xf0d030,.6),florc:al521Mat('530 flor c',0xf0f0f0,.6)},extra),
@@ -63741,26 +63741,26 @@ function rv532Cfg(sala,P){const def=rv530Def(sala);const S=RV532.salas[sala]||{c
           const sol=new THREE.DirectionalLight(tipo==='noite'?0x9fb4ff:tipo==='poente'?0xffb080:0xfff2d8,tipo==='noite'?.28:tipo==='poente'?.55:.75);sol.position.set(sx,H,sz);sol.target.position.set(ax,0,az);sc.add(sol);sc.add(sol.target);sol.userData.rv532=true;sol.userData.i0=sol.intensity;sol.intensity=0;cfg.rv532.sol=sol;st.sol=1;
           const amb=[];sc.traverse(o=>{if((o.isAmbientLight||o.isHemisphereLight)&&!o.userData.rv532)amb.push({L:o,i0:o.intensity});});cfg.rv532.amb=amb;cfg.rv532.ambF=tipo==='noite'?.3:tipo==='poente'?.7:1;st.amb=amb.length;}catch(e){rv532Erro('céu '+sala,e);}
         // o pórtico de pedra, do lado do campo
-        K.push(q.x0+.9,0,zc,0);for(const s of [-1,1]){K.cyl(.34,.4,4.6,M.pedra,0,2.3,s*2.1,14);K.box(1.0,.3,1.0,M.pedra,0,.15,s*2.1);K.box(1.0,.34,1.0,M.pedra,0,4.75,s*2.1);}
+        K.push(q.x0+1.6,0,zc,0);for(const s of [-1,1]){K.cyl(.34,.4,4.6,M.pedra,0,2.3,s*2.1,14);K.box(1.0,.3,1.0,M.pedra,0,.15,s*2.1);K.box(1.0,.34,1.0,M.pedra,0,4.75,s*2.1);}
           K.tor(2.1,.3,M.pedra,0,4.9,0,Math.PI,Math.PI/2,0,0,8,24);K.box(.9,.5,5.4,M.pedra,0,5.0,0);
           for(let i=0;i<14;i++){const a=i/13*Math.PI;K.sph(.16+(i%3)*.05,M.musgo,.2,4.9+Math.sin(a)*2.1,Math.cos(a)*2.1,1,.8,1,7,5);}
-          for(const s of [-1,1])for(let k=0;k<4;k++)try{bot368Flower(K,[M.flora,M.florb][k%2],.5+k*.22,.04,s*2.1+(k-1.5)*.18,.09,k,5);}catch(e){}K.pop();
+          for(const s of [-1,1])for(let k=0;k<4;k++)try{bot368Flower(K,[M.flora,M.florb][k%2],.5+k*.22,.04,s*2.1+(k-1.5)*.18,.09,k,5);}catch(e){}K.pop();c.ob(q.x0+1.6,zc-2.1,.5);c.ob(q.x0+1.6,zc+2.1,.5);
         // a muralha com torres, e a cidade (ou a floresta) atrás dela
         try{st.muralha=rv532Muralha(c,q,mur,h,zc,def,M);}catch(e){rv532Erro('muralha '+sala,e);}
         try{st.cidade=S.cidade?rv532Cidade(K,M,q,mur,h,S.cidade,noite,sala):0;}catch(e){rv532Erro('cidade '+sala,e);}
         // caminho de lajes até a arena, seguindo o terreno
-        for(let k=0;k<16;k++){const x=q.x0+2.2+k*1.5,z=zc+Math.sin(k*.9)*.5;if(x>ax-9.5)break;K.cyl(.45,.45,.06,M.pedra,x,h(x,z)+.02,z,9);}
+        const cam=[];{const xA=q.x0+2.6,xB=ax-8.2;const n=Math.max(6,Math.round((xB-xA)/1.5));for(let k=0;k<=n;k++){const t=k/n;const x=xA+(xB-xA)*t,z=zc+(az-zc)*rv532Sm(t)+Math.sin(t*9.4)*.35;cam.push([x,z]);K.cyl(.45,.45,.06,M.pedra,x,h(x,z)+.02,z,9);}cfg.rv532.cam=cam;}const pertoCam=(x,z,d)=>{for(const p of cam)if(Math.hypot(x-p[0],z-p[1])<d)return true;return false;};
         // o círculo de pedras (a arena, no planalto)
-        for(let i=0;i<10;i++){const a=i/10*6.283;const x=ax+Math.cos(a)*9,z=az+Math.sin(a)*9;rv532Pedra(K,M,x,h(x,z)-.1,z,.9+r()*.5,5380+i,i%3===0);c.ob(x,z,.95);}
+        for(let i=0;i<10;i++){if(i===0||i===5)continue;const a=i/10*6.283;const x=ax+Math.cos(a)*9,z=az+Math.sin(a)*9;rv532Pedra(K,M,x,h(x,z)-.1,z,.9+r()*.5,5380+i,i%3===0);c.ob(x,z,.95);}
         // árvores dentro da muralha e atrás dela; pedras; relva; flores
         let na=0,nf=0,np=0;const dentro=(x,z)=>x>mur.x0+2.2&&x<mur.x1-2.2&&z>mur.z0+2.2&&z<mur.z1-2.2;const tiposA=S.ceu==='poente'?['carvalho','outono','outono','pinheiro','betula']:['carvalho','carvalho','pinheiro','betula','carvalho'];
-        for(let k=0;k<90&&na<26;k++){const x=mur.x0+3.5+r()*(mur.x1-mur.x0-7),z=mur.z0+3+r()*(mur.z1-mur.z0-6);if(Math.hypot(x-ax,z-az)<12.5)continue;if(Math.abs(z-zc)<4.5&&x<q.x0+17)continue;if(S.cidade&&x>mur.x1-15&&Math.abs(z)<9.5)continue; // vista livre da arena para a cidade
+        for(let k=0;k<110&&na<34;k++){const x=mur.x0+3.5+r()*(mur.x1-mur.x0-7),z=mur.z0+3+r()*(mur.z1-mur.z0-6);if(Math.hypot(x-ax,z-az)<12.5)continue;if(Math.abs(z-zc)<4.5&&x<q.x0+17)continue;if(S.cidade&&x>mur.x1-15&&Math.abs(z)<9.5)continue;if(pertoCam(x,z,3.4))continue; // vista livre da arena para a cidade
           rv532Arvore(K,M,x,h(x,z)-.15,z,tiposA[k%5],.8+r()*.5,5390+k);c.ob(x,z,.7);na++;}
         for(let k=0;k<40&&nf<22;k++){const lado=k%3;let x,z;if(lado===0&&S.cidade)continue;if(lado===0){x=mur.x1+2.5+r()*(q.x1-mur.x1-4);z=q.z0+3+r()*(q.z1-q.z0-6);}else{x=q.x0+4+r()*(q.x1-q.x0-8);z=lado===1?q.z0+2+r()*(mur.z0-q.z0-3.5):mur.z1+1.5+r()*(q.z1-mur.z1-3.5);}
           rv532Arvore(K,M,x,h(x,z)-.15,z,k%4===0?'pinheiro':'carvalho',1.0+r()*.5,5420+k);nf++;}
-        for(let k=0;k<14;k++){const x=mur.x0+4+r()*(mur.x1-mur.x0-8),z=mur.z0+3+r()*(mur.z1-mur.z0-6);if(Math.hypot(x-ax,z-az)<11.5)continue;if(Math.abs(z-zc)<4&&x<q.x0+16)continue;const rr=.5+r()*.8;rv532Pedra(K,M,x,h(x,z)-.1,z,rr,5440+k,r()<.6);c.ob(x,z,rr+.3);if(r()<.5){rv532Pedra(K,M,x+rr+.4,h(x+rr+.4,z+.3)-.05,z+.3,rr*.5,5460+k,false);}np++;}
-        for(let k=0;k<70;k++){const x=mur.x0+3+r()*(mur.x1-mur.x0-6),z=mur.z0+2+r()*(mur.z1-mur.z0-4);if(Math.abs(z-zc)<3&&x<q.x0+14)continue;try{forest433Grass(K,x,h(x,z),z,.6+r()*.5,k);}catch(e){}}
-        for(let k=0;k<36;k++){const x=mur.x0+3+r()*(mur.x1-mur.x0-6),z=mur.z0+2+r()*(mur.z1-mur.z0-4);try{bot368Flower(K,[M.flora,M.florb,M.florc][k%3],x,h(x,z)+.04,z,.1,k,6);}catch(e){}}
+        for(let k=0;k<14;k++){const x=mur.x0+4+r()*(mur.x1-mur.x0-8),z=mur.z0+3+r()*(mur.z1-mur.z0-6);if(Math.hypot(x-ax,z-az)<11.5)continue;if(Math.abs(z-zc)<4&&x<q.x0+16)continue;if(pertoCam(x,z,3.0))continue;const rr=.5+r()*.8;rv532Pedra(K,M,x,h(x,z)-.1,z,rr,5440+k,r()<.6);c.ob(x,z,rr+.3);if(r()<.5){rv532Pedra(K,M,x+rr+.4,h(x+rr+.4,z+.3)-.05,z+.3,rr*.5,5460+k,false);}np++;}
+        for(let k=0;k<96;k++){const x=mur.x0+3+r()*(mur.x1-mur.x0-6),z=mur.z0+2+r()*(mur.z1-mur.z0-4);if(Math.abs(z-zc)<3&&x<q.x0+14)continue;try{forest433Grass(K,x,h(x,z),z,.6+r()*.5,k);}catch(e){}}
+        for(let k=0;k<48;k++){const x=mur.x0+3+r()*(mur.x1-mur.x0-6),z=mur.z0+2+r()*(mur.z1-mur.z0-4);try{bot368Flower(K,[M.flora,M.florb,M.florc][k%3],x,h(x,z)+.04,z,.1,k,6);}catch(e){}}
         // arbustos junto da muralha
         for(let k=0;k<16;k++){const u=r();const lado=k%4;let x,z;if(lado===0){x=mur.x0+1.6+r()*1.2;z=mur.z0+3+u*(mur.z1-mur.z0-6);if(Math.abs(z-zc)<5)continue;}else if(lado===1){x=mur.x1-1.8-r()*1.2;z=mur.z0+3+u*(mur.z1-mur.z0-6);}else{x=mur.x0+3+u*(mur.x1-mur.x0-6);z=lado===2?mur.z0+1.6+r()*1.2:mur.z1-1.8-r()*1.2;}
           const y=h(x,z);for(let j=0;j<4;j++)K.sph(.5+r()*.4,[M.folha,M.folha2,M.folha3][j%3],x+(r()-.5)*1.2,y+.3+r()*.3,z+(r()-.5)*1.2,1,.8,1,8,5);}
@@ -63880,6 +63880,61 @@ if(RV532.on&&typeof RV530!=='undefined'&&RV530.on&&typeof rv530Cfg==='function')
 }
 window.__rivais532={estado:RV532,cfg:rv532Cfg,terreno:rv532Terreno,trajes:RV532_TRAJES,erros:RV532.erros,stats:RV532.stats};
 try{if(typeof NOVIDADES198!=='undefined')NOVIDADES198.v532=co523T('🏰 Campos dos Rivais renovados: muralha com torres, céu de verdade (dia, poente e noite), terreno desnivelado, árvores e pedras novas, cidades atrás da muralha; os companheiros dos rivais agora aparecem (e atacam: investidas, rajadas, orbes guiados) e os rivais ganharam escudo de asas, vendaval, chuva de penas, onda de choque e fúria','🏰 Fields of Rivals renewed: castle wall with towers, a real sky (day, sunset, night), uneven ground, new trees and rocks, towns behind the wall; the rivals\' companions now show up (and attack: charges, bursts, homing orbs) and the rivals gained a wing shield, gusts, feather rain, shockwaves and a rage mode','🏰 Campos de los Rivales renovados: muralla con torres, cielo real (día, atardecer y noche), terreno desnivelado, árboles y piedras nuevas, ciudades tras la muralla; los compañeros de los rivales ahora aparecen (y atacan) y los rivales ganaron escudo de alas, vendaval, lluvia de plumas, onda de choque y furia');}catch(e){}
+
+/* ===================== v533 · O PORTÃO É UMA ABERTURA NA MURALHA, CAMPOS MAIORES, ROMANCE COM FLORES E CASAS COLONIAIS COM SACADAS (pedidos do Luiz) =====================
+   «O pórtico visto desse lado ficou incoerente, precisa ser uma abertura na muralha» · «e tire as pedras do meio do caminho» · «olha pelo canto de dentro também como ficou mal fechado»
+   · «Isso se aplica às demais também. Personalize melhor a de Romance, com flores, amplie o espaço, e gostei bastante do balcão usado na porta principal da sala,
+   poderia seguir essa linha para os edifícios acima da muralha».
+   · TROCAS no bloco RV532 (patch533.py): a muralha encosta na parede da sala (x0+0,7, sem fresta por onde se via o céu), o muro continua por cima do arco
+     (casa do portão com cornija e ameias), o arco fica meio embutido na face do muro, os tramos da frente acabam nas colunas, as torres de canto da frente
+     saem da parede da sala; o caminho de lajes curva do portão à arena e nada nasce em cima dele (pedras do círculo abertas dos dois lados, pedras e árvores
+     a ≥ 3 m); o retângulo cresce para 64 × 66 m (muralha 54 × 49 m por dentro), mais árvores, relva e flores.
+   · Este bloco: as cidades do tipo «vila» passam a casas coloniais como as da porta da sala de Romance (`a6Casa`: fachada de reboco colorido, janelas com
+     postigos, porta, SACADA de ferro com vaso de flores) com corpo e telhado de duas águas atrás; e o campo de Romance ganha flores: canteiros com
+     bordadura de pedra, roseiras junto da muralha, fileiras de flores ao longo do caminho, um anel de flores à volta da arena e um pergolado florido. */
+const RV533={on:!/[?&#]rivais533=0/i.test(location.search+location.hash),erros:[],stats:{}};
+function rv533Erro(k,e){if(RV533.erros.length<30)RV533.erros.push(k+': '+(e&&e.message||e));try{console.warn('v533',k,e);}catch(x){}}
+/* casa colonial com sacada (fachada da v221) + corpo + telhado */
+function rv533Casa(K,M,x,y,z,ry,w,d,hw,cor,r){K.push(x,y,z,ry);
+  try{a6Casa(K,0,0,0,w,cor,{h:hw,sacada:true});}catch(e){rv533Erro('a6Casa',e);K.box(w,hw,.5,M.reboco,0,hw/2,0);}
+  K.box(w,hw-.1,d,a6Std('reboco '+cor.toString(16),cor,.9),0,hw/2-.25,-d/2-.2);
+  const sh=new THREE.Shape();sh.moveTo(-w/2-.35,0);sh.lineTo(w/2+.35,0);sh.lineTo(0,2.0+r()*1.2);sh.closePath();K.ext(sh,d+.7,r()<.8?M.telha:M.ardosia,0,hw-.02,-d/2-.1,0,0,0);
+  K.box(.55,1.5,.55,M.torre,w*.25,hw+1.1,-d*.55);K.pop();}
+if(RV533.on&&typeof RV532!=='undefined'&&RV532.on&&typeof rv532Cidade==='function'){
+  try{RV532.salas.vila.flores=true;}catch(e){}
+  try{const cid0=rv532Cidade;rv532Cidade=function(K,M,q,mur,h,tipo,noite,sala){if(tipo!=='vila')return cid0.apply(this,arguments);try{const r=rnd(5370+hashStr(sala));const cores=[0xd9a066,0xa8c8c0,0xd98a7a,0xe8d6a0,0xb8a8d0,0xc87a6a,0xf0c8b0,0xc8d8a0];
+      const faixas=[{lado:'E',x0:mur.x1+1.6,x1:q.x1-1.2,z0:mur.z0+2,z1:mur.z1-2,ry:-Math.PI/2},{lado:'N',x0:mur.x0+3,x1:mur.x1+1,z0:q.z0+1.2,z1:mur.z0-1.6,ry:0},{lado:'S',x0:mur.x0+3,x1:mur.x1+1,z0:mur.z1+1.6,z1:q.z1-1.2,ry:Math.PI}];
+      let n=0;const base=(x,z)=>h(x,z)-.2;
+      for(const f of faixas){const ao=f.lado==='E';const L=ao?(f.z1-f.z0):(f.x1-f.x0);const cnt=Math.max(2,Math.floor(L/8.2));for(let i=0;i<cnt;i++){const u=(i+.5)/cnt;
+          const cx=ao?f.x0+1.4+r()*.6:f.x0+u*L,cz=ao?f.z0+u*L:(f.lado==='N'?f.z1-1.4-r()*.6:f.z0+1.4+r()*.6);const w=5.5+r()*2.5,d=3.8+r()*1.2,hw=7.5+r()*2.5;
+          rv533Casa(K,M,cx,base(cx,cz),cz,f.ry+(r()-.5)*.1,w,d,hw,cores[(i*3+n)%cores.length],r);n++;}}
+      const tx=mur.x1+4.2,tz=mur.z1-5;K.box(3.2,13,3.2,M.torre,tx,base(tx,tz)+6.3,tz);K.cone(2.4,3.2,M.ardosia,tx,base(tx,tz)+14.3,tz,4,Math.PI/4);for(let i=0;i<4;i++){const a=i*1.57;K.box(.9,1.4,.06,M.janela,tx+Math.cos(a)*1.61,base(tx,tz)+11.2,tz+Math.sin(a)*1.61,-a);}
+      const dx=(mur.x0+mur.x1)*.62,dz=(q.z0+mur.z0)/2;K.cyl(4.2,4.4,7,M.reboco,dx,base(dx,dz)+3.3,dz,16);K.sph(4.4,M.ardosia,dx,base(dx,dz)+6.6,dz,1,.75,1,16,9);K.cyl(.6,.6,1.6,M.marmore,dx,base(dx,dz)+10.5,dz,8);
+      RV533.stats[sala]=Object.assign(RV533.stats[sala]||{},{casas:n});return n+2;}catch(e){rv533Erro('vila '+sala,e);return 0;}};}catch(e){rv533Erro('cidade',e);}
+  /* o campo de Romance: flores */
+  function rv533Flores(c,q,Z,P,sala){const {K,M}=c;const h=Z.h,mur=Z.mur,ax=Z.ax,az=Z.az,cam=Z.cam||[];const zc=P.c;const r=rnd(5330+hashStr(sala));
+    const F=[M.flora,M.florb,M.florc,al521Mat('533 rosa',0xff6090,.6),al521Mat('533 lilás',0xc080e0,.6),al521Mat('533 vermelho',0xe03040,.6)];const flor=(x,z,k,s)=>{try{bot368Flower(K,F[k%F.length],x,h(x,z)+.04,z,s||.1,k,5+(k%2));}catch(e){}};
+    const pertoCam=(x,z,d)=>{for(const p of cam)if(Math.hypot(x-p[0],z-p[1])<d)return true;return false;};let n=0;
+    // fileiras ao longo do caminho
+    for(let i=0;i<cam.length;i++){const p=cam[i],p2=cam[Math.min(cam.length-1,i+1)],p0=cam[Math.max(0,i-1)];const dx=p2[0]-p0[0],dz=p2[1]-p0[1],L=Math.hypot(dx,dz)||1;const nx=-dz/L,nz=dx/L;for(const s of [-1,1]){flor(p[0]+nx*s*1.0,p[1]+nz*s*1.0,i+(s>0?0:3),.11);n++;}}
+    // anel de flores à volta da arena (aberto onde o caminho entra e sai)
+    for(let i=0;i<40;i++){const a=i/40*6.283;if(Math.abs(Math.sin(a))<.22)continue;const x=ax+Math.cos(a)*10.4,z=az+Math.sin(a)*10.4;flor(x,z,i,.12);n++;}
+    // canteiros com bordadura de pedra e roseira no meio
+    const roseira=(x,z)=>{const y=h(x,z);for(let j=0;j<4;j++)K.sph(.42+r()*.25,[M.folha,M.folha2,M.folha3][j%3],x+(r()-.5)*.9,y+.35+r()*.25,z+(r()-.5)*.9,1,.85,1,8,5);for(let j=0;j<9;j++)K.sph(.08,[F[3],F[5],F[0]][j%3],x+(r()-.5)*1.2,y+.5+r()*.5,z+(r()-.5)*1.2,1,1,1,5,4);};
+    let nc=0;for(let k=0;k<40&&nc<6;k++){const x=mur.x0+5+r()*(mur.x1-mur.x0-10),z=mur.z0+4+r()*(mur.z1-mur.z0-8);if(Math.hypot(x-ax,z-az)<13)continue;if(pertoCam(x,z,4))continue;if(Math.abs(z-zc)<5&&x<q.x0+16)continue;let ok=true;for(const o of (c.R.world.obst||[])){if(Math.hypot(x-o[0],z-o[1])<o[2]+2.2){ok=false;break;}}if(!ok)continue;
+      const y=h(x,z);K.tor(1.7,.13,M.pedra,x,y+.08,z,0,0,Math.PI/2,0,6,28);for(let j=0;j<14;j++){const a=j/14*6.283,rr=j%2?1.25:.75;flor(x+Math.cos(a)*rr,z+Math.sin(a)*rr,j+k,.11);}roseira(x,z);c.ob(x,z,1.9);nc++;n+=14;}
+    // roseiras junto da muralha (face de dentro) e à volta do pórtico
+    for(let k=0;k<14;k++){const lado=k%3;let x,z;if(lado===0){x=mur.x1-2.2-r()*.8;z=mur.z0+3+r()*(mur.z1-mur.z0-6);}else{x=mur.x0+4+r()*(mur.x1-mur.x0-8);z=lado===1?mur.z0+2.0+r()*.8:mur.z1-2.0-r()*.8;}if(pertoCam(x,z,3))continue;roseira(x,z);}
+    for(const s of [-1,1])roseira(q.x0+2.6,zc+s*3.4);
+    // pergolado florido a meio do caminho
+    try{const i=Math.floor(cam.length*.45);const p=cam[i],p2=cam[i+1]||p,p0=cam[i-1]||p;const dx=p2[0]-p0[0],dz=p2[1]-p0[1],L=Math.hypot(dx,dz)||1;const nx=-dz/L,nz=dx/L;const ry=Math.atan2(dx,dz);const y=h(p[0],p[1]);
+      K.push(p[0],y,p[1],ry);for(const s of [-1,1]){K.cyl(.09,.09,3.0,M.madeira,s*1.5,1.5,0,7);K.cyl(.09,.09,3.0,M.madeira,s*1.5,1.5,-1.2,7);K.box(.12,.12,2.0,M.madeira,s*1.5,3.0,-.6);}for(let j=0;j<4;j++)K.box(3.4,.1,.1,M.madeira,0,3.05,-1.2+j*.4);
+        for(let j=0;j<12;j++){K.sph(.28,[M.folha2,M.folha][j%2],-1.5+j*.27,3.1+(j%3)*.08,-1.2+(j%4)*.4,1,.7,1,6,4);K.sph(.07,[F[3],F[5]][j%2],-1.5+j*.27,3.3,-1.2+(j%4)*.4,1,1,1,5,4);}K.pop();c.ob(p[0]+nx*1.5,p[1]+nz*1.5,.3);c.ob(p[0]-nx*1.5,p[1]-nz*1.5,.3);}catch(e){rv533Erro('pergolado',e);}
+    RV533.stats[sala]=Object.assign(RV533.stats[sala]||{},{flores:n,canteiros:nc});}
+  try{const cfg0=rv532Cfg;rv532Cfg=function(sala,P){const cfg=cfg0.apply(this,arguments);try{const S=RV532.salas[sala];if(S&&S.flores&&cfg&&cfg.rects&&cfg.rects[0]){const q=cfg.rects[0];const d0=q.decor;q.decor=function(c,qq,cx,cz){const rv=d0.apply(this,arguments);try{rv533Flores(c,qq,cfg.rv532,P,sala);}catch(e){rv533Erro('flores '+sala,e);}return rv;};}}catch(e){rv533Erro('cfg',e);}return cfg;};rv530Cfg=rv532Cfg;}catch(e){rv533Erro('instalar',e);}
+}
+window.__rivais533={estado:RV533,erros:RV533.erros,stats:RV533.stats};
+try{if(typeof NOVIDADES198!=='undefined')NOVIDADES198.v533=co523T('🏰 Campos dos Rivais: o portão é agora uma abertura na muralha, os campos cresceram, o caminho ficou livre de pedras; Romance ganhou canteiros, roseiras e um pergolado, e as vilas atrás da muralha têm casas coloniais com sacadas floridas','🏰 Fields of Rivals: the gate is now an opening in the wall, the fields are larger, the path is clear of rocks; Romance gained flower beds, rose bushes and a pergola, and the towns behind the wall have colonial houses with flowered balconies','🏰 Campos de los Rivales: el portón es ahora una abertura en la muralla, los campos crecieron, el camino quedó libre de piedras; Romance ganó canteros, rosales y una pérgola, y las villas tras la muralla tienen casas coloniales con balcones floridos');}catch(e){}
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
