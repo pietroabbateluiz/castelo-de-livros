@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v522</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v523</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -8286,7 +8286,7 @@ function warmCollect(sc,mask){
  const warmScene=new THREE.Scene();warmScene.fog=sc.fog;warmScene.environment=sc.environment;const lightTypes=[];
  sc.traverseVisible(o=>{if(o.isLight){let l;if(o.isPointLight)l=new THREE.PointLight();else if(o.isSpotLight)l=new THREE.SpotLight();else if(o.isDirectionalLight)l=new THREE.DirectionalLight();else if(o.isHemisphereLight)l=new THREE.HemisphereLight();else if(o.isRectAreaLight)l=new THREE.RectAreaLight();else l=new THREE.AmbientLight();l.color.copy(o.color);l.intensity=o.intensity;l.castShadow=o.castShadow;l.layers.enableAll();warmScene.add(l);lightTypes.push(o.type+':'+o.castShadow);}});const formation=lightTypes.sort().join(',');
  const collect=o=>{if(!o.material)return;if(mask&&(o.isMesh||o.isPoints||o.isLine)&&!(o.layers.mask&mask))return;const ms=Array.isArray(o.material)?o.material:[o.material];
-  for(const m of ms){if(!m)continue;let set=WARM_DONE.get(m);if(!set)WARM_DONE.set(m,set=new Set());const key=Q.name+'|'+m.version+'|'+formation+'|'+sc.uuid+'|'+o.type+'|'+o.receiveShadow+'|'+!!o.instanceColor+'|'+Object.keys(o.geometry?.attributes||{}).join(',');if(set.has(key))continue;set.add(key);warmQ.push({m,o,scene:warmScene,source:sc,set,key});}};
+  for(const m of ms){if(!m||!m.isMaterial)continue;let set=WARM_DONE.get(m);if(!set)WARM_DONE.set(m,set=new Set());const key=Q.name+'|'+m.version+'|'+formation+'|'+sc.uuid+'|'+o.type+'|'+o.receiveShadow+'|'+!!o.instanceColor+'|'+Object.keys(o.geometry?.attributes||{}).join(',');if(set.has(key))continue;set.add(key);warmQ.push({m,o,scene:warmScene,source:sc,set,key});}};
  warmAnda190(sc,collect);if(typeof READER!=='undefined'&&READER.g.parent!==sc)READER.g.traverseVisible(collect);
 }
 const warmCam130=new THREE.PerspectiveCamera(60,1,.1,100);warmCam130.layers.enableAll();
@@ -8308,7 +8308,7 @@ async function ensureRoom130(key){
  if(buildIt&&buildKey!==key)throw Error('Montagem concorrente de salas');
  const builder=ROOM_BUILDERS[key];if(!builder)return null;
  const it=buildIt||builder();buildIt=null;buildKey=null;buildBusy=true;const start=performance.now();
- try{let done=false;while(!done){const a=performance.now();do{done=it.next().done;}while(!done&&performance.now()-a<1.25);if(!done)await breathe130();}finishRoom(key);ROOM_MS[key]=Math.round(performance.now()-start);return ROOMS[key];}
+ try{let done=false;while(!done){const a=performance.now();do{done=it.next().done;}while(!done&&performance.now()-a<(window.__esc523?window.__esc523.fatiaEspera():1.25));if(!done)await breathe130();}finishRoom(key);ROOM_MS[key]=Math.round(performance.now()-start);return ROOMS[key];}
  finally{buildBusy=false;const i=BUILD_Q.indexOf(key);if(i>=0)BUILD_Q.splice(i,1);}
 }
 // v210: a bounded shader pipeline for loading screens. Gameplay preparation
@@ -22909,7 +22909,7 @@ function placeHall(genre){const HR=hallRadius(HALLN);const keys=HALLS[HALLN].key
   CH.target=null;CH.onArrive=null;CH.sitting=false;CH.vx=CH.vz=0;CAM.yaw=CH.dir+Math.PI;camInit=false;syncP();HALL_DOORS.forEach(d=>{d.userData.open=0;d.userData.leaves.forEach(pv=>pv.rotation.y=0);});}
 window.__hallCheck109=()=>({radius:hallRadius(HALLN),clamp:HALL_WORLD.clamp(30,0,.3),fronts:HALL_DOORS.map(g=>({genre:g.userData.genre,front:doorFront(g,1.8),radius:Math.hypot(g.position.x,g.position.z)})),camera:{pitch:CAM.pitch,dist:CAM.dist},shop:HALLS[1].X.shop.position.toArray()});
 function hallTitle(){return HALL_NOMES[HALLN]||'Hall dos Gêneros';}
-function goHall(n,viaStair){return fadeTo(async()=>{const revision=PERF130.revision,from=CUR,target=n||(from==='room'?GENRE_FLOOR(CUR_GENRE):HALLN);const keys={2:FLOOR2_ORDER,3:FLOOR3_ORDER,4:FLOOR4_ORDER,5:FLOOR5_ORDER,6:GEN_KEYS6,7:GEN_KEYS7}[target]||[];if(!Q.lite)for(const key of keys){await ensureRoom130(key);prepCheck131(revision);}await travel434Prepare(HALLS[target].scene,revision);prepCheck131(revision);STAIR_FROM=from==='hall'?HALLN:0;CUR='hall';setHallN(target);WORLD=HALL_WORLD;setActive(hallScene);placeHall(viaStair?'stair':(from==='room'?CUR_GENRE:null));if(titleEl)titleEl.textContent=hallTitle();if(btnHall)btnHall.hidden=true;hintFor();});}
+function goHall(n,viaStair){return fadeTo(async()=>{const revision=PERF130.revision,from=CUR,target=n||(from==='room'?GENRE_FLOOR(CUR_GENRE):HALLN);const keys={2:FLOOR2_ORDER,3:FLOOR3_ORDER,4:FLOOR4_ORDER,5:FLOOR5_ORDER,6:GEN_KEYS6,7:GEN_KEYS7}[target]||[];if(!Q.lite&&!(window.__esc523&&window.__esc523.on))for(const key of keys){await ensureRoom130(key);prepCheck131(revision);}else if(window.__esc523&&window.__esc523.on)try{window.__esc523.pedir(keys);}catch(e){}await travel434Prepare(HALLS[target].scene,revision);prepCheck131(revision);STAIR_FROM=from==='hall'?HALLN:0;CUR='hall';setHallN(target);WORLD=HALL_WORLD;setActive(hallScene);placeHall(viaStair?'stair':(from==='room'?CUR_GENRE:null));if(titleEl)titleEl.textContent=hallTitle();if(btnHall)btnHall.hidden=true;hintFor();});}
 function syncP(){P.x=CH.x;P.z=CH.z;P.yaw=CH.dir+Math.PI;P.pitch=0;vx=vz=0;}
 function placeRoom(){if(ROOM.reset)ROOM.reset();const sp=ROOM.spawn;CH.x=sp.x;CH.z=sp.z;CH.dir=sp.dir;CH.target=null;CH.onArrive=null;CH.sitting=false;CH.vx=CH.vz=0;CAM.yaw=0.28;if(VJ.touch){CAM.pitch=CAMDEF.pitch;CAM.dist=CAMDEF.dist;}else CAM.pitch=Math.max(CAM.pitch,0.42);CAM.follow=false;camInit=false;syncP();}
 function roomTitle(genre){if(genre==='minha')return window.VISITA?('Sala de '+(window.VISITA.nome||'um leitor')):'Minha Sala';return 'Sala · '+(EST.GENEROS[genre]?EST.GENEROS[genre].nome:'');}
@@ -47534,7 +47534,7 @@ if(NAV252.on&&typeof asaBarco==='function'&&typeof B246!=='undefined'){
       // cordas novas, do galeão à amurada da chalupa (com barriga)
       const mRope=(window.__AM&&window.__AM.rope)||new T.MeshStandardMaterial({color:0x8a6a40,roughness:1});
       const gun=(u)=>B246.deck+B246.borda+.5*S*Math.pow(1-u,2.2);
-      for(const dz of [-3.6*S,4.2*S]){const z=Z0+dz,u=asaUZ(z);const a=new T.Vector3(ADV.hwAt(z)-.10,1.18,z),b=new T.Vector3(X-asaHw(u)+.1,gun(u)+.05,z);const m=a.clone().lerp(b,.5);m.y-=1.3;
+      for(const dz of [-3.6*S,4.2*S]){const z=Z0+dz,u=asaUZ(z);const a=new T.Vector3(((window.__ADV_ART&&window.__ADV_ART.hwAt)||asaHw)(z)-.10,1.18,z),b=new T.Vector3(X-asaHw(u)+.1,gun(u)+.05,z);const m=a.clone().lerp(b,.5);m.y-=1.3;
         const corda=new T.Mesh(new T.TubeGeometry(new T.QuadraticBezierCurve3(a,m,b),24,.04,5,false),mRope);corda.raycast=()=>{};corda.userData.noCam=true;R.scene.add(corda);}
       C.feita=true;NAV252.stats.chalupa={x:X,hw:+B246.hw.toFixed(2),meio:+B246.meio.toFixed(2),deck:+B246.deck.toFixed(2),saltoB:B246.saltoB.map(v=>+v.toFixed(2)),chegaB:B246.chegaB.map(v=>+v.toFixed(2))};}catch(e){nav252Erro('chalupa',e);}
     return B;};
@@ -56162,7 +56162,7 @@ function p439Preparar(S){if(!S||S.__p439)return;S.__p439=true;const gate=S.gate;
   P439.gate={g:gate,bars,tips,lock,S};const rot=gate.rotation.y;gate.rotation.y=0;gate.updateWorldMatrix(true,false);const v=new THREE.Vector3(1.35,1.5,0);gate.localToWorld(v);P439.gpos=v;gate.rotation.y=rot;gate.updateWorldMatrix(true,false);}
 function p439Poca(S){if(P439.poca||!S)return;const g=S.g,gate=S.gate||(P439.gate&&P439.gate.g);if(!g||!gate)return;const m=new THREE.Mesh(new THREE.CylinderGeometry(1.42,1.52,.035,28),p439Mat(0x2a1612,0x5a1208));m.scale.set(1,1,.42);m.position.set(gate.position.x+1.35,.02,gate.position.z+.05);m.rotation.y=0;m.name='Portão do Torreão · ferro derretido';p439Marca(m);m.material.emissiveIntensity=0;g.add(m);P439.poca=m;
   // o aviso da escada passa para um poste, já que a grade virou poça
-  try{if(S.plate&&S.plate.mesh&&S.plate.mesh.parent===gate){const pl=S.plate.mesh;g.attach(pl);pl.position.x=-1.2*(P439.lado||1);pl.position.z=.33; // encostada na beira do vão, do lado oposto ao Bento: o caminho da escada fica livre
+  try{if(S.plate&&S.plate.mesh&&S.plate.mesh.parent===gate){const pl=S.plate.mesh;g.attach(pl);pl.position.x=-3.1*(P439.lado||1);pl.position.y=1.55;pl.position.z=.42; // encostada na beira do vão, do lado oposto ao Bento: o caminho da escada fica livre
     const post=new THREE.Mesh(new THREE.CylinderGeometry(.03,.035,pl.position.y-.18,8),p439Mat(0x1c1a1c));post.position.set(pl.position.x,(pl.position.y-.18)/2,pl.position.z-.02);post.name='Portão do Torreão · poste da placa';p439Marca(post);g.add(post);}}catch(e){p439Erro('poste',e);}}
 function p439Derretido(S,u){const G=P439.gate;if(!G)return;u=Math.max(0,Math.min(1,u));const k=1-Math.pow(1-u,2);
   if(G.bars){G.bars.scale.y=1-k*.965;G.bars.scale.x=1+k*.08;}
@@ -62601,7 +62601,7 @@ function al522Humor(){const ceu=al521TexCeu('céu humor','#58a8f0','#a8d8f8','#f
       const cores=[al521Mat('feira a',0xe02030,.6),al521Mat('feira b',0x2060d0,.6),al521Mat('feira c',0x30b040,.6),al521Mat('feira d',0xf0c020,.6)];
       al522Barraca(K,M,c,23,q.z1-2,Math.PI,cores[0],text428('PIPOCA','POPCORN','PALOMITAS'));al522Barraca(K,M,c,28,q.z1-2,Math.PI,cores[1],text428('TIRO AO ALVO','SHOOTING','TIRO AL BLANCO'));al522Barraca(K,M,c,33,q.z1-2,Math.PI,cores[2],text428('PESCARIA','FISHING','PESCA'));al522Barraca(K,M,c,38,q.z1-2,Math.PI,cores[3],text428('ALGODÃO DOCE','COTTON CANDY','ALGODÓN'));
       al522Barraca(K,M,c,23,q.z0+2,0,cores[2],text428('MAÇÃ DO AMOR','CANDY APPLE','MANZANA'));al522Barraca(K,M,c,28,q.z0+2,0,cores[3],text428('ARGOLAS','RING TOSS','ANILLAS'));
-      for(let i=0;i<10;i++){const a=i/10*6.283;al522Balao(K,cores[i%4],24.5+Math.cos(a)*.6,2.6+(i%3)*.3,q.z1-5+Math.sin(a)*.6);}K.cyl(.03,.03,2.2,M.ferro,24.5,1.1,q.z1-5,6);K.box(.6,.9,.6,M.madeira,24.5,.45,q.z1-5);c.ob(24.5,q.z1-5,.5);
+      for(let i=0;i<10;i++){const a=i/10*6.283;al522Balao(K,24.5+Math.cos(a)*.6,2.6+(i%3)*.3,q.z1-5+Math.sin(a)*.6,cores[i%4]);}K.cyl(.03,.03,2.2,M.ferro,24.5,1.1,q.z1-5,6);K.box(.6,.9,.6,M.madeira,24.5,.45,q.z1-5);c.ob(24.5,q.z1-5,.5);
       for(let i=0;i<8;i++){const x=q.x0+2+i*4;PR521.lampiao(K,M,c,x,q.z0+.8,3.0);}for(let i=0;i<30;i++){K.sph(.06,[t160Brilho('522 bulbo a',0xfff0c0,1.4),t160Brilho('522 bulbo b',0xff6060,1.4),t160Brilho('522 bulbo c',0x60a0ff,1.4)][i%3],q.x0+.5+i*1.0,6.5+Math.sin(i*.6)*.4,q.z0+.4,1,1,1,7,5);}
       // a lona do circo: mastro central, cobertura cónica listrada, picadeiro e arquibancada em ferradura
       const tx=36,tz=-17;K.cyl(.22,.26,8.5,M.madeira,tx,4.25,tz,12);K.cone(10.5,3.2,M.lona,tx,8.0,tz,24,0,0,0,true);K.cone(.3,1.2,al521Mat('bandeira',0xf0c020,.6),tx,9.9,tz,6);for(let i=0;i<12;i++){const a=i/12*6.283;K.cyl(.1,.1,5.5,M.madeira,tx+Math.cos(a)*10,2.75,tz+Math.sin(a)*10,8);c.ob(tx+Math.cos(a)*10,tz+Math.sin(a)*10,.3);K.plane(5.3,1.2,M.lona,tx+Math.cos(a+.26)*10,5.9,tz+Math.sin(a+.26)*10,-(a+.26)+Math.PI/2,0,0);}
@@ -62648,7 +62648,8 @@ function al522Humor(){const ceu=al521TexCeu('céu humor','#58a8f0','#a8d8f8','#f
        {a:1,b:4,c:29,w:3.2,h:3.2,nome:text428('Teatro de Marionetes','Puppet Theatre','Teatro de marionetas'),porta:'porta'},{a:1,b:5,c:44,w:2.6,h:2.8,nome:text428('Oficina dos Palhaços','Clown Workshop','Taller de los payasos'),porta:'porta'},
        {a:4,b:5,c:-46,w:2.4,h:2.6,nome:text428('Para a oficina','To the workshop','Al taller')}]};}
 /* ===================== SUPER-HERÓIS · BASE SECRETA ===================== */
-function al522Herois(){return {sala:'arena',entrada:{zA:-18.8,zB:-16.0,h:3.6},nome:text428('Base Secreta','Secret Base','Base Secreta'),placaBg:'#101828',placaFg:'#ffd23a',luz:{cor:0xdfe8ff,i0:1.3},
+function al522Herois(){const cfg=al522Herois0();cfg.rects=cfg.rects.filter(q=>q.id<=4);cfg.lig=cfg.lig.filter(l=>l.a<=4&&l.b<=4);return cfg;}
+function al522Herois0(){return {sala:'arena',entrada:{zA:-18.8,zB:-16.0,h:3.6},nome:text428('Base Secreta','Secret Base','Base Secreta'),placaBg:'#101828',placaFg:'#ffd23a',luz:{cor:0xdfe8ff,i0:1.3},
   mats:T=>({chao:al522TexAcoChao(),parede:al522TexAco(),teto:al521Mat('heróis teto',0x1a1e26,1),ombreira:al521Mat('heróis ombreira',0xf0b020,.5,.3),porta:al521Mat('heróis porta',0x5a6270,.5,.6),
     comando:al521Mat('heróis comando',0x2a3140,.7,.3),celas:al521Mat('heróis betão',0x3a3e46,.95),lab:al521Mat('heróis lab',0xdfe3e8,.6,.1),tatame:al521Mat('tatame',0x3a5a8a,.95),perigo:t160Mat('522 perigo',()=>{const m=new T.MeshStandardMaterial({map:clonedTex(he512TexPerigo(),6,1),roughness:.6});m.userData.papelKeep=true;return m;}),vermelho:al521Mat('heróis vermelho',0xc02020,.5,.4)}),
   rects:[
@@ -62751,6 +62752,164 @@ if(AL522.on&&typeof al521Mundo==='function'){const TEMAS522={fazenda:al522Humor,
   {const fr=finishRoom;finishRoom=function(key){const r=fr.apply(this,arguments);if(TEMAS522[key])setTimeout(()=>{try{al521Mundo(ROOMS[key],TEMAS522[key]());}catch(e){al521Erro(key,e);}},3);return r;};}
   try{for(const k in TEMAS522)if(ROOMS[k]&&ROOMS[k].ready)setTimeout(()=>{try{al521Mundo(ROOMS[k],TEMAS522[k]());}catch(e){al521Erro(k,e);}},3);}catch(e){}}
 window.__alas522={estado:AL522,temas:{humor:al522Humor,herois:al522Herois,digital:al522Digital}};
+
+/* ===== v523 — ovo do dragão legível e fácil de usar; escadas do Hall sem a espera (as salas do andar montam-se nos bastidores); Tomé, o Viajante vira o guia do castelo =====
+   Pedidos do Luiz:
+   «o texto dentro do ovo do dragão está apagado e ilegível, e as vezes é difícil interagir com ele, facilite»
+   «deixe e poder subir as escadas do hall, pq quando chego na frente está travando»
+   «a fala de Tomé o Viajante não faz sentido... Dê melhor utilidade para esse NPC»
+   (1) OVO523: a placa do ovo (plano de 2,5×0,52 m com letras de 34 px, de frente só para o centro do Hall) vira um sprite de 3,4×1,33 m,
+       sempre virado para a câmera, pergaminho claro com letras escuras de 82 px, barra dos rubis e uma linha que muda ao aproximar («E · entregar rubis»);
+       sem névoa nem tone mapping. Raio de interação 2,65 → 3,6 m; um cilindro invisível de 1,55 m em volta do ovo recebe o clique e a mira;
+       o ovo entra no `nearBy` (a tecla E / o botão de ação funcionam ao chegar perto, em 3ª pessoa e em 1ª); aviso ao chegar pela primeira vez.
+   (2) ESC523: a escada não espera mais. O `goHall` montava TODAS as salas do andar de destino antes de trocar de cena (`ensureRoom130`, 1,25 ms por
+       quadro de 16 ms ≈ 7 % do tempo → dezenas de segundos parado em frente à escada, sem fade nem aviso: o «travando»). Agora o Hall troca na hora e
+       as salas do andar montam-se nos bastidores (`esc523Passo`, no `tick`): a porta mais perto do leitor primeiro, 1–6 ms por quadro conforme a folga
+       do quadro, depois o andar de cima e o de baixo (no Leve só o andar atual). Quem entra numa sala ainda em montagem continua a montagem
+       (fatia de 8 ms em vez de 1,25) e, se outra sala estiver no meio, ela é terminada antes. Faixa do gatilho da escada um pouco mais funda (1,4 m).
+   (3) TOME523: Tomé, o Viajante (modelo `viajante`: Aventura, Biografia e postos dos halls) fala como um viajante que mapeia o castelo e diz o que
+       falta no andar (chaves, baús, contos, inimigos), o andar de cima com segredos e o próximo passo; botões: levar à sala mais perto com algo
+       por fazer, levar ao Hall do andar, subir ao andar com pendências, abrir o Diário.
+   Interruptores: ?ovo523=0, ?escada523=0, ?tome523=0. Ganchos: window.__ovo523, window.__esc523, window.__tome523. */
+const CO523={q:location.search+location.hash,erros:[]};
+function co523Erro(k,e){CO523.erros.push(k+': '+(e&&e.message||e));try{console.warn('v523',k,e);}catch(x){}}
+function co523T(pt,en,es){try{return text428(pt,en,es);}catch(e){return pt;}}
+function co523Pos(){try{return asaPos();}catch(e){return MODE==='fp'?{x:P.x,z:P.z}:{x:CH.x,z:CH.z};}}
+function co523RR(x,X,Y,W,H,r){x.beginPath();x.moveTo(X+r,Y);x.lineTo(X+W-r,Y);x.quadraticCurveTo(X+W,Y,X+W,Y+r);x.lineTo(X+W,Y+H-r);x.quadraticCurveTo(X+W,Y+H,X+W-r,Y+H);x.lineTo(X+r,Y+H);x.quadraticCurveTo(X,Y+H,X,Y+H-r);x.lineTo(X,Y+r);x.quadraticCurveTo(X,Y,X+r,Y);x.closePath();}
+function co523Texto(x,txt,cx,cy,maxW,px,peso){let f=px;x.font=(peso||'')+' '+f+'px Georgia,serif';while(f>18&&x.measureText(txt).width>maxW){f-=3;x.font=(peso||'')+' '+f+'px Georgia,serif';}x.fillText(txt,cx,cy);}
+
+/* ---------------- (1) o ovo do dragão ---------------- */
+const OVO523={on:!/[?&#]ovo523=0/i.test(CO523.q),raio:3.6,t:0,n:0,avisou:false};
+function ov523Perto(r){const e=RUBY422.egg;if(!e||CUR!=='hall'||HALLN!==1)return false;const p=co523Pos();return Math.hypot(p.x-e.x,p.z-e.z)<(r||OVO523.raio);}
+function ov523Alvo(){return {kind:'egg422',obj:RUBY422.egg.group,label:co523T('Ovo do dragão · entregar rubis','Dragon egg · donate rubies','Huevo del dragón · entregar rubíes')};}
+function ov523Monta(){const e=RUBY422.egg;if(!e||e.placa523||!OVO523.on)return;
+  const c=can(1024,400),tx=new THREE.CanvasTexture(c);tx.encoding=THREE.sRGBEncoding;tx.minFilter=THREE.LinearFilter;tx.magFilter=THREE.LinearFilter;tx.generateMipmaps=false;tx.anisotropy=4;
+  const m=new THREE.SpriteMaterial({map:tx,transparent:true,depthWrite:false,fog:false,toneMapped:false});m.userData.papelKeep=true;
+  const sp=new THREE.Sprite(m);sp.scale.set(3.4,1.33,1);sp.position.set(0,3.25,0);sp.renderOrder=4;sp.userData.noCam=true;sp.userData.fx=true;sp.userData.dynamic434=true;sp.raycast=function(){};sp.name='v523 · placa do ovo';sp.layers.set(1);e.group.add(sp);
+  if(e.sign)e.sign.visible=false;
+  const hit=new THREE.Mesh(new THREE.CylinderGeometry(1.55,1.55,3.4,12,1),new THREE.MeshBasicMaterial({visible:false}));hit.position.y=1.7;hit.visible=false;hit.userData.noCam=true;hit.userData.fx=true;hit.name='v523 · alvo do ovo';e.group.add(hit);e.targets.push(hit);
+  e.placa523={sp,c,tx,ultimo:'',hit};ov523Desenha(true);}
+function ov523Desenha(force){const e=RUBY422.egg,Pl=e&&e.placa523;if(!Pl)return;const s=RUBY422.data||{donated:0};const perto=ov523Perto();const nasceu=s.donated>=1000;
+  const l1=nasceu?co523T('Dragão prismático · nasceu!','Prismatic dragon · hatched!','Dragón prismático · ¡nació!'):co523T('Ovo do dragão prismático','Prismatic dragon egg','Huevo del dragón prismático');
+  const l2=nasceu?'':(Math.min(1000,s.donated|0)+' / 1000 '+co523T('rubis','rubies','rubíes'));
+  const l3=nasceu?co523T('ele já acompanha você','it now travels with you','ya te acompaña'):(perto?co523T('E · entregar rubis','E · donate rubies','E · entregar rubíes'):co523T('aproxime-se para entregar rubis','come closer to donate rubies','acércate para entregar rubíes'));
+  const chave=l1+'|'+l2+'|'+l3;if(!force&&chave===Pl.ultimo)return;Pl.ultimo=chave;
+  const x=Pl.c.getContext('2d'),W=Pl.c.width,H=Pl.c.height;x.clearRect(0,0,W,H);
+  x.fillStyle='rgba(16,10,30,.62)';co523RR(x,6,6,W-12,H-12,46);x.fill();
+  x.fillStyle='#f8ecd2';co523RR(x,20,20,W-40,H-40,36);x.fill();x.lineWidth=10;x.strokeStyle=perto?'#e8a62c':'#c99a3f';co523RR(x,20,20,W-40,H-40,36);x.stroke();
+  x.textAlign='center';x.textBaseline='middle';
+  x.fillStyle='#2b1a3c';co523Texto(x,l1,W/2,l2?110:140,W-120,82,'bold');
+  if(l2){x.fillStyle='#8c1d4f';co523Texto(x,l2,W/2,220,W-120,86,'bold');
+    x.fillStyle='#dccbb0';co523RR(x,140,284,W-280,24,12);x.fill();const f=Math.max(0,Math.min(1,s.donated/1000));if(f>0){x.fillStyle='#e8408a';co523RR(x,140,284,Math.max(24,(W-280)*f),24,12);x.fill();}}
+  if(l3){x.fillStyle=perto?'#1e6f3c':'#6a5a7a';co523Texto(x,l3,W/2,l2?350:250,W-120,52,perto?'bold':'');}
+  Pl.tx.needsUpdate=true;}
+if(OVO523.on){
+  try{const en0=egg422Near;egg422Near=function(){return ov523Perto(OVO523.raio);};OVO523.near0=en0;}catch(e){co523Erro('near',e);}
+  try{const nb0=nearBy;nearBy=function(){const b=nb0.apply(this,arguments);try{if(RUBY422.egg&&ov523Perto(OVO523.raio)&&(!b||b.far||b.kind==='hdoor'||b.kind==='hlivro'))return ov523Alvo();}catch(e){co523Erro('nearBy',e);}return b;};}catch(e){co523Erro('nearBy0',e);}
+  try{const di0=doInteract;doInteract=function(){try{if(!NPC127.open&&!uiBlocked()&&RUBY422.egg&&ov523Perto(OVO523.raio)){updateFocus();const tg=FOCUS;if(!tg||tg.far||tg.kind==='egg422'||tg.kind==='hdoor'){egg422Open();return;}}}catch(e){co523Erro('doInteract',e);}return di0.apply(this,arguments);};}catch(e){co523Erro('doInteract0',e);}
+  try{const rf0=egg422Refresh;egg422Refresh=function(){const r=rf0.apply(this,arguments);try{ov523Monta();ov523Desenha(false);}catch(e){co523Erro('refresh',e);}return r;};}catch(e){co523Erro('refresh0',e);}
+  try{const hb0=hallDragon381Build;hallDragon381Build=function(){const r=hb0.apply(this,arguments);try{ov523Monta();}catch(e){co523Erro('monta',e);}return r;};}catch(e){co523Erro('build0',e);}
+  try{const ht0=hallTick;hallTick=function(dt){const r=ht0.apply(this,arguments);try{if(CUR==='hall'&&HALLN===1&&RUBY422.egg){if(!RUBY422.egg.placa523)ov523Monta();OVO523.t+=dt||0;if((++OVO523.n)%6===0)ov523Desenha(false);const Pl=RUBY422.egg.placa523;if(Pl){const perto=ov523Perto();const k=perto?1+.035*Math.sin(OVO523.t*4):1;Pl.sp.scale.set(3.4*k,1.33*k,1);
+      if(perto&&!OVO523.avisou&&!uiBlocked()){OVO523.avisou=true;try{showToast(co523T('Ovo do dragão prismático: aperte E (ou clique nele) para entregar rubis — 1000 chocam o dragãozinho','Prismatic dragon egg: press E (or click it) to donate rubies — 1000 hatch the little dragon','Huevo del dragón prismático: pulsa E (o haz clic) para entregar rubíes — 1000 lo hacen nacer'),{queue:true});}catch(e){}}}}}catch(e){co523Erro('tick',e);}return r;};}catch(e){co523Erro('tick0',e);}
+  try{if(RUBY422.egg)ov523Monta();}catch(e){co523Erro('monta0',e);}
+}
+window.__ovo523={estado:OVO523,perto:ov523Perto,monta:ov523Monta,desenha:()=>ov523Desenha(true),erros:CO523.erros};
+
+/* ---------------- (2) a escada e as salas nos bastidores ---------------- */
+const ESC523={on:!/[?&#]escada523=0/i.test(CO523.q),fila:[],chave:null,ms:{},ruins:{},ultimoDt:.016,cool:0,cool2:0,aquecer:[],aquecendo:null,stats:{montadas:0,sincronas:0,pedidas:0,adiante:0,aquecidas:0,canceladas:0}};
+function esc523Andar(){try{return CUR==='hall'?HALLN:(GENRE_FLOOR(CUR_GENRE)||1);}catch(e){return 1;}}
+function esc523Chaves(n){let L=[];try{L={1:FLOOR1_ORDER,2:FLOOR2_ORDER,3:FLOOR3_ORDER,4:FLOOR4_ORDER,5:FLOOR5_ORDER}[n]||(n===6?GEN_KEYS6:n===7?GEN_KEYS7:[]);}catch(e){}
+  return (L||[]).map(k=>ROOM_BUILDERS[k]?k:(GENRE_ROOM[k]&&ROOM_BUILDERS[GENRE_ROOM[k]]?GENRE_ROOM[k]:null)).filter(Boolean);}
+function esc523Falta(k){return !!ROOM_BUILDERS[k]&&!(ROOMS[k]&&ROOMS[k].ready)&&!ESC523.ruins[k];}
+function esc523Fatia(){const dt=ESC523.ultimoDt;if(QUIET434.job||PERF130.busy||fadeOnAt)return 0;if(ESC523.fatiaFixa)return ESC523.fatiaFixa;if(dt<1/50)return 6;if(dt<1/35)return 3;return 1;}
+function esc523Proxima(){const E=ESC523;const n=esc523Andar();
+  const pedidos=E.fila.filter(esc523Falta);if(pedidos.length)return pedidos[0];
+  let lista=esc523Chaves(n).filter(esc523Falta);
+  if(lista.length&&CUR==='hall'){try{const p=co523Pos(),H=HALLS[HALLN];const dist=k=>{const d=(H&&H.doors||[]).find(g=>GENRE_ROOM[g.userData.genre]===k||g.userData.genre===k);if(!d)return 99;const f=doorFront(d,0.4);return Math.hypot(f[0]-p.x,f[1]-p.z);};lista.sort((a,b)=>dist(a)-dist(b));}catch(e){}}
+  // os andares vizinhos só quando o Leve não está a ser preparado nos bastidores (a preparação pausa enquanto há montagem) e fora do Leve
+  const prep=(typeof LEVE6!=='undefined'&&(LEVE6.fase==='preparando'||LEVE6.fase==='espera'))||(typeof FLOW417!=='undefined'&&FLOW417.verifying);
+  if(!lista.length&&!Q.lite&&!prep){const cima=esc523Chaves(n+1).filter(esc523Falta);if(cima.length){lista=cima;E.stats.adiante++;}}
+  if(!lista.length&&!Q.lite&&!prep&&n>1){const baixo=esc523Chaves(n-1).filter(esc523Falta);if(baixo.length)lista=baixo;}
+  return lista[0]||null;}
+function esc523Passo(dt){const E=ESC523;E.ultimoDt=dt||.016;if(!E.on||!LOADED||!AQ.liberado)return;
+  if(E.cool>0){E.cool-=dt;return;}
+  const fatia=esc523Fatia();if(fatia<=0)return;
+  if(!buildIt){const k=esc523Proxima();if(!k)return;
+    try{buildIt=ROOM_BUILDERS[k]();buildKey=k;E.chave=k;E.ms[k]=0;}catch(e){co523Erro('sala '+k,e);E.ruins[k]=true;buildIt=null;buildKey=null;return;}
+    buildBusy=true;}
+  if(buildKey!==E.chave)return; // outra montagem (ensureRoom130 / buildStep) está no comando
+  const t0=performance.now();let done=false;
+  try{do{const r=buildIt.next();if(r.done){done=true;break;}}while(performance.now()-t0<fatia);}catch(e){co523Erro('montagem '+buildKey,e);done=true;E.ruins[buildKey]=true;}
+  E.ms[buildKey]=(E.ms[buildKey]||0)+(performance.now()-t0);
+  if(done){const k=buildKey;buildIt=null;buildKey=null;buildBusy=false;E.chave=null;
+    if(ROOMS[k]&&!E.ruins[k]){try{finishRoom(k);}catch(e){co523Erro('finishRoom '+k,e);}try{ROOM_MS[k]=Math.round(E.ms[k]);}catch(e){}E.stats.montadas++;if(!E.aquecer.includes(k))E.aquecer.push(k);}
+    const i=E.fila.indexOf(k);if(i>=0)E.fila.splice(i,1);E.cool=.5;}}
+// depois de montada, a sala é preparada nos bastidores (texturas, programas da placa, BVH da câmera) — o mesmo `travel434Prepare` de uma viagem —
+// e, até lá, o portal da porta não a desenha (o primeiro desenho compilaria os programas no meio do quadro: engasgo)
+function esc523Aquece(){const E=ESC523;if(E.aquecendo||!E.aquecer.length)return;if(QUIET434.job||PERF130.busy||fadeOnAt||buildIt||document.hidden)return;
+  const k=E.aquecer[0];const R=ROOMS[k];if(!R||!R.scene||!R.ready){E.aquecer.shift();return;}
+  E.aquecendo=k;const rev=PERF130.revision;
+  Promise.resolve().then(()=>travel434Prepare(R.scene,rev,false)).then(()=>{const i=E.aquecer.indexOf(k);if(i>=0)E.aquecer.splice(i,1);E.stats.aquecidas++;}).catch(e=>{if(e===PREP_CANCEL131)E.stats.canceladas++;else{co523Erro('aquece '+k,e);const i=E.aquecer.indexOf(k);if(i>=0)E.aquecer.splice(i,1);}}).then(()=>{E.aquecendo=null;});}
+function esc523Fria(sc){const E=ESC523;if(!E.aquecer.length||!sc)return false;for(const k of E.aquecer){const R=ROOMS[k];if(R&&R.scene===sc)return true;}return false;}
+function esc523Termina(){ // termina já a montagem dos bastidores (o leitor vai entrar noutra sala)
+  const E=ESC523,k=buildKey,it=buildIt;if(!it||E.chave!==k)return;const t0=performance.now();let ok=false;
+  try{let r;do{r=it.next();}while(!r.done&&performance.now()-t0<5000);ok=!!(r&&r.done);}catch(e){co523Erro('termina '+k,e);}
+  buildIt=null;buildKey=null;buildBusy=false;E.chave=null;
+  if(ok&&ROOMS[k]){try{finishRoom(k);}catch(e){co523Erro('finishRoom '+k,e);}E.stats.montadas++;}else E.ruins[k]=true; // (quem chamou — ensureRoom130/enterRoom — prepara a sala que vai mostrar; esta fica para o aquecimento normal)
+  if(ok&&ROOMS[k]&&!E.aquecer.includes(k))E.aquecer.push(k);
+  E.stats.sincronas++;}
+function esc523Pedir(keys){const E=ESC523;E.stats.pedidas++;for(const k0 of (keys||[])){const k=ROOM_BUILDERS[k0]?k0:(GENRE_ROOM[k0]&&ROOM_BUILDERS[GENRE_ROOM[k0]]?GENRE_ROOM[k0]:null);if(k&&esc523Falta(k)&&!E.fila.includes(k))E.fila.push(k);}}
+function esc523Escada(dt){ // faixa do gatilho um pouco mais funda do que a do tick original (1,2 m)
+  const E=ESC523;if(E.cool2>0){E.cool2-=dt;return;}if(CUR!=='hall'||fadeOnAt||PERF130.busy||QUIET434.job)return;
+  const p=co523Pos(),HR=hallRadius(HALLN),r=Math.hypot(p.x,p.z);if(r<=HR-1.42||r>HR-1.2)return;
+  const a=Math.atan2(p.z,p.x);for(const S of (HALLX.stairs||[])){if(!S.open)continue;let d=a-S.angle;d=Math.atan2(Math.sin(d),Math.cos(d));if(Math.abs(d)*HR<1.3){E.cool2=2;goHall(S.to,true);break;}}}
+if(ESC523.on){
+  try{const er0=ensureRoom130;ensureRoom130=async function(key){try{if(buildIt&&buildKey!==key&&ESC523.chave===buildKey)esc523Termina();}catch(e){co523Erro('ensure',e);}return er0.apply(this,arguments);};}catch(e){co523Erro('ensure0',e);}
+  try{const tk0=tick;tick=function(dt){const r=tk0.apply(this,arguments);const d=Math.max(0,Math.min(.1,dt||.016));try{esc523Passo(d);}catch(e){co523Erro('passo',e);}try{esc523Aquece();}catch(e){co523Erro('aquece',e);}try{esc523Escada(d);}catch(e){co523Erro('escada',e);}return r;};}catch(e){co523Erro('tick0',e);}
+  try{const rp0=renderPortal;renderPortal=function(p,bb,slow){try{if(p&&p.sceneB&&esc523Fria(p.sceneB))return false;}catch(e){}return rp0.apply(this,arguments);};}catch(e){co523Erro('portal0',e);}
+}
+window.__esc523={on:ESC523.on,estado:ESC523,pedir:esc523Pedir,fatiaEspera:()=>8,proxima:esc523Proxima,termina:esc523Termina,erros:CO523.erros};
+
+/* ---------------- (3) Tomé, o Viajante ---------------- */
+const TOME523={on:!/[?&#]tome523=0/i.test(CO523.q),vez:0};
+const TOME523_FALAS=[
+ ['Já cruzei este castelo de ponta a ponta: sete andares, dezenas de salas e nenhum mapa de confiança. Por isso faço o meu — e ele está à sua disposição.','I have crossed this castle end to end: seven floors, dozens of rooms and not one map worth trusting. So I draw my own — and it is yours to use.','He cruzado este castillo de punta a punta: siete pisos, decenas de salas y ningún mapa de fiar. Por eso hago el mío, y está a tu disposición.'],
+ ['Um viajante que se preze sabe duas coisas: onde está e para onde ainda não foi. Quer saber o que falta por aqui?','A traveller worth his salt knows two things: where he is and where he has not yet been. Shall I tell you what is still left here?','Un viajero que se precie sabe dos cosas: dónde está y adónde aún no ha ido. ¿Quieres saber qué falta por aquí?'],
+ ['Minha mochila está cheia de atalhos. Diga aonde quer ir e eu levo você — sem cobrar passagem.','My pack is full of shortcuts. Tell me where you want to go and I will take you there — no fare charged.','Mi mochila está llena de atajos. Dime adónde quieres ir y te llevo, sin cobrar pasaje.']];
+function tome523E(n){try{return !!(n&&n.g&&(n.g.userData.galeria232==='viajante'||n.g.userData.halls236==='viajante'||/Tom[eé]\b/.test(n.name||'')));}catch(e){return false;}}
+function tome523Nome(g){const G=EST.GENEROS[g];return G?G.nome:g;}
+function tome523Pend(g){const f=[];
+  try{if(!KEYS.baus[g])f.push(hasKey(g)?co523T('abrir o baú','open the chest','abrir el cofre'):co523T('a chave dourada','the golden key','la llave dorada'));
+    if(!KEYS.baus2[g])f.push(hasKey2(g)?co523T('abrir o baú de prata','open the silver chest','abrir el cofre de plata'):co523T('a chave de prata','the silver key','la llave de plata'));}catch(e){}
+  try{if(CONTOS[g]&&!(LEITOR.lidos&&LEITOR.lidos[g]))f.push(co523T('ler o conto','read the tale','leer el cuento'));}catch(e){}
+  try{const k=GENRE_ROOM[g];if(k&&typeof CAV!=='undefined'&&CAV.estado&&CAV.estado.limpas&&!CAV.estado.limpas[k])f.push(co523T('limpar os inimigos','clear the enemies','limpiar a los enemigos'));}catch(e){}
+  return f;}
+function tome523Andar(){try{return CUR==='hall'?HALLN:(GENRE_FLOOR(CUR_GENRE)||1);}catch(e){return 1;}}
+function tome523Generos(n){try{return Object.keys(GENRE_ROOM).filter(g=>GENRE_FLOOR(g)===n&&roomExists(g));}catch(e){return [];}}
+function tome523Hall(n){return HALL_NOMES[n]||co523T('andar '+n,'floor '+n,'piso '+n);}
+function tome523Resumo(){const n=tome523Andar();const gs=tome523Generos(n);const pend=gs.map(g=>[g,tome523Pend(g)]).filter(x=>x[1].length);const nome=tome523Hall(n);let txt;
+  const tudo=co523T('tudo por fazer','everything still to do','todo por hacer');const item=([g,f])=>tome523Nome(g)+' — '+(f.length>=4?tudo:f.join(', '));
+  if(!pend.length)txt=co523T('Neste andar ('+nome+') não ficou nada por fazer — você já viajou mais do que eu.','On this floor ('+nome+') nothing is left to do — you have travelled further than I have.','En este piso ('+nome+') no quedó nada por hacer: ya viajaste más que yo.');
+  else if(pend.length===gs.length&&pend.every(x=>x[1].length>=4))txt=co523T('Neste andar ('+nome+') está tudo por fazer: em cada sala, uma chave dourada e uma de prata (cada uma abre um baú), um conto para ler e os inimigos para limpar.','On this floor ('+nome+') everything is still to do: in each room, a golden key and a silver one (each opens a chest), a tale to read and enemies to clear.','En este piso ('+nome+') está todo por hacer: en cada sala, una llave dorada y una de plata (cada una abre un cofre), un cuento por leer y enemigos por limpiar.');
+  else txt=co523T('Minhas anotações sobre este andar ('+nome+'): ','My notes on this floor ('+nome+'): ','Mis notas sobre este piso ('+nome+'): ')+pend.map(item).join(' · ')+'.';
+  let cima=null;for(let m=n+1;m<=7;m++){const p=tome523Generos(m).filter(g=>tome523Pend(g).length);if(p.length){cima=[m,p.length];break;}}
+  if(cima)txt+=' '+co523T('Lá em cima ('+tome523Hall(cima[0])+') ainda há '+cima[1]+(cima[1]>1?' salas':' sala')+' com segredos.','Upstairs ('+tome523Hall(cima[0])+') '+cima[1]+(cima[1]>1?' rooms':' room')+' still keep secrets.','Arriba ('+tome523Hall(cima[0])+') aún hay '+cima[1]+(cima[1]>1?' salas':' sala')+' con secretos.');
+  return {n,pend,cima,txt};}
+function tome523Botoes(){const R=tome523Resumo();const box=document.createElement('div');box.id='tome523Btns';box.style.cssText='display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px';
+  const mk=(txt,fn)=>{const b=document.createElement('button');b.type='button';b.textContent=txt;b.style.cssText='padding:8px 12px;border:1px solid #c7a367;border-radius:7px;background:#3a2d4e;color:#fff2cc;cursor:pointer;font:inherit;font-size:14px;line-height:1.2';b.onclick=()=>{try{npcClose(true);}catch(e){}try{fn();}catch(e){co523Erro('botão',e);}};box.append(b);return b;};
+  const atual=CUR==='room'?CUR_GENRE:null;const cand=R.pend.map(x=>x[0]).filter(g=>g!==atual);
+  if(cand.length)mk(co523T('Levar-me a ','Take me to ','Llévame a ')+tome523Nome(cand[0]),()=>travel(cand[0]));
+  if(atual&&R.pend.some(x=>x[0]===atual))mk(co523T('O que falta nesta sala?','What is left in this room?','¿Qué falta en esta sala?'),()=>{try{showToast(tome523Nome(atual)+': '+tome523Pend(atual).join(', ')+' · '+nextStep(),{big:true,queue:true});}catch(e){}});
+  const n=R.n;if(!(CUR==='hall'&&HALLN===n))mk(co523T('Levar-me ao '+tome523Hall(n),'Take me to the '+tome523Hall(n),'Llévame al '+tome523Hall(n)),()=>travel(n===1?'hall':'hall'+n));
+  if(R.cima)mk(co523T('Subir ao '+tome523Hall(R.cima[0]),'Go up to the '+tome523Hall(R.cima[0]),'Subir al '+tome523Hall(R.cima[0])),()=>travel('hall'+R.cima[0]));
+  mk(co523T('Abrir o Diário','Open the Diary','Abrir el Diario'),()=>{try{openDiary();}catch(e){}});
+  const ex=document.getElementById('npcExtra');if(ex&&ex.parentElement)ex.after(box);else{const done=document.getElementById('npcDone');if(done&&done.parentElement)done.parentElement.append(box);}}
+if(TOME523.on){
+  try{const nl0=npcLines;npcLines=function(n){if(tome523E(n)){try{const R=tome523Resumo();const f=TOME523_FALAS[(TOME523.vez++)%TOME523_FALAS.length];let prox='';try{prox=' '+co523T('Próximo passo: ','Next step: ','Siguiente paso: ')+nextStep();}catch(e){}return {text:co523T(f[0],f[1],f[2]),extra:R.txt+prox};}catch(e){co523Erro('falas',e);}}return nl0.apply(this,arguments);};}catch(e){co523Erro('falas0',e);}
+  try{const nt0=npcTalk;npcTalk=function(n){try{const old=document.getElementById('tome523Btns');if(old)old.remove();}catch(e){}const r=nt0.apply(this,arguments);try{if(NPC127.open&&tome523E(n))tome523Botoes();}catch(e){co523Erro('botões',e);}return r;};}catch(e){co523Erro('talk0',e);}
+}
+window.__tome523={estado:TOME523,e:tome523E,resumo:tome523Resumo,pend:tome523Pend,falas:TOME523_FALAS,erros:CO523.erros};
+try{if(typeof NOVIDADES198!=='undefined')NOVIDADES198.v523=co523T('🥚 A placa do ovo do dragão ficou legível e o ovo responde à tecla E · as escadas do Hall não esperam mais (as salas montam-se nos bastidores) · Tomé, o Viajante agora é o guia do castelo','🥚 The dragon egg sign is readable and the egg answers the E key · the Hall stairs no longer wait (rooms are built backstage) · Tomé the Traveller is now the castle guide','🥚 El cartel del huevo del dragón se lee bien y el huevo responde a la tecla E · las escaleras ya no esperan · Tomé el Viajero es ahora el guía del castillo');}catch(e){}
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
