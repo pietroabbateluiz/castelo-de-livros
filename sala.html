@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v537</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v538</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -54523,7 +54523,7 @@ window.__robot315={state:ROBOT315,tick:robot315Tick,init:robot315Init,damage:rob
 /* v316: crew enemies live on the Aurora deck; the friendly robot walks and flanks. */
 function ship316PlayerAboard(){if(!robot315Here()||!SHIP302.ready||ASA246.voo?.ship302)return false;const p=cavPos(),q=s303Local(p.x,p.z);return q[0]>-9.1&&q[0]<9.1&&q[1]<-30.8&&q[1]>-66.2;}
 function ship316Clear(x,z,r=.6){const p=s303Local(x,z);return Math.abs(p[0])<=7.8&&p[1]>=-64.5&&p[1]<=-34.3&&(SHIP302.obstacles||[]).every(o=>Math.hypot(x-o[0],z-o[1])>=o[2]+r);}
-function ship316Place(){const S=CAV.salas.sci,R=ROOMS.sci;if(!S||!R||!SHIP302.ready)return;const crew=S.lista.filter(k=>!k.robot315),used=crew.filter(k=>k.ship316).map(k=>[k.x0,k.z0]);
+function ship316Place(){const S=CAV.salas.sci,R=ROOMS.sci;if(!S||!R||!SHIP302.ready)return;const crew=S.lista.filter(k=>!k.robot315&&!k.rival530),used=crew.filter(k=>k.ship316).map(k=>[k.x0,k.z0]);
  const preferred=[[-3,-38],[3,-41],[-4,-47],[4,-55],[-5,-58],[5,-62]];
  for(let i=0;i<crew.length;i++){const k=crew[i];if(k.ship316)continue;const wish=preferred[i%preferred.length],candidates=[];for(let z=-35;z>=-64;z-=.75)for(let x=-7.5;x<=7.5;x+=.75){const p=s303World(x,z);if(!ship316Clear(p[0],p[1],.65)||used.some(o=>Math.hypot(p[0]-o[0],p[1]-o[1])<2.5))continue;candidates.push({p,score:(x-wish[0])**2+(z-wish[1])**2});}candidates.sort((a,b)=>a.score-b.score);if(!candidates.length)throw new Error('No safe Aurora position for crew '+k.id);const p=candidates[0].p;used.push(p);k.ship316=true;k.x=k.x0=p[0];k.z=k.z0=p[1];k.path=null;k.pi=0;k.tPath=0;k.knock.x=k.knock.z=0;k.g.position.set(k.x,cavY(R,k.x,k.z),k.z);k.g.rotation.y=S303_ANGLE+Math.PI;}
  S.pts=crew.map(k=>[k.x0,k.z0]);}
@@ -64269,6 +64269,181 @@ if(CP537.on&&typeof RV530!=='undefined'&&RV530.on&&typeof RV532!=='undefined'&&t
 }
 window.__campos537={estado:CP537,erros:CP537.erros,stats:CP537.stats,campos:CP537.campos,tochas:rv537Tochas};
 try{if(typeof NOVIDADES198!=='undefined')NOVIDADES198.v537=co523T('🔥 Campos dos Rivais sem portais: no 3.º andar o campo é o último salão da ala, no 5.º abre-se na parede da direita; chão limpo para o duelo e muralhas com tochas e braseiros','🔥 Fields of Rivals without portals: on floor 3 the field is the last hall of the wing, on floor 5 it opens in the right wall; clear ground for the duel and walls lined with torches and braziers','🔥 Campos de los Rivales sin portales: en el 3.º el campo es el último salón del ala, en el 5.º se abre en la pared derecha; suelo limpio y murallas con antorchas y braseros');}catch(e){}
+
+/* ===================== v538 · DUELOS DO 1.º ANDAR, PARTE 1: SALÃO DOS ESPECTROS (Terror) E HANGAR DA NAVE (Ficção científica) =====================
+   Pedido do Luiz: «crie uma sala em terror para o duelo, crie uma nave para o duelo em sci-fi». As duas salas do 1.º andar têm a parede da direita
+   livre num canto (Terror: estantes até z ±14,6; Ficção: costelas até z ±12,5), por isso o duelo entra pelo caminho da v530 — `rv530Vao` escolhe o
+   vão livre, `al521CortaParede` abre a porta e `al521Mundo` constrói o anexo — mas com uma `cfg` própria (`rv538Cfg`) em vez do campo de relva:
+   · Terror — «Salão dos Espectros»: salão gótico de pedra de 52 × 46 m e 11 m de pé-direito, colunas com arcos ogivais, sarcófagos encostados,
+     tochas e braseiros (os da v537), rosácea com luar, lancetas, lustre de velas, estandartes rasgados, teias nos cantos, ossadas e névoa rasteira.
+   · Ficção — «Hangar da Nave Vigia-7»: hangar de 54 × 46 m e 9 m, costelas do casco, janelas para as estrelas, vigia grande com um planeta anelado,
+     néon ciano/âmbar, consolas com ecrãs holográficos, cápsulas criogénicas, painéis de luz no tecto e a plataforma de aterragem marcada no chão.
+   O chão fica livre no meio (só colunas/consolas junto das paredes). Sem céu: tecto; a névoa da sala mistura-se para a da noite lá dentro
+   (`cfg.rv532.tipo='noite'`). `?campos538=0` desliga (as duas fichas voltam a `adiado`). */
+const CP538={on:!/[?&#]campos538=0/i.test(location.search+location.hash),erros:[],stats:{}};
+function cp538Erro(k,e){if(CP538.erros.length<20)CP538.erros.push(k+': '+(e&&e.message||e));try{console.warn('v538',k,e);}catch(x){}}
+function cp538Tex(chave,w,h,draw,rep){const tx=t160Tex('538 '+chave,w,h,draw,rep);tx.encoding=THREE.sRGBEncoding;return tx;}
+function cp538Mat(chave,w,h,draw,rep,o){return t160Mat('538 '+chave,()=>{const tx=cp538Tex(chave,w,h,draw,rep);const op=Object.assign({map:tx,roughness:.9},o||{});if(op.emissivo){const ei=op.emissivo;delete op.emissivo;op.emissive=new THREE.Color(0xffffff);op.emissiveMap=tx;op.emissiveIntensity=ei;}const m=new THREE.MeshStandardMaterial(op);m.userData.papelKeep=true;return m;});}
+function cp538Basico(chave,w,h,draw,o){return t160Mat('538 '+chave,()=>{const m=new THREE.MeshBasicMaterial(Object.assign({map:cp538Tex(chave,w,h,draw),transparent:true,depthWrite:false,side:THREE.DoubleSide},o||{}));m.userData.papelKeep=true;return m;});}
+/* ---------- texturas do Terror ---------- */
+function rv538MatsTerror(){const N=mkNoise(5381);
+  const pedra=(chave,base,rep,escuro)=>cp538Mat(chave,512,512,(x,w,h)=>{const r=rnd(hashStr(chave));x.fillStyle='#1c1a1e';x.fillRect(0,0,w,h);const bh=64,bw=128;
+    for(let row=0;row<h/bh;row++){const off=(row%2)*bw/2;for(let col=-1;col<w/bw+1;col++){const bx=col*bw+off,by=row*bh;const v=base+(r()*26|0)-(escuro?14:0);const g=x.createLinearGradient(bx,by,bx+bw,by+bh);g.addColorStop(0,'rgb('+(v+14)+','+(v+12)+','+(v+16)+')');g.addColorStop(1,'rgb('+(v-12)+','+(v-12)+','+(v-8)+')');x.fillStyle=g;x.beginPath();x.roundRect(bx+3,by+3,bw-6,bh-6,3);x.fill();
+      for(let k=0;k<40;k++){const n=N((bx+k*7)*.02,(by+k*3)*.02,2);x.fillStyle=n>.55?'rgba(120,130,110,.10)':'rgba(0,0,0,.12)';x.fillRect(bx+4+r()*(bw-8),by+4+r()*(bh-8),2+r()*5,1+r()*3);}
+      if(r()>.72){x.strokeStyle='rgba(10,8,12,.5)';x.lineWidth=1;x.beginPath();let px=bx+8+r()*(bw-16),py=by+4;x.moveTo(px,py);for(let s=0;s<5;s++){px+=(r()-.5)*14;py+=bh/5;x.lineTo(px,py);}x.stroke();}}}
+    // musgo e humidade junto do chão
+    for(let k=0;k<60;k++){x.fillStyle='rgba(40,70,40,'+(.05+r()*.12)+')';x.beginPath();x.ellipse(r()*w,h-r()*80,20+r()*50,8+r()*20,0,0,7);x.fill();}},rep,{roughness:.95});
+  const lajes=cp538Mat('lajes',512,512,(x,w,h)=>{const r=rnd(53812);x.fillStyle='#17161a';x.fillRect(0,0,w,h);const s=128;for(let i=0;i<4;i++)for(let j=0;j<4;j++){const v=58+(r()*22|0);x.fillStyle='rgb('+v+','+(v-1)+','+(v+3)+')';x.beginPath();x.roundRect(i*s+3,j*s+3,s-6,s-6,4);x.fill();for(let k=0;k<70;k++){x.fillStyle=r()>.5?'rgba(255,255,255,.05)':'rgba(0,0,0,.14)';x.fillRect(i*s+4+r()*(s-8),j*s+4+r()*(s-8),2+r()*6,1+r()*4);}if(r()>.6){x.strokeStyle='rgba(0,0,0,.45)';x.lineWidth=1.5;x.beginPath();let px=i*s+10+r()*100,py=j*s+6;x.moveTo(px,py);for(let q=0;q<6;q++){px+=(r()-.5)*20;py+=18;x.lineTo(px,py);}x.stroke();}}},[26,23],{roughness:.92});
+  const vitral=cp538Mat('vitral',512,512,(x,w,h)=>{const r=rnd(53813);const cx=256,cy=256;x.fillStyle='#06060c';x.fillRect(0,0,w,h);const cores=['#3a2a8a','#6a1a4a','#1a3a7a','#7a2020','#2a5a6a','#5a3a9a'];
+    for(let i=0;i<16;i++){const a0=i/16*Math.PI*2,a1=(i+1)/16*Math.PI*2;x.fillStyle=cores[i%6];x.beginPath();x.moveTo(cx,cy);x.arc(cx,cy,250,a0,a1);x.closePath();x.fill();x.fillStyle='rgba(255,255,255,.12)';x.beginPath();x.moveTo(cx,cy);x.arc(cx,cy,120,a0,a1);x.closePath();x.fill();}
+    for(let rr=60;rr<=250;rr+=47){x.strokeStyle='#0a0a0e';x.lineWidth=7;x.beginPath();x.arc(cx,cy,rr,0,7);x.stroke();}
+    for(let i=0;i<16;i++){const a=i/16*Math.PI*2;x.strokeStyle='#0a0a0e';x.lineWidth=7;x.beginPath();x.moveTo(cx,cy);x.lineTo(cx+Math.cos(a)*256,cy+Math.sin(a)*256);x.stroke();}
+    x.fillStyle='#e8e0ff';x.beginPath();x.arc(cx,cy,34,0,7);x.fill();x.fillStyle='#8a7ad0';x.beginPath();x.arc(cx+8,cy-4,26,0,7);x.fill();
+    for(let k=0;k<400;k++){x.fillStyle='rgba(255,255,255,'+(r()*.12)+')';x.fillRect(r()*w,r()*h,2,2);}},null,{emissivo:.75,roughness:.4});
+  const lanceta=cp538Mat('lanceta',256,768,(x,w,h)=>{const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#5a6ab0');g.addColorStop(.5,'#2a3a7a');g.addColorStop(1,'#141a3a');x.fillStyle=g;x.fillRect(0,0,w,h);x.strokeStyle='#08080c';x.lineWidth=6;for(let yy=0;yy<h;yy+=96){x.beginPath();x.moveTo(0,yy);x.lineTo(w,yy);x.stroke();}for(let xx=0;xx<=w;xx+=64){x.beginPath();x.moveTo(xx,0);x.lineTo(xx,h);x.stroke();}
+    x.fillStyle='rgba(255,255,255,.18)';x.beginPath();x.ellipse(128,80,60,70,0,0,7);x.fill();},null,{emissivo:.55,roughness:.4});
+  const teia=cp538Basico('teia',256,256,(x,w,h)=>{x.clearRect(0,0,w,h);x.strokeStyle='rgba(235,235,245,.75)';x.lineWidth=1.2;const cx=0,cy=0;for(let i=0;i<=8;i++){const a=i/8*Math.PI/2;x.beginPath();x.moveTo(cx,cy);x.lineTo(cx+Math.cos(a)*300,cy+Math.sin(a)*300);x.stroke();}
+    for(let rr=24;rr<260;rr+=26){x.beginPath();for(let i=0;i<=16;i++){const a=i/16*Math.PI/2;const d=rr-(i%2?8:0);x.lineTo(cx+Math.cos(a)*d,cy+Math.sin(a)*d);}x.stroke();}},{opacity:.55});
+  const nevoa=cp538Basico('névoa',256,256,(x,w,h)=>{const g=x.createRadialGradient(128,128,10,128,128,128);g.addColorStop(0,'rgba(190,195,215,.55)');g.addColorStop(.6,'rgba(170,175,200,.22)');g.addColorStop(1,'rgba(160,165,190,0)');x.fillStyle=g;x.fillRect(0,0,w,h);},{opacity:.14});
+  const estandarte=cp538Basico('estandarte',256,640,(x,w,h)=>{x.clearRect(0,0,w,h);const r=rnd(53814);x.fillStyle='#3a0a12';x.beginPath();x.moveTo(0,0);x.lineTo(w,0);x.lineTo(w,h-90);for(let q=w;q>=0;q-=32){x.lineTo(q-16,h-30-r()*60);x.lineTo(q-32,h-90+r()*40);}x.closePath();x.fill();
+    x.strokeStyle='#b08a3a';x.lineWidth=8;x.strokeRect(16,16,w-32,h-200);x.fillStyle='#d8d0c0';x.beginPath();x.arc(128,200,54,0,7);x.fill();x.fillStyle='#3a0a12';x.beginPath();x.arc(108,190,13,0,7);x.arc(148,190,13,0,7);x.fill();x.fillRect(118,220,8,22);x.fillRect(130,220,8,22);
+    for(let k=0;k<80;k++){x.fillStyle='rgba(0,0,0,.18)';x.fillRect(r()*w,r()*h,3+r()*12,2+r()*6);}},{opacity:.96,side:THREE.DoubleSide});
+  return {chao:lajes,c538chao:lajes,parede:pedra('pedra',88,[10,2.2]),c538parede:pedra('pedra',88,[10,2.2]),teto:pedra('pedra teto',52,[12,10],true),c538teto:pedra('pedra teto',52,[12,10],true),
+    ombreira:al521Mat('538 cantaria',0x5a5660,.85),c538ombreira:al521Mat('538 cantaria',0x5a5660,.85),porta:al521Mat('538 porta ferro',0x2a2428,.7,.3),coluna:al521Mat('538 coluna',0x6e6a74,.85),
+    ferro:al521Mat('537 ferro',0x2a2a2e,.6,.5),osso:al521Mat('538 osso',0xd8d0b8,.8),lajeEscura:al521Mat('538 laje escura',0x1a181e,.9),vela:t160Brilho('538 vela',0xffd080,1.2),chama:t160Brilho('537 chama',0xffb040,2.6),
+    vitral,lanceta,teia,nevoa,estandarte,luar:t160Brilho('538 luar',0xb0c0ff,.9)};}
+/* ---------- texturas da nave ---------- */
+function rv538MatsNave(){const N=mkNoise(5382);
+  const chapa=cp538Mat('chapa',512,512,(x,w,h)=>{const r=rnd(53821);x.fillStyle='#2e3440';x.fillRect(0,0,w,h);const s=128;for(let i=0;i<4;i++)for(let j=0;j<4;j++){const v=62+(r()*18|0);const g=x.createLinearGradient(i*s,j*s,i*s+s,j*s+s);g.addColorStop(0,'rgb('+(v+10)+','+(v+14)+','+(v+24)+')');g.addColorStop(1,'rgb('+(v-8)+','+(v-4)+','+(v+6)+')');x.fillStyle=g;x.fillRect(i*s+2,j*s+2,s-4,s-4);x.strokeStyle='rgba(255,255,255,.10)';x.lineWidth=2;x.strokeRect(i*s+5,j*s+5,s-10,s-10);
+      for(const [dx,dy] of [[12,12],[s-12,12],[12,s-12],[s-12,s-12]]){x.fillStyle='#161a22';x.beginPath();x.arc(i*s+dx,j*s+dy,3.5,0,7);x.fill();x.fillStyle='rgba(255,255,255,.25)';x.beginPath();x.arc(i*s+dx-1,j*s+dy-1,1.5,0,7);x.fill();}
+      if(r()>.6){x.fillStyle='rgba(255,180,60,.35)';x.fillRect(i*s+20,j*s+s/2-3,s-40,6);}for(let k=0;k<30;k++){x.fillStyle='rgba(0,0,0,.10)';x.fillRect(i*s+4+r()*(s-8),j*s+4+r()*(s-8),2+r()*8,1+r()*2);}}},[9,1.8],{roughness:.55,metalness:.45});
+  const piso=cp538Mat('piso',512,512,(x,w,h)=>{const r=rnd(53822);x.fillStyle='#1b1f26';x.fillRect(0,0,w,h);const s=256;for(let i=0;i<2;i++)for(let j=0;j<2;j++){const v=40+(r()*12|0);x.fillStyle='rgb('+v+','+(v+3)+','+(v+9)+')';x.fillRect(i*s+3,j*s+3,s-6,s-6);x.strokeStyle='rgba(120,140,170,.35)';x.lineWidth=2;x.strokeRect(i*s+8,j*s+8,s-16,s-16);
+      for(let a=24;a<s-24;a+=24){x.strokeStyle='rgba(255,255,255,.05)';x.beginPath();x.moveTo(i*s+a,j*s+8);x.lineTo(i*s+a,j*s+s-8);x.stroke();}for(let k=0;k<120;k++){x.fillStyle=r()>.5?'rgba(255,255,255,.04)':'rgba(0,0,0,.16)';x.fillRect(i*s+6+r()*(s-12),j*s+6+r()*(s-12),2+r()*5,2+r()*5);}}
+    x.fillStyle='rgba(255,200,60,.55)';for(let k=0;k<8;k++)x.fillRect(k*64,250,32,12);},[13,11.5],{roughness:.7,metalness:.3});
+  const teto=cp538Mat('tecto nave',512,512,(x,w,h)=>{x.fillStyle='#161920';x.fillRect(0,0,w,h);x.strokeStyle='rgba(90,110,140,.35)';x.lineWidth=3;for(let a=0;a<=w;a+=128){x.beginPath();x.moveTo(a,0);x.lineTo(a,h);x.stroke();x.beginPath();x.moveTo(0,a);x.lineTo(w,a);x.stroke();}x.fillStyle='rgba(120,200,255,.25)';for(let a=40;a<w;a+=128)x.fillRect(a,20,48,6);},[14,12],{roughness:.8,metalness:.3});
+  const estrelas=cp538Mat('estrelas',512,256,(x,w,h)=>{const r=rnd(53823);x.fillStyle='#020308';x.fillRect(0,0,w,h);const g=x.createRadialGradient(360,120,10,360,120,260);g.addColorStop(0,'rgba(120,60,180,.55)');g.addColorStop(.5,'rgba(40,70,160,.3)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,0,w,h);
+    for(let k=0;k<700;k++){const a=.45+r()*.55,s=r()>.85?3:2;x.fillStyle='rgba(255,255,255,'+a+')';x.fillRect(r()*w,r()*h,s,s);}for(let k=0;k<14;k++){x.fillStyle='rgba(190,225,255,.95)';x.fillRect(r()*w,r()*h,4,4);}const g2=x.createRadialGradient(140,180,5,140,180,200);g2.addColorStop(0,'rgba(60,120,200,.45)');g2.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g2;x.fillRect(0,0,w,h);},null,{emissivo:1.0,roughness:.35});
+  const planeta=cp538Mat('planeta',1024,384,(x,w,h)=>{const r=rnd(53824);x.fillStyle='#020308';x.fillRect(0,0,w,h);for(let k=0;k<900;k++){x.fillStyle='rgba(255,255,255,'+(.25+r()*.7)+')';x.fillRect(r()*w,r()*h,r()>.9?2.5:1.3,r()>.9?2.5:1.3);}
+    const g=x.createRadialGradient(560,160,20,560,160,420);g.addColorStop(0,'rgba(60,120,200,.25)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,0,w,h);
+    const px=700,py=200,pr=130;const pg=x.createRadialGradient(px-40,py-50,10,px,py,pr);pg.addColorStop(0,'#ffb070');pg.addColorStop(.6,'#b04a30');pg.addColorStop(1,'#3a1010');x.fillStyle=pg;x.beginPath();x.arc(px,py,pr,0,7);x.fill();
+    x.save();x.beginPath();x.arc(px,py,pr,0,7);x.clip();for(let b=-pr;b<pr;b+=14){x.fillStyle='rgba(255,220,160,'+(.06+(b/14%3===0?.08:0))+')';x.fillRect(px-pr,py+b,pr*2,7);}x.fillStyle='rgba(0,0,0,.45)';x.beginPath();x.ellipse(px+70,py+20,120,150,0,0,7);x.fill();x.restore();
+    x.strokeStyle='rgba(230,210,180,.65)';x.lineWidth=14;x.beginPath();x.ellipse(px,py,pr*1.9,pr*.42,-.25,0,7);x.stroke();x.strokeStyle='rgba(180,160,140,.4)';x.lineWidth=6;x.beginPath();x.ellipse(px,py,pr*2.25,pr*.5,-.25,0,7);x.stroke();
+    x.fillStyle='#d8e8ff';x.beginPath();x.arc(180,90,22,0,7);x.fill();x.fillStyle='rgba(0,0,0,.35)';x.beginPath();x.arc(188,84,18,0,7);x.fill();},null,{emissivo:1.0,roughness:.35});
+  const holo=cp538Mat('holo',256,160,(x,w,h)=>{const r=rnd(53825);x.fillStyle='#04121a';x.fillRect(0,0,w,h);x.strokeStyle='rgba(60,220,255,.35)';x.lineWidth=1;for(let a=0;a<w;a+=16){x.beginPath();x.moveTo(a,0);x.lineTo(a,h);x.stroke();}for(let a=0;a<h;a+=16){x.beginPath();x.moveTo(0,a);x.lineTo(w,a);x.stroke();}
+    for(let k=0;k<12;k++){x.fillStyle='rgba(80,230,255,'+(.5+r()*.5)+')';x.fillRect(16+k*19,h-20-r()*90,12,100);}x.strokeStyle='#ffd070';x.lineWidth=2;x.beginPath();for(let a=0;a<=w;a+=8)x.lineTo(a,50+Math.sin(a*.08)*18+r()*6);x.stroke();x.fillStyle='#7ff0ff';x.fillRect(12,10,80,8);x.fillRect(12,24,50,5);},null,{emissivo:1.0,roughness:.3});
+  return {chao:piso,c538chao:piso,parede:chapa,c538parede:chapa,teto,c538teto:teto,ombreira:al521Mat('538 moldura',0x6a7280,.5,.6),c538ombreira:al521Mat('538 moldura',0x6a7280,.5,.6),porta:al521Mat('538 porta nave',0x3a4250,.5,.6),
+    metal:al521Mat('538 metal',0x8a93a0,.5,.6),escuro:al521Mat('538 escuro',0x2a2e36,.7,.3),amarelo:al521Mat('538 amarelo',0xd8a020,.6,.2),neon:t160Brilho('538 neon',0x40e0ff,2.2),neonA:t160Brilho('538 neon âmbar',0xffc040,1.6),painelLuz:t160Brilho('538 painel luz',0xdff4ff,1.6),
+    cristal:t160Brilho('538 cristal',0x80f0ff,1.4),estrelas,planeta,holo};}
+/* ---------- decoração do Salão dos Espectros ---------- */
+/* a face de entrada: a parede da sala (mais baixa, de outro material) fica à vista no troço partilhado — cobre-se com uma pele do anexo, deixando o vão */
+function rv538Pele(c,q,zc,P,mat){const {K}=c;const x0=q.x0,h=q.h;const zA=P.zA,zB=P.zB;const zMax=Math.min(q.z1,21.2),zMin=Math.max(q.z0,-21.2);const x=x0+.06,esp=.2;
+  const caixa=(u0,u1,y0,y1)=>{if(u1-u0<.02||y1-y0<.02)return;K.box(esp,y1-y0,u1-u0,mat,x,(y0+y1)/2,(u0+u1)/2);};
+  caixa(zMin,zA-.12,0,h);caixa(zB+.12,zMax,0,h);caixa(zA-.12,zB+.12,P.h+.18,h);}
+function rv538DecorTerror(c,q,cx,cz){const {K,M,sc}=c;const r=rnd(5383);const x0=q.x0,x1=q.x1,z0=q.z0,z1=q.z1,h=q.h;const zc=c.cp538.zc;let st=CP538.stats.lib={};
+  try{rv538Pele(c,q,zc,c.cp538.P,M.c538parede);}catch(e){cp538Erro('pele',e);}
+  try{const hl=new THREE.HemisphereLight(0x7a6aa0,0x201410,0);hl.userData.i0=.7;hl.position.set(cx,h,cz);sc.add(hl);c.cp538.sol=hl;}catch(e){cp538Erro('hemisfério',e);}
+  try{// a arena: círculo de lajes escuras com anel de cantaria (raso)
+    const ax=cx+2;K.add(new THREE.CircleGeometry(9,48),M.lajeEscura,ax,.012,cz,0,-Math.PI/2,0);K.tor(9.1,.1,M.coluna,ax,.03,cz,Math.PI*2,0,Math.PI/2,0,6,72);
+    for(let i=0;i<12;i++){const a=i/12*6.283;K.box(.5,.05,.5,M.osso,ax+Math.cos(a)*7.2,.02,cz+Math.sin(a)*7.2,a);}}catch(e){cp538Erro('arena',e);}
+  // colunas e arcos ogivais
+  // (colunas de 6,5 m com capitel a 6,5 m: os arcos de meio-ponto entre colunas vizinhas chegam a ~9,8 m, abaixo do tecto de 11 m)
+  const coluna=(x,z)=>{K.push(x,0,z);K.cyl(.9,.95,.5,M.coluna,0,.25,0,8);K.cyl(.56,.64,5.2,M.coluna,0,3.1,0,8);K.cyl(.92,.6,.6,M.coluna,0,6.0,0,8);K.box(1.9,.4,1.9,M.coluna,0,6.5,0);K.pop();c.ob(x,z,.95);};
+  const arco=(xa,za,xb,zb,aoLongoDeX)=>{const d=Math.hypot(xb-xa,zb-za);if(d>8.5)return;const R=d/2;K.tor(R,.26,M.coluna,(xa+xb)/2,6.5,(za+zb)/2,Math.PI,aoLongoDeX?0:Math.PI/2,0,0,7,40);};
+  try{const cols=[];for(let x=x0+6.5;x<x1-3.5;x+=6.5){cols.push([x,z0+1.15,'z0']);cols.push([x,z1-1.15,'z1']);}
+    const porFace={z0:[],z1:[],x1:[]};for(const [x,z,f] of cols){coluna(x,z);porFace[f].push([x,z]);}
+    for(const dz of [-20,-13,-6,6,13,20]){coluna(x1-1.15,zc+dz);porFace.x1.push([x1-1.15,zc+dz]);} // a baia do meio fica para a rosácea
+    for(const f of ['z0','z1']){const L=porFace[f];for(let i=0;i+1<L.length;i++)arco(L[i][0],L[i][1],L[i+1][0],L[i+1][1],true);}
+    const Lx=porFace.x1;for(let i=0;i+1<Lx.length;i++)arco(Lx[i][0],Lx[i][1],Lx[i+1][0],Lx[i+1][1],false);
+    st.colunas=cols.length+Lx.length;}catch(e){cp538Erro('colunas',e);}
+  // tochas e braseiros nas paredes (os da v537)
+  try{if(typeof rv537Tochas==='function')rv537Tochas(c,q,{x0,x1,z0,z1,esp:.3,alt:h},()=>0,zc,M);}catch(e){cp538Erro('tochas',e);}
+  // rosácea com luar e lancetas
+  try{const xr=x1-.2;K.add(new THREE.CircleGeometry(4.2,48),M.vitral,xr,7.2,cz,-Math.PI/2,0,0);K.tor(4.35,.22,M.coluna,xr-.1,7.2,cz,Math.PI*2,Math.PI/2,0,0,8,64);for(let i=0;i<8;i++){const a=i/8*Math.PI;K.box(.14,8.5,.14,M.ferro,xr-.05,7.2,cz,0,0,0);K.push(xr-.08,7.2,cz,0,a,0);K.box(.12,8.4,.12,M.ferro,0,0,0);K.pop();}
+    const luz=c.luz(0x9ab0ff,1.3,x1-7,6.8,cz,36,3.5);try{const sp=rkSprite(sc,0x9ab0ff,11,.22,x1-.7,7.2,cz);sp.userData.noCam=true;}catch(e){}
+    for(const [x,z,ry] of [[x0+16,z0+.2,0],[x0+36,z0+.2,0],[x0+16,z1-.2,Math.PI],[x0+36,z1-.2,Math.PI],[x1-.2,cz-14,-Math.PI/2],[x1-.2,cz+14,-Math.PI/2]]){K.plane(1.7,5.4,M.lanceta,x,6.6,z,ry,0,0);K.push(x,6.6,z,ry);K.box(2.1,.2,.25,M.coluna,0,2.8,0);for(const s of [-1,1])K.box(.2,5.8,.25,M.coluna,s*1.0,0,0);K.pop();}}catch(e){cp538Erro('rosácea',e);}
+  // sarcófagos entre as colunas, encostados às paredes compridas
+  try{let n=0;for(let x=x0+9.75;x<x1-6;x+=13){for(const [z,s] of [[z0+2.1,1],[z1-2.1,-1]]){K.push(x,0,z);K.box(2.7,1.0,1.25,M.coluna,0,.5,0);K.box(2.9,.14,1.45,M.lajeEscura,0,1.07,0);K.box(2.5,.26,1.05,M.lajeEscura,0,1.25,0,0,0,.08*s);
+        K.sph(.16,M.osso,-.6,1.5,.1*s,1,.85,1,8,6);K.box(.5,.07,.08,M.osso,.4,1.42,.2*s,.4);K.box(.45,.07,.08,M.osso,.55,1.42,-.1*s,-.6);K.pop();c.ob(x,z,1.6);n++;}}st.sarcofagos=n;}catch(e){cp538Erro('sarcófagos',e);}
+  // lustre de velas no centro
+  try{const lx=cx+2,ly=7.4;K.cyl(.045,.045,h-ly,M.ferro,lx,(h+ly)/2,cz,6);K.tor(2.3,.09,M.ferro,lx,ly,cz,Math.PI*2,0,Math.PI/2,0,6,40);K.tor(1.2,.07,M.ferro,lx,ly+.5,cz,Math.PI*2,0,Math.PI/2,0,6,28);for(let i=0;i<4;i++){const a=i/4*6.283;K.tube([[lx+Math.cos(a)*2.3,ly,cz+Math.sin(a)*2.3],[lx+Math.cos(a)*1.6,ly+1.2,cz+Math.sin(a)*1.6],[lx,h-.2,cz]],.03,M.ferro,6,5);}
+    for(let i=0;i<14;i++){const a=i/14*6.283,R=i%2?2.3:1.2,y=i%2?ly:ly+.5;const vx=lx+Math.cos(a)*R,vz=cz+Math.sin(a)*R;K.cyl(.05,.06,.45,M.vela,vx,y+.26,vz,6);K.sph(.07,M.chama,vx,y+.56,vz,1,1.5,1,6,5);}
+    c.luz(0xffc080,1.5,lx,ly-.6,cz,32,2.6);}catch(e){cp538Erro('lustre',e);}
+  // estandartes rasgados sob os arcos
+  try{for(const [x,z,ry] of [[x0+13,z0+1.9,0],[x0+26,z0+1.9,0],[x0+39,z0+1.9,0],[x0+13,z1-1.9,Math.PI],[x0+26,z1-1.9,Math.PI],[x0+39,z1-1.9,Math.PI]]){K.plane(1.4,3.5,M.estandarte,x,6.3,z,ry,0,0);K.box(1.7,.08,.08,M.ferro,x,8.1,z,ry);}}catch(e){cp538Erro('estandartes',e);}
+  // teias nos cantos altos e nas colunas
+  try{for(const [x,z,ry] of [[x0+.3,z0+.3,0],[x0+.3,z1-.3,-Math.PI/2],[x1-.3,z1-.3,Math.PI],[x1-.3,z0+.3,Math.PI/2]]){K.push(x,h-.3,z,ry);K.plane(3.2,3.2,M.teia,1.6,-1.6,0,0,0,0);K.plane(3.2,3.2,M.teia,0,-1.6,1.6,Math.PI/2,0,0);K.pop();}
+    for(let i=0;i<8;i++){const x=x0+8+r()*(x1-x0-16),z=r()<.5?z0+1.9:z1-1.9;K.push(x,h-2.1,z,r()*6.28);K.plane(2.2,2.2,M.teia,1.1,-1.1,0,0,0,0);K.pop();}}catch(e){cp538Erro('teias',e);}
+  // estátuas encapuzadas a ladear a rosácea
+  try{for(const s of [-1,1]){const x=x1-2.4,z=cz+s*9.5;K.push(x,0,z,Math.PI/2);K.box(1.4,.5,1.4,M.coluna,0,.25,0);K.cone(.62,2.6,M.lajeEscura,0,1.8,0,10);K.sph(.3,M.lajeEscura,0,3.0,0,1,1.1,1,8,6);K.cone(.36,.7,M.lajeEscura,0,3.25,.05,8);K.pop();c.ob(x,z,.8);}}catch(e){cp538Erro('estátuas',e);}
+  // ossadas soltas junto das paredes e névoa rasteira
+  try{for(let i=0;i<14;i++){const x=x0+3+r()*(x1-x0-6),z=r()<.5?z0+1.2+r()*.8:z1-1.2-r()*.8;K.sph(.15,M.osso,x,.15,z,1,.85,1,7,5);K.box(.5,.07,.07,M.osso,x+.4,.04,z,r()*3);}
+    for(let i=0;i<14;i++){const x=x0+5+r()*(x1-x0-10),z=z0+4+r()*(z1-z0-8);K.plane(9+r()*5,9+r()*5,M.nevoa,x,.3+r()*.25,z,r()*6.28,-Math.PI/2,0);}}catch(e){cp538Erro('névoa',e);}
+  // correntes penduradas junto das paredes do fundo
+  try{for(const z of [cz-19,cz-11,cz+11,cz+19]){const x=x1-4-r()*3;K.cyl(.035,.035,3.2,M.ferro,x,h-1.6,z,5);K.tor(.18,.035,M.ferro,x,h-3.3,z,Math.PI*2,0,0,0,5,10);}}catch(e){cp538Erro('correntes',e);}
+}
+/* ---------- decoração do Hangar da Nave ---------- */
+function rv538DecorNave(c,q,cx,cz){const {K,M,sc}=c;const r=rnd(5384);const x0=q.x0,x1=q.x1,z0=q.z0,z1=q.z1,h=q.h;const zc=c.cp538.zc;let st=CP538.stats.sci={};
+  try{rv538Pele(c,q,zc,c.cp538.P,M.c538parede);}catch(e){cp538Erro('pele',e);}
+  // moldura de néon na porta (por dentro) e faixas de aviso no chão da entrada
+  try{const P=c.cp538.P,xp=x0+.3;for(const z of [P.zA-.35,P.zB+.35]){K.box(.12,P.h+.4,.22,M.metal,xp,(P.h+.4)/2,z);K.box(.06,P.h+.2,.08,M.neon,xp+.09,(P.h+.2)/2,z);}K.box(.12,.3,P.zB-P.zA+.9,M.metal,xp,P.h+.4,zc);K.box(.06,.08,P.zB-P.zA+.7,M.neon,xp+.09,P.h+.3,zc);
+    for(let i=0;i<6;i++)K.box(.5,.02,.18,i%2?M.escuro:M.amarelo,x0+1.2,.013,P.zA-.6+i*(P.zB-P.zA+1.2)/5,.6);try{const sp=rkSprite(sc,0x40e0ff,3.2,.25,xp+.4,P.h*.6,zc);sp.userData.noCam=true;}catch(e){}}catch(e){cp538Erro('porta',e);}
+  try{const hl=new THREE.HemisphereLight(0x9fc4ff,0x1a2028,0);hl.userData.i0=1.0;hl.position.set(cx,h,cz);sc.add(hl);c.cp538.sol=hl;}catch(e){cp538Erro('hemisfério',e);}
+  // plataforma de aterragem no chão (rasa): anel amarelo/preto, anel de néon, número
+  try{const ax=cx+2;K.add(new THREE.RingGeometry(9.2,10.2,64),M.amarelo,ax,.012,cz,0,-Math.PI/2,0);K.add(new THREE.RingGeometry(10.2,10.5,64),M.escuro,ax,.012,cz,0,-Math.PI/2,0);K.tor(9.0,.06,M.neon,ax,.05,cz,Math.PI*2,0,Math.PI/2,0,5,80);K.tor(4.0,.05,M.neonA,ax,.05,cz,Math.PI*2,0,Math.PI/2,0,5,48);
+    for(let i=0;i<8;i++){const a=i/8*6.283;K.box(2.2,.02,.5,M.amarelo,ax+Math.cos(a)*6.5,.014,cz+Math.sin(a)*6.5,-a);}}catch(e){cp538Erro('plataforma',e);}
+  // costelas do casco: pilares nas paredes compridas + viga no tecto, com tiras de néon
+  const costela=(x)=>{for(const [z,s] of [[z0+.55,1],[z1-.55,-1]]){K.box(.7,h,.9,M.metal,x,h/2,z);K.box(.06,h-1.2,.1,M.neon,x,h/2-.2,z+s*.5);c.ob(x,z,.8);}K.box(.7,.6,z1-z0,M.metal,x,h-.3,cz);K.box(.5,.08,z1-z0-1,M.neon,x,h-.62,cz);};
+  try{let n=0;for(let x=x0+6.5;x<x1-3;x+=6.5){costela(x);n++;}st.costelas=n;
+    // tubagens sob o tecto e junto do chão
+    for(const [z,y] of [[z0+.5,h-1.2],[z1-.5,h-1.2],[z0+.6,h-1.7],[z1-.6,h-1.7]]){K.cyl(.14,.14,x1-x0-1,M.escuro,cx,y,z,10,0,0,Math.PI/2);}
+    for(const [z,s] of [[z0+.25,1],[z1-.25,-1]]){K.box(x1-x0-1,.08,.12,M.neon,cx,.08,z+s*.2);K.box(x1-x0-1,.08,.12,M.neonA,cx,h-.1,z+s*.2);}
+    K.box(.12,.08,z1-z0-1,M.neon,x1-.4,.08,cz);}catch(e){cp538Erro('costelas',e);}
+  // janelas para as estrelas entre as costelas, e a grande vigia do fundo com o planeta
+  try{let n=0;for(let x=x0+9.75;x<x1-4;x+=6.5){for(const [z,ry] of [[z0+.16,0],[z1-.16,Math.PI]]){K.plane(4.6,2.4,M.estrelas,x,4.6,z,ry,0,0);K.push(x,4.6,z,ry);K.box(5.0,.16,.3,M.metal,0,1.3,0);K.box(5.0,.16,.3,M.metal,0,-1.3,0);for(const s of [-1,1])K.box(.16,2.6,.3,M.metal,s*2.45,0,0);K.pop();n++;}}
+    K.plane(34,6.2,M.planeta,x1-.16,5.2,cz,-Math.PI/2,0,0);K.push(x1-.2,5.2,cz,-Math.PI/2);K.box(34.6,.3,.4,M.metal,0,3.25,0);K.box(34.6,.3,.4,M.metal,0,-3.25,0);for(const s of [-1,1])K.box(.3,6.8,.4,M.metal,s*17.2,0,0);for(const s of [-1,0,1])if(s)K.box(.14,6.2,.3,M.escuro,s*8.5,0,0);K.pop();
+    c.luz(0x80b0ff,.9,x1-8,5.5,cz,34,3);try{const sp=rkSprite(sc,0xffa060,9,.16,x1-1,5.2,cz+10);sp.userData.noCam=true;}catch(e){}st.janelas=n;}catch(e){cp538Erro('janelas',e);}
+  // consolas com ecrãs holográficos junto das paredes (fora do meio)
+  try{let n=0;for(let x=x0+9.75;x<x1-4;x+=13){for(const [z,s] of [[z0+1.4,1],[z1-1.4,-1]]){K.push(x,0,z,s>0?0:Math.PI);K.box(2.2,.95,.8,M.escuro,0,.48,0);K.box(2.2,.06,.8,M.metal,0,.98,0);K.box(2.0,.9,.1,M.escuro,0,1.45,.3,0,-.35,0);K.plane(1.8,.75,M.holo,0,1.47,.37,0,-.35,0);K.box(.08,.9,.08,M.neon,-1.0,.5,.42);K.box(.08,.9,.08,M.neon,1.0,.5,.42);K.pop();
+        try{const sp=rkSprite(sc,0x60e8ff,1.6,.3,x,1.6,z+s*.4);sp.userData.noCam=true;}catch(e){}c.ob(x,z,1.3);n++;}}
+    // cápsulas criogénicas nos cantos do fundo
+    for(const [x,z] of [[x1-3.2,cz-19.5],[x1-3.2,cz+19.5],[x1-3.2,cz-15.5],[x1-3.2,cz+15.5]]){K.cyl(.75,.8,.3,M.metal,x,.15,z,16);K.cyl(.62,.62,2.2,M.vidro,x,1.4,z,16);K.cyl(.72,.72,.25,M.metal,x,2.62,z,16);K.sph(.3,M.cristal,x,1.2,z,1,2.2,1,8,8);K.box(.1,2.2,.1,M.neon,x-.68,1.4,z);c.ob(x,z,.95);try{const sp=rkSprite(sc,0x80f0ff,2.2,.35,x,1.3,z);sp.userData.noCam=true;}catch(e){}}
+    st.consolas=n;}catch(e){cp538Erro('consolas',e);}
+  // painéis de luz no tecto e as luzes do hangar
+  try{let n=0;for(let x=x0+9.75;x<x1-4;x+=13)for(const z of [cz-14,cz,cz+14]){K.box(3.2,.08,1.1,M.painelLuz,x,h-.74,z);n++;}
+    for(const [x,z,cor,i] of [[x0+10,cz-12,0xcfe8ff,1.1],[x0+10,cz+12,0xcfe8ff,1.1],[x0+26,cz,0xbfe0ff,1.2],[x0+42,cz-12,0xcfe8ff,1.1],[x0+42,cz+12,0xcfe8ff,1.1],[x0+4,cz,0xffc080,.9],[x0+26,cz-21,0x40e0ff,.7],[x0+26,cz+21,0x40e0ff,.7]])c.luz(cor,i,x,h-1.6,z,30);
+    st.paineis=n;}catch(e){cp538Erro('luzes',e);}
+  // ventiladores, caixas de carga encostadas e um drone de vigia a pairar
+  try{for(const [x,z] of [[x0+20,z0+2.2],[x0+46,z1-2.2]]){K.box(1.4,1.4,1.4,M.amarelo,x,.7,z,.3);K.box(1.2,.9,1.2,M.escuro,x+1.5,.45,z,-.2);c.ob(x,z,1.1);c.ob(x+1.5,z,.9);}
+    for(const [x,z] of [[x0+33,z0+.7],[x0+33,z1-.7]]){K.cyl(1.1,1.1,.3,M.escuro,x,h-2.8,z,16,0,Math.PI/2,0);K.tor(1.0,.08,M.metal,x,h-2.8,z,Math.PI*2,0,0,0,6,32);}
+    const dx=x1-10,dz=cz+8;K.sph(.5,M.metal,dx,3.2,dz,1,.6,1,12,8);K.tor(.8,.06,M.neon,dx,3.2,dz,Math.PI*2,0,Math.PI/2,0,5,32);K.sph(.16,M.cristal,dx,3.0,dz,1,1,1,8,6);try{const sp=rkSprite(sc,0x40e0ff,1.8,.3,dx,3.1,dz);sp.userData.noCam=true;}catch(e){}}catch(e){cp538Erro('carga',e);}
+}
+/* ---------- a cfg do anexo (no lugar do campo de relva) ---------- */
+function rv538Cfg(key,P){const terror=key==='lib';const zc=P.c;const q0=terror?{x0:20.04,x1:72,z0:zc-23,z1:zc+23,h:11}:{x0:20.04,x1:74,z0:zc-23,z1:zc+23,h:9};
+  const nome=terror?co523T('Salão dos Espectros','Hall of Spectres','Salón de los Espectros'):co523T('Hangar da Nave Vigia-7','Hangar of the Starship Vigil-7','Hangar de la Nave Vigía-7');
+  const cp={zc,q0,terror,P};
+  const cfg={sala:key,nome,entrada:P,placaBg:terror?'#1a0d14':'#06151e',placaFg:terror?'#d8c8a0':'#7fe8ff',cp538:cp,mats:T=>terror?rv538MatsTerror():rv538MatsNave(),
+    rects:[{id:0,entrada:true,x0:q0.x0,x1:q0.x1,z0:q0.z0,z1:q0.z1,h:q0.h,chao:'c538chao',parede:'c538parede',teto:'c538teto',ombreira:'c538ombreira',luz:{cor:0xffb070,i0:1.0,d:1},
+      decor:function(c,q,cx,cz){c.cp538=cp;return (terror?rv538DecorTerror:rv538DecorNave)(c,q,cx,cz);}}],lig:[],
+    rv532:{tipo:'noite',mur:{x0:q0.x0+.3,x1:q0.x1-.3,z0:q0.z0+.3,z1:q0.z1-.3,esp:.3,alt:q0.h},ax:(q0.x0+q0.x1)/2+2,az:zc,h:()=>0,nevoa:1,cp538:true}};
+  return cfg;}
+if(CP538.on&&typeof RV530!=='undefined'&&RV530.on&&typeof rv530Cfg==='function'&&typeof CP537!=='undefined'){
+  // as fichas de Terror e Ficção deixam de estar adiadas
+  try{for(const d of RV530.lista){if(d.sala==='lib'||d.sala==='sci')delete d.adiado;}CP537.adiadas=CP537.adiadas.filter(k=>k!=='lib'&&k!=='sci');}catch(e){cp538Erro('fichas',e);}
+  // a cfg: Terror e Ficção têm anexo próprio; as outras salas seguem o campo de relva
+  try{const cfg0=rv530Cfg;rv530Cfg=function(key,P){if(key==='lib'||key==='sci'){try{return rv538Cfg(key,P);}catch(e){cp538Erro('cfg '+key,e);}}return cfg0.apply(this,arguments);};}catch(e){cp538Erro('cfg',e);}
+  // registo: caixa, ponto de nascimento do rival, luzes de grelha fora; em Terror, a extensão da navegação e o clamp das masmorras
+  try{const c0=rv530Campo;rv530Campo=function(R,key){const rv=c0.apply(this,arguments);try{const C=RV530.campos[key];if(C&&C.cfg&&C.cfg.cp538){const q=C.cfg.rects[0],cp=C.cfg.cp538;C.box={x0:q.x0,x1:q.x1,z0:q.z0,z1:q.z1};C.mur=C.cfg.rv532.mur;if(cp.sol)C.cfg.rv532.sol=cp.sol;C.ax=C.cfg.rv532.ax;C.az=cp.zc;C.spawn=[q.x0+27,cp.zc+2.5];C.entrada=[q.x0+1.2,cp.zc];C.yawCampo=-Math.PI/2;C.lado=1;
+        try{for(const l of AL521.luzes){const L=l.L;if(L.parent===R.scene&&L.distance===1&&L.position.x>q.x0&&L.position.x<q.x1&&L.position.z>q.z0&&L.position.z<q.z1){L.parent.remove(L);l.i0=0;}}}catch(e){}
+        if(key==='lib'&&typeof DUNGEON395!=='undefined'){try{if(DUNGEON395.baseWorld)DUNGEON395.baseWorld.ext=Math.max(DUNGEON395.baseWorld.ext||0,q.x1+2);}catch(e){}
+          try{const W=R.world,c1=W.clamp;W.clamp=function(x,z,m){if(DUNGEON395.active&&DUNGEON395.world)return DUNGEON395.world.clamp(x,z,m);return c1.apply(this,arguments);};}catch(e){}}
+        CP538.stats[key]=Object.assign(CP538.stats[key]||{},{porta:[+C.P.zA.toFixed(1),+C.P.zB.toFixed(1)],livre:C.P.livre,box:[q.x0,q.x1,+q.z0.toFixed(1),+q.z1.toFixed(1)]});}}catch(e){cp538Erro('registar '+key,e);}return rv;};}catch(e){cp538Erro('campo',e);}
+  // nas Masmorras (v395) a cena troca a névoa e esconde a biblioteca: o duelo fica parado lá em baixo (o relógio da v532 reescreveria a névoa)
+  try{const tk0=rv530Tick;rv530Tick=function(dt){try{if(typeof DUNGEON395!=='undefined'&&DUNGEON395.active&&ROOM&&ROOM===DUNGEON395.room)return;}catch(e){}return tk0.apply(this,arguments);};}catch(e){cp538Erro('tick',e);}
+  // Terror é a sala inicial (já pronta quando os blocos carregam, sem finishRoom por vir): constrói já; Ficção, se já estiver pronta, também
+  try{for(const k of ['lib','sci']){const R=ROOMS[k];if(R&&R.ready&&!RV530.campos[k])setTimeout(()=>{try{rv530Campo(ROOMS[k],k);}catch(e){cp538Erro('pronta '+k,e);}},150);}}catch(e){cp538Erro('prontas',e);}
+}
+window.__campos538={estado:CP538,erros:CP538.erros,stats:CP538.stats,cfg:rv538Cfg};
+try{if(typeof NOVIDADES198!=='undefined')NOVIDADES198.v538=co523T('⚔ Dois duelos novos no 1.º andar: o Salão dos Espectros, atrás da biblioteca de Terror, e o Hangar da Nave Vigia-7, ao lado do deck de Ficção científica','⚔ Two new duels on the 1st floor: the Hall of Spectres behind the Horror library and the Hangar of the Starship Vigil-7 beside the Sci-fi deck','⚔ Dos duelos nuevos en el 1.º piso: el Salón de los Espectros tras la biblioteca de Terror y el Hangar de la Nave Vigía-7 junto a la cubierta de Ciencia ficción');}catch(e){}
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
