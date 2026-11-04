@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v542</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v543</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -64602,7 +64602,7 @@ function cp539Fantasia(R){const key='fant';const T=THREE,sc=R.scene;const st=CP5
 /* =========================================================================================================================================
    AVENTURA · a Ilha do Duelo
    ========================================================================================================================================= */
-const CP539_ILHA={cx:10,cz:86,R:54,ax:9,az:72,rA:15,ya:.5,yq:.45,SEAY:-2.6,gx0:1.2,gx1:2.8,zBordo:19.9,zAmurada:21.5,zFora:22.9,zCais:28.4,quay:[-3.5,7.5,33,41],yConves:2.2,yAmurada:3.25};
+const CP539_ILHA={cx:10,cz:86,R:54,ax:9,az:72,rA:15,ya:.5,yq:.45,SEAY:-2.6,gx0:.4,gx1:4.4,dx0:.95,dx1:3.35,zBordo:19.9,zAmurada:21.5,zFora:22.9,zCais:28.4,quay:[-3.5,7.5,33,41],yConves:2.2,yAmurada:3.25};
 function cp539IlhaRaio(a){const I=CP539_ILHA;return I.R*(1+.06*Math.sin(a*3+1.3)+.04*Math.sin(a*5+.4)+.025*Math.sin(a*9+2.1));}
 function cp539IlhaTerreno(x,z){const I=CP539_ILHA;if(!CP539.ruido)CP539.ruido=mkNoise(53921);const N=CP539.ruido;const dx=x-I.cx,dz=z-I.cz,d=Math.hypot(dx,dz),a=Math.atan2(dz,dx);const Re=cp539IlhaRaio(a);const db=Re-d;let y;
   if(db<=0)y=I.SEAY+Math.max(-4.5,db*.24);else if(db<12)y=I.SEAY+1.3*Math.pow(db/12,.8);else{const t=Math.min(1,(db-12)/14);y=I.SEAY+1.3+t*(1.75+(N(x*.045,z*.045,3)-.5)*1.8);}
@@ -64611,9 +64611,9 @@ function cp539IlhaTerreno(x,z){const I=CP539_ILHA;if(!CP539.ruido)CP539.ruido=mk
   // o cais de pedra e o caminho até à arena
   const q=I.quay;const qx=Math.max(q[0],Math.min(q[1],x)),qz=Math.max(q[2],Math.min(q[3],z));const dq=Math.hypot(x-qx,z-qz);if(dq<7){const s0=dq<.01?1:1-dq/7;const s=s0*s0*(3-2*s0);y=Math.max(y,y*(1-s)+(I.yq-.05)*s);}
   return y;}
-function cp539IlhaAndar(x,z){const I=CP539_ILHA;if(x>=I.gx0-.05&&x<=I.gx1+.05&&z<I.zCais+.3&&z>=I.zBordo-.2){ // prancha por cima da amurada e escada
+function cp539IlhaAndar(x,z){const I=CP539_ILHA;if(z<I.zCais+.3&&z>=I.zBordo-.2&&(z<I.zFora?(x>=I.dx0-.05&&x<=I.dx1+.05):(x>=I.gx0-.05&&x<=I.gx1+.05))){ // prancha por cima da amurada e escada
     if(z<I.zAmurada)return I.yConves+(I.yAmurada-I.yConves)*Math.max(0,(z-I.zBordo)/(I.zAmurada-I.zBordo));if(z<I.zFora)return I.yAmurada;return I.yAmurada+(I.yq-I.yAmurada)*Math.min(1,(z-I.zFora)/(I.zCais-I.zFora));}
-  const q=I.quay;if(x>=q[0]&&x<=q[1]&&z>=q[2]&&z<=q[3])return I.yq;if(x>=I.gx0-.05&&x<=I.gx1+.05&&z>=I.zCais&&z<q[2])return I.yq;return cp539IlhaTerreno(x,z);}
+  const q=I.quay;if(x>=q[0]&&x<=q[1]&&z>=q[2]&&z<=q[3])return I.yq;if(x>=I.gx0-.05&&x<=I.gx1+.05&&z>=I.zCais&&z<q[2])return I.yq;if(z<=I.zFora||Math.hypot(x-I.cx,z-I.cz)>cp539IlhaRaio(Math.atan2(z-I.cz,x-I.cx))+8)return null;return cp539IlhaTerreno(x,z);}
 function cp539MatsIlha(){return {
   terreno:t160Mat('539 terreno da ilha',()=>{const tx=cp539Tex('grão da ilha',256,256,(x,w,h)=>{const r=rnd(53922);x.fillStyle='#e8e8e8';x.fillRect(0,0,w,h);for(let k=0;k<6000;k++){const v=200+r()*55|0;x.fillStyle='rgb('+v+','+v+','+v+')';x.fillRect(r()*w,r()*h,1+r()*2,1+r()*2);}},[70,70]);const m=new THREE.MeshStandardMaterial({map:tx,vertexColors:true,roughness:.95});m.userData.papelKeep=true;return m;}),
   baixio:cp539Basico('baixio',512,512,(x,w,h)=>{const g=x.createRadialGradient(w/2,h/2,w*.3,w/2,h/2,w/2);g.addColorStop(0,'rgba(90,215,205,.75)');g.addColorStop(.72,'rgba(80,200,200,.6)');g.addColorStop(.86,'rgba(70,170,185,.3)');g.addColorStop(1,'rgba(60,150,170,0)');x.fillStyle=g;x.fillRect(0,0,w,h);},{opacity:1,side:THREE.FrontSide}),
@@ -64646,8 +64646,8 @@ function cp539Ilha(R){const key='adv';const T=THREE,sc=R.scene,I=CP539_ILHA;cons
   // ---- a passagem: degraus no convés, prancha por cima da amurada, escada, cais de madeira e cais de pedra ----
   try{const xc=(I.gx0+I.gx1)/2,w=I.gx1-I.gx0;
     // degraus do convés até ao topo da amurada
-    const nd=4;for(let i=0;i<nd;i++){const z0=I.zBordo+(I.zAmurada-I.zBordo)*i/nd,z1=I.zBordo+(I.zAmurada-I.zBordo)*(i+1)/nd,y1=I.yConves+(I.yAmurada-I.yConves)*(i+1)/nd;K.box(w,y1-I.yConves,z1-z0,M.tabua,xc,(I.yConves+y1)/2,(z0+z1)/2);}
-    K.box(w,.12,I.zFora-I.zAmurada,M.tabua,xc,I.yAmurada-.06,(I.zAmurada+I.zFora)/2);
+    const dw=I.dx1-I.dx0,dxc=(I.dx0+I.dx1)/2;const nd=4;for(let i=0;i<nd;i++){const z0=I.zBordo+(I.zAmurada-I.zBordo)*i/nd,z1=I.zBordo+(I.zAmurada-I.zBordo)*(i+1)/nd,y1=I.yConves+(I.yAmurada-I.yConves)*(i+1)/nd;K.box(dw,y1-I.yConves,z1-z0,M.tabua,dxc,(I.yConves+y1)/2,(z0+z1)/2);}
+    K.box(dw,.12,I.zFora-I.zAmurada,M.tabua,dxc,I.yAmurada-.06,(I.zAmurada+I.zFora)/2);K.box(w,.12,.5,M.tabua,xc,I.yAmurada-.06,I.zFora-.2);
     // escada até ao cais (degraus)
     const ne=11;for(let i=0;i<ne;i++){const t0=i/ne,t1=(i+1)/ne;const z0=I.zFora+(I.zCais-I.zFora)*t0,z1=I.zFora+(I.zCais-I.zFora)*t1;const y=I.yAmurada+(I.yq-I.yAmurada)*t1;K.box(w,.1,z1-z0+.02,M.tabua,xc,y-.05,(z0+z1)/2);K.box(w,.06,.06,M.tabuaE,xc,y-.12,z0+.02);}
     for(const s of [-1,1]){const x=xc+s*(w/2+.04);K.tube([[x,I.yAmurada+.08,I.zFora],[x,(I.yAmurada+I.yq)/2+.1,(I.zFora+I.zCais)/2],[x,I.yq+.1,I.zCais]],.06,M.tabuaE,10,6);
@@ -64688,7 +64688,7 @@ function cp539Ilha(R){const key='adv';const T=THREE,sc=R.scene,I=CP539_ILHA;cons
     st.vegetacao=[np,na,nm,nr];}catch(e){cp539Erro('vegetação',e);}
   try{const ms=K.fim(sc,{sombra:true});for(const m of ms){m.userData.cp539=true;m.userData.noCam=true;m.userData.papelKeepGeo=true;m.raycast=()=>{};}st.malhas=ms.length;}catch(e){cp539Erro('fim ilha',e);}
   // andar: prancha+escada+cais (retângulo), cais de pedra e a ilha (raio pela costa, menos 2,5 m de praia molhada)
-  const q=I.quay;const A=cp539Area({rects:[[I.gx0,I.gx1,I.zBordo,q[2]+.5],[q[0],q[1],q[2],q[3]]],radial:{cx:I.cx,cz:I.cz,lim:a=>cp539IlhaRaio(a)-2.5}});cp539Andar(R,A,cp539IlhaAndar);CP539.areas.adv=A;
+  const q=I.quay;const A=cp539Area({rects:[[I.dx0,I.dx1,I.zBordo,I.zFora+.8],[I.gx0,I.gx1,I.zFora-.6,q[2]+2.5],[q[0],q[1],q[2]-.5,q[3]]],radial:{cx:I.cx,cz:I.cz,lim:a=>cp539IlhaRaio(a)-2.5}});cp539Andar(R,A,cp539IlhaAndar);CP539.areas.adv=A;
   try{const L=R.world.obst;if(Array.isArray(L))for(const o of obst)L.push(o);R.world.__nav=null;}catch(e){}
   const C=cp539Regista(R,key,{ax:I.ax,az:I.az,box:{x0:I.cx-I.R*1.2,x1:I.cx+I.R*1.2,z0:q[3]+.5,z1:I.cz+I.R*1.2},mur:{x0:I.ax-I.rA-6,x1:I.ax+I.rA+6,z0:I.az-I.rA-4,z1:I.az+I.rA+6},spawn:[I.ax,I.az+7],entrada:[2,q[3]],yaw:Math.PI,h:cp539IlhaAndar,lua:0x8fa8d8,luaI:.65,escuro:cp539Escuro(R,{cor:0x1a2440,k:.82,kL:.6})});
   C.luzes=luzes;st.luzes=luzes.length;st.obst=obst.length;return C;}
@@ -64876,7 +64876,7 @@ const CP542={on:!/[?&#]campos542=0/i.test(location.search+location.hash),erros:[
 function cp542Erro(k,e){if(CP542.erros.length<20)CP542.erros.push(k+': '+(e&&e.message||e));try{console.warn('v542',k,e);}catch(x){}}
 function cp542Placa(sc,txt,x,y,z,ry,w,base,R){base=base||0;try{const fr=t160Std('542 moldura',0x5a3a22,.85);const tx=txtTex([txt],{w:768,h:160,bg:'#2a1608',fg:'#ffd27a',fs:62,weight:'bold',pad:10});const pl=rkPlate(w||1.9,(w||1.9)*.22,tx,fr,{emis:.45});pl.position.set(x,y,z);pl.rotation.y=ry||0;pl.userData.noCam=true;pl.raycast=()=>{};sc.add(pl);
     const K=t160Kit('542 poste');const hp=Math.max(.3,y-base-.1);K.cyl(.06,.07,hp,fr,x,base+hp/2,z,6);K.fim(sc,{sombra:true});try{if(R&&Array.isArray(R.world.obst)){R.world.obst.push([x,z,.18]);R.world.__nav=null;}}catch(e){}CP542.stats.placas++;return pl;}catch(e){cp542Erro('placa',e);return null;}}
-function cp542Placas(R){if(CP542.placas)return;CP542.placas=true;const sc=R.scene,I=(typeof CP539_ILHA!=='undefined')?CP539_ILHA:null;if(!I)return;
+function cp542Placas(R){return;if(CP542.placas)return;CP542.placas=true;const sc=R.scene,I=(typeof CP539_ILHA!=='undefined')?CP539_ILHA:null;if(!I)return;
   const t=text428('⚔ Ilha do Duelo','⚔ Duel Island','⚔ Isla del Duelo');
   // no topo da prancha (virada para quem chega pelo tombadilho)
   cp542Placa(sc,t,(I.gx0+I.gx1)/2+1.6,I.yConves+1.9,I.zBordo-.4,Math.PI,1.7,I.yConves,R);
@@ -64884,7 +64884,7 @@ function cp542Placas(R){if(CP542.placas)return;CP542.placas=true;const sc=R.scen
   cp542Placa(sc,t+'  ↓',3.4,3.3,12.2,Math.PI,3.2,0,R);}
 /* ---------- o botão «⚔ Duelo» na barra «Ir para» ---------- */
 function cp542Alvo(){try{if(CUR!=='room'||!ROOM)return null;const key=Object.keys(ROOMS).find(k=>ROOMS[k]===ROOM);const C=key&&RV530.campos[key];if(!C||C.pendente)return null;
-    if(key==='adv'&&typeof CP539_ILHA!=='undefined')return {key,x:(CP539_ILHA.gx0+CP539_ILHA.gx1)/2,z:CP539_ILHA.zBordo-.3};
+    if(key==='adv'&&typeof CP539_ILHA!=='undefined')return {key,x:(CP539_ILHA.dx0+CP539_ILHA.dx1)/2,z:CP539_ILHA.zBordo-.3};
     if(C.entrada)return {key,x:C.entrada[0],z:C.entrada[1]};const zc=C.P&&C.P.c!==undefined?C.P.c:0;return {key,x:21.6,z:zc};}catch(e){return null;}}
 function cp542Botao(){try{if(!goList)return;const A=cp542Alvo();if(!A)return;const RV=RV530.rivais[A.key];const feito=RV&&RV.k&&!RV.k.viva&&RV.k2&&!RV.k2.viva;
     const b=document.createElement('button');b.type='button';b.dataset.goKind='duelo542';b.textContent=(A.key==='adv'?text428('⚔ Ilha do Duelo','⚔ Duel Island','⚔ Isla del Duelo'):text428('⚔ Duelo','⚔ Duel','⚔ Duelo'))+(feito?' ✓':'');
