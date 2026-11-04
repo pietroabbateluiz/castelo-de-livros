@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v539</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v540</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -64719,6 +64719,72 @@ try{if(typeof M232_T!=='undefined'&&M232_T){CP539.bau=[M232_T.faixaAtivo,M232_T.
 try{if(typeof T451_FORA!=='undefined'){T451_FORA.push(/^💥 (A grade caiu|The gate is down|¡La reja cayó)/,/^🔥 (O dragão dos rubis derreteu o portão|The ruby dragon melted the gate)/,/^⚙️ (O robô de guarda abriu o portão|The guard robot opened the gate|Os seis robôs empurraram o portão|The six robots pushed the gate)/,/^⛰️ (O golem de pedra abriu o portão|The stone golem opened the gate)/,/^🏹 (A corrente partiu e a grade despencou|The chain snapped and the gate came down)/);}}catch(e){cp539Erro('avisos dos portões',e);}
 window.__campos539={estado:CP539,erros:CP539.erros,stats:CP539.stats,campo:cp539Campo,ilha:CP539_ILHA,fant:CP539_FANT,terreno:cp539IlhaTerreno,andar:cp539IlhaAndar};
 try{if(typeof NOVIDADES198!=='undefined')NOVIDADES198.v539=co523T('⚔ Mais três duelos no 1.º andar: a Esplanada do Egito em Histórica, a Clareira das Fadas atrás da mansão em Fantasia e a Ilha do Duelo atrás da popa do galeão em Aventura','⚔ Three more duels on the 1st floor: the Egyptian Esplanade in History, the Fairy Clearing behind the Fantasy mansion and the Duel Island behind the galleon in Adventure','⚔ Tres duelos más en el 1.º piso: la Explanada de Egipto en Historia, el Claro de las Hadas tras la mansión de Fantasía y la Isla del Duelo tras la popa del galeón en Aventura');}catch(e){}
+
+/* ===================== v540 · CHUVA E TEMPESTADE NOS CAMPOS DE DUELO (bloco `CL540`) =====================
+   Pedido do Luiz: «coloque chuva em algumas salas de duelo e relâmpago em outras, com clarões e barulhos de chuva e trovões».
+   · CHUVA (Romance, Paranormal, Contos, Fazenda, Poesia, Clássicos, Biografias, Cordel, Fantasia e a ilha de Aventura): 1500 riscos de
+     chuva (LineSegments) num volume de 40 × 19 × 40 m que acompanha o leitor, a cair a 18–26 m/s com um pouco de vento; o som da chuva
+     (a camada «chuva» do ambiente da casa, ligada à saída geral de som) sobe com a entrada na arena; de vez em quando um trovão ao longe
+     com um clarão fraco no céu.
+   · TEMPESTADE (Mistério, Guerra, Quadrinhos, Arena, Acrópole, Mitologia, Crônicas, Filosofia, a esplanada do Egito e o Salão dos Espectros):
+     a cada 6–13 s um relâmpago — raio em zigue-zague com ramo (tubo aditivo) a cair atrás da muralha, brilho no topo e no pé, céu e luz da
+     arena num clarão duplo (acende, apaga, volta a acender) — e o trovão chega 0,4–1,6 s depois (estalo + ribombar); vento forte por baixo.
+     No Salão dos Espectros (interior) não há raio à vista: a rosácea e as lancetas acendem com o clarão e o trovão ecoa.
+   Tudo só dentro da arena (segue o `mix` da v532: entra devagar, sai devagar); os campos da v539 param quando o duelo é vencido.
+   Sem luzes novas (o clarão usa a lua/sol do próprio campo). `?clima540=0` desliga. Gancho `window.__clima540`. */
+const CL540={on:!/[?&#]clima540=0/i.test(location.search+location.hash),erros:[],stats:{raios:0,trovoes:0,chuvas:0},salas:{},camada:null,vento:null,
+  tipos:{vila:'chuva',outono:'chuva',bosque:'chuva',fazenda:'chuva',poesia:'chuva',classicos:'chuva',biografia:'chuva',cordel:'chuva',fant:'chuva',adv:'chuva',
+    mys:'raios',guerra:'raios',quadrinhos:'raios',arena:'raios',acropole:'raios',mitologia:'raios',cronica:'raios',filosofia:'raios',cat:'raios',lib:'raios'}};
+function cl540Erro(k,e){if(CL540.erros.length<20)CL540.erros.push(k+': '+(e&&e.message||e));try{console.warn('v540',k,e);}catch(x){}}
+function cl540Chuva(R){const T=THREE,N=1500;const pos=new Float32Array(N*6),vel=new Float32Array(N),len=new Float32Array(N);
+  for(let i=0;i<N;i++){const x=(Math.random()-.5)*40,z=(Math.random()-.5)*40,y=Math.random()*19-1;len[i]=.45+Math.random()*.4;vel[i]=18+Math.random()*8;pos[i*6]=x;pos[i*6+1]=y;pos[i*6+2]=z;pos[i*6+3]=x+.07;pos[i*6+4]=y+len[i];pos[i*6+5]=z+.03;}
+  const g=new T.BufferGeometry();const at=new T.BufferAttribute(pos,3);at.setUsage&&at.setUsage(T.DynamicDrawUsage);g.setAttribute('position',at);
+  const m=new T.LineBasicMaterial({color:0xb8c8e8,transparent:true,opacity:.5,depthWrite:false,fog:true});m.userData.papelKeep=true;
+  const L=new T.LineSegments(g,m);L.name='540 chuva';L.frustumCulled=false;L.userData.noCam=true;L.userData.papelKeepGeo=true;L.raycast=()=>{};L.visible=false;L.renderOrder=3;R.scene.add(L);CL540.stats.chuvas++;
+  return {L,pos,vel,len,N,at};}
+function cl540ChuvaPasso(Ch,dt,px,py,pz,m){const {pos,vel,len,N}=Ch;for(let i=0;i<N;i++){let y=pos[i*6+1]-vel[i]*dt;if(y<-1){y+=19;const x=(Math.random()-.5)*40,z=(Math.random()-.5)*40;pos[i*6]=x;pos[i*6+2]=z;pos[i*6+3]=x+.07;pos[i*6+5]=z+.03;}pos[i*6+1]=y;pos[i*6+4]=y+len[i];}
+  Ch.at.needsUpdate=true;Ch.L.position.set(px,py,pz);Ch.L.material.opacity=.5*m;Ch.L.visible=m>.04;}
+function cl540Raio(E,px,py,pz){const T=THREE,R=E.R;try{if(E.raio){R.scene.remove(E.raio.g);E.raio.g.traverse(o=>{if(o.geometry)o.geometry.dispose();});}}catch(e){}
+  const a=Math.random()*Math.PI*2,d=24+Math.random()*20;const bx=px+Math.cos(a)*d,bz=pz+Math.sin(a)*d;const y0=py+34,y1=py+3+Math.random()*4;
+  const pts=[];const n=11;for(let i=0;i<=n;i++){const t=i/n;pts.push(new T.Vector3(bx+(i&&i<n?(Math.random()-.5)*3.2:0)+(Math.random()-.5)*t*2,y0+(y1-y0)*t,bz+(i&&i<n?(Math.random()-.5)*3.2:0)));}
+  const ramo=[pts[4].clone()];for(let i=1;i<=5;i++){const p=ramo[i-1].clone();p.x+=(Math.random()-.3)*2.6;p.z+=(Math.random()-.5)*2.6;p.y-=2.4+Math.random()*1.4;ramo.push(p);}
+  const tubo=(P,r)=>{const cp=new T.CurvePath();for(let i=0;i<P.length-1;i++)cp.add(new T.LineCurve3(P[i],P[i+1]));return new T.TubeGeometry(cp,(P.length-1)*2,r,4,false);};
+  const m=CL540.matRaio||(CL540.matRaio=(()=>{const mm=new T.MeshBasicMaterial({color:0xe8f0ff,transparent:true,opacity:1,blending:T.AdditiveBlending,depthWrite:false,fog:false});mm.userData.papelKeep=true;return mm;})());
+  const g=new T.Group();g.name='540 relâmpago';g.add(new T.Mesh(tubo(pts,.16),m));g.add(new T.Mesh(tubo(ramo,.09),m));g.traverse(o=>{o.raycast=()=>{};o.userData.noCam=true;o.frustumCulled=false;});
+  try{const s1=rkSprite(g,0xc8d8ff,22,.55,bx,y0-2,bz);const s2=rkSprite(g,0xe0e8ff,8,.6,pts[n].x,y1,pts[n].z);s1.userData.noCam=true;s2.userData.noCam=true;}catch(e){}
+  R.scene.add(g);E.raio={g,t:0};CL540.stats.raios++;return d;}
+function cl540Flash(t){if(t<0)return 0;if(t<.08)return 1;if(t<.14)return .15;if(t<.26)return .85;if(t<.7)return .85*(1-(t-.26)/.44);return 0;}
+function cl540Trovao(forte){try{if(typeof SOM==='undefined'||!SOM.ctx||!SOM.master)return;if(forte)somRuidoCurto(.28,.16,'highpass',1400,.6);SOM_ESPARSOS.trovao();if(forte)setTimeout(()=>{try{if(SOM.ctx)SOM_ESPARSOS.trovao();}catch(e){}},420);CL540.stats.trovoes++;}catch(e){cl540Erro('trovão',e);}}
+function cl540Camada(nome,alvo){try{if(typeof SOM==='undefined'||!SOM.ctx||!SOM.master||typeof somCamada!=='function')return null;let L=nome==='chuva'?CL540.camada:CL540.vento;if(L&&!SOM.camadas.includes(L))L=null;
+    if(!L){if(alvo<.01)return null;L=somCamada(nome,alvo);L.g.gain.value=0;SOM.camadas.push(L);L.ult=-1;if(nome==='chuva')CL540.camada=L;else CL540.vento=L;}
+    if(Math.abs((L.ult||0)-alvo)>.015){L.ult=alvo;L.g.gain.setTargetAtTime(alvo,SOM.ctx.currentTime,.4);}return L;}catch(e){cl540Erro('som '+nome,e);return null;}}
+function cl540Ceu(key,C){const out=[];try{for(let s=0;s<4;s++){const m=T160.cache.get('m:532 ceu '+key+' '+s);if(m)out.push(m);}const z=T160.cache.get('m:532 zenite '+key);if(z)out.push(z);if(C&&C.escuro&&C.escuro.mats)for(const m of C.escuro.mats)if(!out.includes(m))out.push(m);}catch(e){}return out;}
+function cl540Tick(dt){if(!CL540.on||CUR!=='room'||!ROOM)return;const key=Object.keys(ROOMS).find(k=>ROOMS[k]===ROOM);const tipo=key&&CL540.tipos[key];
+  const C=key&&RV530.campos[key];const Z=C&&C.cfg&&C.cfg.rv532;
+  if(!tipo||!Z||C.pendente){cl540Camada('chuva',0);cl540Camada('ventoForte',0);return;}
+  if(typeof DUNGEON395!=='undefined'&&DUNGEON395.active&&ROOM===DUNGEON395.room){cl540Camada('chuva',0);cl540Camada('ventoForte',0);return;}
+  let E=CL540.salas[key];if(!E||E.R!==ROOM){E=CL540.salas[key]={R:ROOM,key,tipo,chuva:null,raio:null,tf:-9,prox:4+Math.random()*5,longe:20+Math.random()*20,ceu:null,ceu0:null};}
+  const m=Math.max(0,Math.min(1,Z.mix||0));const pl=cavPos();const py=(pl.fy!==undefined?pl.fy:(ROOM.floorY?ROOM.floorY(pl.x,pl.z):0));
+  const interior=key==='lib';let dentro=false;try{const b=C.box;dentro=b?(pl.x>b.x0&&pl.x<b.x1&&pl.z>b.z0&&pl.z<b.z1):pl.x>20.6;}catch(e){}const mv=dentro?m:0;
+  // som de fundo
+  if(tipo==='chuva'){cl540Camada('chuva',.42*m);cl540Camada('ventoForte',0);}else{cl540Camada('chuva',0);cl540Camada('ventoForte',(interior?.08:.18)*m);}
+  // a chuva
+  if(tipo==='chuva'){if(!E.chuva&&m>.02)E.chuva=cl540Chuva(ROOM);if(E.chuva)cl540ChuvaPasso(E.chuva,Math.min(.06,dt),pl.x,py,pl.z,mv);}
+  // relâmpagos (tempestade) e trovões ao longe (chuva)
+  E.tf+=dt;let f=0;
+  if(m>.6&&!uiBlocked()){if(tipo==='raios'){E.prox-=dt;if(E.prox<=0){E.prox=6+Math.random()*7;E.tf=0;E.forte=1;let d=30;if(!interior)d=cl540Raio(E,pl.x,py,pl.z);const atraso=.4+Math.min(1.2,d/40)+Math.random()*.3;setTimeout(()=>cl540Trovao(true),atraso*1000);}}
+    else{E.longe-=dt;if(E.longe<=0){E.longe=24+Math.random()*24;E.tf=0;E.forte=.3;setTimeout(()=>cl540Trovao(false),1200+Math.random()*1200);}}}
+  f=cl540Flash(E.tf)*(E.forte||1)*m;
+  if(E.raio){E.raio.t+=dt;const vis=E.raio.t<.3&&(E.raio.t<.08||E.raio.t>.14);E.raio.g.visible=vis;if(E.raio.t>1){try{ROOM.scene.remove(E.raio.g);E.raio.g.traverse(o=>{if(o.geometry)o.geometry.dispose();});}catch(e){}E.raio=null;}}
+  // o clarão: luz da arena e céu (repõe tudo quando acaba)
+  try{if(Z.sol&&f>0)Z.sol.intensity+=f*(Z.sol.isDirectionalLight?3.2:2.4);}catch(e){}
+  try{if(!E.ceu)E.ceu=cl540Ceu(key,C);if(f>0){if(!E.ceu0)E.ceu0=E.ceu.map(mt=>mt.color.clone());for(let i=0;i<E.ceu.length;i++){const mt=E.ceu[i];mt.color.copy(C.cp539?mt.color:E.ceu0[i]).addScalar(f*1.3);}}else if(E.ceu0){if(!C.cp539)for(let i=0;i<E.ceu.length;i++)E.ceu[i].color.copy(E.ceu0[i]);E.ceu0=null;}}catch(e){cl540Erro('céu',e);}
+  if(interior)try{const vt=T160.cache.get('m:538 vitral'),ln=T160.cache.get('m:538 lanceta');if(vt)vt.emissiveIntensity=.75+f*3;if(ln)ln.emissiveIntensity=.55+f*3;}catch(e){}}
+if(CL540.on&&typeof RV530!=='undefined'&&typeof rv530Tick==='function'){
+  try{const tk0=rv530Tick;rv530Tick=function(dt){const rv=tk0.apply(this,arguments);try{cl540Tick(Math.min(.1,dt||.016));}catch(e){cl540Erro('tick',e);}return rv;};}catch(e){cl540Erro('instalar',e);}
+}
+window.__clima540={estado:CL540,erros:CL540.erros,stats:CL540.stats,tick:cl540Tick,raio:()=>{const k=Object.keys(ROOMS).find(k=>ROOMS[k]===ROOM);const E=CL540.salas[k];if(E){E.prox=0;E.longe=0;}return !!E;}};
+try{if(typeof NOVIDADES198!=='undefined')NOVIDADES198.v540=co523T('⛈ Chuva e tempestade nos Campos dos Rivais: em umas arenas chove forte, noutras caem relâmpagos com clarões e trovões','⛈ Rain and storms in the Fields of Rivals: heavy rain in some arenas, lightning, flashes and thunder in others','⛈ Lluvia y tormenta en los Campos de los Rivales: lluvia intensa en unas arenas, relámpagos con destellos y truenos en otras');}catch(e){}
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
