@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v535</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v536</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -62352,7 +62352,7 @@ function al521CortaParede(sc,P,st){const T=THREE;const zA=P.zA,zB=P.zB,zc=(zA+zB
 function al521Mundo(R,cfg){if(!R||!R.scene||!R.world||AL521.feitas[cfg.sala])return;AL521.feitas[cfg.sala]=true;const T=THREE,sc=R.scene,W=R.world;const st=AL521.stats[cfg.sala]={};const r=rnd(5210+cfg.sala.length);const P=cfg.entrada;const zc=(P.zA+P.zB)/2;
   const M=Object.assign({latao:al521Mat('latão',0xc8a040,.4,.8),ferro:al521Mat('ferro',0x30302e,.6,.5),madeira:al521Mat('madeira',0x5a3a22,.85),madClara:al521Mat('madeira clara',0xa07850,.8),branco:al521Mat('branco',0xf0ece4,.8),preto:al521Mat('preto',0x16161a,.9),vidro:t160Mat('521 vidro',()=>{const m=new T.MeshStandardMaterial({color:0xc0e0ff,transparent:true,opacity:.35,roughness:.08,metalness:.2});m.userData.papelKeep=true;return m;})},cfg.mats(T));
   const obst=[];const ob=(x,z,rr)=>obst.push([x,z,rr]);const K=t160Kit('521 '+cfg.sala);
-  al521CortaParede(sc,P,st);
+  if(!cfg.portal)al521CortaParede(sc,P,st);
   const rects=cfg.rects;const byId={};for(const q of rects)byId[q.id]=q;const SALA={id:-1,fantasma:true,x0:-19.8,x1:20.04,z0:-21.2,z1:21.2,h:5.4};
   // aberturas por retângulo e lado: lado 'x0'|'x1'|'z0'|'z1' → lista {c,w,h}
   const ab={};const addAb=(id,lado,c,w,h)=>{(ab[id+'|'+lado]=ab[id+'|'+lado]||[]).push({c,w,h});};
@@ -62360,7 +62360,7 @@ function al521Mundo(R,cfg){if(!R||!R.scene||!R.world||AL521.feitas[cfg.sala])ret
     if(Math.abs(a.x1-b.x0)<eps){addAb(a.id,'x1',L.c,L.w,L.h);addAb(b.id,'x0',L.c,L.w,L.h);L.eixo='z';L.x=(a.x1+b.x0)/2;}else if(Math.abs(b.x1-a.x0)<eps){addAb(a.id,'x0',L.c,L.w,L.h);addAb(b.id,'x1',L.c,L.w,L.h);L.eixo='z';L.x=(b.x1+a.x0)/2;}
     else if(Math.abs(a.z1-b.z0)<eps){addAb(a.id,'z1',L.c,L.w,L.h);addAb(b.id,'z0',L.c,L.w,L.h);L.eixo='x';L.z=(a.z1+b.z0)/2;}else if(Math.abs(b.z1-a.z0)<eps){addAb(a.id,'z0',L.c,L.w,L.h);addAb(b.id,'z1',L.c,L.w,L.h);L.eixo='x';L.z=(b.z1+a.z0)/2;}else al521Erro('lig '+L.a+'-'+L.b,'não adjacentes');}
   // a entrada (parede direita da sala) é uma ligação com o retângulo marcado `entrada:true`
-  const E=rects.find(q=>q.entrada);if(E)addAb(E.id,'x0',zc,P.zB-P.zA,P.h);
+  const E=cfg.portal?null:rects.find(q=>q.entrada);if(E)addAb(E.id,'x0',zc,P.zB-P.zA,P.h);
   // paredes: para cada retângulo e lado, segmentos próprios (parede inteira) ou partilhados (parede inteira se id menor, senão pele)
   const parede=(q,lado,mp)=>{const hh=q.h;const horiz=(lado==='z0'||lado==='z1');const a0=horiz?q.x0:q.z0,a1=horiz?q.x1:q.z1;const fixo=lado==='x0'?q.x0:lado==='x1'?q.x1:lado==='z0'?q.z0:q.z1;
     // intervalos partilhados com vizinhos encostados a este lado
@@ -62383,7 +62383,7 @@ function al521Mundo(R,cfg){if(!R||!R.scene||!R.world||AL521.feitas[cfg.sala])ret
       if(L.porta){const mat=M[L.porta]||M.porta;if(L.eixo==='z'){const b=byId[L.b],lado=b.x0>L.x?1:-1;al521Porta(sc,M,L.x,L.c-L.w/2+.03,-Math.PI/2,L.w-.06,h-.06,mat,L.a+'-'+L.b,lado);}else{const b=byId[L.b],lado=b.z0>L.z?-1:1;al521Porta(sc,M,L.c-L.w/2+.03,L.z,0,L.w-.06,h-.06,mat,L.a+'-'+L.b,lado);}}
       if(L.nome){if(L.eixo==='z'){const b=byId[L.b],s=b.x0>L.x?1:-1;al521Placa(sc,L.nome,L.x-s*.2,h+.5,L.c,s>0?-Math.PI/2:Math.PI/2,cfg.placaBg,cfg.placaFg,mo);}else{const b=byId[L.b],s=b.z0>L.z?1:-1;al521Placa(sc,L.nome,L.c,h+.5,L.z-s*.2,s>0?0:Math.PI,cfg.placaBg,cfg.placaFg,mo);}}}
     // a entrada: chão do vão, ombreiras, verga, porta dupla e placa (como na v517)
-    {const XW=19.92,mo=M.ombreira;K.plane(1.3,P.zB-P.zA,M[E&&E.chao]||M.chao,XW,.006,zc,0,-Math.PI/2,0);for(const z of [P.zA-.1,P.zB+.1])K.box(.34,P.h+.2,.2,mo,XW,(P.h+.2)/2,z);K.box(.34,.26,P.zB-P.zA+.4,mo,XW,P.h+.13,zc);
+    if(!cfg.portal){const XW=19.92,mo=M.ombreira;K.plane(1.3,P.zB-P.zA,M[E&&E.chao]||M.chao,XW,.006,zc,0,-Math.PI/2,0);for(const z of [P.zA-.1,P.zB+.1])K.box(.34,P.h+.2,.2,mo,XW,(P.h+.2)/2,z);K.box(.34,.26,P.zB-P.zA+.4,mo,XW,P.h+.13,zc);
       const lf=(P.zB-P.zA)/2-.05;al521Porta(sc,M,XW+.1,P.zA+.03,-Math.PI/2,lf,P.h-.06,M.porta,cfg.sala+' a',1);al521Porta(sc,M,XW+.1,P.zB-.03,Math.PI/2,lf,P.h-.06,M.porta,cfg.sala+' b',-1);al521Placa(sc,cfg.nome,19.6,P.h+.55,zc,-Math.PI/2,cfg.placaBg,cfg.placaFg,mo);}
     st.rects=rects.length;st.lig=cfg.lig.length;}catch(e){al521Erro(cfg.sala+' conchas',e);}
   // luzes em grelha por retângulo
@@ -62393,9 +62393,9 @@ function al521Mundo(R,cfg){if(!R||!R.scene||!R.world||AL521.feitas[cfg.sala])ret
   for(const q of rects){if(q.decor)try{q.decor(ctx,q,(q.x0+q.x1)/2,(q.z0+q.z1)/2);}catch(e){al521Erro(cfg.sala+' '+q.id,e);}}
   const ms=K.fim(sc,{sombra:true});for(const m of ms){m.userData.papelKeepGeo=true;m.userData.al517=true;}st.malhas=ms.length;
   // andar: clamp = anterior ∪ retângulos ∪ passagens; câmera livre à direita; obstáculos
-  try{const c0=W.clamp,t0=W.camT;const caixas=rects.map(q=>[q.x0,q.x1,q.z0,q.z1,q.m===undefined?null:q.m]);const pass=[[18.0,21.4,P.zA,P.zB]];for(const L of cfg.lig){if(!L.eixo)continue;if(L.eixo==='z')pass.push([L.x-1.6,L.x+1.6,L.c-L.w/2,L.c+L.w/2]);else pass.push([L.c-L.w/2,L.c+L.w/2,L.z-1.6,L.z+1.6]);}
+  try{const c0=W.clamp,t0=W.camT;const caixas=rects.map(q=>[q.x0,q.x1,q.z0,q.z1,q.m===undefined?null:q.m]);const pass=cfg.portal?[]:[[18.0,21.4,P.zA,P.zB]];for(const L of cfg.lig){if(!L.eixo)continue;if(L.eixo==='z')pass.push([L.x-1.6,L.x+1.6,L.c-L.w/2,L.c+L.w/2]);else pass.push([L.c-L.w/2,L.c+L.w/2,L.z-1.6,L.z+1.6]);}
     W.clamp=function(x,z,m){m=m||0;let best=c0.apply(this,arguments),bd=(best[0]-x)**2+(best[1]-z)**2;for(const c of caixas){const mm=c[4]!==null?Math.min(m,c[4]):m;const p=[Math.max(c[0]+mm,Math.min(c[1]-mm,x)),Math.max(c[2]+mm,Math.min(c[3]-mm,z))];const d=(p[0]-x)**2+(p[1]-z)**2;if(d<bd){bd=d;best=p;}}for(const c of pass){const mm=Math.min(m,.3);const p=[Math.max(c[0]+mm,Math.min(c[1]-mm,x)),Math.max(c[2]+mm,Math.min(c[3]-mm,z))];const d=(p[0]-x)**2+(p[1]-z)**2;if(d<bd){bd=d;best=p;}}return best;};
-    if(t0)W.camT=function(ox,oy,oz,dx,dy,dz,dist){if(ox>19.6)return dist;return t0.apply(this,arguments);};let ext=W.ext||0;for(const q of rects)ext=Math.max(ext,Math.abs(q.x1)+2,Math.abs(q.z0)+2,Math.abs(q.z1)+2);W.ext=ext;const lista=W.obst;if(Array.isArray(lista))for(const o of obst)lista.push(o);W.__nav=null;W.__cl=null;st.obstaculos=obst.length;}catch(e){al521Erro(cfg.sala+' andar',e);}
+    if(t0){const cxs=caixas;W.camT=function(ox,oy,oz,dx,dy,dz,dist){if(cfg.portal){for(const c of cxs)if(ox>c[0]&&ox<c[1]&&oz>c[2]&&oz<c[3])return dist;return t0.apply(this,arguments);}if(ox>19.6)return dist;return t0.apply(this,arguments);};}let ext=W.ext||0;for(const q of rects)ext=Math.max(ext,Math.abs(q.x1)+2,Math.abs(q.z0)+2,Math.abs(q.z1)+2);W.ext=ext;const lista=W.obst;if(Array.isArray(lista))for(const o of obst)lista.push(o);W.__nav=null;W.__cl=null;st.obstaculos=obst.length;}catch(e){al521Erro(cfg.sala+' andar',e);}
   try{if(typeof fusaoLimpar==='function')fusaoLimpar(sc);}catch(e){}
   try{const tk=R.tick;R.tick=function(dt){const rv=tk?tk.apply(this,arguments):undefined;try{al521Tick(R,Math.min(.05,dt||.016));}catch(e){al521Erro('tick',e);}return rv;};}catch(e){al521Erro(cfg.sala+' relógio',e);}}
 function al521Tick(R,dt){const A=AL521;A.t+=dt;const sc=R.scene;const ativa=CUR==='room'&&ROOM===R;for(const l of A.luzes){if(l.L.parent!==sc)continue;l.L.intensity=ativa?l.i0*(.93+.07*Math.sin(A.t*5+l.ph)):0;}if(!ativa)return;let p=null;try{p=asaPos();}catch(e){}
@@ -63530,7 +63530,7 @@ function rv530Cfg(sala,P){const ceu=al521TexCeu('céu campo '+sala,'#6fb0ea','#b
         for(const [x,z] of [[q.x0+10,zc],[ax,az],[q.x0+40,q.z0+10],[q.x0+40,q.z1-10]])c.luz(0xfff0d8,1.4,x,9,z,34);
         c.placa(text428('Campo dos Rivais','Field of Rivals','Campo de los Rivales'),ax,3.2,az-9.6,0);}}],
     lig:[]};}
-function rv530Campo(R,key){try{if(!RV530.on||RV530.campos[key]||!R||!R.scene||!R.world)return;const def=rv530Def(key);if(!def)return;if(typeof al521Mundo!=='function'||!AL521||AL521.feitas[key])return;RV530.campos[key]={pendente:true};
+function rv530Campo(R,key){try{if(!RV530.on||RV530.campos[key]||!R||!R.scene||!R.world)return;const def=rv530Def(key);if(!def||def.portal)return;if(typeof al521Mundo!=='function'||!AL521||AL521.feitas[key])return;RV530.campos[key]={pendente:true};
     const P=rv530Vao(R);const cfg=rv530Cfg(key,P);al521Mundo(R,cfg);const sc=R.scene;
     // sem as portas duplas (o pórtico é aberto) e sem as luzes de grelha do campo
     for(const nome of ['521 porta '+key+' a','521 porta '+key+' b']){const g=sc.getObjectByName(nome);if(g&&g.parent)g.parent.remove(g);}
@@ -63546,7 +63546,7 @@ function rv530Companheiro(def){const T=THREE;const g=new T.Group();const it=LOJA
   if(!m){m=new T.Mesh(new T.SphereGeometry(.3,10,8),t160Std('530 comp',0xc0c0ff,.6));}try{m.position.set(0,0,0);}catch(e){}g.add(m);g.name='Rival · companheiro '+def.comp;
   g.userData.olhos=[];g.userData.mand={rotation:{x:0}};rv530Barra(g,(it&&it.slot==='bicho')?1.1:.9);g.traverse(o=>{if(o.isMesh)o.raycast=()=>{};});g.userData.comp530={modelo:m,voa:!(it&&it.slot==='bicho'),t:0};return g;}
 function rv530Registra(key){try{if(!RV530.on||RV530.rivais[key])return;const C=RV530.campos[key],R=ROOMS[key],S=CAV.salas[key];if(!C||!R||!S)return;const def=rv530Def(key);if(!def)return;
-    const mortas=CAV.estado.mortas[key]||{};const x0=C.ax+7,z0=C.az-2;
+    const mortas=CAV.estado.mortas[key]||{};const sp=C.spawn||[C.ax+7,C.az-2];const x0=sp[0],z0=sp[1];
     const g=rv530Rival(def);const k={id:1000,room:key,g,hp:def.hp,max:def.hp,x:x0,z:z0,x0,z0,viva:!mortas[1000],rec:2,path:null,pi:0,tPath:0,bob:0,knock:{x:0,z:0},ferida:0,rival530:true,tipo:'rival530',nome:def.nome,def,ativo:false,voo:0,golpe:0,pena:3,hpMax:def.hp};
     g.position.set(k.x,(R.floorY?R.floorY(k.x,k.z):0),k.z);g.visible=k.viva;R.scene.add(g);cavBarra(k);S.lista.push(k);
     const g2=rv530Companheiro(def);const k2={id:1001,room:key,g:g2,hp:def.chp,max:def.chp,x:x0+1.5,z:z0+1.2,x0:x0+1.5,z0:z0+1.2,viva:!mortas[1001],rec:2.5,path:null,pi:0,tPath:0,bob:Math.random()*6,knock:{x:0,z:0},ferida:0,rival530:true,tipo:'comp530',def,dono:k,tiro:2.5,hpMax:def.chp};
@@ -63815,7 +63815,7 @@ function rv532Empurra(dx,dz){try{if(typeof MODE!=='undefined'&&MODE==='fp'&&type
 function rv532Tick(dt){try{if(!RV530.on||CUR!=='room'||!ROOM)return;const key=Object.keys(ROOMS).find(k=>ROOMS[k]===ROOM);if(!key)return;
     if(RV530.campos[key]&&!RV530.rivais[key]&&CAV.salas[key])rv530Registra(key);const RV=RV530.rivais[key];if(!RV)return;RV530.t+=dt;const t=RV530.t;
     const k=RV.k,k2=RV.k2,def=RV.def,R=ROOM,W=R.world;const fy=(x,z)=>(R.floorY?R.floorY(x,z):0);const bloq=CAV.morto||uiBlocked()||CH.sitting||document.hidden;
-    const pl=cavPos();const px=pl.x,pz=pl.z;const noCampo=px>20.6;const C=RV530.campos[key];const mur=C&&C.mur;
+    const pl=cavPos();const px=pl.x,pz=pl.z;const C=RV530.campos[key];const mur=C&&C.mur;const noCampo=(C&&C.box)?(px>C.box.x0&&px<C.box.x1&&pz>C.box.z0&&pz<C.box.z1):px>20.6;
     // o sol e a névoa do campo só valem lá fora: dentro da sala fica a luz e a névoa de sempre
     try{const Z=C&&C.cfg&&C.cfg.rv532;if(Z){const alvo=noCampo?1:0;Z.mix=(Z.mix||0)+(alvo-(Z.mix||0))*Math.min(1,dt*2.2);if(Z.sol)Z.sol.intensity=(Z.sol.userData.i0||0)*Z.mix;if(Z.amb&&Z.ambF!==1)for(const a of Z.amb)a.L.intensity=a.i0*(1-Z.mix)+a.i0*Z.ambF*Z.mix;
       const F=R.scene.fog;if(F&&F.density!==undefined){if(!Z.fog0)Z.fog0={cor:F.color.clone(),d:F.density};const fc={dia:0xcfe3f3,poente:0xd8a070,noite:0x0a1430}[Z.tipo]||0xcfe3f3,fd={dia:.0025,poente:.005,noite:.008}[Z.tipo]||.0025;F.density=(Z.fog0.d+(fd-Z.fog0.d)*Z.mix)*(Z.nevoa||1);F.color.copy(Z.fog0.cor).lerp(new THREE.Color(fc),Z.mix);}}}catch(e){}
@@ -63847,7 +63847,7 @@ function rv532Tick(dt){try{if(!RV530.on||CUR!=='room'||!ROOM)return;const key=Ob
       else{k.x+=Math.sin(t*.4)*.004;}
       if(k2&&k2.viva){const ox=k.x-k2.x,oz=k.z-k2.z,od=Math.hypot(ox,oz);if(od<1.2&&od>1e-3){k.x+=ox/od*(1.2-od)*.5;k.z+=oz/od*(1.2-od)*.5;}}
       k.x+=k.knock.x*dt;k.z+=k.knock.z*dt;k.knock.x*=Math.exp(-6*dt);k.knock.z*=Math.exp(-6*dt);
-      if(k.x<20.9)k.x=20.9;if(mur){k.x=Math.max(mur.x0+2.4,Math.min(mur.x1-2.4,k.x));k.z=Math.max(mur.z0+2.4,Math.min(mur.z1-2.4,k.z));}const c=W.clamp(k.x,k.z,.6);k.x=Array.isArray(c)?c[0]:c.x;k.z=Array.isArray(c)?c[1]:c.z;
+      if(!(C&&C.box)&&k.x<20.9)k.x=20.9;if(mur){k.x=Math.max(mur.x0+2.4,Math.min(mur.x1-2.4,k.x));k.z=Math.max(mur.z0+2.4,Math.min(mur.z1-2.4,k.z));}const c=W.clamp(k.x,k.z,.6);k.x=Array.isArray(c)?c[0]:c.x;k.z=Array.isArray(c)?c[1]:c.z;
       const a0=(k.alt===undefined||!isFinite(k.alt))?.05:k.alt;k.alt=a0+(altAlvo-a0)*(1-Math.exp(-dt*(k.fase==='mergulha'?3.2:1.8)));k.bob+=dt;const hover=k.alt+(k.ativo?.12*Math.sin(k.bob*2.4):0);
       k.g.position.set(k.x,fy(k.x,k.z)+hover,k.z);if(d>.01)k.g.rotation.y=Math.atan2(dx,dz);k.g.rotation.x=k.fase==='mergulha'?.35:(k.fase==='sobe'?-.2:0);
       if(k.ferida>0)k.ferida-=dt;try{D.rig.update(Math.min(.05,dt),k.ativo?.4:0,0,.5,t);}catch(e){}
@@ -63864,7 +63864,7 @@ function rv532Tick(dt){try{if(!RV530.on||CUR!=='room'||!ROOM)return;const key=Ob
         else{if(k2.rajadaN>0){k2.rajadaT-=dt;if(k2.rajadaT<=0){k2.rajadaT=P2.rajada||.14;k2.rajadaN--;rv532Tiro(k2,def,{cor:P2.cor,tam:.07,vel:P2.vel,forma:P2.forma,guia:P2.guia||0,dy:.3});}}
           else if(d2<14&&k2.tiro<=0){k2.tiro=P2.cad;k2.volta=(k2.volta||0)+1;if(P2.especial&&k2.volta%3===0&&typeof rv535CompEspecial==='function'){rv535CompEspecial(k2,def,P2);}else if(P2.rajada){k2.rajadaN=P2.n;k2.rajadaT=0;}else if(P2.n>1)rv532Leque(k2,def,P2.n,.5,{cor:P2.cor,tam:.07,vel:P2.vel,forma:P2.forma,dy:.3});else rv532Tiro(k2,def,{cor:P2.cor,tam:.07,vel:P2.vel,forma:P2.forma,guia:P2.guia||0,dy:.3});}}
         if(velC>0){const ddx=tx-k2.x,ddz=tz-k2.z,dd=Math.hypot(ddx,ddz);if(dd>.05){const v=Math.min(velC*dt,dd);k2.x+=ddx/dd*v;k2.z+=ddz/dd*v;}}}
-      k2.x+=k2.knock.x*dt;k2.z+=k2.knock.z*dt;k2.knock.x*=Math.exp(-6*dt);k2.knock.z*=Math.exp(-6*dt);if(k2.x<20.9)k2.x=20.9;if(mur){k2.x=Math.max(mur.x0+2.2,Math.min(mur.x1-2.2,k2.x));k2.z=Math.max(mur.z0+2.2,Math.min(mur.z1-2.2,k2.z));}const c2=W.clamp(k2.x,k2.z,.5);k2.x=Array.isArray(c2)?c2[0]:c2.x;k2.z=Array.isArray(c2)?c2[1]:c2.z;
+      k2.x+=k2.knock.x*dt;k2.z+=k2.knock.z*dt;k2.knock.x*=Math.exp(-6*dt);k2.knock.z*=Math.exp(-6*dt);if(!(C&&C.box)&&k2.x<20.9)k2.x=20.9;if(mur){k2.x=Math.max(mur.x0+2.2,Math.min(mur.x1-2.2,k2.x));k2.z=Math.max(mur.z0+2.2,Math.min(mur.z1-2.2,k2.z));}const c2=W.clamp(k2.x,k2.z,.5);k2.x=Array.isArray(c2)?c2[0]:c2.x;k2.z=Array.isArray(c2)?c2[1]:c2.z;
       k2.bob+=dt;const inv=k2.fase==='investida';const h2=corre?(inv?Math.abs(Math.sin(k2.bob*14))*.25:Math.abs(Math.sin(k2.bob*5))*.08):((k.viva&&k.ativo?Math.max(1.4,(k.alt||0)+.6):1.5)+.25*Math.sin(k2.bob*3));k2.g.position.set(k2.x,fy(k2.x,k2.z)+h2,k2.z);
       const face=(k2.fase==='volta'||!k.ativo)?(k.viva?[k.x-k2.x,k.z-k2.z]:[px-k2.x,pz-k2.z]):[px-k2.x,pz-k2.z];k2.g.rotation.y=Math.atan2(face[0],face[1]);if(k2.ferida>0)k2.ferida-=dt;
       try{const m=Cc.modelo;const esc=(Cc.P&&Cc.P.estilo==='corre')?2.6:2.8;const pulso=k2.fase==='rosna'?1+.25*Math.sin(k2.faseT*30):1;m.scale.setScalar(esc*pulso);m.rotation.z=corre?0:Math.sin(k2.bob*3)*.12;m.rotation.x=inv?.25:0;
@@ -64075,6 +64075,137 @@ if(DU535.on&&typeof RV532!=='undefined'&&RV532.on){
     }catch(e){du535Erro('tick',e);}return r;};rv530Tick=rv532Tick;}catch(e){du535Erro('instalar tick',e);}
   window.__duelo535={estado:DU535,erros:DU535.erros,stats:DU535.stats,escolhe:rv535Escolhe,especial:rv535Especial,mordida:rv535Mordida,latido:rv535Latido,compEspecial:rv535CompEspecial};}else{window.__duelo535={estado:DU535,erros:DU535.erros,stats:DU535.stats};}
 try{if(typeof NOVIDADES198!=='undefined')NOVIDADES198.v535=co523T('⚔ Mais difícil até o 2.º andar: o golpe único fica só no Hall 1, inimigos com mais vida e mira, chefes mais resistentes e rápidos · todos os Campos dos Rivais à noite, com lampiões · cada rival e cada companheiro tem um poder especial próprio','⚔ Harder up to floor 2: the one-hit rule stays only in Hall 1, enemies with more health and aim, tougher and faster bosses · all Fields of Rivals at night, with lanterns · every rival and companion has a signature power','⚔ Más difícil hasta el 2.º piso: el golpe único solo en el Hall 1, enemigos con más vida y puntería, jefes más resistentes y rápidos · todos los Campos de los Rivales de noche, con farolas · cada rival y compañero tiene un poder propio');}catch(e){}
+
+/* ===================== v536 · CAMPOS DOS RIVAIS EM TODOS OS ANDARES (1.º, 3.º e 5.º) POR PORTAL (pedido do Luiz) =====================
+   «Replique essas salas de combate em todos os andares» · «tome cuidado para não apagar nada que já existe no jogo, essas são áreas adicionais».
+   As salas do 1.º andar são cenários abertos (Nilo, charneca, castelo, navio) e as do 3.º já usam as duas paredes (alas da v521 à direita, v509/v520 à
+   esquerda); por isso estes campos NÃO cortam parede nenhuma: o campo nasce numa zona livre fora do cenário (a leste, oeste, norte ou sul, onde não há
+   nada — obstáculos, malhas ou área andável — `rv536Lugar`) e liga-se à sala por um PORTAL: um arco de pedra com um disco de luz, posto num ponto livre
+   junto a uma parede da sala (`rv536Portal`, varrimento de obstáculos, malhas e `clamp`); pisar o disco leva ao portão do campo, e o disco do portão
+   traz de volta. Nada da sala é apagado ou movido. O campo em si é o mesmo das v530–v535 (muralha, céu nocturno, terreno, cidade, rival com
+   companheiro e poderes), construído em coordenadas locais e rodado/transladado para o lugar escolhido (`T`: `K.push`, obstáculos, luzes, sprites,
+   terreno, `floorY`, sol). TROCAS: `al521Mundo` ganha `cfg.portal` (sem corte de parede, sem ombreiras/portas/passagem da entrada, câmera livre dentro
+   do retângulo); `rv530Campo` ignora as fichas com `portal`; `rv530Registra` usa `C.spawn`; o tick usa `C.box` para «estar no campo» e `C.mur`
+   (mundo) para prender os rivais. 15 rivais novos (fichas, trajes, poderes, cidades) e o Dragão de bolso no lugar do inexistente «drg_serpente».
+   `?campos536=0` desliga. */
+const CP536={on:!/[?&#]campos536=0/i.test(location.search+location.hash),erros:[],stats:{},portais:{},tele:0,
+  lista:[
+    {sala:'cat',comp:'gato',nome:'Dama Aurora de Pedra',cor:0xd8b060,cachecol:0x2c4a86,asa:0xffe8a0,hp:130,chp:48,dano:12,portal:true,andar:1},
+    {sala:'lib',comp:'sapo',nome:'Conde Noctis',cor:0x222226,cachecol:0x7a2028,asa:0x9060c0,hp:130,chp:48,dano:12,portal:true,andar:1},
+    {sala:'sci',comp:'vagalume',nome:'Unidade Vega-7',cor:0x8aa0b0,cachecol:0x40e0ff,asa:0x80f0ff,hp:135,chp:48,dano:12,portal:true,andar:1},
+    {sala:'fant',comp:'fada',nome:'Rainha Titânia das Asas',cor:0x5a3a86,cachecol:0xc9a24a,asa:0xd0a0ff,hp:135,chp:50,dano:12,portal:true,andar:1},
+    {sala:'adv',comp:'periquito',nome:'Capitão Barba-Negra',cor:0x222226,cachecol:0xc02020,asa:0x80c080,hp:140,chp:50,dano:13,portal:true,andar:1},
+    {sala:'bosque',comp:'raposa',nome:'Guardiã Silvana',cor:0x2f6a3a,cachecol:0xc9a24a,asa:0xa0e080,hp:200,chp:70,dano:15,portal:true,andar:3},
+    {sala:'acropole',comp:'livro',nome:'Sofia de Atenas',cor:0xf4ecd4,cachecol:0x2c4a86,asa:0xffffff,hp:205,chp:70,dano:15,portal:true,andar:3},
+    {sala:'fazenda',comp:'cachorro',nome:'Jacinto do Campo',cor:0xa07040,cachecol:0xe8d8b0,asa:0xffd080,hp:200,chp:70,dano:15,portal:true,andar:3},
+    {sala:'arena',comp:'coelho',nome:'Campeão Dédalo',cor:0xc02020,cachecol:0xffffff,asa:0xff8060,hp:210,chp:72,dano:16,portal:true,andar:3},
+    {sala:'digital',comp:'dragaobolso',nome:'Byte, o Codificador',cor:0x101820,cachecol:0x40ff80,asa:0x40ffc0,hp:210,chp:75,dano:16,portal:true,andar:3},
+    {sala:'biografia',comp:'gato',nome:'Memorialista Vasco',cor:0x6a4a2a,cachecol:0xe8d8b0,asa:0xd8c0a0,hp:290,chp:100,dano:18,portal:true,andar:5},
+    {sala:'cronica',comp:'periquito',nome:'Cronista Tomás',cor:0x2c4a86,cachecol:0xf0d030,asa:0xa0d0ff,hp:290,chp:100,dano:18,portal:true,andar:5},
+    {sala:'ciencia',comp:'mariposa',nome:'Doutora Lumen',cor:0xe8f0f4,cachecol:0x40c0a0,asa:0xc0f0ff,hp:300,chp:105,dano:18,portal:true,andar:5},
+    {sala:'filosofia',comp:'coruja',nome:'Sábio Aristeu',cor:0x3a3a4a,cachecol:0xc9a24a,asa:0xe0d0ff,hp:300,chp:105,dano:19,portal:true,andar:5},
+    {sala:'cordel',comp:'cachorro',nome:'Violeiro Zé Cordel',cor:0xc87a30,cachecol:0x2f6a3a,asa:0xffd060,hp:290,chp:100,dano:18,portal:true,andar:5}],
+  salas:{cat:{ceu:'noite',cidade:'templo'},lib:{ceu:'noite',cidade:'castelo',outono:true},sci:{ceu:'noite',cidade:'fortaleza'},fant:{ceu:'noite',cidade:'castelo'},adv:{ceu:'noite',cidade:'vila'},
+    bosque:{ceu:'noite',cidade:null,outono:true},acropole:{ceu:'noite',cidade:'templo'},fazenda:{ceu:'noite',cidade:'vila'},arena:{ceu:'noite',cidade:'fortaleza'},digital:{ceu:'noite',cidade:'fortaleza'},
+    biografia:{ceu:'noite',cidade:'vila'},cronica:{ceu:'noite',cidade:'vila'},ciencia:{ceu:'noite',cidade:'templo'},filosofia:{ceu:'noite',cidade:'templo'},cordel:{ceu:'noite',cidade:'vila'}},
+  esp:{cat:'calma',lib:'sombra',sci:'raio',fant:'versos',adv:'bombardeio',bosque:'nevoa',acropole:'paginas',fazenda:'bolhas',arena:'calma',digital:'raio',biografia:'paginas',cronica:'versos',ciencia:'sol',filosofia:'nevoa',cordel:'serenata'},
+  tons:{cat:0x3a2a1a,lib:0x1a0a1a,sci:0x0a2a3a,fant:0x2a1a4a,adv:0x1a2a3a,bosque:0x1a3a1a,acropole:0x2a2a4a,fazenda:0x3a2a1a,arena:0x3a1a1a,digital:0x0a2a2a,biografia:0x2a2a2a,cronica:0x1a2a4a,ciencia:0x1a3a3a,filosofia:0x2a2a3a,cordel:0x3a2a1a},
+  trajes:{cat:{manto:0xd8b060,forro:0x2c4a86,debrum:0x8a6a20,gola:0xf4ecd4,luvas:0xd8b060,chapeu:'ch_coroa',capa:'capa',pano:0x2c4a86,capaForro:0xd8b060,ombreiras:0xd8b040,cinto:0x8a6a20,medalha:0xd8b040},
+    lib:{manto:0x222226,forro:0x7a2028,debrum:0x4a1016,gola:0xe8e2d4,luvas:0x222226,chapeu:'ch_cartola',capa:'capa',pano:0x101014,capaForro:0x7a2028,cinto:0x1a1a1e,medalha:0x9060c0},
+    sci:{manto:0x8aa0b0,forro:0x40e0ff,debrum:0x30506a,gola:0xe0f0ff,luvas:0x30506a,chapeu:null,capa:null,ombreiras:0x9aa0a8,cinto:0x30506a,faixa:0x40e0ff,medalha:0x40e0ff},
+    fant:{manto:0x5a3a86,forro:0xd0a0ff,debrum:0xc9a24a,gola:0xf4ecd4,luvas:0xd0a0ff,chapeu:'ch_coroa',capa:'capa_bib',pano:0x3a1a5a,capaForro:0xd0a0ff,ombreiras:0xc9a24a,cinto:0xc9a24a,medalha:0xd0a0ff},
+    adv:{manto:0x222226,forro:0xc02020,debrum:0xc9a24a,gola:0xe8e2d4,luvas:0x4a2a1a,chapeu:'ch_tricorne',capa:'capa',pano:0x2a1a12,capaForro:0xc02020,faixa:0xc02020,cinto:0x4a2a1a,medalha:0xd8b050},
+    bosque:{manto:0x2f6a3a,forro:0xa0e080,debrum:0x5a3a22,gola:0xe8e2d4,luvas:0x5a3a22,chapeu:null,capa:'capa',pano:0x1f4a2a,capaForro:0xa0e080,cinto:0x5a3a22,medalha:0xa0e080},
+    acropole:{manto:0xf4ecd4,forro:0x2c4a86,debrum:0xc9a24a,gola:0x2c4a86,luvas:0xf4ecd4,chapeu:'ch_coroa',capa:null,ombreiras:0xd8b040,faixa:0x2c4a86,cinto:0xd8b040,medalha:0xd8b040},
+    fazenda:{manto:0xa07040,forro:0xe8d8b0,debrum:0x5a3a22,gola:0xe8d8b0,luvas:0x5a3a22,chapeu:'ch_gorro',capa:null,cinto:0x5a3a22,medalha:0xffd080},
+    arena:{manto:0xc02020,forro:0xffffff,debrum:0xd8b040,gola:0xffffff,luvas:0x222226,chapeu:null,capa:'capa',pano:0xc02020,capaForro:0xffffff,ombreiras:0xd8b040,cinto:0x222226,medalha:0xd8b040},
+    digital:{manto:0x101820,forro:0x40ff80,debrum:0x40ffc0,gola:0x203040,luvas:0x40ff80,chapeu:null,capa:null,ombreiras:0x40ffc0,faixa:0x40ff80,cinto:0x40ffc0,medalha:0x40ff80},
+    biografia:{manto:0x6a4a2a,forro:0xe8d8b0,debrum:0xc9a24a,gola:0xf4ecd4,luvas:0x6a4a2a,chapeu:'ch_fedora',capa:'capa',pano:0x4a3a2a,capaForro:0xe8d8b0,cinto:0x2a1a12,medalha:0xd8c0a0},
+    cronica:{manto:0x2c4a86,forro:0xf0d030,debrum:0xf0d030,gola:0xffffff,luvas:0x2c4a86,chapeu:'ch_fedora',capa:null,faixa:0xf0d030,cinto:0x2a1a12,medalha:0xf0d030},
+    ciencia:{manto:0xe8f0f4,forro:0x40c0a0,debrum:0x40c0a0,gola:0xffffff,luvas:0xffffff,chapeu:null,capa:'capa',pano:0xe8f0f4,capaForro:0x40c0a0,cinto:0x40c0a0,medalha:0x40c0a0},
+    filosofia:{manto:0x3a3a4a,forro:0xc9a24a,debrum:0xc9a24a,gola:0xe8e2d4,luvas:0x3a3a4a,chapeu:'ch_mago',capa:'capa',pano:0x2a2a3a,capaForro:0xc9a24a,cinto:0xc9a24a,medalha:0xe0d0ff},
+    cordel:{manto:0xc87a30,forro:0x2f6a3a,debrum:0xf0d030,gola:0xe8d8b0,luvas:0x2f6a3a,chapeu:'ch_gorro',capa:null,faixa:0x2f6a3a,cinto:0x5a3a22,medalha:0xffd060}},
+  comp:{gato:{estilo:'corre',cor:0x8ad24a,vel:10,cad:3.6,duplo:true},sapo:{estilo:'corre',cor:0x80c040,vel:8,cad:4.0,salto:true},vagalume:{estilo:'voa',cor:0xe0ff60,n:2,vel:9,cad:2.6,forma:'orbe',especial:'rajadao',rajada:.14},
+    fada:{estilo:'voa',cor:0xffb0e0,n:3,vel:7,cad:3.0,forma:'orbe',guia:1.5,especial:'sono'},dragaobolso:{estilo:'voa',cor:0x60e0a0,n:2,vel:10,cad:2.4,forma:'fogo',especial:'bola'}}};
+function cp536Erro(k,e){if(CP536.erros.length<40)CP536.erros.push(k+': '+(e&&e.message||e));try{console.warn('v536',k,e);}catch(x){}}
+function cp536T(ry){const c=Math.cos(ry),s=Math.sin(ry);return {ry,c,s,tx:0,tz:0,w(x,z){return [this.tx+x*this.c+z*this.s,this.tz-x*this.s+z*this.c];},l(x,z){const dx=x-this.tx,dz=z-this.tz;return [dx*this.c-dz*this.s,dx*this.s+dz*this.c];}};}
+function cp536Caixa(T,x0,x1,z0,z1){const a=T.w(x0,z0),b=T.w(x1,z1);return {x0:Math.min(a[0],b[0]),x1:Math.max(a[0],b[0]),z0:Math.min(a[1],b[1]),z1:Math.max(a[1],b[1])};}
+/* onde cabe o campo: a leste, oeste, sul ou norte do cenário, numa zona sem nada */
+function rv536Lugar(R,key){const W=R.world,sc=R.scene;const cl=(x,z)=>{const c=W.clamp(x,z,.5);return Array.isArray(c)?c:[c.x,c.z];};
+  const bx=[cl(-999,0)[0],cl(999,0)[0]],bz=[cl(0,-999)[1],cl(0,999)[1]];const q0={x0:20.04,x1:84,z0:-33,z1:33};
+  const cands=[];for(const M of [7,30,60,100]){cands.push({ry:0,tx:bx[1]+M-q0.x0,tz:0},{ry:Math.PI,tx:bx[0]-M+q0.x0,tz:0},{ry:-Math.PI/2,tx:0,tz:bz[1]+M-q0.x0},{ry:Math.PI/2,tx:0,tz:bz[0]-M+q0.x0});}
+  const bb=new THREE.Box3(),sz=new THREE.Vector3();sc.updateMatrixWorld(true);const malhas=[];sc.traverse(o=>{if(!o.isMesh||!o.visible||o.isSprite)return;try{bb.setFromObject(o);}catch(e){return;}if(!isFinite(bb.min.x))return;bb.getSize(sz);if(sz.x>120||sz.z>120)return;malhas.push(bb.clone());});
+  let melhor=null;for(const c of cands){const T=cp536T(c.ry);T.tx=c.tx;T.tz=c.tz;const B=cp536Caixa(T,q0.x0-1,q0.x1+1,q0.z0-1,q0.z1+1);let nO=0,nM=0;
+    for(const o of (W.obst||[])){if(o[0]>B.x0&&o[0]<B.x1&&o[1]>B.z0&&o[1]<B.z1)nO++;}
+    for(const m of malhas){if(m.max.x>B.x0&&m.min.x<B.x1&&m.max.z>B.z0&&m.min.z<B.z1&&m.max.y>-1&&m.min.y<30)nM++;}
+    const sc_=nO*10+nM;if(!melhor||sc_<melhor.sc){melhor={T,B,nO,nM,sc:sc_,ry:c.ry};}if(sc_===0)break;}
+  if(melhor)CP536.stats[key]=Object.assign(CP536.stats[key]||{},{lugar:[+melhor.ry.toFixed(2),+melhor.T.tx.toFixed(1),+melhor.T.tz.toFixed(1)],obstNoCampo:melhor.nO,malhasNoCampo:melhor.nM,bx,bz});
+  return (melhor&&melhor.sc<=6)?melhor:null;}
+/* onde pôr o portal dentro da sala: um ponto livre junto a uma parede */
+function rv536PortalLugar(R,key){const W=R.world,sc=R.scene;const cl=(x,z,m)=>{const c=W.clamp(x,z,m);return Array.isArray(c)?c:[c.x,c.z];};
+  const bx=[cl(-999,0,.5)[0],cl(999,0,.5)[0]],bz=[cl(0,-999,.5)[1],cl(0,999,.5)[1]];const bb=new THREE.Box3(),sz=new THREE.Vector3();sc.updateMatrixWorld(true);const malhas=[];
+  sc.traverse(o=>{if(!o.isMesh||!o.visible||o.isSprite)return;if(o.userData&&(o.userData.fx||o.userData.noCam))return;try{bb.setFromObject(o);}catch(e){return;}if(!isFinite(bb.min.x))return;bb.getSize(sz);if(sz.y<.25)return;if(sz.x>8&&sz.z>8)return;if(bb.min.y>3.6)return;malhas.push(bb.clone());});
+  const sp=R.spawn||{x:0,z:0};const cands=[];const passo=2;
+  for(let x=0;x<=Math.max(Math.abs(bx[0]),bx[1]);x+=passo)for(const sx of (x===0?[1]:[1,-1])){const px=sx*x;if(px<bx[0]+3||px>bx[1]-3)continue;cands.push([px,bz[0]+2.4,Math.PI]);cands.push([px,bz[1]-2.4,0]);}
+  for(let z=0;z<=Math.max(Math.abs(bz[0]),bz[1]);z+=passo)for(const sz_ of (z===0?[1]:[1,-1])){const pz=sz_*z;if(pz<bz[0]+3||pz>bz[1]-3)continue;cands.push([bx[0]+2.4,pz,-Math.PI/2]);cands.push([bx[1]-2.4,pz,Math.PI/2]);}
+  for(let x=bx[0]+4;x<=bx[1]-4;x+=3)for(let z=bz[0]+4;z<=bz[1]-4;z+=3)cands.push([x,z,Math.atan2(-x,-z)+Math.PI]);
+  const sx0=(sp.x||0),sz0=(sp.z||0);cands.sort((a,b)=>Math.hypot(a[0]-sx0,a[1]-sz0)-Math.hypot(b[0]-sx0,b[1]-sz0)); // perto de onde o leitor entra
+  for(const folga of [1.7,1.25,.9]){for(const [x,z,ry] of cands){const c=cl(x,z,Math.min(1.2,folga));if(Math.abs(c[0]-x)>.05||Math.abs(c[1]-z)>.05)continue;if(Math.hypot(x-sx0,z-sz0)<(folga<1?4.5:6))continue;let ok=true;
+    for(const o of (W.obst||[])){if(Math.hypot(x-o[0],z-o[1])<o[2]+folga+.5){ok=false;break;}}if(!ok)continue;
+    const yf=(R.floorY?R.floorY(x,z):0);for(const m of malhas){if(m.max.y<yf+.45)continue;if(m.max.x>x-folga&&m.min.x<x+folga&&m.max.z>z-folga&&m.min.z<z+folga){ok=false;break;}}if(!ok)continue;
+    return {x,z,ry,y:yf};}}
+  return null;}
+/* o portal: arco de pedra com disco de luz */
+function rv536Portal(sc,x,y,z,ry,nome,cor){const K=t160Kit('536 portal');const pedra=al521TexMat('536 pedra',STONE,[2,1.4],0xc8c0b0,.95),musgo=al521Mat('536 musgo',0x6a8a3a,.95),disco=new THREE.MeshBasicMaterial({color:cor||0x80c0ff,transparent:true,opacity:.55,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending});disco.userData.papelKeep=true;
+  K.push(x,y,z,ry);for(const s of [-1,1]){K.cyl(.26,.3,3.6,pedra,s*1.3,1.8,0,12);K.box(.8,.26,.8,pedra,s*1.3,.13,0);K.box(.8,.26,.8,pedra,s*1.3,3.7,0);}K.tor(1.3,.24,pedra,0,3.85,0,Math.PI,0,0,0,8,20);
+  for(let i=0;i<8;i++){const a=i/7*Math.PI;K.sph(.12+(i%3)*.04,musgo,Math.cos(a)*1.3,3.85+Math.sin(a)*1.3,.15,1,.8,1,6,5);}
+  K.add(new THREE.CircleGeometry(1.15,28),disco,0,2.0,0,0,0,0);K.pop();const ms=K.fim(sc,{sombra:true});for(const m of ms){m.userData.papelKeepGeo=true;m.userData.al517=true;m.userData.cp536=true;}
+  try{const sp=rkSprite(sc,cor||0x80c0ff,2.0,.4,x,y+2.0,z);sp.userData.noCam=true;const sp2=rkSprite(sc,0xffffff,.8,.5,x,y+2.0,z);sp2.userData.noCam=true;}catch(e){}
+  try{al521Placa(sc,nome,x,y+4.6,z,ry,'#1f3320','#e8f0c0',pedra);}catch(e){}return ms;}
+/* o campo por portal */
+function rv536Campo(R,key){try{if(!CP536.on||!RV530.on||RV530.campos[key]||!R||!R.scene||!R.world)return;const def=rv530Def(key);if(!def||!def.portal)return;if(typeof al521Mundo!=='function'||!AL521||AL521.feitas[key+' campo'])return;
+    RV530.campos[key]={pendente:true};const lugar=rv536Lugar(R,key);if(!lugar){delete RV530.campos[key];cp536Erro('lugar '+key,'sem zona livre');return;}
+    const pt=rv536PortalLugar(R,key);if(!pt){delete RV530.campos[key];cp536Erro('portal '+key,'sem ponto livre na sala');return;}
+    const T=lugar.T;const PL={zA:-1.4,zB:1.4,h:4.0,c:0,livre:true};const cfg=rv530Cfg(key,PL);if(!cfg||!cfg.rects||!cfg.rects[0]){delete RV530.campos[key];return;}
+    const q0={x0:cfg.rects[0].x0,x1:cfg.rects[0].x1,z0:cfg.rects[0].z0,z1:cfg.rects[0].z1,h:cfg.rects[0].h};const Z=cfg.rv532;Z.T=T;Z.q0=q0;
+    // o retângulo passado à al521 é o do mundo (rodado); o decor corre em coordenadas locais
+    const BW=cp536Caixa(T,q0.x0,q0.x1,q0.z0,q0.z1);const q=cfg.rects[0];q.x0=BW.x0;q.x1=BW.x1;q.z0=BW.z0;q.z1=BW.z1;cfg.portal=true;cfg.qa528=true;cfg.sala=key+' campo';cfg.entrada={zA:-1.4,zB:1.4,h:4,c:0,livre:true};
+    const d0=q.decor;q.decor=function(c,qq,cx,cz){const c0=c;const K=c0.K;const sc=c0.sc;const rk0=rkSprite;const f0=R.floorY;
+      const cw=Object.assign({},c0,{ob:(x,z,r)=>{const p=T.w(x,z);return c0.ob(p[0],p[1],r);},luz:(cor,i0,x,y,z,d,halo)=>{const p=T.w(x,z);return c0.luz(cor,i0,p[0],y,p[1],d,halo);},placa:(t,x,y,z,ry,bg,fg)=>{const p=T.w(x,z);return c0.placa(t,p[0],y,p[1],(ry||0)+T.ry,bg,fg);}});
+      rkSprite=function(s,cor,e,o,x,y,z){const p=T.w(x,z);return rk0(s,cor,e,o,p[0],y,p[1]);};K.push(T.tx,0,T.tz,T.ry);let rv;
+      try{rv=d0.call(this,cw,q0,(q0.x0+q0.x1)/2,(q0.z0+q0.z1)/2);}catch(e){cp536Erro('decor '+key,e);}
+      // o disco de regresso, dentro do arco do portão
+      try{const disco=new THREE.MeshBasicMaterial({color:0x80c0ff,transparent:true,opacity:.55,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending});disco.userData.papelKeep=true;K.add(new THREE.CircleGeometry(1.5,28),disco,q0.x0+1.9,2.3,0,Math.PI/2,0,0);rkSprite(sc,0x80c0ff,1.8,.35,q0.x0+1.9,2.3,0);rkSprite(sc,0xffffff,.7,.5,q0.x0+1.9,2.3,0);}catch(e){cp536Erro('disco',e);}
+      K.pop();rkSprite=rk0;
+      // o terreno, o sol e o floorY passam para o mundo
+      try{const m=sc.getObjectByName('532 terreno '+key);if(m){m.position.set(T.tx,0,T.tz);m.rotation.y=T.ry;m.updateMatrixWorld(true);}}catch(e){cp536Erro('terreno',e);}
+      try{const sol=Z.sol;if(sol){const p=T.w(sol.position.x,sol.position.z);sol.position.set(p[0],sol.position.y,p[1]);const t=T.w(sol.target.position.x,sol.target.position.z);sol.target.position.set(t[0],0,t[1]);}}catch(e){}
+      try{const f1=R.floorY;R.floorY=function(x,z){const l=T.l(x,z);if(l[0]>q0.x0+.3&&l[0]<q0.x1-.3&&l[1]>q0.z0+.3&&l[1]<q0.z1-.3){try{return f1.call(this,l[0],l[1]);}catch(e){}}try{return f0?f0.call(this,x,z):0;}catch(e){return 0;}};}catch(e){cp536Erro('floorY',e);}
+      return rv;};
+    const nL=AL521.luzes.length;al521Mundo(R,cfg);
+    try{for(let i=AL521.luzes.length-1;i>=nL;i--){const l=AL521.luzes[i];if(l.L.parent===R.scene&&l.L.distance===1&&l.i0===1.0){l.L.parent.remove(l.L);l.i0=0;}}}catch(e){}
+    const mur=cp536Caixa(T,Z.mur.x0,Z.mur.x1,Z.mur.z0,Z.mur.z1);const sp=T.w(Z.ax+7,Z.az-2);const box=BW;const entrada=T.w(q0.x0+8,0);const volta=T.w(q0.x0+1.9,0);
+    // o portal da sala
+    let portal=null;try{rv536Portal(R.scene,pt.x,pt.y,pt.z,pt.ry,text428('Campo dos Rivais','Field of Rivals','Campo de los Rivales'),0x80c0ff);const fx=-Math.sin(pt.ry),fz=-Math.cos(pt.ry);portal={x:pt.x,z:pt.z,ry:pt.ry,fora:[pt.x+fx*2.2,pt.z+fz*2.2]};}catch(e){cp536Erro('portal '+key,e);}
+    RV530.campos[key]={P:PL,cfg,ax:sp[0]-7,az:sp[1]+2,spawn:sp,mur,box,h:Z.h,T,portal,entrada,volta,yawCampo:Math.atan2(-Math.cos(T.ry),Math.sin(T.ry)),lado:1};RV530.stats.campos++;
+    CP536.stats[key]=Object.assign(CP536.stats[key]||{},{portal:[+pt.x.toFixed(1),+pt.z.toFixed(1)],box:[+box.x0.toFixed(0),+box.x1.toFixed(0),+box.z0.toFixed(0),+box.z1.toFixed(0)]});}catch(e){cp536Erro('campo '+key,e);try{delete RV530.campos[key];}catch(x){}}}
+function rv536Teleporta(x,z,yaw){try{if(typeof MODE!=='undefined'&&MODE==='fp'&&typeof P!=='undefined'){P.x=x;P.z=z;if(yaw!==undefined)P.yaw=yaw-Math.PI;}CH.x=x;CH.z=z;CH.px=x;CH.pz=z;CH.vx=0;CH.vz=0;CH.target=null;try{if(typeof CAM!=='undefined'&&yaw!==undefined)CAM.yaw=yaw;}catch(e){}try{CH.fy=floorAt(x,z)||0;}catch(e){}try{syncP();}catch(e){}}catch(e){cp536Erro('teleporta',e);}}
+function rv536Tick(dt){try{if(!CP536.on||CUR!=='room'||!ROOM)return;CP536.tele=Math.max(0,(CP536.tele||0)-dt);if(CP536.tele>0)return;const key=Object.keys(ROOMS).find(k=>ROOMS[k]===ROOM);const C=key&&RV530.campos[key];if(!C||!C.portal||uiBlocked()||CH.sitting)return;
+    const pl=cavPos();const pr=C.portal;
+    if(Math.hypot(pl.x-pr.x,pl.z-pr.z)<1.05){CP536.tele=2.0;rv536Teleporta(C.entrada[0],C.entrada[1],C.yawCampo);try{if(!CP536.avisou){CP536.avisou=true;showToast('🌀 '+co523T('O portal leva ao Campo dos Rivais — o disco do portão traz de volta.','The portal leads to the Field of Rivals — the gate\'s disc brings you back.','El portal lleva al Campo de los Rivales — el disco del portón te trae de vuelta.'),{ms:5000});}if(window.__mus199)window.__mus199.sfx('conquista');}catch(e){}return;}
+    if(Math.hypot(pl.x-C.volta[0],pl.z-C.volta[1])<1.05){CP536.tele=2.0;rv536Teleporta(pr.fora[0],pr.fora[1],pr.ry);try{if(window.__mus199)window.__mus199.sfx('conquista');}catch(e){}}}catch(e){cp536Erro('tick',e);}}
+if(CP536.on&&typeof RV530!=='undefined'&&RV530.on&&typeof RV532!=='undefined'&&typeof rv530Cfg==='function'){
+  try{for(const d of CP536.lista){if(!RV530.lista.some(x=>x.sala===d.sala))RV530.lista.push(Object.assign({du535:true},d));}
+    const mit=RV530.lista.find(x=>x.sala==='mitologia');if(mit&&mit.comp==='drg_serpente')mit.comp='dragaobolso';
+    for(const k in CP536.salas)RV532.salas[k]=CP536.salas[k];for(const k in CP536.comp)if(!RV532.comp[k])RV532.comp[k]=CP536.comp[k];
+    if(typeof RV532_TRAJES!=='undefined')for(const k in CP536.trajes)RV532_TRAJES[k]=CP536.trajes[k];
+    if(typeof DU535!=='undefined'){for(const k in CP536.esp)DU535.esp[k]=CP536.esp[k];for(const k in CP536.tons)DU535.tons[k]=CP536.tons[k];}}catch(e){cp536Erro('fichas',e);}
+  try{const fin0=finishRoom;finishRoom=function(key){const r=fin0.apply(this,arguments);try{const d=rv530Def(key);if(d&&d.portal)setTimeout(()=>{try{rv536Campo(ROOMS[key],key);}catch(e){cp536Erro('finish '+key,e);}},200);}catch(e){}return r;};}catch(e){cp536Erro('finish',e);}
+  try{for(const d of CP536.lista){const R=ROOMS[d.sala];if(R&&R.ready)rv536Campo(R,d.sala);}}catch(e){}
+  try{const tk0=tick;tick=function(dt){const r=tk0.apply(this,arguments);try{rv536Tick(Math.min(.05,dt||.016));}catch(e){}return r;};}catch(e){cp536Erro('tick instalar',e);}
+}
+window.__campos536={estado:CP536,erros:CP536.erros,stats:CP536.stats,campo:rv536Campo,lugar:rv536Lugar,portalLugar:rv536PortalLugar,teleporta:rv536Teleporta};
+try{if(typeof NOVIDADES198!=='undefined')NOVIDADES198.v536=co523T('🌀 Campos dos Rivais em todos os andares: no 1.º, 3.º e 5.º um portal de pedra com disco de luz, posto num canto livre de cada sala, leva a um campo de duelo próprio — 15 rivais novos com companheiros, trajes e poderes','🌀 Fields of Rivals on every floor: on floors 1, 3 and 5 a stone portal with a disc of light, placed in a free corner of each room, leads to its own duel field — 15 new rivals with companions, outfits and powers','🌀 Campos de los Rivales en todos los pisos: en el 1.º, 3.º y 5.º un portal de piedra con un disco de luz, en un rincón libre de cada sala, lleva a un campo de duelo propio — 15 rivales nuevos');}catch(e){}
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
