@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v547</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v548</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -63794,7 +63794,7 @@ function rv532Traje(rig,def){const tr=RV532_TRAJES[def.sala];if(!tr||!rig)return
 function rv532Companheiro(def){const T=THREE;const g=new T.Group();const it=LOJA_BY[def.comp];let m=null;try{m=(it&&it.slot==='bicho')?buildBicho(def.comp):buildPet(def.comp);}catch(e){rv532Erro('companheiro '+def.comp,e);}
   if(!m){m=new T.Mesh(new T.SphereGeometry(.3,10,8),t160Std('530 comp',0xc0c0ff,.6));}
   try{const luzes=[];m.traverse(o=>{if(o.isLight)luzes.push(o);});for(const L of luzes)if(L.parent)L.parent.remove(L);}catch(e){}
-  const P=RV532.comp[def.comp]||{estilo:(it&&it.slot==='bicho')?'corre':'voa',cor:0x80c0ff};const esc=P.estilo==='corre'?2.6:2.8;m.scale.setScalar(esc);m.position.set(0,0,0);g.add(m);g.name='Rival · companheiro '+def.comp;
+  const P=RV532.comp[def.comp]||{estilo:(it&&it.slot==='bicho')?'corre':'voa',cor:0x80c0ff};const esc=P.estilo==='corre'?2.6:(window.RV548E?RV548E.voa:2.8);m.scale.setScalar(esc);m.position.set(0,0,0);g.add(m);g.name='Rival · companheiro '+def.comp;
   try{const aura=rkSprite(g,P.cor,1.6,.35,0,P.estilo==='corre'?.5:0,0);aura.userData.noCam=true;g.userData.aura=aura;const anel=new T.Mesh(new T.RingGeometry(.55,.75,24),new T.MeshBasicMaterial({color:P.cor,transparent:true,opacity:.55,side:T.DoubleSide,depthWrite:false}));anel.rotation.x=-Math.PI/2;anel.position.y=P.estilo==='corre'?.04:-.02;anel.material.userData.papelKeep=true;g.add(anel);g.userData.anel=anel;}catch(e){}
   g.userData.olhos=[];g.userData.mand={rotation:{x:0}};rv530Barra(g,P.estilo==='corre'?1.9:1.3);g.traverse(o=>{if(o.isMesh)o.raycast=()=>{};});g.userData.comp530={modelo:m,voa:P.estilo!=='voa'?false:true,t:0,estilo:P.estilo,P};return g;}
 /* ---------- projéteis: penas, orbes, páginas e fogo ---------- */
@@ -63867,7 +63867,7 @@ function rv532Tick(dt){try{if(!RV530.on||CUR!=='room'||!ROOM)return;const key=Ob
       k2.x+=k2.knock.x*dt;k2.z+=k2.knock.z*dt;k2.knock.x*=Math.exp(-6*dt);k2.knock.z*=Math.exp(-6*dt);if(!(C&&C.box)&&k2.x<20.9)k2.x=20.9;if(mur){k2.x=Math.max(mur.x0+2.2,Math.min(mur.x1-2.2,k2.x));k2.z=Math.max(mur.z0+2.2,Math.min(mur.z1-2.2,k2.z));}const c2=W.clamp(k2.x,k2.z,.5);k2.x=Array.isArray(c2)?c2[0]:c2.x;k2.z=Array.isArray(c2)?c2[1]:c2.z;
       k2.bob+=dt;const inv=k2.fase==='investida';const h2=corre?(inv?Math.abs(Math.sin(k2.bob*14))*.25:Math.abs(Math.sin(k2.bob*5))*.08):((k.viva&&k.ativo?Math.max(1.4,(k.alt||0)+.6):1.5)+.25*Math.sin(k2.bob*3));k2.g.position.set(k2.x,fy(k2.x,k2.z)+h2,k2.z);
       const face=(k2.fase==='volta'||!k.ativo)?(k.viva?[k.x-k2.x,k.z-k2.z]:[px-k2.x,pz-k2.z]):[px-k2.x,pz-k2.z];k2.g.rotation.y=Math.atan2(face[0],face[1]);if(k2.ferida>0)k2.ferida-=dt;
-      try{const m=Cc.modelo;const esc=(Cc.P&&Cc.P.estilo==='corre')?2.6:2.8;const pulso=k2.fase==='rosna'?1+.25*Math.sin(k2.faseT*30):1;m.scale.setScalar(esc*pulso);m.rotation.z=corre?0:Math.sin(k2.bob*3)*.12;m.rotation.x=inv?.25:0;
+      try{const m=Cc.modelo;const esc=(Cc.P&&Cc.P.estilo==='corre')?2.6:(window.RV548E?RV548E.voa:2.8);const pulso=k2.fase==='rosna'?1+.25*Math.sin(k2.faseT*30):1;m.scale.setScalar(esc*pulso);m.rotation.z=corre?0:Math.sin(k2.bob*3)*.12;m.rotation.x=inv?.25:0;
         const cu=m.userData.coruja;if(cu&&cu.asas)for(const A of cu.asas)A.piv.rotation.z=A.sx*(.3+.55*Math.sin(k2.bob*15));if(k2.g.userData.aura)k2.g.userData.aura.material.opacity=.25+.15*Math.sin(k2.bob*4)+(k2.fase==='rosna'?.3:0);if(k2.g.userData.anel)k2.g.userData.anel.rotation.z+=dt*1.5;}catch(e){}}}catch(e){rv532Erro('tick',e);}}
 /* ---------- instalação ---------- */
 if(RV532.on&&typeof RV530!=='undefined'&&RV530.on&&typeof rv530Cfg==='function'){
@@ -65057,6 +65057,91 @@ if(HW547.on){
   try{const tk0=tick;tick=function(dt){const rv=tk0.apply(this,arguments);try{hw547Tick(Math.min(.1,dt||.016));}catch(e){hw547Erro('tick',e);}return rv;};}catch(e){hw547Erro('instalar',e);}
 }
 window.__halloween547={estado:HW547,erros:HW547.erros,stats:HW547.stats,aplica:hw547Aplica};
+
+/* ===================== v548 · COMPANHEIROS DOS RIVAIS MAIORES E O CARD DO COMPANHEIRO NOVO (bloco `RV548`) =====================
+   Pedidos do Luiz: «os companions voando ficam tão pequenos que nem dá pra ver. Aumente o tamanho deles e dos inimigos voadores também» ·
+   «estou falando dos companions dos rivais» · «Quando vc matar o inimigo, aparece na tela um card do seu companion novo e a opção já
+   ativada de habilitar».
+   · TAMANHO: os companheiros que voam ao lado dos rivais passam de 2,8× para 5× o modelo da loja (a coruja tinha 64 cm; agora 1,15 m),
+     com a aura, o anel e a barra de vida acompanhando (TROCAS no `rv532Companheiro` e no `rv532Tick`, que refazia a escala a cada
+     quadro). Os de chão (cachorro, raposa, coelho, capivara) ficam como estavam. Os RIVAIS alados (o leitor de asas longas) ficam
+     1,35× maiores — corpo, asas e a barra por cima. A vida, o dano e o alcance dos golpes não mudam.
+   · O CARD: ao vencer um rival pela 1.ª vez, em vez do aviso «… o companheiro dele agora é seu», aparece no meio da tela um card com o
+     companheiro a girar (pré-visualização 3D própria, desfeita ao fechar), o nome, de quem foi ganho, a descrição e o interruptor
+     «Usar este companheiro» JÁ LIGADO — o companheiro entra logo na vaga dele (voador ou de chão). Desligar devolve o companheiro que
+     estava antes. «Continuar» (ou Enter/Esc) fecha; fecha sozinho em 15 s. O rato é solto para poder clicar.
+   `?rivais548=0` desliga. Gancho `window.__rivais548`. */
+window.RV548E={voa:5.0,corre:2.6};
+const RV548={on:!/[?&#]rivais548=0/i.test(location.search+location.hash),erros:[],stats:{rivais:0,comps:0,cards:0},rival:1.35,calar:false,card:null};
+if(!RV548.on)window.RV548E={voa:2.8,corre:2.6};
+function rv548Erro(k,e){if(RV548.erros.length<20)RV548.erros.push(k+': '+(e&&e.message||e));try{console.warn('v548',k,e);}catch(x){}}
+/* ---------- tamanho: rivais e companheiros voadores ---------- */
+if(RV548.on){
+  try{const r0=rv530Rival;rv530Rival=function(def){const g=r0.apply(this,arguments);try{const D=g&&g.userData.rival530,F=RV548.rival;
+      if(D){if(D.rig&&D.rig.g)D.rig.g.scale.multiplyScalar(F);if(D.asas){D.asas.scale.multiplyScalar(F);D.asas.position.multiplyScalar(F);}}
+      const b=g.userData.barra;if(b&&b.sp)b.sp.position.y*=F;RV548.stats.rivais++;}catch(e){rv548Erro('rival',e);}return g;};}catch(e){rv548Erro('rv530Rival',e);}
+  try{const c0=rv530Companheiro;rv530Companheiro=function(def){const g=c0.apply(this,arguments);try{const C=g&&g.userData.comp530;if(C&&C.voa){const k=RV548E.voa/2.8;
+        if(g.userData.aura)g.userData.aura.scale.multiplyScalar(k*.9);if(g.userData.anel)g.userData.anel.scale.multiplyScalar(k*.85);
+        const b=g.userData.barra;if(b&&b.sp){b.sp.position.y=2.25;b.sp.scale.multiplyScalar(1.25);}RV548.stats.comps++;}}catch(e){rv548Erro('comp',e);}return g;};}catch(e){rv548Erro('rv530Companheiro',e);}
+}
+/* ---------- o card do companheiro novo ---------- */
+function rv548Css(){if(document.getElementById('rv548css'))return;const st=document.createElement('style');st.id='rv548css';st.textContent=
+  '#rv548{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.92);opacity:0;z-index:70;width:min(360px,92vw);padding:18px 20px 16px;border-radius:16px;'+
+  'background:radial-gradient(120% 80% at 50% 0%,#3a2340 0%,#1c1222 55%,#120b16 100%);border:1px solid #c9a24a;box-shadow:0 18px 60px rgba(0,0,0,.65),0 0 0 4px rgba(201,162,74,.12) inset;'+
+  'color:#f3e6c8;font:14px/1.4 Georgia,"Times New Roman",serif;text-align:center;transition:opacity .35s ease,transform .45s cubic-bezier(.2,1.4,.4,1)}'+
+  '#rv548.on{opacity:1;transform:translate(-50%,-50%) scale(1)}'+
+  '#rv548 .sup{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:#e8c46a}'+
+  '#rv548 .prev{position:relative;width:200px;height:200px;margin:8px auto 4px;border-radius:50%;background:radial-gradient(circle at 50% 55%,rgba(255,214,120,.28),rgba(120,80,200,.12) 55%,transparent 70%)}'+
+  '#rv548 .prev canvas{width:200px;height:200px;display:block}'+
+  '#rv548 h3{margin:4px 0 2px;font:600 24px/1.15 Georgia,serif;color:#ffe3a0;letter-spacing:.02em}'+
+  '#rv548 .de{font-style:italic;font-size:13px;color:#cdb8e8;margin-bottom:6px}'+
+  '#rv548 .desc{font-size:13px;color:#e9dcc0;opacity:.9;margin:0 4px 12px}'+
+  '#rv548 label.sw{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(201,162,74,.35);cursor:pointer;text-align:left}'+
+  '#rv548 label.sw input{position:absolute;opacity:0;pointer-events:none}'+
+  '#rv548 .tg{flex:none;width:46px;height:26px;border-radius:13px;background:#4a3a52;position:relative;transition:background .2s}'+
+  '#rv548 .tg::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#f3e6c8;transition:left .2s}'+
+  '#rv548 input:checked+.tg{background:#4caf6a}#rv548 input:checked+.tg::after{left:23px}'+
+  '#rv548 .ok{margin-top:12px;padding:9px 22px;border-radius:999px;border:1px solid #c9a24a;background:linear-gradient(#5a3a1c,#3a2410);color:#ffe3a0;font:600 14px Georgia,serif;cursor:pointer}'+
+  '#rv548 .barra{height:3px;margin-top:12px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden}#rv548 .barra i{display:block;height:100%;width:100%;background:#c9a24a;transform-origin:left;}';
+  document.head.appendChild(st);}
+function rv548Preview(cv,id,slot){const T=THREE;let ren=null,raf=0,vivo=true;
+  try{ren=new T.WebGLRenderer({canvas:cv,alpha:true,antialias:true});ren.setPixelRatio(Math.min(2,window.devicePixelRatio||1));ren.setSize(200,200,false);try{ren.outputEncoding=T.sRGBEncoding;}catch(e){}
+    const sc=new T.Scene();sc.add(new T.HemisphereLight(0xfff4e0,0x2a1a3a,1.15));const sol=new T.DirectionalLight(0xffffff,.9);sol.position.set(2,3,4);sc.add(sol);
+    let m=null;try{m=(slot==='bicho')?buildBicho(id):buildPet(id);}catch(e){rv548Erro('modelo',e);}if(!m)m=new T.Mesh(new T.SphereGeometry(.3,16,12),new T.MeshStandardMaterial({color:0xc0c0ff}));
+    const piv=new T.Group();sc.add(piv);piv.add(m);m.updateMatrixWorld(true);const bb=new T.Box3().setFromObject(m);const c=bb.getCenter(new T.Vector3()),sz=bb.getSize(new T.Vector3());const r=Math.max(.05,Math.max(sz.x,sz.y,sz.z));
+    m.position.sub(c);piv.scale.setScalar(1.6/r);const cam=new T.PerspectiveCamera(32,1,.05,50);cam.position.set(0,.55,4.2);cam.lookAt(0,0,0);
+    const t0=performance.now();const loop=()=>{if(!vivo)return;const t=(performance.now()-t0)/1000;piv.rotation.y=t*.9;piv.position.y=Math.sin(t*2.2)*.06;try{ren.render(sc,cam);}catch(e){}raf=requestAnimationFrame(loop);};loop();}
+  catch(e){rv548Erro('pré-visualização',e);}
+  return ()=>{vivo=false;cancelAnimationFrame(raf);try{if(ren){ren.dispose();ren.forceContextLoss();}}catch(e){}};}
+function rv548Fecha(){const C=RV548.card;if(!C)return;RV548.card=null;clearTimeout(C.timer);try{C.para();}catch(e){}try{document.removeEventListener('keydown',C.tecla,true);}catch(e){}
+  C.el.classList.remove('on');setTimeout(()=>{try{C.el.remove();}catch(e){}},400);}
+function rv548Usa(it,on,ant){try{if(on){setEquip(it,true);}else{if(ant&&ant!==it.id&&LOJA_BY[ant]&&lojaOwned(LOJA_BY[ant]))LOJA.equip[it.slot]=ant;else setEquip(it,false);}
+    lojaSave();applyGear();try{if(typeof lojaOpen!=='undefined'&&lojaOpen)renderShop();}catch(e){}}catch(e){rv548Erro('usar',e);}}
+function rv548Card(def){try{const it=LOJA_BY[def.comp];if(!it)return;rv548Css();if(RV548.card)rv548Fecha();
+    const ant=LOJA.equip[it.slot];rv548Usa(it,true,ant);
+    const voa=it.slot!=='bicho';const el=document.createElement('div');el.id='rv548';el.setAttribute('role','dialog');el.setAttribute('aria-label',text428('Companheiro novo','New companion','Compañero nuevo'));
+    const esc=x=>String(x==null?'':x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    el.innerHTML='<div class="sup">🏆 '+esc(text428('Companheiro novo','New companion','Compañero nuevo'))+'</div><div class="prev"><canvas width="200" height="200"></canvas></div>'+
+      '<h3>'+esc(it.nome)+'</h3><div class="de">'+esc(text428('ganho de ','won from ','ganado de ')+def.nome)+'</div>'+(it.desc?'<div class="desc">'+esc(it.desc)+'</div>':'')+
+      '<label class="sw"><span>'+esc(voa?text428('Usar este companheiro (voador)','Use this companion (flying)','Usar este compañero (volador)'):text428('Usar este companheiro (de chão)','Use this companion (ground)','Usar este compañero (de suelo)'))+'</span><input type="checkbox" checked><span class="tg"></span></label>'+
+      '<button type="button" class="ok">'+esc(text428('Continuar','Continue','Continuar'))+'</button><div class="barra"><i></i></div>';
+    document.body.appendChild(el);try{unlock();}catch(e){}
+    const para=rv548Preview(el.querySelector('canvas'),it.id,it.slot);
+    const chk=el.querySelector('input');chk.addEventListener('change',()=>{rv548Usa(it,chk.checked,ant);});
+    el.querySelector('.ok').addEventListener('click',e=>{e.stopPropagation();rv548Fecha();});
+    el.addEventListener('pointerdown',e=>e.stopPropagation());el.addEventListener('click',e=>e.stopPropagation());
+    const tecla=e=>{if(e.key==='Escape'||e.key==='Enter'){e.preventDefault();e.stopPropagation();rv548Fecha();}};document.addEventListener('keydown',tecla,true);
+    const ms=15000;const bar=el.querySelector('.barra i');bar.style.transition='transform '+ms+'ms linear';
+    requestAnimationFrame(()=>{el.classList.add('on');requestAnimationFrame(()=>{bar.style.transform='scaleX(0)';});});
+    RV548.card={el,para,tecla,timer:setTimeout(rv548Fecha,ms+300),id:it.id};RV548.stats.cards++;
+    try{if(window.__mus199)window.__mus199.sfx('conquista');}catch(e){}}catch(e){rv548Erro('card',e);}}
+if(RV548.on){
+  // o prémio: na 1.ª vitória o aviso grande dá lugar ao card
+  try{const p0=rv530Premio;rv530Premio=function(k){const def=k&&k.def;let novo=false;try{novo=!!(def&&!RV530.estado.premios[def.comp]);}catch(e){}
+      RV548.calar=novo;let r;try{r=p0.apply(this,arguments);}finally{RV548.calar=false;}if(novo)setTimeout(()=>rv548Card(def),650);return r;};}catch(e){rv548Erro('rv530Premio',e);}
+  try{const st0=showToast;showToast=function(msg,opt){if(RV548.calar&&typeof msg==='string'&&msg.indexOf('🏆')===0){try{logAdd(msg,true);}catch(e){}return;}return st0.apply(this,arguments);};}catch(e){rv548Erro('showToast',e);}
+}
+window.__rivais548={estado:RV548,erros:RV548.erros,stats:RV548.stats,card:rv548Card,fecha:rv548Fecha};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
