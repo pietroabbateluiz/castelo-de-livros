@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v534</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v535</title><meta name="robots" content="noindex,nofollow"><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -57160,7 +57160,7 @@ function d450Prepara(room){const f=d450Andar(room),D=D450[f],S=CAV.salas[room];i
 function d450Pool(S){try{const tipo=((INI155[S.tipo]||INI155.caveira).proj)||'osso';if(DIF450.pool[tipo])return;const P=projPool155(tipo);if(!P||!P.arr||!P.arr.length)return;
   const base=P.arr[0];while(P.arr.length<44){const c=base.clone(true);c.traverse(o=>{o.raycast=()=>{};});P.arr.push(c);}DIF450.pool[tipo]=true;}catch(e){d450Erro('piscina',e);}}
 function d450Aviso(f){if(DIF450.avisos[f])return;DIF450.avisos[f]=true;const D=D450[f];if(!D)return;
-  const txt=f===5?d450T('⚠ 5º andar · difícil — os inimigos acordam depressa, atiram mais rápido e de mais longe, e no meio da luta não há descanso: a vida só volta sozinha com a sala limpa ou longe deles.','⚠ Floor 5 · hard — enemies wake fast, shoot faster and from farther away, and there is no rest mid-fight: health only comes back on its own once the room is clear or you are far from them.','⚠ Piso 5 · difícil — los enemigos despiertan rápido, disparan más rápido y desde más lejos, y en plena lucha no hay descanso: la vida solo vuelve sola con la sala limpia o lejos de ellos.')
+  const txt=f===1?d450T('⚠ 1º andar · aquecimento — os guardiões já não caem com um só golpe: têm mais vida e miram onde você corre.','⚠ Floor 1 · warm-up — the guardians no longer fall in one hit: they have more health and aim where you run.','⚠ Piso 1 · calentamiento — los guardianes ya no caen de un golpe: tienen más vida y apuntan adonde corres.'):f===2?d450T('⚠ 2º andar · médio — inimigos mais resistentes e rápidos, chefes mais fortes, e no meio da luta a vida não volta sozinha.','⚠ Floor 2 · medium — tougher, faster enemies, stronger bosses, and no health regen mid-fight.','⚠ Piso 2 · medio — enemigos más resistentes y rápidos, jefes más fuertes, y en plena lucha la vida no vuelve sola.'):f===5?d450T('⚠ 5º andar · difícil — os inimigos acordam depressa, atiram mais rápido e de mais longe, e no meio da luta não há descanso: a vida só volta sozinha com a sala limpa ou longe deles.','⚠ Floor 5 · hard — enemies wake fast, shoot faster and from farther away, and there is no rest mid-fight: health only comes back on its own once the room is clear or you are far from them.','⚠ Piso 5 · difícil — los enemigos despiertan rápido, disparan más rápido y desde más lejos, y en plena lucha no hay descanso: la vida solo vuelve sola con la sala limpia o lejos de ellos.')
     :f===6?d450T('⚠ 6º andar · muito difícil — rajadas duplas, inimigos blindados e mais rápidos, chefes apressados e nenhum descanso no meio da luta.','⚠ Floor 6 · very hard — double volleys, armored and faster enemies, hastier bosses and no rest mid-fight.','⚠ Piso 6 · muy difícil — ráfagas dobles, enemigos blindados y más rápidos, jefes acelerados y ningún descanso en plena lucha.')
     :d450T('☠ 7º andar · brutal — mais inimigos, rajadas triplas em leque, tiros mais rápidos e certeiros, inimigos blindados, chefes muito mais rápidos e nenhum descanso no meio da luta.','☠ Floor 7 · brutal — more enemies, triple spread volleys, faster and deadlier shots, armored enemies, much faster bosses and no rest mid-fight.','☠ Piso 7 · brutal — más enemigos, ráfagas triples en abanico, disparos más rápidos y certeros, enemigos blindados, jefes mucho más rápidos y ningún descanso en plena lucha.');
   try{showToast(txt,{big:true,ms:9000,queue:true});}catch(e){}}
@@ -57184,7 +57184,7 @@ function d450EmLuta(){const room=d450Sala(),S=room&&CAV.salas[room];if(!S)return
 {const dn=cavDano;cavDano=function(){const h0=CAV.hp,r=dn.apply(this,arguments);try{if(CAV.hp<h0)d450Conta('golpes');}catch(e){}return r;};if(window.__cav)window.__cav.dano=cavDano;}
 {const tk=caveirasTick;caveirasTick=function(dt){const D=d450Regra();if(!D)return tk.apply(this,arguments);
   const sv=[CAV.recarga,CAV.alcance,CAV.sono];CAV.recarga=D.recarga;CAV.alcance=D.alcance;CAV.sono=D.sono;
-  try{if(d450EmLuta())CAV.ultimoDano=t;}catch(e){d450Erro('luta',e);}
+  try{if(!D.descanso&&d450EmLuta())CAV.ultimoDano=t;}catch(e){d450Erro('luta',e);}
   try{return tk.apply(this,arguments);}finally{CAV.recarga=sv[0];CAV.alcance=sv[1];CAV.sono=sv[2];}};}
 // chefes apressados nesses andares
 {const at=ally428Tick;ally428Tick=function(dt){const D=d450Regra();return at.call(this,D?dt*D.chefe:dt);};
@@ -60526,7 +60526,7 @@ const AG505={on:!/[?&#]agua505=0/i.test(location.search+location.hash),golpe:!/[
 function ag505Erro(o,e){if(AG505.erros.length<12)AG505.erros.push(o+': '+(e&&e.message||e));console.warn('v505',o,e);}
 function ag505Andar(){try{if(CUR==='hall')return +HALLN||1;if(CUR==='room'){if(CUR_GENRE==='minha'||CUR_GENRE==='pessoal')return 1;return GENRE_FLOOR(CUR_GENRE)||1;}}catch(e){}return 1;}
 /* ---------- um golpe ---------- */
-if(AG505.golpe){try{const cf=cavFerir;cavFerir=function(k,n){try{if(k&&k.viva&&Number.isFinite(n)&&n>0&&ag505Andar()<=2){n=Math.max(n,(k.hp||0)+1);AG505.stats.golpes++;}}catch(e){}return cf.call(this,k,n);};}catch(e){ag505Erro('golpe',e);}}
+if(AG505.golpe){try{const cf=cavFerir;cavFerir=function(k,n){try{if(k&&k.viva&&Number.isFinite(n)&&n>0&&(CUR==='hall'&&ag505Andar()<=1)){n=Math.max(n,(k.hp||0)+1);AG505.stats.golpes++;}}catch(e){}return cf.call(this,k,n);};}catch(e){ag505Erro('golpe',e);}}
 /* ---------- o mar ---------- */
 const AG505_VS=`uniform float t;uniform vec3 ilha;uniform vec3 ilhaA,ilhaB;varying vec3 vP;varying vec3 vN;varying float vH;varying float vCalma;
   void main(){vec3 wp=(modelMatrix*vec4(position,1.)).xyz;vec2 p0=wp.xz-vec2(0.,t*2.8);vec3 d=vec3(0.);vec3 n=vec3(0.,1.,0.);
@@ -63753,7 +63753,7 @@ function rv532Cfg(sala,P){const def=rv530Def(sala);const S=RV532.salas[sala]||{c
         // o círculo de pedras (a arena, no planalto)
         for(let i=0;i<10;i++){if(i===0||i===5)continue;const a=i/10*6.283;const x=ax+Math.cos(a)*9,z=az+Math.sin(a)*9;rv532Pedra(K,M,x,h(x,z)-.1,z,.9+r()*.5,5380+i,i%3===0);c.ob(x,z,.95);}
         // árvores dentro da muralha e atrás dela; pedras; relva; flores
-        let na=0,nf=0,np=0;const dentro=(x,z)=>x>mur.x0+2.2&&x<mur.x1-2.2&&z>mur.z0+2.2&&z<mur.z1-2.2;const tiposA=S.ceu==='poente'?['carvalho','outono','outono','pinheiro','betula']:['carvalho','carvalho','pinheiro','betula','carvalho'];
+        let na=0,nf=0,np=0;const dentro=(x,z)=>x>mur.x0+2.2&&x<mur.x1-2.2&&z>mur.z0+2.2&&z<mur.z1-2.2;const tiposA=(S.ceu==='poente'||S.outono)?['carvalho','outono','outono','pinheiro','betula']:['carvalho','carvalho','pinheiro','betula','carvalho'];
         for(let k=0;k<110&&na<34;k++){const x=mur.x0+3.5+r()*(mur.x1-mur.x0-7),z=mur.z0+3+r()*(mur.z1-mur.z0-6);if(Math.hypot(x-ax,z-az)<12.5)continue;if(Math.abs(z-zc)<4.5&&x<q.x0+17)continue;if(S.cidade&&x>mur.x1-15&&Math.abs(z)<9.5)continue;if(pertoCam(x,z,3.4))continue; // vista livre da arena para a cidade
           rv532Arvore(K,M,x,h(x,z)-.15,z,tiposA[k%5],.8+r()*.5,5390+k);c.ob(x,z,.7);na++;}
         for(let k=0;k<40&&nf<22;k++){const lado=k%3;let x,z;if(lado===0&&S.cidade)continue;if(lado===0){x=mur.x1+2.5+r()*(q.x1-mur.x1-4);z=q.z0+3+r()*(q.z1-q.z0-6);}else{x=q.x0+4+r()*(q.x1-q.x0-8);z=lado===1?q.z0+2+r()*(mur.z0-q.z0-3.5):mur.z1+1.5+r()*(q.z1-mur.z1-3.5);}
@@ -63804,7 +63804,7 @@ function rv532Tiro(k,def,o){try{const R=ROOM;const T=THREE;const g=new T.Group()
     else if(forma==='fogo'){const m=new T.Mesh(new T.SphereGeometry(.13,8,6),t160Brilho('532 fogo',0xff9040,2.2));g.add(m);rkSprite(g,0xff8030,1.0,.8,0,0,0);rkSprite(g,0xffe080,.5,.9,0,0,0);}
     else{const m=new T.Mesh(new T.SphereGeometry(o.tam||.14,8,6),t160Brilho('532 orbe '+cor,cor,2.0));g.add(m);rkSprite(g,cor,.9,.75,0,0,0);}
     g.traverse(q=>{if(q.isMesh)q.raycast=()=>{};});const y0=(o.de&&o.de.y!==undefined)?o.de.y:k.g.position.y+(o.dy===undefined?1.1:o.dy);const x0=o.de?o.de.x:k.x,z0=o.de?o.de.z:k.z;g.position.set(x0,y0,z0);R.scene.add(g);
-    const pl=cavPos();const ty=pl.fy+1.0;const vel=o.vel||9;let dx=pl.x-x0,dz=pl.z-z0,d=Math.hypot(dx,dz);const Tt=Math.max(.3,d/vel);const lx=pl.x+(pl.vx||0)*Tt*.7,lz=pl.z+(pl.vz||0)*Tt*.7;dx=lx-x0;dz=lz-z0;d=Math.hypot(dx,dz)||.01;
+    const pl=o.alvo?Object.assign({},cavPos(),{x:o.alvo.x,z:o.alvo.z,vx:0,vz:0}):cavPos();const ty=pl.fy+1.0;const vel=o.vel||9;let dx=pl.x-x0,dz=pl.z-z0,d=Math.hypot(dx,dz);const Tt=Math.max(.3,d/vel);const lx=pl.x+(pl.vx||0)*Tt*.7,lz=pl.z+(pl.vz||0)*Tt*.7;dx=lx-x0;dz=lz-z0;d=Math.hypot(dx,dz)||.01;
     let ang=Math.atan2(dx,dz)+(o.desvio||0);const T2=Math.max(.3,d/vel);const vh=d/T2;const vx=Math.sin(ang)*vh,vz=Math.cos(ang)*vh;g.rotation.y=ang;
     const proj={g,x:x0,y:y0,z:z0,vx,vy:o.vy!==undefined?o.vy:(ty-y0)/T2,vz,t:0,vida:T2+(o.vidaExtra||.6),grav:o.grav||0,scene:R.scene,rv532:{guia:o.guia||0,vel:vh}};CAV.ossos.push(proj);return proj;}catch(e){rv532Erro('tiro',e);return null;}}
 function rv532Leque(k,def,n,abert,o){const o2=Object.assign({},o||{});for(let i=0;i<n;i++){o2.desvio=n===1?0:(i/(n-1)-.5)*abert;rv532Tiro(k,def,o2);}}
@@ -63818,7 +63818,7 @@ function rv532Tick(dt){try{if(!RV530.on||CUR!=='room'||!ROOM)return;const key=Ob
     const pl=cavPos();const px=pl.x,pz=pl.z;const noCampo=px>20.6;const C=RV530.campos[key];const mur=C&&C.mur;
     // o sol e a névoa do campo só valem lá fora: dentro da sala fica a luz e a névoa de sempre
     try{const Z=C&&C.cfg&&C.cfg.rv532;if(Z){const alvo=noCampo?1:0;Z.mix=(Z.mix||0)+(alvo-(Z.mix||0))*Math.min(1,dt*2.2);if(Z.sol)Z.sol.intensity=(Z.sol.userData.i0||0)*Z.mix;if(Z.amb&&Z.ambF!==1)for(const a of Z.amb)a.L.intensity=a.i0*(1-Z.mix)+a.i0*Z.ambF*Z.mix;
-      const F=R.scene.fog;if(F&&F.density!==undefined){if(!Z.fog0)Z.fog0={cor:F.color.clone(),d:F.density};const fc={dia:0xcfe3f3,poente:0xd8a070,noite:0x0a1430}[Z.tipo]||0xcfe3f3,fd={dia:.0025,poente:.005,noite:.008}[Z.tipo]||.0025;F.density=Z.fog0.d+(fd-Z.fog0.d)*Z.mix;F.color.copy(Z.fog0.cor).lerp(new THREE.Color(fc),Z.mix);}}}catch(e){}
+      const F=R.scene.fog;if(F&&F.density!==undefined){if(!Z.fog0)Z.fog0={cor:F.color.clone(),d:F.density};const fc={dia:0xcfe3f3,poente:0xd8a070,noite:0x0a1430}[Z.tipo]||0xcfe3f3,fd={dia:.0025,poente:.005,noite:.008}[Z.tipo]||.0025;F.density=(Z.fog0.d+(fd-Z.fog0.d)*Z.mix)*(Z.nevoa||1);F.color.copy(Z.fog0.cor).lerp(new THREE.Color(fc),Z.mix);}}}catch(e){}
     // projéteis guiados (a mariposa) — o resto anda pelo tick genérico
     for(const o of CAV.ossos){const q=o.rv532;if(!q||!q.guia)continue;const dx=px-o.x,dz=pz-o.z,L=Math.hypot(dx,dz)||1;const kk=Math.min(1,dt*q.guia);o.vx=o.vx*(1-kk)+dx/L*q.vel*kk;o.vz=o.vz*(1-kk)+dz/L*q.vel*kk;const vv=Math.hypot(o.vx,o.vz)||1;o.vx*=q.vel/vv;o.vz*=q.vel/vv;o.vy=((pl.fy+1.0)-o.y)*2;}
     if(k.viva){const D=k.g.userData.rival530;const dx=px-k.x,dz=pz-k.z,d=Math.hypot(dx,dz);
@@ -63835,7 +63835,8 @@ function rv532Tick(dt){try{if(!RV530.on||CUR!=='room'||!ROOM)return;const key=Ob
           if(k.chuvaN<=0&&k.faseT>1.6){k.fase='circula';k.faseT=0;k.ang=Math.atan2(k.z-pz,k.x-px);}}
         else if(k.fase==='circula'){altAlvo=3.0+.4*Math.sin(t*1.3);const raio=5.2;k.ang=(k.ang||Math.atan2(k.z-pz,k.x-px))+dt*(rapido?.75:.6)*(furia?1.3:1)*(k.sentido||1);const tx=px+Math.cos(k.ang)*raio,tz=pz+Math.sin(k.ang)*raio;const ddx=tx-k.x,ddz=tz-k.z,dd=Math.hypot(ddx,ddz);if(dd>.05){const v=Math.min(vAr*dt,dd);k.x+=ddx/dd*v;k.z+=ddz/dd*v;vel=vAr;}
           k.pena-=dt;if(k.pena<=0){k.pena=(furia?1.5:2.4);k.leque=!k.leque;if(k.leque)rv532Leque(k,def,furia?5:3,.7,{cor:def.asa,tam:.1,vel:9.5});else rv532Tiro(k,def,{cor:def.asa,tam:.1,vel:10});}
-          if(k.faseT>(rapido?3.2:4.2)*(furia?.75:1)){k.faseT=0;if(d<9&&Math.random()<.38){k.fase='vento';k.ventoT=0;}else k.fase='mergulha';}}
+          if(k.faseT>(rapido?3.2:4.2)*(furia?.75:1)){k.faseT=0;if(typeof rv535Escolhe==='function'&&rv535Escolhe(k,def,d)){}else if(d<9&&Math.random()<.38){k.fase='vento';k.ventoT=0;}else k.fase='mergulha';}}
+        else if(k.fase==='especial'){altAlvo=(k.esp&&k.esp.alt!==undefined)?k.esp.alt:3.0;let fim=true;try{fim=rv535Especial(k,def,dt,{R,fy,px,pz,pl,d,dx,dz,t});}catch(e){rv532Erro('especial',e);}if(fim){k.esp=null;k.fase='sobe';k.faseT=0;}}
         else if(k.fase==='vento'){altAlvo=1.8;k.ventoT=(k.ventoT||0)+dt;const ax0=px-k.x,az0=pz-k.z,ad=Math.hypot(ax0,az0)||1;
           if(k.ventoT>.35&&d<10){rv532Empurra(ax0/ad*dt*4.2,az0/ad*dt*4.2);if(Math.random()<dt*22){const u=Math.random();const sp=cavFaisca(R.scene,k.x+ax0*u+(Math.random()-.5)*1.2,k.g.position.y+.4+Math.random()*1.2-u*1.2,k.z+az0*u+(Math.random()-.5)*1.2,0xe8f0ff,.6,.45);}}
           if(k.ventoT>1.7){k.fase='mergulha';k.faseT=0;}}
@@ -63856,12 +63857,12 @@ function rv532Tick(dt){try{if(!RV530.on||CUR!=='room'||!ROOM)return;const key=Ob
       if(k.ativo&&!bloq){k2.tiro-=dt;
         if(corre){if(k2.fase==='rosna'){k2.faseT+=dt;velC=0;if(k2.faseT>.55){k2.fase='investida';k2.faseT=0;k2.alvoX=px+(pl.vx||0)*.3;k2.alvoZ=pz+(pl.vz||0)*.3;}}
           else if(k2.fase==='investida'){k2.faseT+=dt;const ddx=px-k2.x,ddz=pz-k2.z,dd=Math.hypot(ddx,ddz)||1;const v=P2.vel*dt;k2.x+=ddx/dd*Math.min(v,dd);k2.z+=ddz/dd*Math.min(v,dd);velC=0;if(Math.random()<dt*18)cavFaisca(R.scene,k2.x+(Math.random()-.5)*.6,fy(k2.x,k2.z)+.2,k2.z+(Math.random()-.5)*.6,0xd8c8a0,.5,.5);
-            if(dd<1.15){cavDano(Math.max(1,Math.round(def.dano*.6)));rv532Empurra(ddx/dd*1.6,ddz/dd*1.6);try{for(let i=0;i<8;i++)cavFaisca(R.scene,px+(Math.random()-.5)*.6,pl.fy+.8+(Math.random()-.5)*.6,pz+(Math.random()-.5)*.6,P2.cor,.4,.4);}catch(e){}k2.fase='volta';k2.faseT=0;k2.tiro=P2.cad;}
+            if(dd<1.15){if(typeof rv535Mordida==='function')rv535Mordida(k2,def,P2,ddx/dd,ddz/dd);else{cavDano(Math.max(1,Math.round(def.dano*.6)));rv532Empurra(ddx/dd*1.6,ddz/dd*1.6);}k2.fase='volta';k2.faseT=0;k2.tiro=P2.cad;}
             else if(k2.faseT>1.6){k2.fase='volta';k2.faseT=0;k2.tiro=P2.cad;}}
-          else if(k2.fase==='volta'){k2.faseT+=dt;velC=5;if(k2.faseT>1.2)k2.fase='orbita';}
-          else{if(k2.tiro<=0&&d2<13){k2.fase='rosna';k2.faseT=0;}}}
+          else if(k2.fase==='volta'){k2.faseT+=dt;velC=5;if(k2.faseT>1.2){if(P2.duplo&&!k2.bis){k2.bis=true;k2.fase='rosna';k2.faseT=.3;}else{k2.bis=false;k2.fase='orbita';}}}
+          else{if(k2.tiro<=0&&d2<13){k2.fase='rosna';k2.faseT=0;try{if(typeof rv535Latido==='function')rv535Latido(k2,def,P2);}catch(e){}}}}
         else{if(k2.rajadaN>0){k2.rajadaT-=dt;if(k2.rajadaT<=0){k2.rajadaT=P2.rajada||.14;k2.rajadaN--;rv532Tiro(k2,def,{cor:P2.cor,tam:.07,vel:P2.vel,forma:P2.forma,guia:P2.guia||0,dy:.3});}}
-          else if(d2<14&&k2.tiro<=0){k2.tiro=P2.cad;if(P2.rajada){k2.rajadaN=P2.n;k2.rajadaT=0;}else if(P2.n>1)rv532Leque(k2,def,P2.n,.5,{cor:P2.cor,tam:.07,vel:P2.vel,forma:P2.forma,dy:.3});else rv532Tiro(k2,def,{cor:P2.cor,tam:.07,vel:P2.vel,forma:P2.forma,guia:P2.guia||0,dy:.3});}}
+          else if(d2<14&&k2.tiro<=0){k2.tiro=P2.cad;k2.volta=(k2.volta||0)+1;if(P2.especial&&k2.volta%3===0&&typeof rv535CompEspecial==='function'){rv535CompEspecial(k2,def,P2);}else if(P2.rajada){k2.rajadaN=P2.n;k2.rajadaT=0;}else if(P2.n>1)rv532Leque(k2,def,P2.n,.5,{cor:P2.cor,tam:.07,vel:P2.vel,forma:P2.forma,dy:.3});else rv532Tiro(k2,def,{cor:P2.cor,tam:.07,vel:P2.vel,forma:P2.forma,guia:P2.guia||0,dy:.3});}}
         if(velC>0){const ddx=tx-k2.x,ddz=tz-k2.z,dd=Math.hypot(ddx,ddz);if(dd>.05){const v=Math.min(velC*dt,dd);k2.x+=ddx/dd*v;k2.z+=ddz/dd*v;}}}
       k2.x+=k2.knock.x*dt;k2.z+=k2.knock.z*dt;k2.knock.x*=Math.exp(-6*dt);k2.knock.z*=Math.exp(-6*dt);if(k2.x<20.9)k2.x=20.9;if(mur){k2.x=Math.max(mur.x0+2.2,Math.min(mur.x1-2.2,k2.x));k2.z=Math.max(mur.z0+2.2,Math.min(mur.z1-2.2,k2.z));}const c2=W.clamp(k2.x,k2.z,.5);k2.x=Array.isArray(c2)?c2[0]:c2.x;k2.z=Array.isArray(c2)?c2[1]:c2.z;
       k2.bob+=dt;const inv=k2.fase==='investida';const h2=corre?(inv?Math.abs(Math.sin(k2.bob*14))*.25:Math.abs(Math.sin(k2.bob*5))*.08):((k.viva&&k.ativo?Math.max(1.4,(k.alt||0)+.6):1.5)+.25*Math.sin(k2.bob*3));k2.g.position.set(k2.x,fy(k2.x,k2.z)+h2,k2.z);
@@ -63897,6 +63898,7 @@ function rv533Erro(k,e){if(RV533.erros.length<30)RV533.erros.push(k+': '+(e&&e.m
 /* casa colonial com sacada (fachada da v221) + corpo + telhado */
 function rv533Casa(K,M,x,y,z,ry,w,d,hw,cor,r){K.push(x,y,z,ry);
   try{a6Casa(K,0,0,0,w,cor,{h:hw,sacada:true});}catch(e){rv533Erro('a6Casa',e);K.box(w,hw,.5,M.reboco,0,hw/2,0);}
+  try{const nj=Math.max(2,Math.round(w/3)),dxj=w/nj;const vidro=t160Brilho('535 janela casa',0xffd890,1.3);for(let i=0;i<nj;i++){const px=-w/2+dxj*(i+.5);if(i!==Math.floor(nj/2))K.box(.96,1.24,.02,vidro,px,1.7,.31);K.box(.96,1.24,.02,vidro,px,hw*.74,.31);}}catch(e){}
   K.box(w,hw-.1,d,a6Std('reboco '+cor.toString(16),cor,.9),0,hw/2-.25,-d/2-.2);
   const sh=new THREE.Shape();sh.moveTo(-w/2-.35,0);sh.lineTo(w/2+.35,0);sh.lineTo(0,2.0+r()*1.2);sh.closePath();K.ext(sh,d+.7,r()<.8?M.telha:M.ardosia,0,hw-.02,-d/2-.1,0,0,0);
   K.box(.55,1.5,.55,M.torre,w*.25,hw+1.1,-d*.55);K.pop();}
@@ -63969,6 +63971,110 @@ if(RV534.on&&typeof rv532Arvore==='function'){
 }
 window.__arvores534={estado:RV534,arvore:rv534Arvore,erros:RV534.erros};
 try{if(typeof NOVIDADES198!=='undefined')NOVIDADES198.v534=co523T('🌳 As árvores dos Campos dos Rivais ganharam um só estilo: tronco com casca, raízes, galhos e copas de folhas pintadas — carvalhos, choupos, pinheiros, bétulas e árvores de outono','🌳 The trees of the Fields of Rivals now share one style: bark trunks, roots, branches and painted-leaf canopies — oaks, poplars, pines, birches and autumn trees','🌳 Los árboles de los Campos de los Rivales ahora tienen un solo estilo: troncos con corteza, raíces, ramas y copas de hojas pintadas');}catch(e){}
+
+/* ===================== v535 · DUELOS E CHEFES MAIS DIFÍCEIS ATÉ O 2.º ANDAR, CÉU ESCURO EM TODOS OS CAMPOS, PODERES VARIADOS
+   (pedidos do Luiz) =====================
+   «os chefes e duelos estão muito fáceis até o segundo andar. Dificulte» · «Essas telas de duelo, deixe todas com céu escuro.» ·
+   «Quero poderes variados nos inimigos voadores e compainios deles.»
+   (1) DIFICULDADE: o «golpe único» da v505 fica só no Hall 1 (TROCA); as regras da v450 ganham o 1.º andar (vida ×1,3, mira 50 %, chefes
+       ×1,15, com descanso) e o 2.º (vida ×1,7, recarga 2,1–3,0 s, tiros ×1,15, mira 75 %, acordam em 2,4 s, chefes ×1,3, sem descanso na luta);
+       os chefes com dano próprio (robô v315, bruxa v318, Dom da sala de Romance e deus v428, javali v428) recebem só 60 % do dano e o robô, a
+       bruxa e o javali andam ×1,2; os rivais dos campos têm 1,7× de vida, companheiros 1,6× e +3 de dano.
+   (2) CÉU ESCURO: os dez campos passam a `noite` (lua, estrelas, janelas acesas); cada sala com o seu tom (tinta sobre o panorama e o zénite);
+       Paranormal e Distopia ficam com árvores de outono; lampiões ao longo do caminho e braseiros nas entradas da arena (emissivos, sem luz).
+   (3) PODERES: cada rival tem um golpe especial (escolhido no fim do `circula`, 45 %): Íris névoa + penas de todos os lados, Dom Aurélio
+       serenata de corações que convergem, Capitã Serena bombardeio, Madame Lúcia sombra (some e reaparece atrás), Zé Raio raio do céu com aviso
+       no chão, Lira versos guiados, Hélio sol (bola de fogo grande que explode), Nina bolhas em leque, Átila muralha de páginas, Mestre Sereno
+       ondas de calma. Companheiros: cão late (onda que empurra) antes da investida, raposa investe duas vezes, coelho salta e aterra com onda,
+       capivara empurra o dobro; coruja pio sónico, beija-flor rajada de 7, periquito leque de 5, mariposa pó de sono (abranda o leitor 2,5 s),
+       livro muro de páginas, serpente-dragão bola de fogo grande — um em cada três ataques.
+   `?duelo535=0` desliga as partes 2 e 3 (as TROCAS de dificuldade ficam). */
+const DU535={on:!/[?&#]duelo535=0/i.test(location.search+location.hash),erros:[],stats:{especiais:0,comp:0},
+  esp:{mys:'nevoa',vila:'serenata',guerra:'bombardeio',outono:'sombra',quadrinhos:'raio',poesia:'versos',mitologia:'sol',infantil:'bolhas',classicos:'paginas',autoajuda:'calma'},
+  nomes:{nevoa:['Névoa da Detetive','Detective\'s Fog'],serenata:['Serenata','Serenade'],bombardeio:['Bombardeio','Bombardment'],sombra:['Sombra','Shadow'],raio:['Raio do Céu','Sky Bolt'],versos:['Versos Guiados','Homing Verses'],sol:['Sol de Hélio','Helios\' Sun'],bolhas:['Bolhas','Bubbles'],paginas:['Muralha de Páginas','Wall of Pages'],calma:['Ondas de Calma','Waves of Calm']},
+  tons:{mys:0x1a2a6a,vila:0x4a2a5a,guerra:0x4a1a1a,outono:0x3a1a4a,quadrinhos:0x1a3a5a,poesia:0x3a2a6a,mitologia:0x2a3a5a,infantil:0x4a2a6a,classicos:0x1a1a2a,autoajuda:0x1a3a3a}};
+function du535Erro(k,e){if(DU535.erros.length<30)DU535.erros.push(k+': '+(e&&e.message||e));try{console.warn('v535',k,e);}catch(x){}}
+/* ---------- (1) dificuldade ---------- */
+try{if(typeof D450!=='undefined'){
+  D450[1]={nivel:['aquecimento','warm-up','calentamiento'],inimigos:0,vida:1.3,reduz:1,recarga:[2.4,3.4],rajada:1,abre:0,tiro:1.05,mira:.5,sono:3.2,passo:.8,vel:1.05,alcance:12,chefe:1.15,descanso:true};
+  D450[2]={nivel:['médio','medium','medio'],inimigos:0,vida:1.7,reduz:1,recarga:[2.1,3.0],rajada:1,abre:0,tiro:1.15,mira:.75,sono:2.4,passo:.6,vel:1.12,alcance:13,chefe:1.3,descanso:false};}}catch(e){du535Erro('D450',e);}
+try{if(typeof robot315Damage==='function'){const d0=robot315Damage;robot315Damage=function(k,n){return d0.call(this,k,(typeof n==='number'&&k&&k.robot315==='enemy')?n*.6:n);};}
+  if(typeof para318Damage==='function'){const d0=para318Damage;para318Damage=function(k,n){return d0.call(this,k,(typeof n==='number'&&k&&k.para318==='enemy')?n*.6:n);};}
+  if(typeof ally428Damage==='function'){const d0=ally428Damage;ally428Damage=function(k,n){return d0.call(this,k,(typeof n==='number')?n*.6:n);};}
+  if(typeof boar428Damage==='function'){const d0=boar428Damage;boar428Damage=function(k,n){return d0.call(this,k,(typeof n==='number')?n*.6:n);};}
+  if(typeof robot315Tick==='function'){const t0=robot315Tick;robot315Tick=function(dt){return t0.call(this,(dt||0)*1.2);};}
+  if(typeof para318Tick==='function'){const t0=para318Tick;para318Tick=function(dt){return t0.call(this,(dt||0)*1.2);};}
+  if(typeof boar428Tick==='function'){const t0=boar428Tick;boar428Tick=function(dt){return t0.call(this,(dt||0)*1.2);};}}catch(e){du535Erro('chefes',e);}
+try{if(typeof RV530!=='undefined')for(const d of RV530.lista){if(d.du535)continue;d.du535=true;d.hp=Math.round(d.hp*1.7);d.chp=Math.round(d.chp*1.6);d.dano=d.dano+3;}}catch(e){du535Erro('rivais',e);}
+function du535Tinge(m,sala){try{const t=m&&m.map;const c=t&&t.image;if(!c||!c.getContext||m.userData.du535)return;m.userData.du535=true;const x=c.getContext('2d');const cor=new THREE.Color(DU535.tons[sala]||0x1a2a6a);x.save();x.globalCompositeOperation='overlay';x.fillStyle='rgba('+(cor.r*255|0)+','+(cor.g*255|0)+','+(cor.b*255|0)+',.5)';x.fillRect(0,0,c.width,c.height);x.restore();t.needsUpdate=true;}catch(e){du535Erro('tinta',e);}}
+function du535Lampioes(c,q,Z,sala){const {K,M,sc}=c;const h=Z.h,cam=Z.cam||[];const vidro=t160Brilho('535 lampião',0xffd890,2.2),ferro=al521Mat('535 ferro',0x2a2a2e,.6,.5),brasa=t160Brilho('535 brasa',0xff7030,2.4);let n=0;
+  for(let i=2;i<cam.length-1;i+=4){const p=cam[i],p2=cam[i+1]||p,p0=cam[i-1]||p;const dx=p2[0]-p0[0],dz=p2[1]-p0[1],L=Math.hypot(dx,dz)||1;const s=(n%2?1:-1);const x=p[0]+(-dz/L)*s*1.6,z=p[1]+(dx/L)*s*1.6;const y=h(x,z);
+    K.cyl(.05,.07,2.6,ferro,x,y+1.3,z,6);K.box(.3,.3,.3,ferro,x,y+2.75,z);K.box(.22,.26,.22,vidro,x,y+2.75,z);K.cone(.24,.18,ferro,x,y+2.98,z,4,Math.PI/4);try{const sp=rkSprite(sc,0xffd890,1.6,.55,x,y+2.75,z);sp.userData.noCam=true;}catch(e){}c.ob(x,z,.25);n++;}
+  for(const s of [-1,1]){const x=Z.ax+s*9.6,z=Z.az;const y=h(x,z);K.cyl(.5,.35,.5,ferro,x,y+.25,z,10);K.sph(.32,brasa,x,y+.6,z,1,.6,1,8,6);try{const sp=rkSprite(sc,0xff8040,2.4,.6,x,y+.7,z);sp.userData.noCam=true;}catch(e){}c.ob(x,z,.6);}
+  DU535.stats['lampioes_'+sala]=n;}
+function du535Explode(R,x,y,z,cor,raio,dano){try{rv532Onda(R,x,y,z,cor,raio,.8);const pl=cavPos();if(Math.hypot(pl.x-x,pl.z-z)<raio){cavDano(dano);const dx=pl.x-x,dz=pl.z-z,L=Math.hypot(dx,dz)||1;rv532Empurra(dx/L*1.4,dz/L*1.4);}for(let i=0;i<10;i++)cavFaisca(R.scene,x+(Math.random()-.5)*1.6,y+.4+Math.random()*1.2,z+(Math.random()-.5)*1.6,i%2?cor:0xffffff,.5,.5);}catch(e){du535Erro('explode',e);}}
+function du535Aviso(def,tipo){try{const n=DU535.nomes[tipo]||[tipo,tipo];showToast('✨ '+co523T(def.nome+': '+n[0]+'!',def.nome+': '+n[1]+'!',def.nome+': '+n[0]+'!'),{ms:2600});}catch(e){}}
+function rv535Escolhe(k,def,d){if(!DU535.on)return false;const tipo=DU535.esp[def.sala];if(!tipo)return false;k.espN=(k.espN||0)+1;if(k.espN<2||Math.random()>.45)return false;k.fase='especial';k.faseT=0;k.esp={tipo,t:0,n:0,alt:3.0,pos:null};du535Aviso(def,tipo);DU535.stats.especiais++;return true;}
+function rv535Especial(k,def,dt,c){const E=k.esp;if(!E)return true;E.t+=dt;const {R,fy,px,pz,pl}=c;const T=THREE;const cor=def.asa;
+  const vai=(tx,tz,v)=>{const ddx=tx-k.x,ddz=tz-k.z,dd=Math.hypot(ddx,ddz);if(dd>.05){const s=Math.min(v*dt,dd);k.x+=ddx/dd*s;k.z+=ddz/dd*s;}return dd;};
+  switch(E.tipo){
+    case 'nevoa':{E.alt=3.2;const Z=RV530.campos[def.sala]&&RV530.campos[def.sala].cfg.rv532;if(Z){Z.nevoa=E.t<2.8?3.5:1;}if(E.t>E.n*.5+.3&&E.n<5){E.n++;const a=Math.random()*6.28;rv532Tiro(k,def,{cor,tam:.1,vel:10,de:{x:px+Math.cos(a)*7,y:pl.fy+2.6,z:pz+Math.sin(a)*7}});}if(E.t>3.2){if(Z)Z.nevoa=1;return true;}return false;}
+    case 'serenata':{E.alt=3.0;if(E.n===0&&E.t>.2){E.n=1;E.orbes=[];for(let i=0;i<8;i++){const a=i/8*6.28;const p=rv532Tiro(k,def,{cor:0xff6090,forma:'orbe',tam:.16,vel:.4,de:{x:px+Math.cos(a)*4.2,y:pl.fy+1.4,z:pz+Math.sin(a)*4.2},vidaExtra:4});if(p){p.vx=0;p.vz=0;p.vy=0;p.vida=4.5;p.rv532={guia:0,vel:5};E.orbes.push(p);}}}
+      if(E.n===1&&E.t>1.1){E.n=2;for(const p of E.orbes){const dx=px-p.x,dz=pz-p.z,L=Math.hypot(dx,dz)||1;p.vx=dx/L*5;p.vz=dz/L*5;p.rv532={guia:2.5,vel:5};}}return E.t>1.4;}
+    case 'bombardeio':{E.alt=4.2;vai(px,pz,5.5);if(E.t>.3+E.n*.4&&E.n<4){E.n++;const p=rv532Tiro(k,def,{forma:'fogo',vel:1,de:{x:k.x,y:k.g.position.y-.3,z:k.z},vidaExtra:3});if(p){p.vx=0;p.vz=0;p.vy=-1;p.grav=9;p.vida=3.5;p.rv535={bomba:true,dano:Math.round(def.dano*.8)};}}return E.t>2.2;}
+    case 'sombra':{if(E.n===0){E.n=1;k.g.visible=false;for(let i=0;i<12;i++)cavFaisca(R.scene,k.x+(Math.random()-.5)*1.4,k.g.position.y+Math.random()*1.8,k.z+(Math.random()-.5)*1.4,0x9060c0,.5,.5);}
+      if(E.n===1&&E.t>.6){E.n=2;const d=pl.dir||0;k.x=px-Math.sin(d)*2.6;k.z=pz-Math.cos(d)*2.6;k.alt=1.2;k.g.visible=true;for(let i=0;i<12;i++)cavFaisca(R.scene,k.x+(Math.random()-.5)*1.4,fy(k.x,k.z)+1+Math.random()*1.5,k.z+(Math.random()-.5)*1.4,0xe0a0ff,.5,.5);}
+      E.alt=1.2;if(E.n===2&&E.t>1.0){E.n=3;const d2=Math.hypot(px-k.x,pz-k.z);if(d2<2.6){cavDano(def.dano);const dx=px-k.x,dz=pz-k.z,L=Math.hypot(dx,dz)||1;rv532Empurra(dx/L*1.5,dz/L*1.5);}rv532Onda(R,k.x,fy(k.x,k.z),k.z,0xe0a0ff,2,.6);}return E.t>1.4;}
+    case 'versos':{E.alt=3.2;if(E.t>.2+E.n*.45&&E.n<3){E.n++;rv532Tiro(k,def,{cor:0xc080ff,forma:'orbe',tam:.15,vel:5.5,guia:2.8,vidaExtra:2});}return E.t>1.8;}
+    case 'sol':{E.alt=3.5;if(E.n===0&&E.t>.3){E.n=1;const p=rv532Tiro(k,def,{forma:'fogo',vel:5.5,tam:.4,vidaExtra:1.2});if(p){p.g.scale.setScalar(2.4);p.rv535={sol:true,dano:Math.round(def.dano*.9),raio:3.2};}}return E.t>1.0;}
+    case 'bolhas':{E.alt=2.6;if(E.n===0&&E.t>.3){E.n=1;for(let i=0;i<7;i++)rv532Tiro(k,def,{cor:i%2?0x80d0ff:0xffb0e0,forma:'orbe',tam:.17,vel:6,desvio:(i/6-.5)*1.6,vidaExtra:1});}return E.t>.8;}
+    case 'paginas':{E.alt=2.4;if(E.n===0&&E.t>.3){E.n=1;const dx=px-k.x,dz=pz-k.z,L=Math.hypot(dx,dz)||1;const nx=-dz/L,nz=dx/L;for(let i=0;i<6;i++){const o=(i-2.5)*1.0;rv532Tiro(k,def,{forma:'pagina',vel:7.5,de:{x:k.x+nx*o,y:k.g.position.y+.6,z:k.z+nz*o},alvo:{x:px+nx*o,z:pz+nz*o},vidaExtra:1});}}return E.t>.8;}
+    case 'calma':{E.alt=.5;vai(px,pz,6);if(E.t>.6+E.n*.6&&E.n<3){E.n++;du535Explode(R,k.x,fy(k.x,k.z),k.z,0xa0e0c0,2.9,Math.round(def.dano*.6));}return E.t>2.4;}
+    case 'raio':{E.alt=4.5;if(E.n===0&&E.t>.1){E.n=1;E.pos={x:px,z:pz};E.anel=rkSprite(R.scene,0xffe060,3.2,.55,px,pl.fy+.3,pz);E.anel.userData.noCam=true;}
+      if(E.n===1&&E.t>1.0){E.n=2;du535Raio(R,E.pos.x,E.pos.z,fy,def);if(E.anel)R.scene.remove(E.anel);E.anel=null;}
+      if(E.n===2&&E.t>1.4){E.n=3;E.pos={x:px,z:pz};E.anel=rkSprite(R.scene,0xffe060,3.2,.55,px,pl.fy+.3,pz);E.anel.userData.noCam=true;}
+      if(E.n===3&&E.t>2.3){E.n=4;du535Raio(R,E.pos.x,E.pos.z,fy,def);if(E.anel)R.scene.remove(E.anel);E.anel=null;}
+      if(E.t>2.6){if(E.anel)R.scene.remove(E.anel);return true;}return false;}
+    default:return true;}}
+function du535Raio(R,x,z,fy,def){try{const T=THREE;const y0=fy(x,z);const g=new T.Group();const m=new T.Mesh(new T.CylinderGeometry(.12,.28,14,8,1,true),new T.MeshBasicMaterial({color:0xffffa0,transparent:true,opacity:.95,depthWrite:false,blending:T.AdditiveBlending,side:T.DoubleSide}));m.position.y=7;g.add(m);rkSprite(g,0xffe060,3,.9,0,.3,0);rkSprite(g,0xffffff,6,.5,0,.4,0);g.position.set(x,y0,z);g.traverse(o=>{if(o.isMesh)o.raycast=()=>{};});R.scene.add(g);CAV.tiros.push({g,t:0,vida:.35,tipo:'vento',scene:R.scene});
+    const pl=cavPos();if(Math.hypot(pl.x-x,pl.z-z)<1.8){cavDano(def.dano);for(let i=0;i<10;i++)cavFaisca(R.scene,pl.x+(Math.random()-.5)*.8,pl.fy+.8+Math.random()*1.2,pl.z+(Math.random()-.5)*.8,0xffe060,.45,.45);}try{if(window.__mus199)window.__mus199.sfx('acerto');}catch(e){}}catch(e){du535Erro('raio',e);}}
+function rv535Mordida(k2,def,P2,nx,nz){const R=ROOM;const pl=cavPos();let dano=Math.max(1,Math.round(def.dano*.6)),emp=1.6;if(P2.pesado){dano=Math.max(1,Math.round(def.dano*.8));emp=3.2;}cavDano(dano);rv532Empurra(nx*emp,nz*emp);
+  try{for(let i=0;i<8;i++)cavFaisca(R.scene,pl.x+(Math.random()-.5)*.6,pl.fy+.8+(Math.random()-.5)*.6,pl.z+(Math.random()-.5)*.6,P2.cor,.4,.4);}catch(e){}
+  if(P2.salto){try{rv532Onda(R,k2.x,(R.floorY?R.floorY(k2.x,k2.z):0),k2.z,P2.cor,2.2,.6);}catch(e){}}DU535.stats.comp++;}
+function rv535Latido(k2,def,P2){if(!P2.latido)return;try{const R=ROOM;const y=(R.floorY?R.floorY(k2.x,k2.z):0);rv532Onda(R,k2.x,y,k2.z,P2.cor,3.4,.7);const pl=cavPos();const d=Math.hypot(pl.x-k2.x,pl.z-k2.z);if(d<3.6){const dx=pl.x-k2.x,dz=pl.z-k2.z,L=Math.hypot(dx,dz)||1;rv532Empurra(dx/L*2.0,dz/L*2.0);}}catch(e){du535Erro('latido',e);}}
+function rv535CompEspecial(k2,def,P2){try{const R=ROOM;const pl=cavPos();DU535.stats.comp++;
+  switch(P2.especial){
+    case 'pio':{rv532Onda(R,pl.x,pl.fy,pl.z,0x80c0ff,2.4,.6);cavDano(Math.max(1,Math.round(def.dano*.5)));rv532Onda(R,k2.x,k2.g.position.y,k2.z,0x80c0ff,1.5,.5);break;}
+    case 'rajadao':{k2.rajadaN=7;k2.rajadaT=0;break;}
+    case 'leque5':{rv532Leque(k2,def,5,1.1,{cor:P2.cor,tam:.07,vel:P2.vel,forma:'pena',dy:.3});break;}
+    case 'sono':{const p=rv532Tiro(k2,def,{cor:0xc080ff,forma:'orbe',tam:.2,vel:5,guia:2.6,dy:.3,vidaExtra:1.5});if(p)p.rv535={sono:true};break;}
+    case 'muro':{const dx=pl.x-k2.x,dz=pl.z-k2.z,L=Math.hypot(dx,dz)||1;const nx=-dz/L,nz=dx/L;for(let i=0;i<3;i++){const o=(i-1)*1.1;rv532Tiro(k2,def,{forma:'pagina',vel:7,de:{x:k2.x+nx*o,y:k2.g.position.y+.3,z:k2.z+nz*o},alvo:{x:pl.x+nx*o,z:pl.z+nz*o},vidaExtra:1});}break;}
+    case 'bola':{const p=rv532Tiro(k2,def,{forma:'fogo',vel:5,tam:.3,dy:.3,vidaExtra:1});if(p){p.g.scale.setScalar(1.9);p.rv535={sol:true,dano:Math.round(def.dano*.7),raio:2.4};}break;}
+    default:rv532Tiro(k2,def,{cor:P2.cor,tam:.07,vel:P2.vel,forma:P2.forma,dy:.3});}}catch(e){du535Erro('comp especial',e);}}
+if(DU535.on&&typeof RV532!=='undefined'&&RV532.on){
+  /* ---------- (2) céu escuro em todos ---------- */
+  try{for(const k in RV532.salas){RV532.salas[k].ceu='noite';}RV532.salas.outono.outono=true;RV532.salas.guerra.outono=true;}catch(e){du535Erro('noite',e);}
+  try{const l0=rv532CeuLados;rv532CeuLados=function(sala,tipo){const out=l0.apply(this,arguments);try{for(const m of out)du535Tinge(m,sala);}catch(e){}return out;};
+    const z0=rv532CeuTopo;rv532CeuTopo=function(sala,tipo){const m=z0.apply(this,arguments);try{du535Tinge(m,sala);}catch(e){}return m;};}catch(e){du535Erro('céu',e);}
+  // lampiões ao longo do caminho e braseiros na arena (emissivos — sem luzes novas)
+  try{const cfg0=rv530Cfg;rv530Cfg=function(sala,P){const cfg=cfg0.apply(this,arguments);try{if(cfg&&cfg.rects&&cfg.rects[0]){const q=cfg.rects[0];const d0=q.decor;q.decor=function(c,qq,cx,cz){const rv=d0.apply(this,arguments);try{du535Lampioes(c,qq,cfg.rv532,sala);}catch(e){du535Erro('lampiões '+sala,e);}return rv;};}}catch(e){du535Erro('cfg',e);}return cfg;};}catch(e){du535Erro('instalar cfg',e);}
+  /* ---------- (3) poderes variados ---------- */
+  try{const C=RV532.comp;C.cachorro.latido=true;C.raposa.duplo=true;C.coelho.salto=true;C.capivara.pesado=true;C.coruja.especial='pio';C.beijaflor.especial='rajadao';C.periquito.especial='leque5';C.mariposa.especial='sono';C.livro.especial='muro';C.drg_serpente.especial='bola';}catch(e){du535Erro('comp',e);}
+  // escolha no fim do 'circula' (chamado pela TROCA)
+  // o golpe especial em curso (chamado pela TROCA a cada quadro); devolve true quando acaba
+  // companheiros: mordida com extras, latido, salto, especial dos voadores
+  // projéteis especiais (bombas, sóis, pó de sono) — a cada quadro
+  try{const tk0=rv532Tick;rv532Tick=function(dt){const r=tk0.apply(this,arguments);try{if(CUR!=='room'||!ROOM)return r;const R=ROOM;const fy=(x,z)=>(R.floorY?R.floorY(x,z):0);const pl=cavPos();
+      for(const o of CAV.ossos){const q=o.rv535;if(!q)continue;
+        if(q.bomba&&o.y<=fy(o.x,o.z)+.2){du535Explode(R,o.x,fy(o.x,o.z),o.z,0xff8030,2.4,q.dano);o.t=o.vida;delete o.rv535;}
+        else if(q.sol&&(Math.hypot(o.x-pl.x,o.z-pl.z)<1.7||o.t>=o.vida-.08)){du535Explode(R,o.x,Math.max(fy(o.x,o.z),o.y-.5),o.z,0xff9040,q.raio||3,q.dano);o.t=o.vida;delete o.rv535;}
+        else if(q.sono&&Math.hypot(o.x-pl.x,o.z-pl.z)<1.0&&Math.abs(o.y-(pl.fy+1))<1.6){delete o.rv535;o.t=o.vida;try{if(!DU535.sono){DU535.sono={v:CH.speed};CH.speed=CH.speed*.55;showToast('💤 '+co523T('Pó de sono: você fica mais lento por 2,5 s','Sleep dust: you move slower for 2.5 s','Polvo de sueño: te mueves más lento 2,5 s'),{ms:2500});}DU535.sonoT=2.5;}catch(e){}}}
+      if(DU535.sono){DU535.sonoT-=dt;if(DU535.sonoT<=0){CH.speed=DU535.sono.v;DU535.sono=null;}}
+      // se o rival morre a meio de um especial, a névoa e o anel do raio saem
+      const key=Object.keys(ROOMS).find(k=>ROOMS[k]===ROOM);const RV=key&&RV530.rivais[key];if(RV&&RV.k&&!RV.k.viva&&RV.k.esp){const E=RV.k.esp;try{if(E.anel)R.scene.remove(E.anel);const Z=RV530.campos[key]&&RV530.campos[key].cfg.rv532;if(Z)Z.nevoa=1;}catch(e){}RV.k.esp=null;}
+    }catch(e){du535Erro('tick',e);}return r;};rv530Tick=rv532Tick;}catch(e){du535Erro('instalar tick',e);}
+  window.__duelo535={estado:DU535,erros:DU535.erros,stats:DU535.stats,escolhe:rv535Escolhe,especial:rv535Especial,mordida:rv535Mordida,latido:rv535Latido,compEspecial:rv535CompEspecial};}else{window.__duelo535={estado:DU535,erros:DU535.erros,stats:DU535.stats};}
+try{if(typeof NOVIDADES198!=='undefined')NOVIDADES198.v535=co523T('⚔ Mais difícil até o 2.º andar: o golpe único fica só no Hall 1, inimigos com mais vida e mira, chefes mais resistentes e rápidos · todos os Campos dos Rivais à noite, com lampiões · cada rival e cada companheiro tem um poder especial próprio','⚔ Harder up to floor 2: the one-hit rule stays only in Hall 1, enemies with more health and aim, tougher and faster bosses · all Fields of Rivals at night, with lanterns · every rival and companion has a signature power','⚔ Más difícil hasta el 2.º piso: el golpe único solo en el Hall 1, enemigos con más vida y puntería, jefes más resistentes y rápidos · todos los Campos de los Rivales de noche, con farolas · cada rival y compañero tiene un poder propio');}catch(e){}
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
