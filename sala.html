@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v557</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v558</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -61034,6 +61034,72 @@ function hq556Fardo(K,M,x,y,z,ry,r){const T=THREE,Q=hq556M(M);K.push(x,y,z,ry);K
   for(let k=0;k<26;k++){const f=(r()*3)|0;const a=r()*6.28;let px=(r()-.5)*1.1,py=(r()-.5)*.5,pz=(r()-.5)*.7;if(f===0)py=.25;else if(f===1)pz=.35*(r()<.5?-1:1);else px=.55*(r()<.5?-1:1);
     K.add(new T.ConeGeometry(.006,.16+r()*.12,3),M.palha,px,py,pz,a,(r()-.5)*1.6,(r()-.5)*1.6);}K.pop();}
 window.__graficos556={estado:HQ556,erros:HQ556.erros,stats:HQ556.stats};
+
+/* ===================== v558 · FANTASMAS NOVOS (bloco `HQ558`) =====================
+   Pedido do Luiz: «melhore esses fantasmas». Os fantasmas (v507, refeitos na v554 em torno de 48 lados) eram lençóis brancos opacos de
+   barra ondulada com olhos pretos — pareciam de desenho. Agora (`tr507Fantasma` trocada; a de antes fica de reserva):
+   · CORPO de aparição em torno de 48 lados × ~45 fiadas: capuz com a frente cavada (rosto em sombra), ombros, manto que se desfaz em
+     6 farrapos compridos que pendem e se afinam no fundo (sem barra de lençol), pregas.
+   · MATERIAL próprio (ShaderMaterial, um por fantasma): translúcido com contorno aceso (fresnel) branco-azulado→ciano, quase invisível no
+     meio, a desvanecer para o fundo dos farrapos, com estrias verticais que sobem e tremeluzir; o manto ondula no próprio vértice (mais
+     nos farrapos), cada um com a sua semente. Sem nevoeiro (brilha através da névoa do cemitério).
+   · ROSTO: oval escuro no fundo do capuz, órbitas negras com olhos acesos (verde-água) e brilho, boca aberta em grito.
+   · BRAÇOS estendidos para a frente em mangas largas e esfarrapadas (tubos de 16 lados com farrapos pendentes) e mãos de dedos
+     compridos e curvos; metade dos fantasmas arrasta CORRENTES com grilhetas nos pulsos.
+   · AURA e 6 FIAPOS de névoa que seguem atrás e por baixo, a ondular; inclinam-se para a frente e respiram (relógio próprio no `tick`).
+   Tamanho de gente (~2,2 m), o grupo flutua no mesmo sítio de antes (o relógio da v507 continua a movê-los).
+   O bloco entra antes do da v507. `?fantasmas558=0` volta aos da v554. Gancho `window.__fantasmas558`. */
+const HQ558={on:!/[?&#]fantasmas558=0/i.test(location.search+location.hash),erros:[],stats:{n:0},fant:[],t:0};
+function hq558Erro(k,e){if(HQ558.erros.length<20)HQ558.erros.push(k+': '+(e&&e.message||e));try{console.warn('v558',k,e);}catch(x){}}
+const HQ558_VS=`uniform float uT;uniform float uSeed;varying vec3 vN;varying vec3 vV;varying float vY;varying float vS;
+void main(){vec3 p=position;float low=1.0-smoothstep(-0.75,0.35,p.y);
+  p.x+=(sin(uT*1.9+p.y*5.0+uSeed)*0.035+sin(uT*3.1+p.z*6.0+uSeed*1.7)*0.018)*(0.25+low*1.9);
+  p.z+=cos(uT*1.6+p.y*4.0+uSeed*0.7)*0.03*(0.25+low*2.0);
+  vec4 mv=modelViewMatrix*vec4(p,1.0);vN=normalize(normalMatrix*normal);vV=normalize(-mv.xyz);vY=p.y;vS=p.x*3.0+p.z*2.0;gl_Position=projectionMatrix*mv;}`;
+const HQ558_FS=`uniform float uT;uniform float uSeed;uniform vec3 cIn;uniform vec3 cRim;uniform float uOp;varying vec3 vN;varying vec3 vV;varying float vY;varying float vS;
+void main(){float f=pow(1.0-abs(dot(normalize(vN),normalize(vV))),1.45);float fade=smoothstep(-1.3,-0.25,vY);
+  float flick=0.86+0.14*sin(uT*6.3+uSeed+vY*7.0);float streak=0.78+0.22*sin(vY*24.0-uT*2.6+vS);
+  vec3 c=mix(cIn,cRim,f)*streak;float a=(0.09+0.8*f)*fade*flick*uOp;gl_FragColor=vec4(c,a);}`;
+function hq558Mat(seed,quente){const T=THREE;const m=new T.ShaderMaterial({uniforms:{uT:{value:0},uSeed:{value:seed},uOp:{value:1},cIn:{value:new T.Color(quente?0x8aa0a8:0x6c86a0)},cRim:{value:new T.Color(quente?0xd8fff0:0xc8f4ff)}},
+  vertexShader:HQ558_VS,fragmentShader:HQ558_FS,transparent:true,depthWrite:false,side:T.DoubleSide});m.name='558 aparição';m.userData.papelKeep=true;return m;}
+function hq558Corpo(seed){const T=THREE;const pf=[[.001,-.42],[.06,-.3],[.12,-.12],[.18,.05],[.23,.3],[.26,.55],[.28,.82],[.3,1.06],[.28,1.22],[.2,1.33],[.15,1.4],[.18,1.48],[.205,1.58],[.19,1.68],[.13,1.75],[.06,1.79],[.001,1.8]];
+  const P=[];for(let i=0;i<pf.length-1;i++){const a=pf[i],b=pf[i+1];for(let k=0;k<3;k++){const u=k/3;P.push([a[0]+(b[0]-a[0])*u,a[1]+(b[1]-a[1])*u]);}}P.push(pf[pf.length-1]);
+  const g=new T.LatheGeometry(P.map(p=>new T.Vector2(p[0],p[1])),48);
+  return hq554Mexe(g,v=>{const th=Math.atan2(v.z,v.x),y=v.y;let r=Math.hypot(v.x,v.z);
+    if(y<.55){const k=Math.min(1,(.55-y)/.97);const s=.5+.5*Math.sin(6*th+seed);r*=1-.62*k*Math.pow(1-s,1.6);v.y-=.3*k*s+.08*k*Math.sin(11*th+seed*2);}
+    r*=1+.03*Math.sin(9*th+y*3+seed)+.02*hq554N(v.x*8+seed,y*6,v.z*8);
+    const fr=Math.max(0,Math.cos(th-Math.PI/2));if(y>1.42&&y<1.7){const k=Math.sin((y-1.42)/.28*Math.PI);r*=1-.5*k*fr*fr;}
+    if(y>1.66&&y<1.8)v.z+=.05*fr;const n=Math.hypot(v.x,v.z)||1;v.x=v.x/n*r;v.z=v.z/n*r+(y>1.66?.05*fr:0);});}
+function hq558Fantasma(R,M,x,y,z){const T=THREE;const seed=Math.random()*10,corr=Math.random()<.5;const mat=hq558Mat(seed,Math.random()<.4);
+  const g=new T.Group();g.name='558 fantasma';g.rotation.order='YXZ';R.scene.add(g);const K=t160Kit('558 fantasma');K.push(0,-.95,0,0,0,0,.92);
+  K.add(hq558Corpo(seed),mat,0,0,0);
+  // rosto em sombra, órbitas, olhos acesos, boca em grito
+  const sombra=t160Mat('558 rosto',()=>{const m=new T.MeshBasicMaterial({color:0x070b12,transparent:true,opacity:.93,depthWrite:false,side:T.DoubleSide});m.userData.papelKeep=true;return m;});
+  const oco=t160Mat('558 órbita',()=>{const m=new T.MeshBasicMaterial({color:0x000000,transparent:true,opacity:.97,depthWrite:false,side:T.DoubleSide});m.userData.papelKeep=true;return m;});
+  const olho=t160Mat('558 olho',()=>{const m=new T.MeshBasicMaterial({color:0xc8fff0,transparent:true,opacity:1,depthWrite:false});m.userData.papelKeep=true;return m;});
+  K.add(new T.CircleGeometry(.12,28),sombra,0,1.555,.095,0,0,0,1,1.28,1);
+  for(const s of [-1,1]){K.add(new T.CircleGeometry(.032,18),oco,s*.046,1.59,.104,0,0,s*.2,1,1.3,1);K.add(new T.SphereGeometry(.017,12,10),olho,s*.046,1.585,.112);}
+  K.add(new T.CircleGeometry(.03,18),oco,0,1.48,.104,0,0,0,1,1.9,1);
+  // braços estendidos, mangas esfarrapadas, mãos de dedos compridos
+  for(const s of [-1,1]){const P=[[s*.25,1.24,.02],[s*.34,1.12,.2],[s*.31,1.03,.4],[s*.25,.98,.56]];K.add(hq554Tubo(P,[.075,.09,.115,.14],16),mat,0,0,0);
+    for(let i=0;i<5;i++){const a=i/5*6.283;K.add(new T.ConeGeometry(.035,.32+(i%2)*.14,6),mat,s*.25+Math.cos(a)*.1,.86-(i%2)*.06,.56+Math.sin(a)*.1,0,Math.PI+Math.sin(a)*.3,-Math.cos(a)*.3);}
+    for(let f=0;f<4;f++){const a=(f-1.5)*.22;const b=[s*.24+Math.sin(a)*.04,.97,.6];const c=[b[0]+Math.sin(a)*.05+s*.01,.93,.72];const d=[c[0]+Math.sin(a)*.03,.85,.79];K.add(hq554Tubo([b,c,d],[.014,.011,.006],5),mat,0,0,0);}
+    if(corr){const ferro=t160Std('558 corrente',0x2c2a32,.45,.75);K.add(new T.TorusGeometry(.085,.018,8,22),ferro,s*.27,.99,.5,0,.2,0);for(let i=0;i<7;i++)K.add(new T.TorusGeometry(.032,.009,6,14),ferro,s*.27,.9-i*.055,.5-i*.01,i%2?Math.PI/2:0,0,0);}}
+  K.pop();const ms=K.fim(g,{sombra:false,juntar:false});for(const m of ms){m.userData.noCam=true;m.raycast=()=>{};m.renderOrder=m.material===sombra?3.5:m.material===oco?5:m.material===olho?6:4;}
+  // aura e fiapos
+  const sp=[];try{const au=rkSprite(g,0x9fe8ff,2.6,.13,0,.05,0);au.userData.noCam=true;au.renderOrder=3;for(const s of [-1,1]){const e=rkSprite(g,0x9affe0,.2,.85,s*.042,.51,.14);e.userData.noCam=true;e.renderOrder=7;sp.push(e);}}catch(e){}
+  const fi=[];for(let i=0;i<6;i++){try{const f=rkSprite(g,0xd0f6ff,.5+Math.random()*.5,.22,0,0,0);f.userData.noCam=true;fi.push({s:f,ph:Math.random()*6,k:i});}catch(e){}}
+  g.traverse(o=>{o.userData.noCam=true;o.__fusaoMoveu=9;});const F={g,x,y,z,ph:Math.random()*6,t:Math.random()*4,a:Math.random()*6.28,r:1.2+Math.random()*1.4};g.position.set(x,y,z);
+  HQ558.fant.push({g,mat,olhos:sp,fi,seed});HQ558.stats.n++;return F;}
+function hq558Tick(dt){if(!HQ558.fant.length)return;dt=Math.min(.1,dt||.016);HQ558.t+=dt;const t=HQ558.t;
+  for(const f of HQ558.fant){if(!f.g.parent||!f.g.visible)continue;f.mat.uniforms.uT.value=t;f.g.rotation.x=.12+.04*Math.sin(t*1.1+f.seed);const b=1+.025*Math.sin(t*1.7+f.seed);f.g.scale.set(b,1/b*1.0,b);
+    for(const e of f.olhos)e.material.opacity=.6+.35*Math.abs(Math.sin(t*3.3+f.seed));
+    for(const q of f.fi){const u=((t*.35+q.k/6+f.seed)%1);q.s.position.set(Math.sin(t*1.3+q.ph)*.22,-.85-u*.6+.15*Math.sin(t+q.ph),-.15-u*.9);q.s.material.opacity=.22*(1-u);}}}
+if(HQ558.on){
+  try{const velha=tr507Fantasma;tr507Fantasma=function(){try{return hq558Fantasma.apply(this,arguments);}catch(e){hq558Erro('fantasma',e);return velha.apply(this,arguments);}};}catch(e){hq558Erro('instalar',e);}
+  try{const tk0=tick;tick=function(dt){const rv=tk0.apply(this,arguments);try{hq558Tick(dt);}catch(e){hq558Erro('tick',e);}return rv;};}catch(e){hq558Erro('tick instalar',e);}
+}
+window.__fantasmas558={estado:HQ558,erros:HQ558.erros,stats:HQ558.stats};
 
 /* ===================== v507 · TERROR E HORROR: A PORTA SECRETA NA ESTANTE E A SALA DE HALLOWEEN (bloco `TR507`) =====================
    Pedido do Luiz: «crie uma porta e uma nova sala em Terror, com decoração de Halloween».
