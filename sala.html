@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v569</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v570</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -67766,6 +67766,122 @@ if(SA2569.on){
   try{const tk0=tick;tick=function(dt){const rv=tk0.apply(this,arguments);try{if(SA2569.anim.length&&CUR==='room'&&ROOM&&SA2569.salas[ROOM.key]){SA2569.t+=Math.min(.1,dt||.016);for(const f of SA2569.anim)f(dt,SA2569.t);}}catch(e){}return rv;};}catch(e){sa2Erro('tick',e);}
 }
 window.__salas2569={estado:SA2569,erros:SA2569.erros,stats:SA2569.stats,fator:sa2Fator,dx:sa2Dx};
+
+/* ===================== v570 · FLORES NOVAS, SÓ NA NATUREZA (bloco `FL570`) =====================
+   Pedido do Luiz: «os itens flores devem ser melhorados e só aparecer em locais de natureza como grama e ilha etc».
+   · AS FLORES (as da v541, que a Rosa pede): deixam de ser uma margarida de bolinhas a girar no ar e passam a ser PLANTAS de
+     verdade, plantadas no chão, num tufo de capim: ROSAS (vermelhas ou cor-de-rosa: três camadas de pétalas em concha, sépalas,
+     caule com folhas serrilhadas e espinhos, dois botões), MARGARIDAS (brancas ou amarelas: 18 pétalas finas e miolo em domo,
+     três hastes), TULIPAS (vermelhas ou amarelas: seis pétalas em taça, folhas compridas), GIRASSOL (duas coroas de pétalas e
+     disco de sementes, folhas em coração) e LAVANDA (cinco espigas de florzinhas lilás). Pétalas e folhas são formas recortadas e
+     curvadas (não esferas achatadas). Balançam com o vento; um brilho suave por cima diz que se apanham (passando por cima, como antes).
+   · ONDE: só em natureza — na relva dos CAMPOS DOS RIVAIS (das cinco salas do 2.º andar e os de Fantasia e Aventura; dentro da
+     muralha, fora do círculo da arena), nos campos e colinas de FANTASIA, na ILHA de Aventura e no relvado do CEMITÉRIO de Terror.
+     Nas salas sem natureza e nos halls não há flores (as poções continuam onde estavam; os halls passam a ter 2 poções).
+     Quando o campo da sala ainda se está a montar, espera por ele antes de sortear.
+   `?flores570=0` volta às flores da v541. Gancho `window.__flores570`. */
+const FL570={on:!/[?&#]flores570=0/i.test(location.search+location.hash),erros:[],stats:{},moldes:null,espera:{},t:0,
+  verde:{fant:1,adv:1,mys:1,vila:1,guerra:1,outono:1,quadrinhos:1}};
+function fl570Erro(k,e){if(FL570.erros.length<20)FL570.erros.push(k+': '+(e&&e.message||e));try{console.warn('v570',k,e);}catch(x){}}
+/* ---------- geometrias: pétala e folha recortadas e curvadas ---------- */
+function fl570Petala(l,w,copa,ponta,seg){const T=THREE,s=new T.Shape();s.moveTo(0,0);s.bezierCurveTo(w*.9,l*.18,w*1.05,l*.7,0,l);s.bezierCurveTo(-w*1.05,l*.7,-w*.9,l*.18,0,0);
+  const g=new T.ShapeGeometry(s,seg||8),p=g.attributes.position;for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i);p.setZ(i,-copa*(x*x)/(w*w)*w+ponta*Math.pow(y/l,3)*l);}g.computeVertexNormals();return g;}
+function fl570Folha(l,w,dobra,serra){const T=THREE,s=new T.Shape();const n=serra?10:0;s.moveTo(0,0);
+  if(!n){s.bezierCurveTo(w,l*.25,w*.9,l*.7,0,l);s.bezierCurveTo(-w*.9,l*.7,-w,l*.25,0,0);}
+  else{for(let i=1;i<=n;i++){const t=i/n,y=t*l,x=w*Math.sin(Math.PI*Math.pow(t,.8))*(i%2?1:.82);s.lineTo(x,y);}for(let i=n-1;i>=0;i--){const t=i/n,y=t*l,x=-w*Math.sin(Math.PI*Math.pow(t,.8))*(i%2?1:.82);s.lineTo(x,y);}}
+  const g=new T.ShapeGeometry(s,6),p=g.attributes.position;for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i);p.setZ(i,-dobra*Math.abs(x)+.25*Math.pow(y/l,2)*l*.3);}g.computeVertexNormals();return g;}
+// pétalas à volta de um eixo vertical: n pétalas inclinadas `incl` (0 = de pé, π/2 = deitada), a girar `fase`
+function fl570Coroa(K,geo,mat,x,y,z,n,incl,fase){for(let i=0;i<n;i++){const a=fase+i/n*Math.PI*2;K.add(geo.clone(),mat,x,y,z,a,incl,0);}}
+function fl570Tufo(K,verde,verde2,x,z,n,alt){for(let i=0;i<n;i++){const a=i/n*Math.PI*2+i*.37,r=.03+(i%3)*.035,h=alt*(.55+(i%4)*.15);const g=new THREE.ConeGeometry(.012,h,3);g.translate(0,h/2,0);K.add(g,i%2?verde:verde2,x+Math.cos(a)*r,0,z+Math.sin(a)*r,a,Math.cos(a)*.35,Math.sin(a)*.35);}}
+function fl570Haste(K,mat,pts,r){K.tube(pts,r,mat,10,5);}
+/* ---------- os moldes ---------- */
+function fl570Moldes(){if(FL570.moldes)return FL570.moldes;const T=THREE,out=[];const D=T.DoubleSide;
+  const mat=(n,c,ro,ex)=>t160Mat('570 '+n,()=>{const m=new T.MeshStandardMaterial(Object.assign({color:c,roughness:ro===undefined?.6:ro,side:D},ex||{}));m.userData.papelKeep=true;return m;});
+  const caule=t160Std('570 caule',0x3a6a2e,.75),caule2=t160Std('570 caule claro',0x5a8a3a,.75),folha=mat('folha',0x3f7f34,.7),folha2=mat('folha clara',0x5f9a44,.7),sepala=mat('sépala',0x3a6a2a,.7),
+    capim=t160Std('570 capim',0x4a8a38,.85),capim2=t160Std('570 capim seco',0x7a9a48,.85),terra=t160Std('570 terra',0x2f4a22,.95),espinho=t160Std('570 espinho',0x6a5a2a,.6);
+  const brilhoSp=(g,cor,y,esc)=>{try{const sp=rkSprite(g,cor,esc||.9,.28,0,y,0);sp.userData.noCam=true;sp.userData.fl570Brilho=true;}catch(e){}};
+  const base=(K)=>{K.cyl(.09,.12,.02,terra,0,.006,0,10);fl570Tufo(K,capim,capim2,0,0,18,.24);fl570Tufo(K,capim2,capim,.05,.03,8,.16);};
+  // ROSAS
+  for(const [nome,cor,cor2] of [['rosa vermelha',0xb8102c,0x8a0a20],['rosa cor-de-rosa',0xf07a9a,0xd85a80]]){const g=new T.Group();g.name='570 '+nome;const K=t160Kit('570 '+nome);base(K);
+    const p1=mat(nome+' pétala',cor,.5,{emissive:cor,emissiveIntensity:.1}),p2=mat(nome+' pétala escura',cor2,.55);
+    const flor=(x,y,z,esc,aberta)=>{K.push(x,y,z,0,0,0,esc);K.sph(.05,p2,0,.02,0,1,1.1,1,10,8);
+      for(let c=0;c<3;c++){const incl=.25+c*.42*aberta,l=.07+c*.025,gp=fl570Petala(l,.045+c*.012,.5,.25*c,6);fl570Coroa(K,gp,c===0?p2:p1,0,-.01-c*.008,0,5,incl,c*.7);}
+      fl570Coroa(K,fl570Folha(.06,.014,.2,false),sepala,0,-.035,0,5,1.9,.3);K.pop();};
+    const hastes=[[[0,0,0],[.02,.25,.01],[-.01,.5,.02],[.0,.68,0]],[[0,0,0],[-.06,.2,.03],[-.12,.38,.05],[-.14,.52,.06]],[[0,0,0],[.07,.18,-.04],[.12,.32,-.07],[.14,.42,-.08]]];
+    hastes.forEach((h,i)=>{fl570Haste(K,caule,h,.008);const top=h[h.length-1];flor(top[0],top[1]+.02,top[2],i===0?1:.75,i===2?.25:1);
+      for(let k=1;k<h.length-1;k++){const q=h[k];K.add(fl570Folha(.09,.035,.25,true),k%2?folha:folha2,q[0],q[1],q[2],i*2+k*1.7,1.0,0);K.cone(.004,.018,espinho,q[0]+.008,q[1]+.04,q[2],4,0,0,-1.2);}});
+    K.fim(g,{sombra:false});brilhoSp(g,cor,.62);out.push({g,nome,cor});}
+  // MARGARIDAS
+  for(const [nome,cor,mio] of [['margarida branca',0xfbf8f0,0xf0b81c],['margarida amarela',0xffd23a,0x8a4a1a]]){const g=new T.Group();g.name='570 '+nome;const K=t160Kit('570 '+nome);base(K);
+    const p=mat(nome+' pétala',cor,.5,{emissive:cor,emissiveIntensity:.08}),m=t160Std('570 '+nome+' miolo',mio,.6),gp=fl570Petala(.085,.016,.25,.01,5);
+    const flor=(x,y,z,inc)=>{K.push(x,y,z,0,inc,0);K.sph(.03,m,0,.006,0,1,.55,1,12,8);fl570Coroa(K,gp,p,0,0,0,18,1.38,0);fl570Coroa(K,fl570Petala(.07,.014,.2,0,4),p,0,-.004,0,12,1.48,.13);K.pop();};
+    const hs=[[[0,0,0],[.02,.25,.0],[.0,.52,.02]],[[0,0,0],[-.05,.2,.04],[-.08,.4,.06]],[[0,0,0],[.06,.16,-.03],[.09,.33,-.05]]];
+    hs.forEach((h,i)=>{fl570Haste(K,caule2,h,.006);const t=h[h.length-1];flor(t[0],t[1],t[2],.15*(i?1:0));K.add(fl570Folha(.08,.02,.2,false),folha2,h[1][0],.06,h[1][2],i*2.1,1.15,0);});
+    for(let i=0;i<5;i++)K.add(fl570Folha(.12,.022,.25,false),folha,0,.02,0,i*1.26,1.25,0);
+    K.fim(g,{sombra:false});brilhoSp(g,cor,.55);out.push({g,nome,cor});}
+  // TULIPAS
+  for(const [nome,cor] of [['tulipa vermelha',0xd8203a],['tulipa amarela',0xffc828]]){const g=new T.Group();g.name='570 '+nome;const K=t160Kit('570 '+nome);base(K);
+    const p=mat(nome+' pétala',cor,.45,{emissive:cor,emissiveIntensity:.1}),gp=fl570Petala(.11,.045,.9,.06,7);
+    const hs=[[[0,0,0],[.01,.3,0],[0,.58,.01]],[[0,0,0],[-.06,.25,.03],[-.09,.46,.04]],[[0,0,0],[.07,.22,-.02],[.1,.42,-.03]]];
+    hs.forEach((h,i)=>{fl570Haste(K,caule2,h,.007);const t=h[h.length-1];fl570Coroa(K,gp,p,t[0],t[1],t[2],3,.22,i);fl570Coroa(K,gp,p,t[0],t[1]-.005,t[2],3,.3,i+Math.PI/3);
+      K.add(fl570Folha(.3,.035,.5,false),folha,h[0][0],.01,h[0][2],i*2.1,.28,0);K.add(fl570Folha(.24,.03,.5,false),folha2,h[0][0],.01,h[0][2],i*2.1+2.2,.38,0);});
+    K.fim(g,{sombra:false});brilhoSp(g,cor,.62);out.push({g,nome,cor});}
+  // GIRASSOL
+  {const g=new T.Group();g.name='570 girassol';const K=t160Kit('570 girassol');base(K);
+    const p=mat('girassol pétala',0xffc81e,.5,{emissive:0xffb000,emissiveIntensity:.1}),p2=mat('girassol pétala funda',0xf0a018,.55);
+    const disco=t160Mat('570 girassol disco',()=>{const c=can(128,128),x=c.getContext('2d');x.fillStyle='#4a2a10';x.fillRect(0,0,128,128);for(let i=0;i<420;i++){const a=i*2.39996,r=Math.sqrt(i)*3;x.fillStyle=i%3?'#2a1608':'#6a3a14';x.beginPath();x.arc(64+Math.cos(a)*r,64+Math.sin(a)*r,1.7,0,7);x.fill();}const tx=new T.CanvasTexture(c);tx.encoding=T.sRGBEncoding;const m=new T.MeshStandardMaterial({map:tx,roughness:.9});m.userData.papelKeep=true;return m;});
+    fl570Haste(K,caule,[[0,0,0],[.02,.3,0],[.0,.6,.02],[.02,.86,.05]],.014);
+    K.push(.02,.88,.07,0,-.55,0);K.add(new T.CircleGeometry(.07,24),disco,0,0,.012);K.sph(.072,t160Std('570 girassol verso',0x3a6a2a,.7),0,0,-.012,1,1,.35,12,8);
+      for(let i=0;i<16;i++){const a=i/16*Math.PI*2;K.add(fl570Petala(.09,.022,.2,.02,5),p,0,0,0,0,0,a-Math.PI/2);}for(let i=0;i<16;i++){const a=(i+.5)/16*Math.PI*2;K.add(fl570Petala(.075,.02,.2,.02,5),p2,0,0,-.004,0,0,a-Math.PI/2);}K.pop();
+    for(const [y,a,l] of [[.25,0,.13],[.45,2.4,.12],[.62,4.5,.1]])K.add(fl570Folha(l,.06,.2,true),folha,.0,y,.0,a,1.0,0);
+    K.fim(g,{sombra:false});brilhoSp(g,0xffd040,.86,1.0);out.push({g,nome:'girassol',cor:0xffc81e});}
+  // LAVANDA
+  {const g=new T.Group();g.name='570 lavanda';const K=t160Kit('570 lavanda');base(K);const fl=mat('lavanda flor',0x9a6ad8,.6,{emissive:0x7a4ab8,emissiveIntensity:.15}),fl2=mat('lavanda flor clara',0xb890f0,.6),cin=t160Std('570 lavanda caule',0x7a9a6a,.8);
+    for(let s=0;s<5;s++){const a=s/5*Math.PI*2,lx=Math.cos(a)*.05,lz=Math.sin(a)*.05,ex=Math.cos(a)*.08,ez=Math.sin(a)*.08;fl570Haste(K,cin,[[lx,0,lz],[lx+ex*.4,.25,lz+ez*.4],[lx+ex,.5,lz+ez]],.005);
+      for(let k=0;k<12;k++){const t=k/12,y=.36+t*.16,ang=k*2.1;K.sph(.012,k%2?fl:fl2,lx+ex*(.72+t*.28)+Math.cos(ang)*.012,y,lz+ez*(.72+t*.28)+Math.sin(ang)*.012,1,1.3,1,5,4);}}
+    for(let i=0;i<8;i++)K.add(fl570Folha(.16,.012,.1,false),folha2,0,.02,0,i*.8,.55,0);
+    K.fim(g,{sombra:false});brilhoSp(g,0xb890f0,.55,.8);out.push({g,nome:'lavanda',cor:0x9a6ad8});}
+  for(const o of out){o.g.traverse(q=>{if(q.isMesh){q.castShadow=false;q.receiveShadow=true;}});o.g.scale.setScalar(1.6);}
+  FL570.moldes=out;FL570.stats.moldes=out.length;return out;}
+/* ---------- onde há natureza ---------- */
+function fl570Regioes(key){const out=[];try{
+    if(FL570.verde[key]&&typeof RV530!=='undefined'){const C=RV530.campos[key];if(C&&(C.cfg||C.box||C.box539)){const m=C.mur,q=C.box539||C.box||(C.cfg&&C.cfg.rects&&C.cfg.rects[0]);let r=null;
+        if(m)r={x0:m.x0+2.6,x1:m.x1-2.6,z0:m.z0+2.6,z1:m.z1-2.6};else if(q)r={x0:q.x0+3,x1:q.x1-3,z0:q.z0+3,z1:q.z1-3};
+        if(r&&r.x1>r.x0&&r.z1>r.z0)out.push({r,fora:[[C.ax!==undefined?C.ax:(r.x0+r.x1)/2,C.az||0,11.5]],peso:2});}}
+    if(key==='fant')out.push({todo:true,peso:3});
+    if(key==='lib'&&typeof HW553!=='undefined'&&HW553.on&&HW553.D){const D=HW553.D;out.push({r:{x0:D.x0+1.5,x1:D.x1-1.5,z0:D.z0+1.5,z1:D.z1-1.5},peso:2});}
+    if(key==='adv'&&typeof NAV252!=='undefined'&&NAV252.ilha&&typeof nav252ChaoIlha==='function'){const I=NAV252.ilha;out.push({c:{x:I.x,z:I.z,r:(I.r||8.5)*.72},semMundo:true,y:(x,z)=>nav252ChaoIlha(x,z),peso:2});}
+  }catch(e){fl570Erro('regiões '+key,e);}return out;}
+function fl570CampoPendente(key){try{if(!FL570.verde[key])return false;if(typeof rv530Def!=='function')return false;const d=rv530Def(key);const C=RV530.campos[key];if(!d&&!C)return false;if(C&&(C.cfg||C.box||C.box539))return false;
+    const n=(FL570.espera[key]=(FL570.espera[key]||0)+1);return n<900;}catch(e){return false;}}
+function fl570Pontos(chave,key,W,n,spawn,floorY){const regs=fl570Regioes(key);if(!regs.length||n<=0)return [];const r=rnd(hashStr(chave+'|f570|'+cavDia()));const out=[];const soma=regs.reduce((a,g)=>a+(g.peso||1),0);const ext=Math.min(80,(W&&W.ext)||30);
+  for(let t=0;t<1600&&out.length<n;t++){let u=r()*soma,R=regs[0];for(const g of regs){u-=(g.peso||1);if(u<=0){R=g;break;}}let x,z;
+    if(R.r){x=R.r.x0+r()*(R.r.x1-R.r.x0);z=R.r.z0+r()*(R.r.z1-R.r.z0);}else if(R.c){const a=r()*6.2832,d=Math.sqrt(r())*R.c.r;x=R.c.x+Math.cos(a)*d;z=R.c.z+Math.sin(a)*d;}else{x=(r()*2-1)*ext;z=(r()*2-1)*ext;}
+    if(spawn&&Math.hypot(x-spawn.x,z-spawn.z)<4)continue;if(R.fora&&R.fora.some(c=>Math.hypot(x-c[0],z-c[1])<c[2]))continue;
+    if(!R.semMundo){if(!fl541Livre(W,x,z,.7))continue;}else{let ok=true;for(const o of (W&&W.obst)||[])if(Math.hypot(x-o[0],z-o[1])<o[2]+.7){ok=false;break;}if(!ok)continue;}
+    if(out.some(p=>Math.hypot(p[0]-x,p[1]-z)<4.5))continue;let y=0;try{y=R.y?R.y(x,z):(floorY?floorY(x,z):0);}catch(e){}if(!isFinite(y)||y<-1.5||y>8)continue;out.push([x,z,y]);}
+  return out;}
+/* ---------- espalhar: poções como antes, flores só na natureza ---------- */
+function fl570Espalha(chave,sc,W,spawn,floorY,key,nf,np){if(FL541.itens[chave]&&FL541.itens[chave].dia===cavDia())return FL541.itens[chave];
+  const sala=/^sala:/.test(chave);if(sala&&fl570CampoPendente(key))return null;
+  const velho=FL541.itens[chave];if(velho)for(const it of velho.lista)try{sc.remove(it.g);}catch(e){}
+  const M=fl541Moldes(),F=fl570Moldes();const ap=FL541.save.apanhados;const lista=[];
+  const nPoc=sala?np:Math.max(np,2),nFlor=sala?(fl570Regioes(key).length?(key==='fant'?4:3):0):0;
+  const pp=fl541Pontos(chave+'|p570',W,nPoc,spawn,floorY,key);const pf=fl570Pontos(chave,key,W,nFlor,spawn,floorY);
+  pp.forEach((p,i)=>{const id=chave+':p'+i;const g=M.pocao[(i+hashStr(chave))%M.pocao.length].clone(true);g.name='541 pocao';g.position.set(p[0],p[2]+.35,p[1]);g.traverse(o=>{o.raycast=()=>{};o.userData.noCam=true;o.userData.papelKeepGeo=true;o.__fusaoMoveu=9;});g.visible=!ap[id];sc.add(g);lista.push({id,tipo:'pocao',g,x:p[0],z:p[1],y:p[2]+.35,ph:i*1.7});});
+  pf.forEach((p,i)=>{const id=chave+':f'+i;const mo=F[(i*3+hashStr(chave+cavDia()))%F.length];const g=mo.g.clone(true);g.name='570 flor';g.position.set(p[0],p[2],p[1]);const ry=(hashStr(id)%628)/100;g.rotation.y=ry;
+    g.traverse(o=>{o.raycast=()=>{};o.userData.noCam=true;o.userData.papelKeepGeo=true;o.__fusaoMoveu=9;if(o.isSprite)o.material=o.material.clone();});g.userData.fl570={ry,ph:i*2.3};g.visible=!ap[id];sc.add(g);lista.push({id,tipo:'flor',g,x:p[0],z:p[1],y:p[2],ph:i*2.3,fl570:true});});
+  FL541.itens[chave]={dia:cavDia(),lista,sc};FL541.stats[chave]=[pf.length,pp.length];FL570.stats[chave]=pf.map(p=>p.map(v=>+v.toFixed(1)));return FL541.itens[chave];}
+// depois do relógio da v541 (que gira e faz flutuar): as flores ficam plantadas, balançam e o brilho pulsa
+function fl570Tick(dt){if(!FL570.on)return;FL570.t+=dt;const t=FL570.t;for(const k in FL541.itens){const G=FL541.itens[k];if(!G||!G.lista)continue;for(const it of G.lista){if(!it.fl570||!it.g.visible)continue;const u=it.g.userData.fl570;
+    it.g.rotation.y=u.ry;it.g.rotation.z=.05*Math.sin(t*1.6+u.ph)+.025*Math.sin(t*3.7+u.ph);it.g.rotation.x=.04*Math.sin(t*1.3+u.ph*1.7);it.g.position.y=it.y;
+    for(const c of it.g.children)if(c.isSprite&&c.userData.fl570Brilho)c.material.opacity=.18+.12*Math.sin(t*2.2+u.ph);}}}
+if(FL570.on&&typeof FL541!=='undefined'&&FL541.on){
+  try{fl541Espalha=fl570Espalha;}catch(e){fl570Erro('espalha',e);}
+  try{const tk0=tick;tick=function(dt){const rv=tk0.apply(this,arguments);try{fl570Tick(Math.min(.1,dt||.016));}catch(e){fl570Erro('tick',e);}return rv;};}catch(e){fl570Erro('tick instalar',e);}
+  try{for(const k in FL541.itens){const G=FL541.itens[k];if(G&&G.lista)for(const it of G.lista)try{G.sc.remove(it.g);}catch(e){}delete FL541.itens[k];}}catch(e){}
+}
+window.__flores570={estado:FL570,erros:FL570.erros,stats:FL570.stats,regioes:fl570Regioes,moldes:fl570Moldes};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
