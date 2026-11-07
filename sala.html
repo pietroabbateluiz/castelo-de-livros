@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v600</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v601</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -73689,6 +73689,92 @@ if(QU600.on&&typeof S567!=='undefined'&&S567.on){
   try{const _a=s580Aplica;s580Aplica=function(R){const r=_a.apply(this,arguments);try{qu600Aplica(R);}catch(e){qu600Erro('aplica',e);}return r;};}catch(e){qu600Erro('ligar',e);}
 }
 window.__quadros600={estado:QU600,erros:QU600.erros,stats:QU600.stats};
+
+/* ===================== v601 · O RELÓGIO DE PÉ DA BIBLIOTECA (bloco `RE601`) =====================
+   Continuação da revisão da Biblioteca («… focando em espaço, texturas, qualidade gráfica, etc» e «continue aperfeiçoando»).
+   O relógio de pé do canto sudoeste era um empilhado de caixas com um mostrador chapado e o pêndulo parado. As malhas dele são
+   recortadas (estavam juntas com o resto da sala) e o mostrador antigo sai; no mesmo lugar entra um relógio de verdade:
+   · CAIXA de nogueira: pés de suporte, base com almofada e espelho de fechadura de latão, molduras, o corpo oco com a porta de vidro
+     (por ela se vê o pêndulo e os dois pesos nas correntes), o capuz com colunas torneadas de capitel de latão, a porta do mostrador
+     em arco com filete dourado e, em cima, o frontão de pescoço de cisne com rosetas e três pináculos de latão.
+   · MOSTRADOR novo (latão gravado com cantoneiras, esmalte creme, algarismos romanos, trilho dos minutos, o mostradorzinho dos
+     segundos e, no arco, a lua num céu de estrelas com «TEMPUS FUGIT»).
+   · Os PONTEIROS mostram a HORA DE VERDADE (do relógio do computador), com o ponteiro dos segundos andando, e o PÊNDULO balança
+     (período de 2 s), quando se está na Biblioteca.
+   `?relogio601=0` volta ao relógio antigo. */
+const RE601={on:!/[?&#]relogio601=0/i.test(location.search+location.hash),feito:false,erros:[],stats:{}};
+function re601Erro(k,e){if(RE601.erros.length<30)RE601.erros.push(k+': '+(e&&e.message||e));try{console.warn('v601',k,e);}catch(x){}}
+const RE601_P={x:15.05,z:27.6,ry:Math.PI/2,yD:1.9,cy:2.12};
+function re601TexMostrador(){return fl591Tex('601 mostrador',256,384,(x,w,h)=>{const r=rnd(60101);
+  let g=x.createLinearGradient(0,0,w,h);g.addColorStop(0,'#e8c878');g.addColorStop(.5,'#b8903a');g.addColorStop(1,'#e0bc68');x.fillStyle=g;x.fillRect(0,0,w,h);
+  x.strokeStyle='rgba(90,60,20,.55)';x.lineWidth=1.5;for(const [cx,cy,s] of [[18,146,1],[w-18,146,-1],[18,h-18,1],[w-18,h-18,-1]]){for(let k=0;k<3;k++){x.beginPath();x.arc(cx+s*(8+k*7),cy-(cy>200?8+k*7:-(8+k*7)),6+k*4,0,Math.PI*1.6);x.stroke();}}
+  // arco: a lua no céu de estrelas
+  x.save();x.beginPath();x.arc(w/2,128,112,Math.PI,0);x.closePath();x.clip();g=x.createLinearGradient(0,16,0,128);g.addColorStop(0,'#0a1a4a');g.addColorStop(1,'#2a4a8a');x.fillStyle=g;x.fillRect(0,0,w,130);
+  x.fillStyle='#ffffff';for(let k=0;k<40;k++){const a=Math.PI+r()*Math.PI,d=r()*104;x.beginPath();x.arc(w/2+Math.cos(a)*d,128+Math.sin(a)*d,.8+r()*1.4,0,7);x.fill();}
+  {const mx=w/2+38,my=70;const g2=x.createRadialGradient(mx-8,my-8,4,mx,my,30);g2.addColorStop(0,'#fff8d8');g2.addColorStop(1,'#e8c870');x.fillStyle=g2;x.beginPath();x.arc(mx,my,30,0,7);x.fill();x.fillStyle='rgba(150,110,40,.6)';x.beginPath();x.arc(mx-9,my-6,3,0,7);x.arc(mx+7,my-6,3,0,7);x.fill();x.strokeStyle='rgba(150,110,40,.7)';x.lineWidth=2;x.beginPath();x.arc(mx,my+4,10,.3,Math.PI-.3);x.stroke();}
+  x.fillStyle='#e8d8a8';x.font='bold 13px Georgia,serif';x.textAlign='center';x.textBaseline='middle';x.fillText('TEMPUS FUGIT​',w/2,116);x.restore();
+  x.strokeStyle='#5a3a10';x.lineWidth=3;x.beginPath();x.arc(w/2,128,112,Math.PI,0);x.stroke();
+  // mostrador redondo
+  const cx=w/2,cy=256;g=x.createRadialGradient(cx-20,cy-30,10,cx,cy,120);g.addColorStop(0,'#fffaf0');g.addColorStop(1,'#efe4c8');x.fillStyle=g;x.beginPath();x.arc(cx,cy,121,0,7);x.fill();
+  x.strokeStyle='#3a2a18';x.lineWidth=2;for(const rr of [121,112,104,74]){x.beginPath();x.arc(cx,cy,rr,0,7);x.stroke();}
+  for(let k=0;k<60;k++){const a=k/60*Math.PI*2-Math.PI/2,r0=k%5?106:103;x.lineWidth=k%5?1:2.4;x.beginPath();x.moveTo(cx+Math.cos(a)*r0,cy+Math.sin(a)*r0);x.lineTo(cx+Math.cos(a)*111,cy+Math.sin(a)*111);x.stroke();}
+  const ROM=['XII','I','II','III','IIII','V','VI','VII','VIII','IX','X','XI'];x.fillStyle='#1a1410';x.font='bold 17px Georgia,"Times New Roman",serif';
+  for(let k=0;k<12;k++){const a=k/12*Math.PI*2-Math.PI/2;x.save();x.translate(cx+Math.cos(a)*89,cy+Math.sin(a)*89);x.rotate(a+Math.PI/2);x.fillText(ROM[k]+'​',0,0);x.restore();}
+  x.lineWidth=1.2;x.beginPath();x.arc(cx,cy-46,22,0,7);x.stroke();for(let k=0;k<12;k++){const a=k/12*Math.PI*2;x.beginPath();x.moveTo(cx+Math.cos(a)*18,cy-46+Math.sin(a)*18);x.lineTo(cx+Math.cos(a)*22,cy-46+Math.sin(a)*22);x.stroke();}
+  x.font='italic 10px Georgia,serif';x.fillText(s567T('Castelo de Papel','Paper Castle')+'​',cx,cy+40);
+  x.strokeStyle='rgba(150,110,40,.6)';x.lineWidth=1;for(let k=0;k<8;k++){const a=k/8*Math.PI*2;x.beginPath();x.moveTo(cx+Math.cos(a)*30,cy+Math.sin(a)*30);x.quadraticCurveTo(cx+Math.cos(a+.3)*50,cy+Math.sin(a+.3)*50,cx+Math.cos(a)*68,cy+Math.sin(a)*68);x.stroke();}});}
+function re601Arco(w,hq,R){const s=new THREE.Shape();s.moveTo(-w/2,0);s.lineTo(w/2,0);s.lineTo(w/2,hq);s.absarc(0,hq,R,0,Math.PI,false);s.lineTo(-w/2,0);return s;}
+function re601Aplica(R){if(RE601.feito||!R||!R.scene||typeof S567==='undefined'||!S567.feito)return;RE601.feito=true;const sc=R.scene,T=THREE,t0=performance.now(),P=RE601_P;
+  // 1) tira o relógio antigo: recorta a caixa das malhas da biblioteca e esconde o mostrador
+  const V={x0:14.74,x1:15.33,y0:.015,y1:2.64,z0:27.22,z1:27.98};let cort=0,esc=0;
+  try{const bb=new T.Box3(),alvos=[];sc.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||!o.geometry)return;const mn=(o.material&&o.material.name)||'';if(/567 mostrador$/.test(mn)){o.visible=false;esc++;return;}
+      if(/^567 biblioteca/.test(o.name||'')){bb.setFromObject(o);if(bb.max.x>V.x0&&bb.min.x<V.x1&&bb.max.z>V.z0&&bb.min.z<V.z1&&bb.max.y>V.y0&&bb.min.y<V.y1)alvos.push(o);}});for(const o of alvos)cort+=fl591Recorta(o,V);}catch(e){re601Erro('recorte',e);}
+  RE601.stats.recortados=cort;RE601.stats.escondidas=esc;
+  const nog=T160.cache.get('m:567 nogueira')||t160Std('601 nogueira',fl591C(0x4b2d19),.55),esc2=t160Std('601 nogueira escura',fl591C(0x2a1a0e),.5),latao=t160Std('601 latão',fl591C(0xd0a858),.28,.9),
+    fundo=t160Std('601 fundo do corpo',fl591C(0x1a100a),.9),vidro=t160Mat('601 vidro',()=>{const m=new T.MeshStandardMaterial({color:0xdde8ff,transparent:true,opacity:.12,roughness:.05,metalness:.3,depthWrite:false});m.userData.papelKeep=true;return m;}),
+    mostM=t160Mat('601 mostrador',()=>{const m=new T.MeshStandardMaterial({map:re601TexMostrador(),roughness:.35,metalness:.25});m.userData.papelKeep=true;return m;}),preto=t160Std('601 ponteiro',fl591C(0x14100c),.35,.4);
+  const K=t160Kit('601 relógio');
+  try{K.push(P.x,0,P.z,P.ry);
+    // pés, base, molduras
+    for(const sx of [-1,1])for(const sz of [-1,1])K.rbox(.1,.08,.1,.02,esc2,sx*.25,.04,sz*.15);
+    K.boxW(.6,.54,.4,nog,0,.35,0,0,0,0,.5);K.box(.64,.035,.44,esc2,0,.098,0);K.boxW(.42,.34,.02,nog,0,.35,.205,0,0,0,.5);K.box(.44,.012,.012,latao,0,.525,.21);K.box(.44,.012,.012,latao,0,.175,.21);
+    K.box(.04,.06,.006,latao,0,.42,.217);K.box(.008,.022,.004,preto,0,.418,.221);K.box(.64,.04,.44,esc2,0,.64,0);
+    // o corpo oco com a porta de vidro
+    K.box(.46,1.04,.02,fundo,0,1.18,-.14);for(const s of [-1,1])K.boxW(.03,1.04,.3,nog,s*.215,1.18,0,0,0,0,.5);
+    K.boxW(.46,.13,.03,nog,0,.725,.135,0,0,0,.5);K.boxW(.46,.1,.03,nog,0,1.66,.135,0,0,0,.5);for(const s of [-1,1])K.boxW(.07,.86,.03,nog,s*.195,1.19,.135,0,0,0,.5);
+    K.box(.32,.88,.006,vidro,0,1.18,.148);for(const s of [-1,1])K.box(.006,.86,.008,latao,s*.161,1.19,.152);K.box(.33,.006,.008,latao,0,1.62,.152);K.box(.33,.006,.008,latao,0,.76,.152);
+    for(const s of [-1,1]){K.cyl(.032,.032,.2,latao,s*.1,1.32,-.06,16);K.sph(.032,latao,s*.1,1.22,-.06,1,.35,1,12,6);K.sph(.032,latao,s*.1,1.42,-.06,1,.35,1,12,6);K.cyl(.0035,.0035,.25,latao,s*.1,1.55,-.06,6);}
+    K.box(.56,.045,.38,esc2,0,1.725,0);
+    // o capuz: caixa, colunas torneadas, porta do mostrador em arco
+    const yH=1.75,hH=.86;K.boxW(.58,hH,.38,nog,0,yH+hH/2,-.01,0,0,0,.5);
+    {const fr=new T.Shape();fr.moveTo(-.25,-.03);fr.lineTo(.25,-.03);fr.lineTo(.25,.44);fr.absarc(0,.44,.25,0,Math.PI,false);fr.lineTo(-.25,-.03);fr.holes.push(new T.Path().moveTo(-.215,0).lineTo(.215,0).lineTo(.215,.44).absarc(0,.44,.215,0,Math.PI,false).lineTo(-.215,0));K.ext(fr,.03,nog,0,P.yD,.195);}
+    {const g=new T.ShapeGeometry(re601Arco(.44,.44,.22),24),pos=g.attributes.position,uv=g.attributes.uv;for(let k=0;k<pos.count;k++)uv.setXY(k,(pos.getX(k)+.22)/.44,pos.getY(k)/.66);uv.needsUpdate=true;K.add(g,mostM,0,P.yD,.182);}
+    {const pts=[];for(let k=0;k<=24;k++){const a=k/24*Math.PI;pts.push([Math.cos(a)*.218,P.yD+.44+Math.sin(a)*.218,.212]);}K.tube(pts,.006,latao,40,6);for(const s of [-1,1])K.cyl(.006,.006,.44,latao,s*.218,P.yD+.22,.212,6);K.cyl(.006,.006,.436,latao,0,P.yD,.212,6,0,0,Math.PI/2);}
+    for(const s of [-1,1]){K.lathe([[.001,0],[.03,0],[.03,.03],[.022,.05],[.026,.12],[.02,.4],[.024,.68],[.03,.72],[.03,.76],[.001,.76]],nog,s*.265,yH+.05,.17,12);K.cyl(.034,.034,.03,latao,s*.265,yH+.05,.17,12);K.cyl(.034,.034,.03,latao,s*.265,yH+.8,.17,12);}
+    K.box(.64,.05,.42,esc2,0,yH+hH+.025,-.01);
+    // frontão de pescoço de cisne, rosetas e pináculos
+    const yT=yH+hH+.05;for(const s of [-1,1]){const pts=[];for(let k=0;k<=20;k++){const t=k/20;pts.push([s*(.3-t*.21),yT+.03+(1-Math.cos(t*Math.PI))/2*.2,.17]);}K.tube(pts,.028,nog,30,8);K.cyl(.042,.042,.02,latao,s*.09,yT+.23,.19,16,0,Math.PI/2,0);K.sph(.017,latao,s*.09,yT+.23,.205,1,1,.6,8,6);}
+    K.boxW(.5,.16,.04,nog,0,yT+.08,.15,0,0,0,.5);K.box(.08,.14,.08,esc2,0,yT+.07,.12);K.sph(.04,latao,0,yT+.18,.12,1,1,1,12,8);K.cone(.012,.1,latao,0,yT+.26,.12,8);
+    for(const s of [-1,1]){K.box(.07,.06,.07,esc2,s*.29,yT+.03,.15);K.sph(.034,latao,s*.29,yT+.095,.15,1,1.15,1,12,8);K.cone(.008,.06,latao,s*.29,yT+.155,.15,8);}
+    K.pop();}catch(e){re601Erro('caixa',e);}
+  for(let k=0;k<12;k++)K.pop();
+  try{const ms=K.fim(sc,{sombra:true});for(const m of ms){m.userData.s567=true;m.userData.re601=true;m.userData.papelKeepGeo=true;m.userData.noCam=true;}RE601.stats.malhas=ms.length;}catch(e){re601Erro('fim',e);}
+  // 2) o que se mexe: pêndulo e ponteiros
+  try{const root=new T.Group();root.name='601 relógio';root.position.set(P.x,0,P.z);root.rotation.y=P.ry;sc.add(root);
+    const pend=new T.Group();pend.position.set(0,1.64,-.03);root.add(pend);const Kp=t160Kit('601 pêndulo');Kp.box(.012,.74,.005,latao,0,-.37,0);Kp.cyl(.085,.085,.016,latao,0,-.8,0,28,0,Math.PI/2,0);Kp.sph(.084,latao,0,-.8,.008,1,1,.22,24,10);Kp.fim(pend,{sombra:false});
+    const mao=(L,wd,mat,ponta)=>{const g=new T.Group(),Kh=t160Kit('601 ponteiro');Kh.box(wd,L,.003,mat,0,L/2-.015,0);if(ponta){Kh.box(ponta,ponta,.003,mat,0,L*.72,0,0,0,Math.PI/4);Kh.box(wd*2.2,wd*2.2,.003,mat,0,0,0,0,0,Math.PI/4);}Kh.fim(g,{sombra:false});return g;};
+    const cz=.182+.008,hrs=mao(.115,.008,preto,.026),min=mao(.165,.005,preto,.018),seg=mao(.034,.003,t160Std('601 ponteiro dos segundos',fl591C(0x8a1a12),.4),0);
+    hrs.position.set(0,P.cy,cz);min.position.set(0,P.cy,cz+.004);seg.position.set(0,P.cy+.079,cz);root.add(hrs,min,seg);
+    const eixo=new T.Mesh(new T.CylinderGeometry(.008,.008,.012,10),latao);eixo.rotation.x=Math.PI/2;eixo.position.set(0,P.cy,cz+.008);root.add(eixo);
+    root.traverse(o=>{o.userData.s567=true;o.userData.noCam=true;o.raycast=()=>{};o.__fusaoMoveu=9;});
+    const acerta=()=>{const d=new Date(),s=d.getSeconds()+d.getMilliseconds()/1000,m=d.getMinutes()+s/60,h=(d.getHours()%12)+m/60;seg.rotation.z=-s/60*Math.PI*2;min.rotation.z=-m/60*Math.PI*2;hrs.rotation.z=-h/12*Math.PI*2;};acerta();
+    let acc=0;S567.anim.push((dt,t)=>{if(S567.aqui!=='bib')return;pend.rotation.z=.13*Math.sin(t*Math.PI);acc+=dt;if(acc>.2){acc=0;acerta();}});RE601.stats.vivo=true;}catch(e){re601Erro('pêndulo e ponteiros',e);}
+  try{if(typeof fusaoLimpar==='function')fusaoLimpar(sc);}catch(e){}
+  RE601.stats.ms=Math.round(performance.now()-t0);}
+if(RE601.on&&typeof S567!=='undefined'&&S567.on){
+  try{const _a=s580Aplica;s580Aplica=function(R){const r=_a.apply(this,arguments);try{re601Aplica(R);}catch(e){re601Erro('aplica',e);}return r;};}catch(e){re601Erro('ligar',e);}
+}
+window.__relogio601={estado:RE601,erros:RE601.erros,stats:RE601.stats};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
