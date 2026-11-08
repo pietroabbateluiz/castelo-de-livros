@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v620</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v621</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -76677,6 +76677,131 @@ function il620Vitrine(sc){const T=THREE,M=i503Mats(),MT=il620Mats(),X=il620Textu
   const am=new T.MeshStandardMaterial({map:X.areia.map,normalMap:X.areia.nrm,normalScale:new T.Vector2(.6,.6),roughness:.95,color:new T.Color(0xb09560).multiplyScalar(.78).multiply(new T.Color(.93,.84,.66))});
   const pg=new T.PlaneGeometry(40,24);const uv=pg.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)*40/6,uv.getY(i)*24/6);const ch=new T.Mesh(pg,am);ch.rotation.x=-Math.PI/2;ch.receiveShadow=true;sc.add(ch);return ms.length;}
 window.__ilhas620={estado:IL620,erros:IL620.erros,stats:IL620.stats,pos:il620Pos,tex:()=>il620Texturas(),mats:()=>il620Mats(),fronde:il620Fronde,cartao:il620Cartao,vitrine:il620Vitrine};
+
+/* ===================== v621 · A MASMORRA DO TERROR MAIS SOMBRIA (bloco `MS621`) =====================
+   Pedido do Luiz (08/11, 00h14): «Melhore a masmorra do terror». Levantamento com fotos (v620): o corredor da Galeria dos Ecos já
+   tinha o piso de lajes escuras da v469, mas as QUATRO CÂMARAS e o PATAMAR da escada ainda usavam o piso antigo da v398 — tijolinho
+   cinza-claro em 4 × 4 com EMISSÃO branca 0,13 (`S.floors[1…5]`, materiais clonados, que a v469 não pegou porque só trocava os que
+   usavam o material comum) —, e as peças de cor por vértice (cantaria, arcos, colunas, frisos, estandartes, painéis, estantes)
+   eram claras e em tons pastel (branco, rosa, azul-bebê, pêssego): pareciam um palácio limpo, não uma masmorra. As poças d'água da
+   v469 (metal 0,7, reflexo do cubo) apareciam como manchas pretas recortadas. Agora (`ms621Aplica`, no fim do `dungeon395Build`,
+   depois das v398/v421/v433/v469):
+   · PISO: as cinco lajes antigas viram a malha de 0,5 m da v469 com o mesmo material (lajes escuras com normais e aspereza), cor por
+     vértice com oclusão junto às paredes e tom variado — o piso todo igual ao do corredor, sem a emissão.
+   · PALETA DE TERROR (`ms621Grade`): a cor por vértice das peças da masmorra (fora os carcereiros, as chaves, os baús e o fogo) passa
+     por uma correção em HSL: brancos e cinzas claros escurecem para pedra velha; rosas viram carmim fundo; azuis-bebê viram ardósia;
+     beges e pêssegos viram madeira escura e pedra suja; o dourado vira bronze. As placas acesas brilham menos.
+   · POÇAS: água escura quase parada (metal 0,2, cor 0x161a20, opacidade 0,42, reflexo 0,3) e a borda molhada mais leve.
+   · HORRORES (kit `Masmorras · v621 horrores`): montes de ossos com caveiras nas celas e no ossuário; as PRATELEIRAS DE CAVEIRAS
+     do ossuário (catacumba: três prateleiras de pedra com caveiras lado a lado e ossos empilhados) na parede de dentro, dos dois
+     lados da porta; duas GAIOLAS penduradas por correntes (uma com um esqueleto) nas celas e no corredor; correntes com gancho
+     pendendo da abóbada do corredor; velas derretidas em grupos com poça de cera (no chão, junto às paredes) com chamas que
+     tremulam; ossos e caveiras soltos pelo chão; e FOGOS-FÁTUOS — luzinhas verde-azuladas que vagam devagar no ossuário, na câmara
+     dos selos e nas celas (só se movem enquanto se está lá embaixo).
+   Sem luzes novas (emissão e halos). Os obstáculos novos (montes, prateleiras) entram no `S.world.obst`.
+   `?masmorra621=0` desliga. Gancho `window.__masmorra621`. */
+const MS621={on:!/[?&#]masmorra621=0/i.test(location.search+location.hash),erros:[],stats:{},feito:false,vivo:null};
+function ms621Erro(k,e){if(MS621.erros.length<30)MS621.erros.push(k+': '+(e&&e.message||e));try{console.warn('v621',k,e);}catch(x){}}
+// ---------- 1 · o piso das câmaras e do patamar ----------
+function ms621Pisos(S){const T=THREE;const f0=S.floors&&S.floors[0]&&S.floors[0].material;if(!f0||!f0.vertexColors||!f0.map)return 0;
+  const paredes=m469Paredes(),noise=mkNoise(62101);let n=0;
+  for(const mesh of S.floors){const mo=mesh.material;if(!mesh.isMesh||mo===f0||!mo||mo.visible===false||!mo.map||!mo.emissiveMap||!mesh.geometry||mesh.geometry.type!=='PlaneGeometry'||Math.abs(mesh.rotation.x+Math.PI/2)>.01)continue;
+    const pr=mesh.geometry.parameters,w=pr.width,d=pr.height,g=new T.PlaneGeometry(w,d,Math.max(1,Math.round(w*2)),Math.max(1,Math.round(d*2)));const p=g.attributes.position,uv=g.attributes.uv,col=new Float32Array(p.count*3);
+    for(let i=0;i<p.count;i++){const x=p.getX(i)+mesh.position.x,z=-p.getY(i)+mesh.position.z;uv.setXY(i,x*.09,z*.09);let dmin=9;for(const b of paredes){const dx=Math.max(b[0]-x,0,x-b[1]),dz=Math.max(b[2]-z,0,z-b[3]);const dd=Math.hypot(dx,dz);if(dd<dmin)dmin=dd;}
+      const ao=.4+.6*Math.min(1,dmin/1.35)**.8,tom=.7+.17*noise(x*.35+60,z*.35+60,2);const v=ao*tom;col[i*3]=v;col[i*3+1]=v*(1-.02*(1-ao));col[i*3+2]=v*(1-.05*(1-ao));}
+    g.setAttribute('color',new T.BufferAttribute(col,3));mesh.geometry.dispose();mesh.geometry=g;mesh.material=f0;n++;}
+  return n;}
+// ---------- 2 · a paleta: pastel → pedra velha, carmim, ardósia, madeira escura, bronze ----------
+function ms621Cor(c,h){// c em linear; decide em HSL sRGB
+  const s=c.clone().convertLinearToSRGB();s.getHSL(h);let H=h.h,Sa=h.s,L=h.l;const L0=L;
+  if(Sa<.16){if(L>.5)L=.2+(L-.5)*.5;}
+  else if((H>.88||H<.03)&&L>.42){H=.99;Sa=Math.min(.7,Sa*.6+.32);L=.19+(L-.42)*.26;}
+  else if(H>.42&&H<.74&&L>.4){Sa*=.5;L=.16+(L-.4)*.34;}
+  else if(H>=.03&&H<.14&&L>.55){Sa*=.8;L=.26+(L-.55)*.44;}
+  else if(H>=.1&&H<.18&&Sa>.35&&L>.35){L*=.82;Sa*=.85;}
+  if(L===L0&&H===h.h&&Sa===h.s)return false;s.setHSL(H,Sa,L);s.convertSRGBToLinear();c.copy(s);return true;}
+function ms621Grade(S){const T=THREE;const excl=new Set();
+  try{const A=CAV.salas&&CAV.salas.dungeon395;if(A)for(const a of A.lista||[])if(a.g)a.g.traverse(o=>excl.add(o));}catch(e){}
+  try{for(const it of S.items||[])if(it.g)it.g.traverse(o=>excl.add(o));}catch(e){}
+  for(const f of S.floors||[])excl.add(f);
+  const c=new T.Color(),h={};let malhas=0,verts=0;const geos=new Set();
+  S.root.traverse(o=>{if(!o.isMesh||excl.has(o)||o.userData.ms621||o.userData.ms621Novo)return;const m=o.material;if(!m||Array.isArray(m)||!m.vertexColors||m.isMeshBasicMaterial)return;
+    if(/flame|fire|ember|brasa|fogo|chama|glow|pool/i.test(m.name||''))return;const g=o.geometry,a=g&&g.attributes.color;if(!a||geos.has(g))return;geos.add(g);
+    for(let i=0;i<a.count;i++){c.setRGB(a.getX(i),a.getY(i),a.getZ(i));if(ms621Cor(c,h)){a.setXYZ(i,c.r,c.g,c.b);verts++;}}a.needsUpdate=true;o.userData.ms621=true;malhas++;});
+  // placas acesas (rótulos e epitáfios) brilham menos
+  let placas=0;S.root.traverse(o=>{if(!o.isMesh)return;const m=o.material;if(m&&!Array.isArray(m)&&m.emissiveMap&&m.emissiveIntensity>.1&&m.emissiveIntensity<.3){m.emissiveIntensity=.08;placas++;}});
+  return {malhas,verts,placas};}
+// ---------- 3 · poças discretas ----------
+function ms621Pocas(S){let n=0;S.root.traverse(o=>{if(!o.isMesh||!o.material||Array.isArray(o.material))return;const m=o.material,nm=m.name||'';
+  if(/469 poça/.test(nm)&&!m.userData.ms621){m.color.set(0x161a20);m.metalness=.2;m.roughness=.08;m.opacity=.42;if('envMapIntensity' in m)m.envMapIntensity=.3;m.userData.ms621=1;m.needsUpdate=true;n++;}
+  else if(/469 borda molhada/.test(nm)&&!m.userData.ms621){m.opacity=Math.min(m.opacity,.32);m.userData.ms621=1;m.needsUpdate=true;n++;}});return n;}
+// ---------- 4 · os horrores ----------
+function ms621Caveira(K,M,x,y,z,ry,s,inc){s=s||1;K.push(x,y,z,ry||0,inc||0,0);
+  K.sph(.105*s,M.osso,0,.09*s,0,1,.92,1.12,12,9);K.sph(.07*s,M.osso,0,.04*s,.085*s,1.15,.85,.75,10,7);
+  for(const sx of [-1,1])K.sph(.026*s,M.vazio,sx*.036*s,.07*s,.138*s,1,1.1,.6,8,6);K.sph(.014*s,M.vazio,0,.035*s,.152*s,.8,1.2,.6,6,4);
+  K.box(.11*s,.03*s,.07*s,M.osso,0,-.005*s,.095*s);for(let i=0;i<5;i++)K.box(.012*s,.014*s,.01*s,M.dente,(-.034+i*.017)*s,.012*s,.133*s);K.pop();}
+function ms621Osso(K,M,x,y,z,ry,rx,rz,L,s){s=s||1;K.push(x,y,z,ry,rx,rz);K.cyl(.024*s,.028*s,L,M.osso,0,0,0,6);for(const e of [-1,1])for(const k of [-1,1])K.sph(.034*s,M.osso,k*.022*s,e*L/2,0,1,.85,1,6,5);K.pop();}
+function ms621Monte(K,M,x,z,r,n,rnd,nCav){for(let i=0;i<n;i++){const a=rnd()*6.283,d=Math.sqrt(rnd())*r,px=x+Math.cos(a)*d,pz=z+Math.sin(a)*d,hgt=(1-d/r)*r*.45;
+    ms621Osso(K,M,px,-8+.03+hgt*rnd(),pz,rnd()*6.283,(rnd()-.5)*.8,Math.PI/2+(rnd()-.5)*.5,.28+rnd()*.22,1);}
+  for(let i=0;i<(nCav||3);i++){const a=rnd()*6.283,d=rnd()*r*.6;ms621Caveira(K,M,x+Math.cos(a)*d,-8+.02+(1-d/r)*r*.42,z+Math.sin(a)*d,rnd()*6.283,1,(rnd()-.5)*.6);}}
+function ms621Prateleira(K,M,x,z,lado,comp,rnd,ob){// prateleiras de pedra junto da parede; lado: +1 = a pedra fica para +x da parede (a face olha para +x)
+  const prof=.42,x0=x+lado*prof/2;for(const y of [-7.92,-7.3,-6.68,-6.06])K.box(prof,.08,comp,M.pedra,x0,y,z);for(const zz of [z-comp/2,z+comp/2])K.box(prof,1.95,.1,M.pedra,x0,-7,zz);
+  for(const y of [-7.88,-7.26,-6.64]){const n=Math.floor(comp/.26);for(let i=0;i<n;i++){const zz=z-comp/2+.16+i*(comp-.32)/(n-1);if(rnd()<.18){for(let k=0;k<3;k++)ms621Osso(K,M,x0+lado*(-.02),y+.06+k*.045,zz,0,Math.PI/2,0,.34,1);continue;}
+      ms621Caveira(K,M,x0+lado*.02,y+.04,zz,lado>0?Math.PI/2:-Math.PI/2,1.05,(rnd()-.5)*.25);}}
+  for(let i=0;i<5;i++)ms621Osso(K,M,x0+lado*(rnd()-.5)*.25,-6.0,z-comp/2+.3+rnd()*(comp-.6),rnd()*.3,Math.PI/2,(rnd()-.5)*.3,.32,1);
+  if(ob)ob(x0,z,comp/2+.1,prof);}
+function ms621Corrente(K,M,x,yTop,z,L,gancho){const n=Math.floor(L/.115);for(let j=0;j<n;j++)K.tor(.06,.015,M.ferro,x,yTop-.06-j*.115,z,Math.PI*2,j%2?Math.PI/2:0,0,0,5,10);
+  if(gancho){const y=yTop-.06-n*.115;K.tube([[x,y,z],[x,y-.16,z],[x+.09,y-.24,z],[x+.13,y-.14,z]],.016,M.ferro,8,5);}return yTop-.06-n*.115;}
+function ms621Gaiola(K,M,x,yTop,z,rnd,esqueleto){const yc=ms621Corrente(K,M,x,yTop,z,.9,false);const yb=yc-1.45;
+  K.tor(.32,.02,M.ferro,x,yc-.02,z,Math.PI*2,0,Math.PI/2,0,5,24);K.tor(.36,.025,M.ferro,x,yb,z,Math.PI*2,0,Math.PI/2,0,5,24);K.tor(.36,.018,M.ferro,x,yb+.7,z,Math.PI*2,0,Math.PI/2,0,5,24);
+  for(let k=0;k<12;k++){const a=k/12*6.283;K.tube([[x+Math.cos(a)*.32,yc-.02,z+Math.sin(a)*.32],[x+Math.cos(a)*.37,yb+.7,z+Math.sin(a)*.37],[x+Math.cos(a)*.36,yb,z+Math.sin(a)*.36]],.013,M.ferro,6,4);}
+  for(let k=0;k<4;k++){const a=k/4*6.283+.4;K.tube([[x,yc+.12,z],[x+Math.cos(a)*.22,yc+.06,z+Math.sin(a)*.22],[x+Math.cos(a)*.32,yc-.02,z+Math.sin(a)*.32]],.014,M.ferro,6,4);}
+  K.cyl(.36,.36,.03,M.ferro,x,yb-.015,z,20);
+  if(esqueleto){ms621Caveira(K,M,x+.06,yb+.5,z+.04,.6,1,.4);for(let i=0;i<9;i++)ms621Osso(K,M,x+(rnd()-.5)*.4,yb+.04+rnd()*.12,z+(rnd()-.5)*.4,rnd()*6,rnd(),Math.PI/2,.24+rnd()*.15,.9);
+    for(let i=0;i<5;i++)K.box(.24,.02,.02,M.osso,x-.02,yb+.18+i*.05,z-.05,0,0,.15);}}
+function ms621Velas(K,M,F,x,z,n,rnd,vivo){K.cyl(.11+n*.025,.14+n*.028,.01,M.cera,x,-7.995,z,16);
+  for(let i=0;i<n;i++){const a=rnd()*6.283,d=rnd()*(.08+n*.03),px=x+Math.cos(a)*d,pz=z+Math.sin(a)*d,h=.08+rnd()*.3,r=.025+rnd()*.025;K.cyl(r,r*1.15,h,M.cera,px,-8+h/2,pz,10);
+    for(let k=0;k<2;k++){const b=rnd()*6.283;K.sph(r*.45,M.cera,px+Math.cos(b)*r*.9,-8+h*(.4+rnd()*.5),pz+Math.sin(b)*r*.9,.6,1.8,.6,6,4);}
+    K.cyl(.003,.003,.03,M.pavio,px,-8+h+.015,pz,4);F.add(dungeon421FlameGeo(.16+r*1.2),dungeon421FireMat(),px,-8+h+.02,pz);if(vivo)vivo.push([px,-8+h+.08,pz]);}}
+function ms621Aplica(){const S=DUNGEON395;if(MS621.feito||!MS621.on||!S||!S.built||!S.root)return;MS621.feito=true;const T=THREE,st=MS621.stats,t0=performance.now();
+  try{st.pisos=ms621Pisos(S);}catch(e){ms621Erro('pisos',e);}
+  try{st.paleta=ms621Grade(S);}catch(e){ms621Erro('paleta',e);}
+  try{st.pocas=ms621Pocas(S);}catch(e){ms621Erro('poças',e);}
+  const V={t:0,fogos:[],velas:[]};MS621.vivo=V;
+  try{const r=rnd(62110);const OB=S.world&&S.world.obst;let nOb=0;const ob=(x,z,rr)=>{if(Array.isArray(OB)){OB.push([+x.toFixed(2),+z.toFixed(2),rr]);nOb++;}};
+    const livre=(x,z,m)=>{try{for(const o of OB||[])if(Math.hypot(x-o[0],z-o[1])<o[2]+m)return false;}catch(e){}return true;};
+    // o kit grava a cor em hex direto nos vértices (lido como linear): converte-se o tom desejado de sRGB para linear antes
+    const L=h=>{const c=new T.Color(h);c.convertSRGBToLinear();return c.getHex();};
+    const std=(n,c,ro,me,o)=>{const m=t160Std('621 '+n,L(c),ro,me,o);m.userData.papelKeep=true;return m;};
+    const M={osso:std('osso velho',0x8c7e64,.86),dente:std('dente',0x9c907a,.6),vazio:std('órbita',0x0c0a08,.95),pedra:std('prateleira de pedra',0x4a4540,.95),ferro:std('ferro enferrujado',0x4a3a30,.72,.45),
+      cera:std('cera',0xcfc2a4,.6,0,{emissive:L(0x3a2a14),emissiveIntensity:.3}),pavio:std('pavio',0x1a1410,.9)};
+    const K=t160Kit('Masmorras · v621 horrores'),F=t160Kit('Masmorras · v621 chamas das velas');
+    // montes de ossos: nas celas (atrás das grades) e nos cantos do ossuário e dos selos
+    let montes=0;for(const [x,z,rr,n] of [[-11.3,-10.9,.7,22],[-11.6,1.0,.65,20],[18.7,1.2,.75,26],[18.7,-11.2,.8,28],[19.0,-16.9,.7,20],[7.0,-29.1,.65,18]]){if(!livre(x,z,rr))continue;ms621Monte(K,M,x,z,rr,n,r,3);ob(x,z,rr*.85);montes++;}
+    // a catacumba: prateleiras de caveiras na parede de dentro do ossuário (x 6), dos dois lados da porta
+    let prat=0;for(const [z,comp] of [[-9.6,4.2],[-0.4,4.0]]){ms621Prateleira(K,M,6.0,z,1,comp,r,(px,pz,meia,prof)=>{for(let q=-meia+.4;q<=meia-.4;q+=.8)ob(px+.15,pz+q,.42);});prat++;}
+    // gaiolas penduradas (uma com esqueleto) e correntes com gancho na abóbada do corredor
+    ms621Gaiola(K,M,-18.7,-2.9,-5,r,true);ms621Gaiola(K,M,18.4,-2.9,-17.6,r,false);
+    let correntes=0;for(const [x,z,L] of [[-1.85,4.5,1.3],[1.85,-6.2,1.0],[-1.85,-23.5,1.4],[1.85,-26.5,.9],[-18.9,-28.8,1.6],[18.9,-5,1.5]]){const yAb=Math.abs(x)<2.3?-5.25+Math.sqrt(2.32*2.32-x*x)-.03:-2.95;ms621Corrente(K,M,x,yAb,z,L,true);correntes++;}
+    // ossos e caveiras soltos pelo chão (longe do caminho do meio)
+    let soltos=0;for(let i=0;i<40&&soltos<18;i++){const zone=[[-19,-7,-11.5,1.5],[7,19,-11.5,1.5],[-19,-7,-29.5,-16.5],[7,19,-29.5,-16.5]][i%4];const x=zone[0]+r()*(zone[1]-zone[0]),z=zone[2]+r()*(zone[3]-zone[2]);if(!livre(x,z,.5))continue;
+      if(r()<.35)ms621Caveira(K,M,x,-7.99,z,r()*6.283,1,(r()-.5)*1.2);else ms621Osso(K,M,x,-7.97,z,r()*6.283,0,Math.PI/2,.3+r()*.15,1);soltos++;}
+    // velas derretidas em grupos junto às paredes
+    let velas=0;for(const [x,z,n] of [[-7.0,-17.3,5],[-7.0,-28.6,4],[-19.2,-20.4,6],[19.2,-29.2,5],[7.0,-16.9,4],[19.2,-16.9,3],[-6.9,1.4,4],[7.2,-11.4,5],[19.3,-6.6,3],[-1.95,9.4,4],[1.95,-29.4,5]]){if(!livre(x,z,.25))continue;ms621Velas(K,M,F,x,z,n,r,V.velas);velas++;}
+    const ms=K.fim(S.root,{sombra:true});for(const m of ms){m.userData.ms621Novo=true;m.userData.dungeon395=true;m.userData.papelKeepGeo=true;m.__fusaoMoveu=9;m.raycast=()=>{};}
+    const mf=F.fim(S.root,{sombra:false});for(const m of mf){m.userData.ms621Novo=true;m.userData.dungeon395=true;m.__fusaoMoveu=9;m.raycast=()=>{};}
+    Object.assign(st,{montes,prateleiras:prat,correntes,soltos,velas,obst:nOb,malhas:ms.length+mf.length});
+    // halos quentes sobre as velas e os fogos-fátuos
+    for(const p of V.velas.filter((q,i)=>i%2===0)){try{const sp=rkSprite(S.root,0xffb060,.55,.35,p[0],p[1],p[2]);sp.userData.dungeon395=true;sp.__fusaoMoveu=9;}catch(e){}}
+    for(const [cx,cz,n] of [[13,-5,6],[13,-23,7],[-13,-5,4]])for(let i=0;i<n;i++){try{const cor=i%3?0x7affc8:0x8ad8ff;const sp=rkSprite(S.root,cor,.55+r()*.35,.7,cx,-6,cz);sp.userData.dungeon395=true;sp.__fusaoMoveu=9;
+      V.fogos.push({sp,cx:cx+(r()-.5)*7,cz:cz+(r()-.5)*7,r:1+r()*2.2,y:-6.6+r()*1.6,ph:r()*6.283,vel:.18+r()*.25,base:.45+r()*.3});}catch(e){}}
+    st.fogos=V.fogos.length;}catch(e){ms621Erro('horrores',e);}
+  try{rkAddTick(S.room,(dt)=>{try{if(!DUNGEON395.active)return;ms621Tick(dt,V);}catch(e){if(!V.erroTick){V.erroTick=1;ms621Erro('tick',e);}}});}catch(e){ms621Erro('tick',e);}
+  st.ms=Math.round(performance.now()-t0);st.pronto=true;}
+function ms621Tick(dt,V){const d=Math.min(.1,dt||.016);V.t+=d;const t=V.t;
+  for(const f of V.fogos){const a=t*f.vel+f.ph;f.sp.position.set(f.cx+Math.cos(a)*f.r,f.y+Math.sin(t*.9+f.ph)*.35,f.cz+Math.sin(a*1.3)*f.r*.7);f.sp.material.opacity=f.base*(.65+.35*Math.sin(t*2.3+f.ph*3));}}
+if(MS621.on){try{const old=dungeon395Build;dungeon395Build=function(){const r=old.apply(this,arguments);try{ms621Aplica();}catch(e){ms621Erro('aplicar',e);}return r;};}catch(e){ms621Erro('ligar',e);}}
+window.__masmorra621={estado:MS621,erros:MS621.erros,stats:MS621.stats,vivo:()=>MS621.vivo,aplicar:ms621Aplica};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
