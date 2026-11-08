@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v626</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v627</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -77623,7 +77623,7 @@ function bico(o){const N=6;const P=[],R=[];for(let i=0;i<=N;i++){const u=i/N;P.p
    ====================================================================================================== */
 const AVE={};
 // ave genérica: corpo, cabeça, bico, olhos, asas, cauda
-function ave(P){const D={tipo:'ave',P,caixa:P.caixa||[-0.25,-0.2,-0.4,0.25,0.25,0.4],h:P.h||{corpo:0.0048,cab:0.0034,bico:0.0022},cor:P.cor};
+function ave(P){if(P.corpo&&!P.corpo.alongado){P.corpo.r=[P.corpo.r[0]*0.94,P.corpo.r[1]*0.9,P.corpo.r[2]*1.14];P.corpo.alongado=true;}const D={tipo:'ave',P,caixa:P.caixa||[-0.25,-0.2,-0.4,0.25,0.25,0.4],h:P.h||{corpo:0.0048,cab:0.0034,bico:0.0022},cor:P.cor};
   const c=P.corpo;const LB=[[Ell([0,0,0],c.r),0],[Ell([0,-c.r[1]*0.25,c.r[2]*0.35],[c.r[0]*0.92,c.r[1]*0.85,c.r[2]*0.62]),0.03],[Ell([0,c.r[1]*0.1,-c.r[2]*0.75],[c.r[0]*0.6,c.r[1]*0.55,c.r[2]*0.4]),0.03]];
   const hc=P.cab.c;LB.push([Cone([0,c.r[1]*0.25,c.r[2]*0.55],[0,hc[1]-P.cab.r*0.35,hc[2]-P.cab.r*0.4],c.r[0]*0.62,P.cab.r*0.72),0.03]);
   for(const e of (c.extra||[]))LB.push(e);D.corpo=UK(LB);
@@ -78027,6 +78027,47 @@ function anima(g,dt,speed,reading){const R=g.userData.comp400;if(!R||!R.body)ret
   R.tails.forEach((t,i)=>{t.rotation.y+=R.cauda626*(0.5+0.5*i/Math.max(1,R.tails.length-1));if(i===0){t.userData.rx626=t.userData.rx626===undefined?t.rotation.x:t.userData.rx626;t.rotation.x=t.userData.rx626+0.12*Math.min(1,v)+(P.senta?P.phi*s*0.85-0.12*s:0);}});}
 if(VI.on){try{if(!VI.anim)VI.anim=comp400Animate;const a0=VI.anim;comp400Animate=function(g,dt,speed,reading){const r=a0.apply(this,arguments);if(g&&g.userData&&g.userData.bi622&&!g.userData.bi622.voa){try{anima(g,dt,speed,reading);}catch(e){erro('anima',e);}}return r;};}catch(e){erro('ligar',e);}}
 window.__vida626=VI;
+})();
+
+/* ============================================================================================================
+   v627 — Rodada 3 de 10 dos companheiros: os voadores pequenos (bloco VP627)
+   VAGA-LUME: as duas asas eram quadradinhos chatos de 4 vértices com uma textura (24 vértices cada); agora cada
+   lado tem o ÉLITRO (a carapaça dura da asa, esculpida em casca fina, marrom-escuro com a borda amarela) entreaberto
+   por cima e a ASA DE MEMBRANA transparente com nervuras por baixo, maior — presos no mesmo pivô, então batem
+   como antes. MARIPOSA: as antenas eram duas tiras chatas (48 vértices); agora são PLUMOSAS — a haste curva com
+   dezenas de barbas finas dos dois lados, como as de mariposa de verdade. AVES da v623 (tucano, martim, cacatua,
+   andorinha, fênix, grifo): corpo mais alongado e menos «ovo» (TROCA no `ave()`). `?voadores627=0` desliga.
+   ============================================================================================================ */
+(function(){
+const BI=window.__bichos622,VO=window.__voadores623;if(!BI||!BI.h||!VO||!VO.h||typeof buildPet!=='function')return;const H=BI.h,V=VO.h;const T=THREE;
+const {S,HX,MX,mul,cl,Ell,Cone,Esf,UK,Cad,Menos,Esp,malha,caixaDe,espinhos,rnd}=H;
+const VP={on:!/[?&#]voadores627=0/i.test(location.search+location.hash),erros:[],n:0,orig:null};
+const ANT=window.__voadores627;if(ANT&&ANT.orig)VP.orig=ANT.orig;
+function erro(k,e){if(VP.erros.length<30)VP.erros.push(k+': '+String(e&&e.message||e).slice(0,300));}
+// élitro (lado +x, espaço do pivô da asa: dobradiça na origem, a asa vai para +x e para trás)
+function elitroGeo(){const k='geo v627 elitro';let g=BI.cache.get(k);if(g)return g;const fora=Ell([0.0095,0.002,-0.014],[0.0095,0.0036,0.029]);const dentro=Ell([0.0095,-0.0006,-0.014],[0.0082,0.0032,0.027]);const f=Menos(fora,dentro,0.001);
+  const B=caixaDe(f,[-0.03,-0.03,-0.06,0.05,0.03,0.04],0.004);g=malha('v627 elitro',f,B,0.0009,(x,y,z,nx,ny,nz)=>{const borda=S(0.0085,0.0105,Math.abs(x-0.011)*1.0+Math.max(0,-z-0.035)*0.4);let c=MX(HX(0x2a1c14),HX(0xe8b030),borda*0.85);return mul(c,ny<0?0.6:1);});return g;}
+function membranaGeo(){const k='geo v627 membrana';let g=BI.cache.get(k);if(g)return g;const b=V.Bd();const cont=[];for(let i=0;i<=22;i++){const a=i/22*Math.PI*2;const L=0.05,W=0.022;const x=L*0.5+Math.cos(a)*L*0.5;cont.push([x,0,Math.sin(a)*W*0.5-x*0.35-0.004]);}
+  V.membrana(b,cont,[0.02,0,-0.01],(p)=>MX([1,0.98,0.9],[0.9,0.95,1],S(0,0.05,p[0])));g=V.geoDe(b,true);BI.cache.set(k,g);return g;}
+function vagalume(g){let n=0;g.traverse(m=>{if(!m.isMesh||!m.material||!/vagalume asa/.test(m.material.name||'')||m.userData.v627)return;m.geometry.computeBoundingBox();const b=m.geometry.boundingBox;const sd=(b.max.x+b.min.x)>0?1:-1;const piv=m.parent;m.visible=false;m.userData.v627=true;
+    const el=new T.Mesh(elitroGeo(),H.matLiso('élitro',0.35));el.name='v627 élitro';el.rotation.set(0.08,sd*0.12,sd*0.18);if(sd<0)el.scale.x=-1;el.position.set(-sd*0.002,0.0,0.004);piv.add(el);
+    const mb=new T.Mesh(membranaGeo(),V.matMembrana('vagalume',0xf4f0e0));mb.name='v627 asa de membrana';if(sd<0)mb.scale.x=-1;mb.rotation.y=sd*0.15;piv.add(mb);n++;});return n;}
+// antenas plumosas
+function antenasGeo(){const k='geo v627 antenas';let g=BI.cache.get(k);if(g)return g;const L=[];const pts=[];
+  for(const sx of [-1,1]){const P=[[sx*0.004,0.012,0.034],[sx*0.012,0.026,0.03],[sx*0.02,0.034,0.016],[sx*0.023,0.035,0.005]];L.push([Cad(P,[0.0011,0.0009,0.0007,0.0004],0.0005),0]);
+    for(let i=0;i<14;i++){const t=0.12+i/14*0.85;const q=bez(P,t);const tg=tanB(P,t);for(const lado of [-1,1]){const n=norm(cross(tg,[0,1,0]));pts.push({p:q,n:[n[0]*lado*0.8+0.0,0.25,n[2]*lado*0.8],r:(1-t)*0.6+0.4});}}}
+  const f=UK(L);const B=caixaDe(f,[-0.04,-0.01,-0.02,0.04,0.05,0.05],0.004);const hast=malha('v627 antenas haste',f,B,0.0005,()=>HX(0xc8bca8));
+  const barb=espinhos(pts,{comp:0.0075,raio:0.00045,seg:4,dir:(p,n)=>n,escala:(p,n)=>1,cor:(t,q)=>mul(MX(HX(0xd8d0c0),HX(0x9a8a74),t),0.9+0.2*q.r)});
+  g=H.junta([hast,barb]);BI.cache.set(k,g);return g;}
+function bez(P,t){// Catmull simples por segmentos
+  const n=P.length-1;const s=t*n;const i=Math.min(n-1,Math.floor(s));const u=s-i;return [P[i][0]+(P[i+1][0]-P[i][0])*u,P[i][1]+(P[i+1][1]-P[i][1])*u,P[i][2]+(P[i+1][2]-P[i][2])*u];}
+function tanB(P,t){const n=P.length-1;const i=Math.min(n-1,Math.floor(t*n));return norm([P[i+1][0]-P[i][0],P[i+1][1]-P[i][1],P[i+1][2]-P[i][2]]);}
+const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];const norm=v=>{const l=Math.hypot(v[0],v[1],v[2])||1;return [v[0]/l,v[1]/l,v[2]/l];};
+function mariposa(g){let n=0;g.traverse(m=>{if(!m.isMesh||!m.material||!/mariposa antena/.test(m.material.name||'')||m.userData.v627)return;m.visible=false;m.userData.v627=true;const a=new T.Mesh(antenasGeo(),H.matLiso('antena plumosa',0.7));a.name='v627 antenas';a.position.copy(m.position);m.parent.add(a);n++;});return n;}
+if(VP.on){try{if(!VP.orig)VP.orig=buildPet;const orig=VP.orig;
+    buildPet=function(id){const g=orig.apply(this,arguments);try{if(g&&id==='vagalume')VP.n+=vagalume(g);else if(g&&id==='mariposa')VP.n+=mariposa(g);if(g&&(id==='vagalume'||id==='mariposa'))g.traverse(q=>{if(q.isMesh){q.userData.papelKeepGeo=true;q.raycast=q.raycast||(()=>{});}q.__fusaoMoveu=9;q.userData.dynamic434=true;});}catch(e){erro(id,e);}return g;};
+  }catch(e){erro('ligar',e);}}
+window.__voadores627=VP;
 })();
 
 window.__build434={revision:434,family:"web",edition:"pt"};
