@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v623</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v624</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -77852,6 +77852,107 @@ if(VO.on){try{if(!VO.orig)VO.orig=comp400Build;const orig=VO.orig;
   }catch(e){erro('ligar',e);}}
 VO.montar=id=>comp400Build(id);VO.especies=()=>Object.keys(AVE);VO.def=defVoa;VO.limpar=()=>{VO.esp={};for(const k of [...BI.cache.keys()])if(/comp400_(tucano|martim|cacatua|andorinha|morcego|abelha|libelula|fenix|arraia|grifo)/.test(k))BI.cache.delete(k);};
 window.__voadores623=VO;VO.AVE=AVE;VO.h={Bd,geoDe,pena,membrana,asaAve,leque,bico,ave,matAsa,matPena,matMembrana,matBrilho};
+})();
+
+/* ============================================================================================================
+   v624 — Os dragões da loja esculpidos (bloco DR624)
+   Continuação do pedido do Luiz (companheiros com mais polígonos). Os 7 dragões `drg_*` (v201) eram tubos e
+   esferas paramétricos com a textura pintada em sRGB lida como linear (tudo desbotado: o Dragão da Forja saía
+   salmão, a Serpe das Brumas quase branca). O esqueleto, o voo, o pouso, o andar e o sopro da v201 ficam iguais;
+   trocam-se as peças por esculturas em campo de distância NOS MESMOS LUGARES (as funções `drgCorpoGeo`,
+   `drgPescocoGeo`, `drgCabecaGeo`, `drgMandGeo`, `drgPernaGeo`, `drgCanelaGeo`, `drgCaudaGeo` e os gomos da
+   serpente): tronco com peito, ombros, coxas, crista do lombo e placas da barriga; pescoço com placas da
+   garganta; cabeça com crânio, arcadas, focinho, narinas e órbitas; mandíbula com dentes; coxas e canelas com
+   pé e garras; cauda em gomos que se sobrepõem, com a ponta própria (ferrão, cristal, folhas, pena). Cor por
+   vértice em espaço linear a partir da paleta de cada dragão (dorso, flanco, barriga), oclusão, e textura
+   triplanar de escamas (pérola, cristal, estrelas, musgo). O de papel continua dobrado em papel, só com a cor
+   certa. `?dragoes624=0` volta aos de antes.
+   ============================================================================================================ */
+(function(){
+const BI=window.__bichos622;if(!BI||!BI.h||typeof DRG==='undefined'||typeof drgMontar!=='function')return;const H=BI.h;const T=THREE;
+const {S,Lr,HX,MX,cl,mul,fbm,ruido,celula,rnd,Ell,Cone,Esf,UK,Uni,Esp,Menos,Esc,Cad,Smin,Smax,Mov,deslo,caixaDe,malha,matPele,matLiso,triplanar,texDe}=H;
+const DR={on:DRG.on&&!/[?&#]dragoes624=0/i.test(location.search+location.hash),cache:new Map(),erros:[],stats:{},tempo:{},orig:null};
+const ANT=window.__dragoes624;if(ANT&&ANT.orig)DR.orig=ANT.orig;
+function erro(k,e){if(DR.erros.length<40)DR.erros.push(k+': '+String(e&&e.stack||e&&e.message||e).slice(0,400));try{console.warn('v624',k,e);}catch(x){}}
+if(!DR.orig)DR.orig={mats:drgMats,corpo:drgCorpoGeo,pesc:drgPescocoGeo,cab:drgCabecaGeo,mand:drgMandGeo,perna:drgPernaGeo,canela:drgCanelaGeo,cauda:drgCaudaGeo,montar:drgMontar};
+const O=DR.orig;
+const lin=s=>HX(parseInt(String(s).replace('#',''),16));
+const papel=S=>S.textura==='papel';
+function pal(S){const C=S.cores;return {base:lin(C.base),clara:lin(C.clara),escura:lin(C.escura),barriga:lin(C.barriga),chifre:lin(C.chifre)};}
+// cor da pele: dorso escuro, flanco base, barriga clara com placas; padrões por textura
+function corPele(S,P,x,y,z,nx,ny,nz,placa){let c=MX(P.base,P.escura,S_(0.15,0.75,ny)*0.75);c=MX(c,P.clara,S_(0.1,-0.25,ny)*S_(-0.6,-0.2,ny)*0.0+S_(0.25,0.0,Math.abs(ny))*0.18);
+  c=MX(c,P.barriga,S_(-0.25,-0.6,ny));if(placa!==undefined)c=MX(c,mul(P.barriga,0.78),placa*S_(-0.3,-0.6,ny));
+  const t=S.textura;if(t==='estrelas'){const [d1]=celula(x*80,y*80,z*80,29);c=MX(c,HX(0xfff4c8),S_(0.07,0.025,d1)*S_(-0.2,0.2,ny));}
+  if(t==='musgo'){const m=S_(0.0,0.5,fbm(x*16,y*16,z*16));c=MX(c,MX(P.clara,HX(0x6a8a2a),0.4),m*S_(0.0,0.5,ny)*0.7);}
+  if(t==='perola'){c=MX(c,HX(0xf4eaff),S_(0.3,0.9,ruido(x*60,y*60,z*60))*0.12);}
+  return mul(c,0.93+0.07*fbm(x*70,y*70,z*70));}
+function S_(a,b,x){return S(a,b,x);}
+// materiais: pele triplanar por tipo; chifre na cor certa; asa e juba com a textura em sRGB
+function matsNovos(id,S){const k='mats '+id;let M=DR.cache.get(k);if(M)return M;const o=O.mats(id);const t=S.textura;
+  const tipo=t==='musgo'?'longo':'escama';const pele=new T.MeshStandardMaterial({map:texDe(tipo).map,normalMap:texDe(tipo).nm,normalScale:new T.Vector2(0,0),vertexColors:true,
+    roughness:t==='cristal'?0.16:(t==='perola'?0.32:(t==='musgo'?0.95:0.55)),metalness:t==='cristal'?0.25:(t==='perola'?0.12:0.06),emissive:t==='estrelas'?0x0c0a26:(t==='cristal'?0x0a1e2c:(S.brasa?0x1a0400:0x000000)),emissiveIntensity:1});
+  triplanar(pele,1/(t==='perola'?0.07:(t==='cristal'?0.1:(t==='musgo'?0.08:0.06))),t==='musgo'?0.003:0.0018);pele.name='v624 pele '+id;
+  const ch=o.chifre.clone();ch.color=new T.Color().setRGB(...pal(S).chifre);ch.vertexColors=false;ch.name='v624 chifre '+id;
+  const fix=m=>{if(m&&m.map){try{m.map.encoding=T.sRGBEncoding;m.map.needsUpdate=true;}catch(e){}m.needsUpdate=true;}return m;};
+  const C0=S.cores.olho||{};const olho=t162OlhoMat('v624 '+id,Object.assign({},C0,{ri:0.5,brilho:false,esc:C0.i2||'#3a2a10',escBorda:'#100a04'}));
+  M=Object.assign({},o,{pele,chifre:ch,olho,asa:fix(o.asa),juba:o.juba?(()=>{const j=o.juba.clone();j.color=new T.Color().setRGB(...lin(S.cores.juba));return j;})():null});DR.cache.set(k,M);return M;}
+
+/* ---------------- peças esculpidas (nos mesmos espaços da v201) ---------------- */
+function caixaG(f,r,passo){return caixaDe(f,[-r,-r,-r,r,r,r],passo);}
+function geo(nome,f,raio,h,cor){const g0=BI.cache.get('geo v624 '+nome);if(g0)return g0;const B=caixaG(f,raio,Math.max(0.006,raio/26));if(!B)throw Error('vazio '+nome);return malha('v624 '+nome,f,B,h,cor);}
+const ao=(f,cor)=>(x,y,z,nx,ny,nz)=>{const c=cor(x,y,z,nx,ny,nz);const e=0.018;const o=cl(f(x+nx*e,y+ny*e,z+nz*e)/e,0,1);const k=0.55+0.45*o;return [c[0]*k,c[1]*k,c[2]*k];};
+function corpoGeo(id,S){const r=S.r,L=S.comp*0.5;const P=pal(S);const serpe=S.forma==='serpe';const f=UK([
+    [Ell([0,0.04*r,0.24*L],[1.02*r,0.98*r,0.33*L]),0],[Ell([0,-0.04*r,-0.02*L],[1.12*r,1.08*r,0.38*L]),0.06*r+0.02],[Ell([0,0.04*r,-0.3*L],[0.92*r,0.94*r,0.24*L]),0.05*r+0.02],
+    [Esp(Ell([0.5*r,0.26*r,0.26*L],[0.42*r,0.55*r,0.26*L],[-0.2,0,0])),0.12*r+0.01],[Esp(Ell([0.52*r,0.04*r,-0.28*L],[0.46*r,0.66*r,0.28*L],[0.25,0,0])),0.12*r+0.01],
+    [Cad([[0,0.95*r,-0.42*L],[0,1.0*r,-0.05*L],[0,0.98*r,0.32*L]],[0.1*r,0.13*r,0.1*r],0.02),0.08*r],
+    [Cone([0,0.32*r,0.36*L],[0,0.7*r,0.36*L+0.9*r],0.72*r,0.62*r),0.06*r]]);
+  const placa=(z)=>S_(0.12,0.0,Math.abs(((z/(0.32*r))%1+1)%1-0.5)-0.38);
+  const fd=(x,y,z)=>{const d=f(x,y,z);if(d>0.01)return d;return d+(y<-0.3*r?0.006*r*placa(z):0);};
+  return geo('corpo '+id,fd,Math.max(L,2.2*r)*1.1,Math.max(0.0045,r*0.095),ao(fd,(x,y,z,nx,ny,nz)=>corPele(S,P,x,y,z,nx,ny,nz,placa(z))));}
+function pescocoGeo(id,S){const r=S.r;const P=pal(S);const pp=drgPescocoPts(S);const rs=pp.map((q,i)=>r*(0.74-0.26*i/(pp.length-1)));const f=Cad(pp,rs,0.02);
+  return geo('pescoço '+id,f,S.comp*0.6+r*3,Math.max(0.004,r*0.085),ao(f,(x,y,z,nx,ny,nz)=>corPele(S,P,x,y,z,nx,ny,nz,S_(0.1,0.0,Math.abs((((y+z)/(0.28*r))%1+1)%1-0.5)-0.38))));}
+function cabecaGeo(id,S){const R=drgRcab(S);const P=pal(S);const foc=S.forma==='serpente'?0.95:(S.forma==='serpe'?1.1:0.85);
+  const fo=(x,y,z)=>Cone([0,-0.06*R,0.35*R],[0,-0.14*R,(1.0+foc*0.85)*R],0.6*R,0.36*R)(x,(y+0.1*R)/0.82-0.1*R,z)*0.82;
+  let f=UK([[Ell([0,0,-0.05*R],[0.95*R,0.84*R,0.95*R]),0],[fo,0.25*R],[Esp(Ell([0.42*R,0.4*R,0.42*R],[0.3*R,0.16*R,0.38*R],[0.2,0,0.25])),0.12*R],
+    [Esp(Ell([0.2*R,0.02*R,(1.0+foc*0.8)*R],[0.13*R,0.11*R,0.12*R])),0.08*R],[Esp(Cone([0.62*R,-0.1*R,-0.1*R],[0.95*R,-0.15*R,-0.55*R],0.18*R,0.03*R)),0.08*R],
+    [Cad([[0,0.7*R,0.3*R],[0,0.82*R,-0.2*R],[0,0.6*R,-0.75*R]],[0.08*R,0.1*R,0.06*R],0.02),0.1*R]]);
+  f=Menos(f,Esp(Esf([0.6*R,0.24*R,0.58*R],0.215*R*1.05)),0.06*R);f=Menos(f,Esp(Ell([0.22*R,0.06*R,(1.08+foc*0.82)*R],[0.05*R,0.04*R,0.06*R])),0.02*R);
+  const corC=(x,y,z,nx,ny,nz)=>{let c=corPele(S,P,x,y,z,nx,ny,nz);c=MX(c,P.escura,S_(0.5*R,0.75*R,y)*0.4);return c;};
+  return geo('cabeça '+id,f,R*2.6,Math.max(0.003,R*0.06),ao(f,corC));}
+function mandGeo(id,S){const R=drgRcab(S);const P=pal(S);const L=[[Ell([0,-0.02*R,0.42*R],[0.56*R,0.2*R,0.62*R]),0],[Cone([0,-0.02*R,0.5*R],[0,0.0,1.05*R],0.4*R,0.2*R),0.12*R]];
+  for(const sx of [-1,1])for(let k=0;k<4;k++){const zz=(0.98-k*0.2)*R;const xx=sx*R*(0.16+k*0.09);L.push([Cone([xx,0.1*R,zz],[xx,0.26*R,zz+0.03*R],0.045*R,0.008*R),0.01*R]);}
+  const f=UK(L);const dentes=(x,y)=>y>0.12*R;return geo('mandíbula '+id,f,R*1.8,Math.max(0.0026,R*0.055),ao(f,(x,y,z,nx,ny,nz)=>dentes(x,y)?HX(0xf4eedc):corPele(S,P,x,y,z,nx,ny,nz)));}
+function pernaGeo(id,S,frente){const r=S.r,Lp=drgLp(S)*(frente?0.92:1);const P=pal(S);const f=UK([[Ell([0,0.02*r,0],[0.5*r,0.6*r,0.55*r]),0],[Cad([[0,r*0.1,0],[0,-Lp*0.3,-Lp*0.06],[0,-Lp*0.54,-Lp*0.04]],[r*0.5,r*0.42,r*0.32],0.02),0.08*r]]);
+  return geo('perna '+id+(frente?'f':'t'),f,Lp+r*1.5,Math.max(0.0036,r*0.085),ao(f,(x,y,z,nx,ny,nz)=>corPele(S,P,x,y,z,nx,ny,nz)));}
+function canelaGeo(id,S,frente){const r=S.r,Lp=drgLp(S)*(frente?0.92:1);const P=pal(S);const pe=[0,-Lp*0.5,Lp*0.08];const L=[[Cad([[0,r*0.05,0],[0,-Lp*0.28,Lp*0.03],pe],[r*0.32,r*0.27,r*0.22],0.02),0],[Ell([0,pe[1]-0.02*r,pe[2]+0.16*r],[0.36*r,0.13*r,0.42*r]),0.06*r]];const G=[];
+  for(let c=0;c<4;c++){const a=(c-1.5)*0.42;const b=[pe[0]+Math.sin(a)*0.22*r,pe[1]-0.05*r,pe[2]+0.3*r+Math.cos(a)*0.2*r];const t=[b[0]+Math.sin(a)*0.1*r,pe[1]-0.14*r,b[2]+0.26*r];const g=Cone(b,t,0.075*r,0.012*r);G.push(g);L.push([g,0.02*r]);}
+  const f=UK(L);const fg=Uni(G,0);return geo('canela '+id+(frente?'f':'t'),f,Lp+r*1.5,Math.max(0.003,r*0.065),ao(f,(x,y,z,nx,ny,nz)=>fg(x,y,z)<0.003*r?HX(0xece2c8):corPele(S,P,x,y,z,nx,ny,nz)));}
+function caudaGeo(id,S,i,n){const r0=S.r*(0.8-i*(0.62/n)),r1=Math.max(S.r*0.08,r0-S.r*0.62/n);const seg=S.comp*0.5*0.26;const P=pal(S);const R=S.r;const L=[[Cone([0,0,seg*0.18],[0,0,-seg*1.08],r0*1.02,r1*1.02),0],[Cad([[0,r0*0.92,0.1*seg],[0,(r0+r1)*0.5,-seg*0.5],[0,r1*0.9,-seg]],[r0*0.14,r0*0.18,r1*0.14],0.004),0.03*R]];
+  if(i===n-1){const Pn=S.cauda&&S.cauda.ponta;const zt=-seg;
+    if(Pn==='ferrao')L.push([Esc(Cone([0,0,zt-0.1*R],[0,0,zt-1.2*R],0.42*R,0.02*R),1,0.32,1),0.08*R]);
+    else if(Pn==='cristal'){for(const [a,l] of [[0,1.3],[0.6,0.9],[-0.6,0.9]])L.push([Cone([0,0,zt],[Math.sin(a)*0.4*R,0.2*R,zt-l*R],0.2*R,0.02*R),0.05*R]);}
+    else if(Pn==='folhas'||Pn==='pena'){for(let k=0;k<6;k++){const a=k/6*Math.PI*2;L.push([Esc(Mov(Cone([0,0,0],[0,0,-1.0*R],0.3*R,0.02*R),[0,0,zt],[Math.sin(a)*0.5,Math.cos(a)*0.5,0]),1,1,1),0.06*R]);}}
+    else if(Pn==='leque')L.push([Esc(Cone([0,0,zt],[0,0,zt-1.2*R],0.7*R,0.1*R),1,0.15,1),0.05*R]);}
+  const f=UK(L);return geo('cauda '+id+' '+i,f,seg*1.6+R*1.6,Math.max(0.0032,R*0.075),ao(f,(x,y,z,nx,ny,nz)=>{let c=corPele(S,P,x,y,z,nx,ny,nz);if(i===n-1&&z<-seg*1.02){const Pn=S.cauda&&S.cauda.ponta;if(Pn==='folhas')c=MX(lin('#5e8a2e'),lin('#9ac24a'),S_(-seg,-seg-R,z));else if(Pn==='cristal'||Pn==='ferrao')c=pal(S).chifre;}return c;}));}
+// gomo da serpente (espaço do gomo: de +0,62 seg a −0,62 seg)
+function gomoGeo(id,S,i,n,rr,seg){const P=pal(S);const f=UK([[Cone([0,0,seg*0.66],[0,0,-seg*0.66],rr,rr*0.97),0],[Cad([[0,rr*0.9,seg*0.5],[0,rr*0.98,0],[0,rr*0.9,-seg*0.5]],[rr*0.1,rr*0.14,rr*0.1],0.003),0.03*rr]]);
+  const placa=(z)=>S_(0.12,0.0,Math.abs(((z/(0.42*rr))%1+1)%1-0.5)-0.38);const fd=(x,y,z)=>{const d=f(x,y,z);return d>0.01?d:d+(y<-0.3*rr?0.008*rr*placa(z):0);};
+  return geo('gomo '+id+' '+i,fd,seg+rr*1.5,Math.max(0.0042,rr*0.11),ao(fd,(x,y,z,nx,ny,nz)=>corPele(S,P,x,y,z,nx,ny,nz,placa(z))));}
+
+/* ---------------- ligação ---------------- */
+if(DR.on){try{
+  drgMats=function(id){const S=DRG.specs[id];try{if(!papel(S))return matsNovos(id,S);const m=O.mats(id);for(const k of ['pele','asa','juba']){const q=m[k];if(q&&q.map&&q.map.encoding!==T.sRGBEncoding){q.map.encoding=T.sRGBEncoding;q.map.needsUpdate=true;q.needsUpdate=true;}}return m;}catch(e){erro('mats '+id,e);return O.mats(id);}};
+  const troca=(nome,novo,orig)=>function(id,S){if(papel(S))return orig.apply(this,arguments);try{return novo.apply(this,arguments);}catch(e){erro(nome+' '+id,e);return orig.apply(this,arguments);}};
+  drgCorpoGeo=troca('corpo',corpoGeo,O.corpo);drgPescocoGeo=troca('pescoço',pescocoGeo,O.pesc);drgCabecaGeo=troca('cabeça',cabecaGeo,O.cab);drgMandGeo=troca('mandíbula',mandGeo,O.mand);
+  drgPernaGeo=troca('perna',pernaGeo,O.perna);drgCanelaGeo=troca('canela',canelaGeo,O.canela);drgCaudaGeo=troca('cauda',caudaGeo,O.cauda);
+  drgMontar=function(id){const t0=performance.now();const g=O.montar.apply(this,arguments);const S=DRG.specs[id];if(!g||!S||papel(S))return g;
+    try{const D=g.userData.drg201;if(D&&D.serpente){const n=D.cauda.length,seg=S.comp/n,r=S.r;D.cauda.forEach((j,i)=>{const rr=r*(0.85+0.55*Math.sin(Math.PI*(0.12+0.8*i/(n-1))));const m=j.children.find(o=>o.isMesh&&o.geometry&&o.geometry.userData!==undefined&&!(o.material===drgMats(id).chifre));if(m){m.geometry=gomoGeo(id,S,i,n,rr,seg);m.material=drgMats(id).pele;}});}
+      if(D)for(const o of D.olhos){o.geometry=t162OlhoGeo(drgRcab(S)*0.21,22);o.material=drgMats(id).olho;}
+      if(S.espinhos==='folhas'){const fm=new T.MeshStandardMaterial({color:new T.Color().setRGB(...lin('#4e7a26')),roughness:0.8,side:T.DoubleSide});D.corpo.children.forEach((o,k)=>{if(o.isMesh&&k>=2&&o.material===drgMats(id).pele)o.material=fm;});}
+      g.traverse(q=>{if(q.isMesh){q.userData.papelKeepGeo=true;q.castShadow=true;}});}catch(e){erro('montar '+id,e);}
+    DR.tempo[id]=Math.round(performance.now()-t0);return g;};
+  }catch(e){erro('ligar',e);}}
+window.__dragoes624=Object.assign(DR,{montar:id=>drgMontar(id),limpar:()=>{DR.cache.clear();for(const k of [...BI.cache.keys()])if(k.startsWith('geo v624'))BI.cache.delete(k);}});
 })();
 
 window.__build434={revision:434,family:"web",edition:"pt"};
