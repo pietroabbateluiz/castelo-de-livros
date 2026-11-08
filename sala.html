@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v621</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v622</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -76802,6 +76802,745 @@ function ms621Tick(dt,V){const d=Math.min(.1,dt||.016);V.t+=d;const t=V.t;
   for(const f of V.fogos){const a=t*f.vel+f.ph;f.sp.position.set(f.cx+Math.cos(a)*f.r,f.y+Math.sin(t*.9+f.ph)*.35,f.cz+Math.sin(a*1.3)*f.r*.7);f.sp.material.opacity=f.base*(.65+.35*Math.sin(t*2.3+f.ph*3));}}
 if(MS621.on){try{const old=dungeon395Build;dungeon395Build=function(){const r=old.apply(this,arguments);try{ms621Aplica();}catch(e){ms621Erro('aplicar',e);}return r;};}catch(e){ms621Erro('ligar',e);}}
 window.__masmorra621={estado:MS621,erros:MS621.erros,stats:MS621.stats,vivo:()=>MS621.vivo,aplicar:ms621Aplica};
+
+/* ============================================================================================================
+   v622 — Os companheiros da v400 esculpidos de verdade (bloco BI622)
+   Pedido do Luiz (08/11): «Melhore os companions pois possuem poucos polígonos». Os 20 bichos de chão da v400
+   (ouriço, tartaruga, lontra, panda-vermelho, feneco, guaxinim, tatu, texugo, gambá, furão, cervo, alpaca, javali,
+   cabra, salamandra, axolote, pangolim, lince, porco-espinho e tamanduá) eram o MESMO molde — bolhas com a mesma
+   carinha, orelhas e bigodes em todos, cores desbotadas (o hex ia cru para a cor do material) — que a v588 só
+   alisava. Agora cada espécie tem anatomia própria em campo de distância (as ferramentas da v579), malha fina
+   (redes de superfície), cor por vértice em espaço linear com oclusão nas dobras, textura de pelo / pelo curto /
+   lã / pele lisa / escama / couro com mapa de normais, olhos de verdade nas órbitas, nariz úmido, bigodes onde há,
+   rabo com ossos (uma malha só que curva) e peças próprias: espinhos, carapaça com escudos, cinta de placas,
+   escamas de cobre, galhada, chifres, presas, crina, brânquias. O esqueleto e os nomes dos grupos continuam os
+   da v400 (body400, head400, eye400_±1, leg400_j, tail400_j): andar, respirar, piscar, olhar, carinho, leitura e
+   combate seguem iguais — e as patas passam a andar em trote (diagonais juntas). `?bichos622=0` volta aos de antes.
+   ============================================================================================================ */
+(function(){
+const T=THREE;
+const BI={on:(typeof cp579Rede==='function')&&(typeof comp400Build==='function')&&!/[?&#]bichos622=0/i.test(location.search+location.hash),
+  cache:new Map(),erros:[],stats:{},tempo:{},montagens:0,esp:{},orig:null,anim:null};
+const ANT=window.__bichos622;if(ANT&&ANT.orig){BI.orig=ANT.orig;BI.anim=ANT.anim;}
+function erro(k,e){if(BI.erros.length<40)BI.erros.push(k+': '+(e&&e.stack||e&&e.message||e).toString().slice(0,400));try{console.warn('v622',k,e);}catch(x){}}
+
+/* ---------------- utilidades ---------------- */
+const S=cp579S,Lr=cp579L,HX=cp579Hex,MX=cp579Mix;
+const cl=(v,a,b)=>v<a?a:(v>b?b:v);
+const mul=(c,k)=>[c[0]*k,c[1]*k,c[2]*k];
+function hash3(i,j,k){let h=Math.imul(i|0,374761393)^Math.imul(j|0,668265263)^Math.imul(k|0,1440662683);h=Math.imul(h^(h>>>13),1274126177);h^=h>>>16;return (h>>>0)/4294967296;}
+function ruido(x,y,z){const i=Math.floor(x),j=Math.floor(y),k=Math.floor(z);const fx=x-i,fy=y-j,fz=z-k;const u=fx*fx*(3-2*fx),v=fy*fy*(3-2*fy),w=fz*fz*(3-2*fz);
+  const a=hash3(i,j,k),b=hash3(i+1,j,k),c=hash3(i,j+1,k),d=hash3(i+1,j+1,k),e=hash3(i,j,k+1),f=hash3(i+1,j,k+1),g=hash3(i,j+1,k+1),h=hash3(i+1,j+1,k+1);
+  const x1=a+(b-a)*u,x2=c+(d-c)*u,x3=e+(f-e)*u,x4=g+(h-g)*u;const y1=x1+(x2-x1)*v,y2=x3+(x4-x3)*v;return (y1+(y2-y1)*w)*2-1;}
+function fbm(x,y,z){return ruido(x,y,z)*0.55+ruido(x*2.03+5.1,y*2.03+1.7,z*2.03+3.3)*0.3+ruido(x*4.1+9.2,y*4.1+2.2,z*4.1+7.7)*0.15;}
+// células (Worley): [d1,d2] em unidades de célula
+function celula(x,y,z,sem){const i=Math.floor(x),j=Math.floor(y),k=Math.floor(z);let d1=9,d2=9;sem=sem|0;
+  for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++)for(let c=-1;c<=1;c++){const ii=i+a,jj=j+b,kk=k+c;const px=ii+hash3(ii,jj,kk+sem),py=jj+hash3(ii+sem,jj,kk),pz=kk+hash3(ii,jj+sem,kk);const d=(x-px)*(x-px)+(y-py)*(y-py)+(z-pz)*(z-pz);if(d<d1){d2=d1;d1=d;}else if(d<d2)d2=d;}
+  return [Math.sqrt(d1),Math.sqrt(d2)];}
+function rnd(sem){let s=(sem|0)||622;return ()=>{s=(s*16807)%2147483647;return (s-1)/2147483646;};}
+
+/* ---------------- campos (cp579) ---------------- */
+const Ell=cp579Ell,Cone=cp579Cone,Esf=cp579Esf,UK=cp579UniaoK,Uni=cp579Uniao,Esp=cp579Espelho,Menos=cp579Menos,Esc=cp579Escala,Cx=cp579Caixa,Cad=cp579Cadeia,Smin=cp579Smin,Smax=cp579Smax;
+const Mov=(f,d,rot)=>cp579Move(f,d[0],d[1],d[2],rot||null);
+const chao=f=>(x,y,z)=>Math.max(f(x,y,z),-y);                  // sola plana no chão
+const deslo=(f,p)=>(x,y,z)=>f(x+p[0],y+p[1],z+p[2]);            // campo do grupo → espaço local (pivô p)
+function xf(d,rot){const m=cp579Rot(rot);return (x,y,z)=>{const px=x-d[0],py=y-d[1],pz=z-d[2];if(!m)return [px,py,pz];return [m[0]*px+m[3]*py+m[6]*pz,m[1]*px+m[4]*py+m[7]*pz,m[2]*px+m[5]*py+m[8]*pz];};}
+function rotV(rot,v){const m=cp579Rot(rot);if(!m)return v.slice();return [m[0]*v[0]+m[1]*v[1]+m[2]*v[2],m[3]*v[0]+m[4]*v[1]+m[5]*v[2],m[6]*v[0]+m[7]*v[1]+m[8]*v[2]];}
+// lâmina: cadeia de cones no plano XY local, achatada em z (orelhas)
+function lamina(pts,rs,t,k){const rm=Math.max.apply(null,rs);const f=Cad(pts.map(p=>[p[0],p[1],0]),rs,k||0);return Esc(f,1,1,t/rm);}
+// lâmina plana: forma 2D (cadeia de círculos no plano XY) extrudada com espessura 2t e borda arredondada
+function laminaPlana(pts,rs,t,k){const f=Cad(pts.map(p=>[p[0],p[1],0]),rs,k||0);return (x,y,z)=>Smax(f(x,y,0),Math.abs(z)-t,t*0.9);}
+// orelha no espaço local: base na origem, sobe em +y, a concha virada para +z (parede de espessura uniforme: não fura na malha)
+function orelhaLoc(o){const w=o.w,h=o.h,t=o.t*0.85;let pf,rf;
+  if(o.tipo==='redonda'){pf=[[0,h*0.05],[0,h*0.5],[0,h*0.86]];rf=[w*0.55,w,w*0.62];}
+  else if(o.tipo==='folha'){pf=[[0,0],[0,h*0.42],[0,h]];rf=[w*0.45,w,w*0.2];}
+  else{pf=[[0,0],[0,h*(o.meio||0.3)],[0,h]];rf=[w*(o.larg0||0.9),w,Math.max(w*(o.ponta||0.1),t*1.1)];}
+  const fora=laminaPlana(pf,rf,t);const pi=pf.map((p,i)=>[p[0],i===0?p[1]+h*0.1:(i===pf.length-1?p[1]-h*0.06:p[1])]);const ri=rf.map(r=>r*0.7);
+  const dentro=Mov(laminaPlana(pi,ri,t*0.8),[0,0,t*1.22]);return {f:Menos(fora,dentro,t*0.35),dentro};}
+// pé: pata (almofada + dedos [+ garras]), casco (fendido), mão (dedos compridos), dedos de anfíbio
+function pe(o){const c=o.c;const L=[];const G=[];
+  if(o.tipo==='casco'){const r=o.r,hh=o.hh||r*1.4;let f=Cone([c[0],hh,c[2]-r*0.1],[c[0],r*0.15,c[2]+r*0.12],r*0.8,r);f=chao(f);
+    if(o.fendido!==false)f=Menos(f,Cx([c[0],hh*0.5,c[2]+r*0.7],[r*0.07,hh*0.7,r*0.75],0.0015),0.003);L.push([f,o.k||0.012]);G.push(f);return {L,garra:Uni(G,0)};}
+  if(o.tipo==='dedos'){// anfíbio: palma achatada + dedos abertos em leque
+    L.push([Ell([c[0],c[1],c[2]],[o.rx,o.ry,o.rz]),o.k||0.01]);const n=o.n||4;
+    for(let i=0;i<n;i++){const a=(o.leque||1.4)*((i/(n-1))-0.5)+(o.giro||0);const dx=Math.sin(a),dz=Math.cos(a);const comp=o.comp*(i===0||i===n-1?0.8:1);
+      L.push([Cone([c[0]+dx*o.rx*0.6,c[1],c[2]+dz*o.rz*0.6],[c[0]+dx*(o.rx*0.6+comp),c[1]-o.ry*0.3,c[2]+dz*(o.rz*0.6+comp)],o.rd,o.rd*0.75),0.004]);
+      L.push([Esf([c[0]+dx*(o.rx*0.6+comp),c[1]-o.ry*0.3,c[2]+dz*(o.rz*0.6+comp)],o.rd*1.15),0.003]);}
+    return {L,garra:null};}
+  // pata
+  L.push([Ell(c,[o.rx,o.ry,o.rz]),o.k||0.012]);const n=o.n||4;const rd=o.rd||o.rx*0.42;
+  for(let i=0;i<n;i++){const a=n>1?(i-(n-1)/2)/((n-1)/2):0;const dx=a*o.rx*0.6,dz=o.rz*(0.6-0.22*a*a);const dc=[c[0]+dx,c[1]-o.ry*0.18,c[2]+dz];L.push([Esf(dc,rd),0.007]);
+    if(o.garra){const gl=o.garra;const g=Cone([dc[0],dc[1]+rd*0.2,dc[2]+rd*0.4],[dc[0]+dx*0.15,Math.max(0.002,dc[1]-rd*0.9),dc[2]+rd*0.6+gl],rd*0.42,rd*0.1);G.push(g);L.push([g,0.002]);}}
+  return {L,garra:G.length?Uni(G,0):null};}
+// perna: cadeia de cones a partir do pivô + pé; devolve campo (grupo) e o das garras/cascos
+function perna(o){const L=[];const P=o.pts,R=o.rs;for(let i=0;i+1<P.length;i++)L.push([Cone(P[i],P[i+1],R[i],R[i+1]),i?(o.k||0.014):0]);
+  let g=null;if(o.pe){const q=pe(o.pe);for(const a of q.L)L.push(a);g=q.garra;}
+  for(const e of (o.extra||[]))L.push(e);
+  let f=UK(L);if(o.pe)f=chao(f);if(o.mod)f=o.mod(f);return {f,garra:g,piv:P[0]};}
+// rabo no espaço do 1.º gomo: base em 0, vai para −z
+function rabo(o){const N=o.N||12;const P=[],R=[];for(let i=0;i<=N;i++){const u=i/N;P.push([0,o.curva?o.curva(u):0,-u*o.comp]);R.push(Math.max(0.0022,o.perfil(u)));}
+  let f=Cad(P,R,o.k||0.006);if(o.sx&&o.sx!==1){const g=f,sx=o.sx;f=(x,y,z)=>g(x/sx,y,z)*Math.min(1,sx);}if(o.mod)f=o.mod(f);return f;}
+
+/* ---------------- texturas (claras: a cor vem dos vértices) com mapa de normais ---------------- */
+function tela(W,H){const c=document.createElement('canvas');c.width=W;c.height=H;return c;}
+// pincel em software (Float32): a tela 2D sem placa de vídeo leva ~11 ms por traço — aqui são milissegundos no total
+function buf(W,H,base){const B=new Float32Array(W*H);B.fill(base);return B;}
+function carimbo(B,W,H,px,py,r,val,a){const r1=r+0.75,x0=Math.floor(px-r1),x1=Math.ceil(px+r1),y0=Math.floor(py-r1),y1=Math.ceil(py+r1);
+  for(let y=y0;y<=y1;y++){const yy=((y%H)+H)%H,dy=y-py;for(let x=x0;x<=x1;x++){const dx=x-px,d=Math.sqrt(dx*dx+dy*dy);const w=cl(r+0.5-d,0,1)*a;if(w<=0)continue;const i=yy*W+(((x%W)+W)%W);B[i]+=(val-B[i])*w;}}}
+function traco(B,W,H,x0,y0,cx,cy,x1,y1,larg,val,a){const L=Math.hypot(x1-x0,y1-y0);const n=Math.max(2,Math.ceil(L/Math.max(0.6,larg*0.45)));const aa=1-Math.pow(1-a,1/Math.max(1,n*0.35));
+  for(let i=0;i<=n;i++){const t=i/n,u=1-t;const px=u*u*x0+2*u*t*cx+t*t*x1,py=u*u*y0+2*u*t*cy+t*t*y1;carimbo(B,W,H,px,py,larg*0.5*(1-0.45*t),val,aa);}}
+function telaDe(B,W,H){const cv=tela(W,H);const x=cv.getContext('2d');const im=x.createImageData(W,H);const d=im.data;for(let i=0;i<W*H;i++){const v=cl(Math.round(B[i]),0,255);d[i*4]=v;d[i*4+1]=v;d[i*4+2]=v;d[i*4+3]=255;}x.putImageData(im,0,0);return cv;}
+function normalDe(B,W,H,forca){const cv=tela(W,H);const ox=cv.getContext('2d');const im=ox.createImageData(W,H);const d=im.data;
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){const xm=(x-1+W)%W,xp=(x+1)%W,ym=(y-1+H)%H,yp=(y+1)%H;const dx=(B[y*W+xp]-B[y*W+xm])/255*forca,dy=(B[yp*W+x]-B[ym*W+x])/255*forca;
+    const nx=-dx,ny=dy,nz=1,l=Math.sqrt(nx*nx+ny*ny+nz*nz);const i=(y*W+x)*4;d[i]=(nx/l*0.5+0.5)*255;d[i+1]=(ny/l*0.5+0.5)*255;d[i+2]=(nz/l*0.5+0.5)*255;d[i+3]=255;}
+  ox.putImageData(im,0,0);return cv;}
+function texDe(tipo){const k='tex '+tipo;let t=BI.cache.get(k);if(t)return t;const t0=performance.now();const W=512,H=512;const r=rnd(6220+tipo.length*31);let B;
+  if(tipo==='pelo'||tipo==='curto'||tipo==='longo'){B=buf(W,H,tipo==='curto'?212:206);
+    const n=tipo==='curto'?16000:(tipo==='longo'?7000:11000),comp=tipo==='curto'?8:(tipo==='longo'?24:15),larg=tipo==='curto'?1.5:(tipo==='longo'?2.4:2.0);
+    for(let i=0;i<n;i++){const px=r()*W,py=r()*H,Lc=comp*(0.55+r()*0.9),a=(r()-0.5)*0.55;const v=r();const c=v<0.45?150+v*130:226+(v-0.45)*52;const cv2=(r()-0.5)*4;
+      traco(B,W,H,px,py,px+Math.sin(a)*Lc*0.5+cv2,py+Math.cos(a)*Lc*0.5,px+Math.sin(a)*Lc,py+Math.cos(a)*Lc,larg*(0.6+r()*0.8),c,0.35+r()*0.5);}}
+  else if(tipo==='la'){B=buf(W,H,196);
+    for(let i=0;i<4200;i++){const px=r()*W,py=r()*H,R0=3+r()*7,a0=r()*6.28,arco=2.4+r()*3.2;const c=165+r()*85,lw=1.6+r()*2.2,al=0.45+r()*0.45;const n=Math.ceil(R0*arco/1.2);
+      for(let k=0;k<=n;k++){const a=a0+arco*k/n;carimbo(B,W,H,px+Math.cos(a)*R0,py+Math.sin(a)*R0,lw*0.5,c,al*0.6);}}}
+  else if(tipo==='liso'){B=buf(W,H,226);
+    for(let i=0;i<1600;i++){const px=r()*W,py=r()*H,R0=2+r()*8;carimbo(B,W,H,px,py,R0,200+r()*55,0.16);}
+    for(let i=0;i<9000;i++)carimbo(B,W,H,r()*W,r()*H,0.7,180+r()*70,0.5);}
+  else{const N=tipo==='escama'?22:34;B=buf(W,H,150);const P=[];for(let j=0;j<N;j++)for(let i=0;i<N;i++)P.push([(i+0.15+r()*0.7)/N*W,(j+0.15+r()*0.7)/N*H]);const cw=W/N;
+    for(let y=0;y<H;y++)for(let x=0;x<W;x++){const ci=Math.floor(x/cw),cj=Math.floor(y/cw);let d1=1e9,d2=1e9;
+      for(let b=-1;b<=1;b++)for(let a2=-1;a2<=1;a2++){let ii=ci+a2,jj=cj+b,ox=0,oy=0;if(ii<0){ii+=N;ox=-W;}if(ii>=N){ii-=N;ox=W;}if(jj<0){jj+=N;oy=-H;}if(jj>=N){jj-=N;oy=H;}const q=P[jj*N+ii];const dx=x-(q[0]+ox),dy=y-(q[1]+oy);const d=dx*dx+dy*dy;if(d<d1){d2=d1;d1=d;}else if(d<d2)d2=d;}
+      const e=(Math.sqrt(d2)-Math.sqrt(d1))/cw;B[y*W+x]=110+120*S(0.0,0.42,e)+22*(1-Math.sqrt(d1)/cw);}}
+  const map=new T.CanvasTexture(telaDe(B,W,H));map.wrapS=map.wrapT=T.RepeatWrapping;map.anisotropy=4;try{map.encoding=T.sRGBEncoding;}catch(e){}
+  const nm=new T.CanvasTexture(normalDe(B,W,H,tipo==='la'?5:(tipo==='liso'?2.2:(tipo==='escama'||tipo==='couro'?3:3.2))));nm.wrapS=nm.wrapT=T.RepeatWrapping;nm.anisotropy=4;
+  t={map,nm,B};BI.cache.set(k,t);BI.stats['tex '+tipo]=Math.round(performance.now()-t0);return t;}
+// textura triplanar no espaço do objeto (sem costura nem polo no focinho) + relevo pela derivada da altura da própria textura
+const TRI_V='varying vec3 vP622;\nvarying vec3 vN622;\n';
+function triplanar(m,esc,relevo){m.userData.tri622={esc,relevo};
+  m.onBeforeCompile=function(sh){sh.uniforms.uEsc622={value:esc};sh.uniforms.uRel622={value:relevo};
+    sh.vertexShader=TRI_V+sh.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\n vP622=position; vN622=normal;');
+    sh.fragmentShader=TRI_V+'uniform float uEsc622;\nuniform float uRel622;\n'+
+      'vec3 pert622(vec3 sp,vec3 sn,vec2 dH){vec3 sx=dFdx(sp),sy=dFdy(sp);vec3 r1=cross(sy,sn),r2=cross(sn,sx);float det=dot(sx,r1);vec3 g=sign(det)*(dH.x*r1+dH.y*r2);return normalize(abs(det)*sn-g);}\n'+
+      sh.fragmentShader.replace('#include <map_fragment>',
+        'float h622=0.0;\n#ifdef USE_MAP\n vec3 bw622=pow(abs(normalize(vN622)),vec3(3.0));bw622/=(bw622.x+bw622.y+bw622.z+1e-5);vec3 P622=vP622*uEsc622;\n'+
+        ' vec4 texelColor=texture2D(map,P622.yz)*bw622.x+texture2D(map,P622.xz)*bw622.y+texture2D(map,P622.xy)*bw622.z;\n h622=dot(texelColor.rgb,vec3(0.3333));\n'+
+        ' texelColor=mapTexelToLinear(texelColor);diffuseColor*=texelColor;\n#endif\n')
+      .replace('#include <normal_fragment_maps>','#include <normal_fragment_maps>\n normal=pert622(-vViewPosition,normal,vec2(dFdx(h622),dFdy(h622))*uRel622);');};
+  m.customProgramCacheKey=function(){return 'tri622';};m.needsUpdate=true;return m;}
+function matPele(tipo,op){op=op||{};const esc=1/(op.passo||0.13);const k='mat '+tipo+'|'+(op.skin?1:0)+'|'+(op.rough||'')+'|'+(op.metal||'')+'|'+esc.toFixed(2)+'|'+(op.ns||'');let m=BI.cache.get(k);if(m)return m;const tx=texDe(tipo);
+  m=new T.MeshStandardMaterial({map:tx.map,normalMap:tx.nm,normalScale:new T.Vector2(0,0),vertexColors:true,roughness:op.rough!==undefined?op.rough:0.9,metalness:op.metal||0,skinning:!!op.skin});
+  triplanar(m,esc,(op.ns||0.55)*(tipo==='la'?0.0042:(tipo==='escama'||tipo==='couro'?0.0024:0.0014)));m.name='v622 '+tipo;BI.cache.set(k,m);return m;}
+function matLiso(nome,rough,metal,skin){const k='liso '+nome+'|'+(skin?1:0);let m=BI.cache.get(k);if(m)return m;m=new T.MeshStandardMaterial({color:0xffffff,vertexColors:true,roughness:rough,metalness:metal||0,skinning:!!skin});m.name='v622 '+nome;BI.cache.set(k,m);return m;}
+
+/* ---------------- malha de uma parte ---------------- */
+// caixa: varre o campo numa grade grossa (passo 0,03) dentro da caixa grande da espécie
+function caixaDe(f,B,passo){passo=passo||0.03;const lim=passo*0.88;let x0=1e9,y0=1e9,z0=1e9,x1=-1e9,y1=-1e9,z1=-1e9,n=0;
+  for(let z=B[2];z<=B[5]+1e-9;z+=passo)for(let y=B[1];y<=B[4]+1e-9;y+=passo)for(let x=B[0];x<=B[3]+1e-9;x+=passo){if(f(x,y,z)<lim){n++;if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;if(z<z0)z0=z;if(z>z1)z1=z;}}
+  if(!n)return null;const p=passo*1.05;return [x0-p,y0-p,z0-p,x1+p,y1+p,z1+p];}
+function uvPara(B,eixo,passo){const dx=B[3]-B[0],dy=B[4]-B[1],dz=B[5]-B[2];passo=passo||0.14;
+  if(eixo==='y')return {eixo:'y',c:[(B[0]+B[3])/2,(B[2]+B[5])/2],v0:B[1],v1:B[4],rep:[Math.max(1,Math.round(Math.PI*(dx+dz)/2/passo)),Math.max(1,Math.round(dy/passo))]};
+  if(eixo==='x')return {eixo:'x',c:[(B[2]+B[5])/2,(B[1]+B[4])/2],v0:B[0],v1:B[3],rep:[Math.max(1,Math.round(Math.PI*(dz+dy)/2/passo)),Math.max(1,Math.round(dx/passo))]};
+  return {eixo:'z',c:[(B[0]+B[3])/2,(B[1]+B[4])/2],v0:B[2],v1:B[5],rep:[Math.max(1,Math.round(Math.PI*(dx+dy)/2/passo)),Math.max(1,Math.round(dz/passo))]};}
+// fL: campo local; Bg: caixa (local) já calculada; cor(x,y,z,nx,ny,nz) local
+function malha(nome,fL,B,h,cor,uv){let g=BI.cache.get('geo '+nome);if(g)return g;const t0=performance.now();const R=cp579Rede(fL,B,h);if(!R||!R.nv||!R.nt)throw Error('malha vazia '+nome);
+  g=cp579Geo(R,{cor,uv});g.userData.bi622=nome;BI.cache.set('geo '+nome,g);BI.stats[nome]={tri:R.nt,ms:Math.round(performance.now()-t0)};return g;}
+
+/* ---------------- espinhos / cerdas / escamas espalhados na superfície ---------------- */
+// procura pontos da superfície de fS (grupo) a partir de raios que saem de c; aceita(p,n) filtra; devolve [{p,n}]
+function pontosSup(fS,c,R,n,sem,aceita){const r=rnd(sem);const out=[];for(let t=0;t<n*8&&out.length<n;t++){let dx=r()*2-1,dy=r()*2-1,dz=r()*2-1;const dl=Math.sqrt(dx*dx+dy*dy+dz*dz);if(dl>1||dl<0.15)continue;dx/=dl;dy/=dl;dz/=dl;
+    let px=c[0]+dx*R,py=c[1]+dy*R,pz=c[2]+dz*R,ok=false;for(let k=0;k<80;k++){const d=fS(px,py,pz);if(d<0.0006){ok=true;break;}px-=dx*d*0.9;py-=dy*d*0.9;pz-=dz*d*0.9;if((px-c[0])*dx+(py-c[1])*dy+(pz-c[2])*dz<0)break;}
+    if(!ok)continue;const e=0.0015;let nx=fS(px+e,py,pz)-fS(px-e,py,pz),ny=fS(px,py+e,pz)-fS(px,py-e,pz),nz=fS(px,py,pz+e)-fS(px,py,pz-e);const nl=Math.sqrt(nx*nx+ny*ny+nz*nz)||1;nx/=nl;ny/=nl;nz/=nl;
+    if(aceita&&!aceita(px,py,pz,nx,ny,nz))continue;out.push({p:[px,py,pz],n:[nx,ny,nz],r:r()});}return out;}
+// espinhos: cones finos de 6 lados (2 anéis), cor por altura do espinho cor(t,ponto)
+function espinhos(pts,op){const P=[],N=[],C=[],I=[];const seg=op.seg||6;const r=rnd(op.sem||77);
+  for(const q of pts){const p=q.p,n=q.n;let ax=n[0],ay=n[1]+(op.sobe||0),az=n[2]-(op.trás||0.8);if(op.dir){const d=op.dir(p,n);ax=d[0];ay=d[1];az=d[2];}
+    ax+=(r()-0.5)*0.35;ay+=(r()-0.5)*0.35;az+=(r()-0.5)*0.35;const al=Math.sqrt(ax*ax+ay*ay+az*az)||1;ax/=al;ay/=al;az/=al;
+    const comp=op.comp*(0.75+r()*0.5)*(op.escala?op.escala(p,n):1);if(comp<0.004)continue;const rb=op.raio*(0.8+r()*0.4);
+    // base perpendicular
+    let ux=-az,uy=0,uz=ax;if(Math.abs(ay)>0.9){ux=1;uy=0;uz=0;}let ul=Math.sqrt(ux*ux+uy*uy+uz*uz)||1;ux/=ul;uy/=ul;uz/=ul;const vx=ay*uz-az*uy,vy=az*ux-ax*uz,vz=ax*uy-ay*ux;
+    const b0=[p[0]-ax*comp*0.12,p[1]-ay*comp*0.12,p[2]-az*comp*0.12];const v0=P.length/3;
+    const aneis=[[0,1],[0.45,0.62]];for(const [t,rr] of aneis){for(let s=0;s<seg;s++){const a=s/seg*Math.PI*2,ca=Math.cos(a),sa=Math.sin(a);const ox=(ux*ca+vx*sa)*rb*rr,oy=(uy*ca+vy*sa)*rb*rr,oz=(uz*ca+vz*sa)*rb*rr;
+      P.push(b0[0]+ax*comp*t+ox,b0[1]+ay*comp*t+oy,b0[2]+az*comp*t+oz);const nn=[ux*ca+vx*sa+ax*0.25,uy*ca+vy*sa+ay*0.25,uz*ca+vz*sa+az*0.25];const nl=Math.sqrt(nn[0]*nn[0]+nn[1]*nn[1]+nn[2]*nn[2]);N.push(nn[0]/nl,nn[1]/nl,nn[2]/nl);const c=op.cor(t,q);C.push(c[0],c[1],c[2]);}}
+    P.push(b0[0]+ax*comp,b0[1]+ay*comp,b0[2]+az*comp);N.push(ax,ay,az);const ct=op.cor(1,q);C.push(ct[0],ct[1],ct[2]);const tip=v0+seg*2;
+    for(let s=0;s<seg;s++){const s1=(s+1)%seg;I.push(v0+s,v0+s1,v0+seg+s1,v0+s,v0+seg+s1,v0+seg+s,v0+seg+s,v0+seg+s1,tip);}}
+  const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(P,3));g.setAttribute('normal',new T.Float32BufferAttribute(N,3));g.setAttribute('color',new T.Float32BufferAttribute(C,3));g.setIndex(I);g.computeBoundingBox();g.computeBoundingSphere();return g;}
+// escamas: placas em forma de folha (meia cúpula achatada) deitadas na superfície, a ponta para trás
+function escamas(pts,op){const P=[],N=[],C=[],I=[];const NS=8,NR=4;
+  for(const q of pts){const p=q.p,n=q.n;// eixo de trás (tangente que aponta para −z) e lado
+    let bx=n[0]*n[2],by=n[1]*n[2],bz=-1+n[2]*n[2];if(op.tras)[bx,by,bz]=op.tras(p,n);let bl=Math.sqrt(bx*bx+by*by+bz*bz);if(bl<1e-4){bx=0;by=-1;bz=0;bl=1;}bx/=bl;by/=bl;bz/=bl;
+    const sx=n[1]*bz-n[2]*by,sy=n[2]*bx-n[0]*bz,sz=n[0]*by-n[1]*bx;const w=op.w*(0.85+q.r*0.3)*(op.escala?op.escala(p):1),l=op.l*(0.85+q.r*0.3)*(op.escala?op.escala(p):1),t=op.t;
+    const lev=op.lev||0.35;const v0=P.length/3;
+    // cúpula: anéis do centro à borda; a borda de trás levanta (lev) — parece telha
+    P.push(p[0]+n[0]*t,p[1]+n[1]*t,p[2]+n[2]*t);N.push(n[0],n[1],n[2]);const c0=op.cor(0,q);C.push(c0[0],c0[1],c0[2]);
+    for(let ri=1;ri<=NR;ri++){const rr=ri/NR;for(let s=0;s<NS;s++){const a=s/NS*Math.PI*2;const ca=Math.cos(a),sa=Math.sin(a);const tras=Math.max(0,ca);const ly=l*rr*ca*(ca>0?1:0.55),lx=w*rr*sa;const hgt=t*(1-rr*rr)+t*lev*tras*rr*1.4-t*0.2*rr;
+      P.push(p[0]+bx*ly+sx*lx+n[0]*hgt,p[1]+by*ly+sy*lx+n[1]*hgt,p[2]+bz*ly+sz*lx+n[2]*hgt);const tilt=0.6*rr;const nn=[n[0]+(bx*ca+sx*sa)*tilt*0.5-bx*lev*0.4,n[1]+(by*ca+sy*sa)*tilt*0.5-by*lev*0.4,n[2]+(bz*ca+sz*sa)*tilt*0.5-bz*lev*0.4];const nl=Math.sqrt(nn[0]*nn[0]+nn[1]*nn[1]+nn[2]*nn[2]);N.push(nn[0]/nl,nn[1]/nl,nn[2]/nl);const c=op.cor(rr,q,ca);C.push(c[0],c[1],c[2]);}}
+    for(let s=0;s<NS;s++){const s1=(s+1)%NS;I.push(v0,v0+1+s,v0+1+s1);}
+    for(let ri=1;ri<NR;ri++)for(let s=0;s<NS;s++){const s1=(s+1)%NS;const a=v0+1+(ri-1)*NS,b=v0+1+ri*NS;I.push(a+s,b+s,b+s1,a+s,b+s1,a+s1);}}
+  const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(P,3));g.setAttribute('normal',new T.Float32BufferAttribute(N,3));g.setAttribute('color',new T.Float32BufferAttribute(C,3));g.setIndex(I);g.computeBoundingBox();g.computeBoundingSphere();return g;}
+// junta geometrias (posição, normal, cor[, uv]) numa só
+function junta(L){let nv=0,ni=0;for(const q of L){nv+=q.attributes.position.count;ni+=q.index.count;}const P=new Float32Array(nv*3),N=new Float32Array(nv*3),C=new Float32Array(nv*3),UVs=new Float32Array(nv*2),I=new Uint32Array(ni);let ov=0,oi=0;
+  for(const q of L){const n=q.attributes.position.count;P.set(q.attributes.position.array,ov*3);N.set(q.attributes.normal.array,ov*3);if(q.attributes.color)C.set(q.attributes.color.array,ov*3);else C.fill(1,ov*3,(ov+n)*3);if(q.attributes.uv)UVs.set(q.attributes.uv.array,ov*2);
+    const ix=q.index.array;for(let i=0;i<ix.length;i++)I[oi+i]=ix[i]+ov;ov+=n;oi+=ix.length;}
+  const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(P,3));g.setAttribute('normal',new T.BufferAttribute(N,3));g.setAttribute('color',new T.BufferAttribute(C,3));g.setAttribute('uv',new T.BufferAttribute(UVs,2));g.setIndex(new T.BufferAttribute(I,1));g.computeBoundingBox();g.computeBoundingSphere();return g;}
+
+/* ======================================================================================================
+   ESPÉCIES — tudo no espaço do grupo: chão em y = 0, cabeça para +z. Cada uma devolve:
+   {pele, rough, caixa, corpo:f, cab:{piv,f}, olho, nariz:f, chifre:f?, pernas:[F,T], cauda:{base,tilt,n,comp,f}, cor(p,n,parte,i), extras(D)}
+   ====================================================================================================== */
+const ESP={};
+// monta a definição a partir dos parâmetros da espécie
+function monta(P){const D={pele:P.pele||'pelo',rough:P.rough,ns:P.ns,caixa:P.caixa,h:P.h||{},passo:P.passo,cor:P.cor,olho:P.olho,bigodes:P.bigodes,extras:P.extras,cascoMat:P.cascoMat,chifreMat:P.chifreMat,narizMat:P.narizMat,P};
+  const t=P.torso;const LT=[[Ell([0,t.peito[0],t.peito[1]],t.peito.slice(2,5)),0]];
+  if(t.meio)LT.push([Ell([0,t.meio[0],t.meio[1]],t.meio.slice(2,5)),t.km!==undefined?t.km:0.05]);
+  if(t.anca)LT.push([Ell([0,t.anca[0],t.anca[1]],t.anca.slice(2,5)),t.ka!==undefined?t.ka:0.05]);
+  if(t.ombro){const q=t.ombro;LT.push([Esp(Ell([q[0],q[1],q[2]],[q[3],q[4],q[5]],q[6]?[q[6],0,0]:null)),t.ko!==undefined?t.ko:0.03]);}
+  if(t.coxa){const q=t.coxa;LT.push([Esp(Ell([q[0],q[1],q[2]],[q[3],q[4],q[5]],q[6]?[q[6],0,0]:null)),t.kc!==undefined?t.kc:0.03]);}
+  if(t.pesc){const p=t.pesc;for(let i=0;i+1<p.length;i++)LT.push([Cone([0,p[i][0],p[i][1]],[0,p[i+1][0],p[i+1][1]],p[i][2],p[i+1][2]),t.kp!==undefined?t.kp:0.035]);}
+  for(const e of (t.extra||[]))LT.push(e);
+  let fc=UK(LT);if(t.mod)fc=t.mod(fc);D.corpo=fc;
+  const c=P.cab;const LH=[[Ell([0,c.cr[0],c.cr[1]],c.cr.slice(2,5),c.crRot||null),0]];
+  if(c.testa){const q=c.testa;LH.push([Ell([0,q[0],q[1]],q.slice(2,5)),q[5]!==undefined?q[5]:0.02]);}
+  if(c.foc){const f=c.foc;let fo=Cone([0,f.a[0],f.a[1]],[0,f.b[0],f.b[1]],f.r0,f.r1);if((f.sx&&f.sx!==1)||(f.sy&&f.sy!==1)){const sx=f.sx||1,sy=f.sy||1,cy=(f.a[0]+f.b[0])/2,g0=fo;fo=(x,y,z)=>g0(x/sx,cy+(y-cy)/sy,z)*Math.min(sx,sy,1);}LH.push([fo,f.k!==undefined?f.k:0.03]);}
+  if(c.boch){const q=c.boch;LH.push([Esp(Ell([q[0],q[1],q[2]],[q[3],q[4],q[5]],q[7]||null)),q[6]!==undefined?q[6]:0.02]);}
+  if(c.max){const q=c.max;LH.push([Ell([0,q[0],q[1]],q.slice(2,5)),q[5]!==undefined?q[5]:0.02]);}
+  for(const e of (c.extra||[]))LH.push(e);
+  if(P.orelha&&P.orelha.tipo!=='nenhuma'){const o=P.orelha;const L=orelhaLoc(o);const fo=Esp(Mov(L.f,o.base,o.rot));LH.push([fo,o.k!==undefined?o.k:0.008]);D.orelha=fo;D.orelhaDentro=Esp(Mov(L.dentro,o.base,o.rot));}
+  let fh=UK(LH);
+  if(P.olho){const o=P.olho;if(!o.fixo){const f0=fh;let c=o.c.slice();const e=0.0007;const gr=q=>{const gx=f0(q[0]+e,q[1],q[2])-f0(q[0]-e,q[1],q[2]),gy=f0(q[0],q[1]+e,q[2])-f0(q[0],q[1]-e,q[2]),gz=f0(q[0],q[1],q[2]+e)-f0(q[0],q[1],q[2]-e);const l=Math.hypot(gx,gy,gz)||1;return [gx/l,gy/l,gz/l];};
+      for(let it=0;it<16;it++){const d=f0(c[0],c[1],c[2]);const n=gr(c);c=[c[0]-n[0]*d,c[1]-n[1]*d,c[2]-n[2]*d];if(Math.abs(d)<2e-5)break;}
+      const n=gr(c);const fd=o.fundo!==undefined?o.fundo:0.42;o.sup=c.slice();o.c=[c[0]-n[0]*o.r*fd,c[1]-n[1]*o.r*fd,c[2]-n[2]*o.r*fd];
+      const fr=o.frente!==undefined?o.frente:0.55;let dx=n[0],dy=n[1]+(o.sobe||0),dz=n[2]+fr;const dl=Math.hypot(dx,dy,dz)||1;dx/=dl;dy/=dl;dz/=dl;o.yaw=Math.atan2(dx,dz);o.pitch=Math.asin(cl(dy,-1,1));o.fixo=true;}
+    fh=Menos(fh,Esp(Esf(o.c,o.r*(o.folga||1.045))),o.kO||o.r*0.32);}
+  for(const s of (c.menos||[]))fh=Menos(fh,s[0],s[1]);
+  if(c.mod)fh=c.mod(fh);
+  D.cab={piv:c.piv,f:fh};
+  if(P.nariz)D.nariz=P.nariz;
+  D.pernas=[perna(P.pF),perna(P.pT)];
+  if(P.cauda){const q=P.cauda;D.cauda={base:q.base,tilt:q.tilt||0,n:q.n||4,comp:q.comp,f:rabo(q)};}
+  if(P.chifre)D.chifre=P.chifre;if(P.casco)D.casco=P.casco;
+  D.aoExtra=P.aoExtra||[];return D;}
+// cor do olho
+const IRIS={escuro:{esc:'#1c130d',escBorda:'#0d0806',i0:'#3a2416',i1:'#24160e',i2:'#0c0705',ri:0.5,pp:0.36,brilho:false},
+  castanho:{esc:'#2a1c12',escBorda:'#120b07',i0:'#6a4224',i1:'#4a2c16',i2:'#1a0f08',ri:0.5,pp:0.42,brilho:false},
+  ambar:{esc:'#3a2a12',escBorda:'#1a1206',i0:'#f2c25a',i1:'#d08a2a',i2:'#6a3e10',ri:0.5,pp:0.3,brilho:false},
+  cabra:{esc:'#3a2a12',escBorda:'#1a1206',i0:'#e8c46a',i1:'#c08a32',i2:'#5a3a12',ri:0.5,pupila:'deitada',pp:0.5,brilho:false},
+  lince:{esc:'#3a3214',escBorda:'#1a1606',i0:'#d8d070',i1:'#a8a040',i2:'#4a4818',ri:0.5,pp:0.34,brilho:false},
+  preto:{esc:'#0c0a0a',escBorda:'#050404',i0:'#1a1616',i1:'#0e0c0c',i2:'#050404',ri:0.5,pp:0.3,brilho:false},
+  dourado:{esc:'#2a2212',escBorda:'#120e06',i0:'#e8b84a',i1:'#b07a22',i2:'#3a2408',ri:0.5,pp:0.36,brilho:false}};
+
+/* ---------------------------------------- OURIÇO ---------------------------------------- */
+ESP.ourico=()=>{const C={esp:HX(0x4a3222),cre:HX(0xd2b892),face:HX(0xc49e74),masc:HX(0x5e412c),foc:HX(0x9a6e58),pe:HX(0x8a6450),orel:HX(0xb08a78)};
+  const D=monta({pele:'pelo',rough:0.9,caixa:[-0.22,-0.01,-0.3,0.22,0.3,0.34],
+    torso:{peito:[0.085,0.07,0.08,0.066,0.075],meio:[0.105,-0.03,0.125,0.092,0.165],km:0.05,extra:[[Ell([0,0.075,-0.12],[0.1,0.06,0.07]),0.04]]},
+    cab:{piv:[0,0.1,0.12],cr:[0.104,0.152,0.054,0.052,0.06],boch:[0.03,0.09,0.17,0.028,0.03,0.032,0.02],foc:{a:[0.097,0.178],b:[0.081,0.262],r0:0.034,r1:0.0115,sy:0.88,k:0.025}},
+    orelha:{tipo:'redonda',base:[0.04,0.142,0.145],w:0.016,h:0.022,t:0.006,rot:[-0.25,0.5,-0.6]},
+    olho:{c:[0.031,0.117,0.195],r:0.0118,yaw:0.55,pitch:0.05,iris:IRIS.preto},
+    nariz:Ell([0,0.083,0.267],[0.0125,0.0105,0.009]),
+    bigodes:{c:[0.014,0.084,0.252],n:3,comp:0.05,abre:0.4,cor:0xd8d0c4},
+    pF:{pts:[[0.062,0.068,0.075],[0.066,0.035,0.085],[0.067,0.014,0.094]],rs:[0.02,0.013,0.01],pe:{tipo:'pata',c:[0.067,0.008,0.1],rx:0.014,ry:0.008,rz:0.016,n:5,rd:0.0055,garra:0.006}},
+    pT:{pts:[[0.068,0.065,-0.12],[0.071,0.035,-0.116],[0.072,0.014,-0.106]],rs:[0.022,0.014,0.011],pe:{tipo:'pata',c:[0.072,0.008,-0.1],rx:0.015,ry:0.008,rz:0.018,n:5,rd:0.0058,garra:0.006}},
+    cauda:{base:[0,0.06,-0.18],tilt:-0.5,n:2,comp:0.03,perfil:u=>0.011*(1-u)+0.004},
+    cor:(p,n,parte,D)=>{const [x,y,z]=p;let c;const ruid=0.93+0.07*fbm(x*60,y*60,z*60);
+      if(parte==='nariz')return mul(HX(0x1c1210),0.8+0.2*S(0.075,0.09,y));
+      if(parte==='cauda')return mul(C.pe,ruid);
+      if(parte==='perna'){c=MX(C.esp,C.pe,S(0.05,0.03,y));if(D.pernas[0].garra||D.pernas[1].garra){const g=Math.min(D.pernas[0].garra?D.pernas[0].garra(x,y,z):1,D.pernas[1].garra?D.pernas[1].garra(x,y,z):1);c=MX(c,HX(0x2a1e18),S(0.002,-0.0005,g));}return mul(c,ruid);}
+      if(parte==='cab'){c=C.face;// testa escura (onde nascem os espinhos), máscara em volta dos olhos, focinho rosado
+        c=MX(c,C.esp,S(0.122,0.142,y+0.35*(0.165-z)));const e=Math.hypot(Math.abs(x)-0.031,(y-0.116)*1.2,(z-0.197)*0.9);c=MX(c,C.masc,S(0.03,0.012,e)*0.75);
+        c=MX(c,C.foc,S(0.235,0.262,z));if(D.orelhaDentro){const od=D.orelhaDentro(x,y,z);c=MX(c,C.orel,S(0.004,0.0,od)*S(0.006,0,D.orelha(x,y,z)));}
+        // boca
+        const yb=0.074-0.12*(0.262-z);c=MX(c,HX(0x3a2018),S(0.0035,0.0008,Math.abs(y-yb))*S(0.2,0.215,z)*S(0.258,0.248,z)*S(0.022,0.008,Math.abs(x)));
+        return mul(c,ruid);}
+      // corpo: dorso escuro sob os espinhos, barriga clara
+      c=MX(C.cre,C.esp,S(0.055,0.09,y-0.25*Math.max(0,z-0.05)));return mul(c,ruid);},
+    extras:(D)=>{const pts=pontosSup(D.corpo,[0,0.09,-0.03],0.32,760,6221,(x,y,z,nx,ny,nz)=>ny>-0.12&&z<0.105&&y>0.06-0.2*Math.max(0,-z-0.1));
+      const cE=HX(0xeae0c6),cM=HX(0x3a2416),cP=HX(0xf6efe0);
+      const g=espinhos(pts,{comp:0.042,raio:0.0029,trás:1.05,sobe:0.25,sem:6222,escala:(p)=>0.72+0.35*S(0.05,0.15,p[1])*S(0.11,0.02,p[2]),
+        cor:(t,q)=>{const v=0.8+0.35*q.r;let c=t<0.18?cE:(t<0.8?MX(cE,cM,S(0.18,0.3,t)):MX(cM,cP,S(0.8,0.9,t)));return mul(c,v);}});
+      // cristinha de espinhos na nuca (presa à cabeça)
+      const ptsC=pontosSup(D.cab.f,[0,0.1,0.13],0.2,90,6223,(x,y,z,nx,ny,nz)=>ny>0.25&&z<0.165&&z>0.11&&Math.abs(x)<0.045);
+      const gc=espinhos(ptsC,{comp:0.03,raio:0.0025,trás:1.2,sobe:0.1,sem:6224,cor:(t,q)=>{const v=0.85+0.3*q.r;return mul(t<0.3?cE:(t<0.72?cM:cP),v);}});
+      return [{onde:'corpo',geo:g,mat:matLiso('espinho',0.55)},{onde:'cab',geo:gc,mat:matLiso('espinho',0.55)}];}});
+  return D;};
+
+/* ---------------------------------------- LONTRA ---------------------------------------- */
+ESP.lontra=()=>{const C={dor:HX(0x553a26),fla:HX(0x74543a),cre:HX(0xd4b892),pe:HX(0x3a2a1e)};
+  return monta({pele:'curto',rough:0.62,ns:0.45,caixa:[-0.2,-0.01,-0.66,0.2,0.32,0.45],
+    torso:{peito:[0.13,0.12,0.07,0.074,0.12],meio:[0.135,-0.02,0.075,0.072,0.13],anca:[0.13,-0.16,0.074,0.076,0.1],ombro:[0.05,0.115,0.13,0.035,0.06,0.06,-0.2],coxa:[0.055,0.115,-0.16,0.042,0.066,0.066,0.2],pesc:[[0.135,0.18,0.068],[0.152,0.255,0.056]]},
+    cab:{piv:[0,0.15,0.26],cr:[0.158,0.296,0.06,0.047,0.058],foc:{a:[0.15,0.324],b:[0.143,0.364],r0:0.04,r1:0.031,sx:1.25,sy:0.82,k:0.025},boch:[0.024,0.139,0.348,0.024,0.02,0.022,0.015],max:[0.13,0.33,0.03,0.016,0.035,0.015]},
+    orelha:{tipo:'redonda',base:[0.047,0.177,0.28],w:0.011,h:0.012,t:0.005,rot:[-0.2,0.6,-0.9]},
+    olho:{c:[0.03,0.171,0.322],r:0.0105,yaw:0.42,pitch:0.12,iris:IRIS.escuro},
+    nariz:Ell([0,0.149,0.372],[0.017,0.011,0.009]),
+    bigodes:{c:[0.03,0.141,0.356],n:4,comp:0.07,abre:0.35,cor:0xe8e2d8},
+    pF:{pts:[[0.05,0.1,0.14],[0.052,0.05,0.15],[0.054,0.016,0.164]],rs:[0.03,0.022,0.017],pe:{tipo:'pata',c:[0.054,0.009,0.172],rx:0.018,ry:0.009,rz:0.02,n:5,rd:0.006,garra:0.004,k:0.01}},
+    pT:{pts:[[0.055,0.1,-0.16],[0.058,0.055,-0.14],[0.06,0.016,-0.164]],rs:[0.034,0.024,0.018],pe:{tipo:'pata',c:[0.06,0.009,-0.15],rx:0.022,ry:0.009,rz:0.03,n:5,rd:0.0066,garra:0.004,k:0.01}},
+    cauda:{base:[0,0.118,-0.24],tilt:-0.12,n:5,comp:0.36,perfil:u=>0.056*Math.pow(1-u,0.85)+0.006,mod:f=>(x,y,z)=>f(x,y/0.8,z)*0.8},
+    cor:(p,n,parte,D)=>{const [x,y,z]=p;const ruid=0.92+0.08*fbm(x*50,y*50,z*50);let c;
+      if(parte==='nariz')return HX(0x141010);
+      if(parte==='cauda'){c=MX(C.fla,C.dor,S(-0.01,0.02,y));return mul(c,ruid);}
+      if(parte==='perna'){c=MX(C.fla,C.pe,S(0.07,0.03,y));return mul(c,ruid);}
+      if(parte==='cab'){c=MX(C.cre,C.fla,S(0.142,0.16,y+0.25*(z-0.33)));c=MX(c,C.dor,S(0.17,0.2,y)*0.6);
+        const yb=0.131;c=MX(c,HX(0x2a1c14),S(0.003,0.0007,Math.abs(y-yb))*S(0.34,0.35,z)*S(0.03,0.012,Math.abs(x)));return mul(c,ruid);}
+      // corpo: dorso escuro, garganta e peito creme
+      const lim=Lr(0.1,0.16,S(0.1,0.24,z));c=MX(C.fla,C.dor,S(0.14,0.19,y));c=MX(c,C.cre,S(lim+0.012,lim-0.012,y)*S(0.05,0.15,z));return mul(c,ruid);}});};
+
+/* ---------------------------------------- CERVO ---------------------------------------- */
+ESP.cervo=()=>{const C={dor:HX(0x8a5530),fla:HX(0xae7744),bar:HX(0xece0c6),bco:HX(0xf6f0e4),foc:HX(0x3a2a20),pe:HX(0x9a6a40),casco:HX(0x262220),chif:HX(0xd8c8a6),chifB:HX(0x6a5038)};
+  const beam=[[0.028,0.945,0.37],[0.055,1.02,0.348],[0.084,1.1,0.338],[0.1,1.175,0.368],[0.102,1.225,0.41]];
+  const chifre=Esp(UK([[Cad(beam,[0.012,0.0105,0.0088,0.0068,0.0035],0.006),0],[Esf([0.03,0.952,0.368],0.0155),0.006],
+    [Cad([[0.052,1.0,0.352],[0.058,1.028,0.42]],[0.0068,0.0028],0),0.008],[Cad([[0.085,1.1,0.34],[0.074,1.17,0.298]],[0.0062,0.0026],0),0.008],[Cad([[0.1,1.175,0.37],[0.122,1.232,0.345]],[0.005,0.0024],0),0.006]]));
+  return monta({pele:'curto',rough:0.85,caixa:[-0.24,-0.01,-0.42,0.24,1.32,0.62],h:{corpo:0.0095,cab:0.005,perna:0.0068,chifre:0.0042},chifreMat:'chifre',
+    torso:{peito:[0.6,0.15,0.1,0.13,0.16],meio:[0.62,-0.02,0.1,0.12,0.18],anca:[0.63,-0.2,0.1,0.12,0.12],ombro:[0.055,0.62,0.17,0.05,0.12,0.08,-0.15],coxa:[0.06,0.58,-0.21,0.065,0.13,0.1,0.2],pesc:[[0.64,0.2,0.075],[0.78,0.31,0.058],[0.86,0.352,0.05]],kp:0.05},
+    cab:{piv:[0,0.87,0.355],cr:[0.9,0.385,0.052,0.056,0.065],foc:{a:[0.885,0.42],b:[0.85,0.515],r0:0.042,r1:0.022,sy:0.92,k:0.03},boch:[0.03,0.875,0.43,0.028,0.03,0.04,0.02],max:[0.84,0.45,0.025,0.018,0.05,0.02]},
+    orelha:{tipo:'folha',base:[0.045,0.935,0.355],w:0.028,h:0.085,t:0.007,rot:[-0.2,0.5,-1.05]},
+    olho:{c:[0.043,0.912,0.415],r:0.016,yaw:0.85,pitch:0.05,iris:IRIS.escuro},
+    nariz:Ell([0,0.852,0.522],[0.019,0.014,0.011]),chifre,
+    pF:{pts:[[0.06,0.55,0.16],[0.062,0.42,0.13],[0.06,0.22,0.16],[0.06,0.07,0.165]],rs:[0.05,0.032,0.02,0.016],pe:{tipo:'casco',c:[0.06,0,0.172],r:0.019,hh:0.032}},
+    pT:{pts:[[0.065,0.58,-0.2],[0.068,0.42,-0.13],[0.064,0.27,-0.25],[0.06,0.07,-0.215]],rs:[0.06,0.04,0.022,0.016],pe:{tipo:'casco',c:[0.06,0,-0.207],r:0.019,hh:0.032}},
+    cauda:{base:[0,0.67,-0.305],tilt:0.5,n:2,comp:0.065,perfil:u=>0.026*(1-0.45*u)+0.005,mod:f=>(x,y,z)=>f(x/0.75,y,z)*0.75},
+    cor:(p,n,parte,D)=>{const [x,y,z]=p;const ruid=0.93+0.07*fbm(x*40,y*40,z*40);let c;
+      if(parte==='nariz')return HX(0x121010);
+      if(parte==='chifre'){const t=S(0.95,1.2,y);return mul(MX(C.chifB,C.chif,t),0.9+0.1*ruido(x*200,y*200,z*200));}
+      if(parte==='cauda'){c=MX(C.bco,C.dor,S(-0.005,0.015,y));return mul(c,ruid);}
+      if(parte==='perna'){if(D.pernas[0].garra){const g=Math.min(D.pernas[0].garra(x,y,z),D.pernas[1].garra(x,y,z));if(g<0.002)return C.casco;}
+        c=MX(C.pe,C.fla,S(0.3,0.5,y));c=MX(c,C.bar,S(0.04,0.0,Math.abs(x)-0.035)*S(0.45,0.55,y)*0.6);c=MX(c,HX(0x5a3a22),S(0.1,0.04,y));return mul(c,ruid);}
+      if(parte==='cab'){c=MX(C.fla,C.dor,S(0.9,0.95,y)*0.6);// focinho escuro, faixa clara atrás do nariz, queixo branco, anel claro no olho
+        c=MX(c,C.foc,S(0.495,0.512,z));c=MX(c,C.bco,S(0.008,0.002,Math.abs(z-0.49))*S(0.88,0.86,y)*0.7);c=MX(c,C.bco,S(0.86,0.84,y)*S(0.4,0.45,z));
+        const e=Math.hypot(Math.abs(x)-0.043,y-0.912,z-0.415);c=MX(c,C.bar,S(0.026,0.019,e)*S(0.0165,0.019,e)*0.7);
+        if(D.orelhaDentro){const od=D.orelhaDentro(x,y,z);c=MX(c,C.bco,S(0.004,0,od)*S(0.006,0,D.orelha(x,y,z)));const borda=S(0.004,0,D.orelha(x,y,z))*S(0.088+0.86,0.07+0.86,y+0.0);c=MX(c,C.foc,0);}
+        return mul(c,ruid);}
+      // corpo: dorso, flanco, barriga clara, garganta branca, pintas de orvalho no lombo
+      c=MX(C.fla,C.dor,S(0.62,0.72,y));c=MX(c,C.bar,S(0.53,0.49,y)*S(0.25,0.1,z));c=MX(c,C.bco,S(0.12,0.04,Math.abs(z-0.3)+Math.abs(y-0.72)*0.6)*0.85);
+      if(y>0.6&&z<0.12&&z>-0.26){const [d1]=celula(x*38,y*38,z*38,7);c=MX(c,C.bco,S(0.3,0.18,d1)*S(0.63,0.68,y)*S(0.74,0.7,y)*0.9);}
+      return mul(c,ruid);}});};
+
+/* ---------------------------------------- TARTARUGA ---------------------------------------- */
+ESP.tartaruga=()=>{const C={pele:HX(0x6e6c4c),peleE:HX(0x48462f),amar:HX(0xc0ac5a),jade:HX(0x3f7a5a),jadeC:HX(0x78ac84),sulco:HX(0x1a3024),marg:HX(0x8a9a5a),plas:HX(0xd6c88c)};
+  // escudos: centros (direções no espaço normalizado da carapaça)
+  const nrm=v=>{const l=Math.hypot(v[0],v[1],v[2]);return [v[0]/l,v[1]/l,v[2]/l];};const CEN=[];
+  for(const a of [-0.95,-0.48,0,0.48,0.95])CEN.push(nrm([0,Math.cos(a),Math.sin(a)]));
+  for(const sx of [-1,1])for(const s of [-0.62,-0.21,0.21,0.62])CEN.push(nrm([sx*0.7,0.62,s]));
+  for(const sx of [-1,1])for(let k=0;k<11;k++){const t=-Math.PI/2+Math.PI*(k+0.5)/11;CEN.push(nrm([sx*Math.cos(t),0.16,Math.sin(t)]));}
+  CEN.push(nrm([0,0.16,1]),nrm([0,0.16,-1]));const NV=13;
+  const sc=(x,y,z)=>{const q=nrm([x/0.2,(y-0.085)/0.15,(z+0.01)/0.255]);let d1=9,d2=9,i1=0;for(let i=0;i<CEN.length;i++){const d=1-(q[0]*CEN[i][0]+q[1]*CEN[i][1]+q[2]*CEN[i][2]);if(d<d1){d2=d1;d1=d;i1=i;}else if(d<d2)d2=d;}return [d1,d2,i1];};
+  const dome0=Smax;const domo=Ell([0,0.13,-0.01],[0.2,0.15,0.255]);
+  const cascoF0=UK([[(x,y,z)=>Math.max(domo(x,y,z),0.088-y),0],[Ell([0,0.1,-0.01],[0.207,0.03,0.262]),0.025],[Ell([0,0.077,-0.01],[0.165,0.026,0.225]),0.012]]);
+  const casco=(x,y,z)=>{const d=cascoF0(x,y,z);if(d>0.02||y<0.09)return d;const [d1,d2]=sc(x,y,z);return d+0.0045*S(0.016,0.0,d2-d1)-0.004*S(0.12,0.0,d1);};
+  return monta({pele:'escama',rough:0.85,ns:0.6,passo:0.16,caixa:[-0.26,-0.01,-0.34,0.26,0.32,0.46],h:{casco:0.0075},cascoMat:'casco',
+    torso:{peito:[0.11,0.08,0.13,0.07,0.12],meio:[0.11,-0.06,0.13,0.07,0.13],pesc:[[0.12,0.16,0.042],[0.14,0.27,0.03]],kp:0.03},
+    cab:{piv:[0,0.14,0.275],cr:[0.15,0.325,0.035,0.033,0.046],foc:{a:[0.146,0.35],b:[0.137,0.378],r0:0.027,r1:0.019,sy:0.92,k:0.018},max:[0.128,0.345,0.025,0.013,0.03,0.01]},
+    orelha:{tipo:'nenhuma'},
+    olho:{c:[0.028,0.156,0.348],r:0.0088,iris:IRIS.castanho,frente:0.25},
+    pF:{pts:[[0.12,0.1,0.15],[0.155,0.06,0.17],[0.165,0.02,0.18]],rs:[0.04,0.035,0.033],pe:{tipo:'pata',c:[0.165,0.012,0.186],rx:0.03,ry:0.012,rz:0.03,n:5,rd:0.008,garra:0.006}},
+    pT:{pts:[[0.12,0.09,-0.16],[0.15,0.05,-0.18],[0.155,0.02,-0.19]],rs:[0.045,0.038,0.035],pe:{tipo:'pata',c:[0.155,0.012,-0.19],rx:0.032,ry:0.012,rz:0.03,n:4,rd:0.009,garra:0.006}},
+    cauda:{base:[0,0.095,-0.245],tilt:-0.3,n:2,comp:0.05,perfil:u=>0.018*(1-u)+0.003},
+    casco,aoExtra:[casco],
+    cor:(p,n,parte,D)=>{const [x,y,z]=p;const ruid=0.9+0.1*fbm(x*45,y*45,z*45);let c;
+      if(parte==='casco'){if(y<0.088||n[1]<-0.5)return mul(C.plas,ruid);const [d1,d2,i]=sc(x,y,z);c=i<NV?MX(C.jade,C.jadeC,0.25):C.jade;if(i>=13&&i<35)c=MX(C.jade,C.marg,0.6);
+        c=MX(c,C.jadeC,S(0.09,0.0,d1)*0.55);c=MX(c,mul(c,0.78),S(0.4,0.9,Math.sin(d1*260))*S(0.0,0.03,d1)*0.5);c=MX(c,C.sulco,S(0.012,0.002,d2-d1));return mul(c,ruid);}
+      if(parte==='perna'){c=MX(C.pele,C.amar,S(0.1,0.0,z<0?1:0)*0.0+0.25*S(0.3,0.9,n[2]));if(D.pernas[0].garra){const g=Math.min(D.pernas[0].garra(x,y,z),D.pernas[1].garra(x,y,z));c=MX(c,HX(0x2a2418),S(0.002,-0.0005,g));}return mul(c,ruid);}
+      if(parte==='cab'){c=MX(C.pele,C.amar,S(0.2,0.8,ruido(x*90,y*90+3,z*90))*0.6);c=MX(c,C.peleE,S(0.15,0.17,y)*0.5);
+        const yb=0.132+0.18*(z-0.37);c=MX(c,HX(0x1a1610),S(0.0028,0.0006,Math.abs(y-yb))*S(0.345,0.355,z));return mul(c,ruid);}
+      if(parte==='cauda')return mul(C.pele,ruid);
+      return mul(MX(C.pele,C.amar,0.2),ruid);},
+    extras:null});};
+
+/* ---------------------------------------- PANDA-VERMELHO ---------------------------------------- */
+ESP.panda_vermelho=()=>{const C={rust:HX(0xb8481c),rustE:HX(0x8a3012),bco:HX(0xf4ece0),preto:HX(0x2a1812),anel:HX(0xdc9a5a),anelE:HX(0x7a3012),lag:HX(0x7a2a10)};
+  return monta({pele:'pelo',rough:0.92,caixa:[-0.2,-0.01,-0.72,0.2,0.42,0.42],
+    torso:{peito:[0.2,0.1,0.085,0.09,0.11],meio:[0.205,-0.04,0.088,0.088,0.12],anca:[0.205,-0.16,0.09,0.092,0.1],ombro:[0.055,0.19,0.12,0.04,0.07,0.06,-0.2],coxa:[0.058,0.19,-0.17,0.045,0.075,0.07,0.2],pesc:[[0.22,0.16,0.07],[0.255,0.21,0.06]]},
+    cab:{piv:[0,0.25,0.21],cr:[0.27,0.25,0.073,0.062,0.062],boch:[0.05,0.25,0.266,0.04,0.038,0.034,0.025],foc:{a:[0.258,0.29],b:[0.248,0.328],r0:0.03,r1:0.018,sy:0.9,k:0.025},max:[0.235,0.298,0.028,0.017,0.03,0.015]},
+    orelha:{tipo:'pontuda',base:[0.054,0.312,0.235],w:0.03,h:0.042,t:0.009,rot:[-0.15,0.3,-0.55],meio:0.35,larg0:0.95,ponta:0.32},
+    olho:{c:[0.03,0.274,0.301],r:0.0118,yaw:0.36,pitch:0.05,iris:IRIS.escuro},
+    nariz:Ell([0,0.251,0.332],[0.014,0.01,0.009]),bigodes:{c:[0.02,0.243,0.318],n:3,comp:0.05,cor:0xf4f0e8},
+    pF:{pts:[[0.055,0.17,0.12],[0.058,0.09,0.13],[0.06,0.03,0.142]],rs:[0.034,0.026,0.02],pe:{tipo:'pata',c:[0.06,0.012,0.152],rx:0.022,ry:0.012,rz:0.024,n:5,rd:0.007,garra:0.005}},
+    pT:{pts:[[0.06,0.17,-0.16],[0.062,0.1,-0.13],[0.062,0.04,-0.17]],rs:[0.04,0.028,0.02],pe:{tipo:'pata',c:[0.062,0.012,-0.152],rx:0.024,ry:0.012,rz:0.034,n:5,rd:0.007,garra:0.005}},
+    cauda:{base:[0,0.215,-0.24],tilt:0.12,n:6,comp:0.42,perfil:u=>0.032+0.024*Math.pow(Math.sin(Math.PI*Math.min(1,u*0.9+0.1)),0.6)*(1-0.5*S(0.85,1,u))},
+    cor:(p,n,parte,D,i)=>{const [x,y,z]=p;const ruid=0.92+0.08*fbm(x*45,y*45,z*45);let c;
+      if(parte==='nariz')return HX(0x141010);
+      if(parte==='cauda'){const u=i.u;const b=S(0.3,0.7,Math.sin(u*Math.PI*11+0.6));c=MX(C.rust,C.anel,b*0.85);c=MX(c,C.anelE,S(0.88,0.97,u));c=MX(c,mul(c,0.75),S(0.01,-0.03,y)*0.5);return mul(c,ruid);}
+      if(parte==='perna'){c=MX(C.preto,C.rustE,S(0.12,0.2,y)*0.5);return mul(c,ruid);}
+      if(parte==='cab'){c=MX(C.rust,C.rustE,S(0.29,0.33,y)*0.5);const ax=Math.abs(x);
+        // focinho branco, bochechas brancas, «sobrancelhas» brancas, lágrima ferrugem do olho à boca, orelhas de borda branca
+        c=MX(c,C.bco,S(0.296,0.31,z)*S(0.266,0.256,y));c=MX(c,C.bco,S(0.058,0.068,ax)*S(0.256,0.246,y)*S(0.24,0.262,z)*S(0.298,0.288,z));
+        c=MX(c,C.bco,S(0.013,0.006,Math.hypot(ax-0.026,y-0.295,(z-0.292)*0.8)));
+        const xl=Lr(0.03,0.02,S(0.3,0.32,z)),yl=Lr(0.262,0.24,S(0.3,0.32,z));c=MX(c,C.lag,S(0.009,0.003,Math.hypot(ax-xl,y-yl))*S(0.29,0.3,z)*0.85);
+        if(D.orelha){const od=D.orelhaDentro(x,y,z),oo=D.orelha(x,y,z);if(oo<0.004&&y>0.3){c=MX(C.rustE,C.bco,S(0.005,0,od));c=MX(c,C.bco,S(0.336,0.35,y)*0.8);}}
+        c=MX(c,C.preto,S(0.24,0.225,y)*S(0.28,0.25,z));return mul(c,ruid);}
+      c=MX(C.rust,C.rustE,S(0.24,0.29,y)*0.6);c=MX(c,C.preto,S(0.17,0.13,y));return mul(c,ruid);}});};
+
+/* ---------------------------------------- FENECO ---------------------------------------- */
+ESP.feneco=()=>{const C={faw:HX(0xe0bf8c),fawE:HX(0xc49a62),cre:HX(0xf6ecd6),rosa:HX(0xeec2b4),preto:HX(0x2a1e18),lis:HX(0x8a6040)};
+  return monta({pele:'pelo',rough:0.92,caixa:[-0.2,-0.01,-0.46,0.2,0.4,0.32],h:{cab:0.0038},
+    torso:{peito:[0.15,0.07,0.055,0.06,0.075],meio:[0.155,-0.02,0.05,0.052,0.08],anca:[0.155,-0.1,0.055,0.058,0.06],ombro:[0.035,0.145,0.08,0.028,0.05,0.04,-0.25],coxa:[0.038,0.145,-0.1,0.03,0.055,0.045,0.2],pesc:[[0.165,0.1,0.042],[0.2,0.145,0.034]]},
+    cab:{piv:[0,0.2,0.15],cr:[0.214,0.16,0.047,0.043,0.046],boch:[0.026,0.2,0.172,0.026,0.026,0.028,0.018],foc:{a:[0.205,0.185],b:[0.194,0.246],r0:0.024,r1:0.008,sy:0.9,k:0.02},max:[0.189,0.205,0.018,0.012,0.03,0.012]},
+    orelha:{tipo:'pontuda',base:[0.03,0.244,0.15],w:0.036,h:0.115,t:0.006,rot:[-0.12,0.32,-0.38],meio:0.3,larg0:0.85,ponta:0.12},
+    olho:{c:[0.025,0.222,0.19],r:0.0118,yaw:0.42,pitch:0.06,iris:IRIS.escuro},
+    nariz:Ell([0,0.196,0.25],[0.0085,0.007,0.006]),bigodes:{c:[0.014,0.19,0.234],n:3,comp:0.055,cor:0x3a3028},
+    pF:{pts:[[0.035,0.13,0.08],[0.037,0.06,0.088],[0.037,0.02,0.1]],rs:[0.022,0.014,0.01],pe:{tipo:'pata',c:[0.037,0.008,0.106],rx:0.012,ry:0.008,rz:0.014,n:4,rd:0.0045}},
+    pT:{pts:[[0.04,0.13,-0.1],[0.042,0.08,-0.075],[0.04,0.035,-0.115],[0.04,0.014,-0.103]],rs:[0.028,0.016,0.011,0.01],pe:{tipo:'pata',c:[0.04,0.008,-0.095],rx:0.012,ry:0.008,rz:0.015,n:4,rd:0.0045}},
+    cauda:{base:[0,0.155,-0.155],tilt:-0.35,n:4,comp:0.22,perfil:u=>0.016+0.022*Math.pow(Math.sin(Math.PI*Math.min(1,u*0.85+0.12)),0.6)*(1-0.6*S(0.85,1,u))},
+    cor:(p,n,parte,D,i)=>{const [x,y,z]=p;const ruid=0.93+0.07*fbm(x*55,y*55,z*55);let c;
+      if(parte==='nariz')return HX(0x161210);
+      if(parte==='cauda'){c=MX(C.faw,C.fawE,S(0.0,0.03,y)*0.5);c=MX(c,C.preto,S(0.8,0.9,i.u));return mul(c,ruid);}
+      if(parte==='perna'){c=MX(C.faw,C.cre,S(0.06,0.02,y)*0.6);return mul(c,ruid);}
+      if(parte==='cab'){c=MX(C.cre,C.faw,S(0.205,0.23,y+0.3*(0.2-z)));const ax=Math.abs(x);
+        const xl=Lr(0.024,0.012,S(0.2,0.235,z)),yl=Lr(0.214,0.198,S(0.2,0.235,z));c=MX(c,C.lis,S(0.006,0.002,Math.hypot(ax-xl,y-yl))*S(0.195,0.205,z)*0.7);
+        if(D.orelha){const od=D.orelhaDentro(x,y,z),oo=D.orelha(x,y,z);if(oo<0.004&&y>0.24){c=MX(C.faw,C.rosa,S(0.004,0,od));c=MX(c,C.cre,S(0.004,0,od)*S(0.3,0.33,y)*0.6);}}
+        return mul(c,ruid);}
+      c=MX(C.faw,C.fawE,S(0.17,0.21,y)*0.6);c=MX(c,C.cre,S(0.125,0.105,y));c=MX(c,C.cre,S(0.07,0.11,z)*S(0.16,0.13,y));return mul(c,ruid);}});};
+
+/* ---------------------------------------- GUAXINIM ---------------------------------------- */
+ESP.guaxinim=()=>{const C={cin:HX(0x8a857c),cinE:HX(0x56514c),bar:HX(0xb6af9f),bco:HX(0xefebe2),preto:HX(0x1c1a19),buff:HX(0xb4aa94)};
+  return monta({pele:'pelo',rough:0.92,caixa:[-0.2,-0.01,-0.6,0.2,0.4,0.4],
+    torso:{peito:[0.18,0.1,0.08,0.085,0.1],meio:[0.2,-0.03,0.09,0.09,0.12],anca:[0.21,-0.14,0.09,0.095,0.1],ombro:[0.05,0.17,0.11,0.04,0.07,0.06,-0.2],coxa:[0.056,0.19,-0.15,0.048,0.08,0.075,0.2],pesc:[[0.2,0.14,0.062],[0.225,0.2,0.055]]},
+    cab:{piv:[0,0.225,0.2],cr:[0.237,0.228,0.066,0.057,0.057],boch:[0.05,0.222,0.24,0.04,0.037,0.033,0.022],foc:{a:[0.226,0.265],b:[0.211,0.322],r0:0.029,r1:0.011,sy:0.9,k:0.025},max:[0.2,0.28,0.025,0.014,0.035,0.014]},
+    orelha:{tipo:'pontuda',base:[0.045,0.28,0.205],w:0.024,h:0.034,t:0.007,rot:[-0.15,0.35,-0.45],ponta:0.3},
+    olho:{c:[0.027,0.242,0.274],r:0.0112,yaw:0.33,pitch:0.06,iris:IRIS.escuro},
+    nariz:Ell([0,0.212,0.326],[0.011,0.0085,0.0075]),bigodes:{c:[0.016,0.206,0.31],n:3,comp:0.05},
+    pF:{pts:[[0.052,0.15,0.11],[0.055,0.08,0.12],[0.057,0.03,0.135]],rs:[0.032,0.022,0.016],pe:{tipo:'pata',c:[0.057,0.01,0.15],rx:0.02,ry:0.01,rz:0.026,n:5,rd:0.0058,garra:0.004}},
+    pT:{pts:[[0.058,0.18,-0.15],[0.06,0.1,-0.12],[0.06,0.035,-0.16]],rs:[0.04,0.028,0.018],pe:{tipo:'pata',c:[0.06,0.01,-0.142],rx:0.022,ry:0.01,rz:0.036,n:5,rd:0.006,garra:0.004}},
+    cauda:{base:[0,0.215,-0.23],tilt:0.05,n:5,comp:0.3,perfil:u=>0.03+0.012*Math.sin(Math.PI*u)-0.014*S(0.8,1,u)},
+    cor:(p,n,parte,D,i)=>{const [x,y,z]=p;const ruid=0.88+0.12*fbm(x*60,y*60,z*60);let c;
+      if(parte==='nariz')return HX(0x121010);
+      if(parte==='cauda'){const b=S(0.25,0.6,Math.sin(i.u*Math.PI*10-0.8));c=MX(C.buff,C.preto,b*0.92);c=MX(c,C.preto,S(0.9,0.97,i.u));return mul(c,ruid);}
+      if(parte==='perna'){c=MX(C.cinE,C.preto,S(0.09,0.04,y));return mul(c,ruid);}
+      if(parte==='cab'){const ax=Math.abs(x);c=MX(C.cin,C.cinE,S(0.27,0.3,y)*0.5);
+        // máscara preta sobre os olhos, sobrancelha branca, focinho branco, bochechas claras
+        const ym=0.243+0.35*(z-0.26);const mask=S(0.017,0.01,Math.abs(y-ym))*S(0.215,0.235,z)*S(0.3,0.29,z);c=MX(c,C.preto,mask);
+        c=MX(c,C.bco,S(0.008,0.003,Math.abs(y-ym-0.022))*S(0.235,0.25,z)*S(0.29,0.28,z)*S(0.008,0.016,ax));
+        c=MX(c,C.bco,S(0.288,0.3,z)*S(0.236,0.222,y));c=MX(c,C.bco,S(0.009,0.002,ax)*S(0.27,0.3,z)*0.8);c=MX(c,C.bar,S(0.04,0.055,ax)*S(0.24,0.215,y)*0.85);
+        if(D.orelha){const od=D.orelhaDentro(x,y,z),oo=D.orelha(x,y,z);if(oo<0.004&&y>0.275){c=MX(C.cinE,C.bco,S(0.005,0,od)*0.9);c=MX(c,C.bco,S(0.305,0.315,y));}}
+        return mul(c,ruid);}
+      c=MX(C.cin,C.cinE,S(0.24,0.3,y)*0.7);c=MX(c,C.bar,S(0.14,0.11,y));return mul(c,ruid);}});};
+
+/* ---------------------------------------- TATU ---------------------------------------- */
+ESP.tatu=()=>{const C={bro:HX(0xa87a4c),broC:HX(0xd8ae74),sulco:HX(0x4e3018),pele:HX(0xc49a80),peleE:HX(0x9a7462)};
+  const cara=Ell([0,0.105,-0.025],[0.106,0.096,0.2]);const banda=z=>{const q=(z+0.07)/0.0165;return Math.abs(q-Math.round(q));};
+  const casco0=(x,y,z)=>Math.max(cara(x,y,z),0.052-y);
+  const casco=(x,y,z)=>{const d=casco0(x,y,z);if(d>0.02)return d;let off=0;if(z>-0.075&&z<0.06)off+=0.0032*S(0.18,0.0,banda(z))-0.001;else{const [d1,d2]=celula(x*70,y*70,z*70,3);off+=0.0028*S(0.1,0.0,d2-d1)-0.0018*S(0.5,0.0,d1);}
+    off+=0.006*S(0.06,0.052,y);return d+off;};
+  return monta({pele:'couro',rough:0.72,ns:0.45,passo:0.15,caixa:[-0.18,-0.01,-0.5,0.18,0.25,0.36],h:{casco:0.0055},cascoMat:'bronze',
+    torso:{peito:[0.09,0.08,0.07,0.06,0.08],meio:[0.1,-0.03,0.085,0.07,0.12],anca:[0.095,-0.13,0.075,0.065,0.08],pesc:[[0.09,0.12,0.045],[0.1,0.17,0.035]]},
+    cab:{piv:[0,0.1,0.17],cr:[0.104,0.2,0.037,0.034,0.048],foc:{a:[0.098,0.23],b:[0.076,0.3],r0:0.026,r1:0.009,sy:0.85,k:0.02},extra:[[Ell([0,0.128,0.2],[0.03,0.012,0.04],[0.15,0,0]),0.012]]},
+    orelha:{tipo:'pontuda',base:[0.026,0.13,0.185],w:0.011,h:0.03,t:0.006,rot:[-0.35,0.3,-0.3],ponta:0.3},
+    olho:{c:[0.024,0.113,0.226],r:0.0078,yaw:0.7,pitch:0.05,iris:IRIS.escuro},
+    nariz:Ell([0,0.078,0.302],[0.008,0.007,0.006]),
+    pF:{pts:[[0.06,0.08,0.1],[0.064,0.04,0.112],[0.065,0.016,0.122]],rs:[0.024,0.018,0.015],pe:{tipo:'pata',c:[0.065,0.008,0.13],rx:0.016,ry:0.008,rz:0.018,n:4,rd:0.005,garra:0.012}},
+    pT:{pts:[[0.062,0.08,-0.13],[0.066,0.04,-0.13],[0.066,0.016,-0.135]],rs:[0.028,0.02,0.016],pe:{tipo:'pata',c:[0.066,0.008,-0.126],rx:0.017,ry:0.008,rz:0.02,n:5,rd:0.005,garra:0.008}},
+    cauda:{base:[0,0.075,-0.215],tilt:-0.25,n:4,comp:0.22,perfil:u=>0.026*(1-u)+0.005,mod:f=>(x,y,z)=>f(x,y,z)+0.0016*S(0.2,0.0,Math.abs(((-z/0.02)%1)-0.5)-0.25)},
+    casco,aoExtra:[casco],
+    cor:(p,n,parte,D,i)=>{const [x,y,z]=p;const ruid=0.9+0.1*fbm(x*50,y*50,z*50);let c;
+      if(parte==='nariz')return HX(0x3a2420);
+      if(parte==='casco'){if(z>-0.075&&z<0.06){const b=banda(z);c=MX(C.broC,C.bro,S(0.02,0.3,b));c=MX(c,C.sulco,S(0.12,0.02,b));}else{const [d1,d2]=celula(x*70,y*70,z*70,3);c=MX(C.broC,C.bro,S(0.05,0.5,d1));c=MX(c,C.sulco,S(0.08,0.0,d2-d1));}
+        c=MX(c,C.sulco,S(0.062,0.052,y)*0.6);return mul(c,ruid);}
+      if(parte==='cauda'){const b=Math.abs(((i.u*11)%1)-0.5);c=MX(C.bro,C.broC,S(0.1,0.4,b));c=MX(c,C.sulco,S(0.1,0.0,b)*0.7);return mul(c,ruid);}
+      if(parte==='perna'){c=MX(C.peleE,C.pele,S(0.02,0.06,y));const g=Math.min(D.pernas[0].garra(x,y,z),D.pernas[1].garra(x,y,z));c=MX(c,HX(0x2a2018),S(0.002,-0.0005,g));return mul(c,ruid);}
+      if(parte==='cab'){c=C.pele;c=MX(c,C.bro,S(0.118,0.128,y)*S(0.255,0.235,z));c=MX(c,C.broC,S(0.124,0.134,y)*S(0.25,0.23,z)*0.5);return mul(c,ruid);}
+      return mul(MX(C.peleE,C.pele,S(0.04,0.08,y)),ruid);}});};
+
+/* ---------------------------------------- TEXUGO ---------------------------------------- */
+ESP.texugo=()=>{const C={cin:HX(0x948f86),cinC:HX(0xbab3a7),cinE:HX(0x625e57),preto:HX(0x1c1a19),bco:HX(0xf2efe8)};
+  return monta({pele:'pelo',rough:0.93,caixa:[-0.22,-0.01,-0.4,0.22,0.32,0.44],
+    torso:{peito:[0.15,0.1,0.1,0.085,0.12],meio:[0.16,-0.04,0.115,0.085,0.14],anca:[0.155,-0.17,0.1,0.085,0.1],ombro:[0.07,0.14,0.12,0.045,0.065,0.065,-0.2],coxa:[0.072,0.14,-0.17,0.05,0.07,0.07,0.2],pesc:[[0.16,0.18,0.072],[0.17,0.23,0.06]]},
+    cab:{piv:[0,0.17,0.23],cr:[0.18,0.265,0.061,0.051,0.063],foc:{a:[0.17,0.3],b:[0.152,0.368],r0:0.034,r1:0.014,sy:0.9,k:0.025},boch:[0.04,0.165,0.29,0.03,0.028,0.035,0.02]},
+    orelha:{tipo:'redonda',base:[0.057,0.2,0.24],w:0.016,h:0.015,t:0.006,rot:[-0.3,0.9,-1.1]},
+    olho:{c:[0.03,0.188,0.308],r:0.0092,yaw:0.45,pitch:0.05,iris:IRIS.escuro},
+    nariz:Ell([0,0.154,0.371],[0.015,0.011,0.009]),
+    pF:{pts:[[0.07,0.12,0.13],[0.074,0.06,0.142],[0.075,0.018,0.152]],rs:[0.036,0.028,0.022],pe:{tipo:'pata',c:[0.075,0.01,0.165],rx:0.022,ry:0.01,rz:0.022,n:5,rd:0.0065,garra:0.024}},
+    pT:{pts:[[0.07,0.12,-0.18],[0.074,0.06,-0.17],[0.075,0.018,-0.175]],rs:[0.04,0.03,0.022],pe:{tipo:'pata',c:[0.075,0.01,-0.162],rx:0.024,ry:0.01,rz:0.028,n:5,rd:0.0065,garra:0.01}},
+    cauda:{base:[0,0.165,-0.262],tilt:0.1,n:2,comp:0.09,perfil:u=>0.026*(1-0.5*u)+0.008},
+    cor:(p,n,parte,D,i)=>{const [x,y,z]=p;const gr=fbm(x*90,y*90,z*90);const ruid=0.92+0.08*gr;let c;
+      if(parte==='nariz')return HX(0x121010);
+      if(parte==='cauda'){c=MX(C.cin,C.cinC,S(-0.3,0.5,gr));return mul(c,ruid);}
+      if(parte==='perna'){c=C.preto;const g=Math.min(D.pernas[0].garra(x,y,z),D.pernas[1].garra(x,y,z));c=MX(c,HX(0xd8ccb0),S(0.002,-0.0005,g)*0.8);return mul(c,ruid);}
+      if(parte==='cab'){const ax=Math.abs(x);c=C.bco;// duas faixas pretas do focinho às orelhas, passando pelos olhos
+        const xs=Lr(0.012,0.04,S(0.36,0.25,z));const st=S(0.014,0.008,Math.abs(ax-xs))*S(0.15,0.17,y+0.0);c=MX(c,C.preto,st);c=MX(c,C.preto,S(0.165,0.15,y)*S(0.29,0.26,z)*0.9);
+        if(D.orelha){const oo=D.orelha(x,y,z);if(oo<0.004)c=MX(C.preto,C.bco,S(0.207,0.212,y));}return mul(c,ruid);}
+      c=MX(C.cinE,C.cin,S(0.12,0.2,y));c=MX(c,C.cinC,S(-0.2,0.6,gr)*S(0.15,0.2,y));c=MX(c,C.preto,S(0.11,0.08,y));c=MX(c,C.preto,S(0.2,0.25,z)*S(0.2,0.16,y));return mul(c,ruid);}});};
+
+/* ---------------------------------------- GAMBÁ (das estrelas) ---------------------------------------- */
+ESP.gamba=()=>{const C={preto:HX(0x17181d),pretoA:HX(0x23262e),bco:HX(0xf2f0ea),est:HX(0xfff6d8)};
+  const listra=(x,y,z)=>{const ax=Math.abs(x);// duas listras do pescoço às ancas (unidas na nuca)
+    const xs=Lr(0.0,0.04,S(0.16,0.06,z))*S(-0.2,-0.1,z+0.0)+Lr(0.04,0.02,S(-0.08,-0.15,z));return S(0.016,0.008,Math.abs(ax-xs))*S(0.18,0.21,y+0.1*Math.max(0,-z-0.08));};
+  return monta({pele:'longo',rough:0.9,caixa:[-0.2,-0.01,-0.5,0.2,0.62,0.36],
+    torso:{peito:[0.15,0.08,0.07,0.075,0.09],meio:[0.17,-0.04,0.08,0.085,0.1],anca:[0.17,-0.13,0.085,0.09,0.08],ombro:[0.045,0.14,0.09,0.035,0.06,0.05,-0.2],coxa:[0.05,0.15,-0.13,0.045,0.07,0.06,0.2],pesc:[[0.16,0.13,0.055],[0.185,0.18,0.048]]},
+    cab:{piv:[0,0.185,0.18],cr:[0.192,0.2,0.053,0.049,0.053],boch:[0.035,0.183,0.21,0.03,0.03,0.03,0.02],foc:{a:[0.185,0.23],b:[0.169,0.286],r0:0.026,r1:0.01,sy:0.9,k:0.02}},
+    orelha:{tipo:'redonda',base:[0.04,0.228,0.19],w:0.014,h:0.016,t:0.005,rot:[-0.25,0.6,-0.7]},
+    olho:{c:[0.025,0.2,0.236],r:0.0105,yaw:0.36,pitch:0.06,iris:IRIS.escuro},
+    nariz:Ell([0,0.17,0.289],[0.01,0.008,0.007]),bigodes:{c:[0.014,0.165,0.274],n:3,comp:0.045,cor:0xd8d4cc},
+    pF:{pts:[[0.048,0.12,0.1],[0.05,0.06,0.108],[0.052,0.018,0.118]],rs:[0.028,0.02,0.015],pe:{tipo:'pata',c:[0.052,0.009,0.128],rx:0.017,ry:0.009,rz:0.02,n:5,rd:0.0055,garra:0.007}},
+    pT:{pts:[[0.052,0.13,-0.13],[0.055,0.07,-0.115],[0.055,0.02,-0.14]],rs:[0.036,0.024,0.017],pe:{tipo:'pata',c:[0.055,0.009,-0.126],rx:0.018,ry:0.009,rz:0.026,n:5,rd:0.0055,garra:0.005}},
+    cauda:{base:[0,0.19,-0.2],tilt:1.15,n:5,comp:0.36,perfil:u=>0.028+0.046*Math.pow(Math.sin(Math.PI*Math.min(1,u*0.95+0.05)),0.55)*(1-0.4*S(0.8,1,u)),curva:u=>-0.07*u*u},
+    cor:(p,n,parte,D,i)=>{const [x,y,z]=p;const ruid=0.9+0.1*fbm(x*50,y*50,z*50);let c=C.preto;
+      const estrela=(q,s)=>{const [d1]=celula(q[0]*s,q[1]*s,q[2]*s,11);return S(0.09,0.03,d1);};
+      if(parte==='nariz')return HX(0x101010);
+      if(parte==='cauda'){c=MX(C.preto,C.bco,S(0.02,0.005,Math.abs(x))*S(-0.03,0.0,y)*0.9+S(0.8,0.95,i.u)*0.5);c=MX(c,C.est,estrela(p,90)*(1-S(0.2,0.6,c[0]))*0.9);return mul(c,ruid);}
+      if(parte==='perna')return mul(MX(C.preto,C.est,estrela(p,110)*0.6),ruid);
+      if(parte==='cab'){const ax=Math.abs(x);c=MX(C.preto,C.bco,S(0.006,0.0025,ax)*S(0.22,0.255,z)*S(0.2,0.21,y));c=MX(c,C.bco,S(0.03,0.01,ax)*S(0.225,0.235,y)*S(0.21,0.17,z));
+        c=MX(c,C.est,estrela(p,110)*(1-S(0.2,0.6,c[0]))*0.8);return mul(c,ruid);}
+      c=MX(C.preto,C.bco,listra(x,y,z));c=MX(c,C.bco,S(0.03,0.01,Math.abs(x))*S(0.15,0.17,z)*S(0.2,0.215,y));c=MX(c,C.est,estrela(p,100)*(1-S(0.2,0.6,c[0]))*0.9);return mul(c,ruid);}});};
+
+/* ---------------------------------------- FURÃO ---------------------------------------- */
+ESP.furao=()=>{const C={cre:HX(0xe6d0a8),creC:HX(0xf4e8d2),guard:HX(0xa47a4c),esc:HX(0x3e2a1c),masc:HX(0x4a3424),rosa:HX(0xd89a92)};
+  return monta({pele:'pelo',rough:0.9,caixa:[-0.15,-0.01,-0.48,0.15,0.24,0.38],h:{corpo:0.0065,cab:0.004,perna:0.0045},
+    torso:{peito:[0.11,0.1,0.05,0.055,0.09],meio:[0.122,-0.04,0.05,0.052,0.12],anca:[0.115,-0.16,0.055,0.058,0.07],ombro:[0.032,0.1,0.1,0.026,0.045,0.04,-0.2],coxa:[0.035,0.105,-0.16,0.03,0.05,0.045,0.2],pesc:[[0.12,0.16,0.042],[0.135,0.22,0.035]]},
+    cab:{piv:[0,0.135,0.22],cr:[0.145,0.25,0.04,0.035,0.045],boch:[0.022,0.138,0.27,0.022,0.02,0.024,0.015],foc:{a:[0.138,0.275],b:[0.131,0.31],r0:0.022,r1:0.012,sy:0.9,k:0.018}},
+    orelha:{tipo:'redonda',base:[0.032,0.17,0.235],w:0.013,h:0.014,t:0.004,rot:[-0.25,0.6,-0.7]},
+    olho:{c:[0.022,0.151,0.275],r:0.0088,yaw:0.45,pitch:0.05,iris:IRIS.escuro},
+    nariz:Ell([0,0.131,0.314],[0.009,0.007,0.006]),narizMat:'nariz rosa',bigodes:{c:[0.012,0.128,0.301],n:3,comp:0.045},
+    pF:{pts:[[0.034,0.085,0.11],[0.036,0.045,0.118],[0.037,0.015,0.126]],rs:[0.02,0.014,0.011],pe:{tipo:'pata',c:[0.037,0.007,0.133],rx:0.012,ry:0.007,rz:0.014,n:5,rd:0.004,garra:0.004}},
+    pT:{pts:[[0.037,0.085,-0.16],[0.04,0.05,-0.15],[0.04,0.015,-0.165]],rs:[0.024,0.016,0.012],pe:{tipo:'pata',c:[0.04,0.007,-0.155],rx:0.013,ry:0.007,rz:0.018,n:5,rd:0.004,garra:0.004}},
+    cauda:{base:[0,0.112,-0.22],tilt:-0.1,n:4,comp:0.2,perfil:u=>0.017*(1-0.45*u)+0.004},
+    cor:(p,n,parte,D,i)=>{const [x,y,z]=p;const ruid=0.92+0.08*fbm(x*60,y*60,z*60);let c;
+      if(parte==='nariz')return C.rosa;
+      if(parte==='cauda')return mul(MX(C.guard,C.esc,S(0.1,0.5,i.u)),ruid);
+      if(parte==='perna')return mul(MX(C.esc,C.guard,S(0.06,0.09,y)*0.6),ruid);
+      if(parte==='cab'){const ax=Math.abs(x);c=C.creC;const ym=0.152+0.25*(z-0.27);c=MX(c,C.masc,S(0.014,0.007,Math.abs(y-ym))*S(0.232,0.25,z)*S(0.298,0.288,z));c=MX(c,C.guard,S(0.0,0.4,y-0.16+0.3*(z-0.25))*0.0);
+        c=MX(c,C.guard,S(0.165,0.18,y)*S(0.26,0.23,z)*0.6);return mul(c,ruid);}
+      c=MX(C.cre,C.guard,S(0.12,0.165,y)*0.85);c=MX(c,C.esc,S(-0.12,-0.2,z)*S(0.13,0.1,y)*0.5);return mul(c,ruid);}});};
+/* ---------------------------------------- ALPACA ---------------------------------------- */
+ESP.alpaca=()=>{const C={la:HX(0xf2e8d4),laS:HX(0xd8c8ac),cara:HX(0xeedcc0),foc:HX(0x7a6a5e),perna:HX(0xd6bc98),pe:HX(0x5a4a40),rosa:HX(0xe8c4b8)};
+  const tufos=(f,s,a,y0)=>(x,y,z)=>{const d=f(x,y,z);if(d>0.03||y<y0)return d;const [d1]=celula(x*s,y*s,z*s,5);return d-a*S(0.75,0.15,d1)*S(y0,y0+0.04,y);};
+  return monta({pele:'la',rough:0.96,ns:0.8,passo:0.11,caixa:[-0.24,-0.01,-0.4,0.24,1.08,0.4],h:{corpo:0.0085,cab:0.0045,perna:0.0062},
+    torso:{peito:[0.5,0.12,0.12,0.13,0.14],meio:[0.52,-0.03,0.13,0.13,0.17],anca:[0.52,-0.16,0.12,0.13,0.12],ombro:[0.065,0.48,0.13,0.055,0.1,0.07,-0.1],coxa:[0.07,0.48,-0.17,0.06,0.11,0.08,0.15],pesc:[[0.56,0.15,0.08],[0.72,0.19,0.068],[0.86,0.215,0.058]],kp:0.04,mod:f=>tufos(f,26,0.011,0.36)},
+    cab:{piv:[0,0.875,0.215],cr:[0.915,0.24,0.047,0.047,0.053],testa:[0.955,0.226,0.055,0.04,0.052,0.03],foc:{a:[0.9,0.27],b:[0.876,0.314],r0:0.033,r1:0.025,sy:0.92,k:0.025},max:[0.866,0.29,0.024,0.015,0.03,0.015],mod:f=>tufos(f,34,0.008,0.935)},
+    orelha:{tipo:'folha',base:[0.032,0.965,0.222],w:0.016,h:0.07,t:0.007,rot:[-0.12,0.25,-0.22]},
+    olho:{c:[0.04,0.924,0.265],r:0.0145,yaw:0.6,pitch:0.05,iris:IRIS.escuro},
+    nariz:Ell([0,0.888,0.316],[0.012,0.008,0.006]),
+    pF:{pts:[[0.068,0.45,0.13],[0.07,0.3,0.135],[0.07,0.16,0.14],[0.07,0.05,0.145]],rs:[0.05,0.034,0.02,0.017],pe:{tipo:'pata',c:[0.07,0.012,0.16],rx:0.02,ry:0.012,rz:0.028,n:2,rd:0.011,garra:0.006},mod:f=>tufos(f,26,0.009,0.3)},
+    pT:{pts:[[0.07,0.45,-0.17],[0.072,0.3,-0.2],[0.07,0.17,-0.22],[0.07,0.05,-0.19]],rs:[0.055,0.036,0.02,0.017],pe:{tipo:'pata',c:[0.07,0.012,-0.175],rx:0.02,ry:0.012,rz:0.028,n:2,rd:0.011,garra:0.006},mod:f=>tufos(f,26,0.009,0.3)},
+    cauda:{base:[0,0.56,-0.275],tilt:0.25,n:2,comp:0.06,perfil:u=>0.03*(1-0.3*u)+0.01},
+    cor:(p,n,parte,D,i)=>{const [x,y,z]=p;const ruid=0.94+0.06*fbm(x*30,y*30,z*30);let c;
+      if(parte==='nariz')return HX(0x3a3030);
+      if(parte==='cauda')return mul(C.la,ruid);
+      if(parte==='perna'){c=MX(C.perna,C.la,S(0.26,0.34,y));c=MX(c,C.pe,S(0.035,0.015,y));return mul(c,ruid);}
+      if(parte==='cab'){c=MX(C.cara,C.la,S(0.935,0.95,y));c=MX(c,C.foc,S(0.3,0.315,z)*S(0.9,0.89,y)*0.6);const yb=0.874;c=MX(c,HX(0x3a2e28),S(0.0025,0.0006,Math.abs(y-yb))*S(0.296,0.304,z));c=MX(c,HX(0x3a2e28),S(0.002,0.0005,Math.abs(x))*S(0.885,0.874,y)*S(0.306,0.312,z));
+        if(D.orelha){const od=D.orelhaDentro(x,y,z),oo=D.orelha(x,y,z);if(oo<0.004&&y>0.96)c=MX(C.cara,C.rosa,S(0.004,0,od)*0.8);}return mul(c,ruid);}
+      c=MX(C.laS,C.la,S(0.36,0.5,y));return mul(c,ruid);}});};
+
+/* ---------------------------------------- JAVALI ---------------------------------------- */
+ESP.javali=()=>{const C={mar:HX(0x5e4a3a),marC:HX(0x8a735c),esc:HX(0x342a22),foc:HX(0x7a6250),disco:HX(0x5e4844),marf:HX(0xeee2c8)};
+  const disco=Menos((x,y,z)=>{const d2=Math.hypot(x,(y-0.27)*1.08)-0.035,dz=Math.abs(z-0.452)-0.0055;return Math.min(Math.max(d2,dz),0)+Math.hypot(Math.max(d2,0),Math.max(dz,0))-0.0015;},Esp(Ell([0.012,0.27,0.458],[0.0065,0.009,0.004])),0.002);
+  const presas=Esp(Cad([[0.04,0.29,0.418],[0.056,0.3,0.44],[0.062,0.328,0.438],[0.057,0.346,0.425]],[0.0085,0.007,0.0045,0.0018],0.004));
+  return monta({pele:'curto',rough:0.93,ns:0.8,caixa:[-0.24,-0.01,-0.5,0.24,0.62,0.56],h:{corpo:0.0085,cab:0.0052,perna:0.0055},chifreMat:'marfim',
+    torso:{peito:[0.33,0.12,0.12,0.15,0.16],meio:[0.32,-0.05,0.12,0.13,0.18],anca:[0.31,-0.2,0.11,0.12,0.11],ombro:[0.065,0.3,0.15,0.05,0.11,0.08,-0.15],coxa:[0.07,0.29,-0.2,0.06,0.12,0.09,0.2],pesc:[[0.34,0.22,0.11],[0.335,0.28,0.09]],extra:[[Ell([0,0.42,0.1],[0.075,0.07,0.12]),0.06]]},
+    cab:{piv:[0,0.335,0.28],cr:[0.35,0.3,0.077,0.082,0.08],foc:{a:[0.32,0.34],b:[0.272,0.46],r0:0.064,r1:0.036,sy:0.95,k:0.035},boch:[0.04,0.3,0.36,0.045,0.05,0.06,0.03],max:[0.27,0.37,0.035,0.025,0.06,0.02],mod:f=>(x,y,z)=>Smax(f(x,y,z),z-0.452,0.006)},
+    orelha:{tipo:'pontuda',base:[0.05,0.415,0.28],w:0.03,h:0.055,t:0.009,rot:[-0.3,0.3,-0.35],ponta:0.15},
+    olho:{c:[0.052,0.37,0.353],r:0.0108,yaw:0.65,pitch:0.05,iris:IRIS.castanho},
+    nariz:disco,narizMat:'focinho',chifre:presas,
+    pF:{pts:[[0.07,0.27,0.14],[0.07,0.15,0.142],[0.07,0.05,0.15]],rs:[0.05,0.026,0.018],pe:{tipo:'casco',c:[0.07,0,0.158],r:0.02,hh:0.03}},
+    pT:{pts:[[0.072,0.27,-0.2],[0.074,0.16,-0.245],[0.07,0.05,-0.22]],rs:[0.055,0.03,0.018],pe:{tipo:'casco',c:[0.07,0,-0.21],r:0.02,hh:0.03}},
+    cauda:{base:[0,0.36,-0.305],tilt:-0.75,n:3,comp:0.13,perfil:u=>0.008*(1-0.3*u)+0.016*S(0.75,0.95,u)*(1-S(0.97,1,u))},
+    cor:(p,n,parte,D,i)=>{const [x,y,z]=p;const gr=fbm(x*80,y*80,z*80);const ruid=0.9+0.1*gr;let c;
+      if(parte==='nariz')return mul(C.disco,0.85+0.15*S(0.45,0.47,z));
+      if(parte==='chifre')return mul(C.marf,0.92+0.08*S(0.3,0.34,y));
+      if(parte==='cauda')return mul(C.esc,ruid);
+      if(parte==='perna'){if(D.pernas[0].garra){const g=Math.min(D.pernas[0].garra(x,y,z),D.pernas[1].garra(x,y,z));if(g<0.002)return HX(0x1e1a18);}return mul(MX(C.esc,C.mar,S(0.12,0.24,y)),ruid);}
+      if(parte==='cab'){c=MX(C.mar,C.foc,S(0.38,0.43,z));c=MX(c,C.marC,S(-0.2,0.7,gr)*0.5);return mul(c,ruid);}
+      c=MX(C.mar,C.marC,S(-0.1,0.8,gr)*0.6);c=MX(c,C.esc,S(0.26,0.2,y)*0.6);return mul(c,ruid);},
+    extras:(D)=>{const pts=pontosSup(D.corpo,[0,0.3,0.0],0.5,220,6231,(x,y,z,nx,ny,nz)=>Math.abs(x)<0.05&&ny>0.45&&z<0.26&&z>-0.14);
+      const g=espinhos(pts,{comp:0.05,raio:0.0024,trás:0.55,sobe:0.5,sem:6232,escala:p=>0.55+0.6*S(-0.14,0.12,p[2]),cor:(t,q)=>mul(MX(HX(0x221a14),HX(0x6a5646),S(0.6,1,t)),0.85+0.3*q.r)});
+      return [{onde:'corpo',geo:g,mat:matLiso('cerda',0.75)}];}});};
+
+/* ---------------------------------------- CABRA ---------------------------------------- */
+ESP.cabra=()=>{const C={bco:HX(0xebe5d8),bcoS:HX(0xcfc6b4),cin:HX(0x8e877c),foc:HX(0xc8a8a0),chif:HX(0x3e3a36),chifC:HX(0x8a8278)};
+  const chifre=Esp((x,y,z)=>Cad([[0.024,0.748,0.305],[0.03,0.8,0.282],[0.04,0.835,0.225],[0.05,0.825,0.165],[0.055,0.8,0.14]],[0.014,0.012,0.009,0.0055,0.002],0.004)(x,y,z)+0.0011*Math.sin(Math.hypot(x-0.024,y-0.748,z-0.305)*420));
+  return monta({pele:'pelo',rough:0.92,caixa:[-0.22,-0.01,-0.42,0.22,0.92,0.52],h:{corpo:0.0085,cab:0.0048,perna:0.0062,chifre:0.0032},
+    torso:{peito:[0.48,0.12,0.1,0.13,0.15],meio:[0.5,-0.04,0.11,0.12,0.17],anca:[0.5,-0.18,0.1,0.12,0.11],ombro:[0.06,0.47,0.14,0.048,0.11,0.075,-0.15],coxa:[0.065,0.47,-0.18,0.058,0.12,0.09,0.2],pesc:[[0.52,0.18,0.07],[0.64,0.27,0.055]]},
+    cab:{piv:[0,0.655,0.275],cr:[0.7,0.3,0.05,0.055,0.06],foc:{a:[0.68,0.33],b:[0.642,0.418],r0:0.035,r1:0.022,sy:0.95,k:0.03},boch:[0.028,0.665,0.35,0.026,0.028,0.035,0.02],max:[0.636,0.37,0.022,0.015,0.04,0.015],extra:[[Cone([0,0.64,0.375],[0,0.565,0.355],0.018,0.005),0.012]]},
+    orelha:{tipo:'folha',base:[0.04,0.715,0.285],w:0.018,h:0.062,t:0.006,rot:[0.1,0.4,-1.35]},
+    olho:{c:[0.042,0.716,0.33],r:0.0128,yaw:0.85,pitch:0.05,iris:IRIS.cabra},
+    nariz:Ell([0,0.645,0.42],[0.012,0.009,0.006]),narizMat:'nariz rosa',chifre,
+    pF:{pts:[[0.06,0.42,0.14],[0.062,0.3,0.12],[0.062,0.16,0.15],[0.062,0.05,0.152]],rs:[0.045,0.03,0.02,0.017],pe:{tipo:'casco',c:[0.062,0,0.16],r:0.019,hh:0.03}},
+    pT:{pts:[[0.065,0.44,-0.18],[0.068,0.3,-0.12],[0.064,0.2,-0.23],[0.062,0.05,-0.2]],rs:[0.055,0.036,0.021,0.017],pe:{tipo:'casco',c:[0.062,0,-0.19],r:0.019,hh:0.03}},
+    cauda:{base:[0,0.55,-0.285],tilt:0.85,n:2,comp:0.05,perfil:u=>0.018*(1-0.4*u)+0.006},
+    cor:(p,n,parte,D,i)=>{const [x,y,z]=p;const ruid=0.93+0.07*fbm(x*45,y*45,z*45);let c;
+      if(parte==='nariz')return C.foc;
+      if(parte==='chifre')return mul(MX(C.chif,C.chifC,S(0.8,0.83,y)*S(0.24,0.16,z)),0.9+0.1*ruido(x*300,y*300,z*300));
+      if(parte==='cauda')return mul(C.bco,ruid);
+      if(parte==='perna'){if(D.pernas[0].garra){const g=Math.min(D.pernas[0].garra(x,y,z),D.pernas[1].garra(x,y,z));if(g<0.002)return HX(0x2a2622);}return mul(MX(C.cin,C.bco,S(0.1,0.3,y)),ruid);}
+      if(parte==='cab'){c=C.bco;c=MX(c,C.foc,S(0.405,0.42,z)*S(0.66,0.65,y)*0.6);c=MX(c,C.bcoS,S(0.62,0.58,y)*0.4);if(D.orelha){const od=D.orelhaDentro(x,y,z),oo=D.orelha(x,y,z);if(oo<0.004)c=MX(c,HX(0xe8c8c0),S(0.004,0,od)*0.7);}return mul(c,ruid);}
+      c=MX(C.bcoS,C.bco,S(0.4,0.5,y));return mul(c,ruid);}});};
+
+/* ---------------------------------------- SALAMANDRA (de brasa) ---------------------------------------- */
+ESP.salamandra=()=>{const C={preto:HX(0x141518),amar:HX(0xf2b030),bra:HX(0xe85e18)};
+  const mancha=(x,y,z,s)=>{const [d1]=celula(x*s,y*s*1.2,z*s*0.6,9);return S(0.42,0.3,d1);};
+  return monta({pele:'liso',rough:0.32,ns:0.4,passo:0.08,caixa:[-0.2,-0.01,-0.64,0.2,0.16,0.34],h:{corpo:0.0055,cab:0.004,perna:0.0038,cauda:0.005},
+    torso:{peito:[0.068,0.1,0.052,0.038,0.08],meio:[0.07,-0.03,0.056,0.04,0.12],anca:[0.066,-0.15,0.048,0.037,0.07],pesc:[[0.072,0.15,0.045],[0.076,0.19,0.045]]},
+    cab:{piv:[0,0.075,0.17],cr:[0.08,0.2,0.053,0.032,0.057],foc:{a:[0.077,0.235],b:[0.072,0.263],r0:0.041,r1:0.03,sx:1.25,sy:0.7,k:0.025},extra:[[Esp(Ell([0.04,0.09,0.172],[0.022,0.015,0.03])),0.015]]},
+    orelha:{tipo:'nenhuma'},
+    olho:{c:[0.034,0.097,0.222],r:0.011,yaw:0.55,pitch:0.2,iris:IRIS.preto},
+    pF:{pts:[[0.045,0.065,0.1],[0.09,0.06,0.11],[0.1,0.02,0.125]],rs:[0.016,0.011,0.009],pe:{tipo:'dedos',c:[0.102,0.007,0.135],rx:0.012,ry:0.006,rz:0.012,n:4,comp:0.016,rd:0.0035,leque:1.6,giro:0.2}},
+    pT:{pts:[[0.045,0.065,-0.15],[0.09,0.06,-0.16],[0.105,0.02,-0.145]],rs:[0.018,0.012,0.0095],pe:{tipo:'dedos',c:[0.108,0.007,-0.135],rx:0.013,ry:0.006,rz:0.013,n:5,comp:0.018,rd:0.0036,leque:1.8,giro:0.15}},
+    cauda:{base:[0,0.066,-0.21],tilt:0,n:6,comp:0.38,perfil:u=>0.034*Math.pow(1-u,0.9)+0.004,curva:u=>-0.04*u*u,sx:0.85},
+    cor:(p,n,parte,D,i)=>{const [x,y,z]=p;let c=C.preto;const fogo=(q)=>MX(C.amar,C.bra,S(-0.3,0.6,fbm(q[0]*40,q[1]*40,q[2]*40)));
+      if(parte==='cauda'){const m=mancha(x+0.3,y,z,26)*S(-0.2,0.4,n[1]);c=MX(C.preto,fogo(p),m);return c;}
+      if(parte==='perna'){const m=mancha(x,y,z,34)*S(-0.1,0.5,n[1]);return MX(C.preto,fogo(p),m);}
+      if(parte==='cab'){const ax=Math.abs(x);let m=mancha(x,y,z,32)*S(0.0,0.5,n[1]);m=Math.max(m,S(0.026,0.018,Math.hypot(ax-0.04,(y-0.09)*1.3,(z-0.172)*0.8)));c=MX(C.preto,fogo(p),m);
+        const yb=0.062+0.0;c=MX(c,HX(0x060606),S(0.002,0.0005,Math.abs(y-yb))*S(0.2,0.21,z));return c;}
+      const ax=Math.abs(x);const fila=S(0.012,0.004,Math.abs(ax-0.026))*S(0.0,0.4,n[1]);const m=Math.max(mancha(x,y,z,24)*S(0.2,0.6,n[1]),fila*mancha(x,y,z*0.6,30));return MX(C.preto,fogo(p),m);}});};
+
+/* ---------------------------------------- AXOLOTE (de pérola) ---------------------------------------- */
+ESP.axolote=()=>{const C={rosa:HX(0xeab0bc),rosaE:HX(0xd894a6),bar:HX(0xf8dcdc),gue:HX(0xd0405e),gueC:HX(0xe87a92),bar2:HX(0xf6c8d2),per:HX(0xfff2e6)};
+  const G=[];for(let k=0;k<3;k++){const B=[0.056,0.108-0.017*k,0.13+0.004*k];const L=0.042+0.01*(1-k);const dir=[0.62,0.55-0.42*k,-0.56];const dl=Math.hypot(dir[0],dir[1],dir[2]);const d=[dir[0]/dl,dir[1]/dl,dir[2]/dl];
+    const tip=[B[0]+d[0]*L,B[1]+d[1]*L,B[2]+d[2]*L];G.push([Cone(B,tip,0.0075,0.0038),0.006]);
+    for(let j=1;j<=5;j++){const t=j/6;const P=[B[0]+d[0]*L*t,B[1]+d[1]*L*t,B[2]+d[2]*L*t];for(const s of [-1,1]){const q=[P[0]+0.004*s,P[1]+0.012,P[2]-0.011];G.push([Cone(P,q,0.0032,0.0012),0.003]);}}}
+  const guelras=Esp(UK(G));
+  const fin=(x,y,z)=>{const u=cl(-z/0.26,0,1);const hg=0.03*(1-0.62*u)*S(0,0.1,u)+0.003;return Math.max(Math.abs(x)-0.0032,Math.abs(y)-hg,-z-0.27,z-0.005);};
+  return monta({pele:'liso',rough:0.3,ns:0.35,passo:0.08,caixa:[-0.16,-0.01,-0.5,0.16,0.18,0.3],h:{corpo:0.005,cab:0.0036,perna:0.0034,cauda:0.0042},
+    torso:{peito:[0.07,0.08,0.05,0.042,0.07],meio:[0.068,-0.04,0.048,0.04,0.1],anca:[0.065,-0.13,0.042,0.038,0.06],extra:[[Ell([0,0.098,-0.14],[0.0035,0.022,0.09]),0.01]]},
+    cab:{piv:[0,0.075,0.12],cr:[0.085,0.165,0.066,0.043,0.06],foc:{a:[0.08,0.2],b:[0.077,0.228],r0:0.049,r1:0.039,sx:1.3,sy:0.7,k:0.03},extra:[[guelras,0.008]]},
+    orelha:{tipo:'nenhuma'},
+    olho:{c:[0.046,0.1,0.196],r:0.0085,yaw:0.9,pitch:0.1,iris:IRIS.preto},
+    pF:{pts:[[0.04,0.06,0.09],[0.07,0.045,0.105],[0.078,0.015,0.12]],rs:[0.012,0.009,0.007],pe:{tipo:'dedos',c:[0.08,0.006,0.128],rx:0.009,ry:0.005,rz:0.009,n:4,comp:0.012,rd:0.0028,leque:1.5,giro:0.2}},
+    pT:{pts:[[0.038,0.06,-0.12],[0.066,0.045,-0.13],[0.074,0.015,-0.125]],rs:[0.013,0.0095,0.0075],pe:{tipo:'dedos',c:[0.076,0.006,-0.118],rx:0.0095,ry:0.005,rz:0.0095,n:5,comp:0.012,rd:0.0028,leque:1.7,giro:0.1}},
+    cauda:{base:[0,0.068,-0.17],tilt:0,n:5,comp:0.26,perfil:u=>0.03*(1-u)+0.003,sx:0.55,mod:f=>(x,y,z)=>Smin(f(x,y,z),fin(x,y,z),0.006)},
+    cor:(p,n,parte,D,i)=>{const [x,y,z]=p;let c;const brilho=(q)=>{const [d1]=celula(q[0]*140,q[1]*140,q[2]*140,13);return S(0.12,0.04,d1);};
+      if(parte==='cauda'){c=MX(C.rosa,C.bar2,S(0.012,0.024,Math.abs(y)));c=MX(c,C.per,brilho(p)*0.6);return c;}
+      if(parte==='perna')return MX(C.rosa,C.bar,S(0.4,-0.2,n[1]));
+      if(parte==='cab'){const ax=Math.abs(x);if(y>0.06&&ax>0.05&&z<0.16){const g=guelras(x,y,z);if(g<0.003)return MX(C.gueC,C.gue,S(0.06,0.09,ax));}
+        c=MX(C.bar,C.rosa,S(0.07,0.085,y));c=MX(c,C.rosaE,S(0.11,0.125,y)*0.4);const yb=0.068+0.25*Math.pow(ax,2)*10;c=MX(c,HX(0x8a4a58),S(0.0022,0.0006,Math.abs(y-yb))*S(0.215,0.205,z)*S(0.05,0.035,ax));c=MX(c,C.per,brilho(p)*0.5);return c;}
+      c=MX(C.bar,C.rosa,S(0.055,0.075,y));c=MX(c,C.rosaE,S(0.095,0.11,y)*0.5);c=MX(c,C.bar2,S(0.1,0.11,y)*S(0.004,0.002,Math.abs(x)));c=MX(c,C.per,brilho(p)*0.6);return c;}});};
+
+/* ---------------------------------------- PANGOLIM (de cobre) ---------------------------------------- */
+ESP.pangolim=()=>{const C={pele:HX(0x9a7a6a),peleE:HX(0x7a5a4c),cob:HX(0xb06a3e),cobC:HX(0xe6a46a),cobE:HX(0x5e341a)};
+  const corEsc=(rr,q,ca)=>{let c=MX(C.cobC,C.cob,S(0.0,0.8,rr));c=MX(c,C.cobE,S(0.75,1,rr)*0.7);return mul(c,0.85+0.3*q.r);};
+  return monta({pele:'couro',rough:0.7,ns:0.45,passo:0.15,caixa:[-0.18,-0.01,-0.66,0.18,0.3,0.34],h:{corpo:0.0065},caudaMat:'cobre',
+    torso:{peito:[0.13,0.08,0.07,0.07,0.09],meio:[0.15,-0.04,0.085,0.085,0.12],anca:[0.15,-0.15,0.08,0.085,0.08],pesc:[[0.13,0.12,0.055],[0.128,0.16,0.045]]},
+    cab:{piv:[0,0.128,0.16],cr:[0.132,0.175,0.04,0.037,0.05],foc:{a:[0.125,0.2],b:[0.101,0.26],r0:0.028,r1:0.0095,sy:0.9,k:0.02}},
+    orelha:{tipo:'nenhuma'},
+    olho:{c:[0.026,0.14,0.197],r:0.0078,yaw:0.55,pitch:0.05,iris:IRIS.escuro},
+    nariz:Ell([0,0.101,0.263],[0.008,0.007,0.006]),
+    pF:{pts:[[0.05,0.1,0.1],[0.054,0.05,0.11],[0.056,0.016,0.12]],rs:[0.024,0.018,0.014],pe:{tipo:'pata',c:[0.056,0.008,0.128],rx:0.015,ry:0.008,rz:0.016,n:3,rd:0.006,garra:0.02}},
+    pT:{pts:[[0.055,0.1,-0.14],[0.058,0.05,-0.13],[0.058,0.016,-0.14]],rs:[0.03,0.02,0.015],pe:{tipo:'pata',c:[0.058,0.008,-0.132],rx:0.017,ry:0.008,rz:0.02,n:5,rd:0.0055,garra:0.008}},
+    cauda:{base:[0,0.135,-0.215],tilt:-0.2,n:6,comp:0.4,perfil:u=>0.048*Math.pow(1-u,0.8)+0.008,curva:u=>-0.05*u*u,mod:f=>(x,y,z)=>f(x,y/0.85,z)*0.85},
+    cor:(p,n,parte,D,i)=>{const [x,y,z]=p;const ruid=0.9+0.1*fbm(x*50,y*50,z*50);
+      if(parte==='nariz')return HX(0x2a1c18);if(parte==='cauda')return mul(C.cob,ruid);
+      if(parte==='perna'){let c=C.pele;const g=Math.min(D.pernas[0].garra(x,y,z),D.pernas[1].garra(x,y,z));c=MX(c,HX(0x3a2a20),S(0.002,-0.0005,g));return mul(c,ruid);}
+      return mul(MX(C.peleE,C.pele,S(0.08,0.12,y)),ruid);},
+    extras:(D)=>{const pts=pontosSup(D.corpo,[0,0.12,-0.03],0.4,330,6241,(x,y,z,nx,ny,nz)=>ny>-0.3&&z<0.13&&y>0.075);
+      const g=escamas(pts,{w:0.021,l:0.027,t:0.0042,lev:0.45,cor:corEsc});
+      const ptsC=pontosSup(D.cab.f,[0,0.13,0.17],0.2,30,6242,(x,y,z,nx,ny,nz)=>ny>0.45&&z<0.19);const gc=escamas(ptsC,{w:0.0085,l:0.011,t:0.0022,lev:0.3,cor:corEsc});
+      return [{onde:'corpo',geo:g,mat:matLiso('cobre',0.38,0.5)},{onde:'cab',geo:gc,mat:matLiso('cobre',0.38,0.5)}];},
+    caudaExtra:(D)=>{const C2=D.cauda;const pts=pontosSup(C2.f,[0,0,-C2.comp*0.45],0.4,170,6243,(x,y,z,nx,ny,nz)=>ny>-0.55&&z<-0.01);
+      return escamas(pts,{w:0.02,l:0.026,t:0.004,lev:0.45,cor:corEsc,escala:p=>0.55+0.45*S(-C2.comp,-0.02,p[2])});}});};
+
+/* ---------------------------------------- LINCE (da neve) ---------------------------------------- */
+ESP.lince=()=>{const C={bco:HX(0xdcd8cc),bcoC:HX(0xf2f0ea),dor:HX(0xb2ab9c),pinta:HX(0x7e776a),preto:HX(0x22201e),orel:HX(0x4a4844),rosa:HX(0xc89a8c)};
+  const ob=[0.04,0.548,0.232],orot=[-0.18,0.28,-0.22];const tv=rotV(orot,[0,0.05,0]);const tip=[ob[0]+tv[0],ob[1]+tv[1],ob[2]+tv[2]];
+  return monta({pele:'longo',rough:0.93,caixa:[-0.2,-0.01,-0.4,0.2,0.66,0.42],h:{corpo:0.0078,cab:0.0042},
+    torso:{peito:[0.38,0.12,0.08,0.1,0.12],meio:[0.38,-0.03,0.075,0.09,0.14],anca:[0.4,-0.16,0.08,0.1,0.1],ombro:[0.05,0.37,0.13,0.04,0.09,0.065,-0.2],coxa:[0.058,0.35,-0.15,0.058,0.11,0.085,0.25],pesc:[[0.4,0.17,0.062],[0.47,0.23,0.055]]},
+    cab:{piv:[0,0.47,0.225],cr:[0.5,0.25,0.061,0.055,0.057],foc:{a:[0.483,0.288],b:[0.473,0.316],r0:0.034,r1:0.026,sy:0.9,k:0.025},boch:[0.048,0.468,0.25,0.044,0.05,0.035,0.03,[0.3,0,0.25]],max:[0.458,0.29,0.024,0.015,0.028,0.014],
+      extra:[[Esp(Cone([0.055,0.47,0.25],[0.072,0.418,0.24],0.03,0.008)),0.02],[Esp(Cone(tip,[tip[0]-0.002,tip[1]+0.04,tip[2]-0.004],0.0042,0.0012)),0.004]]},
+    orelha:{tipo:'pontuda',base:ob,w:0.026,h:0.05,t:0.007,rot:orot,ponta:0.1},
+    olho:{c:[0.03,0.506,0.291],r:0.0128,yaw:0.3,pitch:0.04,iris:IRIS.lince},
+    nariz:Ell([0,0.479,0.319],[0.011,0.008,0.007]),narizMat:'nariz rosa',bigodes:{c:[0.018,0.466,0.308],n:4,comp:0.07},
+    pF:{pts:[[0.052,0.33,0.13],[0.055,0.18,0.13],[0.056,0.04,0.14]],rs:[0.042,0.03,0.024],pe:{tipo:'pata',c:[0.056,0.016,0.152],rx:0.03,ry:0.016,rz:0.032,n:4,rd:0.01}},
+    pT:{pts:[[0.058,0.37,-0.16],[0.062,0.26,-0.11],[0.06,0.13,-0.205],[0.057,0.035,-0.18]],rs:[0.062,0.042,0.024,0.022],pe:{tipo:'pata',c:[0.057,0.016,-0.165],rx:0.03,ry:0.016,rz:0.034,n:4,rd:0.01}},
+    cauda:{base:[0,0.42,-0.255],tilt:0.45,n:2,comp:0.09,perfil:u=>0.024*(1-0.2*u)+0.006},
+    cor:(p,n,parte,D,i)=>{const [x,y,z]=p;const ruid=0.93+0.07*fbm(x*45,y*45,z*45);let c;const pinta=(q,s)=>{const [d1]=celula(q[0]*s,q[1]*s,q[2]*s,17);return S(0.3,0.18,d1);};
+      if(parte==='nariz')return C.rosa;
+      if(parte==='cauda'){c=MX(C.bco,C.preto,S(0.68,0.8,i.u));return mul(c,ruid);}
+      if(parte==='perna'){c=MX(C.bcoC,C.bco,S(0.05,0.15,y));c=MX(c,C.pinta,pinta(p,40)*S(0.12,0.25,y)*0.6);return mul(c,ruid);}
+      if(parte==='cab'){const ax=Math.abs(x);c=MX(C.bcoC,C.bco,S(0.49,0.52,y));c=MX(c,C.pinta,pinta(p,70)*S(0.51,0.53,y)*0.6);
+        const xl=Lr(0.036,0.06,S(0.49,0.44,y)),dl=Math.abs(ax-xl);c=MX(c,C.preto,S(0.004,0.0012,dl)*S(0.5,0.48,y)*S(0.43,0.45,y)*0.8);
+        c=MX(c,C.preto,S(0.0025,0.0008,Math.abs(y-0.462))*S(0.31,0.318,z)*S(0.004,0.012,ax)*0.8);
+        if(D.orelha){const od=D.orelhaDentro(x,y,z),oo=D.orelha(x,y,z);if(oo<0.005&&y>0.54){c=MX(C.orel,C.bcoC,S(0.005,0,od));c=MX(c,C.preto,S(0.585,0.6,y));}}if(y>0.595)c=C.preto;return mul(c,ruid);}
+      c=MX(C.bco,C.dor,S(0.4,0.47,y)*0.7);c=MX(c,C.pinta,pinta(p,34)*S(0.33,0.4,y)*0.75);c=MX(c,C.bcoC,S(0.31,0.28,y));return mul(c,ruid);}});};
+
+/* ---------------------------------------- PORCO-ESPINHO (do musgo) ---------------------------------------- */
+ESP.porco_espinho=()=>{const C={pelo:HX(0x4c4636),peloE:HX(0x3a3428),foc:HX(0x6a604c),musgo:HX(0x5e7e3a),cre:HX(0xeae2c8),esc:HX(0x342a22),verde:HX(0x8aa65a)};
+  return monta({pele:'longo',rough:0.93,caixa:[-0.22,-0.01,-0.42,0.22,0.36,0.34],
+    torso:{peito:[0.16,0.08,0.1,0.1,0.1],meio:[0.18,-0.06,0.12,0.12,0.14],anca:[0.17,-0.18,0.1,0.11,0.09],pesc:[[0.16,0.12,0.075],[0.175,0.16,0.06]]},
+    cab:{piv:[0,0.175,0.16],cr:[0.18,0.185,0.057,0.057,0.057],boch:[0.035,0.165,0.22,0.03,0.03,0.03,0.02],foc:{a:[0.172,0.215],b:[0.163,0.248],r0:0.044,r1:0.032,sy:0.9,k:0.03}},
+    orelha:{tipo:'redonda',base:[0.045,0.218,0.17],w:0.013,h:0.014,t:0.005,rot:[-0.2,0.7,-0.8]},
+    olho:{c:[0.034,0.19,0.213],r:0.0095,yaw:0.55,pitch:0.05,iris:IRIS.escuro},
+    nariz:Ell([0,0.165,0.253],[0.016,0.012,0.008]),bigodes:{c:[0.022,0.158,0.243],n:3,comp:0.06,cor:0xb8b0a0},
+    pF:{pts:[[0.06,0.12,0.09],[0.063,0.06,0.1],[0.064,0.018,0.108]],rs:[0.03,0.024,0.018],pe:{tipo:'pata',c:[0.064,0.009,0.118],rx:0.018,ry:0.009,rz:0.02,n:4,rd:0.006,garra:0.008}},
+    pT:{pts:[[0.065,0.12,-0.17],[0.068,0.06,-0.16],[0.068,0.018,-0.17]],rs:[0.036,0.026,0.019],pe:{tipo:'pata',c:[0.068,0.009,-0.158],rx:0.02,ry:0.009,rz:0.028,n:5,rd:0.006,garra:0.008}},
+    cauda:{base:[0,0.15,-0.262],tilt:-0.2,n:2,comp:0.06,perfil:u=>0.03*(1-0.5*u)+0.008},
+    cor:(p,n,parte,D,i)=>{const [x,y,z]=p;const ruid=0.9+0.1*fbm(x*50,y*50,z*50);let c;
+      if(parte==='nariz')return HX(0x1a1614);if(parte==='cauda')return mul(C.peloE,ruid);
+      if(parte==='perna'){c=C.peloE;const g=Math.min(D.pernas[0].garra(x,y,z),D.pernas[1].garra(x,y,z));c=MX(c,HX(0x1a1612),S(0.002,-0.0005,g));return mul(c,ruid);}
+      if(parte==='cab'){c=MX(C.foc,C.peloE,S(0.22,0.2,z));return mul(c,ruid);}
+      c=MX(C.peloE,C.pelo,S(0.1,0.2,y));c=MX(c,C.musgo,S(0.1,0.5,fbm(x*18,y*18,z*18))*S(0.2,0.26,y)*0.8);return mul(c,ruid);},
+    extras:(D)=>{const pts=pontosSup(D.corpo,[0,0.15,-0.05],0.42,600,6251,(x,y,z,nx,ny,nz)=>ny>-0.15&&z<0.09&&y>0.1);
+      const g=espinhos(pts,{comp:0.11,raio:0.0032,trás:0.95,sobe:0.3,sem:6252,seg:5,escala:p=>0.5+0.6*S(0.1,-0.05,p[2]),
+        cor:(t,q)=>{let c=t<0.14?C.esc:(t<0.55?C.cre:(t<0.74?C.esc:C.cre));if(q.r<0.2&&t>0.74)c=C.verde;return mul(c,0.82+0.3*q.r);}});
+      const ptsC=pontosSup(D.cab.f,[0,0.18,0.17],0.2,70,6253,(x,y,z,nx,ny,nz)=>ny>0.3&&z<0.2);
+      const gc=espinhos(ptsC,{comp:0.05,raio:0.0024,trás:1.0,sobe:0.3,sem:6254,seg:5,cor:(t,q)=>mul(t<0.5?C.cre:C.esc,0.85+0.3*q.r)});
+      return [{onde:'corpo',geo:g,mat:matLiso('espinho',0.55)},{onde:'cab',geo:gc,mat:matLiso('espinho',0.55)}];}});};
+
+/* ---------------------------------------- TAMANDUÁ ---------------------------------------- */
+ESP.tamandua=()=>{const C={cre:HX(0xdcc89e),creE:HX(0xb8a274),preto:HX(0x1e1a18),pele:HX(0x6a5a4a)};
+  const colete=(x,y,z)=>S(0.03,-0.03,z-0.12+0.9*(y-0.24))*S(-0.24,-0.12,z);
+  return monta({pele:'curto',rough:0.9,caixa:[-0.2,-0.01,-0.84,0.2,0.42,0.52],
+    torso:{peito:[0.24,0.1,0.08,0.1,0.12],meio:[0.25,-0.05,0.085,0.095,0.14],anca:[0.25,-0.18,0.085,0.095,0.09],ombro:[0.055,0.23,0.11,0.04,0.08,0.06,-0.2],coxa:[0.06,0.24,-0.18,0.05,0.085,0.07,0.2],pesc:[[0.26,0.16,0.06],[0.285,0.23,0.045]]},
+    cab:{piv:[0,0.285,0.23],cr:[0.292,0.255,0.041,0.041,0.05],extra:[[Cad([[0,0.287,0.28],[0,0.276,0.35],[0,0.259,0.413],[0,0.25,0.438]],[0.027,0.019,0.013,0.0105],0.012),0.025]]},
+    orelha:{tipo:'redonda',base:[0.034,0.322,0.245],w:0.017,h:0.028,t:0.006,rot:[-0.2,0.45,-0.5]},
+    olho:{c:[0.03,0.3,0.282],r:0.0085,yaw:0.55,pitch:0.05,iris:IRIS.escuro},
+    nariz:Ell([0,0.25,0.446],[0.009,0.008,0.006]),
+    pF:{pts:[[0.058,0.2,0.12],[0.062,0.1,0.128],[0.062,0.025,0.138]],rs:[0.034,0.025,0.019],pe:{tipo:'pata',c:[0.062,0.012,0.15],rx:0.02,ry:0.012,rz:0.02,n:3,rd:0.007,garra:0.028}},
+    pT:{pts:[[0.06,0.2,-0.18],[0.064,0.1,-0.17],[0.064,0.025,-0.185]],rs:[0.04,0.028,0.02],pe:{tipo:'pata',c:[0.064,0.012,-0.172],rx:0.022,ry:0.012,rz:0.032,n:5,rd:0.006,garra:0.008}},
+    cauda:{base:[0,0.24,-0.265],tilt:-0.15,n:7,comp:0.5,perfil:u=>0.042*Math.pow(1-u,1.1)+0.006,curva:u=>-0.06*u*u+0.03*S(0.82,1,u)},
+    cor:(p,n,parte,D,i)=>{const [x,y,z]=p;const ruid=0.92+0.08*fbm(x*45,y*45,z*45);let c;
+      if(parte==='nariz')return HX(0x1a1614);
+      if(parte==='cauda'){c=MX(C.cre,C.creE,S(0.2,0.6,i.u));const [d1]=celula(x*60,y*60,z*60,19);c=MX(c,C.preto,S(0.3,0.2,d1)*S(0.4,0.6,i.u)*0.8);c=MX(c,C.pele,S(0.85,0.95,i.u));return mul(c,ruid);}
+      if(parte==='perna'){c=C.cre;c=MX(c,C.preto,colete(x,y,z)*S(0.15,0.2,y));const g=Math.min(D.pernas[0].garra(x,y,z),D.pernas[1].garra(x,y,z));c=MX(c,HX(0x2a2420),S(0.002,-0.0005,g));return mul(c,ruid);}
+      if(parte==='cab'){c=C.cre;const e=Math.hypot(Math.abs(x)-0.03,y-0.3,z-0.282);c=MX(c,C.preto,S(0.016,0.01,e)*0.6);return mul(c,ruid);}
+      c=MX(C.cre,C.preto,colete(x,y,z));return mul(c,ruid);}});};
+
+/* ======================================================================================================
+   MONTAGEM: malhas, materiais, esqueleto da v400
+   ====================================================================================================== */
+function defDe(id){let D=BI.esp[id];if(D)return D;const fn=ESP[String(id).replace('comp400_','')];if(!fn)return null;D=fn();D.id=id;BI.esp[id]=D;return D;}
+function campoGlobal(D){if(D._fg)return D._fg;const L=[[D.corpo,0],[D.cab.f,0.008]];
+  for(const P of D.pernas){const f=P.f;L.push([f,0.008]);L.push([(x,y,z)=>f(-x,y,z),0.008]);}
+  if(D.cauda){const C=D.cauda,tl=xf(C.base,[C.tilt||0,0,0]);L.push([(x,y,z)=>{const q=tl(x,y,z);return C.f(q[0],q[1],q[2]);},0.008]);}
+  for(const e of (D.aoExtra||[]))L.push([e,0.004]);D._fg=UK(L);return D._fg;}
+const EA=0.02;
+function corParte(D,parte,piv){const fg=campoGlobal(D);return (x,y,z,nx,ny,nz)=>{const X=x+piv[0],Y=y+piv[1],Z=z+piv[2];let c=D.cor([X,Y,Z],[nx,ny,nz],parte,D);
+  const o=cl(fg(X+nx*EA,Y+ny*EA,Z+nz*EA)/EA,0,1);const k=0.48+0.52*o;return [c[0]*k,c[1]*k,c[2]*k];};}
+function geoGrupo(D,nome,fG,piv,h,parte,eixo){const key=D.id+' '+nome;const g0=BI.cache.get('geo '+key);if(g0)return g0;
+  const Bg=caixaDe(fG,D.caixa);if(!Bg)throw Error('parte vazia '+nome);const B=[Bg[0]-piv[0],Bg[1]-piv[1],Bg[2]-piv[2],Bg[3]-piv[0],Bg[4]-piv[1],Bg[5]-piv[2]];
+  return malha(key,deslo(fG,piv),B,h,corParte(D,parte,piv),eixo?uvPara(B,eixo,D.passo||0.13):undefined);}
+function geoCauda(D){const key=D.id+' cauda';const g0=BI.cache.get('geo '+key);if(g0)return g0;const C=D.cauda;const r=0.16;
+  const B=caixaDe(C.f,[-r,-r,-C.comp-0.08,r,r,0.06],0.02);const fg=campoGlobal(D);const m=cp579Rot([C.tilt||0,0,0]);
+  const cor=(x,y,z,nx,ny,nz)=>{let c=D.cor([x,y,z],[nx,ny,nz],'cauda',D,{u:-z/C.comp});const X=m[0]*x+m[1]*y+m[2]*z+C.base[0],Y=m[3]*x+m[4]*y+m[5]*z+C.base[1],Z=m[6]*x+m[7]*y+m[8]*z+C.base[2];
+    const NX=m[0]*nx+m[1]*ny+m[2]*nz,NY=m[3]*nx+m[4]*ny+m[5]*nz,NZ=m[6]*nx+m[7]*ny+m[8]*nz;const o=cl(fg(X+NX*EA,Y+NY*EA,Z+NZ*EA)/EA,0,1);const k=0.5+0.5*o;return [c[0]*k,c[1]*k,c[2]*k];};
+  const g=malha(key,C.f,B,(D.h&&D.h.cauda)||0.006,cor,uvPara(B,'z',D.passo||0.13));if(D.caudaExtra){const x=D.caudaExtra(D);if(x){const j=junta([g,x]);BI.cache.set('geo '+key,j);cp579RaboPesos(j,C.comp/C.n,C.n);return j;}}
+  if(!g.attributes.skinIndex)cp579RaboPesos(g,C.comp/C.n,C.n);return g;}
+function matsDe(D){const pele=matPele(D.pele,{rough:D.rough,ns:D.ns,passo:D.passo});const peleS=matPele(D.pele,{rough:D.rough,ns:D.ns,passo:D.passo,skin:true});
+  return {pele,peleS,nariz:matLiso(D.narizMat||'nariz',D.narizMat==='focinho'?0.55:(D.narizMat==='nariz rosa'?0.4:0.26)),chifre:matLiso(D.chifreMat||'chifre',0.55),casco:D.cascoMat==='bronze'?matLiso('bronze',0.42,0.35):(D.cascoMat==='cobre'?matLiso('cobre',0.38,0.5):matPele('liso',{rough:0.42,ns:0.35,passo:0.2}))};}
+function constroi(id){const t0=performance.now();const s=COMP400_BY[id];const D=defDe(id);if(!D)return null;const H=Object.assign({corpo:0.0075,cab:0.0045,perna:0.0055,nariz:0.0018,chifre:0.0038,casco:0.0075},D.h||{});
+  const M=matsDe(D);const g=new T.Group();g.name='Companheiro · '+s.name;const body=new T.Group();body.name='body400';g.add(body);const add=(pai,geo,mat,nome)=>{const m=new T.Mesh(geo,mat);m.name='v622 '+nome;pai.add(m);return m;};
+  add(body,geoGrupo(D,'corpo',D.corpo,[0,0,0],H.corpo,'corpo','z'),M.pele,'corpo');
+  if(D.casco)add(body,geoGrupo(D,'casco',D.casco,[0,0,0],H.casco,'casco','z'),M.casco,'casco');
+  const piv=D.cab.piv;const head=new T.Group();head.name='head400';head.position.set(piv[0],piv[1],piv[2]);body.add(head);
+  add(head,geoGrupo(D,'cab',D.cab.f,piv,H.cab,'cab','z'),M.pele,'cabeça');
+  if(D.nariz)add(head,geoGrupo(D,'nariz',D.nariz,piv,H.nariz,'nariz'),M.nariz,'nariz');
+  if(D.chifre)add(head,geoGrupo(D,'chifre',D.chifre,piv,H.chifre,'chifre'),M.chifre,'chifre');
+  const o=D.olho;if(o){const om=t162OlhoMat('v622 '+id,o.iris||IRIS.escuro);const og=t162OlhoGeo(o.r,22);for(const sd of [-1,1]){const e=new T.Group();e.name='eye400_'+sd;e.position.set(sd*o.c[0]-piv[0],o.c[1]-piv[1],o.c[2]-piv[2]);head.add(e);
+    const m=new T.Mesh(og,om);m.name='v622 olho';m.rotation.set(-(o.pitch||0),sd*(o.yaw||0.5),0,'YXZ');m.userData.noFade=true;e.add(m);}}
+  if(D.bigodes){const b=D.bigodes,P=[];for(const sd of [-1,1])for(let k=0;k<b.n;k++){const a=(k-(b.n-1)/2)*(b.abre||0.35);const px=sd*b.c[0]-piv[0],py=b.c[1]-piv[1],pz=b.c[2]-piv[2];
+      P.push(px,py,pz,px+sd*b.comp*Math.cos(a)*0.92,py+b.comp*Math.sin(a)*0.55-0.006,pz-b.comp*0.3);}
+    const bg=new T.BufferGeometry();bg.setAttribute('position',new T.Float32BufferAttribute(P,3));const lm=new T.LineSegments(bg,new T.LineBasicMaterial({color:b.cor||0xe8e4dc,transparent:true,opacity:0.6}));lm.name='v622 bigodes';head.add(lm);}
+  // pernas: 0 = frente +x, 1 = frente −x, 2 = trás +x, 3 = trás −x; trote: diagonais juntas
+  const fases=[0,Math.PI,Math.PI,0];[0,1,2,3].forEach(j=>{const P=D.pernas[j<2?0:1];const sd=j%2?-1:1;const q=new T.Group();q.name='leg400_'+j;q.position.set(sd*P.piv[0],P.piv[1],P.piv[2]);q.userData.fase622=fases[j];body.add(q);
+    const m=add(q,geoGrupo(D,'perna'+(j<2?0:1),P.f,P.piv,H.perna,'perna','y'),M.pele,'perna');if(sd<0)m.scale.x=-1;});
+  if(D.cauda){const C=D.cauda;const segs=[];let pai=body;for(let k=0;k<C.n;k++){const sg=new T.Group();sg.name='tail400_'+k;if(k===0){sg.position.set(C.base[0],C.base[1],C.base[2]);sg.rotation.x=C.tilt||0;}else sg.position.set(0,0,-C.comp/C.n);pai.add(sg);segs.push(sg);pai=sg;}
+    const sm=cp579RaboOssos(g,segs,geoCauda(D),D.caudaMat==='cobre'?matLiso('cobre',0.38,0.5,true):M.peleS);sm.name='v622 rabo';}
+  if(D.extras){let X=BI.cache.get('extras '+id);if(!X){X=D.extras(D)||[];BI.cache.set('extras '+id,X);}for(const e of X){const pai=e.onde==='cab'?head:body;const m=add(pai,e.geo,e.mat,'extra');if(e.onde==='cab')m.position.set(-piv[0],-piv[1],-piv[2]);}}
+  g.traverse(q=>{q.__fusaoMoveu=9;q.userData.noCam=true;q.userData.companheiro=true;q.userData.dynamic434=true;if(q.isMesh||q.isLineSegments){q.castShadow=!q.isLineSegments;q.receiveShadow=true;q.raycast=()=>{};q.userData.papelKeepGeo=true;q.frustumCulled=!q.isSkinnedMesh;}});
+  g.userData.bi622={id};let tri=0;g.traverse(q=>{if(q.isMesh&&q.geometry&&q.geometry.index)tri+=q.geometry.index.count/3;});g.userData.cm566={tri0:tri,passes:0,bi622:true};
+  BI.tempo[id]=Math.round(performance.now()-t0);BI.montagens++;BI.stats['tri '+id]=Math.round(tri);return comp400Rig(g,s);}
+// trote: as diagonais juntas (a v400 punha três patas na mesma fase)
+function anima(g,dt,speed,reading){const R=g.userData.comp400;if(!R)return;const amp=Math.min(0.5,speed*0.24)*(reading?0:1);for(const l of R.legs){const f=l.userData.fase622;if(f===undefined)continue;l.rotation.x=Math.sin(R.walk+f)*amp;}}
+if(BI.on){try{if(!BI.orig)BI.orig=comp400Build;const orig=BI.orig;
+    comp400Build=function(id){const s=COMP400_BY[id];if(BI.on&&s&&s.slot==='bicho'&&ESP[String(id).replace('comp400_','')]){try{return constroi(id);}catch(e){erro('constroi '+id,e);}}return orig.apply(this,arguments);};
+    try{window.__companions400.build=comp400Build;}catch(e){}
+    if(!BI.anim)BI.anim=comp400Animate;const a0=BI.anim;comp400Animate=function(g,dt,speed,reading){const r=a0.apply(this,arguments);if(g&&g.userData&&g.userData.bi622){try{anima(g,dt,speed,reading);}catch(e){erro('anima',e);}}return r;};
+  }catch(e){erro('ligar',e);}}
+window.__bichos622=Object.assign(BI,{especies:()=>Object.keys(ESP),montar:id=>comp400Build(id),limpar:()=>{for(const k of [...BI.cache.keys()])if(!k.startsWith('tex ')&&!k.startsWith('mat ')&&!k.startsWith('liso '))BI.cache.delete(k);BI.esp={};},def:defDe});
+})();
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
