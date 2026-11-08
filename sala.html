@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v619</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v620</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -76491,6 +76491,192 @@ function ma619Tick(dt,V){if(!V)return;const d=Math.min(.1,dt||.016);V.t+=d;const
   if(V.vaga&&(!V.ultV||t-V.ultV>.05)){V.ultV=t;const p=V.vaga.g.attributes.position;const B=V.vaga.base;for(let i=0;i<B.length;i++){const [x,y,z,ph]=B[i];p.setXYZ(i,x+Math.sin(t*.4+ph)*1.2,y+Math.sin(t*.9+ph*2)*.5,z+Math.cos(t*.35+ph)*1.2);}p.needsUpdate=true;}}
 if(MA619.on){try{const _fr=finishRoom;finishRoom=function(key){const r=_fr.apply(this,arguments);if(key==='fant'){try{setTimeout(()=>{try{ma619Aplica();}catch(e){ma619Erro('aplica',e);}},1200);setTimeout(()=>{try{ma619Cores(ROOMS.fant);}catch(e){}},9000);}catch(e){ma619Erro('agenda',e);}}return r;};}catch(e){ma619Erro('ligar',e);}}
 window.__casa619={estado:MA619,erros:MA619.erros,stats:MA619.stats,vivo:()=>MA619.vivo,aplicar:ma619Aplica,cores:()=>ma619Cores(ROOMS.fant),limpa:(x,z)=>ma619Limpa(x,z),casa:()=>ma619Casa()};
+
+/* ===================== v620 · AS ILHAS DA AVENTURA: ÁRVORES NOVAS E A AREIA DE VERDADE (bloco `IL620`) =====================
+   Pedido do Luiz (08/11, 00h14): «Melhore as árvores e textura das ilhas de Aventura». As três ilhas (a escondida, `NAV252.ilha`, ×2 na
+   v503; a Ilha das Moedas, `ILHA294`, ×4; a Ilha do Duelo da v539) usam as mesmas árvores da v503 — `i503Palmeira` com folhas em fita
+   serrilhada (uma tira em V com a largura alternando 1 e 0,5, sem folíolos), `i503Amendoeira` e `i503Moita` com copas em esferas
+   deformadas lisas —, e o chão é cor por vértice com um grão de 256 px (`n253TexAreia`, um ladrilho a cada 6 m na pequena e 12 m na
+   das Moedas; na do Duelo, `539 terreno da ilha`, um pontilhado em 70 × 70).
+   · AS ÁRVORES são refeitas pelos mesmos nomes (as funções da v503 são trocadas no carregamento; as ilhas são montadas depois, no
+     `finishRoom('adv')`, e a do Duelo também as chama — as três mudam juntas, nos mesmos lugares):
+     – PALMEIRA (`il620Palmeira`): tronco com mais anéis e a base alargada, a «bota» de bases de folhas velhas, cachos de cocos e a
+       espata; as FRONDES são tiras curvas com a textura de uma folha de coqueiro de verdade (`il620TexFronde`: ráquis amarelada e
+       ~58 folíolos por lado, compridos no meio, curtos na base e na ponta, dois tons de verde; recorte por `alphaTest`), dobradas em
+       V para os folíolos caírem; novas para cima, adultas abertas, velhas caídas, e 2–3 secas (a metade de baixo da mesma textura)
+       penduradas junto ao tronco. As folhas balançam ao vento (vértice: deslocamento × u², o u cresce da base para a ponta).
+     – AMENDOEIRA-DA-PRAIA (`il620Amendoeira`): casca nova com sulcos verticais (`il620TexCasca`, mapa + normais), andares de galhos
+       com a ponta virada para cima e, em cada ponta, uma ROSETA de cartões de folhas largas (`il620TexFolhas`: folhas obovadas com
+       nervuras, verde ou com folhas vermelhas e laranja, como a amendoeira de verdade) em volta de um miolo escuro pequeno.
+     – MOITAS (`il620Moita`): cúpula de cartões de folhas com hibisco vermelho ou flores brancas e amarelas, miolo escuro.
+     – FOLHAS SECAS no chão (`il620FolhaCaida`): a fronde seca deitada.
+     Sombras recortadas pelas folhas (`customDepthMaterial` com o mesmo mapa e `alphaTest`).
+   · A AREIA (`il620TexAreia`, 1024², ladrilhável: grãos em três escalas, ondulações do vento, conchinhas e seixos) no lugar do grão
+     antigo, com MAPA DE NORMAIS das ondulações; a Ilha das Moedas ganha um material próprio com a repetição dobrada (a mesma
+     escala de grão das outras). A ILHA DO DUELO ganha a mesma areia e, onde a cor por vértice é relva, uma textura de capim
+     (`il620TexGrama`) misturada no fragment shader pela «verdura» da cor; a areia ganha o tom quente das outras ilhas e a relva um
+     verde mais fundo (a luz forte do dia estourava os dois num verde-água quase branco). A UV do terreno já está em ~5,8 m por unidade:
+     um ladrilho por unidade (o grão antigo repetia 70 vezes).
+   `?ilhas620=0` desliga. Gancho `window.__ilhas620`. */
+const IL620={on:!/[?&#]ilhas620=0/i.test(location.search+location.hash),erros:[],stats:{},tex:null,mats:null,U:{value:0},pos:0,tick:false};
+function il620Erro(k,e){if(IL620.erros.length<30)IL620.erros.push(k+': '+(e&&e.message||e));try{console.warn('v620',k,e);}catch(x){}}
+function il620Can(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return c;}
+function il620Tex(c,rep,clamp){const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=clamp?THREE.ClampToEdgeWrapping:THREE.RepeatWrapping;t.anisotropy=8;if(rep)t.repeat.set(rep[0],rep[1]);return t;}
+// ---------- texturas ----------
+function il620TexFronde(){const W=1024,H=512,c=il620Can(W,H),x=c.getContext('2d'),r=rnd(62001);x.clearRect(0,0,W,H);
+  const fronde=(y0,seca)=>{const yc=y0+128;const N=58;
+    for(const s of [-1,1])for(let i=0;i<N;i++){const t=.045+.94*i/(N-1);const px=10+t*1000+(r()-.5)*4;let L=120*Math.pow(Math.sin(Math.PI*Math.min(1,t*1.04)),.55)*(.86+r()*.22);if(r()<.08)L*=.62;
+      const ang=(30+r()*12)*Math.PI/180,tx=px+Math.cos(ang)*L,ty=yc+s*Math.sin(ang)*L,w=4.2+r()*2.6;const mx=px+Math.cos(ang)*L*.38,my=yc+s*Math.sin(ang)*L*.38,nx=-Math.sin(ang),ny=Math.cos(ang)*s;
+      const g=x.createLinearGradient(px,yc,tx,ty);const k=.85+r()*.3;
+      if(seca){g.addColorStop(0,`rgb(${110*k|0},${80*k|0},${42*k|0})`);g.addColorStop(1,`rgb(${196*k|0},${160*k|0},${100*k|0})`);}
+      else{g.addColorStop(0,`rgb(${36*k|0},${92*k|0},${34*k|0})`);g.addColorStop(.55,`rgb(${70*k|0},${138*k|0},${52*k|0})`);g.addColorStop(1,`rgb(${118*k|0},${170*k|0},${70*k|0})`);}
+      x.fillStyle=g;x.beginPath();x.moveTo(px,yc);x.quadraticCurveTo(mx+nx*w,my+ny*w,tx,ty);x.quadraticCurveTo(mx-nx*w*.6,my-ny*w*.6,px,yc);x.closePath();x.fill();
+      x.strokeStyle=seca?'rgba(240,215,160,.28)':'rgba(220,240,170,.3)';x.lineWidth=1;x.beginPath();x.moveTo(px,yc);x.lineTo(tx,ty);x.stroke();}
+    for(let k=0;k<40;k++){const t=k/40,t2=(k+1)/40;x.strokeStyle=seca?'#8a6a3e':'#c4bc6c';x.lineWidth=9*(1-t)+2;x.beginPath();x.moveTo(8+t*1000,yc);x.lineTo(8+t2*1000,yc);x.stroke();}};
+  fronde(0,false);fronde(256,true);const t=il620Tex(c,null,true);t.encoding=THREE.sRGBEncoding;return t;}
+function il620Folha(x,cx,cy,ang,len,wid,c0,c1,r){x.save();x.translate(cx,cy);x.rotate(ang);const g=x.createLinearGradient(0,0,len,0);g.addColorStop(0,c0);g.addColorStop(.6,c1);g.addColorStop(1,c0);x.fillStyle=g;
+  x.beginPath();x.moveTo(0,0);x.bezierCurveTo(len*.25,-wid*.32,len*.55,-wid*.62,len*.84,-wid*.44);x.quadraticCurveTo(len*1.01,-wid*.16,len,0);x.quadraticCurveTo(len*1.01,wid*.16,len*.84,wid*.44);x.bezierCurveTo(len*.55,wid*.62,len*.25,wid*.32,0,0);x.closePath();x.fill();
+  x.strokeStyle='rgba(20,40,10,.35)';x.lineWidth=1.4;x.stroke();x.strokeStyle='rgba(235,245,190,.42)';x.lineWidth=1.6;x.beginPath();x.moveTo(len*.04,0);x.lineTo(len*.95,0);x.stroke();
+  x.lineWidth=.9;x.strokeStyle='rgba(235,245,190,.22)';for(let k=1;k<6;k++){const p=len*(.12+k*.14);x.beginPath();x.moveTo(p,0);x.lineTo(p+len*.1,-wid*.36);x.moveTo(p,0);x.lineTo(p+len*.1,wid*.36);x.stroke();}
+  x.fillStyle='rgba(255,255,255,.08)';x.beginPath();x.ellipse(len*.5,-wid*.16,len*.28,wid*.09,0,0,7);x.fill();x.restore();}
+function il620Flor(x,cx,cy,R,cor,miolo,n,r){x.save();x.translate(cx,cy);x.rotate(r()*6.28);for(let k=0;k<n;k++){x.rotate(Math.PI*2/n);const g=x.createRadialGradient(R*.2,0,1,R*.55,0,R*.6);g.addColorStop(0,miolo);g.addColorStop(.35,cor);g.addColorStop(1,cor);x.fillStyle=g;x.beginPath();x.ellipse(R*.5,0,R*.52,R*.32,0,0,7);x.fill();
+    x.strokeStyle='rgba(0,0,0,.15)';x.lineWidth=1;x.stroke();}x.fillStyle=miolo;x.beginPath();x.arc(0,0,R*.13,0,7);x.fill();x.restore();}
+function il620TexFolhas(){const S=1024,c=il620Can(S,S),x=c.getContext('2d'),r=rnd(62002);x.clearRect(0,0,S,S);
+  const verdes=[['#24521f','#4f8f36'],['#2c6024','#5d9c3c'],['#1f4a1c','#467f30'],['#33702a','#6aa846']],outono=[['#7a1e12','#c4462a'],['#8a4a12','#d8862c'],['#7a6a14','#c8b438']];
+  // 0 e 1: rosetas de folhas largas (amendoeira) vistas de cima; 1 com folhas vermelhas e laranja
+  for(const q of [0,1]){const ox=q*512,oy=0,cx=ox+256,cy=oy+256;x.save();x.beginPath();x.rect(ox,oy,512,512);x.clip();
+    for(let k=0;k<24;k++){const a=k/24*Math.PI*2+r()*.25,len=150+r()*80,wid=70+r()*26;const [c0,c1]=verdes[(r()*4)|0];il620Folha(x,cx+Math.cos(a)*14,cy+Math.sin(a)*14,a,len,wid,c0,c1,r);}
+    for(let k=0;k<14;k++){const a=r()*6.28,len=100+r()*60,wid=52+r()*20;const out=q===1&&r()<.4;const [c0,c1]=out?outono[(r()*3)|0]:(r()<.3?['#4a7a2a','#8ab84a']:verdes[(r()*4)|0]);il620Folha(x,cx+Math.cos(a)*10,cy+Math.sin(a)*10,a,len,wid,c0,c1,r);}
+    x.fillStyle='#5a4228';x.beginPath();x.arc(cx,cy,9,0,7);x.fill();x.restore();}
+  // 2 e 3: ramos de arbusto em leque com flores (hibisco vermelho; flores brancas e amarelas)
+  for(const q of [2,3]){const ox=(q-2)*512,oy=512,bx=ox+256,by=oy+500;x.save();x.beginPath();x.rect(ox,oy,512,512);x.clip();
+    x.strokeStyle='#4a3a22';x.lineWidth=5;for(let k=0;k<5;k++){const a=-Math.PI/2+(k-2)*.42;x.beginPath();x.moveTo(bx,by);x.quadraticCurveTo(bx+Math.cos(a)*120,by+Math.sin(a)*200,bx+Math.cos(a)*230,by+Math.sin(a)*380);x.stroke();}
+    for(let k=0;k<78;k++){const a=-Math.PI/2+(r()-.5)*2.7,d=50+r()*360;const px=bx+Math.cos(a)*d*.72,py=by+Math.sin(a)*d;const [c0,c1]=verdes[(r()*4)|0];il620Folha(x,px,py,a+(r()-.5)*.9,48+r()*36,24+r()*12,c0,c1,r);}
+    const nfl=q===2?7:9;for(let k=0;k<nfl;k++){const a=-Math.PI/2+(r()-.5)*2.4,d=100+r()*280;const px=bx+Math.cos(a)*d*.7,py=by+Math.sin(a)*d;
+      if(q===2)il620Flor(x,px,py,30+r()*10,['#d81e3a','#e83a5a','#c8102e'][(r()*3)|0],'#ffe070',5,r);else il620Flor(x,px,py,22+r()*8,r()<.6?'#fbf6ea':'#f6d84a','#f0b020',5,r);}
+    x.restore();}
+  const t=il620Tex(c,null,true);t.encoding=THREE.sRGBEncoding;return t;}
+function il620TexCasca(){const W=256,H=512,A=il620Can(W,H),a=A.getContext('2d'),Hc=il620Can(W,H),h=Hc.getContext('2d'),r=rnd(62003);
+  a.fillStyle='#7a6a58';a.fillRect(0,0,W,H);h.fillStyle='#808080';h.fillRect(0,0,W,H);
+  for(let k=0;k<70;k++){const x0=r()*W,w=3+r()*7,y0=r()*H,L=60+r()*220;for(const dx of [-W,0,W])for(const dy of [-H,0,H]){const X=x0+dx,Y=y0+dy;
+      a.strokeStyle=`rgba(${40+r()*20|0},${32+r()*16|0},${24+r()*12|0},.75)`;a.lineWidth=w*.55;a.beginPath();a.moveTo(X,Y);a.bezierCurveTo(X+(r()-.5)*14,Y+L*.33,X+(r()-.5)*14,Y+L*.66,X+(r()-.5)*10,Y+L);a.stroke();
+      h.strokeStyle='rgba(20,20,20,.9)';h.lineWidth=w*.6;h.beginPath();h.moveTo(X,Y);h.bezierCurveTo(X+(r()-.5)*14,Y+L*.33,X+(r()-.5)*14,Y+L*.66,X+(r()-.5)*10,Y+L);h.stroke();}}
+  for(let k=0;k<3000;k++){const v=r();a.fillStyle=v<.5?'rgba(160,145,125,.25)':'rgba(40,30,22,.2)';a.fillRect(r()*W,r()*H,2,2);}
+  for(let k=0;k<26;k++){const x0=r()*W,y0=r()*H,rr=6+r()*14;a.fillStyle='rgba(120,140,90,.18)';a.beginPath();a.ellipse(x0,y0,rr,rr*1.6,0,0,7);a.fill();}
+  const map=il620Tex(A,[1,2]);map.encoding=THREE.sRGBEncoding;const nrm=il620Tex(normalFrom(Hc,2.6),[1,2]);return {map,nrm};}
+// areia: grãos em três escalas, ondulações do vento, conchinhas e seixos; quase branca (a cor vem dos vértices); ladrilhável
+function il620TexAreia(){const S=1024,A=il620Can(S,S),a=A.getContext('2d'),Hc=il620Can(S,S),h=Hc.getContext('2d'),r=rnd(62004);
+  const ad=a.createImageData(S,S),hd=h.createImageData(S,S);const fx=[[2,.0,1.3],[3,1.7,.7],[5,2.9,.45]],fy=[[1,.4,9],[2,2.2,5],[3,4.1,3]];
+  for(let y=0;y<S;y++){for(let xx=0;xx<S;xx++){const u=xx/S*Math.PI*2,v=y/S*Math.PI*2;let ph=0;for(const [k,p,amp] of fx)ph+=Math.sin(k*u+p)*amp;let ph2=0;for(const [k,p,amp] of fy)ph2+=Math.sin(k*v+p+Math.cos(u*2+k))*amp*.0035;
+      const rip=Math.sin(v*34+ph*2.2+Math.sin(u*3)*1.5);const rip2=Math.max(0,rip);const big=.5+.5*Math.sin(u*2+Math.sin(v*3)*1.2)*Math.cos(v*2+Math.sin(u*2)*.8);
+      const g=Math.random();const val=.87+.1*(big-.5)-.075*(1-rip2)+(g-.5)*.12+ph2;const i=(y*S+xx)*4;const cv=Math.max(0,Math.min(255,val*255));ad.data[i]=cv;ad.data[i+1]=cv*.985;ad.data[i+2]=cv*.96;ad.data[i+3]=255;
+      const hv=128+rip*38+(g-.5)*30;hd.data[i]=hd.data[i+1]=hd.data[i+2]=hv;hd.data[i+3]=255;}}
+  a.putImageData(ad,0,0);h.putImageData(hd,0,0);
+  const em=(fn)=>{for(const dx of [-S,0,S])for(const dy of [-S,0,S])fn(dx,dy);};
+  for(let k=0;k<170;k++){const x0=r()*S,y0=r()*S,rr=1.5+r()*3.2,tipo=r();em((dx,dy)=>{a.fillStyle=tipo<.55?`rgba(${70+r()*40|0},${66+r()*30|0},${60+r()*30|0},.75)`:tipo<.8?'rgba(250,240,225,.9)':'rgba(236,186,170,.85)';a.beginPath();a.ellipse(x0+dx,y0+dy,rr,rr*(.6+r()*.4),r()*3,0,7);a.fill();
+      h.fillStyle='rgba(235,235,235,.9)';h.beginPath();h.ellipse(x0+dx,y0+dy,rr,rr*.8,0,0,7);h.fill();});}
+  for(let k=0;k<26;k++){const x0=r()*S,y0=r()*S,rr=6+r()*7;em((dx,dy)=>{a.strokeStyle='rgba(245,236,220,.85)';a.lineWidth=1.6;a.beginPath();for(let q=0;q<5;q++){a.moveTo(x0+dx,y0+dy+rr*.6);a.lineTo(x0+dx+(q-2)*rr*.32,y0+dy-rr*.5);}a.stroke();a.beginPath();a.ellipse(x0+dx,y0+dy,rr*.75,rr*.6,0,Math.PI,0);a.stroke();});}
+  const map=il620Tex(A,null);map.encoding=THREE.sRGBEncoding;const nrm=il620Tex(normalFrom(Hc,1.5),null);return {map,nrm};}
+// capim visto de cima (para a relva da Ilha do Duelo): fios curtos claros e escuros sobre um fundo quase branco, ladrilhável
+function il620TexGrama(){const S=1024,c=il620Can(S,S),x=c.getContext('2d'),r=rnd(62005);x.fillStyle='#e4e8dc';x.fillRect(0,0,S,S);
+  for(let k=0;k<26000;k++){const x0=r()*S,y0=r()*S,L=4+r()*10,an=-Math.PI/2+(r()-.5)*1.6,v=r();x.strokeStyle=v<.45?`rgba(60,80,40,${.22+r()*.25})`:v<.85?`rgba(250,255,235,${.25+r()*.3})`:`rgba(150,140,90,${.25})`;x.lineWidth=1+r()*.8;
+    for(const dx of [-S,0,S])for(const dy of [-S,0,S]){if(x0+dx<-20||x0+dx>S+20||y0+dy<-20||y0+dy>S+20)continue;x.beginPath();x.moveTo(x0+dx,y0+dy);x.lineTo(x0+dx+Math.cos(an)*L,y0+dy+Math.sin(an)*L);x.stroke();}}
+  const t=il620Tex(c,null);t.encoding=THREE.sRGBEncoding;return t;}
+function il620Texturas(){if(IL620.tex)return IL620.tex;const t0=performance.now();IL620.tex={fronde:il620TexFronde(),folhas:il620TexFolhas(),casca:il620TexCasca(),areia:il620TexAreia(),grama:il620TexGrama()};IL620.stats.texMs=Math.round(performance.now()-t0);return IL620.tex;}
+// ---------- materiais ----------
+function il620Vento(m,fronde){m.onBeforeCompile=(sh)=>{sh.uniforms.uTime620=IL620.U;sh.vertexShader='uniform float uTime620;\n'+sh.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\n'+
+  (fronde?'float w620=uv.x*uv.x;':'float w620=.32;')+'\nfloat ph620=position.x*.31+position.z*.23;\ntransformed.x+=sin(uTime620*1.6+ph620)*.075*w620;\ntransformed.z+=cos(uTime620*1.25+ph620*1.3)*.06*w620;\ntransformed.y+=sin(uTime620*2.1+ph620*.7)*.035*w620;');};
+  m.customProgramCacheKey=()=>'il620vento'+(fronde?1:0);}
+function il620Mats(){if(IL620.mats)return IL620.mats;const T=THREE,X=il620Texturas();
+  const mk=(nome,o,vento,fronde)=>{const m=new T.MeshStandardMaterial(Object.assign({color:0xffffff,roughness:.7,metalness:0,vertexColors:true},o));m.name=nome;m.userData.papelKeep=true;if(vento)il620Vento(m,fronde);return m;};
+  const M={fronde:mk('620 fronde de palmeira',{map:X.fronde,alphaTest:.42,side:T.DoubleSide,roughness:.66},true,true),
+    folhas:mk('620 folhagem',{map:X.folhas,alphaTest:.45,side:T.DoubleSide,roughness:.6},true,false),
+    casca:mk('620 casca de amendoeira',{map:X.casca.map,normalMap:X.casca.nrm,normalScale:new T.Vector2(1.2,1.2),roughness:.92}),
+    miolo:mk('620 miolo da copa',{roughness:.9})};
+  const dm=(map,at)=>{const d=new T.MeshDepthMaterial({depthPacking:T.RGBADepthPacking,map,alphaTest:at});d.side=T.DoubleSide;return d;};M.prof={fronde:dm(X.fronde,.42),folhas:dm(X.folhas,.45)};
+  IL620.mats=M;return M;}
+// ---------- geometrias ----------
+// uma fronde: tira curva com 3 vértices por seção (borda, ráquis, borda) dobrada em V; u da base à ponta, v pela metade verde ou seca
+function il620Fronde(L,W,seg,queda,seca,tint,dobra){const T=THREE;const pos=[],uv=[],col=[],idx=[];const v0=seca?0:.5;const fd=dobra===undefined?.38:dobra;
+  const pt=(t)=>[t*L,.2*L*Math.sin(t*Math.PI*.9)-queda*L*t*t];
+  for(let k=0;k<=seg;k++){const t=k/seg;const [x,y]=pt(t);const ww=W*(t<.06?.35+t/.06*.65:1);const cai=fd*ww*(.6+t*.6);
+    pos.push(x,y-cai,ww, x,y,0, x,y-cai,-ww);uv.push(t,v0+.5, t,v0+.25, t,v0);const s=(tint||1)*(.78+.22*Math.min(1,t*2.2));for(let q=0;q<3;q++)col.push(s,s,s);
+    if(k){const a=(k-1)*3,b=k*3;idx.push(a,b,a+1, b,b+1,a+1, a+1,b+1,a+2, b+1,b+2,a+2);}}
+  const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setAttribute('color',new T.Float32BufferAttribute(col,3));g.setIndex(idx);g.computeVertexNormals();return g;}
+// um cartão de folhagem (quadrado com o recorte do quadrante q do atlas) com tom por vértice
+function il620Cartao(lado,q,tom){const T=THREE;const g=new T.PlaneGeometry(lado,lado,1,1);const u0=(q%2)*.5,v0=q<2?.5:0;t160UVRet(g,[u0,v0,u0+.5,v0+.5]);const n=g.attributes.position.count,col=new Float32Array(n*3);for(let i=0;i<n;i++){col[i*3]=col[i*3+1]=col[i*3+2]=tom;}g.setAttribute('color',new T.BufferAttribute(col,3));return g;}
+function il620Tronco(K,mat,P,N,RS,raio,base,tons){const T=THREE;const curva=new T.CatmullRomCurve3(P);const geo=new T.TubeGeometry(curva,N,1,RS,false);const p=geo.attributes.position;const col=new Float32Array(p.count*3);const c=new T.Color();
+  for(let i=0;i<=N;i++){const t=i/N;const C=curva.getPointAt(t);let rad=raio(t);if(t<base)rad*=1+1.5*(base-t)/base;for(let j=0;j<=RS;j++){const k=i*(RS+1)+j;p.setXYZ(k,C.x+(p.getX(k)-C.x)*rad,C.y+(p.getY(k)-C.y)*rad,C.z+(p.getZ(k)-C.z)*rad);
+      c.setScalar(tons(i,j,t));col[k*3]=c.r;col[k*3+1]=c.g;col[k*3+2]=c.b;}}
+  geo.setAttribute('color',new T.BufferAttribute(col,3));geo.computeVertexNormals();K.add(geo,mat);return curva;}
+// ---------- a palmeira ----------
+function il620Palmeira(K,M,x,z,y,h,lean,ry,r,obst){const T=THREE,MT=il620Mats();const dx=Math.cos(ry)*lean,dz=Math.sin(ry)*lean;
+  const P=[new T.Vector3(x,y-.4,z),new T.Vector3(x+dx*h*.12,y+h*.36,z+dz*h*.12),new T.Vector3(x+dx*h*.3,y+h*.7,z+dz*h*.3),new T.Vector3(x+dx*h*.52,y+h,z+dz*h*.52)];
+  const curva=il620Tronco(K,M.tronco,P,22,10,t=>.21*(1-.42*t)+.012*Math.sin(t*90),.1,(i,j,t)=>(.8+.24*((i%2)?1:.45)+.08*i503H3(i,j,3))*(1-.22*t));
+  for(let i=0;i<6;i++){const a=i/6*6.283+r();K.addC(new T.ConeGeometry(.1,.55,5),M.tronco,0xb0a090,x+Math.cos(a)*.22,y-.06,z+Math.sin(a)*.22,0,Math.cos(a)*1.3,-Math.sin(a)*1.3);}
+  const top=curva.getPointAt(1);
+  // a «bota»: bases de folhas velhas em volta do topo, e o palmito
+  for(let i=0;i<9;i++){const a=i/9*6.283+r()*.4;K.addC(new T.ConeGeometry(.09,.55,4),M.tronco,0x8a7458,top.x+Math.cos(a)*.17,top.y-.38-(i%3)*.12,top.z+Math.sin(a)*.17,-a,0,-1.05);}
+  K.addC(new T.CylinderGeometry(.2,.22,.5,10),M.tronco,0x9a9a6a,top.x,top.y-.12,top.z);K.addC(new T.SphereGeometry(.24,10,7),M.tronco,0x7a8a52,top.x,top.y+.08,top.z,0,0,0,1,1.3,1);
+  // cachos de cocos e a espata
+  const nC=5+((r()*4)|0);for(let i=0;i<nC;i++){const a=i*1.05+r()*.5;K.sph(.12+r()*.02,i%3?M.coco:M.cocoVerde,top.x+Math.cos(a)*.27,top.y-.22-(i%2)*.1,top.z+Math.sin(a)*.27,1,1.12,1,10,7);}
+  if(r()<.7){const a=r()*6.283;K.addC(new T.ConeGeometry(.07,.8,6),M.tronco,0xc8b080,top.x+Math.cos(a)*.3,top.y-.25,top.z+Math.sin(a)*.3,-a,0,-2.0);}
+  const nF=13+((r()*4)|0);const L=2.3+h*.24;const ga=2.39996;
+  for(let i=0;i<nF;i++){const a=i*ga+r()*.25;const idade=i%4;const elev=idade===0?.78:idade===1?.32:idade===2?.05:-.3;const Lf=L*(idade===0?.78:1)*(.88+r()*.24);
+    const g=il620Fronde(Lf,Lf*.17,12,idade===0?.25:.45+r()*.25,false,.9+r()*.2);K.add(g,MT.fronde,top.x,top.y+.04,top.z,-a,0,elev+(r()-.5)*.15);}
+  for(let i=0;i<2+((r()*2)|0);i++){const a=r()*6.283;const g=il620Fronde(L*.8,L*.13,10,1.0,true,1,.55);K.add(g,MT.fronde,top.x,top.y-.15,top.z,-a,0,-1.25-r()*.2);}
+  IL620.stats.palmeiras=(IL620.stats.palmeiras||0)+1;if(obst)obst(x,z,.4);}
+// ---------- a amendoeira-da-praia ----------
+function il620Roseta(K,MT,M,ex,ey,ez,s,q,r,dir){const T=THREE;K.add(i503Bloco(.34*s,r()*40,.55,0x1c3a18,0x2e5a24),MT.miolo,ex,ey,ez,r()*6);
+  const n=6+((r()*2)|0);for(let k=0;k<n;k++){const b=dir+k/n*6.283+(r()-.5)*.5,lado=1.1*s*(.8+r()*.35),d=lado*.3;
+    K.add(il620Cartao(lado,q,.8+r()*.3),MT.folhas,ex+Math.cos(b)*d,ey+(r()-.3)*.22*s,ez+Math.sin(b)*d,-b+Math.PI/2,-(.15+r()*.5),(r()-.5)*.6);}
+  for(let k=0;k<3;k++){const lado=.95*s*(.85+r()*.3);K.add(il620Cartao(lado,q,.95+r()*.2),MT.folhas,ex+(r()-.5)*.3*s,ey+.14+k*.06,ez+(r()-.5)*.3*s,r()*6.28,-Math.PI/2+(r()-.5)*.6,(r()-.5)*.4);}
+  for(let k=0;k<2;k++){const b=dir+k*Math.PI/2+r()*.4,lado=.9*s;K.add(il620Cartao(lado,q,.85+r()*.2),MT.folhas,ex,ey+.05,ez,-b,-.25+(r()-.5)*.3,0);}
+  for(let k=0;k<2;k++){const b=r()*6.283,lado=.85*s;K.add(il620Cartao(lado,q,.7+r()*.15),MT.folhas,ex+Math.cos(b)*lado*.3,ey-.2,ez+Math.sin(b)*lado*.3,-b+Math.PI/2,-1.1+r()*.3,0);}}
+function il620Amendoeira(K,M,x,z,y,h,r,obst){const T=THREE,MT=il620Mats();const lean=(r()-.5)*.25,ry=r()*6.283;const outono=r()<.45;
+  const P=[new T.Vector3(x,y-.3,z),new T.Vector3(x+Math.cos(ry)*lean*h*.5,y+h*.55,z+Math.sin(ry)*lean*h*.5),new T.Vector3(x+Math.cos(ry)*lean*h,y+h,z+Math.sin(ry)*lean*h)];
+  const curva=il620Tronco(K,MT.casca,P,12,10,t=>.19*(1-.5*t),.1,(i,j,t)=>(.72+.16*i503H3(i,j,2))*(1-.12*t));
+  for(let andar=0;andar<3;andar++){const t=.48+andar*.22;const C=curva.getPointAt(Math.min(1,t));const nG=5-andar+((r()*2)|0);const R=(2.0-andar*.45)*(.8+h*.05);
+    for(let g=0;g<nG;g++){const a=g/nG*6.283+andar*.7+r()*.6;const ex=C.x+Math.cos(a)*R,ez=C.z+Math.sin(a)*R,ey=C.y+.35+r()*.25;
+      const pts=[new T.Vector3(C.x,C.y,C.z),new T.Vector3(C.x+Math.cos(a)*R*.5,C.y+.05,C.z+Math.sin(a)*R*.5),new T.Vector3(ex,ey,ez)];const gb=new T.TubeGeometry(new T.CatmullRomCurve3(pts),5,1,5,false);
+      {const p=gb.attributes.position;const cv=new T.CatmullRomCurve3(pts);for(let i=0;i<=5;i++){const tt=i/5,Cc=cv.getPointAt(tt),rad=.07*(1-.6*tt);for(let j=0;j<=5;j++){const k=i*6+j;p.setXYZ(k,Cc.x+(p.getX(k)-Cc.x)*rad,Cc.y+(p.getY(k)-Cc.y)*rad,Cc.z+(p.getZ(k)-Cc.z)*rad);}}
+        const col=new Float32Array(p.count*3).fill(.66);gb.setAttribute('color',new T.BufferAttribute(col,3));gb.computeVertexNormals();}
+      K.add(gb,MT.casca);il620Roseta(K,MT,M,ex,ey+.1,ez,(1.05-andar*.12)*(.9+r()*.2),outono&&r()<.6?1:0,r,a);}}
+  il620Roseta(K,MT,M,P[2].x,P[2].y+.3,P[2].z,.95,outono?1:0,r,r()*6);
+  IL620.stats.amendoeiras=(IL620.stats.amendoeiras||0)+1;if(obst)obst(x,z,.42);}
+// ---------- moita ----------
+function il620Moita(K,M,x,z,y,s,r,obst){const MT=il620Mats();const q=r()<.55?2:3;
+  K.add(i503Bloco(s*.38,r()*40,.7,0x1c3a18,0x2c5622),MT.miolo,x,y+s*.3,z,r()*6);
+  const n=18+((r()*8)|0);for(let k=0;k<n;k++){const b=r()*6.283,e=.1+r()*1.15,d=s*.44*Math.cos(e*.6);const lado=s*(.5+r()*.25);
+    K.add(il620Cartao(lado,k%5===0?5-q:q,.8+r()*.3),MT.folhas,x+Math.cos(b)*d,y+s*.18+Math.sin(e)*s*.42,z+Math.sin(b)*d,-b+Math.PI/2,-e,(r()-.5)*.4);}
+  IL620.stats.moitas=(IL620.stats.moitas||0)+1;if(obst)obst(x,z,.7*s);}
+function il620FolhaCaida(K,M,x,z,y,r){const MT=il620Mats();const L=1.4+r()*.7;const g=il620Fronde(L,L*.14,8,.02,true,.95,.12);K.add(g,MT.fronde,x,y+.05,z,r()*6.283,0,.06);}
+// ---------- depois de montar: sombras recortadas, a areia nova e a relva da Ilha do Duelo ----------
+function il620Pos(){const R=ROOMS.adv;if(!R||!R.scene)return;const T=THREE,sc=R.scene,X=il620Texturas(),MT=il620Mats(),st=IL620.stats;let sombras=0,areias=0,duelo=0;sc.updateMatrixWorld(true);
+  sc.traverse(o=>{if(!o.isMesh)return;const m=o.material;if(m===MT.fronde){o.customDepthMaterial=MT.prof.fronde;sombras++;}else if(m===MT.folhas){o.customDepthMaterial=MT.prof.folhas;sombras++;}});
+  // a areia das duas ilhas da v253/v503 (a das Moedas é o clone ×4: material próprio com a repetição dobrada)
+  let matM=null;sc.traverse(o=>{if(!o.isMesh||!o.material||!/^(v160 · )?v253 areia da ilha$/.test(o.material.name||''))return;const m=o.material;
+    if(!m.userData.il620){m.map=X.areia.map;m.normalMap=X.areia.nrm;m.normalScale=new T.Vector2(.6,.6);m.roughness=.95;m.color.multiply(new T.Color(.93,.84,.66));m.userData.il620=1;m.needsUpdate=true;}
+    const esc=new T.Vector3();o.matrixWorld.decompose(new T.Vector3(),new T.Quaternion(),esc);if(Math.max(esc.x,esc.z)>3){if(!matM){matM=m.clone();matM.name='v253 areia da ilha (620 Moedas)';const mp=X.areia.map.clone(),nr=X.areia.nrm.clone();mp.repeat.set(2,2);nr.repeat.set(2,2);mp.needsUpdate=nr.needsUpdate=true;matM.map=mp;matM.normalMap=nr;matM.userData.il620=1;matM.needsUpdate=true;}o.material=matM;}
+    areias++;});
+  // a Ilha do Duelo: areia nova + capim onde a cor do vértice é relva
+  sc.traverse(o=>{if(!o.isMesh||!o.material||!/539 terreno da ilha/.test(o.material.name||'')||o.material.userData.il620)return;const m=o.material;const rep=m.map&&m.map.repeat?m.map.repeat.x:70;
+    const mp=X.areia.map.clone(),nr=X.areia.nrm.clone();mp.repeat.set(1,1);nr.repeat.set(1,1);mp.needsUpdate=nr.needsUpdate=true;m.map=mp;m.normalMap=nr;m.normalScale=new T.Vector2(.5,.5);
+    const U={tGrama620:{value:X.grama},uRepG620:{value:2.2},uGK620:{value:6.0}};m.onBeforeCompile=(sh)=>{Object.assign(sh.uniforms,U);sh.fragmentShader='uniform sampler2D tGrama620;\nuniform float uRepG620;\nuniform float uGK620;\n'+sh.fragmentShader.replace('#include <map_fragment>',
+      '#ifdef USE_MAP\n\tvec4 tA620=mapTexelToLinear(texture2D(map,vUv));\n\tvec4 tB620=mapTexelToLinear(texture2D(tGrama620,vUv*uRepG620));\n\tfloat gm620=0.0;\n\t#ifdef USE_COLOR\n\tgm620=clamp((vColor.g-max(vColor.r,vColor.b))*uGK620,0.0,1.0);\n\t#endif\n\tdiffuseColor*=mix(tA620*vec4(.9,.82,.66,1.),tB620*vec4(.5,.64,.42,1.),gm620);\n#endif');};
+    m.customProgramCacheKey=()=>'il620duelo2';m.userData.il620=1;m.needsUpdate=true;duelo++;});
+  st.sombras=sombras;st.areias=areias;st.duelo=(st.duelo||0)+duelo;IL620.pos++;
+  if(!IL620.tick){try{rkAddTick(R,(dt)=>{IL620.U.value+=Math.min(.1,dt||.016);});IL620.tick=true;}catch(e){il620Erro('tick',e);}}}
+if(IL620.on){try{n253TexAreia=function(){return il620Texturas().areia.map;};}catch(e){il620Erro('areia',e);}
+  try{i503Palmeira=il620Palmeira;i503Amendoeira=il620Amendoeira;i503Moita=il620Moita;i503FolhaCaida=il620FolhaCaida;}catch(e){il620Erro('trocar',e);}
+  try{const _fr=finishRoom;finishRoom=function(key){const r=_fr.apply(this,arguments);if(key==='adv'){for(const t of [2500,8000,15000])setTimeout(()=>{try{il620Pos();}catch(e){il620Erro('pos',e);}},t);}return r;};}catch(e){il620Erro('ligar',e);}}
+function il620Vitrine(sc){const T=THREE,M=i503Mats(),MT=il620Mats(),X=il620Texturas(),K=t160Kit('620 vitrine'),r=rnd(62090);
+  il620Palmeira(K,M,-5,0,0,7,.25,0,r,null);il620Palmeira(K,M,-2.2,-1.5,0,5.5,.4,2.4,r,null);il620Amendoeira(K,M,1.8,0,0,5.5,rnd(62091),null);il620Amendoeira(K,M,6.4,-.5,0,5,rnd(62094),null);
+  il620Moita(K,M,-.4,2.6,0,1.2,rnd(62092),null);il620Moita(K,M,3.6,3,0,1.1,rnd(62093),null);il620Moita(K,M,8.6,2.4,0,1.0,rnd(62095),null);il620FolhaCaida(K,M,-3.6,2.8,0,r);
+  const ms=K.fim(sc,{sombra:true});for(const m of ms){if(m.material===MT.fronde)m.customDepthMaterial=MT.prof.fronde;else if(m.material===MT.folhas)m.customDepthMaterial=MT.prof.folhas;}
+  const am=new T.MeshStandardMaterial({map:X.areia.map,normalMap:X.areia.nrm,normalScale:new T.Vector2(.6,.6),roughness:.95,color:new T.Color(0xb09560).multiplyScalar(.78).multiply(new T.Color(.93,.84,.66))});
+  const pg=new T.PlaneGeometry(40,24);const uv=pg.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)*40/6,uv.getY(i)*24/6);const ch=new T.Mesh(pg,am);ch.rotation.x=-Math.PI/2;ch.receiveShadow=true;sc.add(ch);return ms.length;}
+window.__ilhas620={estado:IL620,erros:IL620.erros,stats:IL620.stats,pos:il620Pos,tex:()=>il620Texturas(),mats:()=>il620Mats(),fronde:il620Fronde,cartao:il620Cartao,vitrine:il620Vitrine};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
