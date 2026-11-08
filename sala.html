@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v630</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v631</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -78199,6 +78199,46 @@ function pes(g,id){const nome=String(id).replace('comp400_','');const cor=PES[no
   const body=g.getObjectByName('body400');if(!body)return;const m=new T.Mesh(geo,H.matLiso('pés de ave',0.5));m.name='v630 pés';m.castShadow=true;m.raycast=()=>{};m.userData.papelKeepGeo=true;body.add(m);g.userData.pn630=true;PN.n++;}
 if(PN.on){try{aplicaPenas();if(!PN.orig)PN.orig=comp400Build;const orig=PN.orig;comp400Build=function(id){const g=orig.apply(this,arguments);try{if(g&&g.userData&&g.userData.bi622&&g.userData.bi622.voa)pes(g,id);}catch(e){erro('pés '+id,e);}return g;};try{window.__companions400.build=comp400Build;}catch(e){}}catch(e){erro('ligar',e);}}
 window.__penas630=PN;
+})();
+
+/* ============================================================================================================
+   v631 — Rodada 7 de 10 dos companheiros: asas dos dragões (bloco AS631)
+   As asas dos dragões da v201 eram uma lâmina retangular com a forma recortada na textura e um tubo na borda.
+   Agora cada asa (Serpe, Forja, Cristal, Estelar) tem os OSSOS esculpidos — braço, antebraço, punho com a garrinha
+   do polegar e quatro DEDOS que abrem em leque até a borda de trás — e a MEMBRANA de verdade entre eles, com a
+   borda recortada em arcos entre as pontas dos dedos, um leve bojo e o degradê das cores de cada dragão (pintas de
+   estrela no Estelar, translúcida e brilhante no Cristal). Tudo no mesmo pivô da asa da v201: bater, planar e
+   recolher continuam iguais. O Dragonete de Papel continua com a asa de papel. `?asas631=0` desliga.
+   ============================================================================================================ */
+(function(){
+const BI=window.__bichos622,VO=window.__voadores623;if(!BI||!BI.h||!VO||!VO.h||typeof DRG==='undefined'||typeof drgMontar!=='function')return;const H=BI.h,V=VO.h;const T=THREE;
+const {S,HX,MX,mul,cl,Cad,UK,Cone,Ell,malha,caixaDe,celula}=H;
+const AS={on:DRG.on&&!/[?&#]asas631=0/i.test(location.search+location.hash),erros:[],n:0,orig:null};
+const ANT=window.__asas631;if(ANT&&ANT.orig)AS.orig=ANT.orig;
+function erro(k,e){if(AS.erros.length<30)AS.erros.push(k+': '+String(e&&e.stack||e&&e.message||e).slice(0,300));}
+const lin=s=>HX(parseInt(String(s).replace('#',''),16));
+// pontos da asa (lado +x; o lado −x é a mesma malha espelhada)
+function esqueleto(Sp){const e=Sp.asas.env,r=Sp.r;const om=[0,0,0.02*e],co=[0.36*e,0.15*r,0.05*e],pu=[0.6*e,0.1*r,0.035*e];
+  const dedos=[[1.0*e,0.0,0.02*e],[0.98*e,-0.015*e,-0.42*e],[0.78*e,-0.025*e,-0.68*e],[0.48*e,-0.03*e,-0.8*e]];const corpo=[0.06*e,-0.01*e,-0.62*e];return {e,r,om,co,pu,dedos,corpo};}
+function ossosGeo(id,Sp){const k='geo v631 ossos '+id;let g=BI.cache.get(k);if(g)return g;const K=esqueleto(Sp);const e=K.e,r=K.r;const L=[[Cad([K.om,K.co,K.pu],[r*0.14,r*0.11,r*0.09],0.01),0]];
+  for(let i=0;i<4;i++){const d=K.dedos[i];const mid=[(K.pu[0]+d[0])*0.5,(K.pu[1]+d[1])*0.5+0.01*e,(K.pu[2]+d[2])*0.5];L.push([Cad([K.pu,mid,d],[r*0.075,r*0.05,r*0.018],0.004),0.008]);}
+  L.push([Cone([K.pu[0],K.pu[1],K.pu[2]],[K.pu[0]+0.05*e,K.pu[1]+0.04*e,K.pu[2]+0.06*e],r*0.06,r*0.008),0.006]);
+  const f=UK(L);const B=caixaDe(f,[-0.1*e,-0.3*e,-0.95*e,1.15*e,0.3*e,0.25*e],0.012);const C=lin(Sp.cores.chifre);const Cb=lin(Sp.cores.escura);
+  g=malha('v631 ossos '+id,f,B,Math.max(0.0028,r*0.05),(x,y,z,nx,ny,nz)=>MX(Cb,C,S(0.3*e,0.7*e,x)*0.6+0.2));return g;}
+function membranaGeo(id,Sp){const k='geo v631 membrana '+id;let g=BI.cache.get(k);if(g)return g;const K=esqueleto(Sp);const e=K.e;const M=Sp.cores.membrana||[Sp.cores.base,Sp.cores.escura];const c0=lin(M[0]),c1=lin(M[1]);
+  const cont=[K.om,K.co,K.pu,K.dedos[0]];const arco=(a,b,n,fundo)=>{for(let i=1;i<n;i++){const s=i/n;const p=[a[0]+(b[0]-a[0])*s,a[1]+(b[1]-a[1])*s,a[2]+(b[2]-a[2])*s];const cx=0.5*e,cz=-0.38*e;const w=Math.sin(Math.PI*s)*fundo;cont.push([p[0]+(cx-p[0])*w,p[1],p[2]+(cz-p[2])*w]);}};
+  for(let i=0;i<3;i++){arco(K.dedos[i],K.dedos[i+1],5,0.16);cont.push(K.dedos[i+1]);}arco(K.dedos[3],K.corpo,5,0.12);cont.push(K.corpo);arco(K.corpo,K.om,4,0.02);
+  const est=Sp.textura==='estrelas'||Sp.estrelas;const b=V.Bd();V.membrana(b,cont,[0.48*e,-0.01*e,-0.34*e],(p)=>{const t=cl(Math.hypot(p[0]-K.pu[0],p[2]-K.pu[2])/(0.85*e),0,1);let c=MX(c0,c1,S(0.15,1,t));if(est){const [d1]=celula(p[0]*70,p[1]*70,p[2]*70,31);c=MX(c,HX(0xfff2c8),S(0.07,0.02,d1));}return c;},(p)=>-0.05*e*Math.sin(Math.PI*cl(p[0]/(1.0*e),0,1))*cl(-p[2]/(0.8*e),0,1));
+  g=V.geoDe(b,true);BI.cache.set(k,g);return g;}
+function matMembrana(id,Sp){const k='mat v631 membrana '+id;let m=BI.cache.get(k);if(m)return m;const cr=Sp.asas.tipo==='cristal';const est=Sp.textura==='estrelas'||Sp.estrelas;
+  m=new T.MeshStandardMaterial({vertexColors:true,side:T.DoubleSide,roughness:cr?0.18:0.62,metalness:cr?0.2:0.04,transparent:cr,opacity:cr?0.78:1,depthWrite:!cr,emissive:est?0x2a2060:(cr?0x2a4a60:0x000000),emissiveIntensity:est?0.35:0.5});m.name='v631 membrana '+id;BI.cache.set(k,m);return m;}
+function aplica(g,id){const Sp=DRG.specs[id];const D=g.userData.drg201;if(!D||!Sp||!Sp.asas||Sp.asas.tipo==='papel'||g.userData.as631)return;const M=drgMats(id);
+  const ossos=ossosGeo(id,Sp),mem=membranaGeo(id,Sp);const mat=matMembrana(id,Sp);
+  for(const A of D.asas){for(const o of A.piv.children)if(o.isMesh)o.visible=false;const sx=A.sx;const mo=new T.Mesh(ossos,M.chifre.clone());mo.material.vertexColors=true;mo.material.color.setRGB(1,1,1);mo.name='v631 ossos da asa';mo.castShadow=true;if(sx<0)mo.scale.x=-1;A.piv.add(mo);
+    const mm=new T.Mesh(mem,mat);mm.name='v631 membrana';mm.castShadow=true;if(sx<0)mm.scale.x=-1;A.piv.add(mm);for(const q of [mo,mm]){q.raycast=()=>{};q.userData.papelKeepGeo=true;}}
+  g.userData.as631=true;AS.n++;}
+if(AS.on){try{if(!AS.orig)AS.orig=drgMontar;const orig=AS.orig;drgMontar=function(id){const g=orig.apply(this,arguments);try{if(g)aplica(g,id);}catch(e){erro('aplica '+id,e);}return g;};}catch(e){erro('ligar',e);}}
+window.__asas631=AS;
 })();
 
 window.__build434={revision:434,family:"web",edition:"pt"};
