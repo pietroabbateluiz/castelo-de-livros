@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v632</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v633</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -78264,6 +78264,42 @@ function tick(dt){for(const slot of ['bicho','pet']){const g=GEAR[slot];if(!g||!
   let alvo=0;for(const o of G.olhos){if(o.scale.y<0.5)alvo=1;o.scale.y=1;}G.f632=(G.f632||0)+(alvo-(G.f632||0))*Math.min(1,(dt||0.016)*(alvo?30:14));const a=ABERTA+(FECHADA-ABERTA)*G.f632;for(const o of G.olhos){const m=o.userData.pc632;if(m)m.rotation.x=a;}}}
 if(PC.on){try{if(!PC.orig)PC.orig=gearTick;const orig=PC.orig;gearTick=function(dt){const r=orig.apply(this,arguments);try{tick(dt);}catch(e){erro('tick',e);}return r;};}catch(e){erro('ligar',e);}}
 window.__classicos632=PC;
+})();
+
+/* ============================================================================================================
+   v633 — Rodada 9 de 10 dos companheiros: leveza de longe (bloco LD633)
+   Os bichos esculpidos (v622) têm 30–80 mil triângulos, mais as cascas de pelo (v629). Quando o bicho aparece
+   pequeno na tela (raio projetado abaixo de ~70 px — a câmera de 3.ª pessoa costuma deixá-lo assim), o tronco, a
+   cabeça, as patas e o rabo trocam para uma versão da MESMA escultura feita com a grade 2,4 × mais grossa (≈1/6 dos
+   triângulos, a mesma cor e o mesmo material), e somem as cascas de pelo e os bigodes; voltando a ficar grande
+   (acima de ~85 px), volta tudo. As versões leves são feitas aos poucos depois que o bicho aparece (uma peça por
+   vez, fora do quadro), para não travar; o rabo leve usa os mesmos ossos. `?leve633=0` desliga.
+   ============================================================================================================ */
+(function(){
+const BI=window.__bichos622;if(!BI||!BI.h||!BI.h2||typeof comp400Build!=='function')return;const H=BI.h,H2=BI.h2;const T=THREE;
+const LD={on:!/[?&#]leve633=0/i.test(location.search+location.hash),erros:[],n:0,trocas:0,orig:null,anim:null,fila:[]};
+const ANT=window.__leve633;if(ANT&&ANT.orig){LD.orig=ANT.orig;LD.anim=ANT.anim;}
+function erro(k,e){if(LD.erros.length<30)LD.erros.push(k+': '+String(e&&e.message||e).slice(0,300));}
+const _v=new T.Vector3(),_c=new T.Vector3();
+function proxima(){const j=LD.fila.shift();if(!j)return;try{j();}catch(e){erro('fila',e);}if(LD.fila.length)setTimeout(proxima,60);}
+function agenda(f){LD.fila.push(f);if(LD.fila.length===1)setTimeout(proxima,400);}
+function prepara(g,id){const D=BI.def(id);if(!D)return;const hB=Object.assign({corpo:0.0075,cab:0.0045,perna:0.0055},D.h||{});const P={pecas:[],cascas:[],det:[],leve:false,pronto:0,raio:0.3};
+  g.traverse(o=>{if(o.name==='v629 pelo')P.cascas.push(o);else if(o.name==='v622 bigodes')P.det.push(o);});
+  const body=g.getObjectByName('body400'),head=g.getObjectByName('head400');if(!body||!head)return;
+  const add=(mesh,fazer)=>{if(!mesh)return;const it={mesh,cheia:mesh.geometry,leve:null};P.pecas.push(it);agenda(()=>{it.leve=fazer();P.pronto++;});};
+  add(body.children.find(o=>o.isMesh&&o.name==='v622 corpo'),()=>H2.geoGrupo(D,'corpo lod633',D.corpo,[0,0,0],hB.corpo*2.4,'corpo'));
+  add(head.children.find(o=>o.isMesh&&o.name==='v622 cabeça'),()=>H2.geoGrupo(D,'cab lod633',D.cab.f,D.cab.piv,hB.cab*2.4,'cab'));
+  body.children.filter(o=>/^leg400_/.test(o.name)).forEach(q=>{const j=+q.name.slice(7);const m=q.children.find(o=>o.isMesh&&o.name==='v622 perna');const Pn=D.pernas[j<2?0:1];add(m,()=>H2.geoGrupo(D,'perna'+(j<2?0:1)+' lod633',Pn.f,Pn.piv,hB.perna*2.4,'perna'));});
+  const rb=body.children.find(o=>o.isSkinnedMesh&&o.name==='v622 rabo');if(rb&&D.cauda){const C=D.cauda;add(rb,()=>{const k='geo '+D.id+' cauda lod633';let ge=BI.cache.get(k);if(ge)return ge;const r=0.16;const B=H.caixaDe(C.f,[-r,-r,-C.comp-0.08,r,r,0.06],0.02);
+    ge=H.malha(D.id+' cauda lod633',C.f,B,((D.h&&D.h.cauda)||0.006)*2.4,(x,y,z,nx,ny,nz)=>D.cor([x,y,z],[nx,ny,nz],'cauda',D,{u:-z/C.comp}));cp579RaboPesos(ge,C.comp/C.n,C.n);BI.cache.set(k,ge);return ge;});}
+  try{const b=new T.Box3().setFromObject(g);P.raio=Math.max(0.12,b.getSize(_v).length()*0.5);}catch(e){}
+  g.userData.ld633=P;LD.n++;}
+function troca(P,leve){if(P.leve===leve)return;if(leve&&P.pronto<P.pecas.length)return;P.leve=leve;LD.trocas++;for(const it of P.pecas){const ge=leve?it.leve:it.cheia;if(ge)it.mesh.geometry=ge;}for(const o of P.cascas)o.visible=!leve;for(const o of P.det)o.visible=!leve;}
+function confere(g){const P=g.userData.ld633;if(!P||typeof camera==='undefined'||!camera)return;g.getWorldPosition(_v);camera.getWorldPosition(_c);const d=Math.max(0.05,_v.distanceTo(_c));
+  const foco=(innerHeight||800)/(2*Math.tan((camera.fov||60)*Math.PI/360));const px=P.raio*foco/d;if(px<70)troca(P,true);else if(px>85)troca(P,false);}
+if(LD.on){try{if(!LD.orig)LD.orig=comp400Build;const orig=LD.orig;comp400Build=function(id){const g=orig.apply(this,arguments);try{if(g&&g.userData&&g.userData.bi622&&!g.userData.bi622.voa)prepara(g,id);}catch(e){erro('prepara '+id,e);}return g;};try{window.__companions400.build=comp400Build;}catch(e){}
+    if(!LD.anim)LD.anim=comp400Animate;const a0=LD.anim;comp400Animate=function(g,dt,speed,reading){const r=a0.apply(this,arguments);if(g&&g.userData&&g.userData.ld633){try{confere(g);}catch(e){erro('confere',e);}}return r;};}catch(e){erro('ligar',e);}}
+window.__leve633=LD;
 })();
 
 window.__build434={revision:434,family:"web",edition:"pt"};
