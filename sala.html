@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v625</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v626</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -77984,6 +77984,49 @@ if(PA.on){try{if(!PA.orig)PA.orig=comp400Build;const orig=PA.orig;
     if(!PA.anim)PA.anim=comp400Animate;const a0=PA.anim;comp400Animate=function(g,dt,speed,reading){const r=a0.apply(this,arguments);if(g&&g.userData&&g.userData.bi622){try{anima(g,dt);}catch(e){erro('anima',e);}}return r;};
   }catch(e){erro('ligar',e);}}
 window.__palpebras625=PA;
+})();
+
+/* ============================================================================================================
+   v626 — Rodada 2 de 10 dos companheiros: VIDA (bloco VI626)
+   Os bichos de chão da v622 passam a: SENTAR quando o personagem lê (lontra, panda-vermelho, feneco, guaxinim,
+   texugo, gambá, furão, lince e tamanduá — o tronco gira em volta do ombro até a anca chegar perto do chão, as
+   patas da frente ficam em pé e as de trás dobram para a frente até o pé tocar o chão; a cabeça compensa o
+   giro); os outros (ouriço, tartaruga, cervo, alpaca, javali, cabra, tatu, pangolim, salamandra, axolote,
+   porco-espinho) BAIXAM a cabeça e descansam. Parados, VIRAM A CABEÇA PARA O PERSONAGEM (até ±0,8 rad, suave).
+   Andando, o corpo SOBE E DESCE no ritmo do trote e o RABO tem inércia (fica para trás nas curvas e sobe um
+   pouco com a velocidade). `?vida626=0` desliga.
+   ============================================================================================================ */
+(function(){
+const BI=window.__bichos622;if(!BI||typeof comp400Animate!=='function')return;const T=THREE;
+const VI={on:!/[?&#]vida626=0/i.test(location.search+location.hash),erros:[],anim:null,par:{}};
+const ANT=window.__vida626;if(ANT&&ANT.anim)VI.anim=ANT.anim;
+function erro(k,e){if(VI.erros.length<30)VI.erros.push(k+': '+String(e&&e.message||e).slice(0,300));}
+const SENTA=new Set(['lontra','panda_vermelho','feneco','guaxinim','texugo','gamba','furao','lince','tamandua']);
+// parâmetros do sentar por espécie, tirados da própria escultura (pivôs do ombro e da anca, altura do pé)
+function par(id){let p=VI.par[id];if(p)return p;const D=BI.def(id);if(!D)return null;const F=D.pernas[0],H=D.pernas[1];const fp=D.P.pF.pts,hp=D.P.pT.pts;
+  const ombro=F.piv,anca=H.piv;const dz=ombro[2]-anca[2];const Lh=anca[1];const queda=anca[1]*0.62;const phi=Math.asin(cl(queda/Math.max(0.05,dz),0,0.9));
+  p={senta:SENTA.has(String(id).replace('comp400_','')),ombro,anca,phi,Lh:Math.max(0.03,Lh),cab:D.cab.piv};VI.par[id]=p;return p;}
+const cl=(v,a,b)=>v<a?a:(v>b?b:v);
+function anima(g,dt,speed,reading){const R=g.userData.comp400;if(!R||!R.body)return;const id=R.s.id;const P=par(id);if(!P)return;dt=Math.min(0.05,dt||0.016);
+  // sentar / descansar
+  R.sit626=(R.sit626||0)+((reading?1:0)-(R.sit626||0))*Math.min(1,dt*2.2);const s=R.sit626*R.sit626*(3-2*R.sit626);const body=R.body;
+  if(P.senta&&s>0.001){const phi=-P.phi*s;const o=P.ombro;const c=Math.cos(phi),sn=Math.sin(phi);// gira em volta do ombro (x)
+    body.rotation.x=phi;body.position.set(0,o[1]-(c*o[1]-sn*o[2]),o[2]-(sn*o[1]+c*o[2]));
+    // patas: as da frente ficam em pé; as de trás dobram para a frente até o pé tocar o chão
+    const ay=P.anca[1],az=P.anca[2];const hy=body.position.y+c*ay-sn*az;const alfa=Math.acos(cl(hy/P.Lh,-1,1));
+    for(const l of R.legs){const tras=/leg400_[23]/.test(l.name);l.rotation.x=tras?(-phi-alfa*0.92):-phi;}
+    if(R.head)R.head.rotation.x+=-phi*0.75;}
+  else{body.rotation.x=0;body.position.set(0,0,0);if(R.head&&s>0.001)R.head.rotation.x+=0.22*s;}
+  // sobe e desce no trote
+  const v=cl(speed||0,0,3);if(!reading&&v>0.05)body.position.y+=Math.abs(Math.sin((R.walk||0)))*0.006*Math.min(1,v);
+  // olhar para o personagem quando parado
+  if(R.head&&typeof CH!=='undefined'){let alvo=0;if(v<0.15&&!reading){const dx=CH.x-R.x,dz=CH.z-R.z;if(dx*dx+dz*dz>0.04){let a=Math.atan2(dx,dz)-(R.dir||0);a=Math.atan2(Math.sin(a),Math.cos(a));alvo=cl(a,-0.8,0.8);}}
+    R.olha626=(R.olha626||0)+(alvo-(R.olha626||0))*Math.min(1,dt*3);R.head.rotation.y+=R.olha626;}
+  // rabo com inércia: fica para trás nas curvas, sobe com a velocidade
+  const d=R.dir||0;const dd=Math.atan2(Math.sin(d-(R.dir626||d)),Math.cos(d-(R.dir626||d)))/Math.max(dt,1e-3);R.dir626=d;R.cauda626=(R.cauda626||0)+(cl(-dd*0.05,-0.35,0.35)-(R.cauda626||0))*Math.min(1,dt*4);
+  R.tails.forEach((t,i)=>{t.rotation.y+=R.cauda626*(0.5+0.5*i/Math.max(1,R.tails.length-1));if(i===0){t.userData.rx626=t.userData.rx626===undefined?t.rotation.x:t.userData.rx626;t.rotation.x=t.userData.rx626+0.12*Math.min(1,v)+(P.senta?P.phi*s*0.85-0.12*s:0);}});}
+if(VI.on){try{if(!VI.anim)VI.anim=comp400Animate;const a0=VI.anim;comp400Animate=function(g,dt,speed,reading){const r=a0.apply(this,arguments);if(g&&g.userData&&g.userData.bi622&&!g.userData.bi622.voa){try{anima(g,dt,speed,reading);}catch(e){erro('anima',e);}}return r;};}catch(e){erro('ligar',e);}}
+window.__vida626=VI;
 })();
 
 window.__build434={revision:434,family:"web",edition:"pt"};
