@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v669</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v670</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -7373,13 +7373,18 @@ function loadMsg(s){const e=document.getElementById('loadSub');if(e)e.textConten
 if(!window.THREE||!THREE.EffectComposer||!THREE.SAOPass||!THREE.SMAAPass||!THREE.Reflector){loadEl.textContent='Não foi possível carregar o Three.js (rede).';return;}
 THREE.RectAreaLightUniformsLib.init();
 
-const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:false,powerPreference:'high-performance'});
+/* v670: sonda da placa de vídeo — decide GPU_FRACA antes de criar o renderer (antialias) */
+const GPU670=(()=>{const g={str:'',fraca:false,integrada:false,forcado:null};try{const m=(location.search+location.hash).match(/[?&#]gpu=(fraca|forte)/i);let ls=null;try{ls=localStorage.getItem('mundo.gpu670');}catch(e){}g.forcado=m?m[1].toLowerCase():(ls==='fraca'||ls==='forte'?ls:null);}catch(e){}
+  try{const c=document.createElement('canvas');const gl=c.getContext('webgl2')||c.getContext('webgl');if(gl){const d=gl.getExtension('WEBGL_debug_renderer_info');g.str=String(d?gl.getParameter(d.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER));const lose=gl.getExtension('WEBGL_lose_context');if(lose)lose.loseContext();}}catch(e){}
+  const s=g.str;g.integrada=/\b(Intel|UHD|Iris|HD Graphics|SwiftShader|llvmpipe|softpipe|Mesa|Mali|Adreno|PowerVR|Vivante|VideoCore|Apple GPU|Radeon\(TM\) Graphics|Radeon Graphics|Vega (3|6|7|8|10|11))\b/i.test(s)&&!/\b(Arc|NVIDIA|GeForce|RTX|GTX|Quadro|Radeon RX|Radeon Pro|Radeon VII)\b/i.test(s);
+  const toque=!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches);g.fraca=g.forcado?g.forcado==='fraca':(g.integrada||toque);g.aa=g.fraca&&!/[?&#]aa670=0/i.test(location.search+location.hash);return g;})();window.__gpu670=GPU670;const GPU_FRACA=GPU670.fraca;
+const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:GPU670.aa,powerPreference:'high-performance'});
 const TOUCHDEV=!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches);const PR=Math.min(TOUCHDEV?1.5:2,devicePixelRatio||1);renderer.setPixelRatio(PR);
 renderer.setSize(innerWidth,innerHeight);
 renderer.outputEncoding=THREE.sRGBEncoding;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure=1.08;
-renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.VSMShadowMap;
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=GPU_FRACA?THREE.PCFShadowMap:THREE.VSMShadowMap;
 
 const scene=new THREE.Scene();
 scene.fog=new THREE.FogExp2(0x100a06,0.038);
@@ -8248,7 +8253,7 @@ window.__fusao={estat:FUSAO.estat,cena:()=>{const F=FUSAO.cenas.get(ACTIVE);retu
 // o three.js compila um programa de shader por combinação material × contagem de luzes, então com a formação igual os programas do Hall servem
 // para todas as salas — em vez de ~15-20 compilações por sala (segundos no Windows/ANGLE), cada sala nova compila só o que lhe é exclusivo.
 const LITE_P=12,LITE_S=3;
-function lightBudget(sc){if(!sc||!sc.isScene)return;const lite=!!Q.lite;try{papelApply(sc);}catch(e){console.error('papel',e);}const LP=Q.papel?PAPEL_P:LITE_P,LS=Q.papel?PAPEL_S:LITE_S;
+function lightBudget(sc){if(!sc||!sc.isScene)return;const lite=!!Q.lite;if(GPU_FRACA&&window.__somb670)window.__somb670.luzes(sc);try{papelApply(sc);}catch(e){console.error('papel',e);}const LP=Q.papel?PAPEL_P:LITE_P,LS=Q.papel?PAPEL_S:LITE_S;
   const pts=[],dirs=[],spots=[],rects=[];
   sc.traverse(o=>{if(!o.isLight||o.userData.padLight||o.userData.lantern431)return;if(o.userData.cs0===undefined)o.userData.cs0=o.castShadow;
     if(o.isRectAreaLight){if(o.visible||o.userData.liteOff)rects.push(o);}});
@@ -8363,7 +8368,7 @@ function warmPoll210(ext,deadline){
   }
 }
 async function warmBatch210(pending,revision,onProgress,completed){
-  const ext=warmExt210(),concurrency=LOAD424.startup?(WARM210.limit||4):1;let cursor=0,ready=[],waiting=[],done=0,lastProgress=-1,stalledAt=performance.now();
+  const ext=warmExt210(),concurrency=(LOAD424.startup||(GPU_FRACA&&PERF130.busy))?(WARM210.limit||4):1;let cursor=0,ready=[],waiting=[],done=0,lastProgress=-1,stalledAt=performance.now();
   // A journey can interrupt Papel's background warmup. Adopt that program so
   // the loading renderer never reads its uniforms before compilation ends.
   if(ext)for(const p of LEVE6.pendGL)warmTrack210(p);
@@ -8487,7 +8492,7 @@ function roomQuality130(key,R){
  lightBudget(R.scene);
 }
 
-function qualityPR(n){const d=devicePixelRatio||1;if(Q.papel)return Math.min(DRS.escala,d);if(n==='leve')return Math.min(1,d);if(n==='classico')return Math.min(1.15,d);if(n==='alto')return Math.min(1.45,d);return PR;}
+function qualityPR(n){const d=devicePixelRatio||1;if(Q.papel)return Math.min(DRS.escala,d);if(n==='leve')return Math.min(1,d);if(n==='classico')return Math.min(GPU_FRACA?1:1.15,d);if(n==='alto')return Math.min(GPU_FRACA?1:1.45,d);return PR;}
 function setQuality(n,opt){opt=opt||{};const papel=(n==='papel');if(papel||!qb[n])n='leve';if(papel&&!Q.papel){DRS.escala=DRS.max;DRS.amostras.length=0;DRS.boas=0;}Q.papel=papel;papelBody();Q.name=n;Q.startup=!!opt.startup;const wasLite=!!Q.lite;Q.lite=(n==='leve');
   if(n==='ultra'){Q.sao=true;Q.bokeh=true;Q.refl=true;Q.slices=22;}
   else if(n==='alto'){Q.sao=true;Q.bokeh=false;Q.refl=true;Q.slices=12;}
@@ -8498,7 +8503,7 @@ function setQuality(n,opt){opt=opt||{};const papel=(n==='papel');if(papel||!qb[n
   renderer.outputEncoding=Q.lite?THREE.LinearEncoding:THREE.sRGBEncoding;renderer.setPixelRatio(p);
   if(!Q.lite){composer.setPixelRatio(p);composer.setSize(innerWidth,innerHeight);}else if(!wasLite){renderer.setSize(innerWidth,innerHeight,false);}
   if(window.__FIRE){const v=window.__FIRE.vol;v.visible=!(n==='classico'||n==='leve'||Q.startup);const st=n==='ultra'?36:22;if(v.material.defines.STEPS!==st){v.material.defines.STEPS=st;v.material.needsUpdate=true;}}
-  sao.enabled=Q.sao;bokeh.enabled=Q.bokeh;refl.visible=Q.refl;M.floor.opacity=Q.refl?0.82:1.0;M.floor.transparent=Q.refl;M.floor.needsUpdate=true;if(window.__hallMarbleQuality)window.__hallMarbleQuality();if(window.__hrefl){window.__hrefl.visible=Q.refl;}if(window.__srefl){window.__srefl.visible=Q.refl;}if(window.__krefl){window.__krefl.visible=Q.refl;}if(window.__frefl){window.__frefl.visible=Q.refl;}if(window.__yrefl){window.__yrefl.visible=Q.refl;}if(window.__MY){window.__MY.floor.opacity=Q.refl?0.86:1.0;window.__MY.floor.transparent=Q.refl;window.__MY.floor.needsUpdate=true;}if(window.__CM){window.__CM.floor.opacity=Q.refl?0.86:1.0;window.__CM.floor.transparent=Q.refl;window.__CM.floor.needsUpdate=true;}if(window.__CATSHAFTS){const nn=n==='ultra'?4:(n==='alto'?2:(n==='classico'?1:2));for(const s of window.__CATSHAFTS)s.visible=s.userData.idx<nn;}if(window.__SM){window.__SM.floor.opacity=Q.refl?0.8:1.0;window.__SM.floor.transparent=Q.refl;window.__SM.floor.needsUpdate=true;}if(window.__HM){window.__HM.floor.opacity=Q.refl?0.8:1.0;window.__HM.floor.transparent=Q.refl;window.__HM.floor.needsUpdate=true;}
+  sao.enabled=Q.sao;bokeh.enabled=Q.bokeh;refl.visible=Q.refl;bloom.enabled=!GPU_FRACA;M.floor.opacity=Q.refl?0.82:1.0;M.floor.transparent=Q.refl;M.floor.needsUpdate=true;if(window.__hallMarbleQuality)window.__hallMarbleQuality();if(window.__hrefl){window.__hrefl.visible=Q.refl;}if(window.__srefl){window.__srefl.visible=Q.refl;}if(window.__krefl){window.__krefl.visible=Q.refl;}if(window.__frefl){window.__frefl.visible=Q.refl;}if(window.__yrefl){window.__yrefl.visible=Q.refl;}if(window.__MY){window.__MY.floor.opacity=Q.refl?0.86:1.0;window.__MY.floor.transparent=Q.refl;window.__MY.floor.needsUpdate=true;}if(window.__CM){window.__CM.floor.opacity=Q.refl?0.86:1.0;window.__CM.floor.transparent=Q.refl;window.__CM.floor.needsUpdate=true;}if(window.__CATSHAFTS){const nn=n==='ultra'?4:(n==='alto'?2:(n==='classico'?1:2));for(const s of window.__CATSHAFTS)s.visible=s.userData.idx<nn;}if(window.__SM){window.__SM.floor.opacity=Q.refl?0.8:1.0;window.__SM.floor.transparent=Q.refl;window.__SM.floor.needsUpdate=true;}if(window.__HM){window.__HM.floor.opacity=Q.refl?0.8:1.0;window.__HM.floor.transparent=Q.refl;window.__HM.floor.needsUpdate=true;}
   if(window.__decor)decorQuality128();
   SLICES.forEach((s,i)=>{s.visible=i<Q.slices;s.material.uniforms.op.value=(0.055*22/Q.slices)*(1-i/Q.slices*0.85);});
   for(const k in qb)qb[k].classList.toggle('on',(Q.papel?k==='papel':k===n)&&!AUTO_QUALITY);if(qAuto)qAuto.classList.toggle('on',AUTO_QUALITY);
@@ -8513,7 +8518,7 @@ for(const k in qb)qb[k].addEventListener('click',()=>{if(PERF130.busy){if(k==='l
    atrás do carregamento ou da transição; qualidade maior só por escolha manual. */
 const AQ={ligado:false,boot:true,inicio:0,liberado:false,calibrando:false,calInicio:0,calFrames:0,calTempo:0,calRuins:0};
 const AQ2={alvo:'leve',am:[],ruins:0,inicio:0,ignorarAte:0,janelas:0,subiu:false}; // v150: medição do arranque em Papel
-function autoQIniciar(){AUTO_QUALITY=false;AUTO_MANUAL=false;AQ.ligado=true;AQ.boot=true;AQ.inicio=performance.now();AQ.liberado=false;AQ.calibrando=false;AQ2.alvo='leve';setQuality('papel',{auto:true,startup:true});}
+function autoQIniciar(){AUTO_QUALITY=false;AUTO_MANUAL=false;AQ.ligado=true;AQ.boot=true;AQ.inicio=performance.now();AQ.liberado=false;AQ.calibrando=false;AQ2.alvo='leve';setQuality((GPU_FRACA&&!TOUCHDEV&&!/[?&#]leve670=0/i.test(location.search+location.hash))?'leve':'papel',{auto:true,startup:true});}
 // Após o livro sair, mede apenas uma vez o comportamento em Leve. Se houver folga consistente,
 // promove silenciosamente para Clássico. Nunca passa de Clássico automaticamente e nunca fica
 // alternando qualidade durante a sessão. Qualquer clique manual encerra esta calibração.
@@ -21219,7 +21224,7 @@ function renderPortal(p,bb,slow){
 let portalEma=0.016; // média móvel do tempo de quadro: com o jogo lento (< 33 fps), os portais passam a atualizar em quadros alternados
 function renderPortals(){if(Q.startup||!PORTALS.length||fadeOnAt)return;frameN++;camera.updateMatrixWorld();camera.matrixWorldInverse.copy(camera.matrixWorld).invert();portalEma+=(lastDt-portalEma)*0.08;
   // Compilation belongs to the loading screen, never the gameplay draw loop.
-  const list=[];for(const p of PORTALS){if(p.sceneA!==ACTIVE||p.fechado223){p.bb=null;continue;}const bb=portalBBox(p);p.bb=bb;if(!bb)continue;p.seen=frameN;list.push(p);}
+  const list=[];for(const p of PORTALS){if(p.sceneA!==ACTIVE||p.fechado223||(window.__port670&&window.__port670.pula(p))){p.bb=null;continue;}const bb=portalBBox(p);p.bb=bb;if(!bb)continue;p.seen=frameN;list.push(p);}
   const near409=list.filter(p=>{const pos=new THREE.Vector3().setFromMatrixPosition(p.quad.matrixWorld);return camera.position.distanceTo(pos)<4.2&&p.bb.frac>.035;}).sort((a,b)=>b.bb.area-a.bb.area)[0];
   if(near409){renderPortal(near409,near409.bb,portalEma>.03);const R=near409.roomKey&&ROOMS[near409.roomKey];if(R&&R!==ROOM){R.tick?.(Math.min(.12,lastDt));near409.tickF=frameN;}return;}
   // alvos de portais fora de vista há muito tempo são liberados (voltam a ser criados quando reaparecem)
@@ -21229,9 +21234,9 @@ function renderPortals(){if(Q.startup||!PORTALS.length||fadeOnAt)return;frameN++
   {const novo=list.find(p=>p.mat.uniforms.ready.value===0);if(novo){renderPortal(novo,novo.bb,portalEma>0.03);const R0=novo.roomKey&&ROOMS[novo.roomKey];if(R0&&R0!==ROOM){novo.tickF=frameN;try{R0.tick(Math.min(0.12,lastDt));}catch(e){}}return;}}
   // orçamento por qualidade: os maiores vãos todo quadro (parados, a cada 4 quadros), os pequenos em rodízio, e um teto de pixels por quadro
   const slow=portalEma>0.03;
-  if(Q.lite&&!list.some(p=>p.bb.frac>0.3||p.cortina223)&&frameN%(Q.papel?(slow?10:6):(slow?6:4)))return; // Leve: um portal a cada 4 quadros (6 quando o aparelho não acompanha) — os vãos viram quadros quase estáticos
+  if((Q.lite||GPU_FRACA)&&!list.some(p=>p.bb.frac>0.3||p.cortina223)&&frameN%(Q.papel?(slow?10:6):(slow?6:4)))return; // Leve: um portal a cada 4 quadros (6 quando o aparelho não acompanha) — os vãos viram quadros quase estáticos
   if(!Q.lite&&slow&&!list.some(p=>p.bb.frac>0.3||p.cortina223)&&frameN%2)return; // demais qualidades: com o quadro pesado, portais só em quadros alternados
-  const K=Q.lite?{full:0,slow:1,minFrac:0,px:Q.papel?0.06e6:0.18e6}:(Q.name==='classico'?{full:1,slow:1,minFrac:0.02,px:0.8e6}:(Q.name==='alto'?{full:2,slow:1,minFrac:0.01,px:1.6e6}:{full:3,slow:2,minFrac:0.006,px:2.6e6}));
+  const K=(Q.lite||GPU_FRACA)?{full:0,slow:1,minFrac:0,px:Q.papel?0.06e6:0.18e6}:(Q.name==='classico'?{full:1,slow:1,minFrac:0.02,px:0.8e6}:(Q.name==='alto'?{full:2,slow:1,minFrac:0.01,px:1.6e6}:{full:3,slow:2,minFrac:0.006,px:2.6e6}));
   list.sort((a,b)=>b.bb.area-a.bb.area);const todo=[],rest=[];let nf=0;
   for(const p of list){if(nf<K.full&&p.bb.frac>=K.minFrac){nf++;if(!(frameN-p.last<4&&portalStill(p)))todo.push(p);}else rest.push(p);}
   rest.sort((a,b)=>b.bb.area*(1+Math.min(30,frameN-b.last))-a.bb.area*(1+Math.min(30,frameN-a.last)));let ns=0;for(const p of rest){if(ns>=K.slow)break;if(frameN-p.last<4&&portalStill(p))continue;todo.push(p);ns++;}
@@ -21246,7 +21251,7 @@ const MIUDO_R=0.32,MEDIO_R=0.55;let miudosN=0,mediosN=0;
 function markMiudos(sc){sc.updateMatrixWorld(true);const skip=new Set();try{READER.g.traverse(o=>skip.add(o));}catch(e){}const s=new THREE.Vector3();
   sc.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||o.isSprite||o.isSkinnedMesh||o.isReflector||skip.has(o))return;if(o.layers.mask!==1||o.userData.hitProxy||o.userData.camProxy||o.userData.portal||o.userData.portalKeep)return;
     const g=o.geometry;if(!g||!g.attributes||!g.attributes.position)return;if(!g.boundingSphere)g.computeBoundingSphere();if(!g.boundingSphere||!isFinite(g.boundingSphere.radius))return;o.getWorldScale(s);
-    const r=g.boundingSphere.radius*Math.max(Math.abs(s.x),Math.abs(s.y),Math.abs(s.z));if(r<MIUDO_R){o.layers.set(2);miudosN++;}else if(r<MEDIO_R){o.layers.set(3);mediosN++;}});}
+    const r=g.boundingSphere.radius*Math.max(Math.abs(s.x),Math.abs(s.y),Math.abs(s.z));if(r<MIUDO_R){o.layers.set(2);miudosN++;if(GPU_FRACA)o.castShadow=false;}else if(r<MEDIO_R){o.layers.set(3);mediosN++;}});}
 for(const hn in HALLS)markMiudos(HALLS[hn].scene); // as salas passam por markMiudos ao nascer (finishRoom)
 // ---- um par de portais por sala: Hall → sala (no arco da rotunda) e sala → Hall (no vão da porta da sala) ----
 for(const hn in HALLS)HALLS[hn].scene.updateMatrixWorld(true);
@@ -22874,7 +22879,7 @@ function showLoading133(){
  (button.hidden?panel:button).focus({preventScroll:true});
 }
 async function fadeTo(fn,options={}){
- if(PERF130.busy||QUIET434.job)return;
+ if(PERF130.busy)return;if(QUIET434.job&&!(window.__port670&&window.__port670.cancelar(options)))return;
  // Explicit quality requests retain the user's selection. Automatic promotion
  // is exclusively the already guarded Papel -> Leve preparation pipeline.
  const kind=options.kind||'travel',id=++QUIET434.serial;
@@ -22892,7 +22897,7 @@ async function fadeTo(fn,options={}){
   // texture uploads, shader completion, portal previews and camera BVHs.
   PERF130.busy=false;last=performance.now();
   await travel434Yield();prepCheck131(revision);
-  await travel434Prepare(ACTIVE,revision);
+  if(QUIET434.job&&QUIET434.job.id===id)QUIET434.job.fundo=true;await travel434Prepare(ACTIVE,revision);
   prepCheck131(revision);PERF130.error=null;QUIET434.stats.transitions++;
  }catch(error){
   if(error===PREP_CANCEL131||id!==QUIET434.serial){QUIET434.stats.cancelled++;return;}
@@ -54419,7 +54424,7 @@ function tick(dt){t+=dt;witch310Tick(t);
   // haze de calor: projeta o fogo na tela
   tmpV.copy(FIREPOS).project(camera);grade.uniforms.fire.value.set(tmpV.x*0.5+0.5,tmpV.y*0.5+0.5);grade.uniforms.fireOn.value=(CUR==='room'&&ROOM===ROOMS.lib&&tmpV.z<1&&tmpV.z>-1)?1:0;grade.uniforms.t.value=t;
 }
-function draw(dt){lastDt=dt;if(Q.lite)try{papelPasso190();}catch(e){}renderPortals();if(Q.lite){renderer.setRenderTarget(null);renderer.render(ACTIVE,camera);}else composer.render();
+function draw(dt){lastDt=dt;if(Q.lite)try{papelPasso190();}catch(e){}if(GPU_FRACA&&window.__cull670)window.__cull670.passo(dt);renderPortals();if(Q.lite){renderer.setRenderTarget(null);renderer.render(ACTIVE,camera);}else{if(GPU_FRACA&&window.__somb670)window.__somb670.passo();composer.render();}
 }
 tmark('preDraw');warmAudio130();try{tick(0.016);draw(0.016);}catch(e){console.error(e);}tmark('primeiroQuadro'); // primeiro quadro ainda atrás da tela de carregamento
 // O jogo já trabalha por trás do livro, mas ainda no perfil de arranque (mais leve que Leve).
@@ -55623,14 +55628,14 @@ async function travel434Prepare(scene,revision=PERF130.revision,doorways=true){
   memReduz(texture,texture.userData?.semTeto?0:memCap());
   if(performance.now()>=deadline){await travel434Yield();prepCheck131(revision);deadline=performance.now()+1.25;}
  }
- warmCollect(scene);await warmScene130(scene,revision,null,true);prepCheck131(revision);
+ warmCollect(scene,(GPU_FRACA&&!doorways)?(Q.lite?3:11):0);await warmScene130(scene,revision,null,true);prepCheck131(revision);
  // Collision acceleration can be built one mesh at a time without touching
  // the camera blocker list belonging to the currently visible scene.
  const meshes=[];scene.traverseVisible(o=>{if(!o.isMesh||!o.geometry||o.isSkinnedMesh||o.userData.noCam||o.userData.portal||o.userData.dynamic434)return;for(let parent=o.parent;parent&&parent!==scene;parent=parent.parent)if(parent===READER.g||parent.userData.noCam||parent.userData.dynamic434)return;meshes.push(o);});
  deadline=performance.now()+1.25;
  for(const mesh of meshes){camBvh190(mesh.geometry);if(performance.now()>=deadline){await travel434Yield();prepCheck131(revision);deadline=performance.now()+1.25;}}
  await gpuReady130(revision);prepCheck131(revision);
- QUIET434.prepared.set(scene,revision+'|'+key);SCENE_READY133.set(scene,key);
+ QUIET434.prepared.set(scene,revision+'|'+key);if(GPU_FRACA&&!doorways){if(window.__port670)window.__port670.pronto(scene,key);}else SCENE_READY133.set(scene,key);
  if(doorways){const sources=new Set(PORTALS.filter(p=>p.sceneA===scene&&p.sceneB&&p.sceneB!==scene).map(p=>p.sceneB));for(const source of sources){await travel434Prepare(source,revision,false);prepCheck131(revision);}}
  PERF130.transitions.push({scene:scene.uuid,quality:Q.name,ms:Math.round(performance.now()-start),kind:'background434',loading:false});if(PERF130.transitions.length>30)PERF130.transitions.shift();
 }
@@ -55648,7 +55653,7 @@ function quiet434Install(){
  const lightStep=leve6Passo;leve6Passo=function(){if(QUIET434.job)return;return lightStep.apply(this,arguments);};
  const canSwitch=startup344CanSwitch;startup344CanSwitch=function(){return !QUIET434.job&&canSwitch.apply(this,arguments);};
  const sample=startup344Sample;startup344Sample=function(dt){QUIET434.lastFrame=dt;if(QUIET434.job&&!PERF130.busy)QUIET434.travelFrames++;return sample.apply(this,arguments);};
- const portals=renderPortals;renderPortals=function(){if(QUIET434.job)return;return portals.apply(this,arguments);};
+ const portals=renderPortals;renderPortals=function(){if(QUIET434.job&&!window.__port670)return;return portals.apply(this,arguments);};
  // Room builders retain their native 16 ms yield. Doorway preparation uses
  // requestAnimationFrame directly, so it never replaces the const scheduler.
  // A completion fence remains asynchronous; never issue gl.finish/readPixels.
@@ -81307,6 +81312,59 @@ if(VG669.on){try{const _fr=finishRoom;finishRoom=function(key){const r=_fr.apply
   try{if(ROOMS&&ROOMS.viagens&&ROOMS.viagens.scene)setTimeout(()=>{try{vg669Aplica();}catch(e){vg669Erro('aplica',e);}},1500);}catch(e){}
   try{const iv=setInterval(()=>{try{if(VG669.feito){clearInterval(iv);return;}const R=ROOMS.viagens;if(R&&R.scene&&R.ready){clearInterval(iv);setTimeout(()=>{try{vg669Aplica();}catch(e){vg669Erro('aplica',e);}},1200);}}catch(e){}},1000);}catch(e){}}
 window.__viagens669={get stats(){return VG669.stats;},get erros(){return VG669.erros;},aplicar:()=>{VG669.feito=false;vg669Aplica();}};
+
+/* ===== v670 — desempenho em placa de vídeo fraca (bloco GPU670) =====
+   A sonda GPU670 (inserida antes do renderer, TROCA 1) lê o nome da placa pelo WEBGL_debug_renderer_info e decide GPU_FRACA
+   (Intel UHD/Iris/HD Graphics, APUs Radeon, Mali/Adreno/PowerVR, SwiftShader/llvmpipe, ou qualquer aparelho de toque);
+   ?gpu=fraca | ?gpu=forte (ou localStorage mundo.gpu670) forçam. Em placa fraca:
+   · o jogo ARRANCA DIRETO EM LEVE (TROCA autoQIniciar), sem passar pelo Papel — o Papel serrilhado e craquelado (escala 0,85→0,55, sem
+     antialiasing, 4 luzes) era o que o jogador via por minutos, porque a promoção automática Papel→Leve exigia 6 s de quadros perfeitos
+     (mediana ≤ 20 ms, máximo ≤ 40 ms, nenhuma tarefa longa) e nenhuma preparação pendente — em placa integrada isso nunca chega;
+   · antialiasing MSAA no canvas (TROCA renderer) — o Leve e o Papel desenham direto na tela, sem SMAA;
+   · Clássico econômico: sombras PCF (em vez de VSM, que exige dois passes de desfoque por mapa), mapas de sombra atualizados a cada 3 quadros
+     (e sempre ao trocar de cena), 1,0× de resolução (em vez de 1,15×), sem bloom, vãos de porta no orçamento do Leve;
+   · as malhas miúdas (raio < 0,32 m, camada 2) não projetam sombra e, quando ficam menores que ~9 px na tela, passam para a camada 4
+     (invisível para a câmera) e voltam acima de 12 px — menos draw calls no Hall e nas salas grandes (só malhas sem emissivo);
+   · preparação de fundo (travel434Prepare) das salas vistas pelos vãos só com os materiais que o vão desenha (máscara 3/11), e sem
+     marcar a sala como pronta (a entrada prepara o resto atrás da tela de carregamento, com 4 compilações em paralelo);
+   Para todos os aparelhos:
+   · uma viagem pedida DURANTE a preparação de fundo (QUIET434.job já com `fundo` marcado: a tela de carregamento acabou, travel434Prepare
+     está preparando as cenas vistas pelos vãos) CANCELA a preparação e segue —
+     antes, fadeTo simplesmente devolvia e a porta não abria enquanto a preparação não acabasse (134 s medidos numa UHD 770);
+   · durante a preparação de fundo os vãos de porta continuam sendo desenhados para as cenas já prontas (os outros guardam a última imagem).
+   Gancho window.__gpu670 (fraca, str, integrada, forcado, aa, stats, erros); ?cull670=0 desliga a ocultação dos miúdos; ?leve670=0 volta ao
+   arranque em Papel; ?aa670=0 desliga o MSAA. */
+const GPU670S={cull:{on:!/[?&#]cull670=0/i.test(location.search+location.hash),t:0,cenas:new WeakMap(),escondidos:0,mostrados:0,ocultosAgora:0,lista:0,px:9,pxVolta:12,passos:0},
+  somb:{n:0,cena:null,luzes:0,atualiza:0},port:{prontos:new WeakMap(),pulados:0,cancelados:0,marcados:0},erros:[]};
+function gpu670Erro(onde,e){GPU670S.erros.push(onde+': '+(e&&e.message||e));if(GPU670S.erros.length>20)GPU670S.erros.shift();}
+// ---- vãos de porta durante a preparação de fundo ----
+function port670Pronto(sc){const k=prepRenderKey133();return SCENE_READY133.get(sc)===k||GPU670S.port.prontos.get(sc)===k;}
+window.__port670={
+  pula(p){try{if(!QUIET434.job||!p.sceneB||p.sceneB===ACTIVE)return false;if(port670Pronto(p.sceneB))return false;p.seen=frameN;GPU670S.port.pulados++;return true;}catch(e){gpu670Erro('pula',e);return false;}},
+  pronto(sc,k){try{GPU670S.port.prontos.set(sc,k);GPU670S.port.marcados++;}catch(e){gpu670Erro('pronto',e);}},
+  cancelar(options){try{if(PERF130.busy||fadeOnAt||!QUIET434.job||!QUIET434.job.fundo)return false;PERF130.revision++;QUIET434.serial++;QUIET434.job=null;GPU670S.port.cancelados++;return true;}catch(e){gpu670Erro('cancelar',e);return false;}},
+  stats:GPU670S.port};
+// ---- sombras do Clássico em placa fraca: um mapa a cada 3 quadros, sempre ao trocar de cena; normalBias para o PCF ----
+window.__somb670={
+  passo(){try{if(Q.lite||!renderer.shadowMap.enabled)return;const S=GPU670S.somb;renderer.shadowMap.autoUpdate=false;S.n++;if(ACTIVE!==S.cena||S.n%3===0){renderer.shadowMap.needsUpdate=true;S.cena=ACTIVE;S.atualiza++;}}catch(e){gpu670Erro('sombras',e);}},
+  luzes(sc){try{const S=GPU670S.somb;sc.traverse(o=>{if(!o.isLight||!o.shadow||o.userData.somb670)return;o.userData.somb670=true;S.luzes++;if(!(o.shadow.normalBias>0.02))o.shadow.normalBias=0.02;});}catch(e){gpu670Erro('luzes',e);}},
+  stats:GPU670S.somb};
+// ---- miúdos longe da câmera saem da camada 2 (vista) para a camada 4 (invisível) ----
+function cull670Lista(sc){const C=GPU670S.cull;let e=C.cenas.get(sc);const now=performance.now();if(e&&now-e.t<4000)return e.lista;const lista=[];const s=new THREE.Vector3();
+  sc.traverse(o=>{if(!o.isMesh||(o.layers.mask!==4&&o.layers.mask!==16))return;
+    if(o.userData.r670===undefined){const g=o.geometry;let r=-1;if(g&&g.boundingSphere&&isFinite(g.boundingSphere.radius)){o.getWorldScale(s);r=g.boundingSphere.radius*Math.max(Math.abs(s.x),Math.abs(s.y),Math.abs(s.z));}
+      const m=Array.isArray(o.material)?o.material[0]:o.material;if(m&&m.emissive&&m.emissive.getHex()!==0&&(m.emissiveIntensity===undefined||m.emissiveIntensity>0))r=-1;if(o.userData.fx||o.userData.hitProxy||o.userData.camProxy)r=-1;o.userData.r670=r;}
+    if(o.userData.r670>0)lista.push(o);});
+  if(!e){e={t:now,lista};C.cenas.set(sc,e);}else{e.t=now;e.lista=lista;}C.lista=lista.length;return lista;}
+window.__cull670={
+  passo(dt){const C=GPU670S.cull;try{if(!C.on||Q.startup||!ACTIVE||!camera)return;C.t+=(dt>0&&dt<1?dt:0.016);if(C.t<0.25)return;C.t=0;C.passos++;
+    const lista=cull670Lista(ACTIVE);if(!lista.length)return;const H=renderer.domElement.height||innerHeight;const f=H/(2*Math.tan(camera.fov*Math.PI/360));const cx=camera.position.x,cy=camera.position.y,cz=camera.position.z;let oc=0;
+    for(const o of lista){const m=o.matrixWorld.elements;const dx=m[12]-cx,dy=m[13]-cy,dz=m[14]-cz;const d=Math.sqrt(dx*dx+dy*dy+dz*dz);const px=d>1e-3?2*o.userData.r670*f/d:1e9;
+      if(o.layers.mask===4){if(px<C.px){o.layers.set(4);C.escondidos++;oc++;}}else if(o.layers.mask===16){if(px>C.pxVolta){o.layers.set(2);C.mostrados++;}else oc++;}}
+    C.ocultosAgora=oc;}catch(e){gpu670Erro('cull',e);}},
+  mostrarTudo(sc){try{(sc||ACTIVE).traverse(o=>{if(o.isMesh&&o.layers.mask===16)o.layers.set(2);});}catch(e){gpu670Erro('mostrarTudo',e);}},
+  stats:GPU670S.cull};
+try{Object.assign(window.__gpu670,{stats:GPU670S,erros:GPU670S.erros,touch:!!TOUCHDEV,leveDireto:GPU_FRACA&&!TOUCHDEV&&!/[?&#]leve670=0/i.test(location.search+location.hash)});}catch(e){gpu670Erro('gancho',e);}
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
