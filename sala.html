@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v682</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v683</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -21120,7 +21120,7 @@ let ROOM=ROOMS.lib;
 const ROOM_BUILDERS={minha:build_minha,sci:build_sci,cat:build_cat,fant:build_fant,adv:build_adv,mys:build_mys,vila:build_vila,guerra:build_guerra,outono:build_outono,quadrinhos:build_quadrinhos,bosque:build_bosque,acropole:build_acropole,fazenda:build_fazenda,arena:build_arena,digital:build_digital,poesia:build_poesia,mitologia:build_mitologia,infantil:build_infantil,classicos:build_classicos,autoajuda:build_autoajuda,biografia:build_biografia,cronica:build_cronica,ciencia:build_ciencia,filosofia:build_filosofia,cordel:build_cordel};
 const FLOOR1_ORDER=['fant','sci','cat','adv'],FLOOR2_ORDER=['mys','vila','guerra','outono','quadrinhos'],FLOOR3_ORDER=['bosque','acropole','fazenda','arena','digital'],FLOOR4_ORDER=['poesia','mitologia','infantil','classicos','autoajuda'],FLOOR5_ORDER=['biografia','cronica','ciencia','filosofia','cordel'];
 const ROOM_MS={};const BUILD_Q=[];let buildIdle=0,buildBusy=false,warmedAt=-1,LOADED=false;
-function roomExists(genre){if(genre==='pessoal')return !!(ROOMS.pessoal||ROOM_BUILDERS.pessoal);if(genre==='minha')return !!(ROOMS.minha||ROOM_BUILDERS.minha);const k=GENRE_ROOM[genre];return !!(k&&(ROOMS[k]||ROOM_BUILDERS[k]));}
+function roomExists(genre){if(genre==='pessoal')return !!(ROOMS.pessoal||ROOM_BUILDERS.pessoal);if(genre==='minha')return !!(ROOMS.minha||ROOM_BUILDERS.minha);if(genre==='prologo')return !!(ROOMS.prologo||ROOM_BUILDERS.prologo);const k=GENRE_ROOM[genre];return !!(k&&(ROOMS[k]||ROOM_BUILDERS[k]));}
 let buildIt=null,buildKey=null; // montagem em andamento (gerador) e a sala dela
 // monta a sala inteira agora (quem entra numa sala que ainda não existe espera só o tempo dela, atrás do fade)
 function ensureRoom(key){if(ROOMS[key])return ROOMS[key];const b=ROOM_BUILDERS[key];if(!b)return null;const t0=performance.now();buildBusy=true;
@@ -22909,7 +22909,7 @@ async function fadeTo(fn,options={}){
 }
 
 function openDoor(g,cb){g.userData.open=1;setTimeout(cb,120);} // arco aberto: só um passo e a travessia começa
-function placeHall(genre){const HR=hallRadius(HALLN);const keys=HALLS[HALLN].keys;const i=Math.max(0,keys.indexOf(genre));const th=i/keys.length*Math.PI*2;const r=genre?HR-3.4:2.6;
+function placeHall(genre){const HR=hallRadius(HALLN);const keys=HALLS[HALLN].keys;const i=Math.max(0,keys.indexOf(genre==='prologo'?'minha':genre));const th=i/keys.length*Math.PI*2;const r=genre?HR-3.4:2.6;
   if(genre==='stair'&&HALLX.stair){const SS=(HALLX.stairs||[]).find(q=>q.to===STAIR_FROM)||HALLX.stair;const A=SS.angle;CH.x=Math.cos(A)*(HR-2.6);CH.z=Math.sin(A)*(HR-2.6);CH.dir=Math.atan2(-CH.x,-CH.z);}else if(genre){CH.x=Math.cos(th)*r;CH.z=Math.sin(th)*r;CH.dir=Math.atan2(-CH.x,-CH.z);}else{CH.x=0.6;CH.z=-3.4;CH.dir=Math.atan2(0-CH.x,0-CH.z);CAM.pitch=CAMDEF.pitch;CAM.dist=CAMDEF.dist;}if(VJ.touch){CAM.pitch=CAMDEF.pitch;CAM.dist=CAMDEF.dist;}if(HALLN===1&&!genre){CAM.pitch=VJ.touch?.65:.43;CAM.dist=8.0;}CAM.follow=false;
   CH.target=null;CH.onArrive=null;CH.sitting=false;CH.vx=CH.vz=0;CAM.yaw=CH.dir+Math.PI;camInit=false;syncP();HALL_DOORS.forEach(d=>{d.userData.open=0;d.userData.leaves.forEach(pv=>pv.rotation.y=0);});}
 window.__hallCheck109=()=>({radius:hallRadius(HALLN),clamp:HALL_WORLD.clamp(30,0,.3),fronts:HALL_DOORS.map(g=>({genre:g.userData.genre,front:doorFront(g,1.8),radius:Math.hypot(g.position.x,g.position.z)})),camera:{pitch:CAM.pitch,dist:CAM.dist},shop:HALLS[1].X.shop.position.toArray()});
@@ -22918,7 +22918,7 @@ function goHall(n,viaStair){return fadeTo(async()=>{const revision=PERF130.revis
 function syncP(){P.x=CH.x;P.z=CH.z;P.yaw=CH.dir+Math.PI;P.pitch=0;vx=vz=0;}
 function placeRoom(){if(ROOM.reset)ROOM.reset();const sp=ROOM.spawn;CH.x=sp.x;CH.z=sp.z;CH.dir=sp.dir;CH.target=null;CH.onArrive=null;CH.sitting=false;CH.vx=CH.vz=0;CAM.yaw=0.28;if(VJ.touch){CAM.pitch=CAMDEF.pitch;CAM.dist=CAMDEF.dist;}else CAM.pitch=Math.max(CAM.pitch,0.42);CAM.follow=false;camInit=false;syncP();}
 function roomTitle(genre){if(genre==='minha')return window.VISITA?('Sala de '+(window.VISITA.nome||'um leitor')):'Minha Sala';return 'Sala · '+(EST.GENEROS[genre]?EST.GENEROS[genre].nome:'');}
-function enterRoom(genre){if(!roomExists(genre)){showToast('Sala em construção — em breve');return;}fadeTo(async()=>{const revision=PERF130.revision;const R=await ensureRoom130(genre==='pessoal'?'pessoal':genre==='minha'?'minha':GENRE_ROOM[genre]);if(!R){showToast('Não deu para montar esta sala — tente de novo');return;}prepCheck131(revision);if(R._booksDirty)buildBooksFor(R);await travel434Prepare(R.scene,revision);prepCheck131(revision);CUR='room';CUR_GENRE=genre;ROOM=R;WORLD=ROOM.world;if(ROOM._booksDirty)buildBooksFor(ROOM);setActive(ROOM.scene);placeRoom();try{cavEntrar(GENRE_ROOM[CUR_GENRE]);}catch(e){}
+function enterRoom(genre){if(!roomExists(genre)){showToast('Sala em construção — em breve');return;}fadeTo(async()=>{const revision=PERF130.revision;const R=await ensureRoom130(genre==='pessoal'?'pessoal':genre==='minha'?'minha':genre==='prologo'?'prologo':GENRE_ROOM[genre]);if(!R){showToast('Não deu para montar esta sala — tente de novo');return;}prepCheck131(revision);if(R._booksDirty)buildBooksFor(R);await travel434Prepare(R.scene,revision);prepCheck131(revision);CUR='room';CUR_GENRE=genre;ROOM=R;WORLD=ROOM.world;if(ROOM._booksDirty)buildBooksFor(ROOM);setActive(ROOM.scene);placeRoom();try{cavEntrar(GENRE_ROOM[CUR_GENRE]);}catch(e){}
   if(genre==='minha')try{salaLembrancas();}catch(e){}
   if(titleEl)titleEl.textContent=roomTitle(genre);if(btnHall)btnHall.hidden=false;hintFor();});}
 function jump(where,genre){try{if(genre!=='minha'&&typeof salaDecorar==='function'&&typeof SALA_ED!=='undefined'&&SALA_ED.ativo)salaDecorar(false);}catch(e){}
@@ -24508,7 +24508,7 @@ function cavLoad(){try{const d=JSON.parse(localStorage.getItem(CAV_KEY)||'null')
   if(WEBMASTER)CAV.estado.fogo=true;cavSave();}
 function cavSalasTotal(){return Object.values(GENRE_ROOM).filter(k=>k&&k!=='minha').length;}
 function cavLimpasN(){return Object.values(GENRE_ROOM).filter(k=>CAV.estado.limpas[k]).length;}
-function cavRoom(){return CUR==='room'&&CUR_GENRE&&CUR_GENRE!=='minha'?GENRE_ROOM[CUR_GENRE]:null;}
+function cavRoom(){return CUR==='room'&&CUR_GENRE&&CUR_GENRE!=='minha'&&CUR_GENRE!=='prologo'?GENRE_ROOM[CUR_GENRE]:null;}
 function cavY(R,x,z){return ((R&&R.floorY)?R.floorY(x,z):0)+1.35;}
 // ---- pontos de nascimento: células da malha a 7–24 m da entrada, com folga em volta e afastadas entre si ----
 function cavPontos(R,room){const world=R.world;let nav;try{nav=navFor(world);}catch(e){return [];}const {S,N,H,walk}=nav;const ci=v=>Math.max(0,Math.min(N-1,Math.floor((v+H)/S)));
@@ -41877,11 +41877,11 @@ function proTirar(k){const E=LOJA.equip;if(k==='veste')E.traje=null;else if(k===
 // v204: o vão da porta chama goHall a cada quadro — som e aviso com intervalo (sem encher o Diário), e o aviso não entra na fila atrás do aviso grande de chegada (que já diz que a porta não abre)
 function proPortaFechada(){const agora=performance.now();if(agora>=(PRO.somAte||0)){PRO.somAte=agora+1400;try{if(window.__mus199)window.__mus199.sfx('bloqueado');}catch(e){}}
   if(agora<(PRO.portaAte||0))return;PRO.portaAte=agora+4500;try{if(typeof toastUntil!=='undefined'&&agora<toastUntil&&toastBig)return;}catch(e){}showToast('A porta não cede. Algo nesta sala ainda não terminou com você…');}
-function proTrancado(){return PRO.trava&&!PRO.permitir&&CUR==='room'&&CUR_GENRE==='minha';} // v679
-{ const _tr=travel;travel=function(key){if(proTrancado()&&key!=='minha'){proPortaFechada();return;}return _tr.apply(this,arguments);};
+function proTrancado(){return PRO.trava&&!PRO.permitir&&CUR==='room'&&CUR_GENRE==='prologo';} // v679/v683
+{ const _tr=travel;travel=function(key){if(proTrancado()&&key!=='prologo'){proPortaFechada();return;}return _tr.apply(this,arguments);};
   const _gh=goHall;goHall=function(){if(proTrancado()){proPortaFechada();return;}return _gh.apply(this,arguments);};
-  const _er=enterRoom;enterRoom=function(g){if(proTrancado()&&g!=='minha'){proPortaFechada();return;}return _er.apply(this,arguments);};
-  const _jp=jump;jump=function(where,genre){if(proTrancado()&&!(where==='room'&&genre==='minha')){proPortaFechada();return;}return _jp.apply(this,arguments);};
+  const _er=enterRoom;enterRoom=function(g){if(proTrancado()&&g!=='prologo'){proPortaFechada();return;}return _er.apply(this,arguments);};
+  const _jp=jump;jump=function(where,genre){if(proTrancado()&&!(where==='room'&&genre==='prologo')){proPortaFechada();return;}return _jp.apply(this,arguments);};
   if(window.__travel)window.__travel=travel;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__jump=jump; }
 /* ---- o Colecionador de Histórias: figura alta de páginas rasgadas e tinta ---- */
 function proPaginaTex(){return t162Tex('v201 página rasgada',128,192,(x,w,h)=>{x.clearRect(0,0,w,h);x.fillStyle='#efe4c8';x.beginPath();x.moveTo(6,4);x.lineTo(w-5,2);x.lineTo(w-3,h*0.4);x.lineTo(w-9,h*0.55);x.lineTo(w-2,h*0.7);x.lineTo(w-14,h-3);x.lineTo(w*0.6,h-8);x.lineTo(w*0.35,h-2);x.lineTo(4,h-6);x.lineTo(8,h*0.6);x.lineTo(2,h*0.3);x.closePath();x.fill();
@@ -41974,12 +41974,12 @@ function proSpawnRevanche(){try{const E=PRO.estado;if(!E||E.fase!=='revanche'||E
 /* ---- o laço do prólogo ---- */
 function proTick(dt){const E=PRO.estado;if(!E)return;
   if(E.fase==='kit'){if(PRO.cena)return;if(!PRO.kit&&(typeof AQ!=='undefined'&&AQ.liberado)&&!PERF130.busy&&!fadeOnAt&&!buildBusy){proVestirKit();PRO.trava=true;
-      if(!(CUR==='room'&&CUR_GENRE==='minha')){PRO.permitir=true;try{travel('minha');}catch(e){proErro('viagem',e);}PRO.permitir=false;}
+      if(!(CUR==='room'&&CUR_GENRE==='prologo')){PRO.permitir=true;try{travel('prologo');}catch(e){proErro('viagem',e);}PRO.permitir=false;}
       if(PRO.primeiraVez){PRO.avisaChegada=1;PRO.avisaT=0;} /* v204: o aviso sai quando o leitor já está na sala (t252) */ return;}
-    if(CUR==='room'&&CUR_GENRE==='minha'&&!(typeof uiBlocked==='function'&&uiBlocked())){E.tempo=(E.tempo||0)+dt;const px=CH.x,pz=CH.z;if(PRO.ux!==undefined){const d=Math.hypot(px-PRO.ux,pz-PRO.uz);if(d<1)E.andou=(E.andou||0)+d;}PRO.ux=px;PRO.uz=pz;
+    if(CUR==='room'&&CUR_GENRE==='prologo'&&!(typeof uiBlocked==='function'&&uiBlocked())){E.tempo=(E.tempo||0)+dt;const px=CH.x,pz=CH.z;if(PRO.ux!==undefined){const d=Math.hypot(px-PRO.ux,pz-PRO.uz);if(d<1)E.andou=(E.andou||0)+d;}PRO.ux=px;PRO.uz=pz;
       const minT=PRO.rapido?6:60,minD=PRO.rapido?3:20,teto=PRO.rapido?14:120;if(Math.random()<dt/3)proGrava();
       if((E.tempo>=minT&&E.andou>=minD)||E.tempo>=teto){if(!CAV.morto)proIniciaRoubo();}}}
-  else if(E.fase==='roubo'){if(PRO.cena)proCenaTick(dt);else if(CUR==='room'&&CUR_GENRE==='minha'&&!PRO.kit){ // recarregou no meio da cena: termina o roubo sem cena
+  else if(E.fase==='roubo'){if(PRO.cena)proCenaTick(dt);else if(CUR==='room'&&CUR_GENRE==='prologo'&&!PRO.kit){ // recarregou no meio da cena: termina o roubo sem cena
       for(const k of ['veste','ima','botas','dragao'])if(!E.roubados[k])proTirar(k);PRO.kit=false;E.fase='busca';proGrava();try{applyGear();}catch(e){}setTimeout(()=>{try{proAbreAviso();}catch(e){}},800);}
     else if(!PRO.kit){PRO.kit=true;PRO.trava=true;}}
   else if(E.fase==='busca'){PRO.vigiaT=(PRO.vigiaT||0)+dt;if(PRO.vigiaT>1){PRO.vigiaT=0;proVigiaRecuperacao();}}
@@ -42517,7 +42517,7 @@ function pro4Cine(dt){const C=PRO.cena,V=PRO4.cine,W=pro4V();const ativa=!!(C&&C
 { const st=document.createElement('style');st.textContent='body.proCine > :not(canvas):not(#toast):not(.vig):not(#fade):not(#danoFlash):not(#grao){opacity:0 !important;pointer-events:none !important;transition:opacity .5s}';document.head.appendChild(st); }
 /* ---- 4. o aviso de chegada sai na sala; e a Fantasia devolve os guardiões quando o leitor sai dela ---- */
 { const _pt=proTick;proTick=function(dt){_pt.apply(this,arguments);try{
-      if(PRO.avisaChegada&&CUR==='room'&&CUR_GENRE==='minha'&&!fadeOnAt&&!PERF130.busy){PRO.avisaT=(PRO.avisaT||0)+dt;if(PRO.avisaT>1.0){PRO.avisaChegada=0;
+      if(PRO.avisaChegada&&CUR==='room'&&CUR_GENRE==='prologo'&&!fadeOnAt&&!PERF130.busy){PRO.avisaT=(PRO.avisaT||0)+dt;if(PRO.avisaT>1.0){PRO.avisaChegada=0;
         showToast('Você acorda na Sala do Acumulador vestindo a Veste das Constelações, com as botas ligeiras, o ímã de moedas e um dragãozinho de jade ao seu lado. A porta… não abre. Ande pela sala.',{big:true,ms:9000});}}
       if(PRO4.ateSair&&!(CUR==='room'&&CUR_GENRE==='castelo')){PRO4.ateSair=false;pro4Devolve();}}catch(e){pro4Erro('tick',e);}}; }
 window.__prologo204={PRO4,calma:pro4CalmaAtiva,devolve:pro4Devolve};
@@ -42759,7 +42759,7 @@ function pri6Confere(){for(const g of PRI6.luzes){let ok=true;for(let p=g;p;p=p.
 { const _sr=proSpawnRevanche;proSpawnRevanche=function(){const antes=PRO.bossK;const r=_sr.apply(this,arguments);try{const k=PRO.bossK;if(k&&k!==antes&&k.g)pri6Acomoda(k.g);}catch(e){v206Erro('revanche',e);}return r;}; }
 { const _dr=draw;draw=function(dt){if(PRI6.luzes.size){try{pri6Confere();}catch(e){v206Erro('confere luzes',e);}}return _dr.apply(this,arguments);}; }
 // o modelo dele montado e os materiais compilados na preparação da Fantasia (atrás do carregamento de entrada)
-function pri6Ensaio(){const f=proFase();if(!(CUR==='room'&&CUR_GENRE===((f==='kit'||f==='roubo')?'minha':'castelo')))return null;if(f!=='kit'&&f!=='roubo'&&f!=='revanche')return null;if(PRO.cena)return null;
+function pri6Ensaio(){const f=proFase();if(!(CUR==='room'&&CUR_GENRE===((f==='kit'||f==='roubo')?'prologo':'castelo')))return null;if(f!=='kit'&&f!=='roubo'&&f!=='revanche')return null;if(PRO.cena)return null;
   if(!PRI6.chefe||PRI6.chefe.parent){const t0=performance.now();PRI6.chefe=PRI6.monta();PRI6.montadoMs=Math.round(performance.now()-t0);try{const L=PRI6.chefe.userData.pro&&PRI6.chefe.userData.pro.luz;if(L){L.userData.i0=0.0001;L.userData.chefe206=true;}}catch(e){}}
   const grupo=new THREE.Group();grupo.name='v206 · ensaio do Colecionador';grupo.visible=false;grupo.add(PRI6.chefe);
   try{const f1=new THREE.Sprite(new THREE.SpriteMaterial({map:c191Tex('fumaca'),color:0xf4efe4,transparent:true,depthWrite:false,opacity:0.8}));f1.material.userData.papelKeep=true;grupo.add(f1);
@@ -54454,7 +54454,7 @@ async function liberarAbertura(){
  try{
   discardWarm131();Q.startup=false;AQ.boot=false;AQ.liberado=true;AQ.ligado=false;
   AQ.calibrando=false;AQ.calInicio=performance.now();AQ.calFrames=0;AQ.calTempo=0;AQ.calRuins=0;
-  loading424Show('environment');await breathe130();await prepareScene130();
+  loading424Show('environment');await breathe130();try{if(typeof pr683Entrar==='function')pr683Entrar();}catch(e){console.error('v683 entrar',e);}await prepareScene130();
   if(LOAD424.failed||window.__loadErr)throw Error(window.__loadErr||'Loading failed');
   PERF130.error=null;START344.state.readyAt=performance.now();window.__worldReady424=true;
   LOAD424.finished=true;loadingProgress132(100,loading424Text('Pronto!','Ready!'));
@@ -63344,7 +63344,7 @@ function ab524Erro(k,e){AB524.erros.push(k+': '+(e&&e.message||e));try{console.w
 // (1) a abertura: pronta quando o Hall está pronto; com o prólogo («kit») espera a Fantasia
 function ab524Pronto(done){try{if(!AB524.on)return done===FLOOR1_ORDER.length&&!!(ROOMS.fant&&ROOMS.fant.ready)&&!buildBusy&&!buildIt&&!BUILD_Q.length;
   const kit=(typeof proFase==='function'&&proFase()==='kit');AB524.stats.prologo=kit;AB524.stats.salasNaAbertura=done;
-  if(kit)return !!(ROOMS.minha&&ROOMS.minha.ready);return true;}catch(e){ab524Erro('pronto',e);return done===FLOOR1_ORDER.length;}} // v679: o prólogo é na Sala do Acumulador
+  if(kit)return !!(ROOMS.prologo&&ROOMS.prologo.ready);return true;}catch(e){ab524Erro('pronto',e);return done===FLOOR1_ORDER.length;}} // v679: o prólogo é na Sala do Acumulador
 // os portais das salas não entram na preparação da abertura: as salas aquecem depois, nos bastidores (ESC523.aquecer)
 function ab524AdiaPortal(p){try{if(!AB524.on||!LOAD424.startup||!p||!p.roomKey)return false;const E=window.__esc523&&window.__esc523.estado;if(E&&!E.aquecer.includes(p.roomKey))E.aquecer.push(p.roomKey);AB524.stats.portaisAdiados++;return true;}catch(e){ab524Erro('portal',e);return false;}}
 // a fila antiga (BUILD_Q, da tela de carregamento) e um iterador órfão do buildStep passam para os bastidores
@@ -63465,7 +63465,7 @@ function* build_pessoal526(){const t0=performance.now();const T=THREE;
   MS526.stats.ms=Math.round(performance.now()-t0);}
 if(MS526.on){ROOM_BUILDERS.pessoal=build_pessoal526;
   // o Acumulador monta-se nos bastidores logo depois do 1.º andar (a Minha Sala copia dele)
-  try{const ch0=esc523Chaves;esc523Chaves=function(n){const L=ch0.apply(this,arguments);if(n===1&&ROOM_BUILDERS.minha&&!L.includes('minha'))return L.concat(['minha']);return L;};}catch(e){ms526Erro('fila',e);}
+  try{const ch0=esc523Chaves;esc523Chaves=function(n){const L=ch0.apply(this,arguments);if(n===1&&ROOM_BUILDERS.minha&&!L.includes('minha')&&!(typeof pr683Trancada==='function'&&pr683Trancada()))return L.concat(['minha']);return L;};}catch(e){ms526Erro('fila',e);}
   // sem a mobília inicial da v479 (c479Inicial corre no finishRoom('pessoal'), antes da restauração das peças salvas)
   try{if(typeof c479Inicial==='function')c479Inicial=function(){ms526Vazia();};}catch(e){ms526Erro('inicial',e);}
   // as chamas das arandelas tremem como no Acumulador (o tique s199 é o mesmo: o material da nuvem é partilhado)
@@ -82649,7 +82649,7 @@ function pr679Redistribuir(R,forcar){const S=pr679St();if(!S.redistribui||!S.ane
   S.stats.redistribuiMs=Math.round(performance.now()-t0);return plano;}
 /* ---------- 2) o prólogo: a sala e a volta ao Hall ---------- */
 function pr679FaseProl(){try{const f=(typeof proFase==='function')?proFase():'feito';return f;}catch(e){return 'feito';}}
-function pr679Abertura(keys){try{const S=pr679St();if(!S.on)return keys;const f=pr679FaseProl();if((f==='kit'||f==='roubo')&&typeof ROOM_BUILDERS!=='undefined'&&ROOM_BUILDERS.minha&&!keys.includes('minha'))return ['minha'].concat(keys);}catch(e){}return keys;}
+function pr679Abertura(keys){try{const S=pr679St();if(!S.on)return keys;const f=pr679FaseProl();if((f==='kit'||f==='roubo')&&typeof ROOM_BUILDERS!=='undefined'&&ROOM_BUILDERS.minha){pr683Registrar();if(ROOM_BUILDERS.prologo&&!keys.includes('prologo'))return ['prologo'].concat(keys);}}catch(e){}return keys;}
 function pr679Adiar(key){try{if(key!=='minha')return false;const S=pr679St();if(!S.on)return false;const f=pr679FaseProl();if(f==='kit'||f==='roubo'){S.adiado=true;return true;}}catch(e){}return false;}
 function pr679SoInterior(N,R){try{s199Salao(N);}catch(e){pr679Erro('salão 199',e);}try{if(R){R.pr679SemExterior=true;pr679MundoInterior(R);}}catch(e){pr679Erro('mundo interior',e);}}
 // sem a ala (sem `a195Mundo`), a caixa de passeio e da câmera é a do salão inteiro, z −30…90 (a `boxWorld` de fábrica pararia em z 30)
@@ -82696,11 +82696,11 @@ function pr679VoltaHall(){const S=pr679St();if(!S.voltando)return;S.voltaT=(S.vo
   try{PRO.permitir=true;goHall();}catch(e){pr679Erro('goHall',e);}finally{PRO.permitir=false;}}
 { const _pt=proTick;proTick=function(dt){_pt.apply(this,arguments);try{const S=pr679St();if(!S.on)return;const E=PRO.estado;if(!E)return;const f=E.fase;
       // o fim do roubo (com cena ou sem) dentro da Sala do Acumulador: de volta ao Hall
-      if(S.faseAntes==='roubo'&&f==='busca'&&CUR==='room'&&CUR_GENRE==='minha'&&!S.voltando){S.voltando=true;S.seguraAviso=true;S.tentativas=0;S.proxVolta=performance.now()+2200;S.stats.fimRoubo=Date.now();}
+      if(S.faseAntes==='roubo'&&f==='busca'&&CUR==='room'&&CUR_GENRE==='prologo'&&!S.voltando){S.voltando=true;S.seguraAviso=true;S.tentativas=0;S.proxVolta=performance.now()+2200;S.stats.fimRoubo=Date.now();}
       S.faseAntes=f;
       if(S.voltando)pr679VoltaHall();
       // a viagem de ida recusada (preparação em curso) é repetida
-      if(f==='kit'&&PRO.kit&&PRO.trava&&!PRO.cena&&!(CUR==='room'&&CUR_GENRE==='minha')&&!fadeOnAt&&!PERF130.busy&&!buildBusy&&!QUIET434.job){const agora=performance.now();if(agora>=(S.proxIda||0)){S.proxIda=agora+3000;if(S.stats.viagens<12){S.stats.viagens++;try{PRO.permitir=true;travel('minha');}catch(e){pr679Erro('viagem',e);}finally{PRO.permitir=false;}}}}
+      if(f==='kit'&&PRO.kit&&PRO.trava&&!PRO.cena&&!(CUR==='room'&&CUR_GENRE==='prologo')&&!fadeOnAt&&!PERF130.busy&&!buildBusy&&!QUIET434.job){const agora=performance.now();if(agora>=(S.proxIda||0)){S.proxIda=agora+3000;if(S.stats.viagens<12){S.stats.viagens++;try{PRO.permitir=true;travel('prologo');}catch(e){pr679Erro('viagem',e);}finally{PRO.permitir=false;}}}}
       // a área externa adiada: quando o prólogo já passou e a sala está montada (recarregou depois do roubo, ou saiu por outro caminho)
       if(S.adiado&&!S.exteriorFeito&&!S.construindo&&f!=='kit'&&f!=='roubo'&&!S.voltando){S.extT=(S.extT||0)+dt;if(S.extT>6&&!PERF130.busy&&!buildBusy&&ROOMS.minha&&ROOMS.minha.ready){S.extT=0;pr679Exterior();}}
     }catch(e){if(!pr679St().avisouTick){pr679St().avisouTick=1;pr679Erro('tick',e);}}}; }
@@ -82812,10 +82812,10 @@ window.__dentro680={stats:()=>pr679St().stats.dentro680,plano:()=>pr679St().plan
    150 s (contados do fim da abertura) a caixa se vai mesmo assim. Textos em português, inglês e espanhol pela língua do jogo (`__locale428`); a caixa tem `translate="no"`
    para o tradutor não mexer no que está sendo digitado. `?intro681=0` desliga. Gancho `window.__intro681` (`estado`, `fechar`). */
 const PRO681={on:!/[?&#]intro681=0/i.test(location.search+location.hash),ativo:false,digitando:false,pronto:false,revelado:false,acabou:false,el:null,t0:0,chegou:0,erros:[],
-  textos:{'pt-BR':['Este castelo tem um ladrão. Chamam-no de Acumulador.','Ele fica com tudo o que não é dele: livros, mapas, brinquedos, lembranças.','Esta sala é o esconderijo dele — cheia do que ele tomou.','Você acorda aqui com a veste, as botas, o ímã e um dragãozinho de jade.','Ele já sabe. E vai querer tudo isso.','Explore a sala. Ande entre as coisas que ele guardou — antes que ele chegue.'],
-    'en-US':['This castle has a thief. They call him the Collector.','He keeps everything that is not his: books, maps, toys, memories.','This room is his hideout — full of what he took.','You wake up here with the vestment, the boots, the magnet and a little jade dragon.','He already knows. And he will want all of it.','Explore the room. Walk among the things he kept — before he comes.'],
-    'es':['Este castillo tiene un ladrón. Lo llaman el Coleccionista.','Se queda con todo lo que no es suyo: libros, mapas, juguetes, recuerdos.','Esta sala es su escondite — llena de lo que tomó.','Despiertas aquí con la veste, las botas, el imán y un dragoncito de jade.','Él ya lo sabe. Y va a querer todo eso.','Explora la sala. Camina entre las cosas que él guardó — antes de que llegue.']},
-  dicas:{'pt-BR':['clique ou pressione uma tecla para explorar a sala','preparando a sala…'],'en-US':['click or press a key to explore the room','preparing the room…'],'es':['haz clic o pulsa una tecla para explorar la sala','preparando la sala…']},
+  textos:{'pt-BR':['Este castelo tem um ladrão: o Acumulador.','Livros, mapas, brinquedos, lembranças — tudo o que não lhe pertence vai parar nesta sala.','Por enquanto, vazia. Você acorda aqui com a veste, as botas, o ímã e um dragãozinho de jade.','E o Acumulador já está à sua frente, de olho no que é seu.','Esta porta só abre com uma chave, guardada no segundo andar do castelo.'],
+    'en-US':['This castle has a thief: the Collector.','Books, maps, toys, memories — everything that is not his ends up in this room.','Empty, for now. You wake up here with the vestment, the boots, the magnet and a little jade dragon.','And the Collector is already in front of you, eyeing what is yours.','This door only opens with a key, kept on the second floor of the castle.'],
+    'es':['Este castillo tiene un ladrón: el Coleccionista.','Libros, mapas, juguetes, recuerdos — todo lo que no le pertenece acaba en esta sala.','Vacía, por ahora. Despiertas aquí con la veste, las botas, el imán y un dragoncito de jade.','Y el Coleccionista ya está frente a ti, con los ojos en lo que es tuyo.','Esta puerta solo se abre con una llave, guardada en el segundo piso del castillo.']},
+  dicas:{'pt-BR':['clique ou pressione uma tecla para continuar','preparando a sala…'],'en-US':['click or press a key to continue','preparing the room…'],'es':['haz clic o pulsa una tecla para continuar','preparando la sala…']},
   titulo:{'pt-BR':'🕯️ A Sala do Acumulador','en-US':'🕯️ The Collector’s Room','es':'🕯️ La Sala del Coleccionista'}};
 function pro681Erro(k,e){if(PRO681.erros.length<20)PRO681.erros.push(k+': '+(e&&e.message||e));try{console.warn('v681',k,e);}catch(x){}}
 function pro681Lingua(){try{const l=window.__locale428&&window.__locale428.language;if(l==='en-US'||l==='es')return l;}catch(e){}return 'pt-BR';}
@@ -82846,7 +82846,7 @@ function pro681Digita(){if(PRO681.digitando||!PRO681.el)return;PRO681.digitando=
     tic();};
   proxima();}
 // a sala pronta: chegou e a preparação de fundo acabou (ou 45 s depois de chegar); a caixa se vai 3,5 s depois do fim do texto, ou no toque
-function pro681Confere(){try{if(!PRO681.ativo)return;const na=(CUR==='room'&&CUR_GENRE==='minha');if(na&&!PRO681.chegou)PRO681.chegou=performance.now();
+function pro681Confere(){try{if(!PRO681.ativo)return;const na=(CUR==='room'&&CUR_GENRE==='prologo');if(na&&!PRO681.chegou)PRO681.chegou=performance.now();
     const pronta=na&&((!QUIET434.job&&!PERF130.busy)||(performance.now()-PRO681.chegou>45000));
     if(pronta&&!PRO681.revelado){PRO681.revelado=true;PRO681.el.classList.add('claro');}
     PRO681.pronto=pronta;const dica=PRO681.el.querySelector('.dica');const L=pro681Lingua();const D=PRO681.dicas[L]||PRO681.dicas['pt-BR'];
@@ -82864,6 +82864,90 @@ function pro681Fechar(){if(!PRO681.ativo)return;PRO681.ativo=false;try{const el=
 try{if(PRO681.on&&typeof proFase==='function'&&proFase()==='kit'&&!(PRO.estado&&PRO.estado.introVisto)&&!PRO.desligado){pro681Cria();
     PRO681.iv=setInterval(()=>{try{if(!PRO681.ativo){clearInterval(PRO681.iv);PRO681.iv=null;return;}if(!PRO681.agendado&&typeof LOAD424!=='undefined'&&LOAD424.finished){PRO681.agendado=true;setTimeout(pro681Digita,650);}pro681Confere();}catch(e){pro681Erro('vigia',e);}},200);}}catch(e){pro681Erro('início',e);}
 window.__intro681={estado:PRO681,fechar:pro681Fechar,erros:PRO681.erros};
+
+/* ===================== v683 · O PRÓLOGO NUMA SALA VAZIA, O ACUMULADOR JÁ À FRENTE, O HALL PREPARADO NOS BASTIDORES, A CHAVE DO 2.º ANDAR (bloco `PRO683`, `prologo683.js`) =====================
+   Pedido do Luiz: «Fazer a sala do acumulador o mais leve o possível, sem objetos. Mas o vilão já está na sua frente há alguns passos
+   e já te rouba logo de cara. Enquanto isso, nos bastidores, já vai precarregando o hall. A sala do acumulador fica completa com os
+   itens depois do prólogo, mas vc não prioriza o carregamento dela por que ela só abre com uma chave q vc pega no segundo andar»;
+   «o texto tem muito ELE, ele, ele... melhore».
+   1) A SALA DO PRÓLOGO (`build_prologo`, chave `prologo`): a casca da Sala do Acumulador — o mesmo `mkRoom` com os mesmos materiais
+      (parquet, pedra, forro), 28 × 60 m, os quatro janelões, a porta para o Hall e três luzes — SEM peças, kit, ala, jardins, editor
+      (`emptyPersonal377`). Monta em frações de segundo. É a única sala montada na abertura quando o prólogo vai acontecer
+      (`pr679Abertura`/`ab524Pronto` passam a `prologo`); a Sala do Acumulador de verdade (`minha`) NÃO é montada na abertura nem aquecida
+      nos bastidores enquanto estiver trancada (`esc523Chaves`): nasce quando o leitor entrar nela, com a chave.
+   2) O JOGO COMEÇA DENTRO DELA: no fim da tela de carregamento, antes de `prepareScene130`, `pr683Entrar` troca para a sala do prólogo sem
+      viagem (CUR/ROOM/WORLD, `setActive`, `placeRoom`); a preparação da abertura prepara essa sala (pequena). O HALL é aquecido nos
+      bastidores (`warmCollect(HALLS[1].scene)`) durante o texto e o roubo, e a volta para ele é quase imediata.
+   3) O ACUMULADOR JÁ À FRENTE: assim que a sala aparece atrás da caixa de texto da v681 (`PRO681.revelado`), `proIniciaRoubo()` é chamada —
+      o Colecionador sobe do charco a 5 m, caminha até 2,4 m e fica parado, olhando o leitor, enquanto o texto é digitado (o relógio da
+      cena é segurado em 1,9 s); quando a caixa fecha, fala e rouba os quatro itens de uma vez (a cena da v201), some, e o leitor é levado
+      ao Hall (v679), onde o aviso do Colecionador abre. Não há mais contagem de tempo e passos.
+   4) A CHAVE DO SEGUNDO ANDAR (`PRO683.chave`): para quem passou pelo prólogo, a porta da Sala do Acumulador fica TRANCADA («A porta da
+      Sala do Acumulador está trancada. A chave está no segundo andar.» — `enterRoom`/`jump` embrulhadas) até apanhar a CHAVE DOURADA que
+      gira e flutua no Hall 2 (em (4, 1, 3,4), com brilho): passar a 1,3 m dela guarda `chaveAcumulador` no estado do prólogo e avisa.
+      Webmaster, veteranos, `?prologo=0` e os prólogos forçados (`?prologo=1|rapido`) não têm porta trancada.
+   5) O TEXTO da caixa, sem o «ele» repetido: «Este castelo tem um ladrão: o Acumulador.» · «Livros, mapas, brinquedos, lembranças — tudo o
+      que não lhe pertence vai parar nesta sala.» · «Por enquanto, vazia. Você acorda aqui com a veste, as botas, o ímã e um dragãozinho de
+      jade.» · «E o Acumulador já está à sua frente, de olho no que é seu.» · «Esta porta só abre com uma chave, guardada no segundo andar
+      do castelo.» (TROCAS no bloco da v681; inglês e espanhol idem).
+   Gancho `window.__prologo683` (`estado`, `trancada`, `chave`, `erros`). */
+const PRO683={on:!/[?&#]prologo683=0/i.test(location.search+location.hash),erros:[],entrou:false,aqueceu:false,roubo:false,chave:null,chaveT:0,stats:{montagemMs:0,entrouEm:0}};
+function pro683Erro(k,e){if(PRO683.erros.length<20)PRO683.erros.push(k+': '+(e&&e.message||e));try{console.warn('v683',k,e);}catch(x){}}
+/* ---- 1. a sala do prólogo: a casca da Sala do Acumulador ---- */
+function* build_prologo(){const t0=performance.now();const PED=STONE,TAC=PARQ;
+  const mt={minha124:true,
+    floor:new THREE.MeshStandardMaterial({map:clonedTex(TAC.map,6,6),normalMap:clonedTex(TAC.normalMap,6,6),roughnessMap:clonedTex(TAC.roughnessMap,6,6),color:0xb98f63,roughness:0.88,normalScale:new THREE.Vector2(0.5,0.5)}),
+    wall:new THREE.MeshStandardMaterial({map:clonedTex(PED.map,3,1.4),normalMap:clonedTex(PED.normalMap,3,1.4),color:0x9a9184,roughness:0.96}),
+    ceil:rkSolid(0x2a2320,0.95),base:rkSolid(0x3a2a1e,0.8),crown:rkSolid(0x4a3a2a,0.9),wood:rkSolid(0x7a5233,0.75),trim:rkSolid(0x5a3a26,0.7),metal:M.brass,
+    fabric:rkSolid(0x243b35,0.96),cushion:rkSolid(0xb8a385,0.98),tableTop:rkSolid(0x8a6240,0.6),tableLeg:rkSolid(0x3a2a20,0.6),door:rkSolid(0x6a3a2a,0.7),knob:M.brass};
+  yield;
+  const W=28,D=60,H=5.4;
+  yield* mkRoom('prologo',{W,D,H,seed:7101,mats:mt,fog:[0x141010,0.005],exposure:1.14,seat:'na sala',hemi:[0xd8cbb4,0x3a2e24,0.80],sun:{col:0xffe6bc,int:1.35,pos:[0,6.0,-D/2-9],target:[0,0.8,1.5]},
+    doorSign:'← HALL DOS GÊNEROS',signBg:'#2a1c12',signFg:'#e6c878',doorLight:0xffc890,win:{xs:[-10,-3.4,3.4,10],w:2.6,y0:1.2,y1:4.3},
+    lights:[[0,4.6,-10,0xffd2a0,1.05,19],[0,4.6,-2,0xffd2a0,0.95,19],[0,4.4,11,0xffd0a0,1.0,18]],emptyPersonal377:true});
+  yield;
+  registerKitRoom('prologo');try{ROOMS.prologo.far=120;ROOMS.prologo.prologo683=true;}catch(e){}
+  PRO683.stats.montagemMs=Math.round(performance.now()-t0);}
+function pr683Registrar(){try{if(typeof ROOM_BUILDERS!=='undefined'&&!ROOM_BUILDERS.prologo)ROOM_BUILDERS.prologo=build_prologo;}catch(e){pro683Erro('registrar',e);}}
+pr683Registrar();
+{ const _rt=roomTitle;roomTitle=function(genre){if(genre==='prologo')return 'Sala do Acumulador';return _rt.apply(this,arguments);}; }
+/* ---- 2. o jogo começa dentro da sala do prólogo (chamada em liberarAbertura, antes de prepareScene130) ---- */
+function pr683Entrar(){try{if(!PRO683.on||PRO683.entrou)return false;if(typeof proFase!=='function'||proFase()!=='kit')return false;const R=ROOMS.prologo;if(!R||!R.ready||!R.scene)return false;
+    PRO683.entrou=true;CUR='room';CUR_GENRE='prologo';ROOM=R;WORLD=ROOM.world;setActive(ROOM.scene);placeRoom();
+    try{if(titleEl)titleEl.textContent=roomTitle('prologo');if(btnHall)btnHall.hidden=false;hintFor();}catch(e){}
+    PRO683.stats.entrouEm=Math.round(performance.now());return true;}catch(e){pro683Erro('entrar',e);return false;}}
+// o Hall aquecido nos bastidores enquanto o prólogo acontece
+function pr683AqueceHall(){try{if(PRO683.aqueceu)return;PRO683.aqueceu=true;if(typeof warmCollect==='function'&&HALLS&&HALLS[1]&&HALLS[1].scene)warmCollect(HALLS[1].scene,0);}catch(e){pro683Erro('aquecer hall',e);}}
+/* ---- 3. o Acumulador já à frente: o roubo começa quando a sala aparece; a cena espera a caixa de texto ---- */
+{ const _pt=proTick;proTick=function(dt){_pt.apply(this,arguments);try{if(!PRO683.on)return;const E=PRO.estado;if(!E)return;const I=(typeof PRO681!=='undefined')?PRO681:null;
+      if(I&&I.revelado&&!PRO683.aqueceu)pr683AqueceHall();
+      if(E.fase==='kit'&&PRO.kit&&!PRO.cena&&!PRO683.roubo&&CUR==='room'&&CUR_GENRE==='prologo'&&I&&I.revelado&&!CAV.morto){PRO683.roubo=true;try{proIniciaRoubo();}catch(e){pro683Erro('roubo',e);}}
+      if(I&&I.ativo&&PRO.cena){const f=PRO.rapido?0.35:1;if(PRO.cena.t>1.9*f)PRO.cena.t=1.9*f;} // ele sobe, chega a dois passos e espera o texto acabar
+    }catch(e){if(!PRO683.avisouTick){PRO683.avisouTick=1;pro683Erro('tick',e);}}}; }
+/* ---- 4. a chave do segundo andar e a porta trancada ---- */
+function pr683Trancada(){try{if(!PRO683.on)return false;if(typeof WEBMASTER!=='undefined'&&WEBMASTER)return false;const E=PRO.estado;if(!E)return false;if(E.forcado||E.motivo==='webmaster'||E.motivo==='veterano'||E.motivo==='url')return false;return !E.chaveAcumulador;}catch(e){return false;}}
+function pr683Chave(){if(PRO683.chave)return PRO683.chave;try{const H=HALLS&&HALLS[2];if(!H||!H.scene)return null;const g=new THREE.Group();g.name='v683 · Chave da Sala do Acumulador';g.position.set(4.0,1.0,3.4);
+    const ouro=new THREE.MeshStandardMaterial({color:0xe6c878,emissive:0x5a4010,emissiveIntensity:0.6,roughness:0.3,metalness:0.85});
+    const anel=new THREE.Mesh(new THREE.TorusGeometry(0.16,0.045,10,24),ouro);anel.position.y=0.22;g.add(anel);
+    const haste=new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.035,0.5,10),ouro);haste.position.y=-0.2;g.add(haste);
+    for(const [y,w] of [[-0.42,0.16],[-0.32,0.11]]){const d=new THREE.Mesh(new THREE.BoxGeometry(w,0.06,0.06),ouro);d.position.set(w/2+0.02,y,0);g.add(d);}
+    try{const s=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,color:0xffe6a0,transparent:true,depthWrite:false,opacity:0.75,blending:THREE.AdditiveBlending}));s.scale.set(1.6,1.6,1);s.material.userData.papelKeep=true;s.layers.set(1);g.add(s);}catch(e){}
+    const base=new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.6,0.12,16),rkSolid(0x3a2a1e,0.8));base.position.y=-1.0+0.06;g.add(base);
+    g.traverse(o=>{if(o.isMesh){o.userData.noCam=true;o.castShadow=false;}});H.scene.add(g);PRO683.chave=g;return g;}catch(e){pro683Erro('chave',e);return null;}}
+function pr683ChaveTick(dt){try{if(!PRO683.on)return;const E=PRO.estado;const tranc=pr683Trancada();const g=PRO683.chave||(tranc?pr683Chave():null);if(!g)return;g.visible=tranc;if(!tranc)return;
+    PRO683.chaveT+=dt;g.rotation.y+=dt*1.2;g.position.y=1.0+Math.sin(PRO683.chaveT*2)*0.08;
+    if(CUR==='hall'&&HALLN===2&&!(typeof uiBlocked==='function'&&uiBlocked())){const d=Math.hypot(CH.x-g.position.x,CH.z-g.position.z);if(d<1.3){E.chaveAcumulador=Date.now();try{proGrava();}catch(e){}g.visible=false;
+        try{showToast('🔑 A Chave da Sala do Acumulador! A porta dela, no Hall dos Gêneros, agora abre.',{big:true,ms:8000});}catch(e){}try{if(window.__mus199)window.__mus199.sfx('conquista');}catch(e){}}}}catch(e){if(!PRO683.avisouChave){PRO683.avisouChave=1;pro683Erro('chave tick',e);}}}
+{ const _ht=hallTick;hallTick=function(dt){const r=_ht.apply(this,arguments);try{pr683ChaveTick(Math.min(0.1,dt||0.016));}catch(e){}return r;}; }
+function pr683PortaTrancada(){const agora=performance.now();if(agora<(PRO683.portaAte||0))return;PRO683.portaAte=agora+4500;try{if(window.__mus199)window.__mus199.sfx('bloqueado');}catch(e){}try{showToast('A porta da Sala do Acumulador está trancada. A chave está no segundo andar.',{big:true,ms:5000});}catch(e){}}
+{ const _er=enterRoom;enterRoom=function(g){if(g==='minha'&&pr683Trancada()){pr683PortaTrancada();return;}return _er.apply(this,arguments);};
+  const _jp=jump;jump=function(where,genre){if(where==='room'&&genre==='minha'&&pr683Trancada()){pr683PortaTrancada();return;}return _jp.apply(this,arguments);};
+  if(window.__enterRoom)window.__enterRoom=enterRoom;if(window.__jump)window.__jump=jump; }
+/* ---- textos nas outras línguas ---- */
+try{const D=window.__localeData428;if(D){const T={'🔑 A Chave da Sala do Acumulador! A porta dela, no Hall dos Gêneros, agora abre.':['🔑 The Key to the Collector’s Room! Its door in the Hall of Genres now opens.','🔑 ¡La Llave de la Sala del Coleccionista! Su puerta, en el Hall de los Géneros, ya se abre.'],
+  'A porta da Sala do Acumulador está trancada. A chave está no segundo andar.':['The Collector’s Room is locked. The key is on the second floor.','La Sala del Coleccionista está cerrada con llave. La llave está en el segundo piso.']};
+  for(const k in T){if(D.en&&!D.en[k])D.en[k]=T[k][0];if(D.es&&!D.es[k])D.es[k]=T[k][1];}}}catch(e){}
+window.__prologo683={estado:PRO683,trancada:pr683Trancada,chave:()=>PRO683.chave,entrar:pr683Entrar,erros:PRO683.erros};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
