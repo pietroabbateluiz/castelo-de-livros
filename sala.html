@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v685</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v686</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -83060,6 +83060,121 @@ function pr685Fino(fn){const T=THREE;const m=PRO685_FINO.m,min=PRO685_FINO.min;c
 function pr685Tris(g){let n=0;try{g.traverse(o=>{if(o.isMesh&&o.geometry){const G=o.geometry;n+=Math.round((G.index?G.index.count:(G.attributes.position?G.attributes.position.count:0))/3);}});}catch(e){}return n;}
 { const _c=collector209;collector209=function(){if(!PRO685.on||!PRO685_FINO.on)return _c.apply(this,arguments);const g=pr685Fino(()=>_c.apply(this,arguments));PRO685_FINO.montagens++;PRO685_FINO.tris=pr685Tris(g);return g;}; }
 window.__encontro685={estado:PRO685,colocar:pr685Coloca,roubar:pr685Roubo,fino:PRO685_FINO,tris:pr685Tris,erros:PRO685.erros};
+
+/* ===================== v686 · AS SALAS DOS BASTIDORES SÓ COM O LEITOR PARADO · SEM GUARDIÕES NO HALL 1 · O PRÓLOGO NUM CORREDOR (bloco `HL686`, `leve686.js`) =====================
+   Pedido do Luiz (depois de medir o que pesa no primeiro Hall): «Quero o par com melhor retorno: segurar a montagem das salas nos bastidores.
+   E prólogo em corredor. Guardiões pode tirar mesmo».
+   1) MONTAGEM SEGURADA (`hl686Pode`): a montagem das salas do andar nos bastidores (`esc523Passo`) e a preparação delas (`esc523Aquece`,
+      texturas e programas da placa) só COMEÇAM quando o leitor está PARADO há 1 s (posição sem mudar, sem destino de clique) — em halls e
+      salas. Exceções: num Hall, a sala de cuja porta o leitor está a menos de 7 m (`HL686.PERTO`) começa mesmo com ele andando (para não
+      cair na tela de montagem ao entrar); e os pedidos explícitos (`ESC523.fila`: a escada, uma porta secreta) passam sempre. Uma sala já
+      começada TERMINA (fatias e `finishRoom`), como na v684 — `buildBusy` não fica preso. `?segura686=0` desliga só isto.
+   2) SEM GUARDIÕES NO HALL 1: as peças da galeria de IA ao lado das portas (v236 — gárgula, robô-esqueleto, ampulheta, anão da lanterna,
+      ~215 mil triângulos, 4–5 engasgos de ~115 ms na chegada) não entram no Hall 1 (`H236.feitos[1]`); os outros andares ficam como estão.
+      O javali (sistema próprio) e a coruja da lojinha ficam. `?guardioes686=0` desliga só isto.
+   3) O PRÓLOGO NUM CORREDOR (`build_prologo686`, chave `prologo`): no lugar da casca de 28 × 60 m da v683, um CORREDOR de 8 × 90 m com os
+      mesmos materiais, 4 luzes ao longo, a porta para o Hall numa ponta e, no fundo, a PORTA FECHADA DA SALA DO ACUMULADOR (folhas de
+      madeira, dobradiças, fechadura, placa «SALA DO ACUMULADOR» e uma lanterna). O Acumulador espera a 25 m (`PRO685.DIST`); o resto é a
+      v685 (o leitor anda até ele, a cena, a volta ao Hall). Título «Corredor»; caixa «🕯️ O Corredor» com o texto novo: «Este corredor leva
+      até a Sala do Acumulador.» · «O Acumulador é o ladrão deste castelo: livros, mapas, brinquedos, lembranças — tudo o que não lhe
+      pertence vai parar naquela sala.» · «Você acorda aqui com a veste, as botas, o ímã e um dragãozinho de jade.» · «E o Acumulador já
+      está no corredor, à sua frente, de olho no que é seu.» · «A porta do fundo só abre com uma chave, guardada no segundo andar do
+      castelo.» (`PRO681.textos` e `PRO681.titulo` trocados no arranque; inglês e espanhol idem). `?corredor686=0` volta à casca da v683.
+   Pedidos seguintes: «vá fazendo carregamento (se der) durante o texto e durante a caminhada pelo corredor (depois de ir precarregando o
+   boss)»; «Ponha moedas de ouro e prata e poções e rubis ao longo de todo o corredor».
+   4) CARREGAMENTO NO CORREDOR, em ordem: o Colecionador (ensaiado na abertura pela v206 e colocado antes de a caixa aparecer — v685); o HALL
+      preparado desde a REVELAÇÃO, durante o texto (`travel434Prepare(HALLS[1].scene)` — programas da placa em paralelo e texturas em
+      fatias; a v684 esperava a caixa fechar); e, com a caixa fechada e o Hall pronto, as cinco SALAS do 1.º andar montam-se durante a
+      CAMINHADA (`esc523Passo`/`esc523Aquece` liberados no corredor mesmo com o leitor andando — a regra do item 1 vale nos halls e nas
+      salas, não aqui). Durante o texto e durante a cena do roubo as salas continuam seguradas (`pro684Calado`: só caixa ou cena), e depois
+      do roubo nada mais começa no corredor; a sala que estiver a meio quando a cena começa acaba durante a cena (fatias de 12 ms por
+      quadro, `ESC523.fatiaFixa`) ou, no fim dela, de uma vez (`esc523Termina`, até 5 s) — a volta ao Hall (`goHall`) espera `buildBusy`.
+      E a volta não prepara os portais das portas do Hall (`travel434Prepare` embrulhada: `doorways=false` enquanto a volta da v679 está em
+      curso) — senão cada sala montada na caminhada seria preparada antes de o Hall aparecer (no teste sem placa, 90 s); elas são preparadas
+      depois, nos bastidores, e o portal só as desenha quando prontas.
+   5) MOEDAS, PRATA, RUBIS E POÇÕES NO CORREDOR: `coinKeyFor` devolve `prologo` no corredor, e os sistemas de sempre tratam dele como de
+      qualquer sala: 16 moedas de ouro (`COIN_N.prologo`), 18 de prata (v346/v433), 28 rubis (v422) e 4 poções (v541, `FL541.salas`),
+      espalhados pelo comprimento (os pontos nascem dentro da caixa 8 × 90 m, com o espaçamento de cada sistema). `?itens686=0` desliga só isto.
+   Gancho `window.__leve686` (`estado`, `pode`, `erros`). */
+const HL686={on:!/[?&#]leve686=0/i.test(location.search+location.hash),segura:!/[?&#]segura686=0/i.test(location.search+location.hash),guardioes:!/[?&#]guardioes686=0/i.test(location.search+location.hash),
+  corredor:!/[?&#]corredor686=0/i.test(location.search+location.hash),carrega:!/[?&#]carrega686=0/i.test(location.search+location.hash),itens:!/[?&#]itens686=0/i.test(location.search+location.hash),PERTO:7,PARADO:1.0,ux:null,uz:null,paradoDesde:0,erros:[],stats:{seguradas:0,liberadasParado:0,liberadasPerto:0,liberadasPedido:0,liberadasCorredor:0,corredorMs:0,hallPrepDesde:''}};
+function hl686Erro(k,e){if(HL686.erros.length<20)HL686.erros.push(k+': '+(e&&e.message||e));try{console.warn('v686',k,e);}catch(x){}}
+/* ---- 1. a montagem dos bastidores só com o leitor parado (ou perto de uma porta) ---- */
+function hl686Parado(){try{const p=co523Pos();const agora=performance.now();if(HL686.ux===null||Math.hypot(p.x-HL686.ux,p.z-HL686.uz)>0.03||(MODE!=='fp'&&CH.target)){HL686.ux=p.x;HL686.uz=p.z;HL686.paradoDesde=agora;return false;}
+    return agora-HL686.paradoDesde>=HL686.PARADO*1000;}catch(e){return true;}}
+function hl686PertoDePorta(){try{if(CUR!=='hall')return false;const H=HALLS[HALLN];if(!H||!H.doors)return false;const p=co523Pos();
+    for(const g of H.doors){const k=GENRE_ROOM[g.userData.genre]||g.userData.genre;if(!esc523Falta(k))continue;const f=doorFront(g,0.4);if(Math.hypot(f[0]-p.x,f[1]-p.z)<=HL686.PERTO)return true;}return false;}catch(e){return false;}}
+function hl686Corredor(){try{if(!HL686.on||!HL686.carrega||CUR!=='room'||CUR_GENRE!=='prologo')return false;const E=PRO.estado;if(!E||E.fase!=='kit'||PRO.cena)return false; /* só durante a caminhada: depois do roubo, nada começa (a volta ao Hall espera `buildBusy`) */
+    const P4=(typeof PRO684!=='undefined')?PRO684:null;if(P4&&P4.on&&(!P4.hallPrep||P4.hallPrepFim===0))return false; /* primeiro o Hall */ return true;}catch(e){return false;}}
+function hl686Pode(){if(!HL686.on||!HL686.segura)return true;try{if(ESC523.fila.some(esc523Falta)){HL686.stats.liberadasPedido++;return true;}}catch(e){}
+  if(CUR==='room'&&CUR_GENRE==='prologo'){if(hl686Corredor()){HL686.stats.liberadasCorredor++;return true;}HL686.stats.seguradas++;return false;} /* no corredor só a regra do corredor (parado não conta: depois do roubo o leitor fica parado e a volta esperaria) */
+  if(hl686Parado()){HL686.stats.liberadasParado++;return true;}if(hl686PertoDePorta()){HL686.stats.liberadasPerto++;return true;}HL686.stats.seguradas++;return false;}
+{ const _p=esc523Passo;esc523Passo=function(dt){if(!buildIt&&!hl686Pode())return;return _p.apply(this,arguments);};
+  const _a=esc523Aquece;esc523Aquece=function(){if(!hl686Pode())return;return _a.apply(this,arguments);}; }
+/* ---- 2. sem guardiões no Hall 1 ---- */
+try{if(HL686.on&&HL686.guardioes&&typeof H236!=='undefined'){H236.feitos[1]=true;H236.postos[1]=H236.postos[1]||[];H236.fila=H236.fila.filter(j=>j.n!==1);}}catch(e){hl686Erro('guardiões',e);}
+/* ---- 3. o prólogo num corredor ---- */
+function pr686Porta(sc,mt,W,D,H){const T=THREE;const g=new T.Group();g.name='v686 · porta da Sala do Acumulador';g.position.set(0,0,-D/2+0.02);sc.add(g);
+  const fm=mt.trim||mt.wood,metal=mt.metal||mt.knob||rkSolid(0xb08a3a,0.4,0.8);const PW=1.1,PH=2.55,PA=2.85;
+  const folhas=new T.Mesh(new T.BoxGeometry(PW*2,PA,0.12),mt.door||rkSolid(0x4a2a1c,0.7));folhas.position.set(0,PA/2,0.10);folhas.castShadow=folhas.receiveShadow=true;g.add(folhas);
+  const fenda=new T.Mesh(new T.BoxGeometry(0.03,PA-0.1,0.02),rkSolid(0x14100a,1));fenda.position.set(0,PA/2,0.17);g.add(fenda);
+  for(const sx of [-1,1]){const m=new T.Mesh(new T.BoxGeometry(0.16,PH+0.1,0.26),fm);m.position.set(sx*(PW+0.08),(PH+0.1)/2,0.09);m.castShadow=true;g.add(m);}
+  {const pts=[];for(let i=0;i<=16;i++){const u=i/16;pts.push(new T.Vector3(-PW-0.02+(2*PW+0.04)*u,PH+0.03+(PA-PH)*(1-Math.pow(2*u-1,2)),0.09));}const tube=new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(pts),24,0.1,8),fm);tube.castShadow=true;g.add(tube);}
+  const soleira=new T.Mesh(new T.BoxGeometry(2.6,0.06,0.5),fm);soleira.position.set(0,0.03,0.2);g.add(soleira);
+  for(const y of [0.55,1.5,2.45])for(const sx of [-1,1]){const d=new T.Mesh(new T.BoxGeometry(0.46,0.07,0.03),metal);d.position.set(sx*(PW-0.33),y,0.17);g.add(d);}
+  const fech=new T.Mesh(new T.BoxGeometry(0.22,0.36,0.04),metal);fech.position.set(0.32,1.22,0.17);g.add(fech);
+  const buraco=new T.Mesh(new T.CylinderGeometry(0.035,0.035,0.05,10),rkSolid(0x0c0a06,1));buraco.rotation.x=Math.PI/2;buraco.position.set(0.32,1.2,0.2);g.add(buraco);
+  const sg=rkPlate(1.7,0.26,txtTex('SALA DO ACUMULADOR',{w:512,h:96,bg:'#2a1c12',fg:'#e6c878',border:'#e6c878',bw:4,fs:30}),fm,{emis:0.05});sg.position.set(0,Math.min(H-0.16,PA+0.48),0.2);g.add(sg);
+  const dl=new T.PointLight(0xffb070,0.9,7,2);dl.position.set(0,2.7,1.3);g.add(dl);
+  g.traverse(o=>{if(o.isMesh){o.userData.noCam=true;o.raycast=()=>{};}});return g;}
+function* build_prologo686(){const t0=performance.now();const PED=STONE,TAC=PARQ;
+  const mt={minha124:true,
+    floor:new THREE.MeshStandardMaterial({map:clonedTex(TAC.map,2,22),normalMap:clonedTex(TAC.normalMap,2,22),roughnessMap:clonedTex(TAC.roughnessMap,2,22),color:0xb98f63,roughness:0.88,normalScale:new THREE.Vector2(0.5,0.5)}),
+    wall:new THREE.MeshStandardMaterial({map:clonedTex(PED.map,9,1.4),normalMap:clonedTex(PED.normalMap,9,1.4),color:0x9a9184,roughness:0.96}),
+    ceil:rkSolid(0x2a2320,0.95),base:rkSolid(0x3a2a1e,0.8),crown:rkSolid(0x4a3a2a,0.9),wood:rkSolid(0x7a5233,0.75),trim:rkSolid(0x5a3a26,0.7),metal:M.brass,
+    fabric:rkSolid(0x243b35,0.96),cushion:rkSolid(0xb8a385,0.98),tableTop:rkSolid(0x8a6240,0.6),tableLeg:rkSolid(0x3a2a20,0.6),door:rkSolid(0x5a3224,0.7),knob:M.brass};
+  yield;
+  const W=8,D=90,H=5.4;
+  const NRp=yield* mkRoom('prologo',{W,D,H,seed:7101,mats:mt,fog:[0x141010,0.006],exposure:1.14,seat:'no corredor',hemi:[0xd8cbb4,0x3a2e24,0.80],sun:{col:0xffe6bc,int:1.1,pos:[0,6.0,-D/2-9],target:[0,0.8,1.5]},
+    doorSign:'← HALL DOS GÊNEROS',signBg:'#2a1c12',signFg:'#e6c878',doorLight:0xffc890,
+    lights:[[0,4.6,30,0xffd2a0,1.05,24],[0,4.6,8,0xffd2a0,1.0,24],[0,4.6,-14,0xffd2a0,1.0,24],[0,4.6,-34,0xffd0a0,1.0,22]],emptyPersonal377:true});
+  yield;
+  try{const sc=(NRp&&NRp.scene)||NR.prologo.scene;const wt=0.24;const tampa=new THREE.Mesh(new THREE.BoxGeometry(wt,3.4,2.2),mt.wall);tampa.position.set(-W/2-wt/2,1.7,-3.55);tampa.receiveShadow=true;sc.add(tampa); /* fecha o vão que o emptyPersonal377 deixa na parede esquerda */
+    pr686Porta(sc,mt,W,D,H);}catch(e){hl686Erro('corredor',e);}
+  yield;
+  registerKitRoom('prologo');try{const R=ROOMS.prologo;R.far=150;R.prologo683=true;R.corredor686=true;}catch(e){}
+  HL686.stats.corredorMs=Math.round(performance.now()-t0);try{PRO683.stats.montagemMs=HL686.stats.corredorMs;}catch(e){}}
+try{if(HL686.on&&HL686.corredor&&typeof ROOM_BUILDERS!=='undefined'){ROOM_BUILDERS.prologo=build_prologo686;if(typeof PRO685!=='undefined')PRO685.DIST=25;}}catch(e){hl686Erro('registrar',e);}
+{ const _rt=roomTitle;roomTitle=function(genre){if(genre==='prologo'&&HL686.on&&HL686.corredor)return 'Corredor';return _rt.apply(this,arguments);}; }
+// o texto da caixa (v681) para o corredor; a caixa já pode existir (nasce no arranque): o título é trocado no elemento
+try{if(HL686.on&&HL686.corredor&&typeof PRO681!=='undefined'){
+  PRO681.textos={'pt-BR':['Este corredor leva até a Sala do Acumulador.','O Acumulador é o ladrão deste castelo: livros, mapas, brinquedos, lembranças — tudo o que não lhe pertence vai parar naquela sala.','Você acorda aqui com a veste, as botas, o ímã e um dragãozinho de jade.','E o Acumulador já está no corredor, à sua frente, de olho no que é seu.','A porta do fundo só abre com uma chave, guardada no segundo andar do castelo.'],
+    'en-US':['This corridor leads to the Collector’s Room.','The Collector is the thief of this castle: books, maps, toys, keepsakes — everything that is not his ends up in that room.','You wake up here with the vestment, the boots, the magnet and a little jade dragon.','And the Collector is already in the corridor, ahead of you, eyeing what is yours.','The door at the end only opens with a key, kept on the second floor of the castle.'],
+    'es':['Este pasillo lleva hasta la Sala del Coleccionista.','El Coleccionista es el ladrón de este castillo: libros, mapas, juguetes, recuerdos — todo lo que no le pertenece acaba en esa sala.','Despiertas aquí con la veste, las botas, el imán y un dragoncito de jade.','Y el Coleccionista ya está en el pasillo, frente a ti, con los ojos puestos en lo que es tuyo.','La puerta del fondo solo se abre con una llave, guardada en el segundo piso del castillo.']};
+  PRO681.titulo={'pt-BR':'🕯️ O Corredor','en-US':'🕯️ The Corridor','es':'🕯️ El Pasillo'};
+  if(PRO681.el){const tt=PRO681.el.querySelector('.tt');const L=pro681Lingua();if(tt)tt.textContent=PRO681.titulo[L]||PRO681.titulo['pt-BR'];}}}catch(e){hl686Erro('texto',e);}
+try{const D=window.__localeData428;if(D){const T={'Corredor':['Corridor','Pasillo']};for(const k in T){if(D.en&&!D.en[k])D.en[k]=T[k][0];if(D.es&&!D.es[k])D.es[k]=T[k][1];}}}catch(e){}
+/* ---- 4. carregamento durante o texto (o Hall) e durante a caminhada (as salas) ---- */
+try{if(HL686.on&&HL686.carrega&&typeof pro684Calado==='function'){pro684Calado=function(){try{if(!PRO684.on)return false;const I=(typeof PRO681!=='undefined')?PRO681:null;if(I&&I.ativo)return true;if(PRO.cena&&CUR==='room'&&CUR_GENRE==='prologo')return true;return false;}catch(e){return false;}};}}catch(e){hl686Erro('calado',e);}
+{ const _pt=proTick;proTick=function(dt){_pt.apply(this,arguments);try{if(!HL686.on||!HL686.carrega)return;const P4=(typeof PRO684!=='undefined')?PRO684:null;if(!P4||!P4.on||P4.hallPrep)return;const I=(typeof PRO681!=='undefined')?PRO681:null;
+      if(I&&I.revelado&&CUR==='room'&&CUR_GENRE==='prologo'&&!PERF130.busy&&!fadeOnAt&&!QUIET434.job&&HALLS&&HALLS[1]&&HALLS[1].scene){P4.hallPrep=true;HL686.stats.hallPrepDesde=I.ativo?'texto':'caminhada';const rev=PERF130.revision;const t0=performance.now();
+        Promise.resolve().then(()=>travel434Prepare(HALLS[1].scene,rev,false)).then(()=>{P4.hallPrepFim=Math.round(performance.now()-t0);}).catch(e=>{if(e!==PREP_CANCEL131)hl686Erro('hall',e);P4.hallPrepFim=-1;});}
+    }catch(e){if(!HL686.avisouTick){HL686.avisouTick=1;hl686Erro('tick',e);}}}; }
+// a sala que estiver a meio nos bastidores quando a cena do roubo começa: durante a cena (cinema, ~15 s) as fatias sobem para 12 ms por
+// quadro (`ESC523.fatiaFixa`) para ela acabar antes do fim; se ainda assim não acabou, no fim da cena é terminada de uma vez
+// (`esc523Termina`, até 5 s) — a volta ao Hall (`goHall`) espera `buildBusy`, e nenhuma outra começa (`pro684Calado` e `hl686Corredor`)
+try{if(HL686.on&&HL686.carrega&&typeof pr685Roubo==='function'){const _r=pr685Roubo;pr685Roubo=function(){const ok=_r.apply(this,arguments);if(ok){try{if(buildIt&&buildKey===ESC523.chave){HL686.fatiaAntes=ESC523.fatiaFixa||0;ESC523.fatiaFixa=12;HL686.stats.cenaFatia=buildKey;}}catch(e){hl686Erro('fatia',e);}}return ok;};
+    const _f=proFimRoubo;proFimRoubo=function(){try{if(HL686.stats.cenaFatia){ESC523.fatiaFixa=HL686.fatiaAntes||0;HL686.stats.cenaFatia='';}if(buildIt&&buildKey===ESC523.chave&&CUR==='room'&&CUR_GENRE==='prologo'){const t0=performance.now();esc523Termina();HL686.stats.terminadaMs=Math.round(performance.now()-t0);}}catch(e){hl686Erro('termina',e);}return _f.apply(this,arguments);};}}catch(e){hl686Erro('roubo',e);}
+// a volta ao Hall depois do roubo não prepara os portais das portas (as salas montadas na caminhada seriam preparadas uma a uma antes de o
+// Hall aparecer — `travel434Prepare(hall, rev, doorways=true)`): o Hall é preparado só, e as salas são preparadas depois, nos bastidores
+// (`esc523Aquece`, quando o leitor parar); até lá o portal da porta não as desenha, como sempre
+try{if(HL686.on&&HL686.carrega){const _tp=travel434Prepare;travel434Prepare=async function(scene,revision,doorways){try{if(doorways!==false&&HALLS&&HALLS[1]&&scene===HALLS[1].scene&&typeof pr679St==='function'&&pr679St().voltando){HL686.stats.voltaSemPortais=(HL686.stats.voltaSemPortais||0)+1;return _tp.call(this,scene,revision,false);}}catch(e){}return _tp.apply(this,arguments);};}}catch(e){hl686Erro('portais',e);}
+/* ---- 5. moedas de ouro e prata, rubis e poções ao longo do corredor ---- */
+try{if(HL686.on&&HL686.itens){const _ck=coinKeyFor;coinKeyFor=function(){if(CUR==='room'&&CUR_GENRE==='prologo'&&ROOMS.prologo&&ROOMS.prologo.ready)return 'prologo';return _ck.apply(this,arguments);};
+  try{COIN_N.prologo=16;}catch(e){}
+  try{if(typeof FL541!=='undefined'&&Array.isArray(FL541.salas)&&!FL541.salas.includes('prologo'))FL541.salas.push('prologo');}catch(e){}
+  try{const _fe=fl541Espalha;fl541Espalha=function(chave,sc,W,spawn,floorY,key,nf,np){if(chave==='sala:prologo')np=4;return _fe.call(this,chave,sc,W,spawn,floorY,key,nf,np);};}catch(e){hl686Erro('poções',e);}}}catch(e){hl686Erro('itens',e);}
+window.__leve686={estado:HL686,pode:hl686Pode,parado:hl686Parado,corredor:hl686Corredor,erros:HL686.erros};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
