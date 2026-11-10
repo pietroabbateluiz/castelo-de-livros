@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v684</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v685</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -82968,11 +82968,98 @@ function pro684Calado(){try{if(!PRO684.on)return false;const I=(typeof PRO681!==
   const _lp=leve6Passo;leve6Passo=function(){if(pro684Calado())return;return _lp.apply(this,arguments);}; }
 // o Hall preparado nos bastidores durante a cena do roubo (a caixa já fechou)
 { const _pt=proTick;proTick=function(dt){_pt.apply(this,arguments);try{if(!PRO684.on||PRO684.hallPrep)return;const I=(typeof PRO681!=='undefined')?PRO681:null;if(I&&I.ativo)return;
-      if(PRO.cena&&CUR==='room'&&CUR_GENRE==='prologo'&&!PERF130.busy&&!fadeOnAt&&!QUIET434.job&&HALLS&&HALLS[1]&&HALLS[1].scene){PRO684.hallPrep=true;const rev=PERF130.revision;const t0=performance.now();
+      if((PRO.cena||(typeof PRO685!=='undefined'&&PRO685.esperando))&&CUR==='room'&&CUR_GENRE==='prologo'&&!PERF130.busy&&!fadeOnAt&&!QUIET434.job&&HALLS&&HALLS[1]&&HALLS[1].scene){PRO684.hallPrep=true;const rev=PERF130.revision;const t0=performance.now();
         Promise.resolve().then(()=>travel434Prepare(HALLS[1].scene,rev,false)).then(()=>{PRO684.hallPrepFim=Math.round(performance.now()-t0);}).catch(e=>{if(e!==PREP_CANCEL131)pro684Erro('hall',e);PRO684.hallPrepFim=-1;});}
     }catch(e){if(!PRO684.avisou){PRO684.avisou=1;pro684Erro('tick',e);}}}; }
 try{pr683AqueceHall=function(){PRO683.aqueceu=true;};}catch(e){}
 window.__silencio684={estado:PRO684,calado:pro684Calado,erros:PRO684.erros};
+
+/* ===================== v685 · O ACUMULADOR LÁ NA FRENTE, PARADO; O LEITOR ANDA ATÉ ELE E SÓ ENTÃO O ROUBO (bloco `PRO685`, `encontro685.js`) =====================
+   Pedido do Luiz: «O ângulo ficou ruim, é para o rival ficar em frente e mais afastado, e deve dar um tempinho para eu andar até ele»;
+   «Mais a frente pra eu andar um pouco. E melhore o gráfico, formas (mais polígonos) do colecionador».
+   Na v683 o roubo começava no instante em que a sala aparecia atrás da caixa de texto: o Colecionador subia do charco a 5 m, andava até
+   2,4 m e a câmera de cinema da v204 (plano baixo de lado, segurado em T=1,9 s) ficava o texto inteiro nesse ângulo. Agora:
+   1) Assim que o leitor está na sala do prólogo (depois da abertura, ainda atrás da caixa escura), o Colecionador é COLOCADO de pé, já
+      subido, a 18 m em frente (`PRO685.DIST`, na direção em que o leitor olha, dentro das paredes), olhando para ele, com a animação de
+      parado — o modelo ensaiado pela v206 (`colecionadorMesh201` devolve o pronto), acomodado pelo `pri6Acomoda` (Papel/Leve e luzes).
+      A sala aparece com a CÂMERA NORMAL do jogo (a de cinema só liga quando há cena): o leitor na porta, o Acumulador lá na frente.
+   2) Quando a caixa fecha, o leitor pode andar («O Acumulador espera você lá na frente. Vá até ele.»); ele espera, virando-se para o
+      leitor. Chegando a menos de 4,5 m (`PRO685.PERTO`) a cena começa (`pr685Roubo`): a sala escurece, o raio, o tremor, a fumaça —
+      e a cena da v201 segue do passo «anda até 2,4 m» (o relógio começa em T=1,9 s: sem subir do charco), segurada em T=2,0 s até ele
+      chegar a dois passos; só então fala e rouba os quatro itens. Longe (mais de 3,5 m) ele anda mais depressa (3 m/s).
+      Se o leitor não for até ele em 45 s (`PRO685.ESPERA`; 10 s no `?prologo=rapido`), ELE vem até o leitor. Qualquer outro caminho que
+      chame `proIniciaRoubo` (a contagem antiga de tempo e passos da v201) cai nesta cena, com o mesmo boneco — nunca um segundo.
+   3) Enquanto ele espera (caixa fechada, leitor andando) os bastidores continuam calados (`pro684Calado`), e o Hall é preparado desde que a
+      caixa fecha (TROCA no bloco da v684), não só durante a cena. A revelação da v683 (`PRO683.roubo`) fica desligada. `?encontro685=0` desliga.
+   4) O COLECIONADOR COM MAIS POLÍGONOS (`pr685Fino`): enquanto o modelo dele é montado (`collector209`, embrulhada), as superfícies curvas
+      nascem com o TRIPLO das divisões — as paramétricas do traje, da capa e do capuz (`t162Sup`: 36×22 → 108×66…) e as esferas, tornos,
+      cilindros, tubos e discos do kit (`THREE.*Geometry` trocadas por subclasses só durante a montagem) — quando a contagem original é de
+      10 ou mais; as de poucas divisões, que são desenho (a gaiola octogonal da lanterna, as barras hexagonais, as chaves), ficam como são.
+      16 936 → 82 328 triângulos no boneco (um só na sala; o custo de CPU — as chamadas de desenho — não muda). `?fino685=0` desliga só isso.
+   Gancho `window.__encontro685` (`estado`, `colocar`, `roubar`, `fino`, `erros`). */
+const PRO685={on:!/[?&#]encontro685=0/i.test(location.search+location.hash),DIST:18,PERTO:4.5,ESPERA:45,boss:null,esperando:false,livreT:0,avisou:false,vem:false,erros:[],stats:{colocadoEm:0,roubadoEm:0,distRoubo:0,andouAte:0}};
+function pro685Erro(k,e){if(PRO685.erros.length<20)PRO685.erros.push(k+': '+(e&&e.message||e));try{console.warn('v685',k,e);}catch(x){}}
+if(PRO685.on){try{PRO683.roubo=true;}catch(e){}} /* a v683 não dispara mais o roubo na revelação */
+function pr685Coloca(){try{if(!PRO685.on||PRO685.boss)return null;if(!(CUR==='room'&&CUR_GENRE==='prologo'&&ROOM&&ROOM.scene))return null;
+    const pl=cavPos();const fx=Math.sin(CH.dir),fz=Math.cos(CH.dir);let bx=pl.x+fx*PRO685.DIST,bz=pl.z+fz*PRO685.DIST;
+    try{const c=WORLD.clamp(bx,bz,0.8);bx=Array.isArray(c)?c[0]:c.x;bz=Array.isArray(c)?c[1]:c.z;}catch(e){}
+    const boss=colecionadorMesh201();const P=boss.userData.pro;P.raiz.position.y=0;boss.scale.setScalar(1);boss.visible=true;
+    boss.position.set(bx,(ROOM&&ROOM.floorY)?ROOM.floorY(bx,bz):0,bz);boss.rotation.y=Math.atan2(pl.x-bx,pl.z-bz);ROOM.scene.add(boss);
+    PRO.boss=boss;PRO685.boss=boss;PRO685.esperando=true;PRO685.livreT=0;
+    try{pri6Acomoda(boss);}catch(e){pro685Erro('acomodar',e);}
+    PRO685.stats.colocadoEm=Math.round(performance.now());return boss;}catch(e){pro685Erro('colocar',e);return null;}}
+/* a cena do roubo com o boneco que já está na sala: começa do passo «anda até dois passos» */
+function pr685Roubo(vem){try{if(!PRO685.on||PRO.cena||!PRO685.boss||!PRO685.esperando)return false;const E=PRO.estado;if(!E)return false;const boss=PRO685.boss;if(!boss.parent)ROOM.scene.add(boss);
+    const pl=cavPos();PRO685.esperando=false;PRO685.vem=!!vem;E.fase='roubo';proGrava();const fast=PRO.rapido?0.35:1;
+    PRO.cena={t:1.9*fast,passo:0,boss,x0:boss.position.x,z0:boss.position.z,sc:ROOM.scene,v685:true};PRO.trava=true;
+    try{PRO4.cine.lado=0;}catch(e){}
+    try{document.body.classList.add('proNoite');}catch(e){}try{if(window.__mus199)window.__mus199.sfx('raio');}catch(e){}
+    try{document.body.classList.add('tremor199');setTimeout(()=>document.body.classList.remove('tremor199'),700);}catch(e){}
+    for(let i=0;i<16;i++)c191Fx('fumaca',boss.position.x+(Math.random()-0.5)*1.6,boss.position.y+0.2+Math.random()*0.5,boss.position.z+(Math.random()-0.5)*1.6,{esc:0.8+Math.random(),vy:0.5+Math.random()*0.6,vida:2.2});
+    try{showToast('A sala escurece. O Acumulador ergue a lanterna…',{big:true,ms:4000});}catch(e){}
+    PRO685.stats.roubadoEm=Math.round(performance.now());PRO685.stats.distRoubo=Math.round(Math.hypot(pl.x-boss.position.x,pl.z-boss.position.z)*10)/10;return true;}catch(e){pro685Erro('roubo',e);return false;}}
+{ const _ir=proIniciaRoubo;proIniciaRoubo=function(){if(PRO685.on&&PRO685.boss&&PRO685.esperando&&!PRO.cena&&CUR==='room'&&CUR_GENRE==='prologo')return pr685Roubo(true);return _ir.apply(this,arguments);};
+  try{if(window.__prologo201)window.__prologo201.iniciarRoubo=proIniciaRoubo;}catch(e){} }
+/* o tique: coloca, espera (olhando o leitor), dispara perto ou pela espera; na cena, segura o relógio até ele chegar a dois passos */
+{ const _pt=proTick;proTick=function(dt){
+      /* ANTES da cena contar: o relógio segurado em T=2,0 s enquanto ele está a mais de 2,6 m (a cena soma até 0,1 s por tique — em `rapido`, 0,29 s de T — e a fala é em T=2,4 s) */
+      try{const C=PRO.cena;if(PRO685.on&&C&&C.v685&&C.passo<1&&C.boss){const f=PRO.rapido?0.35:1;const pl=cavPos();const d=Math.hypot(pl.x-C.boss.position.x,pl.z-C.boss.position.z);if(d>2.6&&C.t>2.0*f)C.t=2.0*f;}}catch(e){}
+      _pt.apply(this,arguments);try{if(!PRO685.on)return;const E=PRO.estado;if(!E)return;const I=(typeof PRO681!=='undefined')?PRO681:null;
+      if(E.fase==='kit'&&PRO.kit&&!PRO.cena&&!PRO685.boss&&CUR==='room'&&CUR_GENRE==='prologo'&&!PERF130.busy&&!fadeOnAt&&!CAV.morto)pr685Coloca();
+      const C=PRO.cena;
+      if(C&&C.v685&&C.passo<1&&C.boss){const pl=cavPos();const dx=pl.x-C.boss.position.x,dz=pl.z-C.boss.position.z,d=Math.hypot(dx,dz);
+        if(d>3.5){const v=Math.min(1.5*dt,d-2.4);C.boss.position.x+=dx/d*v;C.boss.position.z+=dz/d*v;} /* longe, ele apressa o passo (3 m/s com o andar da cena) */ return;}
+      const b=PRO685.boss;if(!b||!PRO685.esperando||C)return;if(!(CUR==='room'&&CUR_GENRE==='prologo'))return;
+      const pl=cavPos();const want=Math.atan2(pl.x-b.position.x,pl.z-b.position.z);b.rotation.y+=Math.atan2(Math.sin(want-b.rotation.y),Math.cos(want-b.rotation.y))*Math.min(1,dt*4);
+      const tt=(typeof t==='number')?t:performance.now()/1000;try{b.userData.anim(dt,null,tt,false);}catch(e){}
+      if(I&&I.ativo)return; /* a caixa de texto ainda na tela */
+      if(!PRO685.avisou){PRO685.avisou=true;try{showToast('O Acumulador espera você lá na frente. Vá até ele.',{ms:6000});}catch(e){}}
+      if(fadeOnAt||PERF130.busy||CAV.morto)return;
+      PRO685.livreT+=dt;const d=Math.hypot(pl.x-b.position.x,pl.z-b.position.z);PRO685.stats.andouAte=Math.round(d*10)/10;
+      if(d<PRO685.PERTO)pr685Roubo(false);else if(PRO685.livreT>(PRO.rapido?10:PRO685.ESPERA))pr685Roubo(true);
+    }catch(e){if(!PRO685.avisouTick){PRO685.avisouTick=1;pro685Erro('tick',e);}}}; }
+/* os bastidores calados também enquanto ele espera e o leitor anda */
+{ const _c=pro684Calado;pro684Calado=function(){try{if(_c.apply(this,arguments))return true;return !!(PRO685.on&&PRO685.esperando&&CUR==='room'&&CUR_GENRE==='prologo');}catch(e){return false;}}; }
+try{const D=window.__localeData428;if(D){const T={'O Acumulador espera você lá na frente. Vá até ele.':['The Collector is waiting up ahead. Go to him.','El Coleccionista te espera ahí delante. Ve hasta él.'],
+  'A sala escurece. O Acumulador ergue a lanterna…':['The room darkens. The Collector raises his lantern…','La sala se oscurece. El Coleccionista alza la linterna…']};
+  for(const k in T){if(D.en&&!D.en[k])D.en[k]=T[k][0];if(D.es&&!D.es[k])D.es[k]=T[k][1];}}}catch(e){}
+/* ---- 4. o Colecionador com o triplo das divisões nas superfícies curvas ---- */
+const PRO685_FINO={on:!/[?&#]fino685=0/i.test(location.search+location.hash),m:3,min:10,montagens:0,tris:0};
+function pr685Fino(fn){const T=THREE;const m=PRO685_FINO.m,min=PRO685_FINO.min;const x=n=>(typeof n==='number'&&n>=min)?Math.round(n*m):n;
+  const O={S:T.SphereGeometry,C:T.CylinderGeometry,K:T.ConeGeometry,R:T.TorusGeometry,L:T.LatheGeometry,U:T.TubeGeometry,D:T.CircleGeometry};const sup=t162Sup;
+  try{T.SphereGeometry=class extends O.S{constructor(r,ws,hs,...a){super(r,x(ws),x(hs),...a);}};
+    T.CylinderGeometry=class extends O.C{constructor(rt,rb,h,rs,hs,...a){super(rt,rb,h,x(rs),hs,...a);}};
+    T.ConeGeometry=class extends O.K{constructor(r,h,rs,...a){super(r,h,x(rs),...a);}};
+    T.TorusGeometry=class extends O.R{constructor(R,r,rs,ts,...a){super(R,r,x(rs),x(ts),...a);}};
+    T.LatheGeometry=class extends O.L{constructor(p,s,...a){super(p,x(s),...a);}};
+    T.TubeGeometry=class extends O.U{constructor(c,ts,r,rs,...a){super(c,x(ts),r,x(rs),...a);}};
+    T.CircleGeometry=class extends O.D{constructor(r,s,...a){super(r,x(s),...a);}};
+    t162Sup=function(nu,nv,f,op){return sup(x(nu),x(nv),f,op);};
+    return fn();}
+  finally{T.SphereGeometry=O.S;T.CylinderGeometry=O.C;T.ConeGeometry=O.K;T.TorusGeometry=O.R;T.LatheGeometry=O.L;T.TubeGeometry=O.U;T.CircleGeometry=O.D;t162Sup=sup;}}
+function pr685Tris(g){let n=0;try{g.traverse(o=>{if(o.isMesh&&o.geometry){const G=o.geometry;n+=Math.round((G.index?G.index.count:(G.attributes.position?G.attributes.position.count:0))/3);}});}catch(e){}return n;}
+{ const _c=collector209;collector209=function(){if(!PRO685.on||!PRO685_FINO.on)return _c.apply(this,arguments);const g=pr685Fino(()=>_c.apply(this,arguments));PRO685_FINO.montagens++;PRO685_FINO.tris=pr685Tris(g);return g;}; }
+window.__encontro685={estado:PRO685,colocar:pr685Coloca,roubar:pr685Roubo,fino:PRO685_FINO,tris:pr685Tris,erros:PRO685.erros};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
