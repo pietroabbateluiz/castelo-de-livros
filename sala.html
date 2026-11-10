@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v678</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v679</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -20597,7 +20597,7 @@ yield;
           const t=new THREE.Mesh(new THREE.SphereGeometry(0.14,10,8), mGancho);
           t.position.set(tx,H-0.18,tz); t.userData.teto=true; dec.add(t); R.tetos.push(t);
         }
-        R.pontoTeto=R.tetos[0];try{a195Decor(R,dec,mGancho,mGrade,H);}catch(e){console.error('ala 195 decor',e);}
+        R.pontoTeto=R.tetos[0];try{a195Decor(R,dec,mGancho,mGrade,H);}catch(e){console.error('ala 195 decor',e);}try{pr679Ancoras(R,dec,mGancho,H);}catch(e){console.error('v679 âncoras',e);}
       }
 yield;
       /* superfícies: chão, paredes, teto, vigas, frisos e os dois tapetes da casa também aceitam cor */
@@ -20634,7 +20634,7 @@ yield;
 yield;
 registerKitRoom('minha');
 try{ ROOMS.minha.world.navKey=()=>'minha'+SALA_NAV; }catch(e){}
-try{yield* a195MontarEtapas212(NR.minha);yield;a195Montar(NR.minha);yield;a195Mundo(ROOMS.minha);}catch(e){console.error('ala 195',e);} // obstáculo que anda obriga a refazer o mapa de caminhada
+try{if(pr679Adiar('minha')){pr679SoInterior(NR.minha,ROOMS.minha);}else{yield* a195MontarEtapas212(NR.minha);yield;a195Montar(NR.minha);yield;a195Mundo(ROOMS.minha);}}catch(e){console.error('ala 195',e);} // v679: no prólogo a área externa fica para depois // obstáculo que anda obriga a refazer o mapa de caminhada
 }
 
 const ROOMS={
@@ -41877,11 +41877,11 @@ function proTirar(k){const E=LOJA.equip;if(k==='veste')E.traje=null;else if(k===
 // v204: o vão da porta chama goHall a cada quadro — som e aviso com intervalo (sem encher o Diário), e o aviso não entra na fila atrás do aviso grande de chegada (que já diz que a porta não abre)
 function proPortaFechada(){const agora=performance.now();if(agora>=(PRO.somAte||0)){PRO.somAte=agora+1400;try{if(window.__mus199)window.__mus199.sfx('bloqueado');}catch(e){}}
   if(agora<(PRO.portaAte||0))return;PRO.portaAte=agora+4500;try{if(typeof toastUntil!=='undefined'&&agora<toastUntil&&toastBig)return;}catch(e){}showToast('A porta não cede. Algo nesta sala ainda não terminou com você…');}
-function proTrancado(){return PRO.trava&&!PRO.permitir&&CUR==='room'&&CUR_GENRE==='castelo';}
-{ const _tr=travel;travel=function(key){if(proTrancado()&&key!=='castelo'){proPortaFechada();return;}return _tr.apply(this,arguments);};
+function proTrancado(){return PRO.trava&&!PRO.permitir&&CUR==='room'&&CUR_GENRE==='minha';} // v679
+{ const _tr=travel;travel=function(key){if(proTrancado()&&key!=='minha'){proPortaFechada();return;}return _tr.apply(this,arguments);};
   const _gh=goHall;goHall=function(){if(proTrancado()){proPortaFechada();return;}return _gh.apply(this,arguments);};
-  const _er=enterRoom;enterRoom=function(g){if(proTrancado()&&g!=='castelo'){proPortaFechada();return;}return _er.apply(this,arguments);};
-  const _jp=jump;jump=function(where,genre){if(proTrancado()&&!(where==='room'&&genre==='castelo')){proPortaFechada();return;}return _jp.apply(this,arguments);};
+  const _er=enterRoom;enterRoom=function(g){if(proTrancado()&&g!=='minha'){proPortaFechada();return;}return _er.apply(this,arguments);};
+  const _jp=jump;jump=function(where,genre){if(proTrancado()&&!(where==='room'&&genre==='minha')){proPortaFechada();return;}return _jp.apply(this,arguments);};
   if(window.__travel)window.__travel=travel;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__jump=jump; }
 /* ---- o Colecionador de Histórias: figura alta de páginas rasgadas e tinta ---- */
 function proPaginaTex(){return t162Tex('v201 página rasgada',128,192,(x,w,h)=>{x.clearRect(0,0,w,h);x.fillStyle='#efe4c8';x.beginPath();x.moveTo(6,4);x.lineTo(w-5,2);x.lineTo(w-3,h*0.4);x.lineTo(w-9,h*0.55);x.lineTo(w-2,h*0.7);x.lineTo(w-14,h-3);x.lineTo(w*0.6,h-8);x.lineTo(w*0.35,h-2);x.lineTo(4,h-6);x.lineTo(8,h*0.6);x.lineTo(2,h*0.3);x.closePath();x.fill();
@@ -41974,12 +41974,12 @@ function proSpawnRevanche(){try{const E=PRO.estado;if(!E||E.fase!=='revanche'||E
 /* ---- o laço do prólogo ---- */
 function proTick(dt){const E=PRO.estado;if(!E)return;
   if(E.fase==='kit'){if(PRO.cena)return;if(!PRO.kit&&(typeof AQ!=='undefined'&&AQ.liberado)&&!PERF130.busy&&!fadeOnAt&&!buildBusy){proVestirKit();PRO.trava=true;
-      if(!(CUR==='room'&&CUR_GENRE==='castelo')){PRO.permitir=true;try{travel('castelo');}catch(e){proErro('viagem',e);}PRO.permitir=false;}
+      if(!(CUR==='room'&&CUR_GENRE==='minha')){PRO.permitir=true;try{travel('minha');}catch(e){proErro('viagem',e);}PRO.permitir=false;}
       if(PRO.primeiraVez){PRO.avisaChegada=1;PRO.avisaT=0;} /* v204: o aviso sai quando o leitor já está na sala (t252) */ return;}
-    if(CUR==='room'&&CUR_GENRE==='castelo'&&!(typeof uiBlocked==='function'&&uiBlocked())){E.tempo=(E.tempo||0)+dt;const px=CH.x,pz=CH.z;if(PRO.ux!==undefined){const d=Math.hypot(px-PRO.ux,pz-PRO.uz);if(d<1)E.andou=(E.andou||0)+d;}PRO.ux=px;PRO.uz=pz;
+    if(CUR==='room'&&CUR_GENRE==='minha'&&!(typeof uiBlocked==='function'&&uiBlocked())){E.tempo=(E.tempo||0)+dt;const px=CH.x,pz=CH.z;if(PRO.ux!==undefined){const d=Math.hypot(px-PRO.ux,pz-PRO.uz);if(d<1)E.andou=(E.andou||0)+d;}PRO.ux=px;PRO.uz=pz;
       const minT=PRO.rapido?6:60,minD=PRO.rapido?3:20,teto=PRO.rapido?14:120;if(Math.random()<dt/3)proGrava();
       if((E.tempo>=minT&&E.andou>=minD)||E.tempo>=teto){if(!CAV.morto)proIniciaRoubo();}}}
-  else if(E.fase==='roubo'){if(PRO.cena)proCenaTick(dt);else if(CUR==='room'&&CUR_GENRE==='castelo'&&!PRO.kit){ // recarregou no meio da cena: termina o roubo sem cena
+  else if(E.fase==='roubo'){if(PRO.cena)proCenaTick(dt);else if(CUR==='room'&&CUR_GENRE==='minha'&&!PRO.kit){ // recarregou no meio da cena: termina o roubo sem cena
       for(const k of ['veste','ima','botas','dragao'])if(!E.roubados[k])proTirar(k);PRO.kit=false;E.fase='busca';proGrava();try{applyGear();}catch(e){}setTimeout(()=>{try{proAbreAviso();}catch(e){}},800);}
     else if(!PRO.kit){PRO.kit=true;PRO.trava=true;}}
   else if(E.fase==='busca'){PRO.vigiaT=(PRO.vigiaT||0)+dt;if(PRO.vigiaT>1){PRO.vigiaT=0;proVigiaRecuperacao();}}
@@ -42517,8 +42517,8 @@ function pro4Cine(dt){const C=PRO.cena,V=PRO4.cine,W=pro4V();const ativa=!!(C&&C
 { const st=document.createElement('style');st.textContent='body.proCine > :not(canvas):not(#toast):not(.vig):not(#fade):not(#danoFlash):not(#grao){opacity:0 !important;pointer-events:none !important;transition:opacity .5s}';document.head.appendChild(st); }
 /* ---- 4. o aviso de chegada sai na sala; e a Fantasia devolve os guardiões quando o leitor sai dela ---- */
 { const _pt=proTick;proTick=function(dt){_pt.apply(this,arguments);try{
-      if(PRO.avisaChegada&&CUR==='room'&&CUR_GENRE==='castelo'&&!fadeOnAt&&!PERF130.busy){PRO.avisaT=(PRO.avisaT||0)+dt;if(PRO.avisaT>1.0){PRO.avisaChegada=0;
-        showToast('Você acorda na sala de Fantasia vestindo a Veste das Constelações, com as botas ligeiras, o ímã de moedas e um dragãozinho de jade ao seu lado. A porta… não abre. Ande pela clareira.',{big:true,ms:9000});}}
+      if(PRO.avisaChegada&&CUR==='room'&&CUR_GENRE==='minha'&&!fadeOnAt&&!PERF130.busy){PRO.avisaT=(PRO.avisaT||0)+dt;if(PRO.avisaT>1.0){PRO.avisaChegada=0;
+        showToast('Você acorda na Sala do Acumulador vestindo a Veste das Constelações, com as botas ligeiras, o ímã de moedas e um dragãozinho de jade ao seu lado. A porta… não abre. Ande pela sala.',{big:true,ms:9000});}}
       if(PRO4.ateSair&&!(CUR==='room'&&CUR_GENRE==='castelo')){PRO4.ateSair=false;pro4Devolve();}}catch(e){pro4Erro('tick',e);}}; }
 window.__prologo204={PRO4,calma:pro4CalmaAtiva,devolve:pro4Devolve};
 /* ================= v205 · OS PRIMEIROS MINUTOS DEPOIS DO ROUBO =================
@@ -42759,7 +42759,7 @@ function pri6Confere(){for(const g of PRI6.luzes){let ok=true;for(let p=g;p;p=p.
 { const _sr=proSpawnRevanche;proSpawnRevanche=function(){const antes=PRO.bossK;const r=_sr.apply(this,arguments);try{const k=PRO.bossK;if(k&&k!==antes&&k.g)pri6Acomoda(k.g);}catch(e){v206Erro('revanche',e);}return r;}; }
 { const _dr=draw;draw=function(dt){if(PRI6.luzes.size){try{pri6Confere();}catch(e){v206Erro('confere luzes',e);}}return _dr.apply(this,arguments);}; }
 // o modelo dele montado e os materiais compilados na preparação da Fantasia (atrás do carregamento de entrada)
-function pri6Ensaio(){if(!(CUR==='room'&&CUR_GENRE==='castelo'))return null;const f=proFase();if(f!=='kit'&&f!=='roubo'&&f!=='revanche')return null;if(PRO.cena)return null;
+function pri6Ensaio(){const f=proFase();if(!(CUR==='room'&&CUR_GENRE===((f==='kit'||f==='roubo')?'minha':'castelo')))return null;if(f!=='kit'&&f!=='roubo'&&f!=='revanche')return null;if(PRO.cena)return null;
   if(!PRI6.chefe||PRI6.chefe.parent){const t0=performance.now();PRI6.chefe=PRI6.monta();PRI6.montadoMs=Math.round(performance.now()-t0);try{const L=PRI6.chefe.userData.pro&&PRI6.chefe.userData.pro.luz;if(L){L.userData.i0=0.0001;L.userData.chefe206=true;}}catch(e){}}
   const grupo=new THREE.Group();grupo.name='v206 · ensaio do Colecionador';grupo.visible=false;grupo.add(PRI6.chefe);
   try{const f1=new THREE.Sprite(new THREE.SpriteMaterial({map:c191Tex('fumaca'),color:0xf4efe4,transparent:true,depthWrite:false,opacity:0.8}));f1.material.userData.papelKeep=true;grupo.add(f1);
@@ -54431,14 +54431,14 @@ tmark('preDraw');warmAudio130();try{tick(0.016);draw(0.016);}catch(e){console.er
 // Assim compilação de shaders e construção das salas não aparecem como travadas para o jogador.
 LOADED=true;
 if(Q.lite){try{warmCollect(HALLS[1].scene);}catch(e){}}
-queueRooms(FLOOR1_ORDER);
+queueRooms(pr679Abertura(FLOOR1_ORDER));
 requestAnimationFrame(frame);
 function setLoadProgress(value){
  const stage=LOAD424.last?.stage||loading424Text('Abrindo a biblioteca…','Opening the library…');
  loading424Bar(document.getElementById('loadTrack424'),document.getElementById('loadFill'),document.getElementById('loadPct'),value,stage,LOAD424.finished);
 }
 function calcLoadProgress(){
- const total=FLOOR1_ORDER.length,done=FLOOR1_ORDER.filter(k=>ROOMS[k]?.ready).length;
+ const L679=pr679Abertura(FLOOR1_ORDER);const total=L679.length,done=L679.filter(k=>ROOMS[k]?.ready).length;
  return total?done/total*100:null;
 }
 async function liberarAbertura(){
@@ -63344,7 +63344,7 @@ function ab524Erro(k,e){AB524.erros.push(k+': '+(e&&e.message||e));try{console.w
 // (1) a abertura: pronta quando o Hall está pronto; com o prólogo («kit») espera a Fantasia
 function ab524Pronto(done){try{if(!AB524.on)return done===FLOOR1_ORDER.length&&!!(ROOMS.fant&&ROOMS.fant.ready)&&!buildBusy&&!buildIt&&!BUILD_Q.length;
   const kit=(typeof proFase==='function'&&proFase()==='kit');AB524.stats.prologo=kit;AB524.stats.salasNaAbertura=done;
-  if(kit)return !!(ROOMS.fant&&ROOMS.fant.ready);return true;}catch(e){ab524Erro('pronto',e);return done===FLOOR1_ORDER.length;}}
+  if(kit)return !!(ROOMS.minha&&ROOMS.minha.ready);return true;}catch(e){ab524Erro('pronto',e);return done===FLOOR1_ORDER.length;}} // v679: o prólogo é na Sala do Acumulador
 // os portais das salas não entram na preparação da abertura: as salas aquecem depois, nos bastidores (ESC523.aquecer)
 function ab524AdiaPortal(p){try{if(!AB524.on||!LOAD424.startup||!p||!p.roomKey)return false;const E=window.__esc523&&window.__esc523.estado;if(E&&!E.aquecer.includes(p.roomKey))E.aquecer.push(p.roomKey);AB524.stats.portaisAdiados++;return true;}catch(e){ab524Erro('portal',e);return false;}}
 // a fila antiga (BUILD_Q, da tela de carregamento) e um iterador órfão do buildStep passam para os bastidores
@@ -82494,6 +82494,227 @@ function tr678Passo(){try{TR678.stats.passos++;const R=(typeof ROOMS!=='undefine
 if(TR678.on){try{const old=finishRoom;finishRoom=function(key){const r=old.apply(this,arguments);TR678.ultimaSala=performance.now();if(!TR678.iv)TR678.iv=setInterval(tr678Passo,2000);return r;};}catch(e){tr678Erro('gancho',e);}
   TR678.iv=setInterval(tr678Passo,2000);}
 window.__torre678={estado:TR678,stats:TR678.stats,erros:TR678.erros,passo:tr678Passo};
+
+/* v679 · o plano da redistribuição (função pura, testável fora do jogo)
+   itens: [{id,enc,x,z,hx,hz,raio,movel}] — centro atual (x,z), meias-medidas do contorno no chão (hx,hz), raio do obstáculo.
+   fixos: [[x,z,r]] obstáculos que não se movem (pilares da soleira, samambaias, bancos, porta…).
+   lustres: [[x,z]] luzes do forro da v677 (as peças de teto não caem em cima).
+   Regras: (1) só as peças do salão antigo (|x| < 14,2; −15,5 < z < 15,5) de chão e teto, fora as muito grandes (lanternas, céu);
+   (2) CONJUNTOS: peças de chão que se tocam (contornos a menos de 0,7 m) andam juntas, e a peça de teto vai com a peça de chão
+   debaixo dela; (3) os conjuntos com o centro atrás de z −4 (a sala de estar da lareira) ficam onde estão; (4) os outros, em ordem
+   de z, formam FAIXAS: cada faixa junta os conjuntos nascidos a menos de 3 m (em z) do primeiro conjunto dela — uma fatia da
+   sala antiga, que anda inteira, com cada conjunto no seu x e no seu recuo; as faixas são espalhadas com o mesmo vão entre si
+   de onde a primeira está (z ≈ −3) até a parede da porta (z 88); (5) um conjunto que cairia em cima de um fixo (pilar, samambaia, banco, porta) desliza 1,1 m por
+   vez até achar lugar; peça a peça se preciso. Nada é perdido: toda peça candidata recebe um destino dentro da sala.
+   Devolve {movimentos:[{id,enc,x,z,z0,grupo,faixa,cel,aj}], grupos, faixas, avisos}. */
+function pr679Plano(itens,fixos,lustres,opts){
+  const O=Object.assign({zc0:-4,zFim:88.0,zTeto:89.1,zVelho:15.5,passo:2.2,ix:-12.1,nx:12,iz:-13.2,nz:47,xMax:14.2,grande:6,margem:0.7,faixaDz:3.0},opts||{});
+  const avisos=[];
+  const cand=itens.filter(p=>p.movel!==false&&(p.enc==='chao'||p.enc==='teto')&&Math.abs(p.x)<O.xMax&&p.z<O.zVelho&&p.z>-15.5&&!(p.hx>O.grande||p.hz>O.grande));
+  const ef=(p)=>{if(p.enc==='teto')return [Math.min(p.hx,1.2),Math.min(p.hz,1.2)];if(p.raio>0)return [Math.min(p.hx,p.raio+0.8),Math.min(p.hz,p.raio+0.8)];return [p.hx,p.hz];};
+  for(const p of cand){const e=ef(p);p.ex=e[0];p.ez=e[1];}
+  const pai={};const find=(a)=>{while(pai[a]!==a)a=pai[a]=pai[pai[a]];return a;};const une=(a,b)=>{a=find(a);b=find(b);if(a!==b)pai[a]=b;};
+  for(const p of cand)pai[p.id]=p.id;
+  const chao=cand.filter(p=>p.enc==='chao'),teto=cand.filter(p=>p.enc==='teto');
+  const M=O.margem;
+  for(let i=0;i<chao.length;i++)for(let j=i+1;j<chao.length;j++){const a=chao[i],b=chao[j];if(Math.abs(a.x-b.x)<a.ex+b.ex+M&&Math.abs(a.z-b.z)<a.ez+b.ez+M)une(a.id,b.id);}
+  for(const t of teto){let melhor=null,md=1e9;for(const c of chao){if(Math.abs(t.x-c.x)<c.ex+0.9&&Math.abs(t.z-c.z)<c.ez+0.9){const d=Math.hypot(t.x-c.x,t.z-c.z);if(d<md){md=d;melhor=c;}}}if(melhor)une(t.id,melhor.id);}
+  const grupos={};for(const p of cand){const r=find(p.id);(grupos[r]=grupos[r]||[]).push(p);}
+  const G=Object.values(grupos).map(L=>{let z0=1e9,z1=-1e9,x0=1e9,x1=-1e9;for(const p of L){z0=Math.min(z0,p.z-p.ez);z1=Math.max(z1,p.z+p.ez);x0=Math.min(x0,p.x-p.ex);x1=Math.max(x1,p.x+p.ex);}return {L,z0,z1,x0,x1,zc:(z0+z1)/2};});
+  const movem=G.filter(g=>g.zc>=O.zc0).sort((a,b)=>a.zc-b.zc);
+  if(!movem.length)return {movimentos:[],grupos:G.length,faixas:0,avisos:['nada a mover']};
+  // faixas: conjuntos lado a lado
+  // um conjunto entra na faixa se nasceu a menos de 3 m (em z) do primeiro dela
+  const F=[];for(const g of movem){let f=null;for(const q of F){if(Math.abs(g.zc-q.zc)<=O.faixaDz){f=q;break;}}
+    if(f){f.L.push(g);g.f=f;}else{const nf={L:[g],zc:g.zc};F.push(nf);g.f=nf;}}
+  // pares espelhados (as duas plantas da porta, as duas estantes): um conjunto de um lado e outro do outro lado, na mesma altura,
+  // que caíram em faixas diferentes, vão para a mesma faixa (a mais à frente)
+  for(const g of movem)for(const h of movem){if(g===h||g.f===h.f)continue;const gx=(g.x0+g.x1)/2,hx=(h.x0+h.x1)/2;
+    if(Math.abs(g.zc-h.zc)<=1.6&&Math.abs(gx+hx)<=2.5&&Math.min(Math.abs(gx),Math.abs(hx))>5&&F.indexOf(g.f)<F.indexOf(h.f)){const de=g.f;de.L.splice(de.L.indexOf(g),1);h.f.L.push(g);g.f=h.f;if(!de.L.length)F.splice(F.indexOf(de),1);}}
+  for(const f of F){let z0=1e9,z1=-1e9;for(const g of f.L){z0=Math.min(z0,g.z0);z1=Math.max(z1,g.z1);}f.z0=z0;f.z1=z1;f.zc0=(z0+z1)/2;f.prof=z1-z0;}
+  F.sort((a,b)=>a.zc0-b.zc0);
+  // espalhar: a primeira faixa fica onde está (fundo); a última encosta na parede da porta; o vão entre faixas é o mesmo
+  const ini=F[0].z0,fim=O.zFim;const soma=F.reduce((s,f)=>s+f.prof,0);const vao=F.length>1?Math.max(0.6,(fim-ini-soma)/(F.length-1)):0;
+  let z=ini;const alvoF=[];for(const f of F){alvoF.push(z+f.prof/2);z+=f.prof+vao;}
+  const cel=(x,z)=>{let i=Math.round((x-O.ix)/O.passo),j=Math.round((z-O.iz)/O.passo);i=Math.max(0,Math.min(O.nx-1,i));j=Math.max(0,Math.min(O.nz-1,j));return [i,j,O.ix+i*O.passo,O.iz+j*O.passo];};
+  const bate=(p,x,z)=>{const rp=Math.max(p.raio||0,0.3)+0.15;if(p.enc==='teto'){for(const l of lustres||[])if(Math.hypot(x-l[0],z-l[1])<1.9)return true;return false;}
+    for(const o of fixos||[]){if(Math.hypot(x-o[0],z-o[1])<rp+(o[2]||0.5))return true;}return false;};
+  const cabe=(p,z)=>(z-p.hz>-13.5&&z+p.hz<O.zTeto);
+  const mov=[];const ocupados=[];
+  const livre=(p,x,z)=>{if(p.enc!=='chao')return true;const rp=Math.max(p.raio||0,0.3);for(const o of ocupados){if(o.grupo===p.grupo)continue;if(Math.hypot(x-o.x,z-o.z)<rp+o.r+0.1)return false;}return true;};
+  let gi=0;
+  F.forEach((f,fi)=>{for(const g of f.L){gi++;const alvo=alvoF[fi]+(g.zc-f.zc0);for(const p of g.L)p.grupo=gi;
+    const tent=[0,1.1,-1.1,2.2,-2.2,3.3,-3.3,4.4,-4.4,5.5,-5.5];let dz=null;
+    for(const d of tent){let ok=true;for(const p of g.L){const z=alvo+d+(p.z-g.zc);if(!cabe(p,z)||bate(p,p.x,z)||!livre(p,p.x,z)){ok=false;break;}}if(ok){dz=d;break;}}
+    if(dz===null){dz=0;avisos.push('grupo '+gi+' ('+g.L.map(p=>p.id).join(',')+'): sem lugar limpo, peça a peça');}
+    for(const p of g.L){let z=alvo+dz+(p.z-g.zc);
+      if(!cabe(p,z)||bate(p,p.x,z)||!livre(p,p.x,z)){let achou=false;for(const d of [1.1,-1.1,2.2,-2.2,3.3,-3.3,4.4,-4.4,5.5,-5.5,6.6,-6.6]){const z2=z+d;if(cabe(p,z2)&&!bate(p,p.x,z2)&&livre(p,p.x,z2)){z=z2;achou=true;break;}}
+        if(!achou){if(!cabe(p,z))z=Math.min(O.zTeto-p.hz-0.05,Math.max(-13.4+p.hz,z));avisos.push(p.id+': fica com sobreposição em z '+z.toFixed(1));}}
+      const c=cel(p.x,z);mov.push({id:p.id,enc:p.enc,x:p.x,z:+z.toFixed(3),z0:p.z,grupo:gi,faixa:fi+1,cel:[c[0],c[1]],aj:[+(p.x-c[2]).toFixed(3),+(z-c[3]).toFixed(3)]});
+      if(p.enc==='chao')ocupados.push({x:p.x,z,r:Math.max(p.raio||0,0.3),grupo:gi});}}});
+  return {movimentos:mov,grupos:G.length,movem:movem.length,faixas:F.length,vao:+vao.toFixed(2),avisos,faixas679:F.map((f,i)=>({z0:+f.z0.toFixed(2),z1:+f.z1.toFixed(2),desl:+(alvoF[i]-f.zc0).toFixed(2),n:f.L.length}))};
+}
+if(typeof module!=='undefined')module.exports={pr679Plano};
+
+/* ===================== v679 · O PRÓLOGO NA SALA DO ACUMULADOR E A SALA REDISTRIBUÍDA (bloco `PR679`, `prologo679.js`) =====================
+   Pedido do Luiz: «Não precisa voltar ao tamanho original, mas redistribua os itens ao longo da sala (cuidado para não perder nada).
+   Vamos fazer o prólogo aí dentro. A diferença é que a área externa não precisa ser carregada no prólogo, pois o Acumulador vem
+   roubar seus itens antes disso, encerrando o prólogo e te levando de volta ao hall».
+   1) A REDISTRIBUIÇÃO (uma vez por navegador, `pr679Redistribuir`): as peças de chão e de teto do salão antigo (z −15…15) são lidas
+      como estão (o registro salvo do leitor ou o lugar de fábrica), agrupadas em CONJUNTOS (o que se toca anda junto; a peça de teto
+      vai com a de chão debaixo), e os conjuntos que ficam à frente de z −4 formam FAIXAS (fatias da sala antiga, de ~3 m) que são
+      espalhadas com o mesmo vão entre si até a parede da porta (z 88) — cada peça no seu x, com o seu giro, dentro da fatia. A sala
+      de estar da lareira (sofá, tapete, poltronas, lenha, a árvore, o baú…) fica onde está. Os pilares da soleira, as samambaias, os
+      bancos de janela, a porta e os lustres novos são desviados. As peças de parede que estavam penduradas à frente (o troféu, o
+      quadro da direita e os três enfeites da «parede da porta», que desde a v1xx flutuavam em z 15, onde a parede já não existe) vão
+      para ganchos novos nas paredes do salão e para os quatro ganchos da parede da porta, que andam 60 m (a v677 não os levou).
+      Cada peça de teto movida ganha a sua própria âncora no forro (guardadas em `mundo.sala.decor.v679`, recriadas a cada abertura
+      ANTES de a decoração ser aplicada — `pr679Ancoras`, chamada na montagem da sala). O registro antigo fica em
+      `mundo.sala.decor.antes679`. NADA É PERDIDO: toda peça recebe um destino dentro da sala; `?redistribui679=0` desliga.
+      Correção da v677: a malha do editor já nasce com 47 fileiras (`SALA_GRADE.nz`/`limz` no início) — antes, uma peça guardada numa
+      célula do salão novo era puxada de volta para a fileira 12 na reabertura (`salaMover` apertava o j à malha de 13).
+   2) O PRÓLOGO NA SALA DO ACUMULADOR: as referências à Fantasia do prólogo (`proTrancado`, as travas de `travel`/`enterRoom`/`jump`,
+      a viagem e a contagem do `proTick`, o aviso de chegada, o ensaio do chefe) passam para `'minha'`; a abertura monta a Sala do
+      Acumulador primeiro e a tela de carregamento espera por ela (`ab524Pronto`, `queueRooms`, `calcLoadProgress`); no fim do roubo
+      (`roubo` → `busca`) o Leitor é levado de volta ao Hall e o aviso grande do Colecionador abre lá; a viagem de ida é repetida se a
+      primeira for recusada. A revanche continua na Fantasia.
+   3) A ÁREA EXTERNA ADIADA: enquanto o prólogo dura (fases kit e roubo), a sala nasce SEM a ala nova da v195, o Jardim das Letras, o
+      jardim das memórias, as bordaduras e a área externa da v581 (`pr679Adiar`): só o salão (com as pilastras da v199). Quando o
+      prólogo termina, a área externa é montada nos bastidores, em fatias (`pr679Exterior`): a parede esquerda volta ao bloco original
+      para `a195Parede` a encontrar, a ala nasce, e a parede nova, a parede de fora e o rodapé são esticados até z 90 como a v677 fez
+      (`an677Estica`); depois a v581, os jardins, o mundo (`a195Mundo`) e as árvores do bosque que cairiam no salão novo afundam.
+   Gancho `window.__prologo679` (`estado`, `stats`, `erros`, `plano`, `redistribuir`, `exterior`). */
+var PR679;
+function pr679St(){if(!PR679)PR679={on:!/[?&#]prologo679=0/i.test(location.search+location.hash),redistribui:!/[?&#]redistribui679=0/i.test(location.search+location.hash),anexo:!/[?&#]anexo677=0/i.test(location.search+location.hash),E:60,
+    adiado:false,exteriorFeito:false,construindo:false,pendentes:{},voltando:false,seguraAviso:false,avisoPendente:false,tentativas:0,faseAntes:null,
+    erros:[],stats:{redistribuidas:0,teto:0,parede:0,recusadas:[],faixas:0,conjuntos:0,ancoras:0,ganchosNovos:0,exteriorMs:0,exteriorPassos:0,arvoresSumidas:0,viagens:0}};return PR679;}
+function pr679Erro(k,e){const S=pr679St();if(S.erros.length<30)S.erros.push(k+': '+(e&&e.message||e));try{console.warn('v679',k,e);}catch(x){}}
+/* ---------- 0) a malha do editor já nasce com o salão novo (correção da v677) ---------- */
+try{if(pr679St().anexo&&typeof SALA_GRADE!=='undefined'&&SALA_GRADE.nz<47){SALA_GRADE.nz=47;SALA_GRADE.limz=89.2;}}catch(e){pr679Erro('malha',e);}
+/* ---------- 1) a redistribuição ---------- */
+// peças que já nasceram encostadas além da malha (o aparador da parede direita, o vaso grande da porta — partes dentro da parede):
+// `s195Cabe` recusava qualquer lugar novo; agora podem andar ao longo da mesma parede, com a mesma folga em x que tinham ao nascer
+var PR679_CABE={bb0:null};
+{ const _anc=salaAncora;salaAncora=function(g){const A=_anc.apply(this,arguments);try{if(g&&g.userData&&!g.userData.bb0&&A&&A.centro){const bb=new THREE.Box3().setFromObject(g);if(!bb.isEmpty())g.userData.bb0={minx:bb.min.x,maxx:bb.max.x};}}catch(e){}return A;};
+  const _ap=s195Aplica;s195Aplica=function(id,R){try{const g=R&&R.marcos&&R.marcos[id];PR679_CABE.bb0=(g&&g.userData&&g.userData.bb0)||null;}catch(e){PR679_CABE.bb0=null;}try{return _ap.apply(this,arguments);}finally{PR679_CABE.bb0=null;}};
+  const _cb=s195Cabe;s195Cabe=function(bb){if(_cb.apply(this,arguments))return true;const b0=PR679_CABE.bb0;if(!b0)return false;const LX=SALA_GRADE.limx,LZ=SALA_GRADE.limz;const minx=Math.min(-LX,b0.minx-0.02),maxx=Math.max(LX,b0.maxx+0.02);return bb.min.x>=minx&&bb.max.x<=maxx&&bb.min.z>=-13.5&&bb.max.z<=LZ;}; }
+// a v166 pendura as peças de parede novas pela parede que o gancho indica — supondo a parede da porta em D/2 (z 30) e os cantos
+// dentro da sala antiga: um gancho no Salão da Porta (z > 31) caía em z 29,98, no ar. Para esses ganchos a parede é a do próprio gancho.
+{ const _mp=m166Parede;m166Parede=function(P,W,D){try{if(pr679St().anexo&&P&&P.z>(D||60)/2+1){const ax=Math.abs(P.x);if(ax>W/2-1.2)return {dir:P.x<0?Math.PI/2:-Math.PI/2,x:Math.sign(P.x)*(W/2-0.02),z:P.z};return {dir:Math.PI,x:P.x,z:P.z+0.10};}}catch(e){}return _mp.apply(this,arguments);}; }
+function pr679RecKey(){return (typeof salaStorage128==='function'?salaStorage128('minha'):'mundo.sala.decor')+'.v679';}
+function pr679Rec(){const S=pr679St();if(S.rec)return S.rec;let r=null;try{r=JSON.parse(localStorage.getItem(pr679RecKey())||'null');}catch(e){}if(!r||typeof r!=='object')r={feito:0,tetos:{},ganchos:{}};r.tetos=r.tetos||{};r.ganchos=r.ganchos||{};S.rec=r;return r;}
+function pr679RecGrava(){try{localStorage.setItem(pr679RecKey(),JSON.stringify(pr679Rec()));}catch(e){pr679Erro('registro',e);}}
+// âncoras e ganchos — chamada na montagem da sala (depois de a195Decor), antes de a decoração ser aplicada
+function pr679Ancoras(R,dec,mGancho,H){const S=pr679St();if(!S.anexo||!R||!R.ganchos||!R.tetos||R.pr679Ancoras)return;R.pr679Ancoras=true;const E=S.E;let novos=0;
+  try{for(const h of R.ganchos){if(h&&h.userData&&h.userData.gancho&&Math.abs(h.position.z-29.88)<0.3&&Math.abs(h.position.x)<13){h.position.z+=E;}}}catch(e){pr679Erro('ganchos da porta',e);}
+  const sph=(r)=>new THREE.Mesh(new THREE.SphereGeometry(r,10,8),mGancho||(R.ganchos[0]&&R.ganchos[0].material));
+  try{for(const z of [21,33,45,57,69,81])for(const s of [-1,1]){const h=sph(0.12);h.position.set(s*13.88,2.55,z);h.userData.gancho=true;h.userData.pr679=true;dec.add(h);R.ganchos.push(h);novos++;}}catch(e){pr679Erro('ganchos novos',e);}
+  try{for(const z of [21,33,45,57,69,81])for(const x of [-8,0,8]){const t=sph(0.14);t.position.set(x,(H||5.4)-0.18,z);t.userData.teto=true;t.userData.pr679=true;dec.add(t);R.tetos.push(t);}}catch(e){pr679Erro('âncoras novas',e);}
+  // as âncoras próprias das peças de teto movidas e os ganchos das peças de parede movidas (do registro): o índice no mapa é acertado aqui
+  try{const rec=pr679Rec(),mapa=(typeof salaMapa128==='function')?salaMapa128(R):null;let mudou=false;
+    for(const id in rec.tetos){const p=rec.tetos[id];if(!Array.isArray(p))continue;const t=sph(0.14);t.position.set(p[0],(H||5.4)-0.18,p[1]);t.userData.teto=true;t.userData.pr679=true;t.userData.peca=id;dec.add(t);R.tetos.push(t);const idx=R.tetos.length-1;S.stats.ancoras++;
+      if(mapa){const d=(mapa[id]=mapa[id]||{});if(d.teto!==idx){d.teto=idx;mudou=true;}}}
+    for(const id in rec.ganchos){const p=rec.ganchos[id];if(!Array.isArray(p))continue;let idx=-1;for(let i=0;i<R.ganchos.length;i++){const h=R.ganchos[i];if(Math.abs(h.position.x-p[0])<0.3&&Math.abs(h.position.z-p[1])<0.3){idx=i;break;}}
+      if(idx<0){const h=sph(0.12);h.position.set(p[0],2.55,p[1]);h.userData.gancho=true;h.userData.pr679=true;dec.add(h);R.ganchos.push(h);idx=R.ganchos.length-1;novos++;}
+      if(mapa){const d=(mapa[id]=mapa[id]||{});if(d.gancho!==idx){d.gancho=idx;mudou=true;}}}
+    if(mudou)try{salaSalvar(R);}catch(e){}}catch(e){pr679Erro('âncoras do registro',e);}
+  S.stats.ganchosNovos=novos;}
+function pr679Itens(R){const T=THREE,out=[],bb=new T.Box3(),c=new T.Vector3(),sz=new T.Vector3();const mapa=salaMapa128(R);
+  for(const id in SALA_PECAS){const P=SALA_PECAS[id],g=R.marcos&&R.marcos[id];if(!g||!P||!P.encaixe)continue;const d=mapa[id]||{};
+    try{salaAncora(g);g.updateMatrixWorld(true);bb.setFromObject(g);if(bb.isEmpty())continue;bb.getCenter(c);bb.getSize(sz);
+      out.push({id,enc:P.encaixe,x:+c.x.toFixed(3),z:+c.z.toFixed(3),y:+c.y.toFixed(3),hx:sz.x/2,hz:sz.z/2,hy:sz.y/2,raio:P.raio||0,movel:!d.guardada,g});}catch(e){pr679Erro('item '+id,e);}}
+  return out;}
+function pr679Redistribuir(R,forcar){const S=pr679St();if(!S.redistribui||!S.anexo)return null;R=R||(typeof NR!=='undefined'&&NR.minha);if(!R||!R.marcos||!R.ganchos||!R.tetos)return null;const rec=pr679Rec();if(rec.feito&&!forcar)return null;
+  const t0=performance.now();const mapa=salaMapa128(R);const chave=salaStorage128(R);
+  try{if(!localStorage.getItem(chave+'.antes679'))localStorage.setItem(chave+'.antes679',JSON.stringify(mapa));}catch(e){}
+  const itens=pr679Itens(R);const w=R.world||(ROOMS.minha&&ROOMS.minha.world);
+  const fixos=[[0,30.3,2.2],[0,88.5,2.2]];try{for(const e of (w&&w.obst||[]))if(e&&e[1]>28&&e[2]>0)fixos.push([e[0],e[1],e[2]]);}catch(e){}
+  const lustres=[[-6,37],[6,37],[0,50],[-6,63],[6,63],[0,78]];
+  const plano=pr679Plano(itens.map(p=>({id:p.id,enc:p.enc,x:p.x,z:p.z,hx:p.hx,hz:p.hz,raio:p.raio,movel:p.movel})),fixos,lustres,{nz:SALA_GRADE.nz,zTeto:SALA_GRADE.limz-0.1});
+  S.plano=plano;S.stats.faixas=plano.faixas||0;S.stats.conjuntos=plano.movem||0;
+  const dec=R.decor,mat=(R.tetos[0]&&R.tetos[0].material);
+  for(const m of plano.movimentos){try{const d=(mapa[m.id]=mapa[m.id]||{});const antes=JSON.stringify(d);
+      if(m.enc==='chao'){d.cel=m.cel.slice();d.aj=m.aj.slice();let ok=s195Aplica(m.id,R);if(!ok){d.aj=[m.aj[0],0];ok=s195Aplica(m.id,R);}if(!ok){d.aj=[0,0];ok=s195Aplica(m.id,R);}
+        if(!ok){const a0=JSON.parse(antes);for(const k of Object.keys(d))delete d[k];Object.assign(d,a0);s195Aplica(m.id,R);S.stats.recusadas.push(m.id);}else S.stats.redistribuidas++;salaObst(m.id,R);}
+      else if(m.enc==='teto'){const t=new THREE.Mesh(new THREE.SphereGeometry(0.14,10,8),mat);t.position.set(m.x,5.4-0.18,m.z);t.userData.teto=true;t.userData.pr679=true;t.userData.peca=m.id;if(dec)dec.add(t);else R.scene.add(t);R.tetos.push(t);
+        d.teto=R.tetos.length-1;d.aj=[0,0];rec.tetos[m.id]=[+m.x.toFixed(2),+m.z.toFixed(2)];s195Aplica(m.id,R);salaObst(m.id,R);S.stats.teto++;S.stats.redistribuidas++;}}catch(e){pr679Erro('mover '+m.id,e);}}
+  // peças de parede penduradas à frente: para os ganchos do salão (mesma parede) e da parede da porta
+  try{const faixas=plano.faixas679||[];const usados=new Set();for(const id in mapa){const d=mapa[id];if(d&&typeof d.gancho==='number')usados.add(d.gancho);}
+    const desl=(z)=>{for(const f of faixas)if(z>=f.z0-3.2&&z<=f.z1+3.2)return f.desl;return faixas.length?faixas[faixas.length-1].desl:0;};
+    for(const p of itens){if(p.enc!=='parede'||!p.movel)continue;if(p.z<-4||p.z>15.5||Math.abs(p.x)>14.2)continue;if(p.y-p.hy<0.4||Math.min(p.hx,p.hz)*2>1.5)continue;
+      const lado=p.x<-12?'esq':p.x>12?'dir':(p.z>13.5?'porta':null);if(!lado)continue;const zAlvo=p.z+desl(p.z);let melhor=-1,md=1e9;
+      for(let i=0;i<R.ganchos.length;i++){if(usados.has(i))continue;const h=R.ganchos[i].position;const ok=lado==='esq'?h.x<-13:lado==='dir'?h.x>13:h.z>80;if(!ok)continue;const dd=lado==='porta'?Math.abs(h.x-p.x):Math.abs(h.z-zAlvo)+(h.z<-4?50:0);if(dd<md){md=dd;melhor=i;}}
+      if(melhor<0)continue;if(salaPendurar(p.id,melhor,R)){usados.add(melhor);const h=R.ganchos[melhor].position;rec.ganchos[p.id]=[+h.x.toFixed(2),+h.z.toFixed(2)];S.stats.parede++;S.stats.redistribuidas++;}}}catch(e){pr679Erro('paredes',e);}
+  rec.feito=Date.now();pr679RecGrava();try{salaSalvar(R);}catch(e){}try{if(w)w.__nav=null;}catch(e){}try{SALA_NAV++;}catch(e){}
+  S.stats.redistribuiMs=Math.round(performance.now()-t0);return plano;}
+/* ---------- 2) o prólogo: a sala e a volta ao Hall ---------- */
+function pr679FaseProl(){try{const f=(typeof proFase==='function')?proFase():'feito';return f;}catch(e){return 'feito';}}
+function pr679Abertura(keys){try{const S=pr679St();if(!S.on)return keys;const f=pr679FaseProl();if((f==='kit'||f==='roubo')&&typeof ROOM_BUILDERS!=='undefined'&&ROOM_BUILDERS.minha&&!keys.includes('minha'))return ['minha'].concat(keys);}catch(e){}return keys;}
+function pr679Adiar(key){try{if(key!=='minha')return false;const S=pr679St();if(!S.on)return false;const f=pr679FaseProl();if(f==='kit'||f==='roubo'){S.adiado=true;return true;}}catch(e){}return false;}
+function pr679SoInterior(N,R){try{s199Salao(N);}catch(e){pr679Erro('salão 199',e);}try{if(R){R.pr679SemExterior=true;pr679MundoInterior(R);}}catch(e){pr679Erro('mundo interior',e);}}
+// sem a ala (sem `a195Mundo`), a caixa de passeio e da câmera é a do salão inteiro, z −30…90 (a `boxWorld` de fábrica pararia em z 30)
+function pr679MundoInterior(R){const w=R.world;if(!w||w.pr679box)return;const W=28,H=5.4,Z0=-30,Z1=30+pr679St().E;w.pr679box=true;
+  w.clamp=(x,z,m)=>[Math.max(-W/2+m,Math.min(W/2-m,x)),Math.max(Z0+m,Math.min(Z1-m,z))];
+  w.camT=(ox,oy,oz,dx,dy,dz,dist)=>{const m=0.55;let t=dist;if(dx>1e-6)t=Math.min(t,((W/2-m)-ox)/dx);else if(dx<-1e-6)t=Math.min(t,((-W/2+m)-ox)/dx);if(dz>1e-6)t=Math.min(t,((Z1-m)-oz)/dz);else if(dz<-1e-6)t=Math.min(t,((Z0+m)-oz)/dz);if(dy>1e-6)t=Math.min(t,((H-0.6)-oy)/dy);return t;};
+  w.ext=Math.max(w.ext||0,Z1+0.6);w.__nav=null;R.far=Math.max(R.far||0,190);}
+function pr679Pendente(k,fn){const S=pr679St();S.pendentes[k]=fn;}
+// a área externa, nos bastidores e em fatias
+function pr679Exterior(){const S=pr679St();if(S.exteriorFeito||S.construindo||!S.adiado)return false;const R=ROOMS.minha,N=(typeof NR!=='undefined'&&NR.minha)||R;if(!R||!R.ready||!R.scene)return false;S.construindo=true;const t0=performance.now();const sc=R.scene,H=5.4,E=S.E;
+  const fim=(err)=>{S.exteriorFeito=true;S.construindo=false;S.stats.exteriorMs=Math.round(performance.now()-t0);try{if(R.world)R.world.__nav=null;}catch(e){}try{SALA_NAV++;}catch(e){}try{delete R.pr679SemExterior;}catch(e){}if(err)pr679Erro('exterior',err);};
+  // (a) a parede esquerda e o rodapé voltam ao bloco original (a v677 os esticou), para a195Parede os encontrar
+  let W=null,Rd=null,rdH=0.12;try{const b=new THREE.Box3(),sz=new THREE.Vector3();for(const o of sc.children){if(!o.isMesh||!o.geometry||!o.geometry.attributes||!o.geometry.attributes.position||o.userData.a195)continue;
+      if(Math.abs(o.position.x+14.12)>0.02&&Math.abs(o.position.x+13.97)>0.02)continue;o.updateMatrixWorld(true);o.geometry.computeBoundingBox();b.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);b.getSize(sz);if(b.min.z>-29.5||b.max.z<29)continue;
+      if(Math.abs(o.position.x+14.12)<0.02&&Math.abs(sz.x-0.24)<0.03&&Math.abs(sz.y-H)<0.06)W=o;
+      else if(Math.abs(o.position.x+13.97)<0.02&&Math.abs(sz.x-0.06)<0.02&&sz.y<0.25){Rd=o;rdH=sz.y;}}
+    // a v677 trocou a geometria por uma cópia esticada sem `parameters`: volta ao bloco original (a195Parede procura BoxGeometry 0,24 × H × 60)
+    if(W){const g0=W.geometry;W.geometry=new THREE.BoxGeometry(0.24,H,60);try{g0.dispose();}catch(e){}}if(Rd){const g0=Rd.geometry;Rd.geometry=new THREE.BoxGeometry(0.06,Math.max(0.05,rdH||0.12),60);try{g0.dispose();}catch(e){}}
+    S.stats.paredeAchada=!!W;S.stats.rodapeAchado=!!Rd;}catch(e){pr679Erro('parede original',e);}
+  let it=null;try{it=a195MontarEtapas212(N);}catch(e){fim(e);return false;}
+  const passo=()=>{try{S.stats.exteriorPassos++;const r=it.next();if(!r.done){setTimeout(passo,60);return;}
+      // (b) a parede nova, a parede de fora e o rodapé esticam até z 90 (como a v677 fez com a parede antiga)
+      try{const alvos=[];for(const o of sc.children){if(!o.isMesh||!o.geometry||!o.geometry.attributes||!o.geometry.attributes.position)continue;const n=o.name||'';if(o===W||o===Rd||/parede de fora \(ala nova\)/.test(n))alvos.push(o);}
+        const b=new THREE.Box3();for(const o of alvos){o.updateMatrixWorld(true);o.geometry.computeBoundingBox();b.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);if(b.max.z>31)continue;if(o===Rd)o.geometry=o.geometry.clone();const nv=an677Estica(o,29.0,E);if(nv)an677Repete(o.material);}}catch(e){pr679Erro('esticar',e);}
+      setTimeout(()=>{try{a195Montar(N);}catch(e){pr679Erro('a195Montar',e);}
+        setTimeout(()=>{try{a195Mundo(ROOMS.minha);}catch(e){pr679Erro('a195Mundo',e);}try{const w=R.world;w.ext=Math.max(w.ext||0,90.6);R.far=Math.max(R.far||0,190);}catch(e){}
+          const pend=Object.keys(S.pendentes);const roda=(i)=>{if(i>=pend.length){setTimeout(()=>{pr679Arvores(sc,E);fim();},300);return;}try{S.pendentes[pend[i]]();}catch(e){pr679Erro('pendente '+pend[i],e);}delete S.pendentes[pend[i]];setTimeout(()=>roda(i+1),250);};roda(0);},250);},250);}catch(e){fim(e);}};
+  setTimeout(passo,30);return true;}
+// as árvores do bosque da v581 que cairiam dentro do salão novo afundam (a v677 só tentava por 2 min)
+function pr679Arvores(sc,E){try{const M4=new THREE.Matrix4(),V3=new THREE.Vector3();let arv=0;sc.traverse(o=>{if(!o.isInstancedMesh||o.userData.an677)return;if(!/581 bosques/.test(o.name||''))return;o.updateMatrixWorld(true);let n=0;for(let i=0;i<o.count;i++){o.getMatrixAt(i,M4);V3.setFromMatrixPosition(M4).applyMatrix4(o.matrixWorld);if(Math.abs(V3.x)<17&&V3.z>27.5&&V3.z<30+E+5){const lp=new THREE.Vector3().setFromMatrixPosition(M4);M4.setPosition(lp.x,lp.y-300,lp.z);o.setMatrixAt(i,M4);n++;}}o.instanceMatrix.needsUpdate=true;try{o.computeBoundingSphere();}catch(e){}o.userData.an677=true;arv+=n;});pr679St().stats.arvoresSumidas=arv;}catch(e){pr679Erro('árvores',e);}}
+// os montadores da área externa que a sala chama no finishRoom ficam à espera enquanto o prólogo dura
+{ const _x5=x581Monta;x581Monta=function(key,R){if(pr679Adiar(key)&&R&&!R.x581){pr679Pendente('x581',()=>_x5(key,R));return;}return _x5.apply(this,arguments);};
+  const _g3=garden396Build;garden396Build=function(key,R){if(pr679Adiar(key)&&R&&!R.garden396){pr679Pendente('garden396',()=>_g3(key,R));return;}return _g3.apply(this,arguments);}; }
+// o aviso grande do Colecionador espera a chegada ao Hall
+{ const _ab=proAbreAviso;proAbreAviso=function(){const S=pr679St();if(S.seguraAviso){S.avisoPendente=true;return;}return _ab.apply(this,arguments);}; }
+function pr679VoltaHall(){const S=pr679St();if(!S.voltando)return;S.voltaT=(S.voltaT||0);
+  if(CUR==='hall'){if(fadeOnAt||PERF130.busy)return;S.voltando=false;S.seguraAviso=false;S.stats.voltou=Date.now();
+    try{showToast('Você está de volta ao Hall. O Colecionador sumiu em páginas com o que era seu — e a porta da Sala do Acumulador se abriu.',{big:true,ms:7000});}catch(e){}
+    if(S.avisoPendente){S.avisoPendente=false;setTimeout(()=>{try{proAbreAviso();}catch(e){pr679Erro('aviso',e);}},2600);}
+    setTimeout(()=>{try{pr679Exterior();}catch(e){pr679Erro('exterior após o roubo',e);}},4000);return;}
+  if(QUIET434.job||PERF130.busy||fadeOnAt)return; // uma viagem em curso (a nossa, ou outra): espera por ela
+  const agora=performance.now();if(agora<(S.proxVolta||0))return;S.proxVolta=agora+3000;S.tentativas++;
+  if(S.tentativas>8){S.voltando=false;S.seguraAviso=false;if(S.avisoPendente){S.avisoPendente=false;try{proAbreAviso();}catch(e){}}return;}
+  try{PRO.permitir=true;goHall();}catch(e){pr679Erro('goHall',e);}finally{PRO.permitir=false;}}
+{ const _pt=proTick;proTick=function(dt){_pt.apply(this,arguments);try{const S=pr679St();if(!S.on)return;const E=PRO.estado;if(!E)return;const f=E.fase;
+      // o fim do roubo (com cena ou sem) dentro da Sala do Acumulador: de volta ao Hall
+      if(S.faseAntes==='roubo'&&f==='busca'&&CUR==='room'&&CUR_GENRE==='minha'&&!S.voltando){S.voltando=true;S.seguraAviso=true;S.tentativas=0;S.proxVolta=performance.now()+2200;S.stats.fimRoubo=Date.now();}
+      S.faseAntes=f;
+      if(S.voltando)pr679VoltaHall();
+      // a viagem de ida recusada (preparação em curso) é repetida
+      if(f==='kit'&&PRO.kit&&PRO.trava&&!PRO.cena&&!(CUR==='room'&&CUR_GENRE==='minha')&&!fadeOnAt&&!PERF130.busy&&!buildBusy&&!QUIET434.job){const agora=performance.now();if(agora>=(S.proxIda||0)){S.proxIda=agora+3000;if(S.stats.viagens<12){S.stats.viagens++;try{PRO.permitir=true;travel('minha');}catch(e){pr679Erro('viagem',e);}finally{PRO.permitir=false;}}}}
+      // a área externa adiada: quando o prólogo já passou e a sala está montada (recarregou depois do roubo, ou saiu por outro caminho)
+      if(S.adiado&&!S.exteriorFeito&&!S.construindo&&f!=='kit'&&f!=='roubo'&&!S.voltando){S.extT=(S.extT||0)+dt;if(S.extT>6&&!PERF130.busy&&!buildBusy&&ROOMS.minha&&ROOMS.minha.ready){S.extT=0;pr679Exterior();}}
+    }catch(e){if(!pr679St().avisouTick){pr679St().avisouTick=1;pr679Erro('tick',e);}}}; }
+/* ---------- 3) a redistribuição acontece quando a sala fica pronta (depois da v677) ---------- */
+{ const _fr=finishRoom;finishRoom=function(key){const r=_fr.apply(this,arguments);if(key==='minha'){setTimeout(()=>{try{pr679Redistribuir(NR.minha);}catch(e){pr679Erro('redistribuir',e);}},120);}return r;};
+  setTimeout(()=>{try{if(ROOMS.minha&&ROOMS.minha.ready)pr679Redistribuir(NR.minha);}catch(e){pr679Erro('redistribuir (fallback)',e);}},3000); }
+/* ---------- textos nas outras línguas ---------- */
+try{const D=window.__localeData428;if(D){const T={
+  'Você está de volta ao Hall. O Colecionador sumiu em páginas com o que era seu — e a porta da Sala do Acumulador se abriu.':['You are back in the Hall. The Collector vanished into pages with what was yours — and the door of the Collector’s Room has opened.','Estás de vuelta en el Hall. El Coleccionista se desvaneció en páginas con lo que era tuyo — y la puerta de la Sala del Coleccionista se abrió.'],
+  'Você acorda na Sala do Acumulador vestindo a Veste das Constelações, com as botas ligeiras, o ímã de moedas e um dragãozinho de jade ao seu lado. A porta… não abre. Ande pela sala.':['You wake up in the Collector’s Room wearing the Constellation Vestment, with the swift boots, the coin magnet and a little jade dragon by your side. The door… won’t open. Walk around the room.','Despiertas en la Sala del Coleccionista con la Veste de las Constelaciones, las botas ligeras, el imán de monedas y un dragoncito de jade a tu lado. La puerta… no abre. Recorre la sala.']};
+  for(const k in T){if(D.en&&!D.en[k])D.en[k]=T[k][0];if(D.es&&!D.es[k])D.es[k]=T[k][1];}}}catch(e){}
+// desfazer a redistribuição (console): volta ao registro guardado em `.antes679` e marca o registro da v679 como desfeito; recarregar depois
+function pr679Desfazer(){try{const k=salaStorage128('minha');const b=localStorage.getItem(k+'.antes679');if(!b)return 'sem cópia do registro antigo';localStorage.setItem(k,b);const rec={feito:Date.now(),desfeito:1,tetos:{},ganchos:{}};localStorage.setItem(pr679RecKey(),JSON.stringify(rec));pr679St().rec=rec;return 'registro antigo restaurado — recarregue a página';}catch(e){return String(e);}}
+window.__prologo679={estado:pr679St(),stats:pr679St().stats,erros:pr679St().erros,plano:()=>pr679St().plano,redistribuir:(f)=>pr679Redistribuir(NR.minha,f),desfazer:pr679Desfazer,exterior:pr679Exterior,itens:()=>pr679Itens(NR.minha),rec:pr679Rec};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
