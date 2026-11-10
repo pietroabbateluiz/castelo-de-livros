@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v680</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v681</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -82797,6 +82797,73 @@ function pr680Dentro(R){const S=pr679St();if(!S.redistribui||!S.anexo)return nul
   st.ms=Math.round(performance.now()-t0);return plano;}
 { const _rd=pr679Redistribuir;pr679Redistribuir=function(R,forcar){const r=_rd.apply(this,arguments);try{pr680Dentro(R||(typeof NR!=='undefined'&&NR.minha));}catch(e){pr679Erro('dentro680',e);}return r;}; }
 window.__dentro680={stats:()=>pr679St().stats.dentro680,plano:()=>pr679St().plano680,aplicar:()=>pr680Dentro(NR.minha)};
+
+/* ===================== v681 · O JOGO COMEÇA DENTRO DA SALA DO ACUMULADOR, COM A HISTÓRIA DIGITADA (bloco `PRO681`, `intro681.js`) =====================
+   Pedido do Luiz: «Inicie o jogo dentro dessa sala e não no hall. Mas ela fica congelada com um texto que vai sendo digitado na tela em
+   uma caixa de texto, conta a história do Acumulador, frases simples, e pede para você explorar a sala (o diálogo deve ter alguns
+   segundos, suficiente para o carregamento da tela)».
+   Na primeira vez (fase «kit» do prólogo, uma vez por perfil — `introVisto` no estado do prólogo): assim que a tela de carregamento se
+   fecha, em vez do Hall o leitor vê uma tela escura com a CAIXA DE TEXTO em que a história do Acumulador vai sendo digitada, frase a
+   frase (seis frases simples; a última pede para explorar a sala), enquanto por baixo a viagem para a Sala do Acumulador acontece
+   (`proTick` da v201/v679). Quando a sala está pronta (chegou e a preparação de fundo acabou — ou 45 s depois de chegar), o escuro some e a
+   sala aparece CONGELADA atrás da caixa: o boneco não anda (`moveTP`), a interface fica escondida e nada conta para o prólogo
+   (`uiBlocked` responde «ocupado»), a câmera fica onde está. Terminado o texto, com a sala pronta, aparece «clique ou pressione uma tecla
+   para explorar» e a caixa se vai 3,5 s depois (ou no clique/tecla); o aviso antigo de chegada não repete. Se a sala não ficar pronta em
+   90 s a caixa se vai mesmo assim. Textos em português, inglês e espanhol pela língua do jogo (`__locale428`); a caixa tem `translate="no"`
+   para o tradutor não mexer no que está sendo digitado. `?intro681=0` desliga. Gancho `window.__intro681` (`estado`, `fechar`). */
+const PRO681={on:!/[?&#]intro681=0/i.test(location.search+location.hash),ativo:false,digitando:false,pronto:false,revelado:false,acabou:false,el:null,t0:0,chegou:0,erros:[],
+  textos:{'pt-BR':['Há muito tempo, um leitor viveu nesta sala.','Ele guardava tudo o que lia: mapas, brinquedos, barcos, estrelas.','Chamaram-no de Acumulador.','Um dia ele se foi. A sala ficou cheia — e ficou sua.','Você acorda aqui com a veste, as botas, o ímã e um dragãozinho de jade.','Explore a sala. Ande entre as coisas que ele guardou.'],
+    'en-US':['Long ago, a reader lived in this room.','He kept everything he read: maps, toys, boats, stars.','They called him the Collector.','One day he was gone. The room stayed full — and became yours.','You wake up here with the vestment, the boots, the magnet and a little jade dragon.','Explore the room. Walk among the things he kept.'],
+    'es':['Hace mucho tiempo, un lector vivió en esta sala.','Guardaba todo lo que leía: mapas, juguetes, barcos, estrellas.','Lo llamaron el Coleccionista.','Un día se fue. La sala quedó llena — y quedó tuya.','Despiertas aquí con la veste, las botas, el imán y un dragoncito de jade.','Explora la sala. Camina entre las cosas que él guardó.']},
+  dicas:{'pt-BR':['clique ou pressione uma tecla para explorar a sala','preparando a sala…'],'en-US':['click or press a key to explore the room','preparing the room…'],'es':['haz clic o pulsa una tecla para explorar la sala','preparando la sala…']},
+  titulo:{'pt-BR':'🕯️ A Sala do Acumulador','en-US':'🕯️ The Collector’s Room','es':'🕯️ La Sala del Coleccionista'}};
+function pro681Erro(k,e){if(PRO681.erros.length<20)PRO681.erros.push(k+': '+(e&&e.message||e));try{console.warn('v681',k,e);}catch(x){}}
+function pro681Lingua(){try{const l=window.__locale428&&window.__locale428.language;if(l==='en-US'||l==='es')return l;}catch(e){}return 'pt-BR';}
+function pro681Cria(){if(PRO681.el)return PRO681.el;const L=pro681Lingua();
+  const st=document.createElement('style');st.textContent='#intro681{position:fixed;inset:0;z-index:15;background:#07060a;display:flex;align-items:flex-end;justify-content:center;transition:background 1.4s ease;cursor:default}'+
+    '#intro681.claro{background:rgba(7,6,10,0)}'+
+    '#intro681 .cx{margin:0 16px 7vh;max-width:min(780px,92vw);width:100%;background:rgba(18,14,26,.93);border:1px solid #b3986c;border-radius:12px;padding:20px 28px 18px;color:#f3e7cf;font:19px/1.55 Georgia,serif;box-shadow:0 12px 44px rgba(0,0,0,.65);min-height:150px;transition:opacity .6s}'+
+    '#intro681 .cx .tt{font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:#d8c69a;margin-bottom:10px;opacity:.85}'+
+    '#intro681 .cx p{margin:0 0 6px;min-height:1.55em}#intro681 .cx p.velha{opacity:.55}'+
+    '#intro681 .cx .cur::after{content:"▌";margin-left:2px;animation:intro681pisca 1s steps(1) infinite;color:#e6c878}'+
+    '#intro681 .cx .dica{margin-top:12px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#b3986c;opacity:0;transition:opacity .8s}#intro681 .cx .dica.on{opacity:.9}'+
+    '#intro681.sumindo{opacity:0;transition:opacity .7s}@keyframes intro681pisca{50%{opacity:0}}'+
+    'body.intro681 > :not(canvas):not(#intro681):not(#load):not(#fade){opacity:0 !important;pointer-events:none !important}';
+  document.head.appendChild(st);
+  const el=document.createElement('div');el.id='intro681';el.setAttribute('translate','no');el.innerHTML='<div class="cx"><div class="tt"></div><div class="tx"></div><div class="dica"></div></div>';
+  el.querySelector('.tt').textContent=PRO681.titulo[L]||PRO681.titulo['pt-BR'];document.body.appendChild(el);document.body.classList.add('intro681');
+  el.addEventListener('pointerdown',pro681Toque);addEventListener('keydown',pro681Toque);
+  PRO681.el=el;PRO681.ativo=true;PRO681.t0=performance.now();return el;}
+function pro681Toque(e){try{if(!PRO681.ativo)return;if(PRO681.acabou&&PRO681.pronto){pro681Fechar();}}catch(x){pro681Erro('toque',x);}}
+// digita frase a frase
+function pro681Digita(){if(PRO681.digitando||!PRO681.el)return;PRO681.digitando=true;const L=pro681Lingua();const frases=PRO681.textos[L]||PRO681.textos['pt-BR'];const tx=PRO681.el.querySelector('.tx');let i=0;
+  const proxima=()=>{if(!PRO681.ativo)return;if(i>=frases.length){PRO681.acabou=true;PRO681.acabouEm=performance.now();pro681Confere();return;}
+    for(const p of tx.querySelectorAll('p')){p.classList.remove('cur');p.classList.add('velha');}
+    const p=document.createElement('p');p.className='cur';tx.appendChild(p);const f=frases[i++];
+    // tempos por letra (28 ms; pausa na vírgula e no ponto) medidos pelo relógio — em máquina lenta as letras aparecem em bloco, mas no tempo certo
+    const T=[];let acc=0;for(let k=0;k<f.length;k++){acc+=28+(f[k]===','||f[k]===':'?120:(f[k]==='.'||f[k]==='!'||f[k]==='?'?180:0));T.push(acc);}const t0=performance.now();
+    const tic=()=>{if(!PRO681.ativo)return;const el=performance.now()-t0;let k=0;while(k<f.length&&T[k]<=el)k++;p.textContent=f.slice(0,k);if(k<f.length)setTimeout(tic,28);else setTimeout(proxima,i>=frases.length?400:850);};
+    tic();};
+  proxima();}
+// a sala pronta: chegou e a preparação de fundo acabou (ou 45 s depois de chegar); a caixa se vai 3,5 s depois do fim do texto, ou no toque
+function pro681Confere(){try{if(!PRO681.ativo)return;const na=(CUR==='room'&&CUR_GENRE==='minha');if(na&&!PRO681.chegou)PRO681.chegou=performance.now();
+    const pronta=na&&((!QUIET434.job&&!PERF130.busy)||(performance.now()-PRO681.chegou>45000));
+    if(pronta&&!PRO681.revelado){PRO681.revelado=true;PRO681.el.classList.add('claro');}
+    PRO681.pronto=pronta;const dica=PRO681.el.querySelector('.dica');const L=pro681Lingua();const D=PRO681.dicas[L]||PRO681.dicas['pt-BR'];
+    if(PRO681.acabou){dica.textContent=pronta?D[0]:D[1];dica.classList.add('on');if(pronta&&performance.now()-Math.max(PRO681.acabouEm||0,PRO681.reveladoEm||0)>3500)pro681Fechar();}
+    if(pronta&&!PRO681.reveladoEm)PRO681.reveladoEm=performance.now();
+    if(performance.now()-PRO681.t0>90000&&PRO681.acabou)pro681Fechar(); // nunca prende o leitor
+  }catch(e){pro681Erro('confere',e);}}
+function pro681Fechar(){if(!PRO681.ativo)return;PRO681.ativo=false;try{const el=PRO681.el;el.classList.add('claro','sumindo');setTimeout(()=>{try{el.remove();}catch(e){}},800);document.body.classList.remove('intro681');removeEventListener('keydown',pro681Toque);}catch(e){pro681Erro('fechar',e);}
+  try{PRO.avisaChegada=0;if(PRO.estado){PRO.estado.introVisto=1;proGrava();}}catch(e){}try{if(PRO681.iv){clearInterval(PRO681.iv);PRO681.iv=null;}}catch(e){}}
+// congelada: o boneco não anda e nada conta enquanto a caixa está na tela
+{ const _mv=moveTP;moveTP=function(dt){if(PRO681.ativo){try{CH.vx=0;CH.vz=0;CH.target=null;CH.onArrive=null;CH.motionSpeed=0;CH.run=false;}catch(e){}return;}return _mv.apply(this,arguments);};
+  const _ub=uiBlocked;uiBlocked=function(){if(PRO681.ativo)return true;return _ub.apply(this,arguments);};
+  const _pt=proTick;proTick=function(dt){if(PRO681.ativo){try{PRO.avisaChegada=0;}catch(e){}}return _pt.apply(this,arguments);}; }
+// começa: na fase «kit», ainda atrás da tela de carregamento; a digitação começa quando a abertura se fecha
+try{if(PRO681.on&&typeof proFase==='function'&&proFase()==='kit'&&!(PRO.estado&&PRO.estado.introVisto)&&!PRO.desligado){pro681Cria();
+    PRO681.iv=setInterval(()=>{try{if(!PRO681.ativo){clearInterval(PRO681.iv);PRO681.iv=null;return;}if(!PRO681.agendado&&typeof LOAD424!=='undefined'&&LOAD424.finished){PRO681.agendado=true;setTimeout(pro681Digita,650);}pro681Confere();}catch(e){pro681Erro('vigia',e);}},200);}}catch(e){pro681Erro('início',e);}
+window.__intro681={estado:PRO681,fechar:pro681Fechar,erros:PRO681.erros};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
