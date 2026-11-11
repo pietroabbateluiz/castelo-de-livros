@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v717</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v718</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -45083,6 +45083,49 @@ if(V229.on&&typeof ESC228!=='undefined'&&ESC228.on){
       const copa=[[0,6.2,0,2.2],[1.9,5.4,1.0,1.7],[-1.8,5.2,1.4,1.6],[-.7,5.6,-2.1,1.6],[1.8,4.9,-1.9,1.5],[.4,6.9,.3,1.5],[-2.4,6.0,-.2,1.3],[2.6,6.1,-.3,1.3],[.2,5.1,2.4,1.3],[-.9,6.6,1.6,1.2],[1.2,6.8,-1.3,1.2]];
       copa.forEach((c,i)=>v225Copa(K,[F.folhaEscura,F.folha,F.folhaClara][i%3],x+c[0],c[1],z+c[2],c[3]*1.08,8+(i%3),rr));V229.estat.carvalho=true;}catch(e){console.error('vila 229 carvalho',e);}};
 }
+
+/* ===================== v718 · ABERTURA MAIS LEVE (A3): AS PINTURAS DA GALERIA E O ARQUEIRO NÍTIDO EM FATIAS OCIOSAS (bloco `AB718`) =====================
+   Fase A3 da proposta do pré-carregamento gradual («Avance pelo modo que achar melhor»). O perfil da abertura (v717) ainda tinha, dentro do
+   script síncrono: `g230Oleo` (2–17 s no headless) — as cinco pinturas «a óleo» da Galeria do 2.º andar (v230), pintadas na carga com
+   ~11.000 pinceladas cada — e `v258Nitida` (1–5 s) — a passagem de nitidez de 1024×1024 px na textura do Bento, o arqueiro (v258), feita
+   assim que a textura descodifica. Nenhum dos dois é visível na abertura (o leitor começa no Hall 1).
+   · PINTURAS: `g230Pintar` passa a pintar só a paisagem (barata) e a enfileirar as pinceladas e a trama da tela (`g230Oleo` + `g230Tela`)
+     num trabalho resumível: as pinceladas saem em fatias de ~12 ms por chamada ociosa (`requestIdleCallback`, 1.500 pinceladas por vez,
+     com o mesmo gerador aleatório, logo a mesma pintura), reaplicando o recorte e a translação da célula do atlas; no fim de cada quadro a
+     textura do atlas é marcada para subir à placa (as molduras já estão nas paredes; o quadro vai ganhando as pinceladas).
+   · ARQUEIRO: `v258Nitida` passa a devolver a textura como está e a fazer a nitidez em 16 fatias de 64 linhas em chamadas ociosas; no fim
+     troca a imagem da textura (como fazia). Até lá o Bento aparece com a textura original (um pouco mais macia).
+   As fatias só correm depois de a abertura estar liberada (`AQ.liberado`), para não concorrer com a preparação do Hall.
+   O bloco é inserido ANTES do bloco v230 (patch718): as pinturas são feitas na carga, de forma síncrona, pelo próprio v230 — só uma
+   substituição de `g230Pintar` instalada antes (a declaração é içada) apanha essa chamada. `?fatias718=0` volta a fazer tudo na carga.
+   Gancho `window.__fatias718`. */
+const AB718={on:!/[?&#]fatias718=0/i.test(location.search+location.hash),fila:[],agendado:false,erros:[],stats:{pinturas:0,pinceladas:0,nitidas:0,fatias:0,ms:0}};
+function ab718Erro(k,e){if(AB718.erros.length<20)AB718.erros.push(k+': '+(e&&e.message||e));try{console.warn('v718',k,e);}catch(x){}}
+function ab718Agendar(){if(AB718.agendado||!AB718.fila.length)return;AB718.agendado=true;if(typeof requestIdleCallback==='function')requestIdleCallback(ab718Passo,{timeout:600});else setTimeout(ab718Passo,40);}
+function ab718Passo(){AB718.agendado=false;try{if(typeof AQ!=='undefined'&&AQ&&!AQ.liberado){setTimeout(()=>{AB718.agendado=false;ab718Agendar();},300);AB718.agendado=true;return;}}catch(e){}
+  const t0=performance.now();let fatias=0;while(AB718.fila.length&&performance.now()-t0<12){const J=AB718.fila[0];let fim=false;try{fim=J.oleo?ab718Oleo(J):ab718Nitida(J);}catch(e){ab718Erro(J.oleo?'óleo':'nítida',e);fim=true;}fatias++;if(fim)AB718.fila.shift();}
+  AB718.stats.fatias+=fatias;AB718.stats.ms+=performance.now()-t0;if(AB718.fila.length)ab718Agendar();}
+// ---- as pinceladas a óleo, resumíveis (o corpo de g230Oleo, por fatias; r continua de onde ficou) ----
+function ab718Oleo(J){const {x,W,H,r,passo,forca,ox,oy}=J;x.save();x.beginPath();x.rect(ox,oy,W,H);x.clip();x.translate(ox,oy);
+  try{if(!J.img){J.img=x.getImageData(ox,oy,W,H).data;J.N=Math.floor(W*H/passo);J.i=0;x.lineCap='round';}
+    const img=J.img;let n=0;for(;J.i<J.N&&n<1500;J.i++,n++){const px=r()*W,py=r()*H;const k=((py|0)*W+(px|0))*4;const j=(r()-.5)*forca;const rr=Math.max(0,Math.min(255,img[k]+j)),gg=Math.max(0,Math.min(255,img[k+1]+j)),bb=Math.max(0,Math.min(255,img[k+2]+j));
+      const ang=Math.sin(px*.013+py*.005)*.35+Math.sin(py*.021)*.25+(r()-.5)*.5;const L=3+r()*7;x.strokeStyle='rgba('+(rr|0)+','+(gg|0)+','+(bb|0)+','+(.14+r()*.22)+')';x.lineWidth=1+r()*1.6;x.beginPath();x.moveTo(px-Math.cos(ang)*L/2,py-Math.sin(ang)*L/2);x.lineTo(px+Math.cos(ang)*L/2,py+Math.sin(ang)*L/2);x.stroke();}
+    AB718.stats.pinceladas+=n;const fim=J.i>=J.N;if(fim){try{g230Tela(x,W,H);}catch(e){}AB718.stats.pinturas++;}ab718Sobe(x.canvas);return fim;}
+  finally{x.restore();}}
+function ab718Sobe(cv){try{for(const n in HALLS){const sc=HALLS[n]&&HALLS[n].scene;if(!sc)continue;sc.traverse(o=>{if(!o.isMesh)return;const ms=Array.isArray(o.material)?o.material:[o.material];for(const m of ms){if(m&&m.map&&m.map.image===cv)m.map.needsUpdate=true;}});}}catch(e){}}
+// ---- a nitidez do arqueiro, por faixas de 64 linhas ----
+function ab718Nitida(J){const S=1024;if(!J.c){const img=J.tex.image;if(!img||!img.width)return true;const c=document.createElement('canvas');c.width=c.height=S;const x=c.getContext('2d');x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';x.drawImage(img,0,0,S,S);J.c=c;J.x=x;J.d=x.getImageData(0,0,S,S).data;J.out=x.createImageData(S,S);J.y=0;}
+  const d=J.d,o=J.out.data,k=1.0;const y1=Math.min(S,J.y+64);
+  for(let y=J.y;y<y1;y++){const ym=y>0?y-1:y,yp=y<S-1?y+1:y;for(let xx=0;xx<S;xx++){const i=(y*S+xx)*4;const xm=xx>0?xx-1:xx,xp=xx<S-1?xx+1:xx;const iu=(ym*S+xx)*4,id=(yp*S+xx)*4,il=(y*S+xm)*4,ir=(y*S+xp)*4;
+    const v0=[0,0,0];for(let ch=0;ch<3;ch++){const v=d[i+ch];const blur=(d[iu+ch]+d[id+ch]+d[il+ch]+d[ir+ch]+v*4)*0.125;let r=v+k*(v-blur);r=(r-128)*1.1+128;v0[ch]=r;}
+    const m=(v0[0]+v0[1]+v0[2])/3;for(let ch=0;ch<3;ch++){let r=m+(v0[ch]-m)*1.06;o[i+ch]=r<0?0:r>255?255:r;}o[i+3]=255;}}
+  J.y=y1;if(J.y<S)return false;J.x.putImageData(J.out,0,0);J.tex.image=J.c;J.tex.anisotropy=8;J.tex.needsUpdate=true;try{V258.est.nitida++;}catch(e){}AB718.stats.nitidas++;return true;}
+if(AB718.on){
+  try{if(typeof g230Pintar==='function'&&typeof g230Oleo==='function'&&typeof g230Tela==='function'&&typeof g230Rnd==='function'){
+    g230Pintar=function(x,W,H,key,seed,ox,oy){const r=g230Rnd(seed);const f=G230_CENAS[key]||G230_CENAS.padrao;const o=f(x,W,H,r)||{};if(o.oleo===false){g230Tela(x,W,H);return;}AB718.fila.push({oleo:true,x,W,H,r,passo:o.passo||16,forca:o.forca||22,ox:ox||0,oy:oy||0});ab718Agendar();};}}catch(e){ab718Erro('g230',e);}
+  try{if(typeof v258Nitida==='function'){v258Nitida=function(tex){try{if(!tex||!tex.image||!tex.image.width)return;AB718.fila.push({oleo:false,tex});ab718Agendar();}catch(e){ab718Erro('nítida pedir',e);}};}}catch(e){ab718Erro('v258',e);}
+}
+window.__fatias718={estado:AB718,erros:AB718.erros,stats:AB718.stats,fila:()=>AB718.fila.length};
 
 /* ===== v230 — Galeria (2º andar): quadros =====
    O 2º andar chama-se Galeria mas não tinha um quadro sequer: paredes lisas entre os arcos. Agora cada arco recebe, por cima, uma pintura grande
