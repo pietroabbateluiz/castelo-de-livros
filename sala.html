@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v751</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v752</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -90628,6 +90628,88 @@ try{const rl=renderLivro;renderLivro=function(){const r=rl.apply(this,arguments)
 
 window.__conto751={estado:C751,atril:c751Atril,lugar:c751Lugar,resgata:c751Resgata,stand:()=>STANDS.pessoal||null};
 }catch(e){console.error('v751',e);}})();
+
+/* ===================== v752 · VALIDAÇÃO DAS MECÂNICAS (2.ª rodada) =====================
+   Pedido do Luiz: «precisamos continuar validando exaustivamente todas as mecânicas do jogo». Correções:
+   1) Javali e Titã (trava do 2.º andar): quem vencia o Titã de Aço (Ficção científica, 1.º andar) antes de dar as 8 comidas
+      ficava com o javali bravo no Hall — e javali bravo não aceita comida; vencido, sumia o resto do dia e no dia seguinte
+      acordava bravo de novo: a Galeria nunca abria. Agora o javali vencido volta manso e à vista, e o javali bravo se acalma
+      quando o leitor chega perto com as 8 comidas — come, corre e derruba a grade como sempre.
+   2) Tecla V: com as Três Esferas, V disparava as esferas E trocava a câmera (Gamer → Clique). Nas salas (e onde a barra de
+      poderes vale), com as esferas conquistadas, V só dispara as esferas; fora disso continua trocando a câmera.
+   3) Grimório: o Escudo de Páginas (R) também acorda ao ler 3 contos, mas a dica só falava dos mestres; agora diz as duas
+      coisas e mostra a barra dos contos.
+   4) Mapa das Salas: aberta a Galeria, o 3.º ao 7.º andar apareciam abertos, mas os portões da v439 (dragão), v440 (robô e
+      óleo) e v444 (golem, corrente das flechas, seis óleos) trancam; agora aparecem trancados e dizem o que abre o portão.
+   5) Prólogo: ao voltar ao Hall o aviso dizia que a porta da Sala do Acumulador «se abriu», mas desde a v683 ela fica trancada
+      até a chave do 2.º andar; o aviso agora diz isso.
+   6) Menu «Ir para» do Terror: «↓ Ir ao alçapão» levava até o alçapão trancado (chave do 6.º andar); trancado, aparece com 🔒.
+   ?valida752=0 desliga. Gancho: window.__ms752. */
+(function(){try{
+const MS752={on:!/[?&]valida752=0/.test(location.search),erros:[],stats:{acalmou:0,vencidoManso:0,teclaV:0,mapa:0,prologo:0,alcapao:0},calmo:false};
+window.__ms752={estado:MS752};
+if(!MS752.on)return;
+function e752(onde,e){try{MS752.erros.push(onde+': '+String(e&&e.message||e));if(MS752.erros.length>40)MS752.erros.shift();console.warn('ms752',onde,e);}catch(x){}}
+const T752=(pt,en,es)=>{try{return text428(pt,en,es);}catch(e){return pt;}};
+const emTexto752=t=>!!(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName||'')));
+
+/* ---------- 1) javali e Titã ---------- */
+try{const tw=boar433TitanWon;boar433TitanWon=function(){if(MS752.calmo)return false;return tw.apply(this,arguments);};}catch(e){e752('titan',e);}
+try{const jh=jav436Hall;jav436Hall=function(dt){try{
+    if(typeof JAV436!=='undefined'&&!JAV436.save.entregue&&!JAV436.fase&&!PAC.on&&boar433Here()){const B=BOAR428,k=B&&B.enemy;
+      if(k){
+        if(B.phase==='won'){ // vencido hoje, sem ter comido: fica manso e à vista para poder comer
+          MS752.calmo=true;B.phase='asleep';k.viva=false;k.g.visible=true;k.path=null;k.tPath=0;try{k.g.userData.barra.sp.visible=false;}catch(x){}MS752.stats.vencidoManso++;}
+        else if(jav436Hostil()&&jav436Tem()>=JAV436.N){const p=cavPos();if(Math.hypot(p.x-k.x,p.z-k.z)<2.4){ // bravo, e o leitor chegou com as 8 comidas: acalma e come
+          MS752.calmo=true;B.phase='asleep';k.viva=false;k.path=null;k.tPath=0;try{k.g.userData.barra.sp.visible=false;}catch(x){}JAV436.perto=false;MS752.stats.acalmou++;}}
+      }}
+  }catch(e){e752('javali',e);}return jh.apply(this,arguments);};}catch(e){e752('jav436Hall',e);}
+
+/* ---------- 2) tecla V ---------- */
+function c752PoderesValem(){try{if(CUR==='room')return true;if(CUR==='hall'&&HALLN===7)return true;if(typeof boar433Here==='function'&&boar433Here())return true;}catch(e){}return false;}
+try{window.addEventListener('keydown',e=>{try{if(e.repeat||e.ctrlKey||e.metaKey||e.altKey||String(e.key).toLowerCase()!=='v')return;if(emTexto752(e.target))return;
+    if(typeof NPC127!=='undefined'&&NPC127.open)return;if(uiBlocked())return;if(typeof esf252Tem!=='function'||!esf252Tem()||!c752PoderesValem())return;
+    e.preventDefault();e.stopImmediatePropagation();MS752.stats.teclaV++;podUsar('esferas','tecla');}catch(x){e752('tecla V',x);}},true);}catch(e){e752('tecla V instalar',e);}
+
+/* ---------- 3) dica do Escudo de Páginas ---------- */
+// em inglês e espanhol, o «ou derrotar …» que a v392/v428 juntam às dicas ficava em português
+try{const l=String(document.documentElement.lang||'');if(/^(en|es)/.test(l)){const en=l.startsWith('en');
+    const nomes=[['Faraó','Pharaoh','Faraón'],['Titã de Aço','Steel Titan','Titán de Acero'],['Mestre do Paranormal','Paranormal Master','Maestro de lo Paranormal'],['Colecionador de Histórias','Collector of Stories','Coleccionista de Historias']];
+    try{for(const [id,i] of [['farao',0],['tita',1],['mestre',2],['colecionador',3]])if(MASTER392.rewards[id])MASTER392.rewards[id].name=en?nomes[i][1]:nomes[i][2];}catch(e){}
+    for(const p of PODERES)if(p&&typeof p.como==='string'){let c=p.como.replace(/ ou derrotar /g,en?' or defeat ':' o derrotar ');for(const n of nomes)c=c.split(n[0]).join(en?n[1]:n[2]);p.como=c;}}}catch(e){e752('dicas',e);}
+try{const p=POD_POR.escudo;if(p){p.como=T752('ler 3 contos · ','read 3 tales · ','leer 3 cuentos · ')+p.como;const pr=p.progresso;p.progresso=()=>{let r=null;try{r=pr();}catch(e){}if(r)return r;try{if(p.pronto())return null;}catch(e){}return [T752('contos lidos','tales read','cuentos leídos'),Math.min(3,podContos()),3];};}}catch(e){e752('escudo',e);}
+
+/* ---------- 4) Mapa das Salas: portões do 3.º ao 7.º andar ---------- */
+function c752Andar(n){return T752(n+'º andar',n+(n===1?'st':n===2?'nd':n===3?'rd':'th')+' floor',n+'.º piso');}
+function c752Portao(m){switch(m){
+  case 3:return T752('o portão do Torreão só derrete com o dragão dos rubis no tamanho máximo (4×)','the Keep gate only melts under the ruby dragon at full size (4×)','la verja del Torreón solo se derrite con el dragón de rubíes en su tamaño máximo (4×)');
+  case 4:return T752('o robô de guarda do Torreão abre o portão em troca de um Óleo Mecânico','the guard robot in the Keep opens the gate in exchange for a Mechanical Oil','el robot guardián del Torreón abre la verja a cambio de un Aceite Mecánico');
+  case 5:return T752('o golem do Observatório abre o portão quando você lê até o fim um conto do 4º andar','the Observatory golem opens the gate once you finish a tale from the 4th floor','el gólem del Observatorio abre la verja cuando terminas un cuento del 4.º piso');
+  case 6:return T752('Bento corta a corrente do portão das Ameias com 3 flechas (Biografias, Crônicas e Ciência)','Bento cuts the Battlements gate chain with 3 arrows (Biographies, Chronicles and Science)','Bento corta la cadena de la verja de las Almenas con 3 flechas (Biografías, Crónicas y Ciencia)');
+  case 7:return T752('os seis robôs aliados do Jardim empurram o portão quando recebem as seis latas de Óleo Mecânico','the six allied robots in the Garden push the gate once they get all six Mechanical Oil cans','los seis robots aliados del Jardín empujan la verja cuando reciben las seis latas de Aceite Mecánico');}
+  return T752('o portão deste andar ainda está fechado','this floor’s gate is still closed','la verja de este piso sigue cerrada');}
+function c752Primeiro(n){try{for(let m=3;m<=n;m++)if(!elevAberto(m))return m;}catch(e){}return 0;}
+try{const rm=refreshMap;refreshMap=function(){const r=rm.apply(this,arguments);try{
+    if(typeof ringEl==='undefined'||!ringEl||!galeriaAberta())return r;
+    ringEl.querySelectorAll('button').forEach(b=>{const key=b.dataset.key||'',S=b.querySelector('small');if(!S)return;let n=0,hub=false;
+      if(/^hall\d$/.test(key)){n=+key.slice(4);hub=true;}else if(typeof roomExists==='function'&&roomExists(key)&&!/^(pessoal|minha)$/.test(key)){n=GENRE_FLOOR(key)||1;}
+      if(n<3)return;const m=c752Primeiro(n);if(!m)return;
+      b.classList.add('locked');b.title=T752('trancado','locked','cerrado');
+      S.textContent=(hub?T752('trancado — ','locked — ','cerrado — '):T752('no ','on the ','en el ')+c752Andar(n)+' — ')+c752Portao(m);S.setAttribute('translate','no');S.dataset.t750='1';MS752.stats.mapa++;});
+  }catch(e){e752('mapa',e);}return r;};}catch(e){e752('refreshMap',e);}
+
+/* ---------- 5) aviso do fim do prólogo ---------- */
+try{const st0=showToast;showToast=function(msg,opt){try{if(typeof msg==='string'&&/^(Você está de volta ao Hall\. O Colecionador sumiu em páginas|You are back in the Hall\. The Collector vanished into pages|Has vuelto al vestíbulo\. El Coleccionista)/.test(msg)&&typeof pr683Trancada==='function'&&pr683Trancada()){
+      msg=T752('Você está de volta ao Hall. O Colecionador sumiu em páginas com o que era seu. A Sala do Acumulador ficou trancada: a chave está no segundo andar.','You are back in the Hall. The Collector vanished into pages with what was yours. The Collector’s Room is locked: the key is on the second floor.','Has vuelto al vestíbulo. El Coleccionista desapareció entre páginas con lo que era tuyo. La Sala del Acumulador quedó cerrada: la llave está en el segundo piso.');MS752.stats.prologo++;}}catch(e){e752('prologo',e);}
+  return st0.call(this,msg,opt);};}catch(e){e752('showToast',e);}
+
+/* ---------- 6) alçapão trancado no menu «Ir para» ---------- */
+try{const rg=renderGoBar;renderGoBar=function(){const r=rg.apply(this,arguments);try{if(typeof goList==='undefined'||!goList)return r;const b=goList.querySelector('button[data-go-kind="hatch421"]');
+    if(b&&typeof dungeon433Owned==='function'&&!dungeon433Owned()){b.textContent=T752('🔒 Alçapão (chave do 6º andar)','🔒 Trapdoor (key on floor 6)','🔒 Trampilla (llave del piso 6)');b.setAttribute('translate','no');MS752.stats.alcapao++;}
+  }catch(e){e752('alcapao',e);}return r;};}catch(e){e752('renderGoBar',e);}
+
+window.__ms752={estado:MS752,portao:c752Portao,primeiro:c752Primeiro};
+}catch(e){console.error('v752',e);}})();
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
