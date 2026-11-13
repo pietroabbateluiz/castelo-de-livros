@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v746</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v747</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -90031,6 +90031,205 @@ window.__penas745={estado:PN,penas:PN745_PENAS,lugares:PN745_LUGARES,erros:PN.er
 
 }catch(e){try{console.error("penas745",e);window.__penas745erro=String(e&&e.stack||e);}catch(x){}}
 })();
+
+/* ===================== v747 · DECORAÇÃO DA MINHA SALA REVISTA =====================
+   Pedido do Luiz: «revise exaustivamente a mecânica de decoração do Minha Sala».
+   1) A sala andava 60 m além da parede da porta: a v677 estende a região do salão do Acumulador até z = 90 (Salão da Porta)
+      e a Minha Sala usa o mesmo a195Clamp/a195CamT — peças novas e estilos caíam atrás da parede (no escuro), a grade do
+      editor desenhava quadrados lá e o leitor e a câmera atravessavam a parede. Agora a Minha Sala tem clamp e câmera
+      próprios, com o salão até z = 30 − margem; peças guardadas lá fora voltam para dentro.
+   2) O assento do catálogo mais perto vira ROOM.chair (v495) e a proteção do editor (1,3 m) travava a própria peça:
+      não girava, não andava, não mudava de tamanho. A proteção agora ignora o assento das peças (e a estante que a
+      Minha Sala vazia não tem).
+   3) Acabamentos (paredes, piso, teto) sem efeito desde a planta nova (v526): os materiais certos são achados pela
+      forma (piso e forro de 28 × 60, paredes do salão), no material original mesmo no Papel, e a cópia toon é
+      sincronizada. A pintura de «Assoalho» deixa de tingir o gramado e os caminhos do jardim.
+   4) Quadros e peças de parede do catálogo (finas) penduram na parede mais perto, retas, sem tapar pilastra, janela ou
+      porta e sem encostar noutra peça de parede; ◀ ▶ deslizam pela parede, ▲ ▼ sobem e descem, girar vira a peça.
+   5) Painel: «✓ Concluir» no topo, botões sem estilo arrumados, nomes dos estilos certos («Biblioteca», «Jardim de
+      inverno» — a camada de idiomas trocava), ajuste fino e giro de 15° também nas peças que não são do catálogo
+      (e o desfazer os acompanha), e ao sair volta o modo de câmera de antes (Gamer ou 1.ª pessoa).
+   6) Menos avisos: entrar no editor, peça de família posta, acabamento escolhido e «Desfeito» deixam de mostrar
+      mensagem (a mudança já aparece); os avisos de falta de espaço continuam.
+   ?minha747=0 desliga. Gancho: window.__ms747. */
+(function(){try{
+const MS747={on:!/[?&]minha747=0/.test(location.search),erros:[],stats:{mundo:0,recolhidas:0,acabamentos:0,parede:0,paredeFalhou:0,modo:0,fino:0,avisosCalados:0},modo0:null,orig:new WeakMap(),alvos:null,frente:new Map()};
+window.__ms747={estado:MS747};
+if(!MS747.on)return;
+const EN7=()=>{try{return String(document.documentElement.lang||'').startsWith('en');}catch(e){return false;}};
+const T7=(pt,en)=>EN7()?en:pt;
+function e7(onde,e){try{MS747.erros.push(onde+': '+String(e&&e.message||e));if(MS747.erros.length>40)MS747.erros.shift();console.warn('ms747',onde,e);}catch(x){}}
+const ehPessoal=R=>!!(R&&typeof ROOMS!=='undefined'&&ROOMS.pessoal&&R.scene===ROOMS.pessoal.scene);
+
+/* ---------- 1) o salão termina na parede da porta ---------- */
+const MS747_Z=30;const MS747_REG=new Map();
+function ms747RegDe(orig,m,cam){const k=(cam?'c':'a')+m;let R=MS747_REG.get(k);if(R)return R;R=orig(m,cam).map(r=>Object.assign({},r));if(R[0]&&R[0].z1>MS747_Z-(m||0))R[0].z1=MS747_Z-(m||0);MS747_REG.set(k,R);return R;}
+function ms747ComRegioes(fn){return function(){const o=a195Regioes;a195Regioes=function(m,cam){return ms747RegDe(o,m,cam);};try{return fn.apply(this,arguments);}finally{a195Regioes=o;}};}
+const ms747Clamp=ms747ComRegioes(function(x,z,m){return a195Clamp(x,z,m);});
+const ms747CamT=ms747ComRegioes(function(){return a195CamT.apply(this,arguments);});
+function ms747Mundo(RM){try{RM=RM||(typeof ROOMS!=='undefined'?ROOMS.pessoal:null);if(!RM||!RM.world||!RM.world.a195)return false;const w=RM.world;
+    if(!w.__ms747){w.clamp=ms747Clamp;w.camT=ms747CamT;w.__ms747=true;w.__nav=null;try{delete w.__cl;}catch(e){}MS747.stats.mundo++;}
+    const R=(typeof DEC128!=='undefined')&&DEC128.rooms.pessoal;if(R&&R.room===RM)for(const f of R.floors||[]){const fw=f.world;if(fw&&fw.clamp!==ms747Clamp){fw.clamp=ms747Clamp;fw.camT=ms747CamT;try{delete fw.__nav;delete fw.__cl;}catch(e){}R.gridLevel=null;try{decorInvalidate128(R);}catch(e){}}}
+    return true;}catch(e){e7('mundo',e);return false;}}
+if(typeof a195Mundo==='function'){const am0=a195Mundo;a195Mundo=function(RM){const r=am0.apply(this,arguments);try{if(window.__ms526Montando||(typeof ROOMS!=='undefined'&&RM&&RM===ROOMS.pessoal))ms747Mundo(RM);}catch(e){e7('a195Mundo',e);}return r;};}
+// peças que ficaram fora (de saves antigos ou pelo bug) voltam para um lugar livre perto da entrada
+function ms747Fora(R,s){try{const f=R.floors[0];const g=s.g;g.updateMatrixWorld(true);const b=new THREE.Box3().setFromObject(g);if(!Number.isFinite(b.min.x))return false;const c=b.getCenter(new THREE.Vector3());
+    const k=f.world.clamp(c.x,c.z,.05);return Math.hypot(k[0]-c.x,k[1]-c.z)>.3;}catch(e){return false;}}
+function ms747Recolhe(R){if(!R||!ehPessoal(R)||R.__recolhendo)return 0;R.__recolhendo=true;let n=0;try{ms747Mundo(R.room);const map=salaMapa128(R);
+    for(const [id,s] of Object.entries(R.placed)){if(!ms747Fora(R,s))continue;const d=map[id]||{};const g=s.g;
+      if(g.userData.parede747){const L=ms747LugarParede(R,id,g,{x:R.room.spawn.x,z:R.room.spawn.z-3},null);if(!L)continue;ms747Aplica(R,id,g,L);n++;continue;}
+      const salvo={...d};delete salvo.pos;const L=decorPlace128(R,id,g,{lvl:s.lvl});if(!L)continue;g.position.set(L.x,L.y,L.z);s.radius=L.radius;d.pos=[L.x,L.z];d.lvl=L.lvl;map[id]=d;n++;}
+    if(n){salaSalvar(R);decorInvalidate128(R);MS747.stats.recolhidas+=n;}}catch(e){e7('recolhe',e);}finally{R.__recolhendo=false;}return n;}
+
+/* ---------- 2) proteção do editor sem o assento das peças e sem a estante que não existe ---------- */
+function ms747NaCena(o,sc){if(!o)return false;let p=o;for(;p;p=p.parent){const d=Object.getOwnPropertyDescriptor(p,'visible');const v=(d&&d.get&&p.__fusaoVis!==undefined)?p.__fusaoVis:p.visible;if(!v)return false;if(!p.parent)break;}return p===sc;}
+if(typeof decorProtected128==='function'){const dp0=decorProtected128;decorProtected128=function(R){const rm=R&&R.room;if(!rm)return dp0.apply(this,arguments);
+    const c=rm.chair,sh=rm.shelf,tc=!!(c&&c.ms495),ts=!!(sh&&ehPessoal(R)&&!ms747NaCena(sh.g,R.scene));if(!tc&&!ts)return dp0.apply(this,arguments);
+    if(tc)rm.chair=null;if(ts)rm.shelf=null;try{return dp0.apply(this,arguments);}finally{if(tc)rm.chair=c;if(ts)rm.shelf=sh;}};}
+
+/* ---------- 3) acabamentos e pintura das superfícies na planta nova ---------- */
+function ms747Base(o){let m=null;try{if(typeof PAPEL_ORIG!=='undefined')m=PAPEL_ORIG.get(o)||null;}catch(e){}m=m||o.material;m=Array.isArray(m)?m[0]:m;try{if(m&&m.isMeshToonMaterial&&typeof PAPEL_DE!=='undefined'&&PAPEL_DE.get(m))m=PAPEL_DE.get(m);}catch(e){}return m;}
+function ms747Pecas(R){const S=new Set();if(R)for(const id in R.placed){try{R.placed[id].g.traverse(n=>S.add(n));}catch(e){}}return S;}
+function ms747Superficies(){const RM=typeof ROOMS!=='undefined'&&ROOMS.pessoal;if(!RM||!RM.scene)return null;const sc=RM.scene;sc.updateMatrixWorld(true);const A={paredes:[],piso:[],teto:[]},b=new THREE.Box3(),s=new THREE.Vector3();
+  const pecas=ms747Pecas((typeof DEC128!=='undefined')&&DEC128.rooms.pessoal);
+  sc.traverse(o=>{if(!o.isMesh||!o.geometry||o.isInstancedMesh||pecas.has(o)||(o.userData&&o.userData.fx))return;const m=ms747Base(o);if(!m||!m.color||m.isMeshBasicMaterial||m.transparent)return;
+    b.setFromObject(o);if(!Number.isFinite(b.min.x))return;b.getSize(s);const cx=(b.min.x+b.max.x)/2,cz=(b.min.z+b.max.z)/2;if(Math.abs(cx)>14.7||cz<-30.7||cz>30.7)return;
+    if(s.x>27.5&&s.z>59.5&&s.y<.25&&Math.abs(b.min.y)<.12)A.piso.push(o);
+    else if(s.x>27.5&&s.z>59.5&&s.y<.7&&b.min.y>4.4)A.teto.push(o);
+    else if(s.y>1&&Math.min(s.x,s.z)<.45&&Math.max(s.x,s.z)>2&&(Math.abs(cx)>13.4||Math.abs(cz)>29.4)&&b.max.y>4.6)A.paredes.push(o);});
+  return A;}
+if(typeof ms493Materiais==='function'&&typeof MS493!=='undefined'){
+  ms493Materiais=function(){try{const A=ms747Superficies();if(!A)return false;const M=MS493.mats;
+      const rec=m=>{if(!MS747.orig.has(m))MS747.orig.set(m,{map:m.map,color:m.color.getHex(),rough:m.roughness});const o=MS747.orig.get(m);return {m,map:o.map,color:o.color,rough:o.rough};};
+      const uni=L=>[...new Set(L.map(ms747Base))].filter(Boolean);const pm=uni(A.paredes),fm=uni(A.piso),tm=uni(A.teto);
+      M.paredes=pm.map(rec);M.parede=pm[0]||null;M.parede0=M.paredes[0]||null;
+      const fr=fm.map(rec);M.piso=fm[0]||null;M.piso0=fr[0]||null;const tr=tm.map(rec);M.teto=tm[0]||null;M.teto0=tr[0]||null;
+      MS747.alvos=A;return !!(M.parede&&M.piso);}catch(e){e7('materiais',e);return false;}};
+  if(typeof ms493Aplica==='function'){const ap0=ms493Aplica;ms493Aplica=function(){const r=ap0.apply(this,arguments);try{ms747SyncPapel();if(r)MS747.stats.acabamentos++;}catch(e){e7('papel',e);}return r;};}}
+function ms747SyncPapel(){const A=MS747.alvos;if(!A||typeof papelSync!=='function')return;for(const o of [...A.paredes,...A.piso,...A.teto]){const L=Array.isArray(o.material)?o.material:[o.material];for(const t of L)if(t&&t.isMeshToonMaterial){try{papelSync(t);}catch(e){}}}}
+// «Assoalho», «Paredes» e «Forro» pintam só o salão (antes o piso incluía gramado, caminhos e canteiros do jardim, e a parede um painel de fundo)
+function ms747FiltraSuperf(R){try{if(!R||!ehPessoal(R)||R.__superf747)return;const sc=R.scene;sc.updateMatrixWorld(true);const dentro=new Set(),b=new THREE.Box3();
+    sc.traverse(o=>{if(!o.isMesh||!o.material)return;b.setFromObject(o);if(!Number.isFinite(b.min.x))return;const cx=(b.min.x+b.max.x)/2,cz=(b.min.z+b.max.z)/2;if(Math.abs(cx)>14.7||cz<-30.7||cz>30.7)return;
+      const add=m=>{for(const x of (Array.isArray(m)?m:[m]))if(x){dentro.add(x);try{if(x.isMeshToonMaterial&&typeof PAPEL_DE!=='undefined'&&PAPEL_DE.get(x))dentro.add(PAPEL_DE.get(x));}catch(e){}}};
+      add(o.material);try{if(typeof PAPEL_ORIG!=='undefined'&&PAPEL_ORIG.get(o))add(PAPEL_ORIG.get(o));}catch(e){}});
+    let mudou=false;for(const k of ['piso','parede']){const L=R.superf[k];if(!Array.isArray(L))continue;const F=L.filter(m=>dentro.has(m)&&!m.isMeshBasicMaterial);if(F.length&&F.length!==L.length){R.superf[k]=F;mudou=true;}}
+    if(mudou)salaMapearSuperf(R);R.__superf747=true;}catch(e){e7('superf',e);}}
+
+/* ---------- 4) peças de parede ---------- */
+const MS747_NOME_PAREDE=/parede|quadro|retrato|moldura|pendurad|m[aá]scara|bras[aã]o|escudo|tape[cç]aria|estandarte|fl[aâ]mula|arandela|placa|painel|p[oô]ster|cartaz|diploma|mapa|tela|gravura|pintura|calend|wall|frame|portrait|painting|tapestry|banner|mask|plaque|poster|sconce/i;
+function ms747Tam(g){const r0=g.rotation.y;g.rotation.y=0;g.updateMatrixWorld(true);const b=new THREE.Box3().setFromObject(g),s=b.getSize(new THREE.Vector3());g.rotation.y=r0;g.updateMatrixWorld(true);return {s,b};}
+function ms747EhParede(R,g,nome){if(!ehPessoal(R)||!g)return false;if(g.userData.parede747!==undefined)return g.userData.parede747;let ok=false;try{if(g.userData.floorCover411)ok=false;else{const {s}=ms747Tam(g);const d=Math.min(s.x,s.z),w=Math.max(s.x,s.z),h=s.y;
+      ok=d<=.3&&h>=.25&&h<=3.6&&w>=.25&&w<=6&&(MS747_NOME_PAREDE.test(String(nome||g.name||''))||(d<=.12&&h>=.5));}}catch(e){ok=false;}g.userData.parede747=ok;return ok;}
+// a frente da peça (local, com rotação 0): o lado do eixo fino oposto às costas chapadas; empate → normais das faces → +z/+x
+function ms747Frente(g,chave){if(chave&&MS747.frente.has(chave))return MS747.frente.get(chave);const T=THREE,{s,b}=ms747Tam(g);const finoZ=s.z<=s.x;const r0=g.rotation.y,p0=g.position.clone();g.rotation.y=0;g.position.set(0,0,0);g.updateMatrixWorld(true);
+  let nMin=0,nMax=0,soma=0;const v=new T.Vector3(),a=new T.Vector3(),c=new T.Vector3(),e1=new T.Vector3(),e2=new T.Vector3();const lo=finoZ?b.min.z:b.min.x,hi=finoZ?b.max.z:b.max.x,tol=Math.max(.004,(hi-lo)*.08);
+  const bb=new T.Box3().setFromObject(g);const lo2=finoZ?bb.min.z:bb.min.x,hi2=finoZ?bb.max.z:bb.max.x;
+  g.traverse(o=>{if(!o.isMesh||!o.geometry||!o.geometry.attributes.position)return;const P=o.geometry.attributes.position,I=o.geometry.index;const passo=Math.max(1,Math.floor(P.count/600));
+    for(let i=0;i<P.count;i+=passo){v.fromBufferAttribute(P,i).applyMatrix4(o.matrixWorld);const q=finoZ?v.z:v.x;if(q<lo2+tol)nMin++;else if(q>hi2-tol)nMax++;}
+    const n=I?I.count:P.count;const pt=Math.max(3,Math.floor(n/3/300)*3);for(let t=0;t+2<n;t+=pt){const i0=I?I.getX(t):t,i1=I?I.getX(t+1):t+1,i2=I?I.getX(t+2):t+2;a.fromBufferAttribute(P,i0).applyMatrix4(o.matrixWorld);e1.fromBufferAttribute(P,i1).applyMatrix4(o.matrixWorld).sub(a);e2.fromBufferAttribute(P,i2).applyMatrix4(o.matrixWorld).sub(a);c.crossVectors(e1,e2);soma+=finoZ?c.z:c.x;}});
+  g.rotation.y=r0;g.position.copy(p0);g.updateMatrixWorld(true);
+  // costas = o lado com mais vértices encostados no extremo (o chapado); se empatar, a soma das normais aponta a frente
+  let sinal=0;if(nMin>nMax*1.4)sinal=1;else if(nMax>nMin*1.4)sinal=-1;else sinal=soma<0?-1:1;
+  const fx=finoZ?0:sinal,fz=finoZ?sinal:0;const phi=Math.atan2(fx,fz);if(chave)MS747.frente.set(chave,phi);return phi;}
+// alvos de raio: o que é da casa (paredes, pilastras, arandelas, janelas, portas) perto do perímetro do salão
+function ms747Alvos(R){const k=R.rev+':'+Object.keys(R.placed).length;if(MS747.ray&&MS747.ray.k===k&&MS747.ray.sc===R.scene)return MS747.ray.L;const sc=R.scene;sc.updateMatrixWorld(true);const pecas=ms747Pecas(R),L=[],b=new THREE.Box3();
+  sc.traverse(o=>{if(!o.isMesh||!o.geometry||o.isSprite||pecas.has(o))return;const u=o.userData||{};if(u.fx||u.hitProxy||u.portal||u.noCam&&u.quill413)return;for(let p=o;p;p=p.parent){if(typeof READER!=='undefined'&&p===READER.g)return;const q=p.userData||{};if(q.npc||q.aiCharacter||q.pet||q.bicho)return;}
+    b.setFromObject(o);if(!Number.isFinite(b.min.x))return;if(b.max.x<12.2&&b.min.x>-12.2&&b.max.z<28.2&&b.min.z>-28.2)return;if(b.min.x>15||b.max.x<-15||b.min.z>31||b.max.z<-31)return;L.push(o);});
+  MS747.ray={k,sc:R.scene,L};return L;}
+const MS747_RC=new THREE.Raycaster();
+function ms747Raio(L,o,d,far){MS747_RC.set(o,d);MS747_RC.near=0;MS747_RC.far=far;try{MS747_RC.camera=camera;}catch(e){}const hs=MS747_RC.intersectObjects(L,false);for(const h of hs){if(!h.face)continue;const m=Array.isArray(h.object.material)?h.object.material[h.face.materialIndex||0]:h.object.material;if(!m||m.isMeshBasicMaterial||(m.transparent&&m.opacity<.95))continue;try{if(typeof quill413Surface==='function'&&!quill413Surface(h))continue;}catch(e){}return h;}return null;}
+const MS747_DIRS=[[-1,0],[1,0],[0,-1],[0,1]];
+// um lugar na parede para a peça g (largura w, altura h, profundidade d) perto de alvo; fixo = mesma parede (normal) só deslizando
+function ms747LugarParede(R,id,g,alvo,fixo,yc0){const T=THREE,{s}=ms747Tam(g);const finoZ=s.z<=s.x;const w=finoZ?s.x:s.z,h=s.y,d=finoZ?s.z:s.x;
+  const L=ms747Alvos(R);const yc=Math.max(h/2+.35,Math.min(5.1-h/2,yc0!=null?yc0:Math.max(1.75,h/2+1.05)));
+  const outros=[];for(const [k,p] of Object.entries(R.placed)){if(k===id||!p.g.userData.parede747||!p.g.visible)continue;outros.push(new T.Box3().setFromObject(p.g).expandByScalar(.04));}
+  let dirs=MS747_DIRS.map(D=>{const dist=D[0]<0?alvo.x+13.9:D[0]>0?13.9-alvo.x:D[1]<0?alvo.z+29.9:29.9-alvo.z;return {D,dist};}).sort((a,b)=>a.dist-b.dist);
+  if(fixo)dirs=[{D:[-fixo[0],-fixo[1]],dist:0}];
+  const o=new T.Vector3(),dv=new T.Vector3();
+  for(const {D} of dirs){const tx=-D[1],tz=D[0];
+    for(let k=0;k<=36;k++){const off=(k%2?1:-1)*Math.ceil(k/2)*.35;const px=alvo.x+tx*off,pz=alvo.z+tz*off;if(Math.abs(px)>13.6||Math.abs(pz)>29.6)continue;if(D[1]>0&&Math.abs(px)<2.4)continue;
+      o.set(px,yc,pz);dv.set(D[0],0,D[1]);const h0=ms747Raio(L,o,dv,32);if(!h0)continue;const n=h0.face.normal.clone().transformDirection(h0.object.matrixWorld);if(n.dot(dv)>0)n.negate();if(Math.abs(n.y)>.25||n.dot(dv)>-.85)continue;
+      n.y=0;n.normalize();const tg=new T.Vector3(-n.z,0,n.x);const P=h0.point.clone();
+      // amostras a 0,35 m da parede, em grade 3 × 3 sobre a área da peça (+3 cm): tudo tem de bater na mesma superfície plana
+      let ok=true;for(const fx of [-.5,0,.5]){for(const fy of [-.5,0,.5]){const q=P.clone().addScaledVector(tg,fx*(w+.06)).add(new T.Vector3(0,fy*(h+.06),0)).addScaledVector(n,.35);const hh=ms747Raio(L,q,n.clone().negate(),.6);if(!hh||Math.abs(hh.distance-.35)>.035){ok=false;break;}}if(!ok)break;}
+      if(!ok)continue;
+      const c=P.clone().addScaledVector(n,d/2+.015);const caixa=new T.Box3(new T.Vector3(c.x-Math.abs(tg.x)*w/2-Math.abs(n.x)*d/2,yc-h/2,c.z-Math.abs(tg.z)*w/2-Math.abs(n.z)*d/2),new T.Vector3(c.x+Math.abs(tg.x)*w/2+Math.abs(n.x)*d/2,yc+h/2,c.z+Math.abs(tg.z)*w/2+Math.abs(n.z)*d/2));
+      if(outros.some(B=>B.intersectsBox(caixa)))continue;
+      return {x:c.x,z:c.z,y:yc-h/2,yc,n:[n.x,n.z],lvl:0,radius:0};}}
+  return null;}
+function ms747Rot(g,L,id,virada){const phi=ms747Frente(g,id);return Math.atan2(L.n[0],L.n[1])-phi+(virada?Math.PI:0);}
+function ms747Aplica(R,id,g,L){const map=salaMapa128(R),d=map[id]||(map[id]={});const vir=!!d.virada747;g.rotation.y=ms747Rot(g,L,id,vir);g.position.set(L.x,L.y,L.z);g.updateMatrixWorld(true);
+  const s=R.placed[id];if(s){s.radius=0;s.lvl=0;}d.pos=[L.x,L.z];d.lvl=0;d.rot=g.rotation.y;d.y747=L.y;d.yc747=L.yc;d.n747=L.n;d.parede747=true;return true;}
+// colocar (catálogo, restauração, duplicar): peça de parede vai para a parede
+if(typeof decorPlace128==='function'){const pl0=decorPlace128;decorPlace128=function(R,id,g,saved){try{if(ehPessoal(R)&&g&&ms747EhParede(R,g,saved&&saved.name402||g.name)){const map=salaMapa128(R);
+      if(saved&&saved.parede747&&saved.pos&&saved.n747){g.rotation.y=saved.rot||0;return {x:saved.pos[0],z:saved.pos[1],y:saved.y747||0,lvl:0,radius:0};}
+      const alvo=(typeof CUR!=='undefined'&&CUR==='room'&&ROOM===R.room)?{x:CH.x+Math.sin(CH.dir||0)*2,z:CH.z+Math.cos(CH.dir||0)*2}:{x:R.room.spawn.x,z:R.room.spawn.z-3};
+      const L=ms747LugarParede(R,id,g,alvo,null,null);if(!L){MS747.stats.paredeFalhou++;return null;}
+      g.rotation.y=ms747Rot(g,L,id,false);MS747.pend=MS747.pend||new Map();MS747.pend.set(id,L);MS747.stats.parede++;return {x:L.x,z:L.z,y:L.y,lvl:0,radius:0};}}catch(e){e7('lugar parede',e);}return pl0.apply(this,arguments);};}
+if(typeof catalog402Add==='function'){const ca0=catalog402Add;catalog402Add=async function(source,itemId,R,savedId){let antes=null;try{const R0=R||salaContexto128();const d0=savedId&&R0&&salaMapa128(R0)[savedId];if(d0&&d0.pos)antes=[d0.pos[0],d0.pos[1]];}catch(e){}
+  const id=await ca0.apply(this,arguments);try{R=R||salaContexto128();const s=id&&R&&R.placed[id];const map=R&&salaMapa128(R);
+      // peça restaurada que precisou de outro lugar (ex.: guardada atrás da parede): o lugar novo fica gravado
+      if(s&&savedId&&antes&&ehPessoal(R)&&map&&map[id]&&map[id].pos&&Math.hypot(map[id].pos[0]-antes[0],map[id].pos[1]-antes[1])>.05){MS747.stats.recolhidas++;clearTimeout(MS747.tSalva);MS747.tSalva=setTimeout(()=>{try{salaSalvar(R);}catch(e){}},300);}
+      if(s&&s.g.userData.parede747&&map&&map[id]){const L=MS747.pend&&MS747.pend.get(id);if(L){MS747.pend.delete(id);const d=map[id];d.y747=L.y;d.yc747=L.yc;d.n747=L.n;d.parede747=true;d.rot=s.g.rotation.y;s.radius=0;salaSalvar(R);}}
+      else if(s&&savedId&&ehPessoal(R)&&ms747Fora(R,s)){setTimeout(()=>{try{ms747Recolhe(R);}catch(e){}},0);}}catch(e){e7('catálogo',e);}return id;};}
+// conferência: peça de parede não ocupa o chão
+if(typeof decorFits128==='function'){const df0=decorFits128;decorFits128=function(R,id,g,x,z,lvl,route){try{if(g&&g.userData&&g.userData.parede747&&ehPessoal(R)){const d=salaMapa128(R)[id]||{};return {radius:0,y:d.y747!=null?d.y747:g.position.y};}}catch(e){e7('fits',e);}return df0.apply(this,arguments);};}
+// mover clicando num quadrado: vai para a parede mais perto do quadrado
+if(typeof decorMove128==='function'){const mv0=decorMove128;decorMove128=function(id,i,j,R){try{const s=R&&R.placed[id];if(s&&s.g.userData.parede747&&ehPessoal(R)){const q=R.celulas.find(o=>o.userData.celula[0]===i&&o.userData.celula[1]===j);if(!q)return false;
+        const d=salaMapa128(R)[id]||{};try{ms497Snap(R);}catch(e){}const L=ms747LugarParede(R,id,s.g,{x:q.position.x,z:q.position.z},null,d.yc747);if(!L){showToast(T7('Não há parede livre ali para esta peça.','No free wall there for this piece.'));return false;}
+        ms747Aplica(R,id,s.g,L);salaSalvar(R);decorInvalidate128(R);return true;}}catch(e){e7('mover parede',e);}return mv0.apply(this,arguments);};}
+// ajuste fino: ◀ ▶ (ao longo da parede) e ▲ ▼ (altura) nas peças de parede; peças de família, tapetes e cópias também andam e giram 15°
+function ms747Sel(){try{const R=salaContexto128();if(!R||!R.universal128)return null;const id=SALA_ED.sel,s=id&&R.placed[id];if(!s)return null;return {R,id,s,d:salaMapa128(R)[id]};}catch(e){return null;}}
+if(typeof ms497Mover==='function'){const mo0=ms497Mover;ms497Mover=function(dx,dz){const S=ms747Sel();try{if(S&&ehPessoal(S.R)&&S.s.g.userData.parede747&&S.d){const n=S.d.n747||[0,1];const tg=[-n[1],n[0]];const along=dx*tg[0]+dz*tg[1];const perp=-(dx*n[0]+dz*n[1]);
+        let L=null;if(Math.abs(along)>1e-4){const p=S.s.g.position;L=ms747LugarParede(S.R,S.id,S.s.g,{x:p.x+n[0]*.5+tg[0]*along,z:p.z+n[1]*.5+tg[1]*along},n,S.d.yc747);if(L&&Math.hypot(L.x-p.x,L.z-p.z)>Math.abs(along)+.36)L=null;}
+        else{const yc=(S.d.yc747||1.75)+(perp>0?.25:-.25);const p=S.s.g.position;L=ms747LugarParede(S.R,S.id,S.s.g,{x:p.x+n[0]*.5,z:p.z+n[1]*.5},n,yc);if(L&&Math.abs(L.yc-yc)>.01)L=null;}
+        if(!L){showToast(T7('Não há espaço para esse lado.','No room that way.'));return false;}try{ms497Snap(S.R);}catch(e){}ms747Aplica(S.R,S.id,S.s.g,L);salaSalvar(S.R);decorInvalidate128(S.R);MS747.stats.fino++;return true;}
+      if(S&&S.d&&!S.d.source402){const x=S.s.g.position.x+dx,z=S.s.g.position.z+dz;const ok=decorFits128(S.R,S.id,S.s.g,x,z,S.s.lvl);if(!ok){showToast(T7('Não há espaço para esse lado.','No room that way.'));return false;}
+        try{ms497Snap(S.R);}catch(e){}S.s.g.position.set(x,ok.y,z);S.s.radius=ok.radius;S.d.pos=[x,z];salaSalvar(S.R);decorInvalidate128(S.R);MS747.stats.fino++;return true;}}catch(e){e7('fino',e);}return mo0.apply(this,arguments);};}
+function ms747Vira(S){const d=S.d;d.virada747=!d.virada747;const L={x:S.s.g.position.x,z:S.s.g.position.z,y:d.y747!=null?d.y747:S.s.g.position.y,yc:d.yc747,n:d.n747||[0,1],lvl:0,radius:0};try{ms497Snap(S.R);}catch(e){}ms747Aplica(S.R,S.id,S.s.g,L);salaSalvar(S.R);return true;}
+if(typeof ms497Girar==='function'){const gi0=ms497Girar;ms497Girar=function(ang){const S=ms747Sel();try{if(S&&ehPessoal(S.R)&&S.s.g.userData.parede747&&S.d)return ms747Vira(S);
+      if(S&&S.d&&!S.d.source402){const prev=S.s.g.rotation.y;S.s.g.rotation.y+=ang;const ok=decorFits128(S.R,S.id,S.s.g,S.s.g.position.x,S.s.g.position.z,S.s.lvl);if(!ok){S.s.g.rotation.y=prev;showToast(T7('Não há espaço para girar aqui.','No room to turn it here.'));return false;}
+        S.s.g.rotation.y=prev;try{ms497Snap(S.R);}catch(e){}S.s.g.rotation.y+=ang;S.s.radius=ok.radius;S.d.rot=S.s.g.rotation.y;salaSalvar(S.R);decorInvalidate128(S.R);MS747.stats.fino++;return true;}}catch(e){e7('girar',e);}return gi0.apply(this,arguments);};}
+if(typeof decorRotate128==='function'){const dr0=decorRotate128;decorRotate128=function(){const S=ms747Sel();try{if(S&&ehPessoal(S.R)&&S.s.g.userData.parede747&&S.d)return ms747Vira(S);}catch(e){e7('girar parede',e);}return dr0.apply(this,arguments);};}
+// tamanho de peça de parede: confere na própria parede
+if(typeof catalog402Resize==='function'){const rz0=catalog402Resize;catalog402Resize=function(mult){const S=ms747Sel();try{if(S&&ehPessoal(S.R)&&S.s.g.userData.parede747&&S.d&&S.d.source402){const g=S.s.g,old=g.scale.x,next=Math.max(.05,Math.min(4,old*mult));g.scale.setScalar(next);
+        const p=g.position,n=S.d.n747||[0,1];const L=ms747LugarParede(S.R,S.id,g,{x:p.x+n[0]*.5,z:p.z+n[1]*.5},n,S.d.yc747);if(!L||Math.hypot(L.x-p.x,L.z-p.z)>1.2){g.scale.setScalar(old);showToast(T7('Não cabe maior aqui na parede.','It does not fit bigger on this wall.'));return;}
+        g.scale.setScalar(old);try{ms497Snap(S.R);}catch(e){}g.scale.setScalar(next);S.d.scale402=next;ms747Aplica(S.R,S.id,g,L);salaSalvar(S.R);decorInvalidate128(S.R);return;}}catch(e){e7('tamanho parede',e);}return rz0.apply(this,arguments);};}
+// duplicar peça de parede: a cópia vai para o lado da original, na mesma parede
+if(typeof ms497Duplicar==='function'){const du0=ms497Duplicar;ms497Duplicar=async function(){const S=ms747Sel();const ok=await du0.apply(this,arguments);try{if(ok&&S&&ehPessoal(S.R)&&S.s.g.userData.parede747&&S.d){const novo=SALA_ED.sel;const N=novo&&S.R.placed[novo];
+        if(N&&N.g.userData.parede747&&novo!==S.id){const n=S.d.n747||[0,1],tg=[-n[1],n[0]],p=S.s.g.position,w=Math.max(.6,ms747Tam(S.s.g).s.x*S.s.g.scale.x);const L=ms747LugarParede(S.R,novo,N.g,{x:p.x+n[0]*.5+tg[0]*(w+.2),z:p.z+n[1]*.5+tg[1]*(w+.2)},n,S.d.yc747);if(L){ms747Aplica(S.R,novo,N.g,L);salaSalvar(S.R);}}}}catch(e){e7('duplicar parede',e);}return ok;};}
+// desfazer: devolve também posição e giro das peças que não são do catálogo e o lado das peças de parede
+if(typeof ms497Restaurar==='function'){const re0=ms497Restaurar;ms497Restaurar=async function(R,alvo){const r=await re0.apply(this,arguments);try{let mudou=false;const map=salaMapa128(R);
+      for(const [id,s] of Object.entries(alvo||{})){const it=R.placed[id];if(!it||!s)continue;
+        if(s.parede747&&s.pos){const L={x:s.pos[0],z:s.pos[1],y:s.y747!=null?s.y747:it.g.position.y,yc:s.yc747,n:s.n747||[0,1],lvl:0,radius:0};map[id]=JSON.parse(JSON.stringify(s));ms747Aplica(R,id,it.g,L);mudou=true;continue;}
+        if(s.source402)continue;const a=map[id]||{};const pos=s.pos,rot=s.rot||0;if(pos&&(!a.pos||a.pos[0]!==pos[0]||a.pos[1]!==pos[1]||(a.rot||0)!==rot)){it.g.rotation.y=rot;const ok=decorFits128(R,id,it.g,pos[0],pos[1],it.lvl,false);it.g.position.set(pos[0],ok?ok.y:it.g.position.y,pos[1]);if(ok)it.radius=ok.radius;map[id]=Object.assign(a,{pos:[pos[0],pos[1]],rot});mudou=true;}}
+      if(mudou){salaSalvar(R);decorInvalidate128(R);}}catch(e){e7('desfazer',e);}return r;};}
+
+/* ---------- 5) painel ---------- */
+const MS747_BTN='color:#ead8af;background:#32271b;border:1px solid #675335;border-radius:4px;padding:7px;cursor:pointer;font:11px system-ui;margin:4px 4px 0 0';
+function ms747Painel(){const p=typeof SALA_PAINEL!=='undefined'&&SALA_PAINEL;if(!p)return;const R=salaContexto128();if(!R||!R.universal128)return;
+  const filhos=[...p.children];const row=filhos.find(c=>c.tagName==='DIV'&&[...c.querySelectorAll(':scope>button')].some(b=>/^✓/.test(b.textContent.trim())));
+  const tit=filhos.find(c=>c.tagName==='DIV'&&!c.id&&/^(Decorar|Decorate) · /.test((c.textContent||'').trim())&&!c.querySelector('button'));const info=p.querySelector('#salaInfo');
+  if(row&&p.firstElementChild!==row){p.prepend(row);if(tit)row.after(tit);if(info)(tit||row).after(info);row.style.top='-12px';}
+  for(const b of p.querySelectorAll(':scope>button'))if(!b.getAttribute('style')&&b.id!=='catalog402Button'&&b.id!=='trofeus498')b.style.cssText=MS747_BTN;
+  try{const cb=p.querySelector('#catalog402Button');if(cb&&EN7()&&/Cat[aá]logo: Sala do Acumulador/.test(cb.textContent)){cb.setAttribute('translate','no');cb.textContent='＋ Catalogue: Collector\u2019s Room, every room, halls and new furniture';}}catch(e){}
+  try{if(typeof MS497_ESTILOS!=='undefined'){const en=EN7();for(const b of p.querySelectorAll('#ajustes497 button')){const t=b.textContent.trim();if(!/^✦/.test(t))continue;b.setAttribute('translate','no');const E=Object.values(MS497_ESTILOS).find(E=>E.n.some(n=>t.toLowerCase().includes(n.toLowerCase().slice(0,4)))||(/estante|shelf/i.test(t)&&E.n[0]==='Biblioteca'));if(E)b.textContent='✦ '+E.n[en?1:0];}}}catch(e){e7('estilos',e);}}
+if(typeof decorPanel128==='function'){const pa0=decorPanel128;decorPanel128=function(){const r=pa0.apply(this,arguments);try{ms747Painel();}catch(e){e7('painel',e);}return r;};}
+// entrar e sair do editor: modo de câmera de antes, peças fora voltam, superfícies só do salão
+if(typeof decorToggle128==='function'){const dt0=decorToggle128;decorToggle128=function(on){const antes=(typeof MODE!=='undefined')?MODE:null;let r;MS747.entrando=!!on;try{r=dt0.apply(this,arguments);}finally{MS747.entrando=false;}
+    try{if(on&&r){if(antes&&antes!=='tp'&&MS747.modo0==null)MS747.modo0=antes;const R=DEC128.active;if(ehPessoal(R)){ms747Mundo(R.room);ms747FiltraSuperf(R);ms747Recolhe(R);}}
+      else if(!on){const m=MS747.modo0;MS747.modo0=null;if(m&&typeof MODE!=='undefined'&&MODE==='tp'&&typeof setMode==='function'){setMode(m);MS747.stats.modo++;}}}catch(e){e7('editor',e);}return r;};}
+// avisos que só repetem o que já aparece na tela
+if(typeof showToast==='function'){const st0=showToast;showToast=function(msg){try{const t=String(msg||'');const ativo=typeof SALA_ED!=='undefined'&&SALA_ED.ativo;
+      if(MS747.entrando&&/^(Decorar|Decorate) · /.test(t)){MS747.stats.avisosCalados++;return;}
+      if(ativo&&(/· peça colocada\. Clique num quadrado para mover\.?$/.test(t)||/^↶ (Desfeito|Undone)/.test(t)||MS747.acab)){MS747.stats.avisosCalados++;return;}}catch(e){}return st0.apply(this,arguments);};}
+// a amostra de acabamento mostra o próprio nome no title; o aviso some
+document.addEventListener('click',e=>{try{const b=e.target&&e.target.closest&&e.target.closest('[data-acab]');if(!b)return;MS747.acab=true;setTimeout(()=>{MS747.acab=false;},0);}catch(x){}},true);
+// a sala já montada (se o bloco correr depois) e a cada montagem nova
+try{ms747Mundo();}catch(e){}
+if(typeof finishRoom==='function'){const fi0=finishRoom;finishRoom=function(key){const r=fi0.apply(this,arguments);try{if(key==='pessoal'){ms747Mundo();const R=DEC128.rooms.pessoal;if(R){ms747FiltraSuperf(R);setTimeout(()=>{try{ms747Recolhe(R);}catch(e){}},1500);}}}catch(e){e7('montar',e);}return r;};}
+Object.assign(window.__ms747,{mundo:ms747Mundo,recolhe:()=>ms747Recolhe(DEC128.rooms.pessoal),superficies:ms747Superficies,lugarParede:(id,x,z)=>{const R=DEC128.rooms.pessoal;const s=R&&R.placed[id];return s?ms747LugarParede(R,id,s.g,{x,z},null,null):null;},ehParede:id=>{const R=DEC128.rooms.pessoal;const s=R&&R.placed[id];return !!(s&&s.g.userData.parede747);},clamp:ms747Clamp,versao:747});
+}catch(e){try{console.error('ms747',e);window.__ms747erro=String(e&&e.stack||e);}catch(x){}}})();
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
