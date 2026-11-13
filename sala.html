@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v747</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v748</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -90228,8 +90228,199 @@ document.addEventListener('click',e=>{try{const b=e.target&&e.target.closest&&e.
 // a sala já montada (se o bloco correr depois) e a cada montagem nova
 try{ms747Mundo();}catch(e){}
 if(typeof finishRoom==='function'){const fi0=finishRoom;finishRoom=function(key){const r=fi0.apply(this,arguments);try{if(key==='pessoal'){ms747Mundo();const R=DEC128.rooms.pessoal;if(R){ms747FiltraSuperf(R);setTimeout(()=>{try{ms747Recolhe(R);}catch(e){}},1500);}}}catch(e){e7('montar',e);}return r;};}
-Object.assign(window.__ms747,{mundo:ms747Mundo,recolhe:()=>ms747Recolhe(DEC128.rooms.pessoal),superficies:ms747Superficies,lugarParede:(id,x,z)=>{const R=DEC128.rooms.pessoal;const s=R&&R.placed[id];return s?ms747LugarParede(R,id,s.g,{x,z},null,null):null;},ehParede:id=>{const R=DEC128.rooms.pessoal;const s=R&&R.placed[id];return !!(s&&s.g.userData.parede747);},clamp:ms747Clamp,versao:747});
+Object.assign(window.__ms747,{mundo:ms747Mundo,recolhe:()=>ms747Recolhe(DEC128.rooms.pessoal),superficies:ms747Superficies,lugarParede:(id,x,z)=>{const R=DEC128.rooms.pessoal;const s=R&&R.placed[id];return s?ms747LugarParede(R,id,s.g,{x,z},null,null):null;},ehParede:id=>{const R=DEC128.rooms.pessoal;const s=R&&R.placed[id];return !!(s&&s.g.userData.parede747);},clamp:ms747Clamp,versao:747,
+  // para a v748 (arrastar peças de parede): achar lugar e aplicar, com o mesmo cálculo da v747
+  _lugar:(R,id,g,alvo,fixo,yc)=>ms747LugarParede(R,id,g,alvo,fixo,yc),_aplica:(R,id,g,L)=>ms747Aplica(R,id,g,L)});
 }catch(e){try{console.error('ms747',e);window.__ms747erro=String(e&&e.stack||e);}catch(x){}}})();
+
+/* ===================== v748 · DECORAR MAIS INTUITIVO (MINHA SALA) =====================
+   Pedido do Luiz: «Veja se é possível aprimorar a mecânica, deixar mais intuitivo, menu, etc, e aprimore».
+   1) Botão «🎨 Decorar a sala» na tela, na Minha Sala (o botão só existia dentro do ☰ Menu desde que a barra «Ir para» saiu, v559).
+   2) Painel em três abas — ✏️ Editar (a peça escolhida: girar, mover, tamanho, cor, duplicar, retirar), ＋ Adicionar
+      (catálogo, estilos prontos, troféus, peças da sala, tapetes, peças por leitura) e 🏠 Sala (acabamentos, pintura das
+      superfícies, depósito, restaurar) —, com «↶ Desfazer» ao lado de «✓ Concluir». Escolher uma peça abre a aba Editar,
+      que mostra o nome da peça e o que dá para fazer; «Restaurar esta sala» foi para o fim da aba Sala.
+   3) Arrastar para mudar de lugar: segurar e arrastar uma peça leva a peça junto com o mouse (ou o dedo), em passos de
+      25 cm, verde onde cabe e vermelha onde não cabe; soltar grava (e o desfazer volta). Peça de parede corre pela parede.
+      Clicar numa peça escolhe a peça (antes, com outra peça escolhida, o clique levava a escolhida para lá).
+   4) Mão sobre as peças, grade do chão só com uma peça escolhida e o quadrado sob o mouse aceso (é onde a peça vai ao clicar).
+   5) Teclas: R gira 15° (Shift+R ao contrário; peça de parede vira), Esc solta a peça escolhida antes de sair.
+   6) Peça nova do catálogo: a câmera vira para ela. Miniaturas do catálogo também no modo Papel.
+   ?minha748=0 desliga. Gancho: window.__ms748. */
+(function(){try{
+const MS748={on:!/[?&]minha748=0/.test(location.search),erros:[],stats:{botao:0,abas:0,cliquesPeca:0,arrastes:0,gravados:0,voltas:0,giroR:0,soltas:0,camera:0,miniPapel:0},drag:null,aba:null,selAnt:null,hoverT:0};
+window.__ms748={estado:MS748};
+if(!MS748.on)return;
+const EN8=()=>{try{return String(document.documentElement.lang||'').startsWith('en');}catch(e){return false;}};
+const T8=(pt,en)=>EN8()?en:pt;
+function e8(onde,e){try{MS748.erros.push(onde+': '+String(e&&e.message||e));if(MS748.erros.length>40)MS748.erros.shift();console.warn('ms748',onde,e);}catch(x){}}
+const R8=()=>{try{const R=DEC128.active;return (R&&R.universal128&&typeof ROOMS!=='undefined'&&ROOMS.pessoal&&R.scene===ROOMS.pessoal.scene)?R:null;}catch(e){return null;}};
+const W7=()=>window.__ms747||{};
+const emTexto=t=>!!(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName||'')));
+
+/* ---------- 1) botão na tela ---------- */
+function ms748Botao(){let b=document.getElementById('btnDecorar748');if(b)return b;b=document.createElement('button');b.id='btnDecorar748';b.type='button';b.setAttribute('translate','no');
+  const base=document.getElementById('btnEstante');let cs=null;try{cs=base?getComputedStyle(base):null;}catch(e){}
+  b.style.cssText='position:fixed;left:50%;bottom:62px;transform:translateX(-50%);z-index:45;padding:9px 20px;border-radius:22px;cursor:pointer;letter-spacing:.05em;font-size:14px;box-shadow:0 3px 12px rgba(0,0,0,.5);display:none;'+
+    (cs?('font-family:'+cs.fontFamily+';color:'+cs.color+';background:'+(cs.backgroundColor&&cs.backgroundColor!=='rgba(0, 0, 0, 0)'?cs.backgroundColor:'#2a1f15')+';border:1px solid #b8964f;'):'font-family:Georgia,serif;color:#ead8af;background:#2a1f15;border:1px solid #b8964f;');
+  b.title=T8('Mobiliar e enfeitar a Minha Sala','Furnish and decorate your room');
+  b.addEventListener('pointerdown',e=>e.stopPropagation());
+  b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();try{salaDecorar(true);try{renderGoBar();}catch(x){}MS748.stats.botao++;ms748BotaoEstado();}catch(x){e8('botão',x);}});
+  document.body.appendChild(b);return b;}
+function ms748BotaoEstado(){try{const b=ms748Botao();const naSala=typeof CUR!=='undefined'&&CUR==='room'&&typeof ROOMS!=='undefined'&&ROOMS.pessoal&&ROOM===ROOMS.pessoal&&!window.VISITA;
+    const ativo=typeof SALA_ED!=='undefined'&&SALA_ED.ativo;let bloq=false;try{bloq=typeof uiBlocked==='function'&&uiBlocked();}catch(e){}
+    const t=T8('🎨 Decorar a sala','🎨 Decorate the room');if(b.textContent!==t)b.textContent=t;const v=(naSala&&!ativo&&!bloq)?'':'none';if(b.style.display!==v)b.style.display=v;}catch(e){}}
+setInterval(ms748BotaoEstado,400);
+
+/* ---------- 2) painel em abas ---------- */
+const ABAS748=[['editar','✏️ Editar','✏️ Edit'],['adicionar','＋ Adicionar','＋ Add'],['sala','🏠 Sala','🏠 Room']];
+const BTN8='color:#ead8af;background:#32271b;border:1px solid #675335;border-radius:4px;padding:7px;cursor:pointer;font:11px system-ui;margin:4px 4px 0 0';
+function topo8(p,el){let n=el;while(n&&n.parentElement&&n.parentElement!==p)n=n.parentElement;return n&&n.parentElement===p?n:null;}
+function ms748Aba(k){const p=typeof SALA_PAINEL!=='undefined'&&SALA_PAINEL;if(!p)return;const head=p.querySelector('#abas748');if(!head)return;MS748.aba=k;
+  for(const b of head.querySelectorAll('[data-aba748]')){const on=b.dataset.aba748===k;b.style.background=on?'#5a4426':'#2a2016';b.style.color=on?'#ffe7b0':'#cdb894';b.style.borderColor=on?'#c9a45c':'#4d3d28';b.setAttribute('aria-selected',on?'true':'false');}
+  for(const d of p.querySelectorAll('[data-conteudo748]'))d.style.display=d.dataset.conteudo748===k?'':'none';MS748.stats.abas++;}
+function ms748Painel(){const p=typeof SALA_PAINEL!=='undefined'&&SALA_PAINEL;const R=R8();if(!p||!R||p.querySelector('#abas748'))return;
+  const kids=[...p.children];
+  const row=kids.find(c=>c.tagName==='DIV'&&[...c.querySelectorAll(':scope>button')].some(b=>/^✓/.test(b.textContent.trim())));if(!row)return;
+  const tit=kids.find(c=>c.tagName==='DIV'&&!c.id&&/^(Decorar|Decorate) · /.test((c.textContent||'').trim())&&!c.querySelector('button'));
+  const info=p.querySelector('#salaInfo'),cat=p.querySelector('#catalog402Button'),acab=p.querySelector('#acab493'),aj=p.querySelector('#ajustes497'),trof=p.querySelector('#trofeus498');
+  const fam=topo8(p,p.querySelector('[data-fam]')),pecas=p.querySelector('#decorPieces128'),tap=p.querySelector('#salaTapBox'),superf=topo8(p,p.querySelector('[data-superf]')),s195p=p.querySelector('#s195Pos'),dep=p.querySelector('#s195Dep');
+  const tools=kids.find(c=>c.tagName==='DIV'&&!c.id&&[...c.querySelectorAll(':scope>button')].some(b=>/^(Girar|Rotate)/.test(b.textContent.trim())));
+  const btns=kids.filter(c=>c.tagName==='BUTTON'&&c!==cat&&c!==trof);
+  const menor=btns.find(b=>/Diminuir|smaller/i.test(b.textContent)),maior=btns.find(b=>/Aumentar|larger/i.test(b.textContent)),salvas=btns.find(b=>/Restaurar peças|Restore saved/i.test(b.textContent));
+  const iP=pecas?kids.indexOf(pecas):-1,iT=tap?kids.indexOf(tap):-1,iS=superf?kids.indexOf(superf):-1;
+  const nota=iP>=0?kids[iP+1]:null;const paleta=(iP>=0&&iT>iP)?kids.slice(iP+2,iT):[];
+  const rotSuperf=iS>0?kids[iS-1]:null;const instr=iS>=0?kids[iS+1]:null;
+  // cabeçalho: «↶ Desfazer» ao lado de «✓ Concluir»
+  try{const des=document.createElement('button');des.type='button';des.id='desfazer748';des.textContent=T8('↶ Desfazer','↶ Undo');des.title=T8('Desfazer a última mudança (Ctrl+Z)','Undo the last change (Ctrl+Z)');des.setAttribute('translate','no');
+    des.style.cssText='color:#ead8af;background:#32271b;border:1px solid #675335;border-radius:4px;padding:7px;cursor:pointer;font:11px system-ui';des.onclick=()=>{try{ms497Desfazer();}catch(e){e8('desfazer',e);}};
+    const ok=[...row.querySelectorAll(':scope>button')].find(b=>/^✓/.test(b.textContent.trim()));if(ok)ok.after(des);else row.prepend(des);
+    for(const b of row.querySelectorAll(':scope>button'))b.style.whiteSpace='nowrap';
+    if(aj)for(const b of aj.querySelectorAll('button'))if(/^↶/.test(b.textContent.trim()))b.style.display='none';}catch(e){e8('desfazer btn',e);}
+  const head=document.createElement('div');head.id='abas748';head.setAttribute('role','tablist');head.style.cssText='display:flex;gap:4px;position:sticky;top:26px;z-index:2;background:#100c09;padding:5px 0 7px;margin:2px 0 6px;border-bottom:1px solid #3b2f22';
+  const box={};for(const [k,pt,en] of ABAS748){const b=document.createElement('button');b.type='button';b.dataset.aba748=k;b.setAttribute('role','tab');b.setAttribute('translate','no');b.textContent=T8(pt,en);
+    b.style.cssText='flex:1;padding:7px 4px;border-radius:5px;border:1px solid #4d3d28;cursor:pointer;font:600 11px system-ui;background:#2a2016;color:#cdb894';b.onclick=()=>ms748Aba(k);head.appendChild(b);
+    const d=document.createElement('div');d.dataset.conteudo748=k;box[k]=d;}
+  (tit||row).after(head);head.after(box.editar);box.editar.after(box.adicionar);box.adicionar.after(box.sala);
+  const sec=(k,txt)=>{const h=document.createElement('div');h.textContent=txt;h.setAttribute('translate','no');h.style.cssText='margin:10px 0 4px;color:#e0b559;font:600 10px system-ui;letter-spacing:.1em;text-transform:uppercase';box[k].appendChild(h);return h;};
+  const poe=(k,el)=>{if(el&&el.parentElement)box[k].appendChild(el);};
+  // ✏️ Editar
+  poe('editar',info);
+  const vazio=document.createElement('div');vazio.id='vazio748';vazio.setAttribute('translate','no');vazio.style.cssText='margin:6px 0 8px;padding:9px;border:1px dashed #5a4a32;border-radius:6px;color:#c9b99c;font:11px/1.5 system-ui';
+  vazio.textContent=T8('Nenhuma peça escolhida. Clique numa peça da sala — ou segure e arraste para mudar de lugar. Para pôr peças novas, use ＋ Adicionar.','No piece selected. Click a piece in the room — or hold and drag it to move it. To add new pieces, use ＋ Add.');box.editar.appendChild(vazio);
+  const acoes=document.createElement('div');acoes.id='acoes748';box.editar.appendChild(acoes);
+  const poeA=el=>{if(el&&el.parentElement)acoes.appendChild(el);};
+  if(tools){for(const b of [...tools.querySelectorAll(':scope>button')])if(/^(Restaurar esta sala|Restore this room|Confirmar restauração|Confirm)/i.test(b.textContent.trim()))MS748.reset=b;if(MS748.reset)MS748.reset.remove();poeA(tools);}
+  // estilos prontos saem dos ajustes e vão para Adicionar
+  let estilos=null;try{if(aj){const sb=[...aj.querySelectorAll('button')].find(b=>/^✦/.test(b.textContent.trim()));if(sb){const linha=sb.parentElement;const h2=linha.previousElementSibling;estilos=document.createElement('div');if(h2&&h2!==aj.firstElementChild)estilos.appendChild(h2);estilos.appendChild(linha);}}}catch(e){e8('estilos',e);}
+  poeA(aj);
+  if(menor||maior){const t=document.createElement('div');t.style.cssText='display:flex;gap:4px;flex-wrap:wrap;align-items:center;margin:6px 0';const l=document.createElement('span');l.textContent=T8('Tamanho:','Size:');l.setAttribute('translate','no');l.style.cssText='color:#bdae92;font:11px system-ui;width:56px';t.appendChild(l);
+    for(const b of [menor,maior])if(b){b.style.cssText=BTN8;b.style.margin='0';b.textContent=b===menor?T8('− menor','− smaller'):T8('+ maior','+ larger');b.setAttribute('translate','no');t.appendChild(b);}acoes.appendChild(t);}
+  for(const el of paleta)poeA(el);poeA(tap);poeA(s195p);
+  const atal=document.createElement('div');atal.setAttribute('translate','no');atal.style.cssText='margin:10px 0 2px;color:#9b8f7e;font:10.5px/1.6 system-ui';
+  atal.textContent=T8('Arrastar: muda de lugar · R: gira 15° (Shift+R ao contrário) · Shift+setas: ajuste fino · Delete: retira · Ctrl+D: duplica · Ctrl+Z: desfaz · Esc: solta a peça','Drag: move · R: turn 15° (Shift+R back) · Shift+arrows: nudge · Delete: remove · Ctrl+D: duplicate · Ctrl+Z: undo · Esc: deselect');acoes.appendChild(atal);
+  // ＋ Adicionar
+  poe('adicionar',cat);if(estilos){sec('adicionar',T8('Estilos prontos','Ready-made styles'));box.adicionar.appendChild(estilos);for(const x of estilos.querySelectorAll('div'))if(/Estilos prontos|Ready-made/i.test(x.textContent)&&!x.querySelector('button'))x.remove();}
+  poe('adicionar',trof);if(fam){sec('adicionar',T8('Peças da sala','Room pieces'));poe('adicionar',fam);try{const t0=fam.firstElementChild;if(t0&&!t0.querySelector('button,input')&&/o que a sala tem|what the room has/i.test(t0.textContent))t0.style.display='none';}catch(e){}}if(pecas){sec('adicionar',T8('Tapetes e peças por leitura','Rugs and reading rewards'));poe('adicionar',pecas);}poe('adicionar',nota);
+  // 🏠 Sala
+  if(acab)poe('sala',acab);if(superf){sec('sala',T8('Pintar paredes, piso e forro','Paint walls, floor and ceiling'));if(rotSuperf&&rotSuperf.parentElement===p&&!rotSuperf.querySelector('button'))rotSuperf.remove();poe('sala',superf);
+    const d=document.createElement('div');d.setAttribute('translate','no');d.style.cssText='color:#9b8f7e;font:10.5px system-ui;margin:3px 0 6px';d.textContent=T8('Escolha a superfície e depois a cor na aba Editar.','Pick the surface, then its colour in the Edit tab.');box.sala.appendChild(d);}
+  if(instr&&instr.parentElement===p)instr.remove();
+  if(salvas||dep){sec('sala',T8('Recuperar peças','Recover pieces'));if(salvas){salvas.style.cssText=BTN8;poe('sala',salvas);}poe('sala',dep);}
+  // o que sobrou (blocos novos de outras versões) fica na aba Sala, sem se perder
+  for(const c of [...p.children])if(c!==row&&c!==head&&c!==tit&&!c.dataset.conteudo748&&c.tagName!=='STYLE')box.sala.appendChild(c);
+  if(MS748.reset){const z=document.createElement('div');z.style.cssText='margin-top:14px;padding-top:8px;border-top:1px solid #4a2a22';const l=document.createElement('div');l.setAttribute('translate','no');l.textContent=T8('Começar de novo','Start over');l.style.cssText='color:#d99a8a;font:600 10px system-ui;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px';z.appendChild(l);
+    MS748.reset.style.borderColor='#7a3a2e';MS748.reset.style.color='#f0c0b4';z.appendChild(MS748.reset);const d=document.createElement('div');d.setAttribute('translate','no');d.style.cssText='color:#9b8f7e;font:10.5px system-ui;margin-top:3px';d.textContent=T8('Tira todas as peças e volta os acabamentos originais desta sala (pede confirmação).','Removes every piece and the finishes of this room (asks to confirm).');z.appendChild(d);box.sala.appendChild(z);}
+  ms748Aba((typeof SALA_ED!=='undefined'&&SALA_ED.sel&&R.placed[SALA_ED.sel])?'editar':'adicionar');ms748Estado();
+  // recolher/expandir o painel (v128) mostra todos os filhos de volta: as abas são refeitas logo depois
+  try{const col=[...row.querySelectorAll(':scope>button')].find(x=>/Recolher|Collapse|Contraer/i.test(x.getAttribute('aria-label')||'')||/^(−|Mostrar painel|Show panel)$/.test(x.textContent.trim()));if(col)col.addEventListener('click',()=>setTimeout(()=>{try{if(p.dataset.folded!=='true')ms748Aba(MS748.aba||'adicionar');}catch(e){}},0));}catch(e){}
+  requestAnimationFrame(()=>{try{const h=row.offsetHeight;if(h>0)head.style.top=Math.max(0,h-12)+'px';}catch(e){}});}
+if(typeof decorPanel128==='function'){const pa0=decorPanel128;decorPanel128=function(){const r=pa0.apply(this,arguments);try{ms748Painel();}catch(e){e8('painel',e);}return r;};}
+// a peça escolhida: nome, o que dá para fazer, e a aba Editar se abre sozinha
+function ms748Estado(){const R=R8();const p=typeof SALA_PAINEL!=='undefined'&&SALA_PAINEL;if(!R||!p||!p.querySelector('#abas748'))return;const sel=SALA_ED.sel;const s=sel&&R.placed[sel];const d=sel&&salaMapa128(R)[sel];
+  const info=p.querySelector('#salaInfo');const vazio=p.querySelector('#vazio748'),acoes=p.querySelector('#acoes748');const algo=!!sel;
+  if(vazio)vazio.style.display=algo?'none':'';if(acoes){acoes.style.opacity=s?'1':(algo?'1':'.45');acoes.style.pointerEvents=algo?'':'none';}
+  if(info)info.style.display=algo?'':'none';
+  if(s&&d&&info){let nome=d.name402||'';try{if(!nome&&s.fam&&SALA_FAM[s.fam])nome=SALA_FAM[s.fam].nome;if(!nome&&typeof SALA_PECAS!=='undefined'&&SALA_PECAS[sel])nome=SALA_PECAS[sel].nome;if(!nome&&typeof SALA_TAP_BASE!=='undefined'&&SALA_TAP_BASE[sel])nome=SALA_TAP_BASE[sel].nome;}catch(e){}
+    nome=nome||T8('Peça','Piece');const parede=!!s.g.userData.parede747;
+    info.textContent='';const b=document.createElement('b');b.style.color='#e0b559';b.textContent=nome;const sp=document.createElement('span');sp.style.color='#9b8f7e';
+    sp.textContent=parede?T8('peça de parede · arraste pela parede · ▲ ▼ sobem e descem · R vira','wall piece · drag along the wall · ▲ ▼ up and down · R flips'):T8('arraste para mudar de lugar · R gira · Delete retira','drag to move · R turns · Delete removes');
+    info.appendChild(b);info.appendChild(document.createElement('br'));info.appendChild(sp);}
+  if(sel&&sel!==MS748.selAnt&&MS748.aba!=='editar')ms748Aba('editar');MS748.selAnt=sel||null;}
+if(typeof salaPainelEstado==='function'){const pe0=salaPainelEstado;salaPainelEstado=function(){const r=pe0.apply(this,arguments);try{ms748Estado();}catch(e){e8('estado',e);}return r;};}
+
+/* ---------- 3) arrastar peças ---------- */
+const RC8=new THREE.Raycaster(),V28=new THREE.Vector2();
+function ms748Raio(px,py){V28.set(px/innerWidth*2-1,-py/innerHeight*2+1);RC8.setFromCamera(V28,camera);RC8.layers.enableAll();RC8.near=0;RC8.far=Infinity;return RC8;}
+const CX8=new Map();
+function ms748Caixa(R,id,s){const D=MS748.drag;const k=R.rev;let c=CX8.get(id);if(!c||c.k!==k||c.g!==s.g||(D&&D.id===id)){c={k,g:s.g,b:new THREE.Box3().setFromObject(s.g)};CX8.set(id,c);}return c.b;}
+function ms748PecaEm(R,px,py){const rc=ms748Raio(px,py);let best=null;
+  for(const [id,s] of Object.entries(R.placed)){if(!s||!s.g||!s.g.visible)continue;const b=ms748Caixa(R,id,s);if(!Number.isFinite(b.min.x)||!rc.ray.intersectsBox(b))continue;
+    let h=null;try{h=rc.intersectObject(s.g,true).find(x=>x.object&&x.object.visible!==false&&!x.object.isSprite);}catch(e){h=null;}if(h&&(!best||h.distance<best.d))best={id,d:h.distance};}return best;}
+function ms748Chao(R,px,py,y0){const rc=ms748Raio(px,py),o=rc.ray.origin,d=rc.ray.direction;if(Math.abs(d.y)<1e-4)return null;let t=(y0-o.y)/d.y;if(!(t>0))return null;let x=o.x+d.x*t,z=o.z+d.z*t;
+  try{const y1=R.floors[0].floorY(x,z);if(Number.isFinite(y1)&&Math.abs(y1-y0)>.05){const t2=(y1-o.y)/d.y;if(t2>0){x=o.x+d.x*t2;z=o.z+d.z*t2;}}}catch(e){}return {x,z};}
+function ms748Tinge(D,cor){try{if(!D.emiss){D.emiss=new Map();D.g.traverse(o=>{if(!o.isMesh||!o.material)return;for(const m of (Array.isArray(o.material)?o.material:[o.material]))if(m&&m.emissive&&!D.emiss.has(m))D.emiss.set(m,m.emissive.getHex());});}
+    for(const m of D.emiss.keys())m.emissive.setHex(cor);}catch(e){}}
+function ms748Destinge(D){try{if(D.emiss)for(const [m,h] of D.emiss)m.emissive.setHex(h);D.emiss=null;}catch(e){}}
+function ms748Inicia(D,e){const R=D.R,s=R.placed[D.id];if(!s)return false;D.s=s;D.g=s.g;D.d=salaMapa128(R)[D.id]||{};D.copia=JSON.parse(JSON.stringify(D.d));D.p0=s.g.position.clone();D.r0=s.g.rotation.y;D.parede=!!s.g.userData.parede747;
+  SALA_ED.sel=D.id;try{salaRealce(D.id);}catch(x){}try{salaPainelEstado();}catch(x){}try{ms497Snap(R);}catch(x){}
+  const f=ms748Chao(R,e.clientX,e.clientY,s.g.position.y);D.off=f?{x:s.g.position.x-f.x,z:s.g.position.z-f.z}:{x:0,z:0};if(D.parede)D.off={x:0,z:0};D.ok=true;D.ult={x:s.g.position.x,z:s.g.position.z};
+  ms748Tinge(D,0x0b2a0b);D.iniciado=true;MS748.stats.arrastes++;try{renderer.domElement.style.cursor='grabbing';}catch(x){}return true;}
+function ms748Move(D,e){const R=D.R,s=D.s;if(!s||!R.placed[D.id])return;const f=ms748Chao(R,e.clientX,e.clientY,D.parede?0:D.p0.y);if(!f)return;
+  if(D.parede){const W=W7();if(!W._lugar)return;const L=W._lugar(R,D.id,s.g,{x:f.x,z:f.z},null,D.d.yc747);if(L){W._aplica(R,D.id,s.g,L);D.ok=true;ms748Tinge(D,0x0b2a0b);}else{D.ok=false;ms748Tinge(D,0x3a0a0a);}return;}
+  const passo=e.altKey?.05:.25;const x=Math.round((f.x+D.off.x)/passo)*passo,z=Math.round((f.z+D.off.z)/passo)*passo;if(D.ult&&D.ult.x===x&&D.ult.z===z)return;
+  let ok=null;try{ok=decorFits128(R,D.id,s.g,x,z,s.lvl,false);}catch(x2){ok=null;}let y=s.g.position.y;try{y=R.floors[0].floorY(x,z);}catch(x3){}s.g.position.set(x,ok?ok.y:y,z);D.ult={x,z};D.ok=!!ok;ms748Tinge(D,ok?0x0b2a0b:0x3a0a0a);}
+function ms748Volta(D){try{const s=D.s;if(!s)return;s.g.position.copy(D.p0);s.g.rotation.y=D.r0;const map=salaMapa128(D.R);map[D.id]=D.copia;s.g.updateMatrixWorld(true);MS748.stats.voltas++;}catch(e){e8('volta',e);}}
+function ms748Solta(D){const R=D.R,s=D.s;ms748Destinge(D);try{renderer.domElement.style.cursor='';}catch(x){}if(!s||!R.placed[D.id])return;
+  if(D.parede){if(D.ok){try{salaSalvar(R);decorInvalidate128(R);MS748.stats.gravados++;}catch(e){e8('gravar parede',e);}}else{ms748Volta(D);try{showToast(T8('Não há parede livre ali para esta peça.','No free wall there for this piece.'));}catch(x){}}}
+  else{const x=s.g.position.x,z=s.g.position.z;let ok=null;if(D.ok){try{ok=decorFits128(R,D.id,s.g,x,z,s.lvl,true);}catch(e){ok=null;}}
+    if(ok){s.g.position.set(x,ok.y,z);s.radius=ok.radius;const d=salaMapa128(R)[D.id]||(salaMapa128(R)[D.id]={});d.pos=[x,z];d.lvl=s.lvl;try{salaSalvar(R);decorInvalidate128(R);}catch(e){e8('gravar',e);}MS748.stats.gravados++;}
+    else{ms748Volta(D);try{showToast(T8('Deixe espaço para circular e mantenha as passagens livres.','Leave room to walk and keep the passages clear.'));}catch(x2){}}}
+  try{salaRealce(D.id);}catch(x){}try{salaPainelEstado();}catch(x){}}
+function ms748Canvas(){try{return renderer.domElement;}catch(e){return null;}}
+addEventListener('pointerdown',e=>{try{const R=R8();const cv=ms748Canvas();if(!R||!cv||e.target!==cv||(e.button!==0&&e.pointerType==='mouse')||MS748.drag)return;if(typeof SALA_ED==='undefined'||!SALA_ED.ativo)return;
+    const hit=ms748PecaEm(R,e.clientX,e.clientY);if(!hit)return;e.stopImmediatePropagation();e.preventDefault();
+    MS748.drag={R,id:hit.id,x:e.clientX,y:e.clientY,pid:e.pointerId,iniciado:false};try{cv.setPointerCapture(e.pointerId);}catch(x){}}catch(x){e8('pointerdown',x);}},true);
+addEventListener('pointermove',e=>{const D=MS748.drag;if(!D){ms748Hover(e);return;}if(e.pointerId!==D.pid)return;e.stopImmediatePropagation();
+  try{if(!D.iniciado){if(Math.hypot(e.clientX-D.x,e.clientY-D.y)<(e.pointerType==='touch'?12:5))return;if(!ms748Inicia(D,e)){MS748.drag=null;return;}}
+    const agora=performance.now();if(agora-(D.t||0)<16&&!D.parede)return;if(D.parede&&agora-(D.t||0)<33)return;D.t=agora;ms748Move(D,e);}catch(x){e8('pointermove',x);}},true);
+function ms748Fim(e,cancela){const D=MS748.drag;if(!D)return;if(e&&e.pointerId!==undefined&&e.pointerId!==D.pid)return;MS748.drag=null;try{const cv=ms748Canvas();if(cv&&cv.releasePointerCapture&&e&&e.pointerId!==undefined)cv.releasePointerCapture(e.pointerId);}catch(x){}
+  if(e&&e.stopImmediatePropagation)e.stopImmediatePropagation();
+  try{if(!D.iniciado){if(cancela)return;const R=D.R;if(!R.placed[D.id])return;SALA_ED.sel=D.id;SALA_ED.fam=null;try{salaRealce(D.id);}catch(x){}try{salaPainelEstado();}catch(x){}MS748.stats.cliquesPeca++;return;}
+    if(cancela){ms748Destinge(D);ms748Volta(D);try{salaRealce(D.id);}catch(x){}try{renderer.domElement.style.cursor='';}catch(x){}return;}ms748Solta(D);}catch(x){e8('soltar',x);}}
+addEventListener('pointerup',e=>ms748Fim(e,false),true);
+addEventListener('pointercancel',e=>ms748Fim(e,true),true);
+
+/* ---------- 4) mão sobre as peças, grade só com peça escolhida, quadrado aceso ---------- */
+let HOV8=null;
+function ms748Quad(R){if(HOV8&&HOV8.parent===R.scene)return HOV8;try{if(HOV8&&HOV8.parent)HOV8.parent.remove(HOV8);}catch(e){}const passo=(R.grade&&R.grade.passo)||1.6;
+  HOV8=new THREE.Mesh(new THREE.PlaneGeometry(passo*.9,passo*.9),new THREE.MeshBasicMaterial({color:0xffd27a,transparent:true,opacity:.42,depthWrite:false,side:THREE.DoubleSide}));HOV8.rotation.x=-Math.PI/2;HOV8.userData.noCam=true;HOV8.userData.fx=true;HOV8.raycast=()=>{};HOV8.__fusaoMoveu=9;HOV8.visible=false;HOV8.renderOrder=3;HOV8.name='Quadrado sob o mouse (v748)';R.scene.add(HOV8);return HOV8;}
+function ms748Hover(e){try{const R=R8();const cv=ms748Canvas();if(!R||!cv||typeof SALA_ED==='undefined'||!SALA_ED.ativo){if(HOV8)HOV8.visible=false;return;}if(e.target!==cv){if(HOV8)HOV8.visible=false;return;}
+    const agora=performance.now();if(agora-MS748.hoverT<70)return;MS748.hoverT=agora;
+    const p=ms748PecaEm(R,e.clientX,e.clientY);const q=ms748Quad(R);
+    if(p){cv.style.cursor='grab';q.visible=false;return;}
+    const sel=SALA_ED.sel&&R.placed[SALA_ED.sel];if(sel&&R.celulas&&R.celulas.length){const h=ms748Raio(e.clientX,e.clientY).intersectObjects(R.celulas,false)[0];if(h){q.position.copy(h.object.position);q.position.y+=.012;q.visible=true;cv.style.cursor='pointer';return;}}
+    q.visible=false;cv.style.cursor='';}catch(x){}}
+function ms748Grade(){try{const R=R8();if(!R){if(HOV8)HOV8.visible=false;return;}const sel=SALA_ED.sel&&R.placed[SALA_ED.sel];const v=!!sel||!!MS748.drag;if(R.decor&&R.decor.visible!==v)R.decor.visible=v;if(!sel&&HOV8)HOV8.visible=false;}catch(e){}}
+setInterval(ms748Grade,120);
+
+/* ---------- 5) teclas ---------- */
+addEventListener('keydown',e=>{try{const R=R8();if(!R||typeof SALA_ED==='undefined'||!SALA_ED.ativo||emTexto(e.target))return;
+    if(e.key==='Escape'){if(MS748.drag){e.preventDefault();e.stopImmediatePropagation();ms748Fim({pointerId:MS748.drag.pid},true);return;}
+      if(SALA_ED.sel){e.preventDefault();e.stopImmediatePropagation();SALA_ED.sel=null;SALA_ED.fam=null;try{salaRealce(null);}catch(x){}try{salaPainelEstado();}catch(x){}MS748.stats.soltas++;return;}return;}
+    if((e.key==='r'||e.key==='R')&&!e.ctrlKey&&!e.metaKey&&!e.altKey){const s=SALA_ED.sel&&R.placed[SALA_ED.sel];if(!s)return;e.preventDefault();e.stopImmediatePropagation();
+      if(s.g.userData.parede747)decorRotate128();else ms497Girar(e.shiftKey?-Math.PI/12:Math.PI/12);try{salaPainelEstado();}catch(x){}MS748.stats.giroR++;}}catch(x){e8('tecla',x);}},true);
+
+/* ---------- 6) câmera na peça nova; miniaturas também no Papel ---------- */
+if(typeof catalog402Add==='function'){const ca0=catalog402Add;catalog402Add=async function(source,itemId,R,savedId){const id=await ca0.apply(this,arguments);try{const RR=R||salaContexto128();
+      if(id&&!savedId&&RR&&R8()===RR&&RR.placed[id]&&typeof CAM!=='undefined'){const g=RR.placed[id].g;CAM.yaw=Math.atan2(CH.x-g.position.x,CH.z-g.position.z);CAM.dist=Math.max(CAM.dist||0,7);CAM.pitch=.5;camInit=false;MS748.stats.camera++;}}catch(e){e8('câmera',e);}return id;};}
+if(typeof ms490Tick==='function'){const mt0=ms490Tick;ms490Tick=function(){let p=false;try{p=!!(typeof Q!=='undefined'&&Q.papel);}catch(e){}if(!p)return mt0.apply(this,arguments);
+    try{Q.papel=false;MS748.stats.miniPapel++;return mt0.apply(this,arguments);}finally{Q.papel=true;}};}
+
+// a dica do rodapé fala do arrastar
+if(typeof setHint==='function'){const sh0=setHint;setHint=function(t){try{if(typeof t==='string'&&/^Decorar · escolha uma peça/.test(t)&&R8())t=T8('Decorar · arraste uma peça para mudar de lugar · clique numa peça para editar · arraste o chão para olhar · Esc solta a peça ou sai','Decorate · drag a piece to move it · click a piece to edit it · drag the floor to look around · Esc deselects or exits');}catch(e){}return sh0.apply(this,arguments);};}
+Object.assign(window.__ms748,{aba:ms748Aba,estadoPainel:ms748Estado,botao:ms748BotaoEstado,versao:748});
+}catch(e){try{console.error('ms748',e);window.__ms748erro=String(e&&e.stack||e);}catch(x){}}})();
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
