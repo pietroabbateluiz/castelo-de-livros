@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v745</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v746</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -89379,6 +89379,9 @@ window.__aventura742={estado:AV742,erros:AV742.erros,stats:AV742.stats,aplicar:a
    Cada pena é desenhada em canvas (sem imagens) e escreve com a própria caligrafia — fonte embutida, tinta e efeito — dentro da
    Pena Mágica da v413 (as seis caligrafias dela continuam do Colecionador). `?penas745=0` desliga; `?penas=todas` dá todas; `?penas=0` zera.
    Fontes (Google Fonts, via Fontsource): licença SIL Open Font License 1.1 — Apache 2.0: special-elite, chewy, schoolbell, satisfy, homemade-apple.
+   v746 (revisão das mecânicas): prévia da escrita na parede antes de fixar (vermelha quando não cabe), tamanho na roda do mouse ou + e −,
+   E também escreve, E numa escrita abre a edição, «Mover para outra parede», apagar com confirmação, pista de onde procurar cada pena que falta,
+   sino baixinho perto de uma pena, ícones pintados aos poucos, chão da pena acompanha a sala e lugares conferidos um a um por foto.
    Gancho: window.__penas745. */
 (function(){
 if(/[?&#]penas745=0(?![0-9a-z])/i.test(location.search+location.hash))return;
@@ -89389,7 +89392,7 @@ const PN745_PENAS=[
  {id:'p01',onde:'hall:1',n:['Pena do Arauto',"Herald's Quill",'Pluma del Heraldo'],cal:['Capitulares do Arauto',"Herald's Capitals",'Capitulares del Heraldo'],f:'cinzel-decorative',fv:'700',tinta:'#8e1b1b',ef:{contorno:['#e3bd57',2.2]},
   d:{forma:'classica',cores:['#6f1010','#a51c1c','#c62f22'],padrao:'faixas',pc:'#e2b84a',np:6,inc:.05,ponta:'ouro',orn:'fita',oc:'#1f3f8f',curva:.28},brilho:'#ffcc66'},
  {id:'p02',onde:'sala:cat',n:['Pena do Copista',"Scribe's Quill",'Pluma del Copista'],cal:['Gótica do mosteiro','Monastery Blackletter','Gótica del monasterio'],f:'unifrakturmaguntia',fs:1.08,tinta:'#2b1a0f',ef:{inicial:'#a8231b'},
-  d:{forma:'remige',cores:['#b9ad95','#e9e1cf','#f7f2e6'],padrao:'veios',pc:'#a99c84',ponta:'natural',orn:'',curva:.42},brilho:'#fff1c9'},
+  d:{forma:'remige',cores:['#6f675b','#9c9283','#d3cab9'],padrao:'faixas',pc:'#5a5348',np:3,inc:.06,suave:true,ponta:'natural',orn:'',curva:.42},brilho:'#fff1c9'},
  {id:'p03',onde:'sala:lib',n:['Pena do Corvo',"Raven's Quill",'Pluma del Cuervo'],cal:['Letras que escorrem','Dripping Letters','Letras que gotean'],f:'creepster',tinta:'#8a0b0b',ef:{pingos:true},
   d:{forma:'remige',cores:['#09090d','#141219','#0c0c11'],padrao:'iridescente',pc:'#5b2a86',pc2:'#1f6a52',ponta:'obsidiana',orn:'gema',oc:'#c3001f',curva:.5},brilho:'#c23a3a'},
  {id:'p04',onde:'sala:sci',n:['Pena de Plasma','Plasma Quill','Pluma de Plasma'],cal:['Holográfica','Holographic','Holográfica'],f:'orbitron',fv:'500',tinta:'#29d9ff',ef:{brilho:['#00e5ff',14],contorno:['rgba(0,40,60,.85)',1.3],esp:2},
@@ -89422,7 +89425,7 @@ const PN745_PENAS=[
   d:{forma:'raio',cores:['#0d47a1','#1976d2','#64b5f6'],padrao:'raio',pc:'#ffeb3b',ponta:'ouro',orn:'estrelas',oc:'#fff59d',curva:.15},brilho:'#ffee58'},
  {id:'p18',onde:'sala:digital',n:['Pena de Pixel','Pixel Quill','Pluma de Píxel'],cal:['Terminal verde','Green Terminal','Terminal verde'],f:'vt323',fs:1.35,tinta:'#39ff6a',ef:{brilho:['#39ff6a',10],esp:1},
   d:{forma:'pixel',cores:['#00bcd4','#7c4dff','#ff4081'],padrao:'',ponta:'pixel',orn:'',curva:0},brilho:'#39ff6a'},
- {id:'p19',onde:'hall:4',n:['Pena Estelar','Star Quill','Pluma Estelar'],cal:['Script das constelações','Constellation Script','Escritura de constelaciones'],f:'pinyon-script',fs:1.3,tinta:'#e6ecff',ef:{contorno:['#1a237e',1.7],brilho:['#7c96ff',12]},
+ {id:'p19',onde:'hall:4',n:['Pena Estelar','Star Quill','Pluma Estelar'],cal:['Script das constelações','Constellation Script','Escritura de constelaciones'],f:'pinyon-script',fs:1.3,tinta:'#eef2ff',ef:{contorno:['#1a237e',.9],brilho:['#7c96ff',12]},
   d:{forma:'classica',cores:['#080c2b','#1a237e','#3949ab'],padrao:'estrelas',pc:'#ffffff',pc2:'#ffe59a',ponta:'prata',orn:'gema',oc:'#cfe8ff',curva:.3},brilho:'#9fb4ff'},
  {id:'p20',onde:'sala:poesia',n:['Pena do Sabiá','Thrush Quill','Pluma del Zorzal'],cal:['Verso livre','Free Verse','Verso libre'],f:'italianno',fs:1.55,tinta:'#283593',ef:{},
   d:{forma:'classica',cores:['#d9772b','#8c7a62','#76664f'],padrao:'',ponta:'ouro',orn:'fita',oc:'#2e7d32',curva:.4},brilho:'#ffb36b'},
@@ -89449,7 +89452,7 @@ const PN745_PENAS=[
  {id:'p31',onde:'hall:6',n:['Pena do Flamingo','Flamingo Quill','Pluma del Flamenco'],cal:['Jardim em flor','Garden in Bloom','Jardín en flor'],f:'sofia',fs:1.1,tinta:'#c2185b',ef:{},
   d:{forma:'larga',cores:['#ffb3c9','#ff7fa6','#f2547f'],padrao:'',franja:true,ponta:'ouro-rosa',orn:'flor',oc:'#ff5c8d',curva:.4},brilho:'#ff9ec4'},
  {id:'p32',onde:'sala:realismo',n:['Pena do Pombo','Pigeon Quill','Pluma de la Paloma'],cal:['Caneta esferográfica','Ballpoint','Bolígrafo'],f:'kalam',fs:1.05,tinta:'#222222',ef:{},
-  d:{forma:'classica',cores:['#9aa2ab','#7f8891','#5d646b'],padrao:'iridescente',pc:'#3fa36b',pc2:'#8a4fb3',soBase:true,ponta:'aco',orn:'',curva:.3},brilho:'#d0e6ff'},
+  d:{forma:'classica',cores:['#4a5058','#5d646b','#3c4148'],padrao:'iridescente',pc:'#3fbf78',pc2:'#9a55c8',soBase:true,ponta:'aco',orn:'',curva:.3},brilho:'#d0e6ff'},
  {id:'p33',onde:'sala:steampunk',n:['Pena de Latão','Brass Quill','Pluma de Latón'],cal:['Vitoriana a vapor','Steam Victorian','Victoriana a vapor'],f:'elsie-swash-caps',fv:'900',tinta:'#6b3e1f',ef:{contorno:['#d4a84b',1.6]},
   d:{forma:'metal',cores:['#7a4a22','#b8863b','#e8c063'],padrao:'engrenagens',pc:'#5a3714',ponta:'cobre',orn:'engrenagem',oc:'#d6a648',curva:.2},brilho:'#ffc56b'},
  {id:'p34',onde:'sala:solarpunk',n:['Pena da Folha Solar','Solar Leaf Quill','Pluma de Hoja Solar'],cal:['Letra de horta','Garden Hand','Letra de huerto'],f:'amatic-sc',fs:1.4,fv:'700',tinta:'#2e7d32',ef:{esp:2},
@@ -89461,7 +89464,7 @@ const PN745_PENAS=[
  {id:'p37',onde:'hall:7',n:['Pena do Cartógrafo',"Cartographer's Quill",'Pluma del Cartógrafo'],cal:['Legenda de mapa','Map Lettering','Rótulos de mapa'],f:'im-fell-dw-pica-sc',tinta:'#1f3a5f',ef:{inicial:'#a8231b'},
   d:{forma:'remige',cores:['#cdb385','#e3cfa4','#c4a064'],padrao:'mapa',pc:'#6b4e2a',pc2:'#2f6f8f',ponta:'bronze',orn:'bussola',oc:'#c9a24a',curva:.3},brilho:'#ffe2a8'},
  {id:'p38',onde:'sala:epistolar',n:['Pena do Pombo-correio','Carrier Pigeon Quill','Pluma de la Paloma Mensajera'],cal:['Correspondência','Correspondence','Correspondencia'],f:'mrs-saint-delafield',fs:1.75,tinta:'#1a237e',ef:{},
-  d:{forma:'classica',cores:['#c3cad3','#d5dbe2','#8b95a1'],padrao:'faixas',pc:'#5a6370',np:2,inc:.05,ponta:'ouro',orn:'lacre',oc:'#b71c1c',curva:.35},brilho:'#e3ecff'},
+  d:{forma:'classica',cores:['#dfe5ec','#eef2f6','#aab4c0'],padrao:'faixas',pc:'#6a7482',np:2,inc:.05,ponta:'ouro',orn:'carta',oc:'#b71c1c',curva:.35},brilho:'#e3ecff'},
  {id:'p39',onde:'sala:viagens',n:['Pena da Andorinha','Swallow Quill','Pluma de la Golondrina'],cal:['Cartão-postal','Postcard','Postal'],f:'lobster',fs:1.05,tinta:'#c62828',ef:{},
   d:{forma:'longa',cores:['#0c1a3c','#173375','#0a1630'],padrao:'iridescente',pc:'#3d6fe0',pc2:'#6a3fc0',pintasBrancas:true,ponta:'prata',orn:'fitaCorreio',oc:'#c62828',curva:.22},brilho:'#9cc3ff'},
  {id:'p40',onde:'sala:western',n:['Pena do Papa-léguas','Roadrunner Quill','Pluma del Correcaminos'],cal:['Cartaz de procurado','Wanted Poster','Cartel de se busca'],f:'rye',fs:0.95,tinta:'#6d3b1f',ef:{},
@@ -89500,16 +89503,16 @@ const PN745_LUGARES={
  p07:{onde:"hall",n:2,x:-9.6,z:-16.5},
  p08:{onde:"sala",sala:"mys",x:11.4,z:-28.2,y:0},
  p09:{onde:"sala",sala:"vila",x:-24.6,z:-27.6,y:0},
- p10:{onde:"sala",sala:"guerra",x:23.1,z:-28.2,y:0},
+ p10:{onde:"sala",sala:"guerra",x:-10.5,z:-27.9,y:0},
  p11:{onde:"sala",sala:"outono",x:25.8,z:-14.4,y:0},
  p12:{onde:"sala",sala:"quadrinhos",x:25.2,z:-28.5,y:0},
- p13:{onde:"hall",n:3,x:-13.2,z:12.9},
+ p13:{onde:"hall",n:3,x:-16.68,z:1.46},
  p14:{onde:"sala",sala:"bosque",x:0.9,z:-39.9,y:0},
  p15:{onde:"sala",sala:"acropole",x:17.7,z:-39.3,y:0},
  p16:{onde:"sala",sala:"fazenda",x:18,z:-37.8,y:0},
  p17:{onde:"sala",sala:"arena",x:-0.9,z:-39.9,y:0},
  p18:{onde:"sala",sala:"digital",x:17.1,z:-40.2,y:0},
- p19:{onde:"hall",n:4,x:-12.3,z:-12.6},
+ p19:{onde:"hall",n:4,x:-16.68,z:-1.46},
  p20:{onde:"sala",sala:"poesia",x:2.7,z:-40.8,y:0},
  p21:{onde:"sala",sala:"mitologia",x:-17.7,z:-40.5,y:0},
  p22:{onde:"sala",sala:"infantil",x:14.1,z:-39.9,y:0},
@@ -89693,6 +89696,10 @@ function pnOrn(g,D,P,Tg,t0,u,B,W,H,R,Tp,larg,contorno){const o=D.orn;if(!o)retur
     if(o==='bussola'){g.fillStyle=metal(['#fff3b0','#c9a24a','#6b4a14'],-9*u,9*u);g.beginPath();g.arc(0,0,9*u,0,7);g.fill();g.fillStyle='#f6efe0';g.beginPath();g.arc(0,0,7*u,0,7);g.fill();g.fillStyle='#b71c1c';g.beginPath();g.moveTo(0,-6*u);g.lineTo(1.6*u,0);g.lineTo(-1.6*u,0);g.closePath();g.fill();g.fillStyle='#263238';g.beginPath();g.moveTo(0,6*u);g.lineTo(1.6*u,0);g.lineTo(-1.6*u,0);g.closePath();g.fill();}
     if(o==='flor'){for(let i=0;i<5;i++){const a=i/5*Math.PI*2;g.fillStyle=pnCss(pnLuz(oc,i%2?.1:-.05));g.beginPath();g.ellipse(Math.cos(a)*4.5*u,Math.sin(a)*4.5*u,4*u,2.6*u,a,0,7);g.fill();}g.fillStyle='#ffd54a';g.beginPath();g.arc(0,0,2.4*u,0,7);g.fill();}
     g.restore();return;}
+  if(o==='carta'){// recado enrolado amarrado no cálamo (pombo-correio): rolinho de papel com fio vermelho
+    g.save();g.translate(x+4*u,y-4*u);g.rotate(.62);const L=40*u,r=7*u;const gr=g.createLinearGradient(0,-r,0,r);gr.addColorStop(0,'#fff7e2');gr.addColorStop(.55,'#ead9b2');gr.addColorStop(1,'#b89b66');g.fillStyle=gr;g.beginPath();g.moveTo(0,-r);g.lineTo(L,-r);g.quadraticCurveTo(L+r*.8,0,L,r);g.lineTo(0,r);g.quadraticCurveTo(-r*.8,0,0,-r);g.closePath();g.fill();
+    g.strokeStyle='rgba(120,90,40,.6)';g.lineWidth=.8*u;g.stroke();g.fillStyle='rgba(150,120,70,.55)';g.beginPath();g.ellipse(L,0,r*.45,r,0,0,7);g.fill();g.strokeStyle='rgba(90,60,30,.35)';g.lineWidth=.6*u;for(let i=1;i<4;i++){g.beginPath();g.moveTo(L*.18,-r+i*r*.5);g.lineTo(L*.86,-r+i*r*.5);g.stroke();}
+    g.strokeStyle=pnCss(oc);g.lineWidth=1.6*u;g.beginPath();g.moveTo(L*.42,-r-.5*u);g.lineTo(L*.42,r+.5*u);g.stroke();g.beginPath();g.moveTo(L*.42,r);g.quadraticCurveTo(L*.36,r+6*u,L*.3,r+9*u);g.moveTo(L*.42,r);g.quadraticCurveTo(L*.5,r+6*u,L*.56,r+8*u);g.stroke();g.restore();return;}
   if(o==='estrelas'){g.fillStyle=pnCss(oc);const st=(sx,sy,r)=>{g.beginPath();for(let i=0;i<8;i++){const a=i/8*Math.PI*2,rr=i%2?r*.3:r;g.lineTo(sx+Math.cos(a)*rr,sy+Math.sin(a)*rr);}g.closePath();g.fill();};for(let i=0;i<6;i++){const t=.25+R()*.7,p=P(t),w=larg(t,1);st(p.x+(R()<.5?-1:1)*(w+6*u+R()*10*u),p.y,(3+R()*4)*u);}return;}}
 function pnSobre(g,D,P,Tg,larg,t0,u,pc,pc2,R,W,H,Tp){const pad=D.padrao;
   if(pad==='pintas'){const fina=!!D.fina,n=D.np||(fina?150:64);const ang=.95;for(let i=0;i<n;i++){const t=t0+.04+R()*(.92-t0),v=(t-t0)/(1-t0),lado=R()<.5?-1:1,w=larg(t,lado);if(w<4*u)continue;const s=.18+R()*.74;const p=P(t),tg=Tg(t),nx=-tg.y*lado,ny=tg.x*lado;
@@ -89745,12 +89752,12 @@ function pnPixeliza(cv,g,W,H){const s=8;const w=Math.ceil(W/s),h=Math.ceil(H/s);
   g.clearRect(0,0,W,H);g.imageSmoothingEnabled=false;g.drawImage(t,0,0,w*s,h*s);g.imageSmoothingEnabled=true;}
 
 /* ---- a escrita de cada pena: fonte própria + tinta + efeito (contorno, brilho, gradiente, pingos, tremor, giz de cera, estêncil, xilogravura) ---- */
-const PN745_GIZ=['#e53935','#fb8c00','#fdd835','#43a047','#1e88e5','#8e24aa','#ec407a'];
+const PN745_GIZ=['#e53935','#fb8c00','#f2b705','#43a047','#1e88e5','#8e24aa','#ec407a'];
 function pnFamilia(Q){return '"PN745 '+Q.id+'", '+(Q.fb||'cursive');}
 function pnLinhas(p,texto,maxW){const L=[];for(const par of String(texto).trim().split('\n')){let lin='';for(const w of par.split(/\s+/)){if(!w)continue;const nx=lin?lin+' '+w:w;if(p.measureText(nx).width>maxW&&lin){L.push(lin);lin=w;}else lin=nx;}L.push(lin);}return L;}
 function pnTexto(c,data,Q){const p=c.getContext('2d'),W=768,ef=Q.ef||{},fam=pnFamilia(Q),fs0=Math.round(58*(Q.fs||1)),peso=(Q.fv||'400'),est=Q.fi?'italic ':'';
   const fonte=sz=>est+peso+' '+sz+'px '+fam;c.width=W;p.font=fonte(fs0);if('letterSpacing' in p)p.letterSpacing=(ef.esp||0)+'px';
-  const marg=ef.brilho?40:ef.contorno?34:28,maxW=W-marg*2;const tx=ef.caixa==='alta'?String(data.text).toUpperCase():String(data.text);
+  const marg=Math.max(ef.brilho?40:ef.contorno?34:28,Math.round(fs0*.42)),maxW=W-marg*2;const tx=ef.caixa==='alta'?String(data.text).toUpperCase():String(data.text);
   const linhas=pnLinhas(p,tx,maxW),lh0=Math.round(fs0*1.3);const H=Math.max(112,Math.min(1024,linhas.length*lh0+marg*2+(ef.pingos?26:0)));const lh=Math.min(lh0,(H-marg*2-(ef.pingos?26:0))/linhas.length),fs=Math.min(fs0,lh/1.3);
   c.height=H;p.clearRect(0,0,W,H);p.font=fonte(fs);if('letterSpacing' in p)p.letterSpacing=(ef.esp||0)+'px';p.textAlign='center';p.textBaseline='middle';p.lineJoin='round';p.miterLimit=2;
   const cor=data.color||Q.tinta||'#333';const R=pnRnd(pnHash(String(data.id||'')+tx));
@@ -89778,7 +89785,8 @@ function pnTexto(c,data,Q){const p=c.getContext('2d'),W=768,ef=Q.ef||{},fam=pnFa
 
 /* ---- estado, fontes, lugares ---- */
 const T745=(pt,en,es)=>{try{return text428(pt,en,es);}catch(e){return pt;}};
-const PN={v3:new THREE.Vector3(),KEY:SKEY('mundo.penas745.v1'),save:{achados:{},sel:null},itens:{},fx:[],erros:[],fontes:{},icones:{},tex:{},base:0,mao:null,maoId:null,silhueta:null,stats:{pegas:0,texturas:0,fontes:0}};
+const PN={v3:new THREE.Vector3(),KEY:SKEY('mundo.penas745.v1'),save:{achados:{},sel:null},itens:{},fx:[],erros:[],fontes:{},icones:{},tex:{},base:0,mao:null,maoId:null,silhueta:null,mira:null,fant:null,viaE:false,
+  stats:{pegas:0,texturas:0,fontes:0,perto:0,fantasmas:0,editar:0,mover:0,curvas:0},dobrar:new Set(),relaxa:false,rc:null};
 function pnErro(onde,e){if(PN.erros.length<30)PN.erros.push(onde+': '+(e&&e.message||e));}
 function pnGrava(){try{localStorage.setItem(PN.KEY,JSON.stringify(PN.save));}catch(e){}}
 function pnLe(){try{const d=JSON.parse(localStorage.getItem(PN.KEY)||'null');if(d&&d.achados&&typeof d.achados==='object'){PN.save.achados={...d.achados};PN.save.sel=typeof d.sel==='string'?d.sel:null;}}catch(e){}
@@ -89787,13 +89795,20 @@ function pnLe(){try{const d=JSON.parse(localStorage.getItem(PN.KEY)||'null');if(
 function pnAchadas(){let n=0;for(const Q of PN745_PENAS)if(PN.save.achados[Q.id])n++;return n;}
 function pnNome(Q){return T745(Q.n[0],Q.n[1],Q.n[2]);}
 function pnCal(Q){return T745(Q.cal[0],Q.cal[1],Q.cal[2]);}
+function pnDaFonte(f){return f>=PN.base?PN745_PENAS[f-PN.base]||null:null;}
 function pnB64(b){const s=atob(b),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u.buffer;}
 function pnFonteOk(Q){const f=PN.fontes[Q.id];return !!(f&&f.ok);}
 function pnFonte(Q){let f=PN.fontes[Q.id];if(f)return f.p;f=PN.fontes[Q.id]={ok:false,p:null};
   f.p=(async()=>{try{const b=PN745_FONTES[Q.id];if(!b||typeof FontFace==='undefined')return false;const ff=new FontFace('PN745 '+Q.id,pnB64(b),{style:Q.fi?'italic':'normal',weight:'100 900'});await ff.load();document.fonts.add(ff);f.ok=true;PN.stats.fontes++;return true;}catch(e){pnErro('fonte '+Q.id,e);return false;}})();return f.p;}
 const PN_HALL=[null,['Hall dos Gêneros','Hall of Genres','Salón de los Géneros'],['Galeria','Gallery','Galería'],['Torreão','Keep','Torreón'],['Observatório','Observatory','Observatorio'],['Ameias','Battlements','Almenas'],['Jardim das Possibilidades','Garden of Possibilities','Jardín de las Posibilidades'],['Atlas das Histórias','Atlas of Stories','Atlas de las Historias']];
+function pnGenero(L){try{return Object.keys(GENRE_ROOM).find(k=>GENRE_ROOM[k]===L.sala)||null;}catch(e){return null;}}
 function pnOndeNome(Q){const L=Q.l||{};try{if(L.onde==='hall'){const h=PN_HALL[L.n];return h?T745(h[0],h[1],h[2]):'';}if(L.onde==='masmorra')return T745('Masmorras','Dungeons','Mazmorras');if(L.onde==='ilha294')return T745('Ilha das Moedas','Coin Island','Isla de las Monedas');
-  if(L.sala==='minha')return T745('Minha Sala','My Room','Mi Sala');const g=Object.keys(GENRE_ROOM).find(k=>GENRE_ROOM[k]===L.sala);const G=g&&EST.GENEROS[g];return G?G.nome:'';}catch(e){return '';}}
+  if(L.sala==='minha')return T745('Minha Sala','My Room','Mi Sala');const g=pnGenero(L);const G=g&&EST.GENEROS[g];return G?G.nome:'';}catch(e){return '';}}
+// onde procurar uma pena que falta: o ambiente e o andar (nunca o ponto)
+function pnPista(Q){const L=Q.l||{};const ord=n=>T745(n+'º andar',n+(n===1?'st':n===2?'nd':n===3?'rd':'th')+' floor',n+'º piso');try{
+  if(L.onde==='hall')return pnOndeNome(Q)+' · '+ord(L.n);if(L.onde==='masmorra')return T745('Masmorras, no subsolo da sala de Terror','Dungeons, under the Horror room','Mazmorras, bajo la sala de Terror');
+  if(L.onde==='ilha294')return T745('Ilha das Moedas, na sala de Aventura','Coin Island, in the Adventure room','Isla de las Monedas, en la sala de Aventura');if(L.sala==='minha')return T745('Minha Sala','My Room','Mi Sala');
+  const g=pnGenero(L),nome=pnOndeNome(Q);return T745('Sala de '+nome,nome+' room','Sala de '+nome)+' · '+ord(g?GENRE_FLOOR(g):1);}catch(e){return '';}}
 
 /* ---- a pena no mundo: lâmina com a pintura da pena, brilho da cor dela, disco no chão e faíscas ---- */
 function pnTex(Q){let t=PN.tex[Q.id];if(t)return t;const c=can(192,768);pnPinta(c,Object.assign({id:Q.id},Q.d));t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=8;PN.tex[Q.id]=t;PN.stats.texturas++;return t;}
@@ -89813,100 +89828,190 @@ function pnLugar(Q){const L=Q.l;if(!L)return null;try{
   if(L.onde==='masmorra'){const D=DUNGEON395;if(CUR!=='room'||!D||!D.active||!D.root||ROOM!==D.room)return null;return {scene:D.root,y:dungeon395Floor(L.x,L.z)};}
   if(L.onde==='ilha294'){const R=ROOMS.adv;if(CUR!=='room'||!R||ROOM!==R||!R.scene||typeof ILHA294==='undefined'||!ILHA294.g)return null;return {scene:R.scene,y:i294Floor(L.x,L.z),ilha:true};}
   const R=ROOMS[L.sala];if(CUR!=='room'||!R||ROOM!==R||!R.scene)return null;if(typeof DUNGEON395!=='undefined'&&DUNGEON395.active&&DUNGEON395.room===R)return null;
-  const y=Number.isFinite(L.y)?L.y:(R.floorY?R.floorY(L.x,L.z):0);return {scene:R.scene,y:Number.isFinite(y)?y:0};}catch(e){return null;}}
-function pnItem(Q,L){let it=PN.itens[Q.id];if(it&&it.scene===L.scene&&it.g.parent===L.scene)return it;if(it&&it.g.parent)it.g.parent.remove(it.g);
-  const g=pnMalha(Q);g.position.set(Q.l.x,L.y,Q.l.z);L.scene.add(g);it={g,scene:L.scene,y:L.y,t:pnHash(Q.id)%600/100,pego:0};PN.itens[Q.id]=it;return it;}
+  // o chão de agora (se a sala ganhar degrau ou tablado depois, a pena acompanha); o do levantamento fica de reserva
+  const y0=R.floorY?R.floorY(L.x,L.z):NaN;const y=Number.isFinite(y0)?y0:(Number.isFinite(L.y)?L.y:0);return {scene:R.scene,y};}catch(e){return null;}}
+function pnItem(Q,L){let it=PN.itens[Q.id];if(it&&it.scene===L.scene&&it.g.parent===L.scene){if(Math.abs(it.y-L.y)>.01){it.y=L.y;it.g.position.y=L.y;}return it;}if(it&&it.g.parent)it.g.parent.remove(it.g);
+  const g=pnMalha(Q);g.position.set(Q.l.x,L.y,Q.l.z);L.scene.add(g);it={g,scene:L.scene,y:L.y,t:pnHash(Q.id)%600/100,pego:0,perto:false};PN.itens[Q.id]=it;return it;}
 function pnExplode(it,Q){const T=THREE,p=it.g.position,cena=it.scene,cor=new T.Color(Q.brilho||'#ffe2a0');for(let i=0;i<16;i++){const sp=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:i%3?cor:new T.Color(0xffffff),transparent:true,opacity:.95,blending:T.AdditiveBlending,depthWrite:false}));const s=.12+Math.random()*.12;sp.scale.set(s,s,1);sp.position.set(p.x,p.y+1.15,p.z);sp.raycast=()=>{};cena.add(sp);
     const a=Math.random()*Math.PI*2,u=Math.random()*2-1,v=1.3+Math.random()*1.6;PN.fx.push({sp,cena,vx:Math.cos(a)*Math.sqrt(1-u*u)*v,vy:Math.abs(u)*v+.9,vz:Math.sin(a)*Math.sqrt(1-u*u)*v,t:0,vida:.8+Math.random()*.5,s0:s});}}
-function pnDescarta(g,id){try{g.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});if(PN.tex[id]&&PN.maoId!==id){PN.tex[id].dispose();delete PN.tex[id];}}catch(e){}}
+// descarte das malhas, dos materiais e — se nada mais usa — da textura da pena
+function pnDescarta(g,id){try{g.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});if(PN.tex[id]&&PN.maoId!==id&&!PN.itens[id]){PN.tex[id].dispose();delete PN.tex[id];}}catch(e){}}
 function pnPega(Q,it){PN.save.achados[Q.id]=Date.now();PN.save.sel=Q.id;pnGrava();PN.stats.pegas++;it.pego=.001;try{pnExplode(it,Q);}catch(e){}try{sfx('pena745');}catch(e){}pnFonte(Q);pnBotao();
   const n=pnAchadas(),N=PN745_PENAS.length,nome=pnNome(Q);
   const msg=n===1?T745('🪶 Você achou a '+nome+' (1/'+N+')! Com ela você escreve nas paredes — Menu › Penas.','🪶 You found the '+nome+' (1/'+N+')! It lets you write on walls — Menu › Quills.','🪶 ¡Encontraste la '+nome+' (1/'+N+')! Con ella escribes en las paredes — Menú › Plumas.')
     :('🪶 '+nome+' · '+n+'/'+N+(n===N?T745(' — todas as penas!',' — every quill!',' — ¡todas las plumas!'):''));
   showToast(msg,{ms:n===1?7000:3600,queue:true});}
-try{SFX199.pena745=function(){[74,79,83].forEach((n,i)=>setTimeout(()=>{try{musHarpa(n,.15);}catch(e){}},i*85));setTimeout(()=>{try{musSino(88,.06);}catch(e){}},300);};}catch(e){}
+try{SFX199.pena745=function(){[74,79,83].forEach((n,i)=>setTimeout(()=>{try{musHarpa(n,.15);}catch(e){}},i*85));setTimeout(()=>{try{musSino(88,.06);}catch(e){}},300);};
+  // perto de uma pena que falta: um brilho de sino bem baixinho (uma vez a cada aproximação)
+  SFX199.pena745perto=function(){try{musSino(96,.03);}catch(e){}setTimeout(()=>{try{musSino(91,.022);}catch(e){}},140);};}catch(e){}
 function pnMundo(dt){if(window.VISITA)return;const pl=cavPos();
   for(const Q of PN745_PENAS){if(!Q.l)continue;const it0=PN.itens[Q.id];
-    if(PN.save.achados[Q.id]&&!(it0&&it0.pego>0)){if(it0){if(it0.g.parent)it0.g.parent.remove(it0.g);delete PN.itens[Q.id];}continue;}
+    if(PN.save.achados[Q.id]&&!(it0&&it0.pego>0)){if(it0){if(it0.g.parent)it0.g.parent.remove(it0.g);delete PN.itens[Q.id];pnDescarta(it0.g,Q.id);}continue;}
     const L=pnLugar(Q);if(!L){if(it0&&it0.scene===ACTIVE)it0.g.visible=false;continue;}const it=pnItem(Q,L),U=it.g.userData.pn745;it.g.visible=true;it.t+=dt;
     if(it.pego>0){it.pego+=dt;const k=Math.min(1,it.pego/.8);U.pivo.position.y=1.2+k*1.3;U.pivo.scale.setScalar(Math.max(.01,1-k*k));U.pivo.rotation.y+=dt*12;U.brilho.material.opacity=.75*(1-k);U.aura.material.opacity=.42*(1-k);U.coluna.material.opacity=.09*(1-k);U.chao.material.opacity=.34*(1-k);for(const f of U.faiscas)f.sp.material.opacity=.7*(1-k);
-      if(k>=1){if(it.g.parent)it.g.parent.remove(it.g);pnDescarta(it.g,Q.id);delete PN.itens[Q.id];}continue;}
+      if(k>=1){if(it.g.parent)it.g.parent.remove(it.g);delete PN.itens[Q.id];pnDescarta(it.g,Q.id);}continue;}
     const tt=it.t;U.pivo.position.y=1.2+Math.sin(tt*1.7)*.07;try{camera.getWorldPosition(PN.v3);U.pivo.rotation.y=Math.atan2(PN.v3.x-it.g.position.x,PN.v3.z-it.g.position.z)+Math.sin(tt*.9)*.45;}catch(e){U.pivo.rotation.y+=dt*.95;}
     U.pena.rotation.z=-.3+Math.sin(tt*1.25)*.07;U.brilho.position.y=U.aura.position.y=U.pivo.position.y;U.brilho.material.opacity=.62+.16*Math.sin(tt*2.6);U.aura.material.opacity=.34+.1*Math.sin(tt*2.1);U.coluna.material.opacity=.055+.025*Math.sin(tt*1.3);U.chao.material.opacity=.26+.1*Math.sin(tt*1.7);
     for(const f of U.faiscas){f.a+=dt*f.v;f.sp.position.set(Math.cos(f.a)*f.r,U.pivo.position.y-.3+f.h+Math.sin(tt*2+f.a)*.1,Math.sin(f.a)*f.r);f.sp.material.opacity=.35+.4*Math.abs(Math.sin(tt*2.4+f.a*2));}
     if(CAV.morto||document.hidden)continue;try{if(uiBlocked())continue;}catch(e){}
     if(L.ilha){try{if(NAV252.onde!=='ilha294')continue;}catch(e){continue;}}
-    if(Math.hypot(pl.x-Q.l.x,pl.z-Q.l.z)<1.2&&Math.abs((pl.fy||0)-L.y)<1.8)pnPega(Q,it);}
+    const d=Math.hypot(pl.x-Q.l.x,pl.z-Q.l.z),dy=Math.abs((pl.fy||0)-L.y);
+    if(!it.perto&&d<7&&dy<3){it.perto=true;PN.stats.perto++;try{sfx('pena745perto');}catch(e){}}else if(it.perto&&d>11)it.perto=false;
+    if(d<1.2&&dy<1.8)pnPega(Q,it);}
   for(let i=PN.fx.length-1;i>=0;i--){const f=PN.fx[i];f.t+=dt;f.vy-=3*dt;f.sp.position.x+=f.vx*dt;f.sp.position.y+=f.vy*dt;f.sp.position.z+=f.vz*dt;const k=f.t/f.vida;f.sp.material.opacity=.95*Math.max(0,1-k);f.sp.scale.setScalar(f.s0*(1-k*.6));
     if(k>=1){f.cena.remove(f.sp);try{f.sp.material.dispose();}catch(e){}PN.fx.splice(i,1);}}}
 // a pena na mão do leitor enquanto escolhe a parede: a pena colecionável no lugar da Pena Mágica
-function pnMao(){const pend=QUILL413.pending,Q=pend&&pend.font>=PN.base?PN745_PENAS[pend.font-PN.base]:null;
+function pnMao(){const pend=QUILL413.pending,Q=pend?pnDaFonte(pend.font):null;
   if(!Q){if(PN.mao)PN.mao.visible=false;return;}if(QUILL413.pen)QUILL413.pen.visible=false;
-  if(!PN.mao||PN.maoId!==Q.id){if(PN.mao&&PN.mao.parent)PN.mao.parent.remove(PN.mao);const g=new THREE.Group();g.name='Pena na mão (v745)';const l=pnLamina(Q,.64);l.position.y=.24;g.add(l);g.traverse(o=>{o.raycast=()=>{};o.__fusaoMoveu=9;o.userData.noCam=true;o.userData.fx=true;});g.position.set(.42,1.02,.28);g.rotation.z=-.42;PN.mao=g;PN.maoId=Q.id;}
+  if(!PN.mao||PN.maoId!==Q.id){const velho=PN.mao,velhoId=PN.maoId;if(velho&&velho.parent)velho.parent.remove(velho);
+    const g=new THREE.Group();g.name='Pena na mão (v745)';const l=pnLamina(Q,.64);l.position.y=.24;g.add(l);g.traverse(o=>{o.raycast=()=>{};o.__fusaoMoveu=9;o.userData.noCam=true;o.userData.fx=true;});g.position.set(.42,1.02,.28);g.rotation.z=-.42;PN.mao=g;PN.maoId=Q.id;
+    if(velho)pnDescarta(velho,velhoId);}
   try{if(PN.mao.parent!==READER.g)READER.g.add(PN.mao);}catch(e){}PN.mao.visible=true;}
-function pnTick(dt){dt=Math.min(.1,Math.max(0,dt||0));pnMundo(dt);pnMao();}
+// a escrita aparece na parede, transparente, onde vai ficar — e fica vermelha quando não cabe ali
+function pnFantasmaSome(){const F=PN.fant;if(!F)return;if(F.mesh.parent)F.mesh.parent.remove(F.mesh);F.mesh.geometry.dispose();F.mesh.material.map&&F.mesh.material.map.dispose();F.mesh.material.dispose();PN.fant=null;}
+function pnFantasma(){const pend=QUILL413.pending,M=PN.mira;let blk=false;try{blk=uiBlocked();}catch(e){}
+  if(!pend||!M||performance.now()-M.t>500||blk||window.VISITA){if(PN.fant)PN.fant.mesh.visible=false;if(!pend)pnFantasmaSome();return;}
+  const chave=pend.text+'|'+pend.font+'|'+pend.color+'|'+(+pend.width).toFixed(2);let F=PN.fant;
+  if(!F||F.chave!==chave){const Q=pnDaFonte(pend.font);if(Q&&!pnFonteOk(Q)){pnFonte(Q);if(F)F.mesh.visible=false;return;}pnFantasmaSome();
+    const r=quill413Texture({text:pend.text,font:pend.font,color:pend.color,width:pend.width,id:'fant745'});const m=new THREE.MeshBasicMaterial({map:r.tx,transparent:true,opacity:.62,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-8});m.userData.papelKeep=true;
+    const mesh=new THREE.Mesh(new THREE.PlaneGeometry(pend.width,pend.width/r.aspect,pnColunas(pend.width)-1,1),m);mesh.name='Prévia da inscrição (v746)';mesh.raycast=()=>{};mesh.__fusaoMoveu=9;mesh.renderOrder=3;mesh.userData.noCam=true;mesh.userData.fx=true;F=PN.fant={mesh,chave,aspect:r.aspect,ok:true,tOk:0,obj:null};PN.stats.fantasmas++;}
+  if(F.mesh.parent!==ACTIVE)ACTIVE.add(F.mesh);const w=M.wall;F.mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),w.normal);F.mesh.position.copy(w.point).addScaledVector(w.normal,.016);F.mesh.visible=true;
+  const agora=performance.now(),mudou=F.obj!==w.object||!F.p0||F.p0.distanceToSquared(w.point)>.0025;if((mudou&&agora-F.tOk>(F.tMin||60))||agora-F.tOk>Math.max(280,F.tMin||0)){F.tOk=agora;F.obj=w.object;F.p0=w.point.clone();const t1=performance.now();try{const hh=pend.width/F.aspect;if(pnFitsPlano(w,pend.width,hh)){F.ok=true;pnDobra(F.mesh,new Array(pnColunas(pend.width)).fill(0));}else{const C=pnCabe(w,pend.width,hh);F.ok=C.ok;pnDobra(F.mesh,C.meio);}}catch(e){F.ok=true;}F.tMin=Math.min(700,Math.max(60,(performance.now()-t1)*8));
+    F.mesh.material.color.set(F.ok?0xffffff:0xff6060);F.mesh.material.opacity=F.ok?.62:.5;}}
+/* paredes curvas (v746): os halls são redondos; a escrita grande não cabia porque a parede foge do plano nas pontas.
+   Agora a conferência aceita parede curva lisa (sem degrau nem canto) e a escrita é dobrada coluna a coluna para acompanhar a parede. */
+const PN_D0=.30;
+function pnRaio(){const rc=PN.rc||(PN.rc=new THREE.Raycaster());try{rc.camera=camera;}catch(e){}return rc;}
+function pnEixos(n){const q=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,0,1),n);return {r:new THREE.Vector3(1,0,0).applyQuaternion(q),u:new THREE.Vector3(0,1,0).applyQuaternion(q)};}
+function pnColunas(w){return Math.max(5,Math.min(11,Math.ceil(w/.4)+1));}
+function pnSonda(obj,p,n){const rc=pnRaio();rc.set(p.clone().addScaledVector(n,PN_D0),n.clone().negate());rc.near=0;rc.far=PN_D0+.45;
+  for(const h of rc.intersectObject(obj,false)){if(!h.face||h.object.isSprite)continue;if(!quill413Surface(h))continue;return PN_D0-h.distance;}return null;}
+function pnAmostra(obj,c,n,w,h,nc,linhas){const E=pnEixos(n),A=[];for(const y of linhas){const l=[];for(let i=0;i<nc;i++){const x=(-.5+i/(nc-1))*w*.98;l.push(pnSonda(obj,c.clone().addScaledVector(E.r,x).addScaledVector(E.u,y*h),n));}A.push(l);}return A;}
+function pnCabeA(A){for(const l of A){for(const d of l)if(d===null||Math.abs(d)>.14)return false;
+    for(let i=1;i<l.length;i++){if(Math.abs(l[i]-l[i-1])>.09)return false;if(i<l.length-1&&Math.abs(l[i-1]-2*l[i]+l[i+1])>.03)return false;}}
+  for(let i=0;i<A[0].length;i++){let a=9,b=-9;for(const l of A){a=Math.min(a,l[i]);b=Math.max(b,l[i]);}if(b-a>.04)return false;}return true;}
+function pnCabe(wall,w,h){const A=pnAmostra(wall.object,wall.point,wall.normal,w,h,pnColunas(w),[.46,0,-.46]);return {ok:pnCabeA(A),meio:A[1]};}
+function pnDobra(mesh,meio){const g=mesh.geometry,nc=meio.length;if(!g.parameters||g.parameters.widthSegments!==nc-1)return false;const pos=g.attributes.position,d=meio.slice();
+  let u=null;for(let i=0;i<nc;i++){if(d[i]===null)d[i]=u;else u=d[i];}u=null;for(let i=nc-1;i>=0;i--){if(d[i]===null)d[i]=u;else u=d[i];}
+  for(let iy=0;iy<2;iy++)for(let ix=0;ix<nc;ix++)pos.setZ(iy*nc+ix,d[ix]===null?0:Math.max(-.2,Math.min(.2,d[ix])));pos.needsUpdate=true;g.computeBoundingBox();g.computeBoundingSphere();return true;}
+const pnFitsPlano=quill413Fits;
+{const fi0=quill413Fits;quill413Fits=function(wall,w,h){if(fi0.apply(this,arguments))return true;if(!PN.relaxa)return false;try{return pnCabe(wall,w,h).ok;}catch(e){pnErro('parede curva',e);return false;}};}
+{const me0=quill413Mesh;quill413Mesh=function(){const g=me0.apply(this,arguments);try{if(g&&g.isMesh)PN.dobrar.add(g);}catch(e){}return g;};}
+function pnDobraSalva(g,root){g.updateWorldMatrix(true,false);const n=new THREE.Vector3(0,0,1).applyQuaternion(g.getWorldQuaternion(new THREE.Quaternion())).normalize(),c=g.getWorldPosition(new THREE.Vector3()).addScaledVector(n,-.012);
+  const rc=pnRaio();rc.set(c.clone().addScaledVector(n,PN_D0),n.clone().negate());rc.near=0;rc.far=PN_D0+.45;let obj=null;
+  for(const h of rc.intersectObject(root,true)){const o=h.object,u=o.userData||{};if(!h.face||!o.isMesh||o.isSprite||o===g||u.quill413||u.fx||u.hitProxy||u.portal)continue;if(!quill413Surface(h))continue;obj=o;break;}
+  if(!obj)return;const P=g.geometry.parameters||{};if(!P.width)return;if(pnAmostra(obj,c,n,P.width,P.height,3,[0])[0].every(d=>d===null||Math.abs(d)<.004))return;const nc=pnColunas(P.width),meio=pnAmostra(obj,c,n,P.width,P.height,nc,[0])[0];
+  if(meio.every(d=>d===null||Math.abs(d)<.004))return;const ng=new THREE.PlaneGeometry(P.width,P.height,nc-1,1);g.geometry.dispose();g.geometry=ng;pnDobra(g,meio);PN.stats.curvas++;}
+function pnDobraFila(){if(!PN.dobrar.size)return;const t0=performance.now();for(const g of [...PN.dobrar]){if(performance.now()-t0>5)break;if(!g.parent){PN.dobrar.delete(g);continue;}
+  let top=g;while(top.parent)top=top.parent;if(top!==ACTIVE)continue;PN.dobrar.delete(g);try{pnDobraSalva(g,top);}catch(e){pnErro('parede curva',e);}}}
+function pnTick(dt){dt=Math.min(.1,Math.max(0,dt||0));pnMundo(dt);pnMao();try{pnFantasma();}catch(e){pnErro('prévia na parede',e);}try{pnDobraFila();}catch(e){pnErro('parede curva',e);}}
 
 /* ---- a escrita: as 50 caligrafias entram na Pena Mágica (índices depois das seis dela) ---- */
 const pnPenaMagica=quill413Owned; // as seis caligrafias da Pena Mágica continuam dela (Colecionador, Sem Inimigos ou Webmaster)
 PN.base=QUILL413.fonts.length;for(const Q of PN745_PENAS)QUILL413.fonts.push([Q.n[0],pnFamilia(Q)]);
 quill413Owned=function(){return pnPenaMagica.apply(this,arguments)||pnAchadas()>0;};
-{const tx0=quill413Texture;quill413Texture=function(data){const Q=data&&data.font>=PN.base?PN745_PENAS[data.font-PN.base]:null;if(!Q)return tx0.apply(this,arguments);
+{const tx0=quill413Texture;quill413Texture=function(data){const Q=data?pnDaFonte(data.font):null;if(!Q)return tx0.apply(this,arguments);
   const c=can(768,112);const r=pnTexto(c,data,Q);const tx=new THREE.CanvasTexture(c);tx.encoding=THREE.sRGBEncoding;tx.anisotropy=8;return {tx,aspect:r.aspect};};}
 // fontes carregadas antes de montar as inscrições do ambiente (sem isso a letra sairia na fonte de reserva)
-{const rs0=quill413Restore;quill413Restore=function(scope){try{if(scope&&!window.VISITA){const falta=[];for(const r of quill413Data(scope)){const Q=r.font>=PN.base?PN745_PENAS[r.font-PN.base]:null;if(Q&&!pnFonteOk(Q)&&!falta.includes(Q))falta.push(Q);}
+{const rs0=quill413Restore;quill413Restore=function(scope){try{if(scope&&!window.VISITA){const falta=[];for(const r of quill413Data(scope)){const Q=pnDaFonte(r.font);if(Q&&!pnFonteOk(Q)&&!falta.includes(Q))falta.push(Q);}
     if(falta.length){const self=this,args=arguments;Promise.all(falta.map(pnFonte)).then(()=>{try{rs0.apply(self,args);}catch(e){pnErro('restore',e);}});return;}}}catch(e){pnErro('restore0',e);}return rs0.apply(this,arguments);};}
 // a parede pode ter sido juntada pela fusão (a original fica no lugar, marcada como invisível): conta a visibilidade de verdade
 function pnVisivel(o){for(let p=o;p;p=p.parent){const d=Object.getOwnPropertyDescriptor(p,'visible');const v=(d&&d.get&&p.__fusaoVis!==undefined)?p.__fusaoVis:p.visible;if(!v)return false;}return true;}
 quill413Surface=function(hit){const o=hit&&hit.object;if(!o||!pnVisivel(o))return false;const m=Array.isArray(o.material)?o.material[(hit.face&&hit.face.materialIndex)||0]:o.material;if(!m||!m.visible||m.opacity===0)return false;
   const planes=m.clippingPlanes||[],clipped=plane=>plane.distanceToPoint(hit.point)<-.0001;if(planes.length&&(m.clipIntersection?planes.every(clipped):planes.some(clipped)))return false;return true;};
-{const ed0=quill413Edit;quill413Edit=function(){const w0=wall420Targets;wall420Targets=function(root){const L=[];if(!root)return L;root.traverse(o=>{if(o.isMesh&&o.geometry&&o.material&&pnVisivel(o))L.push(o);});return L;};try{return ed0.apply(this,arguments);}finally{wall420Targets=w0;}};}
+{const ed0=quill413Edit;quill413Edit=function(){const w0=wall420Targets;wall420Targets=function(root){const L=[];if(!root)return L;root.traverse(o=>{if(o.isMesh&&o.geometry&&o.material&&pnVisivel(o))L.push(o);});return L;};PN.relaxa=true;try{return ed0.apply(this,arguments);}finally{wall420Targets=w0;PN.relaxa=false;}};}
+// mover: a escrita sai da parede antiga só depois de entrar na nova
+{const pl0=quill413Place;quill413Place=function(){const pend=QUILL413.pending,mv=pend&&pend.moveId;if(mv)delete pend.moveId;const sc=pend&&pend.scope;let ok=false;PN.relaxa=true;try{ok=pl0.apply(this,arguments);}finally{PN.relaxa=false;}
+  if(ok&&mv){try{quill413Remove(sc,mv);PN.stats.mover++;}catch(e){pnErro('mover',e);}}else if(!ok&&mv&&QUILL413.pending)QUILL413.pending.moveId=mv;if(ok)pnFantasmaSome();return ok;};}
+// a mira: a parede que o leitor aponta (para a prévia), o nome da pena no aviso e, fora da escrita, a inscrição que dá para editar com E
+function pnInscricaoNaMira(r){try{if(QUILL413.pending||window.VISITA||!quill413Owned())return null;const sc=quill413Scope();const grp=sc&&QUILL413.groups.get(sc);if(!grp||!grp.children.length||!grp.parent)return null;
+  const h=ray.intersectObjects(grp.children,false).find(x=>x.object.userData.quill413&&x.distance<5);if(!h)return null;if(r&&r.kind!=='floor'&&r.kind!=='quill413invalid'&&Number.isFinite(r.dist)&&r.dist<h.distance)return null;
+  const id=h.object.userData.quill413,rec=quill413Data(sc).find(x=>x.id===id);if(!rec)return null;return {kind:'inscricao745',obj:h.object,id,dist:h.distance,tip:'«'+rec.text.slice(0,42)+(rec.text.length>42?'…':'')+'»',label:T745('Editar a inscrição','Edit the inscription','Editar la inscripción')};}catch(e){return null;}}
+{const ra0=resolveAt;resolveAt=function(){const r=ra0.apply(this,arguments);try{const pend=QUILL413.pending;
+  if(pend){if(r&&r.kind==='quill413'){PN.mira={wall:r.wall,t:performance.now()};const Q=pnDaFonte(pend.font);r.label=T745('Escrever aqui','Write here','Escribir aquí')+(Q?T745(' com a ',' with the ',' con la ')+pnNome(Q):'')+' · '+(+pend.width).toFixed(1).replace('.',T745(',','.',','))+' m';}else PN.mira=null;return r;}
+  const ins=pnInscricaoNaMira(r);if(ins)return ins;}catch(e){pnErro('mira',e);}return r;};}
+REACH.inscricao745=4;
+function pnEditar(id){try{if(!quill413Owned()||window.VISITA)return;unlock();quill413UI();const d=QUILL413.dialog;if(!d||!d.open)return;const list=d.querySelectorAll('select')[2];if(!list)return;list.value=id;list.dispatchEvent(new Event('change'));PN.stats.editar++;
+  const st=d.querySelector('p[role=status]');if(st)st.textContent=T745('Editando esta inscrição: mude o texto, a pena, a cor ou o tamanho e clique em «Atualizar», ou mova ou apague.','Editing this inscription: change the text, quill, colour or size and click «Update», or move or delete it.','Editando esta inscripción: cambia el texto, la pluma, el color o el tamaño y haz clic en «Actualizar», o muévela o bórrala.');}catch(e){pnErro('editar',e);}}
+{const a0=act;act=function(tg){if(tg&&tg.kind==='inscricao745'){if(MODE==='tp'||PN.viaE)pnEditar(tg.id);return;}return a0.apply(this,arguments);};
+ const af0=actFP;actFP=function(tg){if(tg&&tg.kind==='inscricao745'){if(PN.viaE)pnEditar(tg.id);return;}return af0.apply(this,arguments);};
+ // E também escreve (não só o clique): aponta pelo centro da tela, ou pelo mouse quando ele está solto
+ const di0=doInteract;doInteract=function(){if(QUILL413.pending&&!NPC127.open){let blk=false;try{blk=uiBlocked();}catch(e){}if(!blk){const meio=locked||!mouseIn||VJ.touch;const tg=resolveAt(meio?0:mx,meio?0:my,meio);if(tg&&tg.kind==='quill413'){quill413Place(tg.wall);return;}showToast(T745('Aponte para uma parede próxima.','Aim at a nearby wall.','Apunta a una pared cercana.'));return;}}
+   PN.viaE=true;try{return di0.apply(this,arguments);}finally{PN.viaE=false;}};}
+// o tamanho muda na hora, apontando para a parede: roda do mouse ou + e −
+function pnTamanho(f){const pend=QUILL413.pending;if(!pend)return false;const w=Math.max(.6,Math.min(4,Math.round(pend.width*f*20)/20));if(w===pend.width)return true;pend.width=w;return true;}
+addEventListener('wheel',e=>{try{if(!QUILL413.pending||(QUILL413.dialog&&QUILL413.dialog.open))return;if(e.target&&e.target.closest&&e.target.closest('dialog'))return;e.preventDefault();e.stopImmediatePropagation();pnTamanho(e.deltaY<0?1.1:1/1.1);}catch(x){}},{capture:true,passive:false});
+addEventListener('keydown',e=>{try{if(!QUILL413.pending||(QUILL413.dialog&&QUILL413.dialog.open)||e.ctrlKey||e.metaKey||e.altKey)return;const tg=e.target;if(tg&&/^(INPUT|TEXTAREA|SELECT)$/.test(tg.tagName))return;
+  const k=e.key;if(k==='+'||k==='='||e.code==='NumpadAdd'){e.preventDefault();e.stopImmediatePropagation();pnTamanho(1.1);}else if(k==='-'||k==='_'||e.code==='NumpadSubtract'){e.preventDefault();e.stopImmediatePropagation();pnTamanho(1/1.1);}}catch(x){}},true);
 
-/* ---- o Penário dentro da janela da Pena: grade das 50 penas, a escolhida em destaque e a prévia da letra ---- */
+/* ---- o Penário dentro da janela da Pena: grade das 50 penas, a escolhida em destaque, a prévia da letra e onde procurar as que faltam ---- */
+function pnIconeJa(Q){return PN.icones[Q.id]||null;}
 function pnIcone(Q){if(PN.icones[Q.id])return PN.icones[Q.id];const c=can(128,512);pnPinta(c,Object.assign({id:Q.id},Q.d));return PN.icones[Q.id]=c.toDataURL('image/png');}
 function pnSilhueta(){if(PN.silhueta)return PN.silhueta;const c=can(128,512);pnPinta(c,{id:'silhueta',forma:'classica',cores:['#80867d','#80867d','#80867d'],raque:'#8e948a',ponta:'ferro',padrao:'',curva:.3});const g=c.getContext('2d');g.globalCompositeOperation='source-atop';g.fillStyle='rgba(52,60,55,.62)';g.fillRect(0,0,128,512);g.globalCompositeOperation='source-over';g.fillStyle='rgba(243,228,200,.9)';g.font='bold 58px Georgia,serif';g.textAlign='center';g.fillText('?',64,240);return PN.silhueta=c.toDataURL('image/png');}
+const PN_VAZIO='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 function pnCss745(){if(document.getElementById('pn745css'))return;const st=document.createElement('style');st.id='pn745css';st.textContent=
   'dialog.pn745dlg{width:min(700px,94vw)!important;padding:18px 20px!important}'+
   '.pn745dlg h3{margin:0 0 10px;font:600 19px Georgia,serif;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}.pn745dlg h3 small{font:13px Georgia,serif;color:#c9b48a;margin-left:auto}'+
   '.pn745dlg textarea{background:#f4ead7;color:#2a1a10;border:1px solid #bda16d;border-radius:8px;padding:8px 10px;font:15px Georgia,serif}'+
   '.pn745dlg select,.pn745dlg input[type=color]{margin:8px 8px 0 0;height:32px;border-radius:7px;border:1px solid #8f7a52;background:#1d2925;color:#f3e4c8;font:14px Georgia,serif;padding:0 6px;vertical-align:middle}.pn745dlg input[type=color]{width:46px;padding:2px}'+
-  '.pn745dlg>button{margin:10px 8px 0 0;padding:7px 12px;border-radius:8px;border:1px solid #bda16d;background:#33463f;color:#f3e4c8;font:14px Georgia,serif;cursor:pointer}.pn745dlg>button:hover{background:#3e564d}'+
-  '.pn745dlg p[role=status]{margin:10px 0 0;font:13px Georgia,serif;color:#d9c7a3}'+
+  '.pn745dlg>button{margin:10px 8px 0 0;padding:7px 12px;border-radius:8px;border:1px solid #bda16d;background:#33463f;color:#f3e4c8;font:14px Georgia,serif;cursor:pointer}.pn745dlg>button:hover{background:#3e564d}.pn745dlg>button:disabled{opacity:.45;cursor:default}'+
+  '.pn745dlg>button.pn745arm{background:#7a2a22;border-color:#e08a6a}'+
+  '.pn745dlg p[role=status]{margin:10px 0 0;font:13px Georgia,serif;color:#d9c7a3;line-height:1.45}'+
   '.pn745sel{display:flex;gap:12px;align-items:center;background:rgba(0,0,0,.2);border:1px solid rgba(189,161,109,.45);border-radius:10px;padding:10px 12px;margin:10px 0 8px}'+
-  '.pn745sel img{width:32px;height:128px;flex:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.55))}.pn745sel .pn745info{flex:1;min-width:0}'+
-  '.pn745sel b{display:block;font:600 16px Georgia,serif}.pn745sel span{display:block;font:12.5px Georgia,serif;color:#c9b48a;margin-top:2px}'+
+  '.pn745sel img{width:40px;height:160px;flex:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.55))}.pn745sel .pn745info{flex:1;min-width:0}'+
+  '.pn745sel b{display:block;font:600 16px Georgia,serif}.pn745sel span{display:block;font:12.5px Georgia,serif;color:#c9b48a;margin-top:2px}.pn745sel span.pn745pista{color:#ffd9a0}'+
   '.pn745prev{display:block;width:100%;height:auto;margin-top:8px;border-radius:7px;background:linear-gradient(135deg,#b9ad97,#cfc5b2 55%,#a99d87);box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}'+
   '.pn745rot{font:13px Georgia,serif;color:#c9b48a;margin:4px 0 4px}'+
   '.pn745grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(25px,1fr));gap:4px;margin:0 0 6px}'+
   '.pn745grade button{height:80px;padding:3px 0;margin:0;border:1px solid rgba(189,161,109,.3);border-radius:6px;background:rgba(0,0,0,.22);cursor:pointer;display:flex;align-items:center;justify-content:center}'+
-  '.pn745grade button img{height:100%;width:auto;max-width:100%;pointer-events:none}.pn745grade button:hover{border-color:#e8c766}'+
-  '.pn745grade button.pn745on{outline:2px solid #ffd36a;outline-offset:1px;background:rgba(255,211,106,.16)}.pn745grade button.pn745falta{cursor:default;opacity:.62}.pn745grade button.pn745falta:hover{border-color:rgba(189,161,109,.3)}'+
+  '.pn745grade button img{height:100%;width:auto;max-width:100%;pointer-events:none}.pn745grade button:hover,.pn745grade button:focus-visible{border-color:#e8c766}'+
+  '.pn745grade button.pn745on{outline:2px solid #ffd36a;outline-offset:1px;background:rgba(255,211,106,.16)}.pn745grade button.pn745falta{opacity:.62}.pn745grade button.pn745falta.pn745ver{opacity:1;outline:1px dashed #ffd9a0}'+
   '.pn745mag{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 8px}.pn745mag button{padding:4px 10px;border-radius:14px;border:1px solid rgba(189,161,109,.5);background:rgba(0,0,0,.2);color:#f3e4c8;font:13px Georgia,serif;cursor:pointer}.pn745mag button.pn745on{outline:2px solid #ffd36a;background:rgba(255,211,106,.16)}';
   document.head.appendChild(st);}
 function pnDialogo(d){if(!d||d.__pn745)return;d.__pn745=true;pnCss745();d.classList.add('pn745dlg');
-  const sels=d.querySelectorAll('select'),font=sels[0],list=sels[2],color=d.querySelector('input[type=color]'),text=d.querySelector('textarea'),title=d.querySelector('h3'),size=sels[1];if(!font||!text)return;
-  const N=PN745_PENAS.length,magica=pnPenaMagica(),nAch=pnAchadas();
+  const sels=d.querySelectorAll('select'),font=sels[0],list=sels[2],color=d.querySelector('input[type=color]'),text=d.querySelector('textarea'),title=d.querySelector('h3'),size=sels[1],status=d.querySelector('p[role=status]'),bts=[...d.querySelectorAll(':scope>button')];if(!font||!text)return;
+  const N=PN745_PENAS.length,magica=pnPenaMagica(),nAch=pnAchadas(),scope=quill413Scope();
   if(nAch){title.textContent='🪶 '+T745('Penas','Quills','Plumas')+(magica?T745(' e Pena Mágica',' and Magic Quill',' y Pluma Mágica'):'');const sm=document.createElement('small');sm.textContent=T745(nAch+' de '+N+' penas',nAch+' of '+N+' quills',nAch+' de '+N+' plumas');title.appendChild(sm);}
   font.style.display='none';font.setAttribute('aria-hidden','true');
   const box=document.createElement('div');box.className='pn745box';
   const sel=document.createElement('div');sel.className='pn745sel';const img=document.createElement('img');img.alt='';const info=document.createElement('div');info.className='pn745info';const nm=document.createElement('b'),cl=document.createElement('span'),on=document.createElement('span');info.append(nm,cl,on);
   const prev=document.createElement('canvas');prev.className='pn745prev';prev.width=768;prev.height=112;prev.setAttribute('aria-label',T745('Prévia da escrita','Lettering preview','Vista previa de la escritura'));info.appendChild(prev);sel.append(img,info);box.appendChild(sel);
   let mag=null;if(magica){const r=document.createElement('div');r.className='pn745rot';r.textContent=T745('Caligrafias da Pena Mágica','Magic Quill scripts','Caligrafías de la Pluma Mágica');box.appendChild(r);mag=document.createElement('div');mag.className='pn745mag';for(let k=0;k<PN.base;k++){const b=document.createElement('button');b.type='button';b.textContent=font.options[k]?font.options[k].textContent:String(k);b.style.fontFamily=QUILL413.fonts[k][1];b.dataset.f=k;b.onclick=()=>escolhe(k,true);mag.appendChild(b);}box.appendChild(mag);}
-  const rot=document.createElement('div');rot.className='pn745rot';rot.textContent=nAch?T745('Suas penas — cada uma com a própria caligrafia','Your quills — each with its own script','Tus plumas — cada una con su propia caligrafía'):T745('Penas escondidas pelo castelo: ache uma para escrever com a letra dela','Quills hidden around the castle: find one to write in its script','Plumas escondidas por el castillo: encuentra una para escribir con su letra');box.appendChild(rot);
-  const grade=document.createElement('div');grade.className='pn745grade';grade.setAttribute('role','listbox');
-  PN745_PENAS.forEach((Q,i)=>{const b=document.createElement('button');b.type='button';b.dataset.f=PN.base+i;const tem=!!PN.save.achados[Q.id];const im=document.createElement('img');im.alt='';im.src=tem?pnIcone(Q):pnSilhueta();b.appendChild(im);
-    if(tem){b.title=pnNome(Q)+' — '+pnCal(Q);b.setAttribute('aria-label',b.title);b.onclick=()=>escolhe(PN.base+i,true);}else{b.className='pn745falta';b.title=T745('Ainda não achada','Not found yet','Aún no encontrada');b.setAttribute('aria-label',b.title);b.tabIndex=-1;}grade.appendChild(b);});
+  const rot=document.createElement('div');rot.className='pn745rot';rot.textContent=nAch?T745('Suas penas — cada uma com a própria caligrafia (toque numa que falta para saber onde procurar)','Your quills — each with its own script (tap a missing one to see where to look)','Tus plumas — cada una con su propia caligrafía (toca una que falta para saber dónde buscar)'):T745('Penas escondidas pelo castelo: ache uma para escrever com a letra dela (toque numa para saber onde procurar)','Quills hidden around the castle: find one to write in its script (tap one to see where to look)','Plumas escondidas por el castillo: encuentra una para escribir con su letra (toca una para saber dónde buscar)');box.appendChild(rot);
+  const grade=document.createElement('div');grade.className='pn745grade';grade.setAttribute('role','listbox');let verFalta=-1;const fila=[];
+  PN745_PENAS.forEach((Q,i)=>{const b=document.createElement('button');b.type='button';b.dataset.f=PN.base+i;const tem=!!PN.save.achados[Q.id];const im=document.createElement('img');im.alt='';b.appendChild(im);
+    if(tem){const ja=pnIconeJa(Q);im.src=ja||PN_VAZIO;if(!ja)fila.push([Q,im]);b.title='Nº '+(i+1)+' · '+pnNome(Q)+' — '+pnCal(Q);b.setAttribute('aria-label',b.title);b.onclick=()=>escolhe(PN.base+i,true);}
+    else{im.src=pnSilhueta();b.className='pn745falta';b.title='Nº '+(i+1)+' · '+T745('escondida em ','hidden in ','escondida en ')+pnPista(Q);b.setAttribute('aria-label',T745('Pena nº ','Quill no. ','Pluma n.º ')+(i+1)+', '+T745('ainda não achada','not found yet','aún no encontrada'));b.onclick=()=>mostraFalta(i);}grade.appendChild(b);});
   box.appendChild(grade);font.parentNode.insertBefore(box,font);
-  let tPrev=0;const desenha=()=>{clearTimeout(tPrev);tPrev=setTimeout(()=>{try{const f=+font.value,Q=f>=PN.base?PN745_PENAS[f-PN.base]:null;const go=()=>{const data={text:text.value.trim()||T745('Aqui esteve um leitor.','A reader was here.','Aquí estuvo un lector.'),font:f,color:color.value,width:+size.value||1.4,id:'prev745'};
+  // os desenhos das penas achadas são pintados aos poucos (três por vez), sem travar a janela
+  const pinta=()=>{if(!d.open||!fila.length)return;for(let k=0;k<3&&fila.length;k++){const [Q,im]=fila.shift();try{im.src=pnIcone(Q);}catch(e){}}setTimeout(pinta,16);};setTimeout(pinta,30);
+  let tPrev=0;const desenha=()=>{clearTimeout(tPrev);tPrev=setTimeout(()=>{try{const f=+font.value,Q=pnDaFonte(f);const go=()=>{const data={text:text.value.trim()||T745('Aqui esteve um leitor.','A reader was here.','Aquí estuvo un lector.'),font:f,color:color.value,width:+size.value||1.4,id:'prev745'};
       const r=quill413Texture(data),src=r.tx.image;prev.height=Math.round(768/r.aspect);const g=prev.getContext('2d');g.clearRect(0,0,prev.width,prev.height);g.drawImage(src,0,0,prev.width,prev.height);r.tx.dispose();};if(Q&&!pnFonteOk(Q))pnFonte(Q).then(go);else go();}catch(e){pnErro('prévia',e);}},60);};
-  const marca=()=>{const f=+font.value;for(const b of grade.children)b.classList.toggle('pn745on',+b.dataset.f===f);if(mag)for(const b of mag.children)b.classList.toggle('pn745on',+b.dataset.f===f);
-    const Q=f>=PN.base?PN745_PENAS[f-PN.base]:null;if(Q){img.src=pnIcone(Q);img.style.visibility='';nm.textContent=pnNome(Q);cl.textContent=T745('Caligrafia: ','Script: ','Caligrafía: ')+pnCal(Q);on.textContent=T745('Achada em: ','Found in: ','Encontrada en: ')+pnOndeNome(Q);}
+  const marca=()=>{verFalta=-1;const f=+font.value;for(const b of grade.children){b.classList.toggle('pn745on',+b.dataset.f===f);b.classList.remove('pn745ver');}if(mag)for(const b of mag.children)b.classList.toggle('pn745on',+b.dataset.f===f);
+    on.classList.remove('pn745pista');prev.style.display='';const Q=pnDaFonte(f);if(Q){img.src=pnIcone(Q);img.style.visibility='';nm.textContent=pnNome(Q);cl.textContent=T745('Caligrafia: ','Script: ','Caligrafía: ')+pnCal(Q);on.textContent=T745('Achada em: ','Found in: ','Encontrada en: ')+pnOndeNome(Q);}
     else{img.style.visibility='hidden';nm.textContent=T745('Pena Mágica','Magic Quill','Pluma Mágica');cl.textContent=T745('Caligrafia: ','Script: ','Caligrafía: ')+(font.options[f]?font.options[f].textContent:'');on.textContent='';}};
-  function escolhe(f,tinta){font.value=String(f);const Q=f>=PN.base?PN745_PENAS[f-PN.base]:null;if(Q){if(tinta)color.value=Q.tinta;PN.save.sel=Q.id;pnGrava();pnFonte(Q);}marca();desenha();}
-  text.addEventListener('input',desenha);color.addEventListener('input',desenha);if(size)size.addEventListener('change',desenha);if(list)list.addEventListener('change',()=>{marca();desenha();});
+  function mostraFalta(i){if(verFalta===i){marca();return;}verFalta=i;const Q=PN745_PENAS[i];for(const b of grade.children){b.classList.remove('pn745ver');}grade.children[i].classList.add('pn745ver');
+    img.src=pnSilhueta();img.style.visibility='';nm.textContent=T745('Pena nº ','Quill no. ','Pluma n.º ')+(i+1)+T745(' — ainda escondida',' — still hidden',' — aún escondida');cl.textContent=T745('Escondida em: ','Hidden in: ','Escondida en: ')+pnPista(Q);
+    on.textContent=T745('Ela brilha e toca um sino baixinho quando você chega perto.','It glows and chimes softly when you get close.','Brilla y suena una campanita cuando te acercas.');on.classList.add('pn745pista');prev.style.display='none';}
+  function escolhe(f,tinta){font.value=String(f);const Q=pnDaFonte(f);if(Q){if(tinta)color.value=Q.tinta;PN.save.sel=Q.id;pnGrava();pnFonte(Q);}marca();desenha();}
+  text.addEventListener('input',desenha);color.addEventListener('input',desenha);if(size)size.addEventListener('change',desenha);if(list)list.addEventListener('change',()=>{marca();desenha();moverOk();});
+  // apagar pede confirmação (segundo clique em até 3 s); mover leva a escrita para outra parede
+  const bApagar=bts[2],bAtual=bts[1];
+  // o «Fechar» da janela antiga não tinha tradução no inglês
+  if(bts[3]&&/^(Fechar|Close|Cerrar)$/.test(bts[3].textContent.trim()))bts[3].textContent=T745('Fechar','Close','Cerrar');
+  if(bApagar){let arm=0,txt0=bApagar.textContent;bApagar.addEventListener('click',e=>{if(!list||!list.value)return;if(Date.now()<arm){arm=0;bApagar.textContent=txt0;bApagar.classList.remove('pn745arm');return;}e.preventDefault();e.stopImmediatePropagation();arm=Date.now()+3000;bApagar.textContent=T745('Clique de novo para apagar','Click again to delete','Haz clic de nuevo para borrar');bApagar.classList.add('pn745arm');setTimeout(()=>{if(Date.now()>=arm){bApagar.textContent=txt0;bApagar.classList.remove('pn745arm');}},3100);},true);}
+  const bMover=document.createElement('button');bMover.type='button';bMover.textContent=T745('Mover para outra parede','Move to another wall','Mover a otra pared');
+  bMover.onclick=()=>{const id=list&&list.value,rec=id&&quill413Data(scope).find(r=>r.id===id);if(!rec){if(status)status.textContent=T745('Escolha na lista a inscrição que vai mudar de parede.','Pick in the list the inscription to move.','Elige en la lista la inscripción que vas a mover.');return;}
+    const v={text:text.value.trim()||rec.text,font:+font.value,color:color.value,width:+size.value||rec.width};if(!quill413Valid(v)){if(status)status.textContent=T745('Confira o texto, a pena e o tamanho.','Check the text, quill and size.','Revisa el texto, la pluma y el tamaño.');return;}
+    QUILL413.pending={...v,scope,moveId:id};if(!pnDaFonte(v.font)){try{if(!QUILL413.pen){QUILL413.pen=quill413Model().g;QUILL413.pen.position.set(.42,1.08,.28);QUILL413.pen.rotation.z=-.4;READER.g.add(QUILL413.pen);}QUILL413.pen.visible=true;}catch(e){}}
+    d.close();showToast(T745('Aponte para a nova parede e clique (ou E). Esc cancela.','Aim at the new wall and click (or E). Esc cancels.','Apunta a la nueva pared y haz clic (o E). Esc cancela.'));};
+  if(bAtual)bAtual.after(bMover);else d.appendChild(bMover);const moverOk=()=>{bMover.disabled=!(list&&list.value);};moverOk();
+  if(status)status.textContent=T745('Depois de «Escrever na parede», aponte para uma parede a até 5,5 m: a escrita aparece ali antes de ficar (vermelha quando não cabe). Clique ou aperte E para escrever; a roda do mouse ou + e − mudam o tamanho; Esc cancela. Para mudar uma escrita, aponte para ela e aperte E.',
+    'After «Write on a wall», aim at a wall within 5.5 m: the lettering shows there before it sticks (red when it does not fit). Click or press E to write; the mouse wheel or + and − change the size; Esc cancels. To change an inscription, aim at it and press E.',
+    'Después de «Escribir en la pared», apunta a una pared a menos de 5,5 m: la escritura aparece allí antes de quedar (roja cuando no cabe). Haz clic o pulsa E para escribir; la rueda del ratón o + y − cambian el tamaño; Esc cancela. Para cambiar una inscripción, apúntala y pulsa E.');
   // começa na última pena usada (ou na primeira achada); sem penas, fica na Pena Mágica
   const ultima=PN745_PENAS.findIndex(Q=>Q.id===PN.save.sel&&PN.save.achados[Q.id]),primeira=PN745_PENAS.findIndex(Q=>PN.save.achados[Q.id]);const ini=ultima>=0?ultima:primeira;
-  if(ini>=0&&(!magica||ultima>=0))escolhe(PN.base+ini,true);else{marca();desenha();}
-  for(const Q of PN745_PENAS)if(PN.save.achados[Q.id])pnFonte(Q);}
+  if(ini>=0&&(!magica||ultima>=0))escolhe(PN.base+ini,true);else{marca();desenha();}}
 {const ui0=quill413UI;quill413UI=function(){if(!window.VISITA&&!quill413Owned()){showToast(T745('Ache uma das 50 penas escondidas pelo castelo (ou derrote o Colecionador de Histórias) para escrever nas paredes.','Find one of the 50 quills hidden around the castle (or defeat the Collector of Stories) to write on walls.','Encuentra una de las 50 plumas escondidas por el castillo (o derrota al Coleccionista de Historias) para escribir en las paredes.'));return;}
   const r=ui0.apply(this,arguments);try{const d=QUILL413.dialog;if(d&&d.open)pnDialogo(d);}catch(e){pnErro('janela',e);}return r;};}
 function pnBotao(){try{const b=document.getElementById('quill413Button');if(!b)return;b.onclick=()=>quill413UI();const n=pnAchadas();if(n)b.textContent='🪶 '+T745('Penas','Quills','Plumas')+' · '+T745('escrever nas paredes','write on walls','escribir en las paredes')+' ('+n+'/'+PN745_PENAS.length+')';}catch(e){}}
@@ -89916,12 +90021,13 @@ try{pnLe();}catch(e){pnErro('ler',e);}
 for(const Q of PN745_PENAS)Q.l=PN745_LUGARES[Q.id]||null;
 {const tk=caveirasTick;caveirasTick=function(dt){const r=tk.apply(this,arguments);try{pnTick(dt);}catch(e){pnErro('tick',e);}return r;};}
 // a lista de inscrições foi lida antes das caligrafias novas existirem: relê (sem isso, as escritas das penas sumiriam da lista ao salvar outra)
-try{QUILL413.records.clear();const precisa=new Set();for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k||k.indexOf('inscricoes413.')<0)continue;try{for(const r of JSON.parse(localStorage.getItem(k)||'[]'))if(r&&r.font>=PN.base&&PN745_PENAS[r.font-PN.base])precisa.add(PN745_PENAS[r.font-PN.base]);}catch(e){}}
+try{QUILL413.records.clear();const precisa=new Set();for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k||k.indexOf('inscricoes413.')<0)continue;try{for(const r of JSON.parse(localStorage.getItem(k)||'[]')){const Q=r&&pnDaFonte(r.font);if(Q)precisa.add(Q);}}catch(e){}}
   Promise.all([...precisa].map(pnFonte)).then(()=>{try{for(const n of Object.keys(HALLS))quill413Restore('hall:'+n);for(const [key,R]of Object.entries(ROOMS))if(R.ready)quill413Restore('room:'+key);}catch(e){pnErro('reler',e);}});}catch(e){pnErro('inscrições',e);}
 pnBotao();
-window.__penas745={estado:PN,penas:PN745_PENAS,lugares:PN745_LUGARES,erros:PN.erros,achadas:pnAchadas,pinta:(id,c)=>{const Q=PN745_PENAS.find(q=>q.id===id);return Q?pnPinta(c||can(256,1024),Object.assign({id:Q.id},Q.d)):null;},texto:(c,data,id)=>{const Q=PN745_PENAS.find(q=>q.id===id);return Q?pnTexto(c,data,Q):null;},fonte:id=>{const Q=PN745_PENAS.find(q=>q.id===id);return Q?pnFonte(Q):null;},
+window.__penas745={estado:PN,penas:PN745_PENAS,lugares:PN745_LUGARES,erros:PN.erros,achadas:pnAchadas,pista:id=>{const Q=PN745_PENAS.find(q=>q.id===id);return Q?pnPista(Q):'';},pinta:(id,c)=>{const Q=PN745_PENAS.find(q=>q.id===id);return Q?pnPinta(c||can(256,1024),Object.assign({id:Q.id},Q.d)):null;},texto:(c,data,id)=>{const Q=PN745_PENAS.find(q=>q.id===id);return Q?pnTexto(c,data,Q):null;},fonte:id=>{const Q=PN745_PENAS.find(q=>q.id===id);return Q?pnFonte(Q):null;},
+  editar:id=>pnEditar(id),tamanho:f=>pnTamanho(f),
   dar(id){const Q=PN745_PENAS.find(q=>q.id===id);if(!Q)return false;PN.save.achados[id]=Date.now();pnGrava();pnBotao();return true;},todas(){for(const Q of PN745_PENAS)PN.save.achados[Q.id]=PN.save.achados[Q.id]||Date.now();pnGrava();pnBotao();return pnAchadas();},
-  reset(){PN.save.achados={};PN.save.sel=null;pnGrava();for(const id in PN.itens){const it=PN.itens[id];if(it.g.parent)it.g.parent.remove(it.g);}PN.itens={};pnBotao();},abrir:()=>quill413UI(),versao:745};
+  reset(){PN.save.achados={};PN.save.sel=null;pnGrava();for(const id in PN.itens){const it=PN.itens[id];if(it.g.parent)it.g.parent.remove(it.g);}PN.itens={};pnBotao();},abrir:()=>quill413UI(),versao:746};
 
 }catch(e){try{console.error("penas745",e);window.__penas745erro=String(e&&e.stack||e);}catch(x){}}
 })();
