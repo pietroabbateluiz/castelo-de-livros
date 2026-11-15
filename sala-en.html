@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v817</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v818</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -7434,6 +7434,12 @@ function normalFrom(hc,strength){const w=hc.width,h=hc.height,src=hc.getContext(
   for(let y=0;y<h;y++){const ym=((y-1+h)%h)*w,yp=((y+1)%h)*w,y0=y*w;for(let x=0;x<w;x++){const xm=(x-1+w)%w,xp=(x+1)%w;
     const dx=(src[(y0+xm)*4]-src[(y0+xp)*4])*s,dy=(src[(ym+x)*4]-src[(yp+x)*4])*s;const l=1/Math.sqrt(dx*dx+dy*dy+1);const i=(y0+x)*4;d[i]=(dx*l*0.5+0.5)*255;d[i+1]=(dy*l*0.5+0.5)*255;d[i+2]=(l*0.5+0.5)*255;d[i+3]=255;}}
   ox.putImageData(od,0,0);return o;}
+function* normalFromG(hc,strength){let fat8c=0;const w=hc.width,h=hc.height,src=hc.getContext('2d').getImageData(0,0,w,h).data;const o=can(w,h),ox=o.getContext('2d'),od=ox.createImageData(w,h),d=od.data;
+  const s=strength/255;
+  for(let y=0;y<h;y++){const ym=((y-1+h)%h)*w,yp=((y+1)%h)*w,y0=y*w;for(let x=0;x<w;x++){const xm=(x-1+w)%w,xp=(x+1)%w;
+    const dx=(src[(y0+xm)*4]-src[(y0+xp)*4])*s,dy=(src[(ym+x)*4]-src[(yp+x)*4])*s;const l=1/Math.sqrt(dx*dx+dy*dy+1);const i=(y0+x)*4;d[i]=(dx*l*0.5+0.5)*255;d[i+1]=(dy*l*0.5+0.5)*255;d[i+2]=(l*0.5+0.5)*255;d[i+3]=255;};if(!(++fat8c&31))yield "normalFromG#1";}
+  ox.putImageData(od,0,0);return o;}
+
 
 // madeira com veios (fbm), tábuas com juntas e topos escalonados, tom por tábua
 function woodSet(S,base,plank,seed,rep,nstr){const fbm=mkNoise(seed),r=rnd(seed+5);const A=can(S,S),Hc=can(S,S),Rc=can(S,S);const ax=A.getContext('2d'),hx=Hc.getContext('2d'),rx=Rc.getContext('2d');const ad=ax.createImageData(S,S),hd=hx.createImageData(S,S),rd=rx.createImageData(S,S);
@@ -69727,6 +69733,43 @@ function cp579Rede(f,caixa,h){const t0=(typeof performance!=='undefined')?perfor
     pos[q*3]=x;pos[q*3+1]=y;pos[q*3+2]=z;}
   const idx=(nv>65535)?new Uint32Array(I):new Uint16Array(I);
   const ms=((typeof performance!=='undefined')?performance.now():0)-t0;return {pos,nor,idx,aval,ms,nv,nt:I.length/3};}
+function* cp579RedeG(f,caixa,h){let fat8c=0;const t0=(typeof performance!=='undefined')?performance.now():0;
+  const x0=caixa[0]-2*h,y0=caixa[1]-2*h,z0=caixa[2]-2*h;const nx=Math.ceil((caixa[3]-caixa[0])/h)+4,ny=Math.ceil((caixa[4]-caixa[1])/h)+4,nz=Math.ceil((caixa[5]-caixa[2])/h)+4;
+  const NX=nx+1,NY=ny+1,NZ=nz+1,NXY=NX*NY;const V=new Float32Array(NX*NY*NZ);
+  // passo grosso (4h): longe da superfície o sinal já se sabe
+  const C=4,H=h*C;const cx=Math.ceil(nx/C)+1,cy=Math.ceil(ny/C)+1,cz=Math.ceil(nz/C)+1;const Vc=new Float32Array(cx*cy*cz);let aval=0;
+  for(let k=0;k<cz;k++){for(let j=0;j<cy;j++)for(let i=0;i<cx;i++){Vc[i+cx*(j+cy*k)]=f(x0+i*H,y0+j*H,z0+k*H);aval++;};yield "cp579RedeG#1";}
+  const lim=H*1.5;
+  for(let k=0;k<NZ;k++){const kc=Math.min(cz-1,Math.round(k/C)),z=z0+k*h;for(let j=0;j<NY;j++){const jc=Math.min(cy-1,Math.round(j/C)),y=y0+j*h;const base=NX*(j+NY*k),bc=cx*(jc+cy*kc);
+    for(let i=0;i<NX;i++){const vc=Vc[Math.min(cx-1,Math.round(i/C))+bc];if(vc>lim||vc<-lim)V[base+i]=vc;else{V[base+i]=f(x0+i*h,y,z);aval++;}}};yield "cp579RedeG#2";}
+  // vértices: um por célula cortada (média dos cruzamentos nas 12 arestas)
+  const cel=new Int32Array(nx*ny*nz).fill(-1);const P=[];
+  const AR=[[0,1],[2,3],[4,5],[6,7],[0,2],[1,3],[4,6],[5,7],[0,4],[1,5],[2,6],[3,7]];const OFF=[[0,0,0],[1,0,0],[0,1,0],[1,1,0],[0,0,1],[1,0,1],[0,1,1],[1,1,1]];const val=new Float64Array(8);
+  for(let k=0;k<nz;k++){for(let j=0;j<ny;j++)for(let i=0;i<nx;i++){let neg=0;for(let c=0;c<8;c++){const o=OFF[c];const v=V[(i+o[0])+NX*((j+o[1])+NY*(k+o[2]))];val[c]=v;if(v<0)neg++;}
+    if(neg===0||neg===8)continue;let sx=0,sy=0,sz=0,n=0;
+    for(const e of AR){const a=val[e[0]],b=val[e[1]];if((a<0)===(b<0))continue;const t=a/(a-b);const oa=OFF[e[0]],ob=OFF[e[1]];sx+=oa[0]+(ob[0]-oa[0])*t;sy+=oa[1]+(ob[1]-oa[1])*t;sz+=oa[2]+(ob[2]-oa[2])*t;n++;}
+    cel[i+nx*(j+ny*k)]=P.length/3;P.push(x0+(i+sx/n)*h,y0+(j+sy/n)*h,z0+(k+sz/n)*h);};yield "cp579RedeG#3";}
+  // quadriláteros: um por aresta da grade que cruza a superfície
+  const I=[];const C3=(i,j,k)=>cel[i+nx*(j+ny*k)];
+  const quad=(a,b,c,d,flip)=>{if(a<0||b<0||c<0||d<0)return;if(flip){const t=b;b=d;d=t;}
+    // diagonal mais curta
+    const dac=(P[a*3]-P[c*3])**2+(P[a*3+1]-P[c*3+1])**2+(P[a*3+2]-P[c*3+2])**2,dbd=(P[b*3]-P[d*3])**2+(P[b*3+1]-P[d*3+1])**2+(P[b*3+2]-P[d*3+2])**2;
+    if(dac<=dbd)I.push(a,b,c,a,c,d);else I.push(a,b,d,b,c,d);};
+  for(let k=1;k<nz;k++){for(let j=1;j<ny;j++)for(let i=0;i<nx;i++){const v0=V[i+NX*(j+NY*k)],v1=V[i+1+NX*(j+NY*k)];if((v0<0)===(v1<0))continue;
+    quad(C3(i,j-1,k-1),C3(i,j,k-1),C3(i,j,k),C3(i,j-1,k),!(v0<0));};yield "cp579RedeG#4";}
+  for(let k=1;k<nz;k++){for(let j=0;j<ny;j++)for(let i=1;i<nx;i++){const v0=V[i+NX*(j+NY*k)],v1=V[i+NX*(j+1+NY*k)];if((v0<0)===(v1<0))continue;
+    quad(C3(i-1,j,k-1),C3(i-1,j,k),C3(i,j,k),C3(i,j,k-1),!(v0<0));};yield "cp579RedeG#5";}
+  for(let k=0;k<nz;k++){for(let j=1;j<ny;j++)for(let i=1;i<nx;i++){const v0=V[i+NX*(j+NY*k)],v1=V[i+NX*(j+NY*(k+1))];if((v0<0)===(v1<0))continue;
+    quad(C3(i-1,j-1,k),C3(i,j-1,k),C3(i,j,k),C3(i-1,j,k),!(v0<0));};yield "cp579RedeG#6";}
+  // assenta cada vértice na superfície (um passo de Newton) e a normal vem do gradiente do campo (sombreado liso)
+  const nv=P.length/3;const pos=new Float32Array(P),nor=new Float32Array(nv*3);const e=h*0.25;
+  for(let q=0;q<nv;q++){let x=pos[q*3],y=pos[q*3+1],z=pos[q*3+2];
+    for(let it=0;it<2;it++){const f1=f(x+e,y-e,z-e),f2=f(x-e,y-e,z+e),f3=f(x-e,y+e,z-e),f4=f(x+e,y+e,z+e);aval+=4;let gx=f1-f2-f3+f4,gy=-f1-f2+f3+f4,gz=-f1+f2-f3+f4;const gl=Math.sqrt(gx*gx+gy*gy+gz*gz)||1;gx/=gl;gy/=gl;gz/=gl;
+      if(it===0){const d=(f1+f2+f3+f4)*0.25;const s=Math.max(-h,Math.min(h,d));x-=gx*s;y-=gy*s;z-=gz*s;}else{nor[q*3]=gx;nor[q*3+1]=gy;nor[q*3+2]=gz;}}
+    pos[q*3]=x;pos[q*3+1]=y;pos[q*3+2]=z;;if(!(++fat8c&15))yield "cp579RedeG#7";}
+  const idx=(nv>65535)?new Uint32Array(I):new Uint16Array(I);
+  const ms=((typeof performance!=='undefined')?performance.now():0)-t0;return {pos,nor,idx,aval,ms,nv,nt:I.length/3};}
+
 
 /* ---------- geometria: cores por vértice, mapa (cilíndrico em volta de um eixo, sem costura) ---------- */
 // op: {cor:(x,y,z,nx,ny,nz)=>[r,g,b], uv:{eixo:'z'|'y'|'x', c:[a,b] (centro no plano), v0, v1, rep:[ru,rv]} }
@@ -69748,6 +69791,25 @@ function cp579Geo(R,op){const T=THREE;op=op||{};let nv=R.nv;let pos=R.pos,nor=R.
     idx=(nv>65535)?new Uint32Array(I):new Uint16Array(I);}
   g.setAttribute('position',new T.BufferAttribute(pos,3));g.setAttribute('normal',new T.BufferAttribute(nor,3));if(col)g.setAttribute('color',new T.BufferAttribute(col,3));if(uv)g.setAttribute('uv',new T.BufferAttribute(uv,2));g.setIndex(new T.BufferAttribute(idx,1));
   g.computeBoundingBox();g.computeBoundingSphere();g.userData.cp579=true;return g;}
+function* cp579GeoG(R,op){let fat8c=0;const T=THREE;op=op||{};let nv=R.nv;let pos=R.pos,nor=R.nor,idx=R.idx;
+  let col=null;if(op.cor){col=new Float32Array(nv*3);for(let q=0;q<nv;q++){const c=op.cor(pos[q*3],pos[q*3+1],pos[q*3+2],nor[q*3],nor[q*3+1],nor[q*3+2]);col[q*3]=c[0];col[q*3+1]=c[1];col[q*3+2]=c[2];;if(!(++fat8c&63))yield "cp579GeoG#1";}}
+  const g=new T.BufferGeometry();let uv=null;
+  if(op.uv){// mapa cilíndrico em volta de um eixo; na costura só os triângulos que a cruzam ganham cópias dos vértices (u + 1; o mapa repete)
+    const U=op.uv,ax=U.eixo||'z',c=U.c||[0,0],ru=(U.rep&&U.rep[0])||1,rv=(U.rep&&U.rep[1])||1,v0=U.v0||0,v1=U.v1||1;
+    const uu=new Float32Array(nv),vv=new Float32Array(nv);
+    for(let q=0;q<nv;q++){const x=pos[q*3],y=pos[q*3+1],z=pos[q*3+2];let a,b,w;if(ax==='z'){a=x-c[0];b=y-c[1];w=z;}else if(ax==='y'){a=x-c[0];b=z-c[1];w=y;}else{a=z-c[0];b=y-c[1];w=x;}uu[q]=Math.atan2(a,b)/(2*Math.PI)+0.5;vv[q]=(w-v0)/(v1-v0);;if(!(++fat8c&63))yield "cp579GeoG#2";}
+    const dup=new Map();const extra=[];const I=Array.from(idx);
+    for(let t=0;t<I.length;t+=3){const a=I[t],b=I[t+1],d=I[t+2];const mx=Math.max(uu[a],uu[b],uu[d]);if(mx-Math.min(uu[a],uu[b],uu[d])<=0.5)continue;
+      for(let s=0;s<3;s++){const q=I[t+s];if(mx-uu[q]>0.5){let k=dup.get(q);if(k===undefined){k=nv+extra.length;extra.push(q);dup.set(q,k);}I[t+s]=k;}};if(!(++fat8c&63))yield "cp579GeoG#3";}
+    if(extra.length){const n2=nv+extra.length;const P2=new Float32Array(n2*3),N2=new Float32Array(n2*3);P2.set(pos);N2.set(nor);let C2=null;if(col){C2=new Float32Array(n2*3);C2.set(col);}
+      const U2=new Float32Array(n2),V2=new Float32Array(n2);U2.set(uu);V2.set(vv);
+      extra.forEach((q,i)=>{const k=nv+i;for(let e=0;e<3;e++){P2[k*3+e]=pos[q*3+e];N2[k*3+e]=nor[q*3+e];if(C2)C2[k*3+e]=col[q*3+e];}U2[k]=uu[q]+1;V2[k]=vv[q];});
+      pos=P2;nor=N2;col=C2;nv=n2;uv=new Float32Array(nv*2);for(let q=0;q<nv;q++){uv[q*2]=U2[q]*ru;uv[q*2+1]=V2[q]*rv;;if(!(++fat8c&63))yield "cp579GeoG#4";}}
+    else{uv=new Float32Array(nv*2);for(let q=0;q<nv;q++){uv[q*2]=uu[q]*ru;uv[q*2+1]=vv[q]*rv;;if(!(++fat8c&63))yield "cp579GeoG#5";}}
+    idx=(nv>65535)?new Uint32Array(I):new Uint16Array(I);}
+  g.setAttribute('position',new T.BufferAttribute(pos,3));g.setAttribute('normal',new T.BufferAttribute(nor,3));if(col)g.setAttribute('color',new T.BufferAttribute(col,3));if(uv)g.setAttribute('uv',new T.BufferAttribute(uv,2));g.setIndex(new T.BufferAttribute(idx,1));
+  g.computeBoundingBox();g.computeBoundingSphere();g.userData.cp579=true;return g;}
+
 // gera (com cache por nome) — o campo só roda uma vez por tipo de bicho em cada sessão
 function cp579Peca(nome,f,caixa,h,op){let g=CP579.cache.get(nome);if(g)return g;const R=cp579Rede(f,caixa,h*(CP579.res||1));g=cp579Geo(R,op);g.userData.cp579=nome;CP579.cache.set(nome,g);
   CP579.stats[nome]={tri:R.nt,vert:R.nv,aval:R.aval,ms:Math.round(R.ms)};return g;}
@@ -72153,6 +72215,40 @@ function np589Geos(){if(NP589.geos)return NP589.geos;const T=THREE,t0=performanc
   const mOlho=new T.MeshStandardMaterial({map:np589TexOlho(),roughness:0.12,metalness:0});mOlho.name='v589 olho';
   const mBico=new T.MeshStandardMaterial({color:new T.Color(0xb88a40).convertSRGBToLinear(),roughness:0.35});const mGarra=new T.MeshStandardMaterial({color:new T.Color(0x2e2622).convertSRGBToLinear(),roughness:0.4});
   NP589.geos={corpo,cabeca,asaE:asa(-1),asaD:asa(1),olho:np589OlhoGeo(0.046),mPena,mOlho,mBico,mGarra,tri:Rc.nt+Rh.nt,ms:0};NP589.geos.ms=Math.round(performance.now()-t0);NP589.stats.geos={tri:NP589.geos.tri,ms:NP589.geos.ms};return NP589.geos;}
+function* np589GeosG(){if(NP589.geos)return NP589.geos;;yield "np589GeosG#1";const T=THREE,t0=performance.now(),C=cp579Hex;;yield "np589GeosG#2";
+  const Ell=cp579Ell,Con=cp579Cone,Sm=cp579Smin,Sx=cp579Smax;;yield "np589GeosG#3";
+  const MARROM=C(0x6e4a2c),ESC=C(0x3e281a),CREME=C(0xe2cc9c),BARRA=C(0x7a5434),DISCO=C(0xeedcb4),BORDA=C(0x5a3a22),SOBR=C(0xf6eedc),CLARO=C(0xc8a070);;yield "np589GeosG#4";
+  const rede=function*(f,cx,h){return ((yield* cp579RedeG(f,cx,h)));};;yield "np589GeosG#5";
+  const geo=function*(R,cor,uv){return ((yield* cp579GeoG(R,{cor,uv})));};;yield "np589GeosG#6";
+  // corpo (no espaço do grupo da coruja: poleiro em y 0..0,32)
+  const Fc=[Ell([0,0.53,0],[0.155,0.205,0.14]),Ell([0,0.48,0.055],[0.125,0.165,0.1]),Ell([0,0.69,0.012],[0.125,0.075,0.115]),Ell([-0.056,0.372,0.032],[0.056,0.052,0.052]),Ell([0.056,0.372,0.032],[0.056,0.052,0.052]),Ell([0,0.36,-0.1],[0.075,0.07,0.032],[0.5,0,0])];;yield "np589GeosG#7";
+  const fCorpo=(x,y,z)=>{let d=Sm(Fc[0](x,y,z),Fc[1](x,y,z),0.04);d=Sm(d,Fc[2](x,y,z),0.04);d=Sm(d,Fc[3](x,y,z),0.025);d=Sm(d,Fc[4](x,y,z),0.025);return Sm(d,Fc[5](x,y,z),0.03);};;yield "np589GeosG#8";
+  const corCorpo=(x,y,z)=>{const st=0.5+0.5*Math.sin(y*150+Math.sin(x*44)*1.6+x*14);let c=np589Mix(ESC,MARROM,0.5+0.5*st);
+    const frente=np589S(0.02,0.09,z)*np589S(0.125,0.05,Math.abs(x));const bar=np589S(0.55,0.95,Math.sin(y*190+Math.abs(x)*42));const listra=np589S(0.6,0.95,Math.sin(x*120))*np589S(0.6,0.68,y);
+    let b=np589Mix(CREME,BARRA,Math.max(bar*0.6,listra*0.5));const coxa=np589S(0.42,0.38,y)*np589S(0.0,0.03,z+0.02);b=np589Mix(b,CREME,coxa*0.6);return np589Mix(c,b,Math.max(frente,coxa*0.85));};;yield "np589GeosG#9";
+  const Rc=(yield* rede(fCorpo,[-0.18,0.28,-0.16,0.18,0.78,0.18],0.0072));;yield "np589GeosG#10";const corpo=(yield* geo(Rc,corCorpo,{eixo:'y',c:[0,0],v0:0.28,v1:0.78,rep:[5,3]}));;yield "np589GeosG#11";
+  // cabeça (no espaço do grupo da cabeça)
+  const Fh=[Ell([0,0,-0.01],[0.15,0.13,0.13]),Ell([-0.058,-0.005,0.072],[0.08,0.087,0.05]),Ell([0.058,-0.005,0.072],[0.08,0.087,0.05]),Ell([0,0.046,0.108],[0.03,0.036,0.03]),Ell([0,-0.03,0.115],[0.028,0.04,0.034]),
+    Con([-0.08,0.085,-0.012],[-0.128,0.198,-0.034],0.036,0.008),Con([0.08,0.085,-0.012],[0.128,0.198,-0.034],0.036,0.008)];;yield "np589GeosG#12";
+  const Oc=[cp579Esf([-0.055,0.02,0.142],0.05),cp579Esf([0.055,0.02,0.142],0.05)];;yield "np589GeosG#13";
+  const fCab=(x,y,z)=>{let d=Sm(Fh[0](x,y,z),Fh[1](x,y,z),0.03);d=Sm(d,Fh[2](x,y,z),0.03);d=Sm(d,Fh[3](x,y,z),0.018);d=Sm(d,Fh[4](x,y,z),0.018);d=Sm(d,Fh[5](x,y,z),0.022);d=Sm(d,Fh[6](x,y,z),0.022);
+    d=Sx(d,-Oc[0](x,y,z),0.012);return Sx(d,-Oc[1](x,y,z),0.012);};;yield "np589GeosG#14";
+  const corCab=(x,y,z)=>{let c=np589Mix(ESC,MARROM,0.6+0.4*(0.5+0.5*Math.sin(y*90+x*40)));
+    let q=1e9;for(const sx of [-1,1]){const dx=(x-sx*0.058)/0.08,dy=(y+0.005)/0.087;q=Math.min(q,Math.sqrt(dx*dx+dy*dy));}
+    const naFace=np589S(0.03,0.07,z);const disco=np589S(1.02,0.86,q)*naFace;c=np589Mix(c,DISCO,disco);const borda=np589S(0.8,0.92,q)*np589S(1.08,0.96,q)*naFace;c=np589Mix(c,BORDA,borda*0.85);
+    const sob=np589S(0.03,0.0,Math.hypot((x)*0.8,(y-0.05)))*np589S(0.08,0.1,z)+np589S(0.022,0.0,Math.abs(y-0.062-Math.abs(x)*0.45))*np589S(0.07,0.02,Math.abs(x))*np589S(0.09,0.11,z);c=np589Mix(c,SOBR,Math.min(1,sob)*0.85);
+    const tufo=np589S(0.15,0.19,y)*np589S(0.06,0.09,Math.abs(x));c=np589Mix(c,ESC,tufo*0.8);return c;};;yield "np589GeosG#15";
+  const Rh=(yield* rede(fCab,[-0.17,-0.15,-0.16,0.17,0.22,0.16],0.006));;yield "np589GeosG#16";const cabeca=(yield* geo(Rh,corCab,{eixo:'y',c:[0,0],v0:-0.15,v1:0.22,rep:[4,2]}));;yield "np589GeosG#17";
+  // asas (cada uma no espaço do ombro: pivô onde ela bate)
+  const asa=function*(sx){const F=[Ell([sx*0.012,-0.125,-0.008],[0.046,0.158,0.112],[0,0,sx*0.12]),Ell([sx*0.02,-0.05,0.012],[0.052,0.072,0.092]),Con([sx*0.008,-0.215,-0.035],[sx*0.0,-0.315,-0.075],0.036,0.008)];
+    const f=(x,y,z)=>{let d=Sm(F[0](x,y,z),F[1](x,y,z),0.025);return Sm(d,F[2](x,y,z),0.02);};
+    const cor=(x,y,z)=>{const pinta=np589S(0.55,0.9,Math.sin(y*92+0.6)*Math.sin(z*70+y*20));let c=np589Mix(MARROM,CLARO,pinta*0.7);c=np589Mix(c,ESC,np589S(-0.19,-0.3,y)*0.8);return np589Mix(c,ESC,np589S(0.02,0.045,sx*x)*0.3);};
+    const R=(yield* rede(f,[-0.07,-0.34,-0.13,0.07,0.04,0.12],0.0066));return (yield* geo(R,cor,{eixo:'y',c:[0,0],v0:-0.34,v1:0.04,rep:[3,3]}));};;yield "np589GeosG#18";
+  const mPena=new T.MeshStandardMaterial({vertexColors:true,map:(typeof cs588TexPena==='function')?cs588TexPena():null,roughness:0.82,metalness:0});;yield "np589GeosG#19";mPena.name='v589 penas da coruja';;yield "np589GeosG#20";
+  const mOlho=new T.MeshStandardMaterial({map:np589TexOlho(),roughness:0.12,metalness:0});;yield "np589GeosG#21";mOlho.name='v589 olho';;yield "np589GeosG#22";
+  const mBico=new T.MeshStandardMaterial({color:new T.Color(0xb88a40).convertSRGBToLinear(),roughness:0.35});;yield "np589GeosG#23";const mGarra=new T.MeshStandardMaterial({color:new T.Color(0x2e2622).convertSRGBToLinear(),roughness:0.4});;yield "np589GeosG#24";
+  NP589.geos={corpo,cabeca,asaE:(yield* asa(-1)),asaD:(yield* asa(1)),olho:np589OlhoGeo(0.046),mPena,mOlho,mBico,mGarra,tri:Rc.nt+Rh.nt,ms:0};;yield "np589GeosG#25";NP589.geos.ms=Math.round(performance.now()-t0);;yield "np589GeosG#26";NP589.stats.geos={tri:NP589.geos.tri,ms:NP589.geos.ms};;yield "np589GeosG#27";return NP589.geos;}
+
 
 /* ---------- troca a geometria da coruja, mantendo o esqueleto (grupo, cabeça, olhos, asas) ---------- */
 function np589Coruja(O){if(!O||!O.g||!O.head||O.g.userData.np589)return false;const T=THREE,g=O.g,hd=O.head,G=np589Geos();
@@ -72167,6 +72263,19 @@ function np589Coruja(O){if(!O||!O.g||!O.head||O.g.userData.np589)return false;co
   K.cyl(0.004,0.004,0.024,LAT,0,0.028,0.17,8,0,0,Math.PI/2);for(const m of K.fim(hd,{sombra:true}))marca(m);
   const K2=t160Kit('589 coruja · garras');for(const sx of [-1,1]){const x0=sx*0.052;for(const [dx,dz] of [[-0.018,1],[0,1],[0.018,1],[0,-1]])K2.tube([[x0+dx*0.3,0.338,0.02*dz],[x0+dx,0.329,0.045*dz],[x0+dx*1.15,0.317,0.058*dz]],0.0065,G.mGarra,8,6);}for(const m of K2.fim(g,{sombra:true}))marca(m);
   O.eyes.length=0;O.eyes.push(...olhos);O.wings.length=0;O.wings.push(...asas);g.userData.np589=true;NP589.stats.coruja={tri:G.tri};return true;}
+function* np589CorujaG(O){if(!O||!O.g||!O.head||O.g.userData.np589)return false;;yield "np589CorujaG#1";const T=THREE,g=O.g,hd=O.head,G=(yield* np589GeosG());;yield "np589CorujaG#2";
+  for(const c of g.children.slice()){if(c===hd||!c.isMesh)continue;const gm=c.geometry,p=gm&&gm.parameters;const poleiro=gm&&gm.type==='CylinderGeometry'&&p&&p.radiusTop>=0.019&&c.position.y<0.32;if(!poleiro)g.remove(c);};yield "np589CorujaG#3";
+  for(const c of hd.children.slice())hd.remove(c);;yield "np589CorujaG#4";
+  const marca=m=>{m.castShadow=true;m.receiveShadow=true;m.__fusaoMoveu=9;m.userData.np589=true;m.userData.portalKeep=true;return m;};;yield "np589CorujaG#5";
+  g.add(marca(new T.Mesh(G.corpo,G.mPena)));;yield "np589CorujaG#6";
+  const asas=[];;yield "np589CorujaG#7";for(const sx of [-1,1]){const w=marca(new T.Mesh(sx<0?G.asaE:G.asaD,G.mPena));w.position.set(sx*0.142,0.645,0);g.add(w);asas.push({w,sx});};yield "np589CorujaG#8";
+  hd.add(marca(new T.Mesh(G.cabeca,G.mPena)));;yield "np589CorujaG#9";const olhos=[];;yield "np589CorujaG#10";for(const sx of [-1,1]){const e=marca(new T.Mesh(G.olho,G.mOlho));e.position.set(sx*0.055,0.02,0.112);e.rotation.y=sx*0.12;hd.add(e);olhos.push(e);};yield "np589CorujaG#11";
+  const K=t160Kit('589 coruja · bico, óculos e garras');;yield "np589CorujaG#12";K.cone(0.024,0.062,G.mBico,0,-0.034,0.143,18,0,Math.PI/2+0.62,0);;yield "np589CorujaG#13";K.sph(0.019,G.mBico,0,-0.02,0.128,1,0.8,1.1,14,10);;yield "np589CorujaG#14";
+  const LAT=t160Std('589 latão dos óculos',new T.Color(0xc8a050).convertSRGBToLinear().getHex(),0.3,0.85);;yield "np589CorujaG#15";for(const sx of [-1,1]){K.tor(0.05,0.0065,LAT,sx*0.055,0.02,0.168,Math.PI*2,0,0,0,10,40);K.cyl(0.004,0.004,0.1,LAT,sx*0.122,0.026,0.12,6,sx*0.35,Math.PI/2,0);};yield "np589CorujaG#16";
+  K.cyl(0.004,0.004,0.024,LAT,0,0.028,0.17,8,0,0,Math.PI/2);;yield "np589CorujaG#17";for(const m of K.fim(hd,{sombra:true}))marca(m);;yield "np589CorujaG#18";
+  const K2=t160Kit('589 coruja · garras');;yield "np589CorujaG#19";for(const sx of [-1,1]){const x0=sx*0.052;for(const [dx,dz] of [[-0.018,1],[0,1],[0.018,1],[0,-1]])K2.tube([[x0+dx*0.3,0.338,0.02*dz],[x0+dx,0.329,0.045*dz],[x0+dx*1.15,0.317,0.058*dz]],0.0065,G.mGarra,8,6);};yield "np589CorujaG#20";for(const m of K2.fim(g,{sombra:true}))marca(m);;yield "np589CorujaG#21";
+  O.eyes.length=0;;yield "np589CorujaG#22";O.eyes.push(...olhos);;yield "np589CorujaG#23";O.wings.length=0;;yield "np589CorujaG#24";O.wings.push(...asas);;yield "np589CorujaG#25";g.userData.np589=true;;yield "np589CorujaG#26";NP589.stats.coruja={tri:G.tri};;yield "np589CorujaG#27";return true;}
+
 function np589Garante(){try{const O=(typeof HALLS!=='undefined')&&HALLS[1]&&HALLS[1].X&&HALLS[1].X.owl;if(O&&!NP589.feito.coruja)NP589.feito.coruja=np589Coruja(O)||O.g.userData.np589===true;}catch(e){np589Erro('coruja',e);NP589.feito.coruja=true;}}
 
 if(NP589.on){
@@ -72225,6 +72334,40 @@ function np590Geos(){if(NP590.geos)return NP590.geos;const T=THREE,t0=performanc
   const gorro=geo(fG,[-0.56,-0.06,-0.56,0.56,0.4,0.2],0.0078,(x,y,z)=>G[qG(x,y,z)][2],null);
   const mVC=new T.MeshStandardMaterial({vertexColors:true,roughness:0.62});mVC.name='v590 roupa do bobo';const mPele=new T.MeshStandardMaterial({vertexColors:true,roughness:0.55});mPele.name='v590 pele do bobo';
   NP590.geos={corpo:corpo.g,bracoE:braco(-1).g,bracoD:braco(1).g,anteE:ante(-1).g,anteD:ante(1).g,cabeca:cabeca.g,gorro:gorro.g,mVC,mPele,pontas,tri:corpo.nt+cabeca.nt+gorro.nt};NP590.stats.geos={tri:NP590.geos.tri,ms:Math.round(performance.now()-t0)};return NP590.geos;}
+function* np590GeosG(){if(NP590.geos)return NP590.geos;;yield "np590GeosG#1";const T=THREE,t0=performance.now(),C=cp579Hex,Ell=cp579Ell,Con=cp579Cone,Sm=cp579Smin;;yield "np590GeosG#2";
+  const LUVA=C(0xf6f1e6),VERM=C(0xc0202a),AMAR=C(0xe8b830),VERDE=C(0x2a7a3a),AZUL=C(0x2a4a9a),PELE=C(0xf0c8a0),ROSA=C(0xe88a80),PRETO=C(0x18141a),BOCA=C(0x8a1a22),SOBR=C(0x5a3a26);;yield "np590GeosG#3";
+  const un=(L,k)=>{const n=L.length;return (x,y,z)=>{let d=L[0][0](x,y,z);for(let i=1;i<n;i++)d=Sm(d,L[i][0](x,y,z),L[i][1]);return d;};};;yield "np590GeosG#4";
+  const maisPerto=(L)=>(x,y,z)=>{let b=0,d=1e9;for(let i=0;i<L.length;i++){const q=L[i][0](x,y,z);if(q<d){d=q;b=i;}}return b;};;yield "np590GeosG#5";
+  const geo=function*(f,cx,h,cor,uv){const R=(yield* cp579RedeG(f,cx,h));return {g:(yield* cp579GeoG(R,{cor,uv})),nt:R.nt};};;yield "np590GeosG#6";
+  // losangos de arlequim (em volta do eixo vertical do corpo): vermelho e amarelo, trocando de lado no meio
+  const losango=(x,y,z)=>{const a=Math.atan2(x,z);const p=a*1.15,q=y*7.2;const c=(Math.floor(p+q)+Math.floor(p-q))&1;return (x<0)?(c?VERM:AMAR):(c?AMAR:VERM);};;yield "np590GeosG#7";
+  /* corpo: tronco, quadril, pescoço, pernas e sapatos de bico enrolado (uma peça) */
+  const P=[];;yield "np590GeosG#8";const add=(f,k,cor)=>P.push([f,k,cor]);;yield "np590GeosG#9";
+  add(Ell([0,0.84,0],[0.205,0.27,0.15]),0,'tronco');;yield "np590GeosG#10";add(Ell([0,0.96,0.01],[0.2,0.14,0.14]),0.04,'tronco');;yield "np590GeosG#11";add(Ell([0,0.64,0],[0.19,0.1,0.13]),0.04,'tronco');;yield "np590GeosG#12";add(Con([0,1.06,0],[0,1.21,0.005],0.062,0.055),0.03,'pele');;yield "np590GeosG#13";
+  for(const sx of [-1,1]){const pc=sx<0?'pernaE':'pernaD',sc=sx<0?'sapatoE':'sapatoD';add(Con([sx*0.1,0.62,0],[sx*0.112,0.34,0.012],0.075,0.06),0.03,pc);add(Con([sx*0.112,0.34,0.012],[sx*0.12,0.11,0],0.058,0.046),0.02,pc);
+    add(Ell([sx*0.12,0.055,0.05],[0.066,0.052,0.135]),0.025,sc);add(cp579Cadeia([[sx*0.12,0.06,0.16],[sx*0.12,0.085,0.245],[sx*0.12,0.15,0.275],[sx*0.12,0.205,0.245]],[0.042,0.03,0.019,0.012],0.012),0.015,sc);};yield "np590GeosG#14";
+  const fCorpo=un(P);;yield "np590GeosG#15";const qC=maisPerto(P);;yield "np590GeosG#16";
+  const corCorpo=(x,y,z)=>{const i=qC(x,y,z),t=P[i][2];if(t==='tronco'){if(y>0.575&&y<0.632)return PRETO;return losango(x,y,z);}if(t==='pele')return PELE;if(t==='pernaE')return AMAR;if(t==='pernaD')return VERM;if(t==='sapatoE')return VERM;return AMAR;};;yield "np590GeosG#17";
+  const corpo=(yield* geo(fCorpo,[-0.26,-0.01,-0.2,0.26,1.24,0.33],0.0105,corCorpo,null));;yield "np590GeosG#18";
+  /* braço (no grupo do ombro) e antebraço com a mão (no grupo do cotovelo) */
+  const braco=function*(sx){const L=[[Con([0,0.02,0],[0,-0.27,0],0.052,0.044),0],[Ell([sx*0.008,-0.04,0],[0.072,0.085,0.07]),0.03]];return (yield* geo(un(L),[-0.1,-0.32,-0.1,0.1,0.11,0.1],0.006,()=>sx<0?VERM:AMAR,null));};;yield "np590GeosG#19";
+  const ante=function*(sx){const L=[[Con([0,0.01,0],[0,-0.23,0],0.045,0.038),0,'manga'],[Ell([0,-0.235,0],[0.052,0.022,0.052]),0.012,'punho'],[Ell([0,-0.29,0.008],[0.04,0.055,0.026]),0.014,'mao'],[Con([-sx*0.012,-0.262,0.03],[-sx*0.02,-0.3,0.045],0.013,0.009),0.008,'mao']];
+    const q=maisPerto(L);return (yield* geo(un(L),[-0.08,-0.37,-0.07,0.08,0.06,0.08],0.0055,(x,y,z)=>{const t=L[q(x,y,z)][2];return t==='mao'?LUVA:t==='punho'?(sx<0?VERM:AMAR):(sx<0?AMAR:VERM);},null));};;yield "np590GeosG#20";
+  /* cabeça (no grupo da cabeça) */
+  const H=[[Ell([0,0.01,-0.005],[0.13,0.142,0.13]),0],[Ell([-0.066,-0.04,0.078],[0.058,0.05,0.05]),0.03],[Ell([0.066,-0.04,0.078],[0.058,0.05,0.05]),0.03],[Ell([0,-0.098,0.058],[0.06,0.046,0.05]),0.03],[Ell([-0.128,0,0],[0.026,0.046,0.03]),0.015],[Ell([0.128,0,0],[0.026,0.046,0.03]),0.015]];;yield "np590GeosG#21";
+  const corCab=(x,y,z)=>{let c=PELE;const bo=Math.min(Math.hypot(x+0.07,y+0.045,z-0.1),Math.hypot(x-0.07,y+0.045,z-0.1));c=np590Mix(c,ROSA,np590S(0.035,0.012,bo)*0.7);
+    if(z>0.09){const yb=-0.064+0.032*Math.pow(x/0.055,2);if(Math.abs(x)<0.058&&Math.abs(y-yb)<0.009)c=np590Mix(c,BOCA,np590S(0.009,0.005,Math.abs(y-yb))*np590S(0.058,0.045,Math.abs(x)));
+      for(const sx of [-1,1]){const ys=0.06+0.01*(1-Math.pow((x-sx*0.05)/0.03,2));if(Math.abs(x-sx*0.05)<0.03&&Math.abs(y-ys)<0.007)c=np590Mix(c,SOBR,0.9);}}return c;};;yield "np590GeosG#22";
+  const cabeca=(yield* geo(un(H),[-0.17,-0.17,-0.16,0.17,0.17,0.16],0.0062,corCab,null));;yield "np590GeosG#23";
+  /* gorro: a touca e as três pontas que caem (no grupo do gorro) */
+  const base=[[[0,0.05,0],[-0.14,0.2,0],[-0.3,0.2,0],[-0.4,0.08,0]],[[0,0.05,0],[0.14,0.2,0],[0.3,0.2,0],[0.4,0.08,0]],[[0,0.06,0],[0,0.22,-0.1],[0.02,0.3,-0.26],[0.04,0.22,-0.4]]];;yield "np590GeosG#24";
+  const pontas=base.map(pts=>{const f=pts[3],a=pts[2],d=[f[0]-a[0],f[1]-a[1],f[2]-a[2]],l=Math.hypot(d[0],d[1],d[2]);const u=[d[0]/l,d[1]/l,d[2]/l];return {pts:pts.concat([[f[0]+u[0]*0.09,f[1]+u[1]*0.09,f[2]+u[2]*0.09]]),guizo:[f[0]+u[0]*0.12,f[1]+u[1]*0.12,f[2]+u[2]*0.12]};});;yield "np590GeosG#25";
+  const G=[[Ell([0,-0.012,0],[0.152,0.13,0.152]),0,AZUL]];;yield "np590GeosG#26";const coresP=[VERM,AMAR,VERDE];;yield "np590GeosG#27";pontas.forEach((P2,i)=>G.push([cp579Cadeia(P2.pts,[0.062,0.048,0.038,0.026,0.006],0.02),0.035,coresP[i]]));;yield "np590GeosG#28";
+  const qG=maisPerto(G);;yield "np590GeosG#29";const fG=(x,y,z)=>{const d=un(G)(x,y,z);return cp579Smax(d,-(y+0.03),0.01);};;yield "np590GeosG#30";
+  const gorro=(yield* geo(fG,[-0.56,-0.06,-0.56,0.56,0.4,0.2],0.0078,(x,y,z)=>G[qG(x,y,z)][2],null));;yield "np590GeosG#31";
+  const mVC=new T.MeshStandardMaterial({vertexColors:true,roughness:0.62});;yield "np590GeosG#32";mVC.name='v590 roupa do bobo';;yield "np590GeosG#33";const mPele=new T.MeshStandardMaterial({vertexColors:true,roughness:0.55});;yield "np590GeosG#34";mPele.name='v590 pele do bobo';;yield "np590GeosG#35";
+  NP590.geos={corpo:corpo.g,bracoE:(yield* braco(-1)).g,bracoD:(yield* braco(1)).g,anteE:(yield* ante(-1)).g,anteD:(yield* ante(1)).g,cabeca:cabeca.g,gorro:gorro.g,mVC,mPele,pontas,tri:corpo.nt+cabeca.nt+gorro.nt};;yield "np590GeosG#36";NP590.stats.geos={tri:NP590.geos.tri,ms:Math.round(performance.now()-t0)};;yield "np590GeosG#37";return NP590.geos;}
+
 
 function np590Bobo(b){const S=b&&b.userData&&b.userData.bobo;if(!S||b.userData.np590)return false;const T=THREE,G=np590Geos();
   const marca=m=>{m.castShadow=true;m.receiveShadow=true;m.__fusaoMoveu=9;m.userData.np590=true;return m;};const tira=gr=>{for(const c of gr.children.slice())if(c.isMesh&&!S.bolas.includes(c))gr.remove(c);};
@@ -72244,6 +72387,25 @@ function np590Bobo(b){const S=b&&b.userData&&b.userData.bobo;if(!S||b.userData.n
   S.guizos.length=0;const gz=new T.SphereGeometry(0.032,16,12);for(const P2 of G.pontas){const p=P2.guizo;const m=marca(new T.Mesh(gz,OURO));m.position.set(p[0],p[1],p[2]);S.gorro.add(m);S.guizos.push(m);}
   for(const bl of S.bolas){bl.geometry=new T.SphereGeometry(0.065,24,18);}
   b.userData.np590=true;NP590.stats.bobo={tri:G.tri};return true;}
+function* np590BoboG(b){const S=b&&b.userData&&b.userData.bobo;;yield "np590BoboG#1";if(!S||b.userData.np590)return false;;yield "np590BoboG#2";const T=THREE,G=(yield* np590GeosG());;yield "np590BoboG#3";
+  const marca=m=>{m.castShadow=true;m.receiveShadow=true;m.__fusaoMoveu=9;m.userData.np590=true;return m;};;yield "np590BoboG#4";const tira=gr=>{for(const c of gr.children.slice())if(c.isMesh&&!S.bolas.includes(c))gr.remove(c);};;yield "np590BoboG#5";
+  tira(b);;yield "np590BoboG#6";for(const a of S.bracos){tira(a.om);tira(a.cot);};yield "np590BoboG#7";tira(S.cab);;yield "np590BoboG#8";tira(S.gorro);;yield "np590BoboG#9";
+  b.add(marca(new T.Mesh(G.corpo,G.mVC)));;yield "np590BoboG#10";
+  for(const a of S.bracos){a.om.add(marca(new T.Mesh(a.sx<0?G.bracoE:G.bracoD,G.mVC)));a.cot.add(marca(new T.Mesh(a.sx<0?G.anteE:G.anteD,G.mPele)));a.mao=a.cot.children[a.cot.children.length-1];};yield "np590BoboG#11";
+  S.cab.add(marca(new T.Mesh(G.cabeca,G.mPele)));;yield "np590BoboG#12";S.gorro.add(marca(new T.Mesh(G.gorro,G.mVC)));;yield "np590BoboG#13";{const KF=t160Kit('590 bobo · faixa do gorro');KF.tor(0.15,0.02,t160Std('590 ouro dos guizos',new T.Color(0xd8b050).convertSRGBToLinear().getHex(),0.3,0.85),0,-0.025,0,Math.PI*2,0,Math.PI/2,0,12,56);for(const m of KF.fim(S.gorro,{sombra:true}))marca(m);};yield "np590BoboG#14";
+  const OURO=t160Std('590 ouro dos guizos',new T.Color(0xd8b050).convertSRGBToLinear().getHex(),0.3,0.85),NARIZ=t160Brilho('590 nariz',new T.Color(0xd8202a).convertSRGBToLinear().getHex(),0.15,{roughness:0.18}),BRANCO=t160Std('590 branco do olho',0xf2f2f2,0.2,0),IRIS=t160Std('590 íris',new T.Color(0x2a3a6a).convertSRGBToLinear().getHex(),0.15,0);;yield "np590BoboG#15";
+  const K=t160Kit('590 bobo · rosto');;yield "np590BoboG#16";K.sph(0.034,NARIZ,0,-0.012,0.142,1,1,1,20,14);;yield "np590BoboG#17";for(const sx of [-1,1]){K.sph(0.023,BRANCO,sx*0.05,0.03,0.112,1,1.1,0.8,18,12);K.sph(0.012,IRIS,sx*0.05,0.03,0.128,1,1.15,0.7,14,10);K.sph(0.004,BRANCO,sx*0.05-0.004,0.036,0.137,1,1,1,8,6);};yield "np590BoboG#18";for(const m of K.fim(S.cab,{sombra:true}))marca(m);;yield "np590BoboG#19";
+  const K2=t160Kit('590 bobo · gola, cinto e sapatos');;yield "np590BoboG#20";const R=t160Std('590 vermelho',new T.Color(0xc0202a).convertSRGBToLinear().getHex(),0.6,0),Y=t160Std('590 amarelo',new T.Color(0xe8b830).convertSRGBToLinear().getHex(),0.6,0);;yield "np590BoboG#21";
+  for(let k=0;k<12;k++){const a=k/12*Math.PI*2;K2.push(Math.sin(a)*0.15,1.1,Math.cos(a)*0.13,a);K2.cone(0.055,0.15,k%2?R:Y,0,0,0.06,12,0,Math.PI/2+0.45,0);K2.sph(0.016,OURO,0,-0.06,0.13,1,1,1,12,8);K2.pop();};yield "np590BoboG#22";
+  for(let k=0;k<6;k++){const a=k/6*Math.PI*2+0.3;K2.sph(0.026,OURO,Math.sin(a)*0.205,0.57,Math.cos(a)*0.145,1,1,1,14,10);};yield "np590BoboG#23";
+  for(let k=0;k<12;k++){const a=(k+0.5)/12*Math.PI*2;K2.push(Math.sin(a)*0.19,0.56,Math.cos(a)*0.13,a);K2.cone(0.05,0.12,k%2?Y:R,0,-0.02,0.025,12,0,Math.PI-0.5,0);K2.pop();};yield "np590BoboG#24";
+  for(let k=0;k<4;k++)K2.sph(0.017,OURO,0,0.76+k*0.1,0.16-Math.max(0,k-1)*0.012,1,1,0.7,12,8);;yield "np590BoboG#25";
+  for(const sx of [-1,1])K2.sph(0.024,OURO,sx*0.12,0.22,0.24,1,1,1,14,10);;yield "np590BoboG#26";for(const m of K2.fim(b,{sombra:true}))marca(m);;yield "np590BoboG#27";
+  // os guizos das pontas do gorro (o tique da v151 mexe neles)
+  S.guizos.length=0;;yield "np590BoboG#28";const gz=new T.SphereGeometry(0.032,16,12);;yield "np590BoboG#29";for(const P2 of G.pontas){const p=P2.guizo;const m=marca(new T.Mesh(gz,OURO));m.position.set(p[0],p[1],p[2]);S.gorro.add(m);S.guizos.push(m);};yield "np590BoboG#30";
+  for(const bl of S.bolas){bl.geometry=new T.SphereGeometry(0.065,24,18);};yield "np590BoboG#31";
+  b.userData.np590=true;;yield "np590BoboG#32";NP590.stats.bobo={tri:G.tri};;yield "np590BoboG#33";return true;}
+
 function np590Garante(){try{const b=(typeof HALLS!=='undefined')&&HALLS[3]&&HALLS[3].X&&HALLS[3].X.bobo;if(b&&!NP590.feito)NP590.feito=np590Bobo(b)||b.userData.np590===true;}catch(e){np590Erro('bobo',e);NP590.feito=true;}}
 if(NP590.on){try{const iv=setInterval(()=>{np590Garante();if(NP590.feito||++NP590.tent>1200)clearInterval(iv);},500);}catch(e){np590Erro('espera',e);}}
 window.__npc590={estado:NP590,erros:NP590.erros,stats:NP590.stats,bobo:()=>{try{return HALLS[3].X.bobo;}catch(e){return null;}}};
@@ -77039,6 +77201,11 @@ function matLiso(nome,rough,metal,skin){const k='liso '+nome+'|'+(skin?1:0);let 
 function caixaDe(f,B,passo){passo=passo||0.03;const lim=passo*0.88;let x0=1e9,y0=1e9,z0=1e9,x1=-1e9,y1=-1e9,z1=-1e9,n=0;
   for(let z=B[2];z<=B[5]+1e-9;z+=passo)for(let y=B[1];y<=B[4]+1e-9;y+=passo)for(let x=B[0];x<=B[3]+1e-9;x+=passo){if(f(x,y,z)<lim){n++;if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;if(z<z0)z0=z;if(z>z1)z1=z;}}
   if(!n)return null;const p=passo*1.05;return [x0-p,y0-p,z0-p,x1+p,y1+p,z1+p];}
+function* caixaDeG(f,B,passo){passo=passo||0.03;const lim=passo*0.88;let x0=1e9,y0=1e9,z0=1e9,x1=-1e9,y1=-1e9,z1=-1e9,n=0;
+  for(let z=B[2];z<=B[5]+1e-9;z+=passo){for(let y=B[1];y<=B[4]+1e-9;y+=passo)for(let x=B[0];x<=B[3]+1e-9;x+=passo){if(f(x,y,z)<lim){n++;if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;if(z<z0)z0=z;if(z>z1)z1=z;}};yield "caixaDeG#1";}
+  if(!n)return null;const p=passo*1.05;return [x0-p,y0-p,z0-p,x1+p,y1+p,z1+p];}
+fat8Reg("caixaDeG",caixaDeG);
+
 function uvPara(B,eixo,passo){const dx=B[3]-B[0],dy=B[4]-B[1],dz=B[5]-B[2];passo=passo||0.14;
   if(eixo==='y')return {eixo:'y',c:[(B[0]+B[3])/2,(B[2]+B[5])/2],v0:B[1],v1:B[4],rep:[Math.max(1,Math.round(Math.PI*(dx+dz)/2/passo)),Math.max(1,Math.round(dy/passo))]};
   if(eixo==='x')return {eixo:'x',c:[(B[2]+B[5])/2,(B[1]+B[4])/2],v0:B[0],v1:B[3],rep:[Math.max(1,Math.round(Math.PI*(dz+dy)/2/passo)),Math.max(1,Math.round(dx/passo))]};
@@ -77046,6 +77213,10 @@ function uvPara(B,eixo,passo){const dx=B[3]-B[0],dy=B[4]-B[1],dz=B[5]-B[2];passo
 // fL: campo local; Bg: caixa (local) já calculada; cor(x,y,z,nx,ny,nz) local
 function malha(nome,fL,B,h,cor,uv){let g=BI.cache.get('geo '+nome);if(g)return g;const t0=performance.now();const R=cp579Rede(fL,B,h);if(!R||!R.nv||!R.nt)throw Error('malha vazia '+nome);
   g=cp579Geo(R,{cor,uv});g.userData.bi622=nome;BI.cache.set('geo '+nome,g);BI.stats[nome]={tri:R.nt,ms:Math.round(performance.now()-t0)};return g;}
+function* malhaG(nome,fL,B,h,cor,uv){let g=BI.cache.get('geo '+nome);if(g)return g;const t0=performance.now();const R=(yield* cp579RedeG(fL,B,h));if(!R||!R.nv||!R.nt)throw Error('malha vazia '+nome);
+  g=(yield* cp579GeoG(R,{cor,uv}));g.userData.bi622=nome;BI.cache.set('geo '+nome,g);BI.stats[nome]={tri:R.nt,ms:Math.round(performance.now()-t0)};return g;}
+fat8Reg("malhaG",malhaG);
+
 
 /* ---------------- espinhos / cerdas / escamas espalhados na superfície ---------------- */
 // procura pontos da superfície de fS (grupo) a partir de raios que saem de c; aceita(p,n) filtra; devolve [{p,n}]
@@ -79008,6 +79179,17 @@ function tg639Gargula(){const BI=window.__bichos622;if(!BI||!BI.h)throw Error('s
   const f=UK(L);const B=caixaDe(f,[-.6,-.05,-.6,.6,1.1,.6],.04);
   const cor=(x,y,z,nx,ny,nz)=>{const base=HX(0x9a96a6),esc=HX(0x4e4a58),musgo=HX(0x6a7a4a);let c=MX(base,esc,S(.3,-.2,ny)*.6);c=MX(c,musgo,S(.4,.9,fbm(x*6,y*6,z*6))*S(.2,.7,ny)*.5);return mul(c,.85+.3*fbm(x*40,y*40,z*40));};
   const g=malha('639 gárgula',f,B,.0095,cor);const m=matPele('liso',{passo:.25,rough:.9});m.userData.papelKeep=true;return {g,m};}
+function* tg639GargulaG(){const BI=window.__bichos622;;yield "tg639GargulaG#1";if(!BI||!BI.h)throw Error('sem v622');;yield "tg639GargulaG#2";const {S,HX,MX,mul,fbm,Esf,Ell,Cone,Cad,UK,Mov,Esc,malha,caixaDe,matPele}=BI.h;;yield "tg639GargulaG#3";
+  const corpo=Ell([0,.3,0],[.26,.3,.34]);;yield "tg639GargulaG#4";const peito=Ell([0,.42,.18],[.2,.2,.16]);;yield "tg639GargulaG#5";const cab=Ell([0,.68,.22],[.17,.15,.18]);;yield "tg639GargulaG#6";const foc=Ell([0,.62,.38],[.11,.09,.12]);;yield "tg639GargulaG#7";
+  const chifre=s=>Cone([s*.1,.78,.18],[s*.2,.98,.08],.04,.006);;yield "tg639GargulaG#8";const orelha=s=>Cone([s*.14,.74,.2],[s*.26,.88,.14],.035,.005);;yield "tg639GargulaG#9";
+  const asa=s=>Ell([s*.3,.5,-.1],[.06,.32,.3],[0,0,s*.5]);;yield "tg639GargulaG#10";const dedo=s=>Cad([[s*.3,.78,-.2],[s*.42,.95,-.35],[s*.4,.6,-.45]],[.025,.02,.012],.01);;yield "tg639GargulaG#11";
+  const braco=s=>Cad([[s*.22,.35,.2],[s*.3,.12,.34],[s*.26,.03,.44]],[.07,.055,.04],.02);;yield "tg639GargulaG#12";const perna=s=>Cad([[s*.2,.2,-.05],[s*.3,.1,.1],[s*.28,.03,.25]],[.1,.07,.045],.02);;yield "tg639GargulaG#13";
+  const garra=(s,x,z)=>Cad([[s*x,.04,z],[s*x+s*.02,.0,z+.1]],[.018,.006],.005);;yield "tg639GargulaG#14";
+  const L=[[corpo,0],[peito,.08],[cab,.05],[foc,.03],[chifre(1),.01],[chifre(-1),.01],[orelha(1),.01],[orelha(-1),.01],[asa(1),.03],[asa(-1),.03],[dedo(1),.01],[dedo(-1),.01],[braco(1),.03],[braco(-1),.03],[perna(1),.04],[perna(-1),.04],[garra(1,.26,.44),.005],[garra(-1,.26,.44),.005],[garra(1,.32,.44),.005],[garra(-1,.32,.44),.005]];;yield "tg639GargulaG#15";
+  const f=UK(L);;yield "tg639GargulaG#16";const B=(yield* fat8Reg.t.caixaDeG(f,[-.6,-.05,-.6,.6,1.1,.6],.04));;yield "tg639GargulaG#17";
+  const cor=(x,y,z,nx,ny,nz)=>{const base=HX(0x9a96a6),esc=HX(0x4e4a58),musgo=HX(0x6a7a4a);let c=MX(base,esc,S(.3,-.2,ny)*.6);c=MX(c,musgo,S(.4,.9,fbm(x*6,y*6,z*6))*S(.2,.7,ny)*.5);return mul(c,.85+.3*fbm(x*40,y*40,z*40));};;yield "tg639GargulaG#18";
+  const g=(yield* fat8Reg.t.malhaG('639 gárgula',f,B,.0095,cor));;yield "tg639GargulaG#19";const m=matPele('liso',{passo:.25,rough:.9});;yield "tg639GargulaG#20";m.userData.papelKeep=true;;yield "tg639GargulaG#21";return {g,m};}
+
 function tg639Aplica(){const R=ROOMS.lib;if(!R||!R.scene||TG639.feito)return;TG639.feito=true;if(!TG639.on)return;const sc=R.scene,T=THREE,t0=performance.now(),st=TG639.stats,OB=R.world&&R.world.obst,r=rnd(63910);
   const ob=(x,z,rad)=>{if(Array.isArray(OB))OB.push([+x.toFixed(2),+z.toFixed(2),rad]);};const V={t:0,chamas:[],morcegos:[],poeira:null,aranha:null};TG639.vivo=V;
   const pedra=tg639Pedra(),carv=tg639Carvalho(),ferro=tg639Std('ferro forjado',0x1a1a20,.6,.5),cera=tg639Std('cera',0xe8dcc0,.6),chama=t160Brilho('639 chama',tg639C(0xffb050),1.8),brasa=t160Brilho('639 olho de brasa',tg639C(0xff6020),2.2),
@@ -79053,6 +79235,52 @@ function tg639Aplica(){const R=ROOMS.lib;if(!R||!R.scene||TG639.feito)return;TG6
   try{rkAddTick(R,dt=>{try{tg639Tick(dt,V);}catch(e){if(!V.erroTick){V.erroTick=1;tg639Erro('tick',e);}}});}catch(e){tg639Erro('tick',e);}
   try{if(typeof fusaoLimpar==='function')fusaoLimpar(sc);}catch(e){}
   st.ms=Math.round(performance.now()-t0);st.pronto=true;}
+function* tg639AplicaG(){const R=ROOMS.lib;;yield "tg639AplicaG#1";if(!R||!R.scene||TG639.feito)return;;yield "tg639AplicaG#2";TG639.feito=true;;yield "tg639AplicaG#3";if(!TG639.on)return;;yield "tg639AplicaG#4";const sc=R.scene,T=THREE,t0=performance.now(),st=TG639.stats,OB=R.world&&R.world.obst,r=rnd(63910);;yield "tg639AplicaG#5";
+  const ob=(x,z,rad)=>{if(Array.isArray(OB))OB.push([+x.toFixed(2),+z.toFixed(2),rad]);};;yield "tg639AplicaG#6";const V={t:0,chamas:[],morcegos:[],poeira:null,aranha:null};;yield "tg639AplicaG#7";TG639.vivo=V;;yield "tg639AplicaG#8";
+  const pedra=tg639Pedra(),carv=tg639Carvalho(),ferro=tg639Std('ferro forjado',0x1a1a20,.6,.5),cera=tg639Std('cera',0xe8dcc0,.6),chama=t160Brilho('639 chama',tg639C(0xffb050),1.8),brasa=t160Brilho('639 olho de brasa',tg639C(0xff6020),2.2),
+    teia=t160Mat('507 teia',()=>{const m=new T.MeshBasicMaterial({map:(typeof tr507TexTeia==='function'?tr507TexTeia():null),transparent:true,depthWrite:false,side:T.DoubleSide,opacity:.9});m.userData.papelKeep=true;return m;}),
+    morcego=tg639Std('morcego',0x1a1418,.9),asaM=tg639Std('asa de morcego',0x221a22,.9,0,{side:T.DoubleSide});;yield "tg639AplicaG#9";
+  const K=t160Kit('639 salão gótico');;yield "tg639AplicaG#10";
+  // ===== 1. arcos e capitéis em pedra escura; revestimento das colunas =====
+  try{let n=0;const G=sc.children.find(o=>o.name==='Biblioteca gótica · noite v93');if(G)G.traverse(q=>{if(!q.isMesh||!q.material||!q.material.color)return;const c=q.material.color.getHexString();if(c==='8a919c'||(c==='9a7950'&&q.geometry&&q.geometry.type==='BoxGeometry'&&q.position.y>5)){q.material=pedra;q.userData.papelKeepGeo=true;n++;}});st.arcos=n;}catch(e){tg639Erro('arcos',e);};yield "tg639AplicaG#11";
+  const COL=[[-7.5,-8],[7.5,-8],[-7.5,8],[7.5,8]];;yield "tg639AplicaG#12";
+  try{for(const [x,z] of COL){const g=new T.CylinderGeometry(.5,.56,6.0,8,1,true);const uv=g.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)*2,uv.getY(i)*3);K.add(g,pedra,x,3.1,z,Math.PI/8);
+      K.cyl(.72,.78,.22,pedra,x,.11,z,8,Math.PI/8);K.cyl(.62,.72,.18,pedra,x,.31,z,8,Math.PI/8);K.cyl(.6,.5,.5,pedra,x,6.35,z,8,Math.PI/8);K.box(1.5,.22,1.5,pedra,x,6.71,z);
+      for(let k=0;k<8;k++){const a=k/8*Math.PI*2+Math.PI/8;K.add(new T.ConeGeometry(.1,.36,6),pedra,x+Math.cos(a)*.6,6.3,z+Math.sin(a)*.6,0,Math.PI+.3*Math.cos(a),.3*Math.sin(a));}ob(x,z,.75);}st.colunas=4;}catch(e){tg639Erro('colunas',e);};yield "tg639AplicaG#13";
+  // ===== 2. o forro de vigas =====
+  try{const Y=8.95,H=20.6,W=18.6;for(const z of [-20,-8,0,8,20])K.boxW(2*W,.4,.42,carv,0,Y,z,0,0,0,.6);for(const x of [-18,-7.5,0,7.5,18])K.boxW(.42,.34,2*H,carv,x,Y+.04,0,0,0,0,.6);
+    for(const z of [-20,-8,0,8,20])for(const x of [-18,-7.5,0,7.5,18]){K.lathe([[.001,0],[.12,0],[.16,.1],[.09,.2],[.14,.3],[.06,.42],[.001,.46]],carv,x,Y-.66,z,8);}
+    for(const [x,z] of COL){for(const s of [-1,1]){K.tube([[x+s*.5,6.8,z],[x+s*1.2,7.9,z],[x+s*2.2,8.72,z]],.1,carv,8,6);K.tube([[x,6.8,z+s*.5],[x,7.9,z+s*1.2],[x,8.72,z+s*2.2]],.1,carv,8,6);}}st.vigas=1;}catch(e){tg639Erro('vigas',e);};yield "tg639AplicaG#14";
+  // ===== 3. teias =====
+  try{let n=0;const web=(x,y,z,ry,s,rx)=>{const g=new T.PlaneGeometry(s,s);g.translate(s/2,-s/2,0);K.add(g,teia,x,y,z,ry||0,rx||0,0);n++;};
+    for(const [x,z] of COL){for(const s of [-1,1]){web(x+s*.3,6.6,z,s>0?0:Math.PI,1.4+r()*.6,0);web(x,6.6,z+s*.3,s>0?Math.PI/2:-Math.PI/2,1.4+r()*.6,0);}}
+    for(const [x,z] of [[-18.3,-20.3],[18.3,-20.3],[-18.3,20.3],[18.3,20.3]]){web(x,8.9,z,Math.atan2(-x,-z),2.8+r(),0);}
+    for(let k=0;k<8;k++){const x=-15+r()*30,z=-18+r()*36;web(x,8.9,z,r()*6.28,.9+r()*.9,-Math.PI/2);}
+    // a aranha pendurada no fio
+    const ax=-7.0,az=-7.4;K.cyl(.004,.004,2.4,ferro,ax,7.4,az,4);const ar=new T.Group();ar.position.set(ax,6.2,az);const ka=t160Kit('639 aranha');ka.sph(.07,morcego,0,0,0,1,.7,1.3,8,6);ka.sph(.045,morcego,0,.01,.1,1,.8,1,7,5);for(const s of [-1,1])for(let k=0;k<4;k++){const a=.4+k*.5;ka.tube([[0,0,0],[s*.1,.06,.08-k*.05],[s*.2,-.04,.1-k*.08]],.006,morcego,4,4);}ka.fim(ar,{sombra:false});ar.traverse(o=>{if(o.isMesh){o.userData.noCam=true;o.raycast=()=>{};}});sc.add(ar);V.aranha={g:ar,y0:6.2};st.teias=n;}catch(e){tg639Erro('teias',e);};yield "tg639AplicaG#15";
+  // ===== 4. candelabros de chão =====
+  try{const cand=(x,z)=>{K.lathe([[.001,0],[.3,0],[.28,.04],[.12,.08],[.08,.1],[.05,.6],[.07,.7],[.05,1.3],[.001,1.3]],ferro,x,0,z,10);for(let k=0;k<6;k++){const a=k/6*Math.PI*2;K.tube([[x+Math.cos(a)*.05,.3,z+Math.sin(a)*.05],[x+Math.cos(a+1.2)*.06,.9,z+Math.sin(a+1.2)*.06],[x+Math.cos(a+2.4)*.05,1.3,z+Math.sin(a+2.4)*.05]],.012,ferro,10,4);}
+      const velas=[[0,1.42]];for(let k=0;k<4;k++){const a=k/4*Math.PI*2+Math.PI/4;velas.push([a,1.28]);K.tube([[x,1.3,z],[x+Math.cos(a)*.22,1.2,z+Math.sin(a)*.22],[x+Math.cos(a)*.34,1.26,z+Math.sin(a)*.34]],.014,ferro,8,5);}
+      for(const [a,y] of velas){const px=x+(a?Math.cos(a)*.34:0),pz=z+(a?Math.sin(a)*.34:0);K.cyl(.05,.05,.02,ferro,px,y,pz,10);K.cyl(.022,.026,.16+r()*.08,cera,px,y+.09,pz,8);K.sph(.03,cera,px,y+.02,pz,1,.3,1,6,4);
+        const sp=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:0xffb050,transparent:true,opacity:.85,blending:T.AdditiveBlending,depthWrite:false}));sp.scale.set(.22,.34,1);sp.position.set(px,y+.24,pz);sp.layers.set(1);sp.userData.noCam=true;sc.add(sp);V.chamas.push({sp,ph:r()*6,y:y+.24});}
+      try{rkSprite(sc,0xffb050,2.2,.28,x,1.5,z).userData.noCam=true;}catch(e){}ob(x,z,.38);};
+    for(const [x,z] of [[-12,-14],[12,-14],[-12,14],[12,14],[-16,0],[16,0]])cand(x,z);try{for(const [x,z] of [[-12,0],[12,0]]){const L=new T.PointLight(0xffb060,1.1,16,1.6);L.position.set(x,2.2,z);L.userData.i0=1.1;sc.add(L);}}catch(e){}st.candelabros=6;}catch(e){tg639Erro('candelabros',e);};yield "tg639AplicaG#16";
+  const ms=K.fim(sc,{sombra:true});;yield "tg639AplicaG#17";for(const m of ms){m.userData.tg639=true;m.userData.papelKeepGeo=true;if(m.material!==pedra)m.userData.noCam=true;};yield "tg639AplicaG#18";st.malhas=ms.length;;yield "tg639AplicaG#19";
+  // ===== 5. gárgulas nos capitéis =====
+  try{const {g,m}=(yield* tg639GargulaG());for(const [x,z] of COL){const mesh=new T.Mesh(g,m);mesh.castShadow=true;const gx=x+Math.sign(x)*.5,gz=z+Math.sign(z)*.5;mesh.position.set(gx,6.82,gz);mesh.rotation.y=Math.atan2(-x,-z);mesh.scale.setScalar(.95);mesh.userData.papelKeepGeo=true;mesh.userData.noCam=true;mesh.raycast=()=>{};mesh.name='639 gárgula';sc.add(mesh);
+      const ko=t160Kit('639 olhos');const ry=mesh.rotation.y;for(const s of [-1,1]){const lx=s*.06,ly=.7,lz=.38;const wx=gx+Math.cos(ry)*lx*.95+Math.sin(ry)*lz*.95,wz=gz-Math.sin(ry)*lx*.95+Math.cos(ry)*lz*.95;ko.sph(.016,brasa,wx,6.82+ly*.95,wz,1,1,1,6,4);}ko.fim(sc,{sombra:false});}st.gargulas=4;st.gargulaTris=g.index?g.index.count/3:0;}catch(e){tg639Erro('gárgulas',e);};yield "tg639AplicaG#20";
+  // ===== 6. morcegos =====
+  try{for(let i=0;i<6;i++){const g=new T.Group();const kb=t160Kit('639 morcego');kb.sph(.06,morcego,0,0,0,1,.8,1.4,8,6);kb.sph(.045,morcego,0,.03,.08,1,.9,1,7,5);for(const s of [-1,1])kb.add(new T.ConeGeometry(.012,.04,4),morcego,s*.025,.08,.08);kb.fim(g,{sombra:false});
+      const asas=[];for(const s of [-1,1]){const sh=new T.Shape();sh.moveTo(0,0);sh.lineTo(s*.22,.08);sh.lineTo(s*.36,.0);sh.lineTo(s*.3,-.06);sh.lineTo(s*.18,-.03);sh.lineTo(s*.08,-.07);sh.closePath();const a=new T.Mesh(new T.ShapeGeometry(sh),asaM);a.rotation.x=-Math.PI/2;const piv=new T.Group();piv.position.set(s*.03,.02,0);piv.add(a);g.add(piv);asas.push({m:piv,s});}
+      g.traverse(o=>{if(o.isMesh){o.userData.noCam=true;o.raycast=()=>{};}});sc.add(g);const C=[[0,-1],[8.5,4.5],[-8.5,-6.5],[-2.5,9.5],[0.5,-9],[4,4]][i];V.morcegos.push({g,asas,cx:C[0],cz:C[1],r:2.2+r()*1.6,h:6.4+r()*1.6,ph:r()*6.28,vel:.7+r()*.5,bat:7+r()*4});}st.morcegos=6;}catch(e){tg639Erro('morcegos',e);};yield "tg639AplicaG#21";
+  // ===== 7. poeira no luar =====
+  try{const N=360,pos=new Float32Array(N*3),base=[];for(let i=0;i<N;i++){const x=-19+r()*9,y=.5+r()*7,z=-4+r()*8;pos[i*3]=x;pos[i*3+1]=y;pos[i*3+2]=z;base.push([x,y,z,r()*6.28]);}
+    const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(pos,3));const m=new T.PointsMaterial({map:GLOW,color:0xc8d8ff,size:.09,transparent:true,opacity:.55,blending:T.AdditiveBlending,depthWrite:false,sizeAttenuation:true});const pts=new T.Points(g,m);pts.frustumCulled=false;pts.userData.noCam=true;pts.layers.set(1);sc.add(pts);V.poeira={g,base};}catch(e){tg639Erro('poeira',e);};yield "tg639AplicaG#22";
+  try{R.world.__nav=null;}catch(e){};yield "tg639AplicaG#23";
+  try{rkAddTick(R,dt=>{try{tg639Tick(dt,V);}catch(e){if(!V.erroTick){V.erroTick=1;tg639Erro('tick',e);}}});}catch(e){tg639Erro('tick',e);};yield "tg639AplicaG#24";
+  try{if(typeof fusaoLimpar==='function')fusaoLimpar(sc);}catch(e){};yield "tg639AplicaG#25";
+  st.ms=Math.round(performance.now()-t0);;yield "tg639AplicaG#26";st.pronto=true;;yield "tg639AplicaG#27";}
+
 function tg639Tick(dt,V){if(!V)return;const d=Math.min(.1,dt||.016);V.t+=d;const t=V.t;
   for(const c of V.chamas){const f=.8+.25*Math.sin(t*11+c.ph)+.15*Math.sin(t*23+c.ph*2);c.sp.scale.set(.2*f,.32*f,1);c.sp.position.y=c.y+.015*Math.sin(t*9+c.ph);c.sp.material.opacity=.7+.2*Math.sin(t*13+c.ph);}
   for(const b of V.morcegos){const a=t*b.vel+b.ph;b.g.position.set(b.cx+Math.cos(a)*b.r,b.h+Math.sin(t*1.7+b.ph)*.4,b.cz+Math.sin(a)*b.r);b.g.rotation.y=-a;b.g.rotation.z=.3;for(const w of b.asas)w.m.rotation.z=w.s*Math.sin(t*b.bat+b.ph)*.7;}
@@ -79533,6 +79761,13 @@ function ga644TexMarmore(){const S=1024,c=bb592CanCPU(S,S),x=c.getContext('2d'),
   const veio=(cor,lw,n,prof)=>{for(let k=0;k<n;k++){let px=r()*S,py=r()*S;const L=120+r()*500,a0=r()*6.28;x.strokeStyle=cor;x.lineWidth=lw*(.6+r()*.8);x.beginPath();x.moveTo(px,py);y.strokeStyle=prof;y.lineWidth=lw*1.4;y.beginPath();y.moveTo(px,py);let a=a0;for(let s=0;s<12;s++){a+=(r()-.5)*.9;px+=Math.cos(a)*L/12;py+=Math.sin(a)*L/12;x.lineTo(px,py);y.lineTo(px,py);}x.stroke();y.stroke();}};
   veio('rgba(120,118,112,.35)',2.2,40,'#6e6e6e');veio('rgba(150,146,138,.22)',1.2,70,'#7a7a7a');veio('rgba(190,150,80,.28)',1.4,18,'#8a8a8a');veio('rgba(255,255,255,.3)',1,40,'#8a8a8a');
   const mk=cv=>{const t=new THREE.CanvasTexture(cv);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=8;return t;};const map=mk(c);map.encoding=THREE.sRGBEncoding;return {map,nm:mk(normalFrom(h,.6)),c,h};}
+function* ga644TexMarmoreG(){let fat8c=0;const S=1024,c=bb592CanCPU(S,S),x=c.getContext('2d'),h=bb592CanCPU(S,S),y=h.getContext('2d'),r=rnd(64401),f=mkNoise(64402);
+  const d=x.createImageData(S,S),e=y.createImageData(S,S);for(let i=0;i<S*S;i++){const px=i%S,py=i/S|0;const n=f(px*.004,py*.004,4),m=f(px*.02,py*.02,3);const v=.9+.12*(n-.5)+.05*(m-.5);d.data[i*4]=Math.min(255,232*v)|0;d.data[i*4+1]=Math.min(255,224*v)|0;d.data[i*4+2]=Math.min(255,208*v)|0;d.data[i*4+3]=255;e.data[i*4]=e.data[i*4+1]=e.data[i*4+2]=128+10*(m-.5);e.data[i*4+3]=255;;if(!(++fat8c&4095))yield "ga644TexMarmoreG#1";}
+  x.putImageData(d,0,0);y.putImageData(e,0,0);
+  const veio=(cor,lw,n,prof)=>{for(let k=0;k<n;k++){let px=r()*S,py=r()*S;const L=120+r()*500,a0=r()*6.28;x.strokeStyle=cor;x.lineWidth=lw*(.6+r()*.8);x.beginPath();x.moveTo(px,py);y.strokeStyle=prof;y.lineWidth=lw*1.4;y.beginPath();y.moveTo(px,py);let a=a0;for(let s=0;s<12;s++){a+=(r()-.5)*.9;px+=Math.cos(a)*L/12;py+=Math.sin(a)*L/12;x.lineTo(px,py);y.lineTo(px,py);}x.stroke();y.stroke();}};
+  veio('rgba(120,118,112,.35)',2.2,40,'#6e6e6e');veio('rgba(150,146,138,.22)',1.2,70,'#7a7a7a');veio('rgba(190,150,80,.28)',1.4,18,'#8a8a8a');veio('rgba(255,255,255,.3)',1,40,'#8a8a8a');
+  const mk=cv=>{const t=new THREE.CanvasTexture(cv);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=8;return t;};const map=mk(c);map.encoding=THREE.sRGBEncoding;return {map,nm:mk((yield* normalFromG(h,.6))),c,h};}
+
 function ga644TexFresco(){const W=2048,H=512,c=bb592CanCPU(W,H),x=c.getContext('2d'),r=rnd(64403);
   const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#d9dfe9');g.addColorStop(.35,'#8fa6cf');g.addColorStop(.7,'#3d5590');g.addColorStop(1,'#15224a');x.fillStyle=g;x.fillRect(0,0,W,H);
   // nuvens (elipses macias)
@@ -79559,6 +79794,19 @@ function ga644Musa(){const BI=window.__bichos622;if(!BI||!BI.h)throw Error('sem 
   const f=UK(L);const B=caixaDe(f,[-.5,-.02,-.4,.5,1.98,.45],.04);
   const cor=(x,y,z,nx,ny,nz)=>{const base=HX(0xe6e0d4),esc=HX(0x8c867a);let c=MX(base,esc,S(.3,-.4,ny)*.55);return mul(c,.9+.18*fbm(x*18,y*18,z*18));};
   const g=malha('644 musa',f,B,.013,cor);const m=matPele('liso',{passo:.2,rough:.5});m.userData.papelKeep=true;return {g,m};}
+function* ga644MusaG(){const BI=window.__bichos622;;yield "ga644MusaG#1";if(!BI||!BI.h)throw Error('sem v622');;yield "ga644MusaG#2";const {S,HX,MX,mul,fbm,Esf,Ell,Cone,Cad,UK,malha,caixaDe,matPele}=BI.h;;yield "ga644MusaG#3";
+  const tunica0=Cone([0,0,0],[0,1.28,0],.34,.2);;yield "ga644MusaG#4";const tunica=(x,y,z)=>tunica0(x,y,z)+.012*Math.sin(Math.atan2(x,z)*11+y*3)*S(1.3,.1,y);;yield "ga644MusaG#5";
+  const torso=Ell([0,1.4,0],[.2,.2,.14]);;yield "ga644MusaG#6";const peito=Ell([0,1.43,.05],[.19,.11,.12]);;yield "ga644MusaG#7";const ombros=Ell([0,1.54,0],[.26,.08,.13]);;yield "ga644MusaG#8";const pescoco=Cone([0,1.55,0],[0,1.67,0],.06,.05);;yield "ga644MusaG#9";
+  const cabeca=Esf([0,1.76,0],.11);;yield "ga644MusaG#10";const cabelo=Ell([0,1.8,-.02],[.12,.1,.12]);;yield "ga644MusaG#11";const coque=Esf([0,1.84,-.09],.075);;yield "ga644MusaG#12";
+  const bracoE=Cad([[.25,1.5,0],[.3,1.2,.05],[.22,.95,.12]],[.062,.05,.045],.02);;yield "ga644MusaG#13";const maoE=Esf([.2,.92,.14],.05);;yield "ga644MusaG#14";
+  const bracoD=Cad([[-.25,1.5,0],[-.34,1.3,.1],[-.2,1.4,.3]],[.062,.05,.045],.02);;yield "ga644MusaG#15";const maoD=Esf([-.17,1.44,.33],.052);;yield "ga644MusaG#16";
+  const cintoPts=[];;yield "ga644MusaG#17";for(let k=0;k<=12;k++){const a=k/12*Math.PI*2;cintoPts.push([Math.cos(a)*.215,1.27+Math.sin(a*2)*.005,Math.sin(a)*.16]);};yield "ga644MusaG#18";const cinto=Cad(cintoPts,cintoPts.map(()=>.016),.004);;yield "ga644MusaG#19";
+  const dobra=Cad([[.22,.95,.12],[.26,.6,.2],[.3,.1,.3]],[.04,.05,.06],.02);;yield "ga644MusaG#20";
+  const L=[[tunica,0],[torso,.06],[peito,.05],[ombros,.05],[pescoco,.03],[cabeca,.0],[cabelo,.03],[coque,.02],[bracoE,.03],[maoE,.02],[bracoD,.03],[maoD,.02],[cinto,0],[dobra,.05]];;yield "ga644MusaG#21";
+  const f=UK(L);;yield "ga644MusaG#22";const B=(yield* fat8Reg.t.caixaDeG(f,[-.5,-.02,-.4,.5,1.98,.45],.04));;yield "ga644MusaG#23";
+  const cor=(x,y,z,nx,ny,nz)=>{const base=HX(0xe6e0d4),esc=HX(0x8c867a);let c=MX(base,esc,S(.3,-.4,ny)*.55);return mul(c,.9+.18*fbm(x*18,y*18,z*18));};;yield "ga644MusaG#24";
+  const g=(yield* fat8Reg.t.malhaG('644 musa',f,B,.013,cor));;yield "ga644MusaG#25";const m=matPele('liso',{passo:.2,rough:.5});;yield "ga644MusaG#26";m.userData.papelKeep=true;;yield "ga644MusaG#27";return {g,m};}
+
 function ga644Aplica(){const H=(typeof HALLS!=='undefined')&&HALLS[2];if(!H||!H.scene||GA644.feito)return;GA644.feito=true;if(!GA644.on)return;const sc=H.scene,T=THREE,t0=performance.now(),st=GA644.stats,r=rnd(64410),HR=(typeof hallRadius==='function')?hallRadius(2):20.9;
   const ob=(x,z,rad)=>{try{if(typeof HOBST2!=='undefined'&&Array.isArray(HOBST2))HOBST2.push([+x.toFixed(2),+z.toFixed(2),rad]);}catch(e){}};
   const tx=(typeof co523T==='function')?co523T:(a)=>a;
@@ -79599,6 +79847,47 @@ function ga644Aplica(){const H=(typeof HALLS!=='undefined')&&HALLS[2];if(!H||!H.
   try{const ms=K.fim(sc,{sombra:true});for(const m of ms){m.userData.papelKeepGeo=true;m.userData.noCam=true;}st.malhas=ms.length;}catch(e){ga644Erro('kit',e);}
   try{if(typeof fusaoLimpar==='function')fusaoLimpar(sc);}catch(e){}
   st.ms=Math.round(performance.now()-t0);st.pronto=true;}
+function* ga644AplicaG(){const H=(typeof HALLS!=='undefined')&&HALLS[2];;yield "ga644AplicaG#1";if(!H||!H.scene||GA644.feito)return;;yield "ga644AplicaG#2";GA644.feito=true;;yield "ga644AplicaG#3";if(!GA644.on)return;;yield "ga644AplicaG#4";const sc=H.scene,T=THREE,t0=performance.now(),st=GA644.stats,r=rnd(64410),HR=(typeof hallRadius==='function')?hallRadius(2):20.9;;yield "ga644AplicaG#5";
+  const ob=(x,z,rad)=>{try{if(typeof HOBST2!=='undefined'&&Array.isArray(HOBST2))HOBST2.push([+x.toFixed(2),+z.toFixed(2),rad]);}catch(e){}};;yield "ga644AplicaG#6";
+  const tx=(typeof co523T==='function')?co523T:(a)=>a;;yield "ga644AplicaG#7";
+  // ===== 1. o mármore do piso e a marchetaria =====
+  try{const TX=(yield* ga644TexMarmoreG());let n=0;sc.traverse(o=>{if(!o.isMesh||!o.material||o.material.name!=='v160 · 397 floor'||o.material.userData.ga644)return;const m=o.material;m.userData.ga644=true;m.map=TX.map;m.map.repeat.set(10.5,10.5);m.normalMap=TX.nm;m.normalMap.repeat.set(10.5,10.5);m.normalScale=new T.Vector2(.5,.5);m.color.setHex(0xffffff);m.roughness=.5;m.metalness=0;m.userData.papelKeep=true;m.needsUpdate=true;n++;});st.piso=n;
+    const verde=new T.MeshStandardMaterial({map:(()=>{const t=new T.CanvasTexture(TX.c);t.wrapS=t.wrapT=T.RepeatWrapping;t.encoding=T.sRGBEncoding;t.repeat.set(4,4);return t;})(),color:ga644C(0x3d6650),roughness:.4,metalness:0,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2});verde.userData.papelKeep=true;
+    const g=new T.Group();g.position.y=.012;sc.add(g);const ring=(a,b)=>{const m=new T.Mesh(new T.RingGeometry(a,b,96),verde);m.rotation.x=-Math.PI/2;m.receiveShadow=true;m.userData.papelKeepGeo=true;m.userData.noCam=true;m.raycast=()=>{};g.add(m);};ring(11.6,12.2);ring(18.2,18.6);
+    for(let k=0;k<10;k++){const a=k/10*Math.PI*2;const L=18.2-12.2;const m=new T.Mesh(new T.PlaneGeometry(L,.22),verde);m.rotation.x=-Math.PI/2;m.rotation.z=-a;m.position.set(Math.cos(a)*15.2,0,Math.sin(a)*15.2);m.userData.papelKeepGeo=true;m.userData.noCam=true;m.raycast=()=>{};g.add(m);}
+    st.marchetaria=12;}catch(e){ga644Erro('piso',e);};yield "ga644AplicaG#8";
+  // ===== 2. o afresco da cúpula =====
+  try{let n=0;sc.traverse(o=>{if(!o.isMesh||!o.geometry||o.geometry.type!=='ConeGeometry'||!o.material||!o.material.map)return;const p=o.geometry.parameters;if(!p||p.radius<15)return;const m=o.material;if(m.userData.ga644)return;m.userData.ga644=true;const t=ga644TexFresco();m.map=t;m.map.repeat.set(1,1);m.normalMap=null;m.color.setHex(0xffffff);m.emissive=new T.Color(0xffffff);m.emissiveMap=t;m.emissiveIntensity=.42;m.roughness=.9;m.userData.papelKeep=true;m.needsUpdate=true;n++;});st.cupula=n;}catch(e){ga644Erro('cúpula',e);};yield "ga644AplicaG#9";
+  const K=t160Kit('644 galeria');;yield "ga644AplicaG#10";const cantaria=ga644Std('cantaria',0xe1d7c2,.83),latao=ga644Std('latão',0xc9a35a,.35,.45),terracota=ga644Std('terracota',0x9a5a3a,.85),terra=ga644Std('terra',0x3a2a1c,1),tronco=ga644Std('tronco de palmeira',0x7a6248,.9),
+    madeiraL=ga644Std('lira',0x6a4a2a,.6),ouro=ga644Std('ouro',0xd4b050,.3,.6),mascara=ga644Std('máscara',0xf0ead8,.5),paleta=ga644Std('paleta',0x8a6a44,.7);;yield "ga644AplicaG#11";
+  // ===== 3. as cinco musas =====
+  try{const Mu=(yield* ga644MusaG());const lista=[[0.9,'palavra',tx('A Palavra','The Word','La Palabra')],[2.17,'musica',tx('A Música','Music','La Música')],[-2.85,'teatro',tx('O Teatro','Theater','El Teatro')],[-1.55,'pintura',tx('A Pintura','Painting','La Pintura')],[-0.35,'danca',tx('A Dança','Dance','La Danza')]];let n=0;
+    for(const [a,tipo,nome] of lista){const R=HR-2.2,x=Math.cos(a)*R,z=Math.sin(a)*R,ry=Math.atan2(-x,-z);
+      K.push(x,0,z,ry);K.cyl(.62,.66,.12,cantaria,0,.06,0,24);K.cyl(.5,.55,.78,cantaria,0,.51,0,24);K.cyl(.57,.52,.08,cantaria,0,.94,0,24);K.cyl(.54,.57,.05,cantaria,0,1.0,0,24);
+      // placa
+      const pm=new T.MeshStandardMaterial({map:ga644TexPlaca(nome),roughness:.4,metalness:.5});pm.userData.papelKeep=true;const pl=new T.Mesh(new T.PlaneGeometry(.56,.14),pm);pl.position.set(x+Math.sin(ry)*.56,.55,z+Math.cos(ry)*.56);pl.rotation.y=ry;pl.userData.papelKeepGeo=true;pl.userData.noCam=true;pl.raycast=()=>{};sc.add(pl);
+      // atributo na mão direita (−.17, 1.44, .33 local)
+      const hx=-.17,hy=1.02+1.44,hz=.33;
+      if(tipo==='palavra'){K.box(.2,.26,.05,ouro,hx,hy+.08,hz+.03,0,0,.2);K.box(.17,.23,.03,mascara,hx,hy+.08,hz+.06,0,0,.2);}
+      else if(tipo==='musica'){K.tor(.1,.014,madeiraL,hx,hy+.14,hz,Math.PI,0,0,0,6,16);for(const s of [-1,1])K.cyl(.014,.016,.3,madeiraL,hx+s*.1,hy+.26,hz,6);K.box(.24,.02,.02,madeiraL,hx,hy+.41,hz);for(let k=0;k<5;k++)K.box(.004,.26,.004,ouro,hx-.07+k*.035,hy+.27,hz);}
+      else if(tipo==='teatro'){K.sph(.1,mascara,hx,hy+.12,hz+.02,1,1.25,.6,12,8);K.box(.05,.02,.02,terra,hx-.03,hy+.15,hz+.08);K.box(.05,.02,.02,terra,hx+.03,hy+.15,hz+.08);K.tor(.035,.008,terra,hx,hy+.07,hz+.08,Math.PI,0,0,Math.PI,5,10);}
+      else if(tipo==='pintura'){K.sph(.14,paleta,hx-.04,hy+.08,hz,1,.15,.8,12,8);for(const [cc,dx,dz] of [[0xd03030,-.1,.04],[0x3060c0,-.04,.08],[0xe0c030,.04,.06],[0x30a050,.08,0]])K.sph(.02,ga644Std('tinta '+cc,cc,.5),hx-.04+dx,hy+.105,hz+dz);K.cyl(.006,.006,.28,madeiraL,hx+.06,hy+.2,hz+.02,6,0,0,.5);}
+      else{K.tor(.11,.012,madeiraL,hx,hy+.12,hz,Math.PI*2,0,.4,0,6,24);K.cyl(.11,.11,.004,mascara,hx,hy+.12,hz,24,0,Math.PI/2+.4,0);for(let k=0;k<6;k++){const aa=k/6*Math.PI*2;K.cyl(.018,.018,.006,ouro,hx+Math.cos(aa)*.11,hy+.12+Math.sin(aa)*.11*Math.sin(.4),hz+Math.sin(aa)*.11*Math.cos(.4),8,0,.4,0);}}
+      K.pop();
+      const m=new T.Mesh(Mu.g,Mu.m);m.position.set(x,1.02,z);m.rotation.y=ry;m.castShadow=true;m.receiveShadow=true;m.userData.papelKeepGeo=true;m.userData.noCam=true;m.userData.kit=true;sc.add(m);
+      const L=new T.PointLight(0xffe2c0,.55,5,2);L.position.set(x*.93,3.1,z*.93);sc.add(L);ob(x,z,.8);n++;}
+    st.musas=n;st.musaTris=Math.round(Mu.g.index?Mu.g.index.count/3:Mu.g.attributes.position.count/3);}catch(e){ga644Erro('musas',e);};yield "ga644AplicaG#12";
+  // ===== 4. as palmeiras =====
+  try{const folha=new T.MeshStandardMaterial({map:ga644TexFolha(),transparent:true,alphaTest:.5,side:T.DoubleSide,roughness:.85});folha.userData.papelKeep=true;let n=0;
+    for(const a of [1.55,2.8,-2.2,-0.95]){const R=HR-2.0,x=Math.cos(a)*R,z=Math.sin(a)*R;K.push(x,0,z,0);K.lathe([[.001,0],[.3,0],[.34,.08],[.3,.42],[.38,.5],[.4,.58],[.33,.58],[.001,.58]],terracota,0,0,0,18);K.cyl(.3,.3,.02,terra,0,.57,0,16);K.cyl(.06,.09,.5,tronco,0,.8,0,8);K.pop();
+      const g=new T.Group();g.position.set(x,1.0,z);sc.add(g);for(let k=0;k<11;k++){const aa=k/11*Math.PI*2+r()*.3,piv=new T.Group();piv.rotation.y=aa;piv.rotation.x=-.55-r()*.5;const p=new T.Mesh(new T.PlaneGeometry(.55,1.7),folha);p.position.y=.85;p.rotation.x=Math.PI/2*0;p.userData.papelKeepGeo=true;p.userData.noCam=true;p.raycast=()=>{};piv.add(p);g.add(piv);}
+      for(let k=0;k<5;k++){const aa=k/5*Math.PI*2+.3,piv=new T.Group();piv.rotation.y=aa;piv.rotation.x=-.2-r()*.3;const p=new T.Mesh(new T.PlaneGeometry(.45,1.3),folha);p.position.y=.65;p.userData.papelKeepGeo=true;p.userData.noCam=true;p.raycast=()=>{};piv.add(p);g.add(piv);}
+      ob(x,z,.6);n++;}st.palmeiras=n;}catch(e){ga644Erro('palmeiras',e);};yield "ga644AplicaG#13";
+  // ===== fim =====
+  try{const ms=K.fim(sc,{sombra:true});for(const m of ms){m.userData.papelKeepGeo=true;m.userData.noCam=true;}st.malhas=ms.length;}catch(e){ga644Erro('kit',e);};yield "ga644AplicaG#14";
+  try{if(typeof fusaoLimpar==='function')fusaoLimpar(sc);}catch(e){};yield "ga644AplicaG#15";
+  st.ms=Math.round(performance.now()-t0);;yield "ga644AplicaG#16";st.pronto=true;;yield "ga644AplicaG#17";}
+
 if(GA644.on){try{if(typeof HALLS!=='undefined'&&HALLS[2]&&HALLS[2].scene)setTimeout(()=>{try{ga644Aplica();}catch(e){ga644Erro('aplica',e);}},1200);}catch(e){}
   try{const _gh=goHall;goHall=function(n){const r=_gh.apply(this,arguments);try{if((n===2||HALLN===2)&&!GA644.feito)setTimeout(()=>{try{ga644Aplica();}catch(e){ga644Erro('aplica',e);}},300);}catch(e){}return r;};}catch(e){ga644Erro('ligar',e);}}
 window.__galeria644={estado:GA644,erros:GA644.erros,stats:GA644.stats,aplicar:ga644Aplica};
@@ -94268,6 +94557,52 @@ window.__md816={estado:MD816};
    da página nasce com `willReadFrequently` (no processador), porque ler os pixels de uma tela acelerada espera a placa — que está
    ocupada com o jogo. As telas da página (abertura, HUD) e as duas que copiam a imagem do jogo continuam aceleradas.
    `?canvas816=0` volta ao comportamento antigo. */
+/* ===================== v818 · ESCULTURAS FORA DA ABERTURA, EM FATIAS (bloco `FAT818` + gêmeos geradores do `fatiar.js`) =====================
+   Medido na máquina do Luiz (v816, `?medir816=1`): logo depois do script, ainda atrás da tela de carregamento, quatro esculturas por
+   campo de distância travavam 3,5 s seguidos — a coruja do Hall 1 (`np589`, 0,37 s), o bobo do Hall 3 (`np590`, 0,79 s), as musas do
+   Hall 2 (`ga644`, 0,90 s) e as gárgulas da Biblioteca (`tg639`, 1,41 s) — e três delas nem estão à vista na abertura.
+   O FATIADOR (`fatiar.js`, na hora de montar a build) cria um GÊMEO GERADOR de cada função pesada (`function* nomeG`), com `yield`
+   nas fatias da grade (`cp579RedeG`: uma fatia de z de cada vez; `cp579GeoG`: de 64 em 64 vértices) e entre os passos de quem as
+   chama (`np589GeosG`/`np589CorujaG`, `np590GeosG`/`np590BoboG`, `tg639GargulaG`/`tg639AplicaG`, `ga644MusaG`/`ga644AplicaG`,
+   `malhaG`/`caixaDeG` da v622). A ordem do que cada função faz é exatamente a mesma; os originais ficam intactos para quem não foi
+   convertido. Este bloco é a FILA que toca os geradores: `requestIdleCallback` (o tempo livre entre os quadros; 3–8 ms de cada vez,
+   12 ms atrás da tela de carregamento; 5 ms a cada 60 ms quando não sobra tempo). A coruja do Hall 1 corre cedo (está à vista na
+   abertura); as outras só depois do «Pronto», e a que ficar à vista (o leitor entrou na Biblioteca, chegou ao Hall 2 ou 3) passa à
+   frente com 12 ms por vez. `?fatias818=0` volta a fazer tudo de uma vez. Gancho `window.__fatias818`
+   (`stats.jobs`: tempo, passos, o maior passo e onde foi, e todos os passos de mais de 12 ms). */
+function fat8Reg(n,f){(fat8Reg.t=fat8Reg.t||{})[n]=f;}
+const FAT818={on:!/[?&#]fatias818=0/i.test(location.search+location.hash),fila:[],atual:null,agendado:false,stats:{jobs:[],passos:0,ms:0,maxPasso:0},erros:[]};
+function fat8Pronto(){try{return !!LOAD424.finished;}catch(e){return true;}}
+// põe um gerador na fila; op: {nome, cedo (corre antes do «Pronto»), fim(valor), erro(e)}
+function fat8Go(it,op){op=op||{};const J={it,nome:op.nome||'?',cedo:!!op.cedo,urgente:op.urgente||null,erro:op.erro||null,fim:op.fim||null,ms:0,passos:0,max:0,rot:'início',rotMax:'',t0:performance.now()};
+  if(!FAT818.on){try{let r;do{r=it.next();}while(!r.done);if(J.fim)J.fim(r.value);}catch(e){if(J.erro)J.erro(e);else FAT818.erros.push(J.nome+': '+(e&&e.message||e));}return J;}
+  FAT818.fila.push(J);fat8Agenda();return J;}
+function fat8Agenda(){if(FAT818.agendado)return;FAT818.agendado=true;if(typeof requestIdleCallback==='function')requestIdleCallback(fat8Passo,{timeout:60});else setTimeout(fat8Passo,16);}
+function fat8Urge(J){try{return !!(J.urgente&&J.urgente());}catch(e){return false;}}
+function fat8Passo(dl){const F=FAT818;F.agendado=false;const pronto=fat8Pronto();let orc=5;try{if(dl&&typeof dl.timeRemaining==='function'&&!dl.didTimeout)orc=Math.max(4,Math.min(pronto?8:12,dl.timeRemaining()));}catch(e){}
+  // quem está à vista passa à frente e ganha 12 ms (o leitor entrou na sala ou chegou ao andar antes de a peça ficar pronta)
+  if(pronto){const u=F.fila.findIndex(fat8Urge);if(u>=0&&!(F.atual&&fat8Urge(F.atual))){if(F.atual)F.fila.unshift(F.atual);F.atual=F.fila.splice(F.atual?u+1:u,1)[0];}if(F.atual&&fat8Urge(F.atual))orc=Math.max(orc,12);}
+  const t0=performance.now();let agora=t0;
+  while(agora-t0<orc){let J=F.atual;if(!J){const i=F.fila.findIndex(j=>pronto||j.cedo);if(i<0)break;J=F.atual=F.fila.splice(i,1)[0];}
+    const a=agora;let r;
+    try{r=J.it.next();}catch(e){F.atual=null;if(J.erro){try{J.erro(e);}catch(x){}}else F.erros.push(J.nome+': '+(e&&e.message||e));agora=performance.now();continue;}
+    agora=performance.now();const d=agora-a;J.ms+=d;J.passos++;const rot=r.done?'fim':String(r.value);if(d>J.max){J.max=d;J.rotMax=J.rot+' → '+rot;}if(d>12){const k=J.rot+' → '+rot;(J.gr=J.gr||{})[k]=Math.max(J.gr[k]||0,Math.round(d));}J.rot=rot;
+    if(r.done){F.atual=null;F.stats.jobs.push({nome:J.nome,ms:Math.round(J.ms),passos:J.passos,max:Math.round(J.max*10)/10,onde:J.rotMax,espera:Math.round(agora-J.t0),grandes:J.gr||null});if(J.fim){try{J.fim(r.value);}catch(e){F.erros.push(J.nome+' fim: '+(e&&e.message||e));}}}}
+  F.stats.passos++;F.stats.ms+=agora-t0;if(agora-t0>F.stats.maxPasso)F.stats.maxPasso=agora-t0;
+  if(F.atual||F.fila.length)fat8Agenda();}
+if(FAT818.on){
+  // coruja do Hall 1: o `np589Garante` (chamado de 0,5 em 0,5 s e pelo `npcOwl`) passa a pôr o gêmeo na fila, cedo
+  try{let ped=false;np589Garante=function(){try{const O=(typeof HALLS!=='undefined')&&HALLS[1]&&HALLS[1].X&&HALLS[1].X.owl;if(!O||NP589.feito.coruja||ped)return;ped=true;
+      fat8Go(np589CorujaG(O),{nome:'coruja 589',cedo:true,fim:v=>{ped=false;NP589.feito.coruja=v||O.g.userData.np589===true;},erro:e=>{ped=false;np589Erro('coruja',e);NP589.feito.coruja=true;}});}catch(e){np589Erro('coruja',e);NP589.feito.coruja=true;}};}catch(e){FAT818.erros.push('np589: '+e.message);}
+  // bobo do Hall 3
+  try{let ped=false;np590Garante=function(){try{const b=(typeof HALLS!=='undefined')&&HALLS[3]&&HALLS[3].X&&HALLS[3].X.bobo;if(!b||NP590.feito||ped)return;ped=true;
+      fat8Go(np590BoboG(b),{nome:'bobo 590',urgente:()=>CUR==='hall'&&HALLN===3,fim:v=>{ped=false;NP590.feito=v||b.userData.np590===true;},erro:e=>{ped=false;np590Erro('bobo',e);NP590.feito=true;}});}catch(e){np590Erro('bobo',e);NP590.feito=true;}};}catch(e){FAT818.erros.push('np590: '+e.message);}
+  // gárgulas e companhia da Biblioteca (1,5 s depois do finishRoom('lib')) e as musas do Hall 2 (1,2 s depois da carga / ao chegar ao Hall 2)
+  try{let ped=false;tg639Aplica=function(){const R=ROOMS.lib;if(!R||!R.scene||TG639.feito||ped)return;ped=true;fat8Go(tg639AplicaG(),{nome:'biblioteca 639',urgente:()=>CUR==='room'&&ROOM===ROOMS.lib,erro:e=>tg639Erro('aplica',e)});};}catch(e){FAT818.erros.push('tg639: '+e.message);}
+  try{let ped=false;ga644Aplica=function(){const H=(typeof HALLS!=='undefined')&&HALLS[2];if(!H||!H.scene||GA644.feito||ped)return;ped=true;fat8Go(ga644AplicaG(),{nome:'galeria 644',urgente:()=>CUR==='hall'&&HALLN===2,erro:e=>ga644Erro('aplica',e)});};}catch(e){FAT818.erros.push('ga644: '+e.message);}
+}
+window.__fatias818={estado:FAT818,stats:FAT818.stats,erros:FAT818.erros,go:fat8Go};
+
 window.__build434={revision:434,family:"web",edition:"en"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
    familias:()=>SALA_FAM,famModelos:(f)=>SALA_FAM[f]?SALA_FAM[f].lista():null,
