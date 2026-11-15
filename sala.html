@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v789</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v790</title><meta name="robots" content="noindex,nofollow"><script>/* v549: zera o webmaster uma vez, antes de qualquer save ser lido (?zera549=0 evita, ?zera549=1 repete) */(function(){try{var q=location.search+location.hash;var wm=!!window.__WEBMASTER||/[?&#](webmaster|wm)(=1|=true|\b)/i.test(q);if(!wm||/[?&#]zera549=0/i.test(q))return;var F='castelo549.wmZerado';if(localStorage.getItem(F)==='1'&&!/[?&#]zera549=1/i.test(q))return;var ks=[],bk={},i;for(i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wm.')===0)ks.push(k);}for(i=0;i<ks.length;i++)bk[ks[i]]=localStorage.getItem(ks[i]);try{localStorage.setItem('castelo549.copiaWm',JSON.stringify({quando:new Date().toISOString(),dados:bk}));}catch(e){}for(i=0;i<ks.length;i++)localStorage.removeItem(ks[i]);localStorage.setItem(F,'1');window.__zera549={apagadas:ks.length,quando:Date.now()};}catch(e){}})();</script><!-- v76 protagonist: MakeHuman core assets (CC0), authored skin weights, inverse kinematics and distance-driven gait. Source and asset license: https://github.com/makehumancommunity/makehuman/blob/master/LICENSE.md -->
 <style>.loadPct{white-space:nowrap}.loadFill,#sceneProgressFill132{transition:none!important}.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{width:24%!important;animation:loading424Wait 1.5s ease-in-out infinite!important}@keyframes loading424Wait{0%{transform:translateX(-110%)}100%{transform:translateX(430%)}}@media(prefers-reduced-motion:reduce){.loadTrack[data-wait="true"] .loadFill,.sceneProgressTrack132[data-wait="true"] #sceneProgressFill132{animation:none!important;transform:translateX(160%)}}</style>
 <style>
 /* Navigation is one bounded row; interaction and powers have their own rows. */
@@ -91834,6 +91834,66 @@ if(MS789.on){
 // com o mouse, depois de escolher o destino o Menu ficava aberto por cima. Agora a escolha no «Ir para» fecha o Menu também aqui.
 if(MS789.on){try{if(menuOv){menuOv.addEventListener('click',e=>{try{const bt=e.target&&e.target.closest&&e.target.closest('#goList button');if(bt&&menuOv.contains(bt)){MS789.stats.fecha++;setTimeout(()=>{try{if(menuOpen)menuShow(false);}catch(x){}},0);}}catch(x){}},true);}}catch(e){e789('menu fecha',e);}}
 window.__ms789={stats:MS789.stats,erros:MS789.erros};
+
+/* ===================== MS790 · mecânicas — 4.ª rodada: inimigos não atiram através das paredes =====================
+   · Os inimigos atiravam sempre que o leitor estava ao alcance, mesmo com parede no meio, e os ossos, balas, chamas e bolas de
+     plasma atravessavam paredes, pilares e móveis grandes (no modo Combatente o tiro do leitor já parava na parede; o deles, não).
+     Agora o inimigo comum só atira com linha de visão até o leitor — as mesmas malhas que seguram a câmera: paredes, pilares,
+     estantes e móveis grandes; os outros inimigos, vidro e folhagem não tapam. Sem visão, tenta de novo em 0,35 s e, se já está
+     perto (a menos de 3,4 m, onde antes parava), continua vindo pelo caminho até enxergar o leitor, em vez de ficar parado atrás
+     da parede. Os projéteis dos inimigos comuns param, com um estouro de papel, ao bater numa parede, num móvel grande ou no chão;
+     a 1,3 m do leitor seguem como antes (quem está encostado na parede continua sendo atingido).
+   · Não mudam: os chefes (Acumulador, Faraó, Titã, Mestre, javali e os outros), os aliados, os tiros que não saem de inimigo
+     comum e a mira do leitor no modo Clássico (alcança inimigo atrás de parede, para nenhuma sala ficar sem como ser limpa).
+   Gancho: window.__ms790 (`visao(k)`, `raio(...)`, `stats`, `erros`). `?ms790=0` desliga. */
+const MS790={on:!/[?&#]ms790=0/i.test(location.search+location.hash),stats:{tiros:0,semVisao:0,paradosNaParede:0,anda:0,testes:0,ms:0},erros:[]};
+function e790(k,e){try{if(MS790.erros.length<20)MS790.erros.push(k+': '+String(e&&e.message||e));}catch(x){}}
+function m790Chefe(k){try{if(!k)return true;if(k.chefe201||k.chefe||k.mestre||k.robot315||k.para318||k.ally428||k.rival530||k.ship316)return true;
+    if(typeof FARAO220!=='undefined'&&FARAO220.k===k)return true;if(/farao|colecionador|tita|mestre|lobisomem|guardi/i.test(String(k.tipo||'')))return true;if((k.max||0)>=300)return true;}catch(e){}return false;}
+// malhas dos inimigos da sala: não tapam a visão (nem a própria, nem a dos outros) e não seguram projétil
+const M790X={S:null,n:-1,t:0,set:new WeakSet()};
+function m790Excl(){try{const r=cavRoom(),S=r&&CAV.salas[r];const now=performance.now();
+    if(S&&(M790X.S!==S||M790X.n!==S.lista.length||now-M790X.t>2000)){const W=new WeakSet();for(const k of S.lista){try{if(k&&k.g)k.g.traverse(o=>{if(o.isMesh)W.add(o);});}catch(e){}}M790X.set=W;M790X.S=S;M790X.n=S.lista.length;M790X.t=now;}}catch(e){e790('excl',e);}
+  return M790X.set;}
+const M790R=new THREE.Raycaster(),M790H=[],M790O=new THREE.Vector3(),M790D=new THREE.Vector3();
+// distância até a primeira malha que segura a câmera no raio (sem as dos inimigos); dist quando nada
+function m790Raio(ox,oy,oz,dx,dy,dz,dist){let list,B;try{list=camBlockList(ACTIVE);B=camBS190;}catch(e){return dist;}if(!list||!list.length||!B)return dist;
+  const X=m790Excl(),near=0.05;let melhor=dist;
+  for(let i=0,n=list.length;i<n;i++){const o=list[i];if((!o.visible&&!o.userData.camProxy)||X.has(o))continue;const j=i*4,r=B[j+3],cx=B[j]-ox,cy=B[j+1]-oy,cz=B[j+2]-oz,tt=cx*dx+cy*dy+cz*dz;
+    if(tt<-r||tt>melhor+r)continue;if(cx*cx+cy*cy+cz*cz-tt*tt>r*r)continue;
+    let d=null;try{d=camRaio190(o,ox,oy,oz,dx,dy,dz,near,melhor);}catch(e){d=null;}
+    if(d===null){try{M790O.set(ox,oy,oz);M790D.set(dx,dy,dz);M790R.set(M790O,M790D);M790R.near=near;M790R.far=melhor;M790H.length=0;o.raycast(M790R,M790H);for(const h of M790H)if(h.distance<melhor)melhor=h.distance;M790H.length=0;}catch(e){}}
+    else if(d<melhor)melhor=d;}
+  return melhor;}
+// o inimigo k vê o leitor? (do peito do inimigo — o grupo dele fica no chão onde ele está — até 0,8 m antes do leitor)
+function m790Visao(k){const t0=performance.now();try{const pl=cavPos();let ey=1.1;try{ey=(k.g&&isFinite(k.g.position.y)?k.g.position.y:cavY(ROOM,k.x,k.z))+1.1;}catch(e){}const py=(pl.fy||0)+1.1;
+    let dx=pl.x-k.x,dy=py-ey,dz=pl.z-k.z;const d=Math.hypot(dx,dy,dz);if(d<1.4)return true;dx/=d;dy/=d;dz/=d;const lim=d-.8;MS790.stats.testes++;
+    return !(m790Raio(k.x,ey,k.z,dx,dy,dz,lim)<lim-.02);}
+  catch(e){e790('visao',e);return true;}finally{MS790.stats.ms+=performance.now()-t0;}}
+// projéteis em voo: testa o trecho que vão andar neste quadro
+function m790Voo(dt){const t0=performance.now();let pl=null;try{pl=cavPos();}catch(e){}
+  for(const o of CAV.ossos){if(!o.m790||o.t>=o.vida||o.t<.12||o.scene!==ACTIVE||o.ref451)continue;if(pl&&Math.hypot(o.x-pl.x,o.z-pl.z)<1.3)continue;
+    const vx=o.vx,vy=o.vy-(o.grav||0)*dt,vz=o.vz,sp=Math.hypot(vx,vy,vz);if(sp<.01)continue;const passo=sp*dt+.05,ux=vx/sp,uy=vy/sp,uz=vz/sp;
+    const t=m790Raio(o.x,o.y,o.z,ux,uy,uz,passo);
+    if(t<passo){MS790.stats.paradosNaParede++;const hx=o.x+ux*t,hy=o.y+uy*t,hz=o.z+uz*t;try{for(let i=0;i<4;i++)cavFaisca(o.scene,hx+(Math.random()-.5)*.25,hy+(Math.random()-.5)*.25,hz+(Math.random()-.5)*.25,i%2?0xf3ead2:0xc9b48a,.22+Math.random()*.15,.35+Math.random()*.15);}catch(e){}
+      o.t=o.vida;o.y=-1e3;o.vy=0;}}
+  MS790.stats.ms+=performance.now()-t0;}
+// sem visão e já perto (onde antes parava), o inimigo continua vindo pelo caminho até enxergar o leitor (só nas salas: as lutas do
+// Hall — Galeria, Calabouço, Estufa — têm o andar próprio dos seus inimigos)
+function m790Anda(dt){if(CUR!=='room')return;const r=cavRoom(),S=r&&CAV.salas[r];if(!S||CAV.morto||(typeof uiBlocked==='function'&&uiBlocked())||(typeof CH!=='undefined'&&CH.sitting))return;const pl=cavPos();
+  for(const k of S.lista){if(!k||!k.viva||!(k.cego790>0))continue;k.cego790-=dt;if(k.sono>0||m790Chefe(k))continue;
+    const d=Math.hypot(pl.x-k.x,pl.z-k.z);if(d>CAV.distMin+.05||d<1.6)continue;
+    if((k.tP790=(k.tP790||0)-dt)<=0&&caminhoVez190()){k.tP790=.5+Math.random()*.3;try{k.p790=findPath(k.x,k.z,pl.x,pl.z);}catch(e){k.p790=null;}k.pi790=0;}
+    let tx=pl.x,tz=pl.z;const P=k.p790;if(P&&P.length){while(k.pi790<P.length-1&&Math.hypot(P[k.pi790][0]-k.x,P[k.pi790][1]-k.z)<.4)k.pi790++;tx=P[k.pi790][0];tz=P[k.pi790][1];}
+    const L=Math.hypot(tx-k.x,tz-k.z)||1,v=(k.vel||CAV.vel)*dt;k.x+=(tx-k.x)/L*Math.min(v,L);k.z+=(tz-k.z)/L*Math.min(v,L);MS790.stats.anda++;}}
+if(MS790.on){
+  try{const a0=cavArremessar;cavArremessar=function(k){let comum=false;
+      try{comum=!!(k&&k.viva&&!m790Chefe(k));if(comum){if(!m790Visao(k)){MS790.stats.semVisao++;k.rec=Math.min(k.rec||0,.35);k.cego790=1.2;return;}k.cego790=0;}}catch(e){e790('arremessar',e);}
+      const n0=CAV.ossos.length;const r=a0.apply(this,arguments);try{if(CAV.ossos.length>n0)MS790.stats.tiros++;if(comum)for(let i=n0;i<CAV.ossos.length;i++)CAV.ossos[i].m790=1;}catch(e){}return r;};}catch(e){e790('instalar',e);}
+  try{const ct=caveirasTick;caveirasTick=function(dt){try{if(dt>0&&CAV.ossos.length)m790Voo(dt);}catch(e){e790('projeteis',e);}
+      const r=ct.apply(this,arguments);try{if(dt>0)m790Anda(dt);}catch(e){e790('anda',e);}return r;};}catch(e){e790('caveirasTick',e);}
+}
+window.__ms790={visao:m790Visao,raio:m790Raio,chefe:m790Chefe,stats:MS790.stats,erros:MS790.erros};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
