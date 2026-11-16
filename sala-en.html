@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v828</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v829</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -108690,6 +108690,119 @@ if(TX828.on&&typeof tp615Textura==='function'&&tp615Textura.__gen){const t0=tp61
     return null;};
   tp615Textura.__gen=t0.__gen;}
 window.__oficina828={estado:FW828,stats:FW828.stats,erros:FW828.erros,texturas:TX828};
+
+/* ===================== v829 · COMPANHEIROS: LUZ DE RECORTE, PREENCHIMENTO E SOMBRA NO CHÃO (bloco `CR829`) · CÂMERA DIANTE DA CORTINA (bloco `CM829`) =====================
+   Pedido do Luiz (16/11): «nova rodada de melhorias gráficas sem perder a otimização, a começar pelos companions».
+   Levantamento com os 53 companheiros fotografados NA CENA DO JOGO (luz do Hall, Papel e Leve, de perto e na distância normal da
+   câmera): (a) com a luz do jogo as faces verticais recebem pouca luz e os pelos escuros (capivara, lontra, javali, gambá, arraia,
+   morcego, dragões escuros) viram um borrão sem volume; (b) os bichos esculpidos da v622 tinham uma sombra de chão do mesmo tamanho
+   para todos e quase invisível (0,22), e os voadores só tinham sombra abaixo de 1,2 m (nunca, à altura do ombro).
+   (1) LUZ DE RECORTE E DE PREENCHIMENTO — as peças opacas do corpo ganham, no fim do sombreador (uma linha antes do `gl_FragColor`,
+   igual no material padrão e no «toon» do Papel): um preenchimento proporcional à cor da peça (como uma luz ambiente só deles),
+   um piso mínimo para o preto não fechar, e uma luz de recorte nas bordas viradas para fora da câmera (mais forte em cima), que é
+   o brilho rasante do pelo. Tudo atenuado nas cores claras (quase nada acima de 0,5 de luminância: o lince e a alpaca não lavam). O material do companheiro é um GÊMEO do
+   original (um por material, guardado; a cor e a emissão são a mesma instância; brilho, opacidade e visibilidade leem o original),
+   logo nada do resto do jogo que use o mesmo material muda. Não há luz nova na cena (o número de luzes não muda → nenhum outro
+   programa é recompilado); os companheiros ganham os seus programas (uns 4–8 por modo gráfico, compilados quando aparecem).
+   (2) SOMBRA NO CHÃO — a dos bichos esculpidos passa a ter o tamanho da pegada de cada um (medida na montagem) e 0,38 de força; os
+   voadores (todos, também os esculpidos, que não tinham nenhuma) ganham uma sombra macia que cresce e enfraquece com a altura e
+   some aos 3,2 m. É a mesma malha de sombra de sempre (uma por companheiro), só com outros números.
+   (3) No Papel, as cascas de pelo do rabo (v629) deixam de ganhar contorno de nanquim (eram 5 malhas com ossos a mais por bicho,
+   uma casca escura por cima da outra).
+   CM829 — pedido do Luiz («com certeza»): ao entrar na Fantasia a câmera ficava 20 cm ATRÁS da cortina fechada da porta (o limite
+   da sala, FR − 1,1 m, cai depois do plano da cortina) e a tela ficava roxa. Agora, com a cortina do vestíbulo fechada, o raio da
+   câmera para 30 cm antes do plano dela — em qualquer sala com vestíbulo.
+   (4) Um companheiro esculpido equipado volta a aparecer ao recarregar a página (defeito antigo; ver `cr8NasceG`).
+   Interruptores: ?recorte829=0 · ?sombra829=0 · ?nasce829=0 · ?cortina829=0. Ganchos `window.__recorte829` e `window.__cortina829`. */
+const CR829={on:!/[?&#]recorte829=0/i.test(location.search+location.hash),sombra:!/[?&#]sombra829=0/i.test(location.search+location.hash),erros:[],
+  stats:{mats:0,malhas:0,grupos:0,cascas:0},P:{A:0.9,B:0.05,F:0.11,S:0.008}};
+function cr8Erro(k,e){if(CR829.erros.length<30)CR829.erros.push(k+': '+String(e&&e.message||e).slice(0,200));}
+const CR8_ALVO='gl_FragColor = vec4( outgoingLight, diffuseColor.a );';
+const CR8_COD=['{','float l829 = dot( diffuseColor.rgb, vec3( 0.2126, 0.7152, 0.0722 ) );','float w829 = 1.0 - 0.88 * smoothstep( 0.10, 0.5, l829 );',
+  'float d829 = 1.0 - clamp( dot( normalize( vViewPosition ), normal ), 0.0, 1.0 );','float k829 = d829 * d829 * ( 0.35 + 0.65 * d829 ) * ( 0.6 + 0.4 * clamp( normal.y, -1.0, 1.0 ) );',
+  'outgoingLight += w829 * ( diffuseColor.rgb * ( '+CR829.P.F.toFixed(3)+' + '+CR829.P.A.toFixed(3)+' * k829 ) + vec3( 0.92, 0.96, 1.0 ) * ( '+CR829.P.S.toFixed(4)+' + '+CR829.P.B.toFixed(3)+' * k829 ) );','}'].join('\n');
+function cr8Injeta(sh){const f=sh.fragmentShader;if(f.indexOf(CR8_ALVO)>=0&&f.indexOf('l829')<0)sh.fragmentShader=f.replace(CR8_ALVO,CR8_COD+'\n'+CR8_ALVO);}
+function cr8Compila(sh){cr8Injeta(sh);} // a MESMA função para todos os gêmeos sem sombreador próprio: partilham o programa
+const CR8_MAPA=new WeakMap(),CR8_GEMEOS=new WeakSet();
+function cr8De(m){let c=CR8_MAPA.get(m);if(c)return c;const T=THREE;c=m.clone();
+  const o0=m.onBeforeCompile,tem=!!o0&&o0!==T.Material.prototype.onBeforeCompile;
+  if(tem){const k0=m.customProgramCacheKey;c.onBeforeCompile=function(sh,r){o0.call(this,sh,r);cr8Injeta(sh);};
+    c.customProgramCacheKey=function(){let k='';try{k=k0?String(k0.call(m)):'';}catch(e){}return 'cr829|'+String(o0)+'|'+k;};}
+  else{c.onBeforeCompile=cr8Compila;c.customProgramCacheKey=function(){return 'cr829';};}
+  // a cor e a emissão são a mesma instância; o que o jogo anima no original (brilho, opacidade…) vale para o gêmeo
+  try{if(m.color&&m.color.isColor)c.color=m.color;if(m.emissive&&m.emissive.isColor)c.emissive=m.emissive;
+    for(const p of ['emissiveIntensity','opacity','visible','roughness','metalness'])if(p in m)Object.defineProperty(c,p,{get(){return m[p];},set(v){m[p]=v;},configurable:true,enumerable:true});}catch(e){cr8Erro('gêmeo',e);}
+  c.userData=m.userData;c.name=m.name; // o mesmo nome e os mesmos dados (quem procura o material pelo nome, ou anima um uniforme guardado ali, continua a achar)
+  c.needsUpdate=true;CR8_MAPA.set(m,c);CR8_GEMEOS.add(c);CR829.stats.mats++;return c;}
+function cr8Serve(o,m){if(!m||!m.isMaterial||CR8_GEMEOS.has(m))return false;
+  if(!(m.isMeshStandardMaterial||m.isMeshToonMaterial||m.isMeshPhongMaterial))return false; // o Lambert ilumina no vértice: não tem a normal no fragmento
+  if(m.transparent||m.opacity<1||m.blending!==THREE.NormalBlending||m.wireframe)return false;
+  if(m.isMeshPhysicalMaterial&&m.transmission>0)return false; // asas translúcidas (no Papel viram transparentes)
+  if(/contorno|sombra|olho|pálpebra|brilho|chama|brasa|luz/i.test(o.name||''))return false;if(o.userData&&(o.userData.fx||o.userData.noFade))return false;
+  if(m.emissive&&m.emissiveIntensity>0&&(m.emissive.r+m.emissive.g+m.emissive.b)*m.emissiveIntensity>0.5)return false;return true;}
+const CR8_BOX=new THREE.Box3(),CR8_B2=new THREE.Box3(),CR8_V=new THREE.Vector3();
+/* gêmeos de recorte nas peças do corpo; mede a pegada (largura × comprimento) e o raio para a sombra */
+function cr8Grupo(g,id){if(!g||!g.isObject3D||!g.userData)return g;if(g.userData.cr829)return g;const F={pe:null,raio:0.3,malhas:0,corpo:null};g.userData.cr829=F;CR829.stats.grupos++;
+  if(CR829.on)g.traverse(o=>{if(!o.isMesh||!o.material)return;try{
+    if(Array.isArray(o.material)){let mudou=false;const nm=o.material.map(m=>cr8Serve(o,m)?(mudou=true,cr8De(m)):m);if(mudou){o.material=nm;F.malhas++;}}
+    else if(cr8Serve(o,o.material)){o.material=cr8De(o.material);F.malhas++;}}catch(e){cr8Erro('peça '+id,e);}});
+  CR829.stats.malhas+=F.malhas;try{F.corpo=g.getObjectByName('body400')||null;}catch(e){}
+  try{g.updateMatrixWorld(true);const inv=new THREE.Matrix4().copy(g.matrixWorld).invert(),m4=new THREE.Matrix4();CR8_BOX.makeEmpty();
+    g.traverse(o=>{if(!o.isMesh||o.isSprite||!o.geometry||!o.geometry.attributes.position)return;if(/rabo|cauda|contorno|bigode|pelo|sombra|asa|pena/i.test(o.name||''))return;
+      for(let p=o;p&&p!==g;p=p.parent)if(!p.visible)return;const gg=o.geometry;if(!gg.boundingBox)gg.computeBoundingBox();if(!gg.boundingBox||!isFinite(gg.boundingBox.min.x))return;
+      m4.multiplyMatrices(inv,o.matrixWorld);CR8_B2.copy(gg.boundingBox).applyMatrix4(m4);if(CR8_B2.max.x-CR8_B2.min.x<4)CR8_BOX.union(CR8_B2);});
+    if(!CR8_BOX.isEmpty()){CR8_BOX.getSize(CR8_V);F.pe=[Math.max(0.2,Math.min(1.5,CR8_V.x*1.55)),Math.max(0.26,Math.min(2.2,CR8_V.z*1.3))];F.raio=Math.max(0.12,Math.max(CR8_V.x,CR8_V.z)*0.5);}}catch(e){cr8Erro('pegada '+id,e);}
+  return g;}
+if(CR829.on||CR829.sombra){
+  try{const b0=buildBicho;buildBicho=function(id){const g=b0.apply(this,arguments);try{cr8Grupo(g,id);}catch(e){cr8Erro('bicho '+id,e);}return g;};}catch(e){cr8Erro('buildBicho',e);}
+  try{const p0=buildPet;buildPet=function(id){const g=p0.apply(this,arguments);try{cr8Grupo(g,id);}catch(e){cr8Erro('pet '+id,e);}return g;};}catch(e){cr8Erro('buildPet',e);}
+  try{const c0=comp400Build;comp400Build=fr8Wrap(function*(id){const g=(yield* fr8Prev(c0,this,arguments,"cr829"));try{cr8Grupo(g,id);}catch(e){cr8Erro('comp400 '+id,e);}return g;});try{window.__companions400.build=comp400Build;}catch(e){}}catch(e){cr8Erro('comp400Build',e);}
+}
+if(CR829.sombra){
+  // bichos esculpidos: a sombra com a pegada de cada um
+  try{const s0=c191SombraPor;c191SombraPor=function(chave,x,z,y,largo,comp,ry,forca){
+      try{if(chave==='bicho'){const g=GEAR.bicho,F=g&&g.userData&&g.userData.cr829;if(F&&F.pe&&g.userData.comp400){largo=F.pe[0];comp=F.pe[1];if(forca>0.01)forca=Math.min(0.42,forca*(0.38/0.22));}}}catch(e){}
+      return s0.call(this,chave,x,z,y,largo,comp,ry,forca);};
+    CR829.sombra0=s0;}catch(e){cr8Erro('sombra bicho',e);}
+  // voadores: sombra macia que cresce e enfraquece com a altura (depois de tudo o que o quadro fez com eles)
+  try{const g0=gearTick;gearTick=function(dt){const r=g0.apply(this,arguments);
+      try{const P=GEAR.pet;if(P&&P.parent&&CR829.sombra0&&typeof floorAt==='function'){let vis=true;for(let p=P;p;p=p.parent)if(!p.visible){vis=false;break;}
+          if(vis){const F=P.userData.cr829,o=(F&&F.corpo)||P.userData.voo191||P;o.getWorldPosition(CR8_V);const fy=floorAt(CR8_V.x,CR8_V.z),h=Math.max(0,CR8_V.y-fy);
+            const b=Math.max(0.2,Math.min(0.95,((F&&F.raio)||0.2)*1.5))*(1+0.2*Math.min(3,h));CR829.sombra0.call(this,'pet',CR8_V.x,CR8_V.z,fy,b,b,0,0.30*Math.max(0,1-h/3.2));}}}catch(e){if(!CR829.avisou){CR829.avisou=true;cr8Erro('sombra pet',e);}}
+      return r;};}catch(e){cr8Erro('gearTick',e);}
+}
+// Papel: as cascas de pelo com ossos (rabo, v629) não ganham contorno
+try{const pc0=papelCasca;papelCasca=function(o){if(CR829.on&&o&&o.name==='v629 pelo'){if(!o.userData.cr829c){o.userData.cr829c=true;CR829.stats.cascas++;}return null;}return pc0.apply(this,arguments);};}catch(e){cr8Erro('papelCasca',e);}
+// o que já estava equipado quando este bloco chega: recebe os gêmeos no lugar (se o Papel já passou por ele, desfaz-se a conversão
+// dessas peças, trocam-se os materiais e converte-se de novo — o mesmo que uma troca de modo gráfico faz)
+try{CR829.stats.arranque=[];for(const sl of ['pet','bicho']){const g=GEAR[sl];if(!g||!g.userData||g.userData.cr829)continue;let papel=false;
+    g.traverse(o=>{if(papel||!o.isMesh||!o.material)return;const ms=Array.isArray(o.material)?o.material:[o.material];for(const m of ms)if(m&&PAPEL_DE.get(m))papel=true;});
+    if(papel)g.traverse(o=>{try{papelUm(o,false);}catch(e){}});
+    cr8Grupo(g,GEAR[sl+'Id']);
+    if(papel&&Q.papel)g.traverse(o=>{try{papelUm(o,true);}catch(e){}});
+    CR829.stats.arranque.push(sl+(papel?' no lugar (Papel)':' no lugar'));}}catch(e){cr8Erro('arranque',e);}
+/* DEFEITO ANTIGO achado na conferência: um companheiro ESCULPIDO (os 30 da v400: lince, cervo, tucano…) equipado não voltava ao recarregar
+   a página. O primeiro `applyGear` do arranque corre antes de a v400 registar esses itens na loja: guarda o id (`GEAR.bichoId`) sem
+   montar nada, e ninguém voltava a aplicar (as v162/v163/v196 só refazem os modelos delas). Agora, atrás da tela de carregamento, um
+   trabalho da fila monta o modelo em fatias (fica guardado) e aplica o equipamento de novo. */
+function* cr8NasceG(){const falta=[];for(const sl of ['pet','bicho']){const id=LOJA.equip[sl];if(id&&LOJA_BY[id]&&!GEAR[sl]&&GEAR[sl+'Id']===id)falta.push([sl,id]);}
+  if(!falta.length)return;
+  for(const [sl,id] of falta){try{if(typeof COMP400_BY!=='undefined'&&COMP400_BY[id])(yield* fat8Call(comp400Build,[id]));}catch(e){cr8Erro('nasce '+id,e);}yield 'companheiro '+id;}
+  let n=0;for(const [sl,id] of falta)if(LOJA.equip[sl]===id&&!GEAR[sl]&&GEAR[sl+'Id']===id){GEAR[sl+'Id']='~cr829';n++;}
+  if(n){applyGear();CR829.stats.arranque.push('nascidos: '+falta.map(f=>f[1]).join(', '));}}
+if(!/[?&#]nasce829=0/i.test(location.search+location.hash))try{fat8Go(cr8NasceG(),{nome:'companheiro 829',cedo:true});}catch(e){cr8Erro('nasce',e);}
+window.__recorte829={estado:CR829,erros:CR829.erros,stats:CR829.stats,de:cr8De,serve:cr8Serve,grupo:cr8Grupo,gemeo:m=>CR8_GEMEOS.has(m)};
+
+/* ---------- CM829 · a câmera não atravessa a cortina fechada do vestíbulo ---------- */
+const CM829={on:!/[?&#]cortina829=0/i.test(location.search+location.hash),erros:[],stats:{cortes:0},fc:new WeakMap(),V:new THREE.Vector3()};
+function cm8Plano(T){let fc=CM829.fc.get(T);if(fc!==undefined)return fc;fc=null;try{const K=T.tunel&&T.tunel.userData&&T.tunel.userData.cortina223;const cg=K&&K.mesh&&K.mesh.parent;
+    if(cg){cg.updateWorldMatrix(true,false);cg.getWorldPosition(CM829.V);fc=v222Loc(T,CM829.V.x,CM829.V.z).f;}}catch(e){}if(fc!==null)CM829.fc.set(T,fc);return fc;}
+try{const ct0=v222CamT;v222CamT=function(world,orig,ox,oy,oz,dx,dy,dz,dist){let t=ct0.apply(this,arguments);
+    try{if(CM829.on&&V223.on&&CUR==='room'&&ROOM&&ROOM.world===world&&ROOM.vest222){const T=ROOM.vest222,C=v223Estado(T);
+        if(C&&C.v<0.5){const fc=cm8Plano(T);if(fc!==null){const l0=v222Loc(T,ox,oz),l1=v222Loc(T,ox+dx,oz+dz),df=l1.f-l0.f;
+            if(df>1e-4&&l0.f<fc-0.32){const tc=(fc-0.3-l0.f)/df;if(tc<t){const u=l0.u+(l1.u-l0.u)*tc;if(Math.abs(u)<T.secao.w/2+0.3){t=Math.max(0.12,tc);CM829.stats.cortes++;}}}}}}}catch(e){if(CM829.erros.length<8)CM829.erros.push(String(e&&e.message||e));}
+    return t;};}catch(e){CM829.erros.push('ligar: '+String(e&&e.message||e));}
+window.__cortina829={estado:CM829,erros:CM829.erros,stats:CM829.stats};
 
 window.__build434={revision:434,family:"web",edition:"en"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
