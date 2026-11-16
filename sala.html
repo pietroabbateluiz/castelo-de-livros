@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v829</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v830</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -108803,6 +108803,207 @@ try{const ct0=v222CamT;v222CamT=function(world,orig,ox,oy,oz,dx,dy,dz,dist){let 
             if(df>1e-4&&l0.f<fc-0.32){const tc=(fc-0.3-l0.f)/df;if(tc<t){const u=l0.u+(l1.u-l0.u)*tc;if(Math.abs(u)<T.secao.w/2+0.3){t=Math.max(0.12,tc);CM829.stats.cortes++;}}}}}}}catch(e){if(CM829.erros.length<8)CM829.erros.push(String(e&&e.message||e));}
     return t;};}catch(e){CM829.erros.push('ligar: '+String(e&&e.message||e));}
 window.__cortina829={estado:CM829,erros:CM829.erros,stats:CM829.stats};
+
+/* ===================== v830 · MORADORES DAS SALAS, CHEFES E INIMIGOS (bloco `CI830`) =====================
+   Cinco partes: (1) sombra de contato e (2) luz de recorte dos moradores; (3) personagens humanos sem acessórios e com altura e
+   corpo próprios; (4) chefes; (5) halo dos inimigos nos modos Leve e Papel. Cada parte tem o seu comentário mais abaixo.
+   Segunda etapa da rodada gráfica pedida pelo Luiz («…a começar pelos companions», «e depois os npcs, inimigos e chefes»).
+   Levantamento: os moradores registados (`NPC127.rooms`) de todas as salas, fotografados na luz de cada sala, em Papel.
+   As peças da galeria de IA (v232) já tinham sombra de contato, reflexo e luz de contorno desde a v462. Os OUTROS moradores — os
+   personagens com esqueleto da Catedral, os gnomos e as fadas da Fantasia, o esqueleto e o ceifador da Biblioteca, os robôs da
+   Ficção Científica, a boneca e os vultos, as corujas das salas sem morador — não tinham nada disso: no Papel e no Leve (sem
+   sombras projetadas) flutuavam sobre o chão, e ficavam chapados contra o fundo.
+   (1) SOMBRA DE CONTATO — cada sala ganha UMA malha instanciada (a mancha macia e o material das sombras da v462: uma chamada de
+   desenho por sala, seja qual for o número de moradores) com uma mancha por morador apoiado no chão, do tamanho dele; segue os
+   que andam e some com os que somem. Ficam de fora os que já têm sombra (as peças da v462) e os que estão no ar (fadas).
+   (2) LUZ DE RECORTE E DE PREENCHIMENTO — a da v829 (`cr8De`: o mesmo gêmeo de material, os mesmos programas), só nas peças que
+   NUNCA são fundidas pelo motor (as fusões juntam peças paradas de mesmo material numa malha só e recusam materiais com sombreador
+   próprio — dar o recorte a uma peça fundível custaria a fusão dela): personagens e peças com esqueleto e moradores com fala
+   (`aiCharacter`/`talkName127`).
+   As peças da v462 ficam como estão (já têm a luz de contorno delas).
+   Aplica-se no fim do acabamento de cada sala (ainda escondida: os programas entram no ensaio de entrada) e de novo, devagar,
+   com o leitor lá dentro (moradores que chegam depois). `?moradores830=0` desliga tudo; `?sombra830=0` só as sombras.
+   Gancho `window.__moradores830`. */
+const CI830={on:!/[?&#]moradores830=0/i.test(location.search+location.hash),sombra:!/[?&#](moradores830|sombra830)=0/i.test(location.search+location.hash),
+  erros:[],stats:{salas:0,sombras:0,recorte:0,grupos:0,noAr:0,v462:0},cenas:new WeakMap(),CAP:48,n:0,
+  chefes:!/[?&#](moradores830|chefes830)=0/i.test(location.search+location.hash),halo:!/[?&#](moradores830|halo830)=0/i.test(location.search+location.hash),HALO:0.6};
+function ci8Erro(k,e){if(CI830.erros.length<30)CI830.erros.push(k+': '+String(e&&e.message||e).slice(0,200));}
+const CI8_BOX=new THREE.Box3(),CI8_B2=new THREE.Box3(),CI8_V=new THREE.Vector3(),CI8_M=new THREE.Matrix4(),CI8_S=new THREE.Vector3(),CI8_ZERO=new THREE.Matrix4().makeScale(0,0,0);
+/* a peça nunca entra nas fusões? (as razões PERMANENTES do `fusaoElegivel` — esqueleto, morador com fala; visibilidade e movimento não
+   contam). As famílias que a fusão deixa de fora só pelo NOME (esqueleto leitor, fadas) não entram: o esqueleto são 132 peças na
+   Biblioteca, que já existe quando o jogo abre — os programas novos dele caíam no quadro do «Pronto» (704 ms contra 471–495 no teste). */
+function ci8NuncaFunde(o,raiz){if(o.isSkinnedMesh||o.isInstancedMesh||o.morphTargetInfluences||o.renderOrder||o.userData.cat217)return true;
+  for(const k in o.userData)if(FUSAO_UD.test(k))return true;
+  for(let p=o.parent;p;p=p.parent){const u=p.userData;if(p===READER.g||(u&&(u.aiCharacter||u.npc||u.talkName127)))return true;if(p===raiz)break;}
+  return false;}
+function ci8Quer(o,g,forca){if(!o.isMesh||!o.material||o.userData.fusao||PAPEL_HULLDE.get(o))return false;if(!forca&&!ci8NuncaFunde(o,g))return false;
+  const ms=Array.isArray(o.material)?o.material:[o.material];for(const m of ms){const b=papelBase(m);if(b&&!(b.userData&&b.userData.t462)&&cr8Serve(o,b))return true;}return false;}
+/* gêmeos de recorte nas peças que servem; se o Papel já passou pela peça, desfaz-se a conversão dela, troca-se o material e
+   converte-se de novo (o mesmo que uma troca de modo gráfico faz) */
+function ci8Recorte(g,forca){if(!CR829.on||!g||g.userData.ci830r)return 0;g.userData.ci830r=true;let n=0;const L=[];g.traverse(o=>{try{if(ci8Quer(o,g,forca))L.push(o);}catch(e){ci8Erro('quer',e);}});
+  for(const o of L){try{let papel=false;for(const m of (Array.isArray(o.material)?o.material:[o.material]))if(m&&PAPEL_DE.get(m))papel=true;
+      if(papel)papelUm(o,false);
+      const troca=m=>(m&&!(m.userData&&m.userData.t462)&&cr8Serve(o,m))?cr8De(m):m;
+      o.material=Array.isArray(o.material)?o.material.map(troca):troca(o.material);n++;
+      if(papel&&Q.papel)papelUm(o,true);}catch(e){ci8Erro('recorte',e);}}
+  CI830.stats.recorte+=n;return n;}
+/* a caixa do morador no mundo: os ossos nas peças com esqueleto (a geometria delas está na pose de repouso), a geometria nas outras */
+function ci8Caixa(g){CI8_BOX.makeEmpty();g.updateWorldMatrix(true,true);let ossos=false;g.traverse(o=>{if(o.isSkinnedMesh&&o.skeleton&&o.skeleton.bones&&o.skeleton.bones.length)ossos=true;});CI830.ossos=ossos;g.traverse(o=>{if(!o.isMesh||o.isSprite||!o.geometry||!o.geometry.attributes||!o.geometry.attributes.position)return;
+    if(o.userData.fx||o.userData.sombra462||PAPEL_HULLDE.get(o)||(o.material&&o.material.blending===THREE.AdditiveBlending))return;
+    if(o.isSkinnedMesh&&o.skeleton&&o.skeleton.bones&&o.skeleton.bones.length){for(const b of o.skeleton.bones){const e=b.matrixWorld.elements;if(isFinite(e[12])){CI8_V.set(e[12],e[13],e[14]);CI8_BOX.expandByPoint(CI8_V);}}return;}
+    if(ossos)return; // chapéu, avental e o que mais o personagem leva não alargam a pegada
+    const gg=o.geometry;if(!gg.boundingBox)gg.computeBoundingBox();const b=gg.boundingBox;if(!b||!isFinite(b.min.x))return;CI8_B2.copy(b).applyMatrix4(o.matrixWorld);if(CI8_B2.max.x-CI8_B2.min.x<8&&CI8_B2.max.y-CI8_B2.min.y<12&&CI8_B2.max.z-CI8_B2.min.z<8)CI8_BOX.union(CI8_B2);});return CI8_BOX;}
+function ci8Estado(sc){let E=CI830.cenas.get(sc);if(E)return E;E={inst:null,itens:[],vistos:new WeakSet()};CI830.cenas.set(sc,E);return E;}
+function ci8Mundo(g,o){const p=g.parent,x=g.position.x,y=g.position.y,z=g.position.z;if(!p)return o.set(x,y,z);const e=p.matrixWorld.elements;return o.set(e[0]*x+e[4]*y+e[8]*z+e[12],e[1]*x+e[5]*y+e[9]*z+e[13],e[2]*x+e[6]*y+e[10]*z+e[14]);}
+function ci8Chefe(k){return !!k&&(k.tipo==='farao'||k.tipo==='colecionador'||!!k.chefe201||!!k.chefe||!!k.mestre);}
+/* regista a sombra de um grupo apoiado no chão (ou num apoio que o chão da sala não conhece: um píer, um banco) */
+function ci8Item(E,R,g,nome){const b=ci8Caixa(g);if(b.isEmpty())return false;b.getSize(CI8_S);const cx=(b.min.x+b.max.x)/2,cz=(b.min.z+b.max.z)/2,yb=b.min.y;let fy=0;try{if(R.floorY)fy=R.floorY(cx,cz);}catch(e){}if(!isFinite(fy))fy=0;
+  // no ar (fadas, o robô que flutua): sem sombra
+  if(!isFinite(yb)||yb-fy>0.9||(yb-fy>0.45&&/fada|fadinha/i.test((nome||'')+' '+(g.name||'')))){CI830.stats.noAr++;return false;}
+  if(E.itens.length>=CI830.CAP)return false;ci8Mundo(g,CI8_V);const y=Math.max(yb,fy);
+  E.itens.push({g,R,raio:Math.max(0.34,Math.min(CI830.ossos?0.5:1.6,Math.sqrt(Math.max(0.01,CI8_S.x*CI8_S.z))*0.66)),dx:cx-CI8_V.x,dz:cz-CI8_V.z,dy:y-fy,ry:g.rotation.y,gx:NaN,gy:NaN,gz:NaN,vis:null,nome});
+  CI830.stats.sombras++;return true;}
+function ci8Sala(key){if(!CI830.on)return;const R=ROOMS[key];if(!R||!R.scene)return;const sc=R.scene,E=ci8Estado(sc);const lista=(NPC127.rooms[key]||[]);let novos=0,pecas=null,gnomos=null;
+  for(const n of lista){const g=n&&n.g;if(!g||!g.isObject3D||E.vistos.has(g))continue;let dentro=false;for(let p=g;p;p=p.parent)if(p===sc){dentro=true;break;}if(!dentro)continue;E.vistos.add(g);CI830.stats.grupos++;
+    try{if(!gnomos){gnomos=new Set();if(key==='fant')try{for(const q of __FANT.lifeV58.gnomes)if(q&&q.root)gnomos.add(q.root);}catch(e){}}
+      if(!gnomos.has(g))ci8Recorte(g);}catch(e){ci8Erro('recorte '+key,e);}
+    if(!CI830.sombra)continue;
+    try{// as peças da galeria (v462) ganham a sombra delas quando a sala corre: não se repete
+      if(!pecas){pecas=new Set();try{for(const o of (G232.postos[key]||[]))if(o&&o.m)pecas.add(o.m);}catch(e){}}
+      let da462=false;for(let p=g;p&&p!==sc;p=p.parent)if(pecas.has(p)){da462=true;break;}if(!da462&&pecas.size)g.traverse(o=>{if(pecas.has(o))da462=true;});if(da462){CI830.stats.v462++;continue;}
+      if(ci8Item(E,R,g,n.name))novos++;}catch(e){ci8Erro('sombra '+key,e);}}
+  // (4) CHEFES: o Faraó e o Acumulador ficaram de fora da sombra de contato dos inimigos (v474) — entram aqui, com a luz de recorte
+  if(CI830.chefes)try{const S=CAV.salas[key];if(S&&S.lista)for(const k of S.lista){const g=k&&k.g;if(!g||!g.isObject3D||!ci8Chefe(k)||E.vistos.has(g))continue;let dentro=false;for(let p=g;p;p=p.parent)if(p===sc){dentro=true;break;}if(!dentro)continue;
+      E.vistos.add(g);CI830.stats.chefes=(CI830.stats.chefes||0)+1;try{ci8Recorte(g,true);}catch(e){ci8Erro('recorte chefe',e);}
+      if(CI830.sombra&&!(g.userData.n474&&g.userData.n474.sombra)){const v0=g.visible;g.visible=true;try{if(ci8Item(E,R,g,'chefe '+(k.tipo||''))){novos++;E.itens[E.itens.length-1].dy+=0.045;}}finally{g.visible=v0;}}}}catch(e){ci8Erro('chefes '+key,e);}
+  if(novos&&E.itens.length){try{if(!E.inst){const B=t462Blob();try{t462Qualidade();}catch(e){}const im=new THREE.InstancedMesh(B.geo,B.mat,CI830.CAP);im.name='830 sombras dos moradores';im.count=0;im.frustumCulled=false;im.renderOrder=-1;im.raycast=()=>{};
+        im.userData.noCam=true;im.userData.fx=true;im.userData.sombra462=true;im.castShadow=false;im.receiveShadow=false;im.matrixAutoUpdate=false;sc.add(im);im.updateMatrixWorld(true);E.inst=im;CI830.stats.salas++;}
+      ci8Poe(E,true);}catch(e){ci8Erro('malha '+key,e);}}}
+/* escreve as matrizes: todas (tudo=true) ou só as de quem andou, girou ou mudou de visibilidade */
+function ci8Poe(E,tudo){const im=E.inst;if(!im)return;let mudou=false;const L=E.itens;for(let i=0;i<L.length;i++){const it=L[i],g=it.g;let vis=false;if(g.parent){vis=true;for(let p=g;p;p=p.parent)if(!p.visible){vis=false;break;}}
+    ci8Mundo(g,CI8_V);const gx=CI8_V.x,gy=CI8_V.y,gz=CI8_V.z,ry=g.rotation.y;
+    if(!tudo&&vis===it.vis&&Math.abs(gx-it.gx)<0.004&&Math.abs(gy-it.gy)<0.004&&Math.abs(gz-it.gz)<0.004&&Math.abs(ry-it.gr)<0.01)continue;
+    const andou=it.gx===it.gx&&(Math.abs(gx-it.gx0)>0.004||Math.abs(gz-it.gz0)>0.004||Math.abs(gy-it.gy0)>0.004);
+    if(it.gx!==it.gx){it.gx0=gx;it.gy0=gy;it.gz0=gz;}it.vis=vis;it.gx=gx;it.gy=gy;it.gz=gz;it.gr=ry;mudou=true;if(!vis){im.setMatrixAt(i,CI8_ZERO);continue;}
+    let dx=it.dx,dz=it.dz;const d=ry-it.ry;if(d){const c=Math.cos(d),s=Math.sin(d);dx=it.dx*c+it.dz*s;dz=-it.dx*s+it.dz*c;}
+    const x=gx+dx,z=gz+dz;let fy=null;if(andou||it.fy===undefined){fy=0;try{if(it.R.floorY)fy=it.R.floorY(x,z);}catch(e){}if(!isFinite(fy))fy=0;it.fy=fy;}else fy=it.fy;
+    CI8_M.makeScale(it.raio,1,it.raio);CI8_M.setPosition(x,fy+it.dy+0.014,z);im.setMatrixAt(i,CI8_M);}
+  if(im.count!==L.length){im.count=L.length;mudou=true;}if(mudou)im.instanceMatrix.needsUpdate=true;}
+/* (5) INIMIGOS — no Leve e no Papel a aura de partículas e a luz da sala da v474 não rodam («Não roda no Leve nem no Papel»): nada
+   distinguia o inimigo que já vem atrás do leitor do que ainda está parado. Nesses dois modos, um halo macio na cor do tipo acende
+   no chão em volta de cada inimigo acordado a menos de 16 m (um anel de luz, que clareia na telegrafia do tiro): UMA malha instanciada por sala, só
+   desenhada quando há algum aceso. Os inimigos não ganham a luz de recorte: parados, as peças deles entram na fusão estática
+   (6 peixes = 30 peças → poucas malhas), e o sombreador próprio tirava-as de lá. `?halo830=0` desliga. */
+const CI8_C=new THREE.Color();
+function ci8HaloMalha(sc){let H=sc.userData.halo830;if(H)return H;if(!CI830.haloGeo){CI830.haloGeo=new THREE.CircleGeometry(1,24);CI830.haloGeo.rotateX(-Math.PI/2);
+    // um ANEL de luz (apagado no meio: a sombra de contato do inimigo fica lá)
+    const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d'),gr=x.createRadialGradient(64,64,0,64,64,64);for(const [p,a] of [[0,0],[.34,0],[.5,.45],[.64,1],[.8,.4],[1,0]])gr.addColorStop(p,'rgba(255,255,255,'+a+')');x.fillStyle=gr;x.fillRect(0,0,128,128);
+    const m=new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c),transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2});m.userData.papelKeep=true;m.userData.fusaoUnico=true;m.name='v830 halo do inimigo';CI830.haloMat=m;}
+  H=new THREE.InstancedMesh(CI830.haloGeo,CI830.haloMat,16);H.name='830 halo dos inimigos';H.frustumCulled=false;H.raycast=()=>{};H.userData.fx=true;H.userData.noCam=true;H.userData.noFade=true;H.layers.set(1);H.matrixAutoUpdate=false;
+  CI8_C.setRGB(0,0,0);for(let i=0;i<16;i++){H.setColorAt(i,CI8_C);H.setMatrixAt(i,CI8_ZERO);} // (o `setColorAt` cria o atributo com `count` posições: a contagem só baixa depois)
+  H.count=0;H.visible=false;sc.add(H);H.updateMatrixWorld(true);sc.userData.halo830=H;return H;}
+function ci8Halo(dt){const sc=ROOM&&ROOM.scene;if(!sc)return;let H=sc.userData.halo830;const room=cavRoom(),S=room&&ROOMS[room]===ROOM?CAV.salas[room]:null;
+  if(!S||!S.lista||!(Q.lite||Q.papel)||CAV.morto){if(H&&H.visible)H.visible=false;return;}
+  const pl=cavPos(),d0=Math.min(.05,dt||.016);let n=0;
+  for(const k of S.lista){const g=k.g,D=g&&g.userData.n474;if(!D||n474Fora(k))continue;let a=k.h830||0;const dx=pl.x-k.x,dz=pl.z-k.z;
+    const alvo=(k.viva&&g.visible&&!(k.sono>0)&&dx*dx+dz*dz<256)?((k.n474&&k.n474.tele>0)?1:.6):0;a+=(alvo-a)*Math.min(1,d0*3);k.h830=a;if(a<.02||n>=16)continue;
+    if(!H)H=ci8HaloMalha(sc);let base;try{base=cavY(ROOM,k.x,k.z);}catch(e){base=g.position.y;}
+    const r=Math.max(.75,D.w*1.3)*(1+.05*Math.sin((k.bob||0)*3.1));CI8_M.makeScale(r,1,r);CI8_M.setPosition(k.x,base-1.35+.022,k.z);H.setMatrixAt(n,CI8_M);
+    const I=INI155[k.tipo]||INI155.caveira;CI8_C.set(I&&I.faisca?I.faisca[1]:0xffd080).multiplyScalar(a*CI830.HALO);H.setColorAt(n,CI8_C);n++;}
+  if(H){H.count=n;H.visible=n>0;if(n){H.instanceMatrix.needsUpdate=true;if(H.instanceColor)H.instanceColor.needsUpdate=true;}}}
+if(CI830.on){
+  try{const fr0=finishRoom;finishRoom=fr8Wrap(function*(key){const r=(yield* fr8Prev(fr0,this,arguments,"ci830"));try{ci8Sala(key);}catch(e){ci8Erro('sala '+key,e);}return r;});}catch(e){ci8Erro('finishRoom',e);}
+  try{const g0=gearTick;gearTick=function(dt){const r=g0.apply(this,arguments);
+      try{if(CUR==='room'&&ROOM&&ROOM.scene){const q=(CI830.n=(CI830.n+1)%90);
+          if(q===0){let key=CI830.chave;if(!key||ROOMS[key]!==ROOM)key=CI830.chave=Object.keys(ROOMS).find(k=>ROOMS[k]===ROOM);if(key)ci8Sala(key);}
+          const E=CI830.cenas.get(ROOM.scene);if(E&&E.inst)ci8Poe(E,false);if(CI830.halo)ci8Halo(dt);}}catch(e){if(!CI830.avisou){CI830.avisou=true;ci8Erro('quadro',e);}}
+      return r;};}catch(e){ci8Erro('gearTick',e);}
+  // salas que já existem quando o bloco chega (a Biblioteca)
+  try{for(const k in ROOMS){try{if(ROOMS[k]&&ROOMS[k].scene&&NPC127.rooms[k])ci8Sala(k);}catch(e){ci8Erro('início '+k,e);}}}catch(e){}
+}
+/* (3) PERSONAGENS HUMANOS (figuras articuladas `detailedHuman`) — pedido do Luiz a meio da rodada (16/11, 17h05): «Esses NPcs de
+   chapéu são ridículos, pode remover eles» e, perguntado quais, «tire só os acessórios e varie a altura e forma dos repetidos».
+   (a) SEM ACESSÓRIOS: os habitantes que levavam algo na cabeça (cartola, fedora, chapéu de palha, touca, lenço, nuvem, toucado
+   egípcio, turbante, chapéu cónico, elmo, gálea — 13 personagens do 6.º andar e dos pátios e do Nilo da Histórica) ficam sem os
+   acessórios da v224 (os da cabeça e os que vinham com eles: avental, óculos, colar, rolo). O personagem, o lugar e as falas ficam.
+   Quem só tinha a cruz ou o colar (Frei Anselmo, Sobek-hotep) fica como estava.
+   (b) ALTURA E FORMA: são cinco modelos (templário, gladiador, estudiosa, monge, nobre) para duas dezenas e meia de habitantes — os
+   repetidos eram gêmeos. Cada um ganha altura (0,91–1,06) e corpo (largura 0,92–1,13; profundidade 0,94–1,11) próprios, de uma
+   tabela por habitante (sempre os mesmos, em qualquer sessão; um habitante novo tira o corpo do nome); os que nascem sentados
+   mantêm a altura (o banco). O leitor não muda.
+   `?acessorios830=1` devolve os acessórios; `?varia830=0` desliga a variação (corpo e cores); `?cores830=0` só as cores. */
+CI830.semAcess=!/[?&#]acessorios830=1/i.test(location.search+location.hash);CI830.varia=!/[?&#](moradores830|varia830)=0/i.test(location.search+location.hash);CI830.cores=!/[?&#](moradores830|varia830|cores830)=0/i.test(location.search+location.hash);
+const CI8_CABECA=/^(fedora|cartola|palha|lenco|touca|nuvem|nemes|turbante|hennin|elmo|galea)$/;
+if(CI830.on&&CI830.semAcess)try{const a0=v224Acessorios;v224Acessorios=function(rig,lista,cor){try{if(lista&&lista.some(t=>CI8_CABECA.test(t))){CI830.stats.semAcess=(CI830.stats.semAcess||0)+1;return;}}catch(e){ci8Erro('acessórios',e);}return a0.apply(this,arguments);};}catch(e){ci8Erro('v224Acessorios',e);}
+function ci8Hash(t){let h=2166136261;for(let i=0;i<t.length;i++){h^=t.charCodeAt(i);h=Math.imul(h,16777619);}h^=h>>>15;h=Math.imul(h,2246822507);h^=h>>>13;return h>>>0;}
+/* (c) CORES (17h54: «esses repetidos vc pode mudar a cor do cabelo, roupa etc também»): a malha de cada modelo tem UMA textura (um
+   atlas de projeções, sem regiões separadas), então a cor muda no sombreador do material de cada habitante: o texel é classificado
+   pelo tom/saturação/valor e pela posição do vértice na pose de repouso (acima do queixo; atrás da nuca; mãos; pés) em PELE, ROUPA
+   (a janela de tom do traje de cada modelo: o verde-oliva da estudiosa, o bordô do nobre, o castanho do hábito; no templário, o
+   tecido branco) e CABELO (escuro, na cabeça e atrás dos ombros, fora dos olhos e do nariz) — e cada classe ganha o seu giro de
+   tom, saturação e valor (o tecido branco, uma tinta). Sem textura nova, sem memória; um programa a mais por sala (o dos humanos
+   troca o da luz de recorte, que continua lá dentro). Os valores por habitante estão na tabela; quem não está nela não muda de cor. */
+const CI8_H=new WeakMap();
+const CI8_HV='varying vec3 vB830;\n';
+const CI8_HF=['uniform vec3 uRo830;','uniform vec3 uCa830;','uniform vec4 uJa830;','uniform vec3 uTi830;','uniform vec4 uRe830;','uniform vec3 uPe830;','varying vec3 vB830;',
+  'vec3 hsv830(vec3 c){vec4 K=vec4(0.0,-1.0/3.0,2.0/3.0,-1.0);vec4 p=mix(vec4(c.bg,K.wz),vec4(c.gb,K.xy),step(c.b,c.g));vec4 q=mix(vec4(p.xyw,c.r),vec4(c.r,p.yzx),step(p.x,c.r));float d=q.x-min(q.w,q.y);return vec3(abs(q.z+(q.w-q.y)/(6.0*d+1.0e-10)),d/(q.x+1.0e-10),q.x);}',
+  'vec3 rgb830(vec3 c){vec4 K=vec4(1.0,2.0/3.0,1.0/3.0,3.0);vec3 p=abs(fract(c.xxx+K.xyz)*6.0-K.www);return c.z*mix(K.xxx,clamp(p-K.xxx,0.0,1.0),c.y);}',''].join('\n');
+const CI8_HC=['{ vec3 s830 = pow( max( diffuseColor.rgb, vec3( 0.0 ) ), vec3( 0.4545 ) ); vec3 h830 = hsv830( s830 );',
+  'float dP830 = abs( fract( h830.x - 0.062 + 0.5 ) - 0.5 );',
+  'float pele830 = ( 1.0 - smoothstep( 0.05, 0.08, dP830 ) ) * smoothstep( 0.14, 0.24, h830.y ) * smoothstep( 0.42, 0.54, h830.z );',
+  's830 = mix( s830, rgb830( vec3( h830.x, clamp( h830.y * uPe830.x, 0.0, 1.0 ), clamp( h830.z * uPe830.y, 0.0, 1.0 ) ) ), pele830 * uPe830.z );',
+  'float cab830 = smoothstep( uRe830.x - 0.015, uRe830.x + 0.015, vB830.y );',
+  'float mao830 = smoothstep( uRe830.z - 0.02, uRe830.z + 0.02, abs( vB830.x ) ) * ( 1.0 - smoothstep( 1.05, 1.15, vB830.y ) );',
+  'float jan830; vec3 r830;',
+  'if ( uJa830.x < 0.0 ) { jan830 = ( 1.0 - smoothstep( 0.16, 0.30, h830.y ) ) * smoothstep( 0.50, 0.66, h830.z ); r830 = s830 * uTi830; }',
+  'else { float dJ830 = abs( fract( h830.x - uJa830.x + 0.5 ) - 0.5 ); jan830 = ( 1.0 - smoothstep( uJa830.y * 0.75, uJa830.y, dJ830 ) ) * smoothstep( uJa830.z * 0.5, uJa830.z, h830.y );',
+  '  r830 = rgb830( vec3( fract( h830.x + uRo830.x ), clamp( h830.y * uRo830.y, 0.0, 1.0 ), clamp( h830.z * uRo830.z, 0.0, 1.0 ) ) ); }',
+  'float mR830 = jan830 * ( 1.0 - mao830 ) * mix( 1.0, 1.0 - pele830, cab830 ) * smoothstep( 0.07, 0.11, vB830.y ) * uJa830.w;',
+  's830 = mix( s830, r830, mR830 );',
+  'float tras830 = smoothstep( uRe830.y - 0.02, uRe830.y + 0.02, vB830.y ) * ( 1.0 - smoothstep( -0.035, -0.005, vB830.z ) );',
+  'float rosto830 = smoothstep( 0.035, 0.07, vB830.z ) * smoothstep( 1.555, 1.575, vB830.y ) * ( 1.0 - smoothstep( 1.645, 1.675, vB830.y ) );',
+  'float mC830 = max( cab830, tras830 ) * ( 1.0 - jan830 ) * ( 1.0 - smoothstep( uRe830.w * 0.8, uRe830.w, h830.z ) ) * ( 1.0 - rosto830 ) * step( 0.001, uRe830.w );',
+  's830 = mix( s830, rgb830( vec3( fract( h830.x + uCa830.x ), clamp( h830.y * uCa830.y, 0.0, 1.0 ), clamp( h830.z * uCa830.z, 0.0, 1.0 ) ) ), mC830 );',
+  'diffuseColor.rgb = pow( s830, vec3( 2.2 ) ); }'].join('\n');
+function ci8HumInjeta(sh,P){if(sh.fragmentShader.indexOf('uRo830')<0&&sh.fragmentShader.indexOf('#include <map_fragment>')>=0&&sh.vertexShader.indexOf('#include <begin_vertex>')>=0){
+    sh.vertexShader=CI8_HV+sh.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvB830 = position;');sh.fragmentShader=CI8_HF+sh.fragmentShader.replace('#include <map_fragment>','#include <map_fragment>\n'+CI8_HC);}
+  if(sh.fragmentShader.indexOf('uRo830')>=0){sh.uniforms.uRo830={value:P.ro};sh.uniforms.uCa830={value:P.ca};sh.uniforms.uJa830={value:P.ja};sh.uniforms.uTi830={value:P.ti};sh.uniforms.uRe830={value:P.re};sh.uniforms.uPe830={value:P.pe};}}
+/* a MESMA função para todos os humanos (partilham o programa); no Papel o `this` é o gêmeo toon — os valores vêm do material de que ele saiu */
+function ci8HumCompila(sh){try{const P=CI8_H.get(this)||CI8_H.get(PAPEL_DE.get(this));if(P)ci8HumInjeta(sh,P);}catch(e){ci8Erro('cores (programa)',e);}if(CR829.on)cr8Injeta(sh);}
+/* por modelo: janela da roupa [tom central (voltas; <0 = tecido branco), meia-largura, saturação mínima, peso] e regiões [y do queixo, y de baixo do cabelo comprido, |x| das mãos, valor máximo do cabelo (0 = sem cabelo a pintar)] */
+const CI8_MODELO={estudiosa:{ja:[0.18,0.10,0.10,1],re:[1.47,1.28,0.33,0.42]},nobre:{ja:[0.975,0.075,0.14,1],re:[1.47,1.30,0.33,0.40]},monge:{ja:[0.062,0.09,0.12,1],re:[1.47,9,0.42,0]},templario:{ja:[-1,0,0,1],re:[1.47,9,0.34,0.40]}};
+/* a malha do personagem chega DEPOIS do `detailedHuman` (o modelo é carregado à parte: `rig.readyPromise`), e a essa altura o
+   Papel ou a luz de recorte podem já ter passado por ela ou não — aqui o material que estiver na malha ganha o gêmeo de recorte
+   (se ainda não tem) e, para quem está na tabela, as cores; se o Papel já tinha o toon desse gêmeo guardado, o toon é acertado. */
+function ci8Humano(rig,v){const g=rig&&rig.g;if(!g)return 0;const M=CI8_MODELO[g.userData.aiCharacter];if(!M)v=null;let n=0;
+  g.traverse(o=>{if(!o.isSkinnedMesh||!o.material||Array.isArray(o.material)||PAPEL_HULLDE.get(o))return;const cur=o.material,conv=!!PAPEL_DE.get(cur),base=conv?PAPEL_DE.get(cur):cur;
+    if(!(base.isMeshStandardMaterial||base.isMeshToonMaterial)||CI8_H.get(base))return;if(!v&&!CR829.on)return;
+    const c=CR8_GEMEOS.has(base)?base:cr8De(base);
+    if(v&&base.map){const T=THREE,ro=v.roupa||[0,1,1],ca=v.cabelo||[0,1,1],ti=v.tinta||[1,1,1],pe=v.pele||[1,1],ja=M.ja,re=M.re;
+      CI8_H.set(c,{ro:new T.Vector3(ro[0],ro[1],ro[2]),ca:new T.Vector3(ca[0],ca[1],ca[2]),ja:new T.Vector4(ja[0],ja[1],ja[2],(v.roupa||v.tinta)?ja[3]:0),ti:new T.Vector3(ti[0],ti[1],ti[2]),re:new T.Vector4(re[0],re[1],re[2],v.cabelo?re[3]:0),pe:new T.Vector3(pe[0],pe[1],v.pele?1:0)});
+      c.onBeforeCompile=ci8HumCompila;c.customProgramCacheKey=function(){return 'ci830h';};c.needsUpdate=true;
+      try{const t=PAPEL_CACHE.get(c);if(t&&t!==c){t.onBeforeCompile=ci8HumCompila;t.customProgramCacheKey=function(){return 'ci830h';};t.needsUpdate=true;}}catch(e){}n++;}
+    if(c!==base){o.material=c;if(conv)papelUm(o,true);}});
+  if(n)CI830.stats.cores=(CI830.stats.cores||0)+1;return n;}
+/* corpo (altura, largura, profundidade) e cores de cada habitante que existe hoje, escolhidos para os que partilham o modelo não se
+   parecerem; o primeiro de cada modelo fica com as cores originais. Quem não está na lista (um habitante novo) tira o corpo do nome.
+   roupa/cabelo: [giro do tom em voltas, saturação ×, valor ×]; tinta: cor do tecido branco; pele: [saturação ×, valor ×] */
+const CI8_CORPOS=[[/Cavaleiro templ|Templar knight/i,1.04,1.07,1.06,null],[/Guilherme|William/i,0.95,0.97,0.99,{tinta:[0.34,0.40,0.62],cabelo:[0.02,1.0,1.7]}],[/Gladiador|gladiator/i,1.01,1.04,1.03,null],
+  [/Cronista da corte|Court chronicler/i,1.05,0.94,0.96,null],[/^Peregrina$|^Pilgrim$/i,0.93,1.08,1.07,{roupa:[0.42,1.7,0.95],cabelo:[0,0.8,0.5],pele:[1.1,0.74]}],
+  [/Copista|Copyist/i,1,0.92,0.95,{roupa:[0.56,1.5,0.9],cabelo:[-0.02,1.3,1.3],pele:[1.05,0.88]}],[/Dama sentada|Seated lady/i,1,1.10,1.08,{roupa:[0.78,2.0,0.85],cabelo:[0,0.6,0.42]}],
+  [/Rem[ée]dios/i,0.94,1.13,1.11,{roupa:[-0.05,0.5,1.45],cabelo:[0,0.15,1.9],pele:[1.05,0.9]}],[/Iara/i,1.06,1.00,1.00,{roupa:[0.08,1.7,1.08],cabelo:[0.03,1.0,1.7]}],[/Hor[áa]cio|Horace/i,0.91,0.95,0.97,{roupa:[0.36,1.5,0.7],cabelo:[0,0.15,1.6]}],
+  [/Patr[íi]cio|patrician/i,1.03,1.09,1.07,null],[/Leitora da corte|Lady reader/i,1,0.93,0.96,{roupa:[0.64,1.2,0.95],cabelo:[0.01,1.1,1.6]}],[/In[êe]s/i,0.94,0.95,0.97,{roupa:[0.42,1.3,0.95],cabelo:[-0.03,1.4,1.3],pele:[1.05,0.9]}],
+  [/Barreto/i,1.06,1.05,1.04,{roupa:[0,0.15,0.62],cabelo:[0,0.6,0.5]}],
+  [/Monge beneditino|Benedictine/i,1.05,1.11,1.11,null],[/Peregrino sentado|Seated pilgrim/i,1,0.94,0.96,{roupa:[0,0.2,0.6]}],[/Anselm/i,0.93,1.03,1.05,{roupa:[0.02,0.45,1.6]}],[/Sonhador|Dreamer/i,1.02,0.92,0.94,{roupa:[0.52,0.8,1.05]}]];
+function ci8Varia(rig,opt){const g=rig&&rig.g;if(!g||!g.scale||g.userData.varia830)return;const nome=String(opt.name||g.name||'');let alt,larg,prof;const C=CI8_CORPOS.find(c=>c[0].test(nome));
+  if(C){alt=C[1];larg=C[2];prof=C[3];}else{const h=ci8Hash(nome+'|'+String(opt.kind||''));const a=(h&1023)/1023,b=((h>>>10)&1023)/1023,c=((h>>>20)&1023)/1023;alt=0.91+0.16*a;larg=0.90+0.24*b;prof=0.93+0.20*(0.7*b+0.3*c);}
+  if(opt.seated)alt=1; // sentado: a altura é a do banco
+  g.scale.set(g.scale.x*larg,g.scale.y*alt,g.scale.z*prof);g.userData.varia830=[+larg.toFixed(3),+alt.toFixed(3),+prof.toFixed(3)];CI830.stats.variados=(CI830.stats.variados||0)+1;
+  const depois=()=>{try{ci8Humano(rig,(CI830.cores&&C&&C[4])||null);}catch(e){ci8Erro('humano '+nome,e);}};
+  try{if(rig.readyPromise&&typeof rig.readyPromise.then==='function')rig.readyPromise.then(depois,()=>{});else depois();}catch(e){ci8Erro('humano (espera) '+nome,e);}}
+if(CI830.on&&CI830.varia)try{const d0=detailedHuman;detailedHuman=fr8Wrap(function*(opt){const rig=(yield* fr8Prev(d0,this,arguments,"ci830h"));
+    try{if(opt&&(opt.kind||'reader')!=='reader')ci8Varia(rig,opt);}catch(e){ci8Erro('variação',e);}return rig;});}catch(e){ci8Erro('detailedHuman',e);}
+window.__moradores830={estado:CI830,erros:CI830.erros,stats:CI830.stats,sala:ci8Sala,recorte:ci8Recorte,itens:k=>{const R=ROOMS[k],E=R&&CI830.cenas.get(R.scene);return E?E.itens.map(i=>[i.nome,+i.raio.toFixed(2),+(i.gx+i.dx).toFixed(2),+(i.fy+i.dy).toFixed(2),+(i.gz+i.dz).toFixed(2),i.vis]):null;}};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
