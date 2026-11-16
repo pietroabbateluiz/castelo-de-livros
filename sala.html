@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v819</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v820</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -95419,6 +95419,48 @@ if(FR819.on){
   try{const m0=master429Tick;master429Tick=function(){if(FR819.atual&&!FR819.rodando)return;return m0.apply(this,arguments);};}catch(e){FR819.erros.push('master429: '+e.message);}
 }
 window.__fatias819={estado:FR819,stats:FR819.stats,erros:FR819.erros};
+
+/* ===================== v820 · A GRADE DE CAMINHOS NÃO É REFEITA A CADA OBSTÁCULO (bloco `NV820`) =====================
+   `navFor(world)` — a grade de células de 30 cm em que o clique, os inimigos, os baús de prata, as chaves e a colocação dos ativos
+   procuram caminho e lugar — refazia TUDO sempre que o número de obstáculos mudava: para cada célula, uma chamada a `world.clamp`
+   (na Fantasia e na Catedral são ~500 mil chamadas a um clamp de várias camadas: 0,4–0,9 s). Como cada peça de decoração acrescenta
+   obstáculos e logo a seguir alguém pergunta pela grade, uma sala era varrida 20–30 vezes enquanto se montava: 5,8 s de `navFor` em
+   240 s de perfil, e era ele que estava dentro das travas do `chest2Spot` (0,6–0,9 s), do `g232Cands`, das chaves e das caveiras.
+   A grade tem duas partes: a MÁSCARA DO CLAMP (onde o mundo deixa andar: cara, e não depende dos obstáculos) e os DISCOS dos
+   obstáculos (baratos). A máscara passa a ficar guardada no mundo (`world.__nv8`) e só é refeita quando muda o tamanho do mundo,
+   a `navKey` (menos a revisão da decoração, `d<n>`, que só mexe em obstáculos — era ela que invalidava tudo 14 vezes na Fantasia),
+   ou a própria função `clamp` (as camadas que a embrulham trocam a função); a cada reaproveitamento uma célula em 64 é conferida
+   de novo (a fase roda a cada vez), e qualquer diferença refaz tudo. O resultado é o mesmo de antes, célula a célula.
+   E a primeira máscara de cada sala é feita em fatias antes do acabamento (`nv8AqueceG`, no `fr8Monta`), para o primeiro pedido
+   já a encontrar pronta. `?nav820=0` volta à grade refeita de cada vez. Gancho `window.__nav820` (`stats`). */
+const NV820={on:!/[?&#]nav820=0/i.test(location.search+location.hash),stats:{inteiras:0,reusos:0,recusas:0,aquecidas:0,msInteira:0,msReuso:0,porque:{semMascara:0,tamanho:0,navKey:0,clamp:0}},erros:[]};
+function nv8Dim(world){const S=0.3,N=Math.ceil((world.ext||16.8)*2/S);return {S,N,H:N*S/2};}
+// a parte da navKey que diz respeito ao clamp: a revisão da decoração (`d<n>`, posta pelo decorRegister128 porque as peças mudam obstáculos de lugar sem mudar a contagem) não entra
+function nv8Chave(nk){return String(nk).replace(/d\d+/g,'d#');}
+function nv8Linha(world,base,j,N,H,S){const z=-H+(j+.5)*S,o=j*N;for(let i=0;i<N;i++){const x=-H+(i+.5)*S;const c=world.clamp(x,z,.9);if(Math.abs(c[0]-x)<=.01&&Math.abs(c[1]-z)<=.01)base[o+i]=1;}}
+function nv8Guardada(world,N,nk,conta){const B=world.__nv8;if(B&&B.base&&B.N===N&&B.nk===nk&&B.clamp===world.clamp)return B;if(conta){const p=NV820.stats.porque;if(!B)p.semMascara++;else if(B.N!==N)p.tamanho++;else if(B.nk!==nk)p.navKey++;else p.clamp++;}return null;}
+function nv8NavFor(world){const nk=world.navKey?world.navKey():'';if(world.__nav&&world.__navN===world.obst.length&&world.__navK===nk)return world.__nav;
+  const t0=performance.now(),{S,N,H}=nv8Dim(world),obstacles=world.obst,nkb=nv8Chave(nk);let base=null;const B=nv8Guardada(world,N,nkb,true);
+  if(B){const f=B.fase=(B.fase+1)&63,fi=f&7,fj=f>>3;let ok=true;   // conferência: 1 célula em 64, fase a rodar
+    for(let j=fj;j<N&&ok;j+=8){const z=-H+(j+.5)*S,o=j*N;for(let i=fi;i<N;i+=8){const x=-H+(i+.5)*S;const c=world.clamp(x,z,.9);if(((Math.abs(c[0]-x)<=.01&&Math.abs(c[1]-z)<=.01)?1:0)!==B.base[o+i]){ok=false;break;}}}
+    if(ok)base=B.base;else NV820.stats.recusas++;}
+  if(!base){base=new Uint8Array(N*N);for(let j=0;j<N;j++)nv8Linha(world,base,j,N,H,S);world.__nv8={N,nk:nkb,clamp:world.clamp,base,fase:0};NV820.stats.inteiras++;NV820.stats.msInteira+=performance.now()-t0;}
+  const walk=new Uint8Array(base);
+  for(const [ox,oz,r] of obstacles){const radius=r+.06;if(radius<=0)continue;const loX=Math.max(0,Math.ceil((ox-radius+H)/S-.5)),hiX=Math.min(N-1,Math.floor((ox+radius+H)/S-.5)),loZ=Math.max(0,Math.ceil((oz-radius+H)/S-.5)),hiZ=Math.min(N-1,Math.floor((oz+radius+H)/S-.5));for(let j=loZ;j<=hiZ;j++)for(let i=loX;i<=hiX;i++){const dx=-H+(i+.5)*S-ox,dz=-H+(j+.5)*S-oz;if(dx*dx+dz*dz<radius*radius)walk[j*N+i]=0;}}
+  if(B&&base===B.base){NV820.stats.reusos++;NV820.stats.msReuso+=performance.now()-t0;}
+  world.__nav={S,N,H,walk};world.__navN=world.obst.length;world.__navK=nk;return world.__nav;}
+// a máscara de um mundo em fatias (linhas da grade até acabar o tempo da fatia)
+function* nv8AqueceG(world){if(!world||typeof world.clamp!=='function')return;const nk=nv8Chave(world.navKey?world.navKey():''),{S,N,H}=nv8Dim(world);if(nv8Guardada(world,N,nk))return;
+  const clamp=world.clamp,base=new Uint8Array(N*N);for(let j=0;j<N;j++){nv8Linha(world,base,j,N,H,S);if(performance.now()>=fat8Fim){yield 'grade';if(world.clamp!==clamp)return;}}
+  if(!world.__nv8||world.__nv8.clamp!==clamp||world.__nv8.N!==N){world.__nv8={N,nk,clamp,base,fase:0};NV820.stats.aquecidas++;}}
+if(NV820.on){
+  try{navFor=(typeof jav443Sem==='function')?jav443Sem(nv8NavFor):nv8NavFor;}catch(e){NV820.erros.push('navFor: '+e.message);}
+  // antes do acabamento de uma sala montada nos bastidores: a máscara dela, em fatias
+  try{const m0=fr8Monta;fr8Monta=function*(it,key){let r;for(;;){r=it.next();if(r.done)break;yield r.value;}
+      try{const R=ROOMS[key];if(R&&R.world&&!R.__fr8&&!R.ready&&FR819.on){const g=nv8AqueceG(R.world);for(;;){fat8Fim=performance.now()+4;if(g.next().done)break;yield 'grade';}}}catch(e){NV820.erros.push('aquece '+key+': '+(e&&e.message||e));}
+      return yield* m0((function*(){return r.value;})(),key);};}catch(e){NV820.erros.push('fr8Monta: '+e.message);}
+}
+window.__nav820={estado:NV820,stats:NV820.stats,erros:NV820.erros};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
