@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v830</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v831</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -109004,6 +109004,88 @@ function ci8Varia(rig,opt){const g=rig&&rig.g;if(!g||!g.scale||g.userData.varia8
 if(CI830.on&&CI830.varia)try{const d0=detailedHuman;detailedHuman=fr8Wrap(function*(opt){const rig=(yield* fr8Prev(d0,this,arguments,"ci830h"));
     try{if(opt&&(opt.kind||'reader')!=='reader')ci8Varia(rig,opt);}catch(e){ci8Erro('variação',e);}return rig;});}catch(e){ci8Erro('detailedHuman',e);}
 window.__moradores830={estado:CI830,erros:CI830.erros,stats:CI830.stats,sala:ci8Sala,recorte:ci8Recorte,itens:k=>{const R=ROOMS[k],E=R&&CI830.cenas.get(R.scene);return E?E.itens.map(i=>[i.nome,+i.raio.toFixed(2),+(i.gx+i.dx).toFixed(2),+(i.fy+i.dy).toFixed(2),+(i.gz+i.dz).toFixed(2),i.vis]):null;}};
+
+/* ===================== v831 · O CÉU ESTRELADO DA FANTASIA, REFEITO (bloco `CE831`) =====================
+   Pedido do Luiz (16/11): «melhore as estrelas da sala fantasia. Elas parecem baixas em alguns pontos e não cobrem o céu inteiro,
+   parecem artificiais». Visto na máquina dele (Papel, 1536 × 695) e no código da v719:
+   (a) BAIXAS — as estrelas moravam numa esfera de 47,5 m de raio em volta da câmera, DENTRO da cena: tudo o que fica mais longe
+       do que isso (a floresta distante, as colinas, as torres, a arena no alto da colina) aparecia ATRÁS das estrelas; e a esfera só
+       seguia a câmera em x/z — de um ponto alto (o planalto da arena, o deque da Grande Árvore) as de baixo ficavam abaixo dos olhos.
+   (b) NÃO COBREM — a esfera acabava 2° acima do horizonte dela (não do horizonte que se vê) e eram só 630 estrelas visíveis mais
+       uma faixa pontilhada de ±8° (a «Via Láctea»), com vazios grandes entre elas.
+   (c) ARTIFICIAIS — o tamanho era dado em pixels do quadro (4–11 px × dpr); no Papel o quadro é desenhado a 55–85 % e ampliado, e
+       cada estrela virava uma bola macia de 8–18 px na tela, todas da mesma textura de brilho, a pulsar de tamanho.
+   AGORA: (1) as estrelas ficam NO INFINITO — o sombreador usa só a rotação da câmera (não a posição) e desenha na profundidade do
+   fundo, ANTES das camadas distantes do céu (serras e copas ao longe, ordem −40…−20: as estrelas ficam em −60): aparecem só onde
+   não há mais nada (céu) e nunca na frente de árvore, colina, serra ou torre, de qualquer altura e de qualquer câmera. (2) Cobrem a abóbada inteira até 8° abaixo do horizonte (de um ponto alto o céu continua até à linha
+   do terreno), com extinção perto do horizonte (mais fracas e raras em baixo, como no céu de verdade). (3) São 6.840 estrelas de
+   brilho e cor variados — a grande maioria fraca e pequena (1,0–1,8 px), 1.500 médias, 140 brilhantes (até 4,4 px, com um halo curto)
+   — desenhadas como um ponto gaussiano (sem textura), com o tamanho corrigido pela escala real do quadro; cintilam no BRILHO (as
+   brilhantes mais), não no tamanho. (4) A Via Láctea deixa de ser uma faixa pontilhada: 3.400 pontinhos muito fracos com densidade
+   irregular ao longo de um grande círculo, por cima de uma faixa de luz difusa (uma malha, textura de ruído de 256 × 64).
+   As 1.800 estrelas antigas (v10/v143) continuam a ser o relógio do dia e da noite (a opacidade delas manda), mas não são desenhadas.
+   Custo: 2 chamadas de desenho (eram 2: as antigas e as da v719), ~10.200 pontos, 0 luzes, 1 textura de 256 × 64; monta em ~10 ms.
+   `?ceu831=0` volta ao céu da v719. Gancho `window.__ceu831`. */
+const CE831={on:!/[?&#]ceu831=0/i.test(location.search+location.hash),erros:[],stats:{},pts:null,faixa:null};
+function ce8Erro(k,e){if(CE831.erros.length<20)CE831.erros.push(k+': '+String(e&&e.message||e).slice(0,200));}
+function ce8Montar(){if(!ES719.on||ES719.feito)return;const R=ROOMS.fant;if(!R||!R.scene)return;const sc=R.scene;const T=THREE;
+  let velhas=null;for(const o of sc.children){if(o.isPoints&&o.geometry&&o.geometry.attributes.position&&o.geometry.attributes.position.count===1800){velhas=o;break;}}
+  if(!velhas&&ES719.tent++<20)return; // o céu antigo ainda não está (a sala monta-se por partes)
+  ES719.feito=true;const t0=performance.now();const r=rnd(83201);
+  // grande círculo da Via Láctea: normal inclinada 58° do zénite
+  const az=r()*Math.PI*2,inc=Math.PI*0.32;const nx=Math.sin(inc)*Math.cos(az),ny=Math.cos(inc),nz=Math.sin(inc)*Math.sin(az);
+  // base (u, v) no plano do grande círculo
+  let ux=-nz,uy=0,uz=nx;{const L=Math.hypot(ux,uy,uz)||1;ux/=L;uy/=L;uz/=L;}const vx=ny*uz-nz*uy,vy=nz*ux-nx*uz,vz=nx*uy-ny*ux;
+  const ruido=a=>0.55+0.3*Math.sin(a*3+1.7)+0.22*Math.sin(a*7+0.4)+0.14*Math.sin(a*13+2.9); // densidade irregular ao longo da faixa
+  const grupos=[[5200,1.0,1.8,.26,.74,0],[1500,1.7,2.6,.55,.95,0],[140,2.8,4.4,.85,1.0,1],[3400,0.9,1.4,.10,.34,2]];let N=0;for(const g of grupos)N+=g[0];
+  const P=new Float32Array(N*3),C=new Float32Array(N*3),S=new Float32Array(N),F=new Float32Array(N);const YMIN=-0.14;
+  let i=0;for(const [n,s0,s1,b0,b1,tipo] of grupos){for(let k=0;k<n;k++,i++){let x,y,z;
+      if(tipo===2){let ok=false;for(let tent=0;tent<12&&!ok;tent++){const a=r()*Math.PI*2;if(r()>ruido(a)*0.85)continue;const dev=(r()+r()+r()-1.5)*.2;
+          x=Math.cos(a)*ux+Math.sin(a)*vx+nx*dev;y=Math.cos(a)*uy+Math.sin(a)*vy+ny*dev;z=Math.cos(a)*uz+Math.sin(a)*vz+nz*dev;const L2=Math.hypot(x,y,z);x/=L2;y/=L2;z/=L2;ok=y>=YMIN;}
+        if(!ok){const a=r()*Math.PI*2,yy=YMIN+r()*(1-YMIN),rr=Math.sqrt(Math.max(0,1-yy*yy));x=Math.cos(a)*rr;y=yy;z=Math.sin(a)*rr;}}
+      else{const a=r()*Math.PI*2,yy=YMIN+r()*(1-YMIN),rr=Math.sqrt(Math.max(0,1-yy*yy));x=Math.cos(a)*rr;y=yy;z=Math.sin(a)*rr;} // uniforme em área
+      P[i*3]=x;P[i*3+1]=y;P[i*3+2]=z;const q0=r();const b=b0+(b1-b0)*(tipo===0?q0*q0:q0); // as fracas são a maioria
+      let cr=1,cg=1,cb=1;const q=r();
+      if(tipo===1){if(q<.42){cr=.8;cg=.89;cb=1;}else if(q<.78){cr=1;cg=.93;cb=.76;}else if(q<.9){cr=1;cg=.76;cb=.62;}}
+      else if(tipo===2){cr=.9;cg=.94;cb=1;}else{if(q<.28){cr=.86;cg=.92;cb=1;}else if(q<.44){cr=1;cg=.95;cb=.84;}else if(q<.5){cr=1;cg=.84;cb=.74;}}
+      C[i*3]=cr*b;C[i*3+1]=cg*b;C[i*3+2]=cb*b;S[i]=s0+r()*(s1-s0);F[i]=r()*Math.PI*2+(tipo===1?10:0);}}
+  const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(P,3));g.setAttribute('cor',new T.BufferAttribute(C,3));g.setAttribute('tam',new T.BufferAttribute(S,1));g.setAttribute('fase',new T.BufferAttribute(F,1));
+  g.boundingSphere=new T.Sphere(new T.Vector3(),1e6);
+  const U={t:{value:0},noite:{value:1},escala:{value:1}};
+  const mat=new T.ShaderMaterial({uniforms:U,
+    vertexShader:['attribute vec3 cor;attribute float tam;attribute float fase;uniform float t;uniform float escala;varying vec3 vCor;varying float vA;varying float vB;',
+      'void main(){vec3 d=mat3(viewMatrix)*position;vec4 p=projectionMatrix*vec4(d,1.0);gl_Position=vec4(p.xy,p.w*0.999999,p.w);',
+      'float br=step(9.0,fase);float cint=1.0+mix(0.09,0.24,br)*sin(t*mix(1.1,2.3,br)+fase);',
+      'float ext=smoothstep(-0.10,0.24,position.y);vA=cint*mix(0.12,1.0,ext);vB=br;vCor=cor;gl_PointSize=max(1.0,tam*escala*mix(1.0,1.9,br));}'].join('\n'),
+    fragmentShader:['uniform float noite;varying vec3 vCor;varying float vA;varying float vB;',
+      'void main(){vec2 q=gl_PointCoord-0.5;float d2=dot(q,q)*4.0;float a=exp(-d2*mix(3.2,9.0,vB))+vB*0.22*exp(-d2*1.6);gl_FragColor=vec4(vCor,a*vA*noite);}'].join('\n'),
+    transparent:true,depthWrite:false,depthTest:true,blending:T.AdditiveBlending,fog:false});mat.name='831 estrelas';mat.userData.papelKeep=true;mat.userData.sky409=true;
+  const pts=new T.Points(g,mat);pts.name='831 céu estrelado';pts.frustumCulled=false;pts.renderOrder=-60;pts.userData.papelKeep=true;pts.userData.papelKeepGeo=true;pts.userData.noCam=true;pts.userData.sky409=true;pts.raycast=()=>{};sc.add(pts);
+  // a faixa de luz difusa da Via Láctea: uma tira em volta do grande círculo, no infinito, com ruído e queda gaussiana para as bordas
+  let faixa=null;try{const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d');const im=x.createImageData(256,64);const rr=rnd(83207);
+    const base=new Float32Array(33*9);for(let k=0;k<base.length;k++)base[k]=rr();const val=(u,v)=>{const fu=u*32,fv=v*8,i0=Math.floor(fu),j0=Math.floor(fv),a=fu-i0,b=fv-j0;const s=(i,j)=>base[(j%8)*33+(i%32)];
+      const sa=a*a*(3-2*a),sb=b*b*(3-2*b);return (s(i0,j0)*(1-sa)+s(i0+1,j0)*sa)*(1-sb)+(s(i0,j0+1)*(1-sa)+s(i0+1,j0+1)*sa)*sb;};
+    for(let j=0;j<64;j++)for(let i2=0;i2<256;i2++){const u=i2/256,v=j/64;const n=0.6*val(u,v)+0.4*val((u*2)%1,(v*2)%1);const w=Math.exp(-Math.pow((v-0.5)/0.21,2));const fenda=1-0.55*Math.exp(-Math.pow((v-0.52+0.06*Math.sin(u*19))/0.045,2))*(0.5+0.5*Math.sin(u*9+1));
+        const k=Math.max(0,Math.min(1,(0.25+0.95*n)*w*fenda));const o=(j*256+i2)*4;im.data[o]=Math.round(205*k);im.data[o+1]=Math.round(218*k);im.data[o+2]=Math.round(255*k);im.data[o+3]=255;}
+    x.putImageData(im,0,0);const tx=new T.CanvasTexture(c);tx.wrapS=T.RepeatWrapping;tx.wrapT=T.ClampToEdgeWrapping;tx.minFilter=T.LinearFilter;tx.magFilter=T.LinearFilter;tx.generateMipmaps=false;
+    const SEG=72,LIN=6,MEIA=0.42;const pos=new Float32Array((SEG+1)*(LIN+1)*3),uv=new Float32Array((SEG+1)*(LIN+1)*2),idx=[];
+    for(let s=0;s<=SEG;s++){const a=s/SEG*Math.PI*2;for(let l=0;l<=LIN;l++){const dv=(l/LIN-0.5)*2*MEIA;const k=s*(LIN+1)+l;let px=Math.cos(a)*ux+Math.sin(a)*vx+nx*dv,py=Math.cos(a)*uy+Math.sin(a)*vy+ny*dv,pz=Math.cos(a)*uz+Math.sin(a)*vz+nz*dv;const L=Math.hypot(px,py,pz);
+        pos[k*3]=px/L;pos[k*3+1]=py/L;pos[k*3+2]=pz/L;uv[k*2]=s/SEG*3;uv[k*2+1]=l/LIN;}}
+    for(let s=0;s<SEG;s++)for(let l=0;l<LIN;l++){const a=s*(LIN+1)+l,b=a+LIN+1;idx.push(a,b,a+1,b,b+1,a+1);}
+    const gf=new T.BufferGeometry();gf.setAttribute('position',new T.BufferAttribute(pos,3));gf.setAttribute('uv',new T.BufferAttribute(uv,2));gf.setIndex(idx);gf.boundingSphere=new T.Sphere(new T.Vector3(),1e6);
+    const mf=new T.ShaderMaterial({uniforms:{noite:U.noite,mapa:{value:tx},forca:{value:0.14}},
+      vertexShader:'varying vec2 vUv;varying float vE;void main(){vUv=uv;vE=smoothstep(-0.12,0.3,position.y);vec3 d=mat3(viewMatrix)*position;vec4 p=projectionMatrix*vec4(d,1.0);gl_Position=vec4(p.xy,p.w*0.999999,p.w);}',
+      fragmentShader:'uniform sampler2D mapa;uniform float noite;uniform float forca;varying vec2 vUv;varying float vE;void main(){vec3 c=texture2D(mapa,vUv).rgb;gl_FragColor=vec4(c*forca*noite*vE,1.0);}',
+      transparent:true,depthWrite:false,depthTest:true,blending:T.AdditiveBlending,side:T.DoubleSide,fog:false});mf.name='831 via láctea';mf.userData.papelKeep=true;mf.userData.sky409=true;
+    faixa=new T.Mesh(gf,mf);faixa.name='831 via láctea';faixa.frustumCulled=false;faixa.renderOrder=-61;faixa.userData.papelKeep=true;faixa.userData.papelKeepGeo=true;faixa.userData.noCam=true;faixa.userData.sky409=true;faixa.userData.fx=true;faixa.raycast=()=>{};sc.add(faixa);}catch(e){ce8Erro('via láctea',e);}
+  // as estrelas antigas continuam a ser o relógio da noite (a opacidade delas é animada pelo `noite143`), mas não se desenham
+  try{if(velhas&&velhas.geometry)velhas.geometry.setDrawRange(0,0);}catch(e){ce8Erro('antigas',e);}
+  ES719.pts=pts;ES719.velhas=velhas;CE831.pts=pts;CE831.faixa=faixa;
+  try{const t0k=R.tick;R.tick=function(dt){const r0=t0k?t0k.apply(this,arguments):undefined;try{U.t.value+=Math.min(.1,dt||.016);const vm=velhas&&velhas.material;
+        if(vm&&typeof vm.opacity==='number')U.noite.value=Math.max(0,Math.min(1,vm.opacity/.95));U.escala.value=Math.max(0.5,renderer.getPixelRatio());}catch(e){}return r0;};}catch(e){ce8Erro('tick',e);}
+  Object.assign(ES719.stats,{pontos:N,ms:Math.round(performance.now()-t0),velhas:!!velhas,ceu831:true});Object.assign(CE831.stats,{pontos:N,ms:Math.round(performance.now()-t0),faixa:!!faixa});}
+if(CE831.on){try{es719Montar=ce8Montar;}catch(e){ce8Erro('ligar',e);}}
+window.__ceu831={estado:CE831,erros:CE831.erros,stats:CE831.stats};
 
 window.__build434={revision:434,family:"web",edition:"en"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
