@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v836</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v837</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -109444,6 +109444,252 @@ if(TV836.topoOn){setInterval(()=>{try{if(typeof SALA_ED!=='undefined'&&SALA_ED.a
       e.preventDefault();e.stopImmediatePropagation();T.H=Math.max(6,Math.min(48,T.H*(e.deltaY>0?1.12:1/1.12)));}catch(x){tv8Erro('roda',x);}},{capture:true,passive:false});
   if(typeof decorToggle128==='function'){const tg0=decorToggle128;decorToggle128=function(on){try{if(!on&&TV836.topo)tv8Liga(false);}catch(e){}return tg0.apply(this,arguments);};}}
 window.__decorar836={estado:TV836,stats:TV836.stats,erros:TV836.erros,liga:tv8Liga,papel:(R,id)=>{try{return tv8Papel(R,id,R.placed[id].g);}catch(e){return null;}},debaixo:tv8Debaixo};
+
+/* ===================== v837 · OS FUNDOS DA MINHA SALA E DA SALA DO ACUMULADOR: SEM O JARDIM DE DENTRO, JANELÕES COM CORTINAS (bloco `CO837`) =====================
+   Pedidos do Luiz (17/11): «aquele fundo na sala onde tem as árvores.... daquela parte só deixe a lareira» · «nessa área do fundo
+   que citei deixe as janelas mas já com cortinas (e crie um monte de possíveis cortinas)» · «E nos fundos tire essa estrutura branca
+   em pleno chão pois não faz sentido» · «todas essas inclusões também devem ser replicadas na Sala do Acumulador» — e, perguntado com
+   foto dos fundos do Acumulador, «Tirar só árvores e mureta» (a lareira, os bancos das janelas, as plantas e o relógio ficam; os
+   janelões ganham as cortinas novas).
+   O QUE ERA: a Sala do Acumulador tem, a meio do salão (z −15,5 a −23,5, de parede a parede e entrando no Fliperama da Minha Sala),
+   o «jardim além das janelas» — cinco árvores (malhas instanciadas: troncos, copas, folhas) e uma mureta baixa de cantaria branca
+   (60 cm) com canteiros e sebe —, sobra da época em que o fundo da sala era antes dele; sem colisão, o leitor passava por dentro.
+   A Minha Sala (v526) copia essa arquitetura e herdou o mesmo jardim — e, da marcenaria do Acumulador, os peitoris brancos e as
+   almofadas da antiga fila de janelas (z ≈ −14,6, de quando a sala acabava ali), que na Minha Sala ficavam soltos no ar a meio do
+   salão, sem banco nem estante embaixo (no Acumulador são as prateleiras da biblioteca e os bancos das janelas). Os quatro janelões
+   do fundo (z = −30) ficavam atrás das árvores; no Acumulador tinham cortinas verdes das peças dele.
+   AGORA, nas duas salas: (1) o «jardim além das janelas» sai — no Acumulador no fim da montagem dele (que vem antes da Minha Sala, então
+   a cópia já nasce sem o jardim) e na Minha Sala também, por garantia; na Minha Sala saem ainda aqueles peitoris e almofadas soltos
+   (só da cópia: no Acumulador ficam); o resto dos fundos fica (no Acumulador: lareira, bancos, plantas, relógio; as peças que o
+   jogador pôs no Decorar nunca são tocadas); (2) os quatro janelões (2,6 × 3,1 m, x = ±3,4 e ±10) ganham cortinas — varão a 4,55 m, panos até o chão, entre
+   as pilastras (o pano de fora de cada janelão vai até a pilastra mais perto, sem atravessá-la); no Acumulador as cortinas verdes
+   antigas dão lugar às novas; (3) 32 cortinas (mais «sem cortina») para escolher no Decorar (na Minha Sala, aba 🏠 Sala; no Acumulador, no fim do painel)
+   → «Cortinas dos janelões»: onze modelos (amarrada com abraçadeira, reta, reta com ilhós, fechada/blecaute, voal, dupla com voal,
+   com bandô, romana, de teatro com festões, franjas e borlas, café de meia altura e austríaca) em dez tecidos desenhados no jogo
+   (veludo, linho, liso, seda, voal, renda, listras, xadrez, damasco e floral), com varão de latão, ferro ou madeira, e «sem cortina».
+   Começa com veludo vinho amarrada. Cada sala grava a sua (`mundo.sala.pessoal.cortinas837`, `mundo.sala.minha.cortinas837`).
+   Cada cortina vira poucas malhas (as peças com o mesmo material dos quatro janelões são fundidas numa só), sem sombra própria e fora
+   do caminho da câmera.
+   Chaves: `?fundo837=0` (o jardim e os peitoris ficam), `?cortinas837=0` (sem cortinas novas). Gancho `window.__cortinas837`. */
+const CO837={limpa:!/[?&#]fundo837=0/i.test(location.search+location.hash),on:!/[?&#]cortinas837=0/i.test(location.search+location.hash),
+  padrao:'veludo-vinho',salas:{pessoal:{chave:'mundo.sala.pessoal.cortinas837',grupo:null,estilo:null,janelas:null},minha:{chave:'mundo.sala.minha.cortinas837',grupo:null,estilo:null,janelas:null,antigas:[]}},erros:[],stats:{limpos:0,peitoris:0,montagens:0,malhas:0,antigas:0}};
+function co8Erro(o,e){try{if(CO837.erros.length<30)CO837.erros.push(o+': '+(e&&e.message||e));}catch(x){}}
+function co8T(pt,en,es){try{if(typeof text428==='function')return text428(pt,en,es||pt);}catch(e){}return String(document.documentElement.lang||'').startsWith('en')?en:pt;}
+
+/* ---------- (1) tirar o jardim de dentro do salão ---------- */
+function co8Limpa(R){if(!CO837.limpa||!R||!R.scene)return 0;let n=0;const fora=[];
+  R.scene.traverse(o=>{if(o&&o.name==='Minha Sala · jardim além das janelas')fora.push(o);});
+  for(const o of fora){try{if(o.parent){o.parent.remove(o);n++;}}catch(e){co8Erro('limpa',e);}}
+  CO837.stats.limpos+=n;return n;}
+// só na Minha Sala: as malhas da cópia da marcenaria do Acumulador que ficam inteiras na antiga fila de janelas (z −15,4 a −13,9,
+// abaixo de 1,4 m) — os peitoris brancos e as almofadas soltos no ar; as malhas da marcenaria que correm a sala toda não entram
+function co8Peitoris(R){if(!CO837.limpa||!R||!R.scene||typeof ROOMS==='undefined'||R!==ROOMS.pessoal)return 0;let n=0;const fora=[];try{
+    const bb=new THREE.Box3();R.scene.updateMatrixWorld(true);
+    R.scene.traverse(o=>{if(!o.isMesh&&!o.isInstancedMesh)return;let p=o.parent,marc=false,copia=false;while(p){const nm=p.name||'';if(/marcenaria Ateli/.test(nm))marc=true;if(/arquitetura do Acumulador/.test(nm))copia=true;p=p.parent;}
+      if(!marc||!copia)return;bb.setFromObject(o);if(!Number.isFinite(bb.min.x))return;
+      if(bb.min.z>-15.4&&bb.max.z<-13.9&&bb.max.y<1.4&&bb.max.x-bb.min.x<26)fora.push(o);});
+    for(const o of fora){if(o.parent){o.parent.remove(o);n++;}}}catch(e){co8Erro('peitoris',e);}   // a geometria é a mesma do Acumulador: só sai da cena, não é descartada
+  CO837.stats.peitoris=(CO837.stats.peitoris||0)+n;return n;}
+
+/* ---------- janelões e pilastras ---------- */
+const CO8_JAN0=[{cx:-10,w:2.6},{cx:-3.4,w:2.6},{cx:3.4,w:2.6},{cx:10,w:2.6}];
+function co8Janelas(R){const out=[];try{const bb=new THREE.Box3();R.scene.updateMatrixWorld(true);
+    R.scene.traverse(o=>{if(!o.isMesh||!o.material)return;const ms=Array.isArray(o.material)?o.material:[o.material];if(!ms.some(m=>m&&m.transparent&&m.opacity<.6))return;bb.setFromObject(o);
+      if(!Number.isFinite(bb.min.x))return;if(Math.abs(bb.max.z+30.02)>.12||Math.abs(bb.min.z+30.02)>.12)return;const w=bb.max.x-bb.min.x,h=bb.max.y-bb.min.y;if(w<1.5||w>4||h<2)return;
+      out.push({cx:(bb.min.x+bb.max.x)/2,w,y0:bb.min.y,y1:bb.max.y});});}catch(e){co8Erro('janelas',e);}
+  if(out.length<2)return CO8_JAN0.map(j=>({cx:j.cx,w:j.w,y0:1.2,y1:4.3}));out.sort((a,b)=>a.cx-b.cx);return out;}
+function co8Pilastras(R){const iv=[];try{const v=new THREE.Vector3();R.scene.traverse(o=>{if(!o.isMesh||!o.geometry||!o.geometry.attributes.position)return;if(!/pilastras e pórtico|bases e capitéis|arandelas/.test(o.name||''))return;
+      const a=o.geometry.attributes.position;o.updateMatrixWorld(true);const xs=[];for(let i=0;i<a.count;i++){v.fromBufferAttribute(a,i).applyMatrix4(o.matrixWorld);if(v.z<-29.2&&v.z>-30.3&&Math.abs(v.x)<14.3&&v.y>.3&&v.y<4.7)xs.push(v.x);}
+      xs.sort((p,q)=>p-q);let a0=null,b0=null;for(const x of xs){if(a0===null){a0=b0=x;continue;}if(x-b0>.3){iv.push([a0,b0]);a0=x;}b0=x;}if(a0!==null)iv.push([a0,b0]);});}catch(e){co8Erro('pilastras',e);}
+  return iv;}
+// limites de cada varão: até 0,55 m além do janelão, sem passar da pilastra mais perto (folga de 5 cm) nem da parede lateral
+function co8Limites(J,piv){return J.map(j=>{let esq=j.cx-j.w/2-.55,dir=j.cx+j.w/2+.55;
+    for(const [a,b] of piv){if(b<=j.cx-j.w/2+.01&&b+.05>esq)esq=b+.05;if(a>=j.cx+j.w/2-.01&&a-.05<dir)dir=a-.05;}
+    esq=Math.max(esq,-13.85);dir=Math.min(dir,13.85);return Object.assign({},j,{esq,dir});});}
+
+/* ---------- tecidos desenhados (canvas 256², repetíveis) ---------- */
+function co8Hex(h){return '#'+(h>>>0).toString(16).padStart(6,'0').slice(-6);}
+function co8Mix(h,k){const r=(h>>16)&255,g=(h>>8)&255,b=h&255;const f=c=>Math.max(0,Math.min(255,Math.round(k>0?c+(255-c)*k:c*(1+k))));return (f(r)<<16)|(f(g)<<8)|f(b);}
+function co8Rnd(s){return ()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296;};}
+const CO8_TEX=new Map();
+function co8Tecido(tec,cores){const key=tec+'|'+cores.join(',');if(CO8_TEX.has(key))return CO8_TEX.get(key);
+  const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d');const A=cores[0],B=cores[1]!=null?cores[1]:co8Mix(A,.25),C=cores[2]!=null?cores[2]:co8Mix(A,-.3);const rnd=co8Rnd(tec.length*977+A);
+  const fio=(alfa,n)=>{for(let i=0;i<n;i++){const y=rnd()*256,x=rnd()*256;g.fillStyle=rnd()<.5?'rgba(255,255,255,'+alfa+')':'rgba(0,0,0,'+alfa+')';if(rnd()<.5)g.fillRect(0,y,256,1);else g.fillRect(x,0,1,256);}};
+  g.fillStyle=co8Hex(A);g.fillRect(0,0,256,256);
+  if(tec==='veludo'){for(let x=0;x<256;x++){const k=.5+.5*Math.sin(x/256*Math.PI*6+Math.sin(x/37)*.8);g.fillStyle='rgba(255,255,255,'+(.035*k)+')';g.fillRect(x,0,1,256);}fio(.025,80);}
+  else if(tec==='linho'){fio(.06,420);for(let i=0;i<60;i++){g.fillStyle='rgba(255,255,255,.07)';g.fillRect(0,rnd()*256,256,2);}}
+  else if(tec==='seda'){for(let i=-256;i<512;i+=6){g.strokeStyle='rgba(255,255,255,'+(.03+.03*Math.sin(i/30))+')';g.lineWidth=3;g.beginPath();g.moveTo(i,0);g.lineTo(i+256,256);g.stroke();}fio(.015,60);}
+  else if(tec==='voal'||tec==='liso'){fio(.03,tec==='voal'?120:200);}
+  else if(tec==='listras'){const L=[[0,46,A],[46,6,C],[52,40,B],[92,6,C],[98,30,A]];for(let rep=0;rep<2;rep++)for(const [x,w,cor] of L){g.fillStyle=co8Hex(cor);g.fillRect(rep*128+x,0,w,256);}fio(.03,160);}
+  else if(tec==='xadrez'){g.globalAlpha=.55;for(const [cor,w,off] of [[B,40,10],[C,14,70],[B,40,138],[C,14,198]]){g.fillStyle=co8Hex(cor);g.fillRect(off,0,w,256);g.fillRect(0,off,256,w);}g.globalAlpha=.35;g.fillStyle='#ffffff';g.fillRect(118,0,3,256);g.fillRect(0,118,256,3);g.globalAlpha=1;fio(.03,140);}
+  else if(tec==='damasco'){g.fillStyle=co8Hex(B);const motivo=(cx,cy,s)=>{g.save();g.translate(cx,cy);g.scale(s,s);for(const sx of [1,-1]){g.save();g.scale(sx,1);g.beginPath();g.moveTo(0,-56);g.bezierCurveTo(28,-46,34,-18,14,-6);g.bezierCurveTo(40,2,44,30,18,40);g.bezierCurveTo(10,46,4,52,0,60);g.lineTo(0,-56);g.fill();
+        g.beginPath();g.ellipse(26,-30,9,16,.6,0,Math.PI*2);g.fill();g.beginPath();g.ellipse(30,24,8,13,-.5,0,Math.PI*2);g.fill();g.restore();}g.restore();};
+    for(const [x,y] of [[64,64],[192,192],[192,-64],[-64,192],[192,64+256],[64,64+256],[64+256,64],[-64,-64],[64+256,192+0]])motivo(x,y,.95);g.globalAlpha=.25;fio(.04,120);g.globalAlpha=1;}
+  else if(tec==='floral'){const flor=(x,y,r,cor)=>{g.fillStyle=co8Hex(C);for(let k=0;k<2;k++){g.beginPath();g.ellipse(x+(k?r*1.4:-r*1.4),y+r*.9,r*.9,r*.38,k?.7:-.7,0,Math.PI*2);g.fill();}
+        g.fillStyle=co8Hex(cor);for(let k=0;k<5;k++){const a=k/5*Math.PI*2;g.beginPath();g.arc(x+Math.cos(a)*r*.7,y+Math.sin(a)*r*.7,r*.55,0,Math.PI*2);g.fill();}g.fillStyle='#f3d36b';g.beginPath();g.arc(x,y,r*.35,0,Math.PI*2);g.fill();};
+    for(let i=0;i<22;i++){const x=rnd()*256,y=rnd()*256,r=6+rnd()*6;for(const dx of [-256,0,256])for(const dy of [-256,0,256])flor(x+dx,y+dy,r,i%3?B:co8Mix(B,.25));}fio(.02,80);}
+  else if(tec==='renda'){g.globalCompositeOperation='destination-out';for(let y=0;y<256;y+=32)for(let x=0;x<256;x+=32){const ox=(y/32)%2?16:0;g.beginPath();g.arc(x+ox,y,9,0,Math.PI*2);g.fill();for(let k=0;k<6;k++){const a=k/6*Math.PI*2;g.beginPath();g.arc(x+ox+Math.cos(a)*14,y+Math.sin(a)*14,3,0,Math.PI*2);g.fill();}}g.globalCompositeOperation='source-over';}
+  const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.encoding=THREE.sRGBEncoding;t.anisotropy=4;t.needsUpdate=true;const r={c,t};CO8_TEX.set(key,r);return r;}
+
+/* ---------- os 32 estilos (+ «sem cortina») ---------- */
+const CO8_ESTILOS=[
+ ['veludo-vinho','Veludo vinho, amarrada','Wine velvet, tied back','Terciopelo vino, recogida','amarrada','veludo',[0x6e1423],{varao:'latao',borla:0xd4a63a}],
+ ['veludo-musgo','Veludo verde-musgo, amarrada','Moss velvet, tied back','Terciopelo musgo, recogida','amarrada','veludo',[0x3d4a24],{varao:'latao',borla:0xd4a63a}],
+ ['veludo-noite','Veludo azul-noite, com bandô','Midnight velvet with valance','Terciopelo azul noche, con galería','bando','veludo',[0x1b2a4a],{varao:'latao',franja:0xd4a63a}],
+ ['petroleo','Veludo azul-petróleo, amarrada','Teal velvet, tied back','Terciopelo petróleo, recogida','amarrada','veludo',[0x1d4d55],{varao:'latao',borla:0xc9a24a}],
+ ['mostarda','Veludo mostarda, reta','Mustard velvet, straight','Terciopelo mostaza, recta','reta','veludo',[0xc4932b],{varao:'latao'}],
+ ['linho-cru','Linho cru, reta','Raw linen, straight','Lino crudo, recta','reta','linho',[0xd9ccb0],{varao:'madeira'}],
+ ['linho-cinza','Linho cinza, com ilhós','Grey linen, grommets','Lino gris, con ojales','ilhos','linho',[0x8c8c86],{varao:'ferro'}],
+ ['terracota','Linho terracota, com ilhós','Terracotta linen, grommets','Lino terracota, con ojales','ilhos','linho',[0xb5603c],{varao:'ferro'}],
+ ['voal-branco','Voal branco','White sheer','Visillo blanco','voal','voal',[0xf4f1ea],{varao:'ferro'}],
+ ['voal-lavanda','Voal lavanda','Lavender sheer','Visillo lavanda','voal','voal',[0xc7b8e0],{varao:'ferro'}],
+ ['voal-vinho','Voal e veludo vinho (dupla)','Sheer and wine velvet','Visillo y terciopelo vino','dupla','veludo',[0x6e1423],{varao:'latao',voal:0xf4efe4,borla:0xd4a63a}],
+ ['voal-musgo','Voal e linho verde (dupla)','Sheer and green linen','Visillo y lino verde','dupla','linho',[0x56683f],{varao:'madeira',voal:0xf1eee4}],
+ ['damasco-ouro','Damasco dourado, com bandô','Gold damask with valance','Damasco dorado, con galería','bando','damasco',[0xa9832f,0xd2b25e],{varao:'latao',franja:0xe2c06a}],
+ ['damasco-esmeralda','Damasco esmeralda, amarrada','Emerald damask, tied back','Damasco esmeralda, recogida','amarrada','damasco',[0x1f5a43,0x2e7a5b],{varao:'latao',borla:0xd4a63a}],
+ ['damasco-vinho','Damasco vinho, reta','Wine damask, straight','Damasco vino, recta','reta','damasco',[0x5a1420,0x7a2232],{varao:'latao'}],
+ ['listras-azul','Listras azul e creme, reta','Blue and cream stripes','Rayas azul y crema, recta','reta','listras',[0x2e4f7a,0xeee6d2,0xc9a24a],{varao:'madeira'}],
+ ['listras-vinho','Listras vinho e ouro, com ilhós','Wine and gold stripes, grommets','Rayas vino y oro, con ojales','ilhos','listras',[0x6a1b25,0xc9a24a,0xe8d9b0],{varao:'latao'}],
+ ['listras-rosa','Listras rosa e creme, amarrada','Pink and cream stripes, tied back','Rayas rosa y crema, recogida','amarrada','listras',[0xd7a1a4,0xf2e9dc,0xffffff],{varao:'madeira',borla:0xf2e9dc}],
+ ['xadrez-vermelho','Xadrez escocês vermelho, reta','Red tartan, straight','Escocés rojo, recta','reta','xadrez',[0x9e1b1b,0x1c2f4a,0xe0c46a],{varao:'madeira'}],
+ ['xadrez-verde','Xadrez verde, amarrada','Green tartan, tied back','Escocés verde, recogida','amarrada','xadrez',[0x2d4f2c,0x8a2a22,0xe9dcc0],{varao:'madeira',borla:0xe9dcc0}],
+ ['floral-rosas','Floral de rosas, amarrada','Rose floral, tied back','Floral de rosas, recogida','amarrada','floral',[0xf1e6d6,0xc2566b,0x6f8f4e],{varao:'madeira',borla:0xc2566b}],
+ ['floral-azul','Floral azul, reta','Blue floral, straight','Floral azul, recta','reta','floral',[0xe9eef5,0x2f5d9a,0x4f7d6b],{varao:'ferro'}],
+ ['seda-rosa','Seda rosa antigo, amarrada','Dusty pink silk, tied back','Seda rosa antiguo, recogida','amarrada','seda',[0xc9958f],{varao:'latao',borla:0xe8c9a0}],
+ ['seda-champanhe','Seda champanhe, austríaca','Champagne silk, Austrian','Seda champán, austriaca','austriaca','seda',[0xd8c39a],{varao:'latao'}],
+ ['austriaca-branca','Austríaca branca','White Austrian blind','Austriaca blanca','austriaca','liso',[0xf2efe8],{varao:'latao'}],
+ ['romana-linho','Romana de linho','Linen Roman blind','Estor de lino','romana','linho',[0xcfc2a3],{varao:'nenhum'}],
+ ['romana-mostarda','Romana mostarda','Mustard Roman blind','Estor mostaza','romana','liso',[0xc9952e],{varao:'nenhum'}],
+ ['teatro-vermelho','Teatro: veludo vermelho, festões e borlas','Theatre: red velvet, swags and tassels','Teatro: terciopelo rojo, festones y borlas','teatro','veludo',[0x8e0f18],{varao:'latao',borla:0xd4a63a,franja:0xd4a63a}],
+ ['teatro-preto','Teatro: veludo preto e ouro','Theatre: black velvet and gold','Teatro: terciopelo negro y oro','teatro','veludo',[0x161616],{varao:'latao',borla:0xd4a63a,franja:0xd4a63a}],
+ ['cafe-xadrez','Café: xadrez vermelho, meia altura','Café: red gingham, half height','Café: cuadros rojos, media altura','cafe','xadrez',[0xf3eee2,0xc23b32,0xc23b32],{varao:'latao'}],
+ ['cafe-renda','Café: renda branca','Café: white lace','Café: encaje blanco','cafe','renda',[0xf7f4ec],{varao:'latao'}],
+ ['blecaute','Blecaute grafite, fechada','Graphite blackout, drawn','Opaca grafito, cerrada','fechada','liso',[0x34363b],{varao:'ferro'}],
+ ['sem','Sem cortina','No curtains','Sin cortinas','sem','liso',[0xffffff],{}]];
+function co8Estilo(id){const e=CO8_ESTILOS.find(x=>x[0]===id)||CO8_ESTILOS[0];return {id:e[0],nome:co8T(e[1],e[2],e[3]),tipo:e[4],tec:e[5],cores:e[6],ex:e[7]||{}};}
+
+/* ---------- geometria ---------- */
+// pano preso no varão pela borda de fora (x0) estendendo-se para `dir`; largura no alto wT, na abraçadeira wTie (em vTie) e embaixo wB
+function co8Pano(o){const nF=o.nF||6,nx=Math.max(12,Math.round(nF*7)),ny=o.ny||18,P=[],U=[],I=[];const esc=o.esc||.6;
+  for(let j=0;j<=ny;j++){const v=j/ny;let w;if(o.vTie==null)w=o.wT+(o.wB-o.wT)*v;else if(v<=o.vTie){const t=v/o.vTie;w=o.wT+(o.wTie-o.wT)*Math.pow(t,1.7);}else{const t=(v-o.vTie)/(1-o.vTie);w=o.wTie+(o.wB-o.wTie)*Math.pow(t,.75);}
+    const comp=Math.min(3.2,o.wT/Math.max(.08,w)),d=o.d0*Math.sqrt(comp);
+    for(let i=0;i<=nx;i++){const u=i/nx;const yb=o.yB+(o.recorte?o.recorte(u):0);const y=o.yT+(yb-o.yT)*v;const x=o.x0+o.dir*u*w;
+      let z=o.z0+d*Math.sin(u*nF*2*Math.PI+(o.fase||0))*(1-.12*v)+(o.bojo?o.bojo(u,v):0);P.push(x,y,z);U.push(u*o.wT/esc,(o.yT-y)/esc);}}
+  for(let j=0;j<ny;j++)for(let i=0;i<nx;i++){const a=j*(nx+1)+i,b=a+1,c=a+nx+1,d=c+1;I.push(a,c,b,b,c,d);}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(P,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(U,2));g.setIndex(I);g.computeVertexNormals();return g;}
+function co8Cil(x1,x2,y,z,r){const g=new THREE.CylinderGeometry(r,r,Math.abs(x2-x1),10,1);g.rotateZ(Math.PI/2);g.translate((x1+x2)/2,y,z);return g;}
+function co8Esf(x,y,z,r){const g=new THREE.SphereGeometry(r,10,8);g.translate(x,y,z);return g;}
+function co8Caixa(w,h,d,x,y,z){const g=new THREE.BoxGeometry(w,h,d);g.translate(x,y,z);return g;}
+function co8Anel(x,y,z,r,t){const g=new THREE.TorusGeometry(r,t,6,14);g.translate(x,y,z);return g;}
+function co8Borla(x,y,z){const L=[];const c=new THREE.ConeGeometry(.05,.2,10,1,true);c.translate(x,y-.12,z);L.push(c);L.push(co8Esf(x,y,z,.035));return L;}
+function co8Festao(xa,xb,y,z,cai,r){const pts=[];for(let i=0;i<=16;i++){const t=i/16;pts.push(new THREE.Vector3(xa+(xb-xa)*t,y-cai*Math.sin(Math.PI*t),z+.04*Math.sin(Math.PI*t)));}
+  return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),24,r,8,false);}
+function co8Uv(g){if(!g.attributes.uv){const n=g.attributes.position.count;g.setAttribute('uv',new THREE.Float32BufferAttribute(new Float32Array(n*2),2));}if(!g.index){const n=g.attributes.position.count;const I=[];for(let i=0;i<n;i++)I.push(i);g.setIndex(I);}
+  for(const k of Object.keys(g.attributes))if(k!=='position'&&k!=='normal'&&k!=='uv')g.deleteAttribute(k);if(!g.attributes.normal)g.computeVertexNormals();return g;}
+function co8Monta(R,E,J){J=J||[];const T=E.tipo;const out={pano:[],voal:[],varao:[],borla:[],franja:[]};if(T==='sem')return out;
+  const ZP=-29.86,ZV=-29.95,YV=Math.max(...J.map(j=>j.y1))+.25,yChao=.03;
+  for(const j of J){const L=j.esq,Rr=j.dir,meio=j.cx,meia=j.w/2;const yT=YV-.04;
+    const varao=(y)=>{if(E.ex.varao==='nenhum')return;out.varao.push(co8Cil(L-.06,Rr+.06,y,ZP+.08,.022),co8Esf(L-.1,y,ZP+.08,.045),co8Esf(Rr+.1,y,ZP+.08,.045),co8Caixa(.04,.04,.14,L+.08,y,ZP+.02),co8Caixa(.04,.04,.14,Rr-.08,y,ZP+.02));};
+    const lados=(o)=>{// dois panos, um de cada lado do janelão
+      const wE=meio-L,wD=Rr-meio;const fase=[0,Math.PI*.5];
+      out[o.alvo||'pano'].push(co8Pano(Object.assign({x0:L,dir:1,wT:o.frac*wE,wTie:o.wTie,wB:o.wB!=null?o.wB*wE:o.frac*wE,vTie:o.vTie,yT:o.yT||yT,yB:o.yB||yChao,nF:o.nF,d0:o.d0,z0:o.z0||ZP,fase:fase[0],esc:o.esc},o.extra||{})));
+      out[o.alvo||'pano'].push(co8Pano(Object.assign({x0:Rr,dir:-1,wT:o.frac*wD,wTie:o.wTie,wB:o.wB!=null?o.wB*wD:o.frac*wD,vTie:o.vTie,yT:o.yT||yT,yB:o.yB||yChao,nF:o.nF,d0:o.d0,z0:o.z0||ZP,fase:fase[1],esc:o.esc},o.extra||{})));};
+    const amarra=(alvo,z0)=>{const yTie=1.35,vTie=(yT-yTie)/(yT-yChao);lados({alvo,frac:.98,wTie:.3,wB:.42,vTie,nF:7,d0:.035,z0});
+      for(const [xa,dir,lado] of [[L,1,meio-L],[Rr,-1,Rr-meio]]){const xc=xa+dir*.15;out.borla.push(co8Anel(xc,yTie,(z0||ZP)+.04,.17,.018));if(E.ex.borla!=null)out.borla.push(...co8Borla(xa+dir*.04,yTie-.02,(z0||ZP)+.1));}};
+    if(T==='amarrada'){varao(YV);amarra();}
+    else if(T==='reta'){varao(YV);lados({frac:.42,nF:5,d0:.06});}
+    else if(T==='ilhos'){varao(YV);lados({frac:.45,nF:5,d0:.07,yT:YV-.08});for(const [xa,dir,w] of [[L,1,(meio-L)*.45],[Rr,-1,(Rr-meio)*.45]])for(let k=0;k<=8;k++)out.varao.push(co8Anel(xa+dir*w*k/8,YV,ZP+.08,.04,.009));}
+    else if(T==='fechada'){varao(YV);lados({frac:.97,nF:9,d0:.035});}
+    else if(T==='voal'){varao(YV);lados({alvo:'voal',frac:1.02,nF:12,d0:.02,z0:ZP+.02});}
+    else if(T==='dupla'){varao(YV);out.varao.push(co8Cil(L-.02,Rr+.02,YV-.06,ZP-.06,.012));lados({alvo:'voal',frac:1.02,nF:12,d0:.018,z0:ZP-.06,yT:YV-.08});amarra('pano',ZP+.03);}
+    else if(T==='bando'){varao(YV);lados({frac:.4,nF:5,d0:.06,yT:YV-.1});const w=Rr-L+.16;const ondas=E.ex.franja!=null?5:0;
+      out.pano.push(co8Pano({x0:L-.08,dir:1,wT:w,wB:w,yT:YV+.12,yB:YV-.38,nF:Math.round(w*4),d0:.012,z0:ZP+.14,esc:.6,ny:6,recorte:u=>ondas?.07*Math.abs(Math.sin(Math.PI*u*ondas))-.07:0}));
+      out.varao.push(co8Caixa(w,.04,.18,(L+Rr)/2,YV+.14,ZP+.06));if(E.ex.franja!=null)for(let k=0;k<=Math.round(w/.05);k++){const x=L-.08+k*.05;out.franja.push(co8Caixa(.012,.07,.012,x,YV-.42-(ondas?(.07*Math.abs(Math.sin(Math.PI*(k*.05/w)*ondas))-.07):0),ZP+.15));}}
+    else if(T==='romana'){const w=j.w+.24,yT2=j.y1+.18,yB2=j.y1-1.05;out.varao.push(co8Caixa(w+.04,.06,.08,meio,yT2+.03,ZP+.04));
+      out.pano.push(co8Pano({x0:meio-w/2,dir:1,wT:w,wB:w,yT:yT2,yB:yB2,nF:1,d0:0,z0:ZP+.02,esc:.6,ny:24,bojo:(u,v)=>v>.45?.05*Math.abs(Math.sin(Math.PI*(v-.45)/.55*4)):0}));}
+    else if(T==='teatro'){varao(YV);amarra();const xs=[L,meio,Rr];for(let k=0;k<2;k++){out.pano.push(co8Uv(co8Festao(xs[k]-.05,xs[k+1]+.05,YV-.05,ZP+.16,.42,.11)));if(E.ex.franja!=null)out.franja.push(co8Uv(co8Festao(xs[k]-.05,xs[k+1]+.05,YV-.2,ZP+.2,.42,.025)));}
+      if(E.ex.borla!=null)for(const x of xs)out.borla.push(...co8Borla(x,YV-.12,ZP+.26));}
+    else if(T==='cafe'){const yC=j.y0+1.35;out.varao.push(co8Cil(meio-meia-.08,meio+meia+.08,yC,ZP+.06,.012),co8Esf(meio-meia-.11,yC,ZP+.06,.025),co8Esf(meio+meia+.11,yC,ZP+.06,.025));
+      for(const [x0,dir] of [[meio-meia-.04,1],[meio+meia+.04,-1]])out.pano.push(co8Pano({x0,dir,wT:meia+.08,wB:meia+.08,yT:yC-.02,yB:j.y0+.03,nF:6,d0:.02,z0:ZP+.04,esc:.4,ny:8}));}
+    else if(T==='austriaca'){varao(YV);const w=j.w+.3,k=4;out.pano.push(co8Pano({x0:meio-w/2,dir:1,wT:w,wB:w,yT:YV-.02,yB:YV-1.35,nF:1,d0:0,z0:ZP+.04,esc:.6,ny:20,
+        recorte:u=>.22*(1-Math.abs(Math.sin(Math.PI*u*k))),bojo:(u,v)=>.09*v*Math.abs(Math.sin(Math.PI*u*k))}));}
+  }
+  return out;}
+const CO8_MET={latao:[0xb48c45,.85,.35],ferro:[0x222222,.6,.45],madeira:[0x5b3a22,0,.6]};
+function co8Materiais(E){const tex=co8Tecido(E.tec,E.cores);const veludo=E.tec==='veludo',seda=E.tec==='seda',renda=E.tec==='renda';
+  const pano=new THREE.MeshStandardMaterial({map:tex.t,color:0xffffff,roughness:veludo?.92:seda?.42:.82,metalness:seda?.06:0,side:THREE.DoubleSide,transparent:renda,alphaTest:renda?.4:0});pano.name='v837 cortina';
+  const tv=co8Tecido('voal',[E.ex.voal!=null?E.ex.voal:E.cores[0]]);const voal=new THREE.MeshStandardMaterial({map:tv.t,color:0xffffff,roughness:.9,side:THREE.DoubleSide,transparent:true,opacity:.42,depthWrite:false});voal.name='v837 voal';
+  const m=CO8_MET[E.ex.varao]||CO8_MET.latao;const varao=new THREE.MeshStandardMaterial({color:m[0],metalness:m[1],roughness:m[2]});varao.name='v837 varão';
+  const borla=new THREE.MeshStandardMaterial({color:E.ex.borla!=null?E.ex.borla:co8Mix(E.cores[0],-.2),roughness:.7,metalness:E.ex.borla===0xd4a63a?.4:0});borla.name='v837 borla';
+  const franja=new THREE.MeshStandardMaterial({color:E.ex.franja!=null?E.ex.franja:0xd4a63a,roughness:.6,metalness:.35});franja.name='v837 franja';
+  for(const x of [pano,voal,varao,borla,franja])x.userData.v837=true;return {pano,voal,varao,borla,franja};}
+function co8Descarta(g){try{g.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){for(const m of (Array.isArray(o.material)?o.material:[o.material]))if(m&&m.dispose)m.dispose();}});if(g.parent)g.parent.remove(g);}catch(e){co8Erro('descarta',e);}}
+// cortinas antigas do Acumulador (das peças dele) diante dos janelões: tecido escuro a menos de 0,9 m da parede do fundo, na altura dos janelões
+function co8Antigas(R,J){const out=[];try{const bb=new THREE.Box3();R.scene.updateMatrixWorld(true);
+    R.scene.traverse(o=>{if(!(o.isMesh||o.isInstancedMesh)||!o.visible||!o.material)return;if(o.userData&&o.userData.v837)return;let p=o;while(p){if(p.userData&&p.userData.cortinas837)return;p=p.parent;}
+      bb.setFromObject(o);if(!Number.isFinite(bb.min.x))return;if(bb.min.z<-30.4||bb.max.z>-28.6||bb.max.y<3.0||bb.min.y>1.6)return;const w=bb.max.x-bb.min.x,h=bb.max.y-bb.min.y,d=bb.max.z-bb.min.z;if(h<2.2||d>.9||w>3.6)return;
+      const perto=J.some(j=>bb.max.x>j.cx-j.w/2-1.4&&bb.min.x<j.cx+j.w/2+1.4);if(!perto)return;
+      const ms=Array.isArray(o.material)?o.material:[o.material];if(ms.some(m=>m&&m.transparent&&m.opacity<.6))return; // vidro
+      const nome=((o.name||'')+' '+(o.parent&&o.parent.name||'')).toLowerCase();if(/pilastra|capit|cornija|arandela|caixilho|lareira|rel[oó]gio|vidr|janela da|parede/.test(nome)&&!/cortin/.test(nome))return;
+      if(/cortin/.test(nome)||ms.some(m=>m&&m.color&&m.color.g>m.color.r*1.05&&m.color.g>m.color.b&&m.color.r<.35))out.push(o);});}catch(e){co8Erro('antigas',e);}return out;}
+function co8Aplica(key,id,grava){if(!CO837.on)return false;const S=CO837.salas[key];const R=ROOMS[key];if(!S||!R||!R.scene)return false;try{
+    if(!S.janelas){const J=co8Janelas(R);S.janelas=co8Limites(J,co8Pilastras(R));}
+    if(key==='minha'&&!S.antigasFeitas){S.antigasFeitas=true;for(const o of co8Antigas(R,S.janelas)){o.visible=false;o.userData.esconde837=true;S.antigas.push(o);}CO837.stats.antigas=S.antigas.length;}
+    const E=co8Estilo(id||CO837.padrao);if(S.grupo){co8Descarta(S.grupo);S.grupo=null;}
+    const geo=co8Monta(R,E,S.janelas),M=co8Materiais(E);const G=new THREE.Group();G.name=(key==='minha'?'Sala do Acumulador':'Minha Sala')+' · cortinas dos janelões (v837)';G.userData.noCam=true;G.userData.cortinas837=true;
+    for(const k of ['pano','voal','varao','borla','franja']){const L=geo[k].map(co8Uv);if(!L.length)continue;let g=null;try{g=mergeGeometries(L);}catch(e){g=null;}
+      if(!g){for(const x of L){const m=new THREE.Mesh(x,M[k]);m.userData.noCam=true;m.userData.v837=true;m.receiveShadow=true;G.add(m);}continue;}for(const x of L)x.dispose();
+      const m=new THREE.Mesh(g,M[k]);m.name='v837 '+k;m.userData.noCam=true;m.userData.v837=true;m.receiveShadow=true;m.castShadow=false;if(k==='voal')m.renderOrder=2;G.add(m);}
+    R.scene.add(G);S.grupo=G;S.estilo=E.id;CO837.stats.montagens++;CO837.stats.malhas=G.children.length;
+    try{if(typeof Q!=='undefined'&&Q.papel&&typeof papelUm==='function')G.traverse(o=>{if(o.isMesh)papelUm(o,true);});}catch(e){co8Erro('papel',e);}
+    if(grava){try{localStorage.setItem(S.chave,E.id);}catch(e){}}co8Ui();return true;}catch(e){co8Erro('aplica '+key,e);return false;}}
+function co8Salvo(key){const S=CO837.salas[key];try{return (S&&localStorage.getItem(S.chave))||CO837.padrao;}catch(e){return CO837.padrao;}}
+// as antigas continuam escondidas mesmo se algum sistema as religar (troca de modelo de peça, modo gráfico)
+setInterval(()=>{try{const S=CO837.salas.minha;if(S.antigas.length)for(const o of S.antigas)if(o.visible)o.visible=false;}catch(e){}},1500);
+
+/* ---------- no fim da montagem das duas salas ---------- */
+if(typeof finishRoom==='function'&&typeof fr8Wrap==='function'){const fr0=finishRoom;finishRoom=fr8Wrap(function*(key){const r=(yield* fr8Prev(fr0,this,arguments,"CO837"));
+    try{if(key==='pessoal'||key==='minha'){co8Fundos(key);co8Aplica(key,co8Salvo(key),false);
+        if(key==='pessoal')for(const ms of [1500,6000])setTimeout(()=>{try{co8Fundos('pessoal');}catch(e){}},ms);}}catch(e){co8Erro('montagem '+key,e);}return r;});}
+function co8Fundos(key){const R=ROOMS[key];co8Limpa(R);if(key==='pessoal')co8Peitoris(R);}
+for(const k of ['minha','pessoal']){try{if(typeof ROOMS!=='undefined'&&ROOMS[k]&&ROOMS[k].scene&&ROOMS[k].ready){co8Fundos(k);if(!CO837.salas[k].grupo)co8Aplica(k,co8Salvo(k),false);}}catch(e){co8Erro('início '+k,e);}}
+
+/* ---------- a escolha no Decorar → 🏠 Sala ---------- */
+function co8Amostra(E){const c=document.createElement('canvas');c.width=c.height=56;const g=c.getContext('2d');
+  const gr=g.createLinearGradient(0,0,0,56);gr.addColorStop(0,'#bcd6ea');gr.addColorStop(1,'#eef3e6');g.fillStyle=gr;g.fillRect(8,6,40,44);g.strokeStyle='#6b5233';g.lineWidth=2;g.strokeRect(8,6,40,44);g.beginPath();g.moveTo(28,6);g.lineTo(28,50);g.moveTo(8,28);g.lineTo(48,28);g.stroke();
+  if(E.tipo==='sem'){g.strokeStyle='#b03030';g.lineWidth=3;g.beginPath();g.moveTo(10,48);g.lineTo(46,8);g.stroke();return c;}
+  const t=co8Tecido(E.tec,E.cores);const mini=document.createElement('canvas');mini.width=mini.height=64;mini.getContext('2d').drawImage(t.c,0,0,64,64);const pat=g.createPattern(mini,'repeat');
+  const pinta=(caminho,alfa)=>{g.save();g.globalAlpha=alfa||1;g.fillStyle=pat;g.beginPath();caminho();g.fill();g.globalAlpha=1;g.strokeStyle='rgba(0,0,0,.25)';g.lineWidth=1;g.stroke();g.restore();};
+  const ampulheta=(x0,dir)=>()=>{g.moveTo(x0,3);g.lineTo(x0+dir*16,3);g.quadraticCurveTo(x0+dir*7,22,x0+dir*5,31);g.quadraticCurveTo(x0+dir*9,42,x0+dir*12,53);g.lineTo(x0,53);g.closePath();};
+  const faixa=(x0,w)=>()=>{g.rect(x0,3,w,50);};
+  const T=E.tipo;
+  if(T==='amarrada'||T==='teatro'||T==='dupla'){if(T==='dupla')pinta(()=>g.rect(6,3,44,50),.55);pinta(ampulheta(4,1));pinta(ampulheta(52,-1));if(T==='teatro')pinta(()=>{g.moveTo(4,2);g.quadraticCurveTo(28,26,52,2);g.closePath();});}
+  else if(T==='reta'||T==='ilhos'){pinta(faixa(4,11));pinta(faixa(41,11));}
+  else if(T==='fechada'){pinta(faixa(4,23));pinta(faixa(29,23));}
+  else if(T==='voal'){pinta(()=>g.rect(5,3,46,50),.6);}
+  else if(T==='bando'){pinta(faixa(4,10));pinta(faixa(42,10));pinta(()=>g.rect(3,2,50,10));}
+  else if(T==='romana'){pinta(()=>g.rect(9,5,38,20));g.strokeStyle='rgba(0,0,0,.3)';for(const y of [14,19,24]){g.beginPath();g.moveTo(9,y);g.lineTo(47,y);g.stroke();}}
+  else if(T==='austriaca'){pinta(()=>{g.moveTo(7,4);g.lineTo(49,4);g.lineTo(49,20);for(let k=4;k>=0;k--){g.quadraticCurveTo(7+k*10.5+5,30,7+k*10.5,20);}g.closePath();});}
+  else if(T==='cafe'){pinta(()=>g.rect(8,30,40,20));g.strokeStyle='#b48c45';g.lineWidth=2;g.beginPath();g.moveTo(6,30);g.lineTo(50,30);g.stroke();}
+  return c;}
+function co8Ui(){try{if(!CO837.on)return;const p=typeof SALA_PAINEL!=='undefined'&&SALA_PAINEL;if(!p||!p.isConnected||typeof SALA_ED==='undefined'||!SALA_ED.ativo)return;
+    let key=null;try{if(CUR==='room'&&ROOM===ROOMS.pessoal)key='pessoal';else if(CUR==='room'&&ROOM===ROOMS.minha)key='minha';}catch(e){}if(!key)return;const S=CO837.salas[key];
+    const box=p.querySelector('[data-conteudo748="sala"]')||p;let sec=p.querySelector('#cortinas837');if(sec&&sec.dataset.sala!==key){sec.remove();sec=null;}
+    if(!sec){sec=document.createElement('div');sec.id='cortinas837';sec.dataset.sala=key;sec.setAttribute('translate','no');
+      const h=document.createElement('div');h.textContent=co8T('Cortinas dos janelões do fundo','Curtains for the back windows','Cortinas de los ventanales del fondo');h.style.cssText='margin:10px 0 4px;color:#e0b559;font:600 10px system-ui;letter-spacing:.1em;text-transform:uppercase';sec.appendChild(h);
+      const nome=document.createElement('div');nome.className='co837nome';nome.style.cssText='color:#ead8af;font:11px system-ui;margin:0 0 5px';sec.appendChild(nome);
+      const grade=document.createElement('div');grade.style.cssText='display:grid;grid-template-columns:repeat(6,1fr);gap:4px';
+      for(const e of CO8_ESTILOS){const E=co8Estilo(e[0]);const b=document.createElement('button');b.type='button';b.dataset.co837=E.id;b.title=E.nome;b.setAttribute('aria-label',E.nome);
+        b.style.cssText='padding:1px;background:#1d1610;border:2px solid #3a2d1e;border-radius:5px;cursor:pointer;line-height:0';const cv=co8Amostra(E);cv.style.cssText='width:100%;height:auto;display:block;border-radius:3px';b.appendChild(cv);
+        b.addEventListener('pointerdown',ev=>ev.stopPropagation());b.addEventListener('click',ev=>{ev.preventDefault();ev.stopPropagation();co8Aplica(sec.dataset.sala,E.id,true);});grade.appendChild(b);}
+      sec.appendChild(grade);
+      // na Minha Sala, logo antes de «Restaurar esta sala» (o fim da aba 🏠 Sala); no Acumulador, no fim do painel
+      const rest=[...box.querySelectorAll('button')].find(b=>/Começar de novo|Restaurar esta sala|Start over|Restore this room/i.test(b.textContent||''));let ancora=rest;while(ancora&&ancora.parentElement&&ancora.parentElement!==box)ancora=ancora.parentElement;
+      if(box!==p&&ancora&&ancora.parentElement===box)box.insertBefore(sec,ancora);else box.appendChild(sec);}
+    const atual=S.estilo||co8Salvo(key);for(const b of sec.querySelectorAll('[data-co837]'))b.style.borderColor=b.dataset.co837===atual?'#ffd98a':'#3a2d1e';
+    const n=sec.querySelector('.co837nome');const t=co8Estilo(atual).nome;if(n&&n.textContent!==t)n.textContent=t;}catch(e){co8Erro('ui',e);}}
+if(CO837.on)setInterval(()=>{try{if(typeof SALA_ED!=='undefined'&&SALA_ED.ativo)co8Ui();}catch(e){}},600);
+window.__cortinas837={estado:CO837,stats:CO837.stats,erros:CO837.erros,estilos:CO8_ESTILOS.map(e=>e[0]),aplica:co8Aplica,limpa:co8Limpa,peitoris:co8Peitoris,janelas:k=>CO837.salas[k]&&CO837.salas[k].janelas,antigas:co8Antigas};
 
 window.__build434={revision:434,family:"web",edition:"en"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
