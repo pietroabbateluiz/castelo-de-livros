@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v840</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v841</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -111172,6 +111172,175 @@ window.__esportes840={estado:ES840,stats:ES840.stats,erros:ES840.erros,abrir:(p,
   recordes:()=>es8Recordes().map(g=>({esporte:g.e,recordes:g.L.map(es8RecTxt)})),ranking:()=>es8Ranking(),dentro:es8Dentro,aqui:es8Aqui,seg:es8Seg,tempo:es8Tempo,
   layout:()=>({medalhas:ES840.med.layout||null,nMedalhas:ES840.med.n,nTrofeus:ES840.tro.n,fora:{medalhas:ES840.med.fora,trofeus:ES840.tro.fora}}),
   ir:(x,z)=>{const X=[x!==undefined?x:33.4,z!==undefined?z:5.3];CH.x=X[0];CH.z=X[1];if(CH.px!==undefined){CH.px=X[0];CH.pz=X[1];}return X;},esportes:()=>ES8_ESP.map(e=>e[0])};
+
+/* ===================== v841 · O GIBI GIGANTE POP-UP DOS QUADRINHOS: A HISTÓRIA QUE SALTA DA PÁGINA (bloco `GB841`) =====================
+   Pedido do Luiz (17/11): «Faça» — o gibi gigante pop-up nos Quadrinhos, que ficou guardado como rascunho na época da v620
+   (`gibi_quadrinhos_rascunho_GB620.js`) porque ele pediu antes as ilhas, a masmorra e os companheiros.
+   · No fundo da nave central dos Quadrinhos, à esquerda da mesa de autógrafos (v575), entre os expositores giratórios (v658) e o lápis
+     gigante encostado no vidro de nanquim (v658): um GIBI GIGANTE aberto no chão (5,3 × 3,65 m, capa vermelha, blocos de folhas com as
+     beiradas riscadas, duas páginas desenhadas em quadros — `gb841Pagina`: a cidade à noite com retícula, o herói de máscara com o
+     balão, a explosão com linhas de velocidade, o close dos olhos e o «CONTINUA…») e, saltando das páginas como num livro pop-up, os
+     RECORTES de papel (frente desenhada e verso liso de papel, num atlas só — `gb841Atlas`, 2048²): o horizonte da cidade de gibi
+     (prédios de cor chapada com contorno de tinta, janelas acesas, caixas-d'água e antenas), dois prédios na frente, o LIVRO-HERÓI que
+     voa de capa e máscara preso numa haste, o balão «Era uma vez…», a explosão «ZÁS!», duas nuvens em arames e a legenda «Enquanto
+     isso, na cidade…»; dobradiças de papel na base de cada recorte; páginas soltas no chão. O herói sobe e desce, as nuvens e o balão
+     balançam devagar. (O lápis e o nanquim gigantes do rascunho saíram: a gibiteca da v658 já tem os dois, logo atrás.)
+   · Entra 1,6 s depois do `finishRoom('quadrinhos')` (camada no formato do fatiador, `fr8Wrap`, como a v830 e a v837). Obstáculos no
+     `R.world.obst` (`__nav` zerado); as chaves conferidas como na v617 (`ex617Chaves`). `?gibi841=0` desliga. Gancho `window.__gibi841`. */
+const GB841={on:!/[?&#]gibi841=0/i.test(location.search+location.hash),erros:[],stats:{},vivo:null,lugar:{x:-8.6,z:-23.3}};
+function gb841Erro(k,e){if(GB841.erros.length<30)GB841.erros.push(k+': '+(e&&e.message||e));try{console.warn('v841',k,e);}catch(x){}}
+function gb841T(pt,en,es){try{return typeof s567T==='function'?s567T(pt,en,es):pt;}catch(e){return pt;}}
+// ---------- utilidades de desenho em estilo gibi ----------
+function gb841Reticula(x,x0,y0,w,h,cor,passo,rmax,dir){x.save();x.beginPath();x.rect(x0,y0,w,h);x.clip();x.fillStyle=cor;
+  for(let yy=y0;yy<y0+h+passo;yy+=passo)for(let xx=x0+((Math.round((yy-y0)/passo))%2)*passo/2;xx<x0+w+passo;xx+=passo){const k=dir==='x'?(xx-x0)/w:(yy-y0)/h;const rr=rmax*k;if(rr<.5)continue;x.beginPath();x.arc(xx,yy,rr,0,7);x.fill();}x.restore();}
+function gb841Estrela(x,cx,cy,n,r0,r1,rot){x.beginPath();for(let i=0;i<n*2;i++){const a=rot+i/(n*2)*Math.PI*2,r=i%2?r1:r0;x.lineTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r);}x.closePath();}
+function gb841Texto(x,txt,cx,cy,px,cor,contorno,larg,rot){x.save();x.translate(cx,cy);if(rot)x.rotate(rot);x.font='900 '+px+'px Impact,"Arial Black",sans-serif';x.textAlign='center';x.textBaseline='middle';
+  if(contorno){x.lineJoin='round';x.strokeStyle=contorno;x.lineWidth=larg||px*.16;x.strokeText(txt,0,0);}x.fillStyle=cor;x.fillText(txt,0,0);x.restore();}
+// ---------- as duas páginas abertas (2048 × 1408: esquerda e direita) ----------
+function gb841Pagina(){const W=2048,H=1408,c=bb592CanCPU(W,H),x=c.getContext('2d'),r=rnd(84101);x.fillStyle='#f4eedb';x.fillRect(0,0,W,H);
+  for(let k=0;k<4000;k++){x.fillStyle=`rgba(120,100,60,${r()*.05})`;x.fillRect(r()*W,r()*H,2,2);}
+  const quadro=(x0,y0,w,h,fn)=>{x.save();x.beginPath();x.rect(x0,y0,w,h);x.clip();fn(x0,y0,w,h);x.restore();x.lineWidth=8;x.strokeStyle='#141414';x.strokeRect(x0,y0,w,h);};
+  const M=56,G=26,PW=1024-2*M;
+  // página esquerda
+  quadro(M,M,PW,420,(a,b,w,h)=>{const g=x.createLinearGradient(0,b,0,b+h);g.addColorStop(0,'#1b2a5a');g.addColorStop(1,'#3a5aa8');x.fillStyle=g;x.fillRect(a,b,w,h);gb841Reticula(x,a,b,w,h,'rgba(255,255,255,.18)',14,4,'y');
+    x.fillStyle='#f6e7a8';x.beginPath();x.arc(a+w-120,b+90,52,0,7);x.fill();x.fillStyle='#1b2a5a';x.beginPath();x.arc(a+w-100,b+78,46,0,7);x.fill();
+    let px=a;while(px<a+w){const bw=60+r()*90,bh=120+r()*220;x.fillStyle=['#232338','#2d2b46','#1c1c2c'][Math.floor(r()*3)];x.fillRect(px,b+h-bh,bw,bh);x.fillStyle='#f6d860';
+      for(let wy=b+h-bh+16;wy<b+h-16;wy+=26)for(let wx=px+10;wx<px+bw-14;wx+=22)if(r()<.45)x.fillRect(wx,wy,10,14);x.strokeStyle='#0c0c14';x.lineWidth=4;x.strokeRect(px,b+h-bh,bw,bh);px+=bw+4;}});
+  quadro(M,M+420+G,(PW-G)/2,440,(a,b,w,h)=>{x.fillStyle='#f6c64a';x.fillRect(a,b,w,h);gb841Reticula(x,a,b,w,h,'rgba(214,80,30,.55)',12,5,'x');
+    x.fillStyle='#e8b48e';x.beginPath();x.arc(a+w*.42,b+h*.62,92,0,7);x.fill();x.lineWidth=6;x.strokeStyle='#141414';x.stroke();
+    x.fillStyle='#141414';x.beginPath();x.ellipse(a+w*.42,b+h*.58,96,30,0,0,7);x.fill();x.fillStyle='#fff';x.beginPath();x.ellipse(a+w*.42-36,b+h*.58,18,11,0,0,7);x.ellipse(a+w*.42+36,b+h*.58,18,11,0,0,7);x.fill();
+    x.fillStyle='#fff';x.beginPath();x.ellipse(a+w*.62,b+h*.2,110,60,0,0,7);x.fill();x.stroke();gb841Texto(x,'!?',a+w*.62,b+h*.2,70,'#141414');});
+  quadro(M+(PW-G)/2+G,M+420+G,(PW-G)/2,440,(a,b,w,h)=>{x.fillStyle='#e8443a';x.fillRect(a,b,w,h);x.strokeStyle='rgba(255,240,200,.75)';x.lineWidth=5;
+    for(let k=0;k<40;k++){const an=k/40*Math.PI*2;x.beginPath();x.moveTo(a+w/2+Math.cos(an)*60,b+h/2+Math.sin(an)*60);x.lineTo(a+w/2+Math.cos(an)*400,b+h/2+Math.sin(an)*400);x.stroke();}
+    x.fillStyle='#f6e04a';gb841Estrela(x,a+w/2,b+h/2,12,170,110,.1);x.fill();x.lineWidth=7;x.strokeStyle='#141414';x.stroke();gb841Texto(x,gb841T('BUM!','BOOM!','¡BUM!'),a+w/2,b+h/2,92,'#e8443a','#141414',12,-.12);});
+  quadro(M,M+880+2*G,PW,1408-2*M-880-2*G,(a,b,w,h)=>{x.fillStyle='#8ad0e8';x.fillRect(a,b,w,h);gb841Reticula(x,a,b,w,h,'rgba(40,90,160,.35)',13,5,'y');
+    for(const s of [-1,1]){x.fillStyle='#fff';x.beginPath();x.ellipse(a+w/2+s*170,b+h/2,120,62,0,0,7);x.fill();x.lineWidth=7;x.strokeStyle='#141414';x.stroke();x.fillStyle='#2a6a3a';x.beginPath();x.arc(a+w/2+s*170,b+h/2,46,0,7);x.fill();x.fillStyle='#141414';x.beginPath();x.arc(a+w/2+s*170,b+h/2,22,0,7);x.fill();
+      x.fillStyle='#fff';x.beginPath();x.arc(a+w/2+s*170-14,b+h/2-14,9,0,7);x.fill();x.lineWidth=12;x.beginPath();x.moveTo(a+w/2+s*60,b+h/2-80-(s>0?0:0));x.lineTo(a+w/2+s*290,b+h/2-96);x.stroke();}});
+  // página direita
+  const D=1024;
+  quadro(D+M,M,(PW-G)/2,560,(a,b,w,h)=>{x.fillStyle='#38c0c8';x.fillRect(a,b,w,h);gb841Reticula(x,a,b,w,h,'rgba(10,70,90,.35)',12,5,'y');
+    x.strokeStyle='rgba(255,255,255,.8)';x.lineWidth=6;for(let k=0;k<9;k++){x.beginPath();x.moveTo(a+20,b+120+k*40);x.lineTo(a+w*.5,b+120+k*40);x.stroke();}
+    x.fillStyle='#e8443a';x.beginPath();x.moveTo(a+w*.5,b+h*.35);x.lineTo(a+w*.95,b+h*.2);x.lineTo(a+w*.88,b+h*.75);x.closePath();x.fill();x.lineWidth=7;x.strokeStyle='#141414';x.stroke();
+    x.fillStyle='#f4e2c8';x.beginPath();x.arc(a+w*.72,b+h*.3,50,0,7);x.fill();x.stroke();x.fillStyle='#141414';x.fillRect(a+w*.62,b+h*.26,110,22);});
+  quadro(D+M+(PW-G)/2+G,M,(PW-G)/2,560,(a,b,w,h)=>{x.fillStyle='#f07ab0';x.fillRect(a,b,w,h);gb841Reticula(x,a,b,w,h,'rgba(140,30,90,.4)',12,6,'x');
+    x.fillStyle='#fff';x.beginPath();x.moveTo(a+40,b+60);x.lineTo(a+w-40,b+60);x.lineTo(a+w-40,b+260);x.lineTo(a+w*.4,b+260);x.lineTo(a+w*.3,b+330);x.lineTo(a+w*.32,b+260);x.lineTo(a+40,b+260);x.closePath();x.fill();x.lineWidth=7;x.strokeStyle='#141414';x.stroke();
+    x.fillStyle='#141414';x.font='bold 34px "Comic Sans MS",Georgia,sans-serif';x.textAlign='center';x.fillText(gb841T('Quem leu','Who read','¿Quién leyó'),a+w/2,b+140);x.fillText(gb841T('este livro?','this book?','este libro?'),a+w/2,b+190);});
+  quadro(D+M,M+560+G,PW,1408-2*M-560-G-150,(a,b,w,h)=>{const g=x.createLinearGradient(0,b,0,b+h);g.addColorStop(0,'#f6e04a');g.addColorStop(1,'#f0a030');x.fillStyle=g;x.fillRect(a,b,w,h);gb841Reticula(x,a,b,w,h,'rgba(200,60,20,.4)',14,6,'y');
+    for(let k=0;k<6;k++){const bx=a+60+k*140,bh=140+((k*53)%120);x.fillStyle=['#3a7ad8','#e8443a','#8ad050','#f07ab0','#38c0c8','#f2c020'][k];x.fillRect(bx,b+h-bh,110,bh);x.lineWidth=6;x.strokeStyle='#141414';x.strokeRect(bx,b+h-bh,110,bh);}
+    x.fillStyle='#fff';x.beginPath();x.ellipse(a+w*.3,b+90,150,56,0,0,7);x.fill();x.lineWidth=6;x.strokeStyle='#141414';x.stroke();gb841Texto(x,gb841T('VUPT!','WHOOSH!','¡ZUM!'),a+w*.3,b+92,64,'#3a7ad8','#141414',9,-.08);});
+  quadro(D+M,1408-M-150,PW,150,(a,b,w,h)=>{x.fillStyle='#f6e04a';x.fillRect(a,b,w,h);x.fillStyle='#141414';x.font='bold 54px "Comic Sans MS",Georgia,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(gb841T('CONTINUA…','TO BE CONTINUED…','CONTINUARÁ…'),a+w/2,b+h/2);});
+  // sombra da dobra no meio
+  const sg=x.createLinearGradient(1024-90,0,1024+90,0);sg.addColorStop(0,'rgba(60,40,20,0)');sg.addColorStop(.5,'rgba(60,40,20,.32)');sg.addColorStop(1,'rgba(60,40,20,0)');x.fillStyle=sg;x.fillRect(1024-90,0,180,H);
+  x.fillStyle='#141414';x.font='bold 30px Georgia,serif';x.textAlign='center';x.fillText('12',512,H-20);x.fillText('13',1536,H-20);
+  const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=8;return t;}
+// ---------- o atlas dos recortes (2048²): frente desenhada; o verso é a mesma silhueta em papel liso ----------
+const GB841_AT={ceu:[0,0,2048,640],heroi:[0,640,1024,1280],predE:[1024,640,1504,1280],predD:[1504,640,1984,1280],bum:[0,1280,640,1920],balao:[640,1280,1408,1760],nuvem1:[1408,1280,1984,1600],nuvem2:[1408,1600,1984,1920],legenda:[640,1760,1408,1920]};
+function gb841Atlas(){const W=2048,c=bb592CanCPU(W,W),x=c.getContext('2d'),r=rnd(84102);x.clearRect(0,0,W,W);
+  const recorte=(caminho,borda)=>{x.save();x.lineJoin='round';x.strokeStyle='#fbf6ea';x.lineWidth=borda||22;caminho();x.stroke();x.restore();};
+  const CORES=[['#f2c020','#b88a08'],['#e8443a','#a82820'],['#3a7ad8','#20488e'],['#38c0c8','#1a7c84'],['#f07ab0','#b0407a'],['#8ad050','#4e8a24'],['#9a6ae0','#5a3aa0']];
+  const predio=(x0,base,w,h,cor,lit)=>{const [c1,c2]=cor;x.fillStyle=c1;x.fillRect(x0,base-h,w,h);gb841Reticula(x,x0,base-h,w,h,c2,11,4.5,'y');
+    for(let wy=base-h+24;wy<base-30;wy+=46)for(let wx=x0+18;wx<x0+w-30;wx+=40){x.fillStyle='#141414';x.fillRect(wx-4,wy-4,30,36);x.fillStyle=r()<lit?'#fff2a8':'#2a3a5a';x.fillRect(wx,wy,22,28);}
+    x.lineWidth=7;x.strokeStyle='#141414';x.strokeRect(x0,base-h,w,h);};
+  // horizonte: silhueta (borda de papel), prédios, caixas-d'água e antenas
+  {const [X0,Y0,X1,Y1]=GB841_AT.ceu,base=Y1-14;const P=[];let px=X0+30;while(px<X1-140){const w=110+r()*150,h=230+r()*360;P.push([px,w,Math.min(h,Y1-Y0-70)]);px+=w+6+r()*18;}
+    recorte(()=>{x.beginPath();for(const [p,w,h] of P)x.rect(p,base-h,w,h);});x.fillStyle='#fbf6ea';for(const [p,w,h] of P)x.fillRect(p-8,base-h-8,w+16,h+16);
+    P.forEach(([p,w,h],i)=>{predio(p,base,w,h,CORES[i%CORES.length],.42);if(i%3===1){x.fillStyle='#8a5a34';x.fillRect(p+w*.3,base-h-56,46,46);x.lineWidth=5;x.strokeStyle='#141414';x.strokeRect(p+w*.3,base-h-56,46,46);x.beginPath();x.moveTo(p+w*.3-4,base-h-56);x.lineTo(p+w*.3+23,base-h-80);x.lineTo(p+w*.3+50,base-h-56);x.closePath();x.fillStyle='#5a3a24';x.fill();x.stroke();}
+      if(i%4===2){x.strokeStyle='#141414';x.lineWidth=5;x.beginPath();x.moveTo(p+w*.6,base-h);x.lineTo(p+w*.6,base-h-70);x.moveTo(p+w*.6-18,base-h-48);x.lineTo(p+w*.6+18,base-h-48);x.stroke();}});}
+  // dois prédios da frente
+  for(const [k,ci] of [['predE',2],['predD',4]]){const [X0,Y0,X1,Y1]=GB841_AT[k],w=X1-X0-60,h=Y1-Y0-60,x0=X0+30,base=Y1-20;x.fillStyle='#fbf6ea';x.fillRect(x0-10,base-h-10,w+20,h+20);
+    predio(x0,base,w,h-40,CORES[ci],.5);x.fillStyle=CORES[ci][1];x.beginPath();x.moveTo(x0-6,base-h+40);x.lineTo(x0+w/2,base-h-8);x.lineTo(x0+w+6,base-h+40);x.closePath();x.fill();x.lineWidth=7;x.strokeStyle='#141414';x.stroke();
+    x.fillStyle='#141414';x.fillRect(x0+w/2-40,base-120,80,120);x.fillStyle='#e8c060';x.fillRect(x0+w/2-30,base-110,60,110);}
+  // o Livro-Herói: livro de capa vermelha com capa de herói amarela, máscara, sorriso, punho para a frente e linhas de velocidade
+  {const [X0,Y0,X1,Y1]=GB841_AT.heroi,cx=X0+560,cy=Y0+330;x.save();
+    const cabo=()=>{x.beginPath();x.moveTo(cx-60,cy-90);x.bezierCurveTo(cx-260,cy-170,cx-420,cy-60,cx-470,cy-140);x.bezierCurveTo(cx-430,cy+10,cx-330,cy+70,cx-60,cy+40);x.closePath();};
+    recorte(()=>{cabo();x.moveTo(cx-140,cy-150);x.rect(cx-140,cy-150,300,250);x.moveTo(cx+150,cy-40);x.rect(cx+150,cy-40,160,60);},30);
+    x.strokeStyle='rgba(20,20,20,.7)';x.lineWidth=6;for(let k=0;k<5;k++){x.beginPath();x.moveTo(cx-520,cy-80+k*40);x.lineTo(cx-470+k*8,cy-80+k*40);x.stroke();}
+    cabo();x.fillStyle='#f6c64a';x.fill();x.lineWidth=8;x.strokeStyle='#141414';x.stroke();gb841Reticula(x,cx-480,cy-180,420,260,'rgba(200,110,20,.45)',12,4,'y');
+    x.fillStyle='#fbf6ea';x.fillRect(cx-128,cy-138,290,232);x.strokeStyle='#bba98a';x.lineWidth=2;for(let k=0;k<9;k++){x.beginPath();x.moveTo(cx-124,cy+90-k*3);x.lineTo(cx+158,cy+90-k*3);x.stroke();}
+    x.fillStyle='#c4282c';x.beginPath();x.rect(cx-140,cy-150,290,230);x.fill();x.lineWidth=9;x.strokeStyle='#141414';x.stroke();x.fillStyle='#8a1a1e';x.fillRect(cx-140,cy-150,34,230);
+    x.fillStyle='#f6c64a';gb841Estrela(x,cx+5,cy-5,5,60,26,-Math.PI/2);x.fill();x.lineWidth=5;x.strokeStyle='#141414';x.stroke();
+    x.fillStyle='#141414';x.beginPath();x.ellipse(cx+10,cy-92,96,28,0,0,7);x.fill();x.fillStyle='#fff';x.beginPath();x.ellipse(cx-26,cy-94,20,13,0,0,7);x.ellipse(cx+48,cy-94,20,13,0,0,7);x.fill();
+    x.fillStyle='#141414';x.beginPath();x.arc(cx-20,cy-93,7,0,7);x.arc(cx+54,cy-93,7,0,7);x.fill();x.lineWidth=7;x.beginPath();x.arc(cx+12,cy-56,26,.25,Math.PI-.25);x.stroke();
+    x.fillStyle='#c4282c';x.beginPath();x.rect(cx+150,cy-36,120,46);x.fill();x.lineWidth=7;x.stroke();x.fillStyle='#fbf6ea';x.beginPath();x.arc(cx+292,cy-13,34,0,7);x.fill();x.lineWidth=7;x.strokeStyle='#141414';x.stroke();
+    x.restore();}
+  // balão «Era uma vez…»
+  {const [X0,Y0,X1,Y1]=GB841_AT.balao,cx=(X0+X1)/2,cy=Y0+190;const b=()=>{x.beginPath();x.ellipse(cx,cy,330,150,0,0,Math.PI*2);x.moveTo(cx-120,cy+130);x.lineTo(cx-210,cy+270);x.lineTo(cx-30,cy+144);};
+    recorte(b,30);x.fillStyle='#ffffff';b();x.fill();x.lineWidth=9;x.strokeStyle='#141414';x.beginPath();x.ellipse(cx,cy,330,150,0,0,Math.PI*2);x.stroke();
+    x.fillStyle='#fff';x.beginPath();x.moveTo(cx-120,cy+130);x.lineTo(cx-210,cy+270);x.lineTo(cx-30,cy+144);x.closePath();x.fill();x.stroke();x.fillStyle='#fff';x.beginPath();x.ellipse(cx,cy,322,142,0,0,Math.PI*2);x.fill();
+    x.fillStyle='#141414';x.font='bold 84px "Comic Sans MS",Georgia,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(gb841T('Era uma vez…','Once upon a time…','Érase una vez…'),cx,cy+4,600);}
+  // explosão «ZÁS!»
+  {const [X0,Y0,X1,Y1]=GB841_AT.bum,cx=(X0+X1)/2,cy=(Y0+Y1)/2;recorte(()=>gb841Estrela(x,cx,cy,14,300,205,.05),28);x.fillStyle='#f6e04a';gb841Estrela(x,cx,cy,14,300,205,.05);x.fill();x.lineWidth=10;x.strokeStyle='#e8443a';x.stroke();
+    x.fillStyle='#f6a030';gb841Estrela(x,cx,cy,14,232,170,.05);x.fill();gb841Texto(x,gb841T('ZÁS!','ZAP!','¡ZAS!'),cx,cy+6,150,'#e8443a','#141414',16,-.14);}
+  // nuvens
+  for(const k of ['nuvem1','nuvem2']){const [X0,Y0,X1,Y1]=GB841_AT[k],cx=(X0+X1)/2,cy=(Y0+Y1)/2+16;const n=()=>{x.beginPath();for(const [dx,dy,rr] of [[-170,20,76],[-90,-30,100],[20,-50,112],[130,-14,96],[200,30,64],[60,40,80],[-60,46,78]])x.moveTo(cx+dx+rr,cy+dy),x.arc(cx+dx,cy+dy,rr,0,Math.PI*2);};
+    recorte(n,26);x.fillStyle='#ffffff';n();x.fill();x.lineWidth=8;x.strokeStyle='#141414';n();x.stroke();x.fillStyle='#fff';x.save();x.beginPath();for(const [dx,dy,rr] of [[-170,20,72],[-90,-30,96],[20,-50,108],[130,-14,92],[200,30,60],[60,40,76],[-60,46,74]])x.moveTo(cx+dx+rr,cy+dy),x.arc(cx+dx,cy+dy,rr,0,Math.PI*2);x.fill();
+    x.clip();gb841Reticula(x,X0,cy+10,X1-X0,Y1-cy,'rgba(90,150,220,.55)',11,4.5,'y');x.restore();}
+  // legenda
+  {const [X0,Y0,X1,Y1]=GB841_AT.legenda;x.fillStyle='#fbf6ea';x.fillRect(X0+6,Y0+6,X1-X0-12,Y1-Y0-12);x.fillStyle='#f6e04a';x.fillRect(X0+18,Y0+18,X1-X0-36,Y1-Y0-36);x.lineWidth=7;x.strokeStyle='#141414';x.strokeRect(X0+18,Y0+18,X1-X0-36,Y1-Y0-36);
+    x.fillStyle='#141414';x.font='bold 52px "Comic Sans MS",Georgia,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(gb841T('Enquanto isso, na cidade…','Meanwhile, in the city…','Mientras tanto, en la ciudad…'),(X0+X1)/2,(Y0+Y1)/2,X1-X0-70);}
+  // o verso: a mesma silhueta em papel liso
+  const v=bb592CanCPU(W,W),y=v.getContext('2d');y.drawImage(c,0,0);y.globalCompositeOperation='source-in';y.fillStyle='#efe6d2';y.fillRect(0,0,W,W);y.globalCompositeOperation='source-atop';
+  for(let k=0;k<9000;k++){y.fillStyle=`rgba(120,100,60,${r()*.07})`;y.fillRect(r()*W,r()*W,3,3);}
+  const mk=cv=>{const t=new THREE.CanvasTexture(cv);t.encoding=THREE.sRGBEncoding;t.anisotropy=8;return t;};return {frente:mk(c),verso:mk(v)};}
+function gb841Folhas(){const c=bb592CanCPU(64,64),x=c.getContext('2d');x.fillStyle='#ece3cc';x.fillRect(0,0,64,64);for(let y=0;y<64;y+=4){x.fillStyle='rgba(120,104,80,.35)';x.fillRect(0,y,64,1);}
+  const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.encoding=THREE.sRGBEncoding;return t;}
+function gb841Aplica(){const R=ROOMS.quadrinhos;if(!R||!R.scene||!R.world)return;const sc=R.scene;if(sc.userData.gb841)return;sc.userData.gb841=true;const st=GB841.stats,t0=performance.now();
+  const T=THREE,OB=R.world.obst,r=rnd(84110);const V={t:0,heroi:null,nuvens:[],balao:null};GB841.vivo=V;
+  const MEUS=[];const ob=(x,z,rad)=>{const o=[+x.toFixed(3),+z.toFixed(3),rad];OB.push(o);MEUS.push(o);st.obst=(st.obst||0)+1;};
+  const S=(n,c,ro,me,o)=>{const m=t160Std('841 '+n,c,ro,me,o);m.userData.papelKeep=true;return m;};
+  const M={capa:S('capa do gibi',0xc4282c,.6),capaEsc:S('lombada',0x8a1a1e,.65),haste:S('haste',0x2a2a2a,.4,.6),arame:S('arame',0x6a6a6a,.35,.7),dobra:S('dobradiça de papel',0xefe6d2,.9)};
+  const AT=gb841Atlas();const frente=new T.MeshStandardMaterial({map:AT.frente,alphaTest:.5,roughness:.85});frente.name='841 recortes';frente.userData.papelKeep=true;
+  const verso=new T.MeshStandardMaterial({map:AT.verso,alphaTest:.5,roughness:.9});verso.name='841 verso dos recortes';verso.userData.papelKeep=true;
+  const pag=new T.MeshStandardMaterial({map:gb841Pagina(),roughness:.9});pag.name='841 páginas';pag.userData.papelKeep=true;
+  const folhas=new T.MeshStandardMaterial({map:gb841Folhas(),roughness:.95});folhas.name='841 beirada das folhas';folhas.userData.papelKeep=true;
+  const soltas=new T.MeshStandardMaterial({map:pag.map,roughness:.9,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-4});soltas.name='841 páginas soltas';soltas.userData.papelKeep=true;
+  const uvDe=(k,inv)=>{const [x0,y0,x1,y1]=GB841_AT[k];const u0=x0/2048,u1=x1/2048,v0=1-y1/2048,v1=1-y0/2048;return inv?[u1,v0,u0,v1]:[u0,v0,u1,v1];};
+  const K=t160Kit('841 gibi');
+  // ===== o lugar: lombada ao longo de z, páginas abertas em x, o alto das páginas para o fundo (−z) =====
+  const BX=GB841.lugar.x,BZ=GB841.lugar.z;st.lugar={BX,BZ};K.push(BX,0,BZ);
+  // ===== 1. o gibi: capa, blocos de folhas e as duas páginas =====
+  K.box(5.3,.035,3.65,M.capa,0,.0175,0);K.box(.3,.05,3.65,M.capaEsc,0,.025,0);
+  for(const s of [-1,1]){K.boxW(2.47,.11,3.45,folhas,s*1.27,.09,0,0,0,0,.08);
+    const g=new T.PlaneGeometry(2.5,3.5,10,1);const p=g.attributes.position,uv=g.attributes.uv;for(let i=0;i<p.count;i++){const u=(p.getX(i)+1.25)/2.5;uv.setX(i,s<0?u*.5:.5+u*.5);
+      const d=s<0?(1-u)*2.5:u*2.5;p.setZ(i,.035*Math.sin(Math.min(1,d/.7)*Math.PI/2));}p.needsUpdate=true;g.computeVertexNormals();
+    K.add(g,pag,s*1.27,.148,0,0,-Math.PI/2,0);}
+  // ===== 2. os recortes: frente desenhada e verso de papel liso, com dobradiça na base =====
+  const Y=.17;
+  const recorte=(k,w,h,x,y,z,ry,rx,dobra)=>{K.plane(w,h,frente,x,y,z,ry||0,rx||0,0,uvDe(k));K.plane(w,h,verso,x-Math.sin(ry||0)*.004,y,z-Math.cos(ry||0)*.004,(ry||0)+Math.PI,-(rx||0),0,uvDe(k,true));
+    if(dobra){K.box(w*.86,.012,.1,M.dobra,x,Y+.006,z+.03,ry||0,.5);K.box(w*.86,.012,.1,M.dobra,x,Y+.006,z-.04,ry||0,-.5);}};
+  recorte('ceu',4.7,1.47,0,Y+.735,-1.45,0,-.06,true);
+  recorte('predE',1.08,1.44,-1.45,Y+.72,-.62,.12,0,true);recorte('predD',1.0,1.33,1.55,Y+.665,-.42,-.15,0,true);
+  recorte('bum',1.1,1.1,1.42,Y+.55,.82,-.28,0,true);recorte('legenda',1.32,.275,-1.25,Y+.14,1.3,.1,0,true);
+  // haste do herói, arames das nuvens e o cabinho do balão
+  K.cyl(.012,.012,1.62,M.haste,.15,Y+.81,-.2,6);K.cyl(.012,.012,1.06,M.haste,-1.55,Y+.53,.44,6);
+  for(const [x,z,h] of [[-.75,-1.15,2.5],[1.25,-1.25,2.75]])K.cyl(.006,.006,h,M.arame,x,Y+h/2,z,4);
+  // ===== 3. páginas soltas no chão (o lápis e o nanquim gigantes já estão ao lado, na gibiteca da v658) =====
+  K.pop();
+  for(const [dx,dz,ry,u] of [[-3.1,.2,.4,0],[2.9,-.6,-.3,1],[3.4,.9,.9,0]]){const g=new T.PlaneGeometry(.9,1.24);const uv=g.attributes.uv;for(let i=0;i<uv.count;i++)uv.setX(i,u*.5+uv.getX(i)*.5);
+    K.add(g,soltas,BX+dx,.006,BZ+dz,ry,-Math.PI/2,0);}
+  const ms=K.fim(sc,{sombra:true});for(const m of ms){m.userData.gb841=true;m.userData.papelKeepGeo=true;m.userData.noCam=true;}st.malhas=ms.length;
+  // ===== 4. o que se mexe (fora do kit): o herói, as nuvens e o balão =====
+  const solto=(k,w,h,x,y,z,ry)=>{const g=new T.Group();g.position.set(x,y,z);g.rotation.y=ry||0;const a=new T.Mesh(new T.PlaneGeometry(w,h),frente),b=new T.Mesh(new T.PlaneGeometry(w,h),verso);
+    t160UVRet(a.geometry,uvDe(k));t160UVRet(b.geometry,uvDe(k,true));b.rotation.y=Math.PI;b.position.z=-.004;for(const m of [a,b]){m.userData.noCam=true;m.castShadow=true;m.raycast=()=>{};g.add(m);}sc.add(g);return g;};
+  V.heroi={g:solto('heroi',1.6,1.0,BX+.15,Y+1.62+.5,BZ-.2,.06),y0:Y+1.62+.5};
+  V.balao={g:solto('balao',1.3,.81,BX-1.55,Y+1.06+.38,BZ+.44,.15),y0:Y+1.06+.38};
+  for(const [k,w,h,x,z,yy,ph] of [['nuvem1',1.15,.64,-.75,-1.15,2.5,0],['nuvem2',.98,.55,1.25,-1.25,2.75,2.1]])V.nuvens.push({g:solto(k,w,h,BX+x,Y+yy+h*.4,BZ+z,0),y0:Y+yy+h*.4,ph});
+  // obstáculos do gibi (seis círculos cobrem a capa) e conferência das chaves
+  for(const x of [-1.9,0,1.9])for(const z of [-.95,.95])ob(BX+x,BZ+z,1.28);
+  try{R.world.__nav=null;}catch(e){}
+  try{if(typeof ex617Chaves==='function')ex617Chaves('quadrinhos',R,MEUS,st);}catch(e){gb841Erro('chaves',e);}
+  try{rkAddTick(R,(dt)=>{try{gb841Tick(dt,V);}catch(e){if(!V.erroTick){V.erroTick=1;gb841Erro('tick',e);}}});}catch(e){gb841Erro('tick',e);}
+  try{if(typeof fusaoLimpar==='function')fusaoLimpar(sc);}catch(e){}
+  st.ms=Math.round(performance.now()-t0);st.pronto=true;}
+function gb841Tick(dt,V){if(!V)return;const d=Math.min(.1,dt||.016);V.t+=d;const t=V.t;
+  if(V.heroi){const g=V.heroi.g;g.position.y=V.heroi.y0+Math.sin(t*1.1)*.09;g.rotation.z=Math.sin(t*1.1+.6)*.05;}
+  if(V.balao){V.balao.g.rotation.z=Math.sin(t*.8)*.035;V.balao.g.position.y=V.balao.y0+Math.sin(t*.8+1)*.02;}
+  for(const n of V.nuvens){n.g.position.y=n.y0+Math.sin(t*.6+n.ph)*.04;n.g.rotation.z=Math.sin(t*.45+n.ph)*.03;}}
+if(GB841.on){
+  try{if(typeof finishRoom==='function'&&typeof fr8Wrap==='function'){const fr0=finishRoom;finishRoom=fr8Wrap(function*(key){const r=(yield* fr8Prev(fr0,this,arguments,"GB841"));
+      if(key==='quadrinhos')try{setTimeout(()=>{try{gb841Aplica();}catch(e){gb841Erro('aplica',e);}},1600);}catch(e){}return r;});}}catch(e){gb841Erro('ligar',e);}
+  try{if(typeof ROOMS!=='undefined'&&ROOMS.quadrinhos&&ROOMS.quadrinhos.ready)setTimeout(()=>{try{gb841Aplica();}catch(e){gb841Erro('aplica',e);}},1600);}catch(e){}}
+window.__gibi841={estado:GB841,erros:GB841.erros,stats:GB841.stats,vivo:()=>GB841.vivo,passo:(dt)=>gb841Tick(dt,GB841.vivo),atlas:GB841_AT,aplicar:()=>gb841Aplica()};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
