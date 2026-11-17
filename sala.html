@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v832</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v833</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -14888,12 +14888,12 @@ yield;;yield "build_cat#54";
 CAT.visitors=[];;yield "build_cat#55";CAT.rigs=[];;yield "build_cat#56";CAT.visitorTime=0;;yield "build_cat#57";
 {
  const specs=[
- ['Cavaleiro templário','templar',-6.9,14.1,.78,false,0xd9ceac,0xc99b7b],
- ['Cronista da corte','scholar',-6.3,15.2,-2.37,false,0x304958,0xaf785b],
- ['Gladiador romano','roman',6.85,10.1,-.31,false,0x823f2c,0xb1815c],
- ['Patrício romano','noble',6.35,11.65,2.83,false,0x703d50,0xc79c7c],
- ['Monge beneditino','monk',-6.8,-7,.72,false,0x534838,0xba8a66],
- ['Peregrina','scholar',-5.8,-5.8,-2.45,false,0x405b4e,0x8f6248],
+ ['Cavaleiro templário','templar',-8.9,13.6,2.72,false,0xd9ceac,0xc99b7b],
+ ['Cronista da corte','scholar',-8.8,12.3,.42,false,0x304958,0xaf785b],
+ ['Gladiador romano','roman',8.9,14.3,-.42,false,0x823f2c,0xb1815c],
+ ['Patrício romano','noble',8.8,15.65,-2.72,false,0x703d50,0xc79c7c],
+ ['Monge beneditino','monk',-8.95,-7.2,2.72,false,0x534838,0xba8a66],
+ ['Peregrina','scholar',-8.8,-8.5,.42,false,0x405b4e,0x8f6248],
  ['Leitora da corte','noble',-2.6,5.55,Math.PI,true,0x5d3555,0xc89e83],
  ['Copista','scholar',3.3,7.3,Math.PI,true,0x344c69,0xb08463],
  ['Peregrino sentado','monk',-3.4,-9,Math.PI,true,0x70583c,0x946947],
@@ -109109,6 +109109,22 @@ window.__ceu831={estado:CE831,erros:CE831.erros,stats:CE831.stats};
 const DZ832={on:!/[?&#]desliza832=0/i.test(location.search+location.hash)};
 try{if(!DZ832.on)window.__preso832=true;}catch(e){}
 window.__desliza832={estado:DZ832};
+
+/* ===================== v833 · CATEDRAL: OS VISITANTES DE PÉ SAEM DA PASSAGEM (bloco `VP833`) =====================
+   Pedido do Luiz (16/11, depois da v832): «Sim, deixe em locais que não atrapalhem a passagem» (os seis visitantes de pé das naves
+   laterais; na v832 o leitor já os contorna, mas eles continuavam no meio do caminho e o Patrício, encostado à coluna, fazia um canto).
+   ONDE ESTAVAM: na linha das colunas, do lado de dentro das naves laterais — o Templário e o Cronista a oeste (z ≈ 14–15), o Gladiador
+   e o Patrício a leste (z ≈ 10–12, entre a coluna de z = 12 e a mureta de pedra), o Monge e a Peregrina a oeste (z ≈ −6…−7, entre a
+   arca de pedra e as colunas): a faixa livre ao lado deles ficava com 0,5–1 m, e a Peregrina tapava o vão entre duas colunas.
+   ONDE FICAM: encostados à parede de fora, em trechos de parede sem móvel nenhum (conferido no mapa de colisão e por foto), virados um
+   para o outro e um pouco para a nave — o Templário e o Cronista sob os vitrais do lado oeste (z 13,6 e 12,3), o Gladiador e o Patrício
+   no trecho livre depois da mureta do lado leste (z 14,3 e 15,65), o Monge e a Peregrina no recanto entre a arca e a estante (z −7,2 e
+   −8,5). Ao lado de cada par a nave fica com 2,2–2,3 m livres (do pé da coluna ao visitante) e os vãos entre as colunas ficam todos
+   abertos. Os quatro sentados nos bancos não mudam; nomes, falas, roupas e corpos (v830) são os mesmos.
+   COMO: troca das seis linhas de posição na lista `specs` da Catedral (`trocas833.py`, uma ocorrência de cada no PT e no EN) — assim
+   o personagem, o disco de colisão (`CAT_NEW_OBST`), o registo de fala, a sombra e a malha de caminhos nascem já no lugar novo.
+   Sem chave de URL (são posições de origem). Gancho: `window.__visitantes833`. */
+window.__visitantes833={lugares:{templario:[-8.9,13.6],cronista:[-8.8,12.3],gladiador:[8.9,14.3],patricio:[8.8,15.65],monge:[-8.95,-7.2],peregrina:[-8.8,-8.5]}};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
