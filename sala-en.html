@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v841</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v842</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -111341,6 +111341,578 @@ if(GB841.on){
       if(key==='quadrinhos')try{setTimeout(()=>{try{gb841Aplica();}catch(e){gb841Erro('aplica',e);}},1600);}catch(e){}return r;});}}catch(e){gb841Erro('ligar',e);}
   try{if(typeof ROOMS!=='undefined'&&ROOMS.quadrinhos&&ROOMS.quadrinhos.ready)setTimeout(()=>{try{gb841Aplica();}catch(e){gb841Erro('aplica',e);}},1600);}catch(e){}}
 window.__gibi841={estado:GB841,erros:GB841.erros,stats:GB841.stats,vivo:()=>GB841.vivo,passo:(dt)=>gb841Tick(dt,GB841.vivo),atlas:GB841_AT,aplicar:()=>gb841Aplica()};
+
+/* ===================== v842 · OS PAINÉIS DOS FILMES, DOS JOGOS E DOS ESPORTES NA MESMA TOADA DA ESTANTE (bloco `CL842`) =====================
+   Pedido do Luiz (17/11): «revise o layout do menu de jogos, esportes, etc, para todos ficarem no mesmo do Livros».
+   O painel dos livros é, desde a v743, a ESTANTE EM TELA CHEIA: barra do alto com o castelo, «Castelo de Papel» e o título, as ações em
+   pílulas (a de adicionar dourada) e o ×; coluna da esquerda com o cartão do perfil e as prateleiras; as placas douradas com os números;
+   abas de papel; barra de ferramentas com categorias, busca, ordem e as vistas ▦ estante / ☰ lista; capas em prateleiras de madeira
+   com a fita e a plaquinha dourada; lista em linhas; paginação; e a FICHA em janela (capa grande, estrelas, botões de prateleira e o
+   resumo à esquerda; o título grande, os campos e as abas da ficha à direita; Salvar / Cancelar / Excluir no rodapé). Os painéis dos
+   filmes (v838/v839, gaveta lateral), dos jogos (v567, janela no meio) e dos esportes (v840, gaveta) eram outra coisa. Agora os três
+   são montados por um construtor só, com AS MESMAS PEÇAS E CLASSES da Estante (`e7-top`, `e7-marca`, `e7-acoes`, `e7-wrap`, `e7-side`,
+   `e7-perfil`, `e7-prats`, `e7-placas`, `e7-abas`, `e7-tab`, `e7-ferr`, `e7-cats`, `e7-busca`, `e7-vistas`, `e7-estante`/`e7-grade`/
+   `e7-livro`/`e7-capa`/`e7-fita`/`e7-bdg`/`e7-plaq`, `e7-lista`/`e7-linha`, `e7-pags`, `e7-res`, `e7-modal`/`e7-dlg`/`e7-ficha`/`e7-fh`/
+   `e7-fb`/`e7-fl`/`e7-fr`/`e7-fid`/`e7-fabas`/`e7-fp`/`e7-fgrid`, `e7-stars`, `e7-fsts`, `e7-fresumo`) e com a folha de estilo da própria
+   Estante (`#e743css`) copiada na hora com o escopo trocado (`#est.e743on` → `.c842on`): o que mudar na Estante muda nos três. Sem a
+   Estante nova (`?estante743=0`) ficam os painéis antigos.
+   · FILMES: prateleiras Todos · Assisti · Quero assistir · Avaliados · Com resenha; placas (filmes, assisti, quero assistir, avaliados,
+     resenhas, nota média); abas Filmes · Ranking · Resenhas; categorias pelos estilos mais comuns; busca por título, ano ou estilo;
+     ordem (recentes, nota, título, ano); pôsteres na estante com a fita verde «assisti» ou azul «quero assistir» e as estrelas; ficha
+     com o pôster, as estrelas (meia), Assisti / Quero assistir, o título grande, o ano e 🔎 Buscar dados (Wikipédia e Wikidata, da
+     v838), e as abas Resenha e Dados (estilos, visto em, pôster).
+   · JOGOS: prateleiras Todos e uma por plataforma (bolinha na cor dela); placas por plataforma; capas da Steam (ou desenhadas na cor da
+     plataforma) com a fita da plataforma; ficha com a capa, o nome grande, a plataforma e o link da Steam ou da capa; «📥 Colar lista».
+   · ESPORTES: prateleiras Todos · Provas · Treinos · Medalhas · Troféus; placas (registros, provas, treinos, medalhas, troféus,
+     recordes, km); abas Registros · Recordes · Ranking; categorias por esporte; capas com o ícone do esporte na cor dele, a fita e o
+     selo do prêmio; ficha com Prova / Treino, o resumo da marca, o evento grande, esporte, data e local, e as abas Resultado
+     (distância ou marca, unidade, tempo, colocação, participantes, categoria, prêmio) e Observações.
+   Esc fecha a janela aberta, depois a ficha, depois o painel; abrir um painel fecha a Estante e os outros, e abrir a Estante fecha os
+   painéis. Os dados, as salas e o que abre cada painel (bilheteria, cartazes, quiosque, caixas de jogo, secretaria, medalhas,
+   troféus, placares, pódio) continuam os mesmos. Chave: `?colecoes842=0`. Gancho `window.__colecoes842`. */
+const CL842={on:!/[?&#]colecoes842=0/i.test(location.search+location.hash),css:false,P:{},erros:[],stats:{aberturas:0},uiKey:'castelo.colecoes842.ui'};
+function cl8Erro(k,e){if(CL842.erros.length<40)CL842.erros.push(k+': '+(e&&e.message||e));try{console.warn('v842',k,e);}catch(x){}}
+function cl8T(pt,en,es){try{return s567T(pt,en,es===undefined?pt:es);}catch(e){return pt;}}
+function cl8Lang(){try{return S567_EN?'en':(S567_ES?'es':'pt');}catch(e){return 'pt';}}
+function cl8El(tag,cls,txt,pai){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null&&txt!=='')e.textContent=txt;if(pai)pai.appendChild(e);return e;}
+function cl8Btn(cls,txt,pai,fn,tit){const b=cl8El('button',cls,txt,pai);b.type='button';if(tit){b.title=tit;b.setAttribute('aria-label',tit);}if(fn)b.addEventListener('click',ev=>{try{fn(ev);}catch(e){cl8Erro('botão',e);}});return b;}
+function cl8Nf(n){try{return Number(n||0).toLocaleString(cl8Lang()==='en'?'en-US':cl8Lang()==='es'?'es-ES':'pt-BR');}catch(e){return String(n||0);}}
+function cl8Dec(n,d){const s=(+n||0).toFixed(d==null?1:d);return cl8Lang()==='en'?s:s.replace('.',',');}
+function cl8Hue(s){let h=0;for(const ch of String(s||''))h=(h*31+ch.charCodeAt(0))>>>0;return h%360;}
+function cl8HueCor(hex){try{const c=new THREE.Color(hex),h={};c.getHSL(h);return Math.round(h.h*360);}catch(e){return 30;}}
+function cl8Toast(t,ms){try{showToast(t,{ms:ms||2800});}catch(e){}}
+function cl8Data(d){d=String(d||'').slice(0,10);if(!/^\d{4}-\d{2}-\d{2}$/.test(d))return '';const [a,m,dd]=d.split('-');return cl8Lang()==='en'?(m+'/'+dd+'/'+a):(dd+'/'+m+'/'+a);}
+function cl8Plural(n,um,varios){return cl8Nf(n)+' '+(n===1?um:varios);}
+const CL8_EXTRA=`
+.c842on{z-index:31}
+body.c842aberto #toast{z-index:41!important;pointer-events:none!important}
+body.c842aberto #toast.show::after{display:none!important}
+.c842on .e7-ficha form.c842form{display:flex;flex-direction:column;gap:0;border:0;padding:0;margin:0}
+.c842on .e7-paper .e7-fid input.c842tit{font-size:20px;padding:8px 10px}
+.c842on .e7-fid>.c842buscar{justify-self:start;align-self:end}
+.c842on .e7-ferr>select{max-width:190px}
+.c842-filmes .e7-fid{grid-template-columns:120px auto minmax(0,1fr)}
+.c842-jogos .e7-fid{grid-template-columns:minmax(0,220px) minmax(0,1fr)}
+.c842-esportes .e7-fid{grid-template-columns:minmax(0,1fr) 170px}
+.c842on .e7-capa.gen.c842ic{justify-content:center;gap:8px}
+.c842on .e7-capa .c842em{font-size:46px;line-height:1;font-style:normal;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+.c842on .e7-cvs .c842em,.c842on .e7-res .c842em{font-size:26px}
+.c842on .e7-cvs.c842ic .e7-gt,.c842on .e7-res .c842ic .e7-gt{display:none}
+.c842on .e7-cvbig .c842em{font-size:80px}
+.c842on .e7-avatar .c842av{font-size:40px;line-height:1}
+.c842on .e7-prats i.c842dot{display:inline-block;width:12px;height:12px;margin:0 4px;border-radius:50%;background:var(--c);box-shadow:0 0 0 2px rgba(255,250,240,.7)}
+.c842on .e7-lac{display:flex;align-items:center;gap:10px}
+.c842on .e7-lac .c842pts{font-size:19px;color:#5a1420;text-align:right;font-variant-numeric:tabular-nums;min-width:64px}
+.c842on .e7-lac .c842pts small{display:block;font-size:10.5px;color:#86704f;letter-spacing:.06em}
+.c842on .c842row{display:flex;gap:8px;align-items:center}.c842on .c842row>input{flex:1;min-width:0}
+.c842on .c842prev{width:40px;height:58px;object-fit:cover;border:1px solid rgba(91,60,25,.35);border-radius:3px;flex:none}
+.c842on .e7-tab .e7-h3.c842sec{margin:18px 0 8px}
+.c842on .e7-tab .e7-thead+.e7-h3.c842sec{margin-top:4px}
+.c842on .acts .btn.danger.conf{background:#a0352a;color:#fff}
+.c842on .c842colar textarea{width:100%;min-height:170px;resize:vertical}
+.c842on .c842colar .c842lin{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-top:10px}
+.c842on .c842db{padding:16px;display:flex;flex-direction:column;gap:10px}
+.c842on .c842db label{display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:#5b4630}
+.c842on .e7-fresumo div+div{margin-top:2px}
+.c842on .sugCab{margin:0;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#7a654a}
+`;
+// o escopo da Estante é `#est.e743on` (um id e uma classe); a cópia usa `:is(#col842filmes,#col842jogos,#col842esportes).c842on`, que pesa o mesmo,
+// para ganhar das regras antigas da gaveta (`.est{width:420px…}`, que estão no corpo da página) como a Estante ganha
+const CL8_SEL=':is(#col842filmes,#col842jogos,#col842esportes).c842on';
+function cl8Css(){if(CL842.css)return true;const src=document.getElementById('e743css');if(!src||!src.textContent)return false;
+  const st=document.createElement('style');st.id='cl842css';st.textContent=src.textContent.replace(/#est\.e743on/g,CL8_SEL).replace(/\.e743vis/g,'.c842vis')+CL8_EXTRA.replace(/\.c842on/g,CL8_SEL);
+  (document.body||document.head).appendChild(st);CL842.css=true;return true;}
+function cl8UI(){try{return JSON.parse(localStorage.getItem(CL842.uiKey)||'{}')||{};}catch(e){return {};}}
+function cl8UIGrava(S){try{const u=cl8UI();u[S.k]={vista:S.st.vista,ordem:S.st.ordem};localStorage.setItem(CL842.uiKey,JSON.stringify(u));}catch(e){}}
+function cl8Estado(S,base){const u=cl8UI()[S.k]||{};const st=Object.assign({cat:'',q:'',pag:0,vista:'grade'},base);
+  if(u.vista==='grade'||u.vista==='lista')st.vista=u.vista;if(u.ordem&&S.ordens.some(o=>o[0]===u.ordem))st.ordem=u.ordem;return st;}
+
+/* ---------- capas, estrelas, botões de prateleira, campos, abas da ficha ---------- */
+function cl8Capa(C,cls){const d=cl8El('div','e7-capa '+(cls||''));d.style.setProperty('--h',C.hue==null?cl8Hue(C.titulo):C.hue);
+  const gerada=()=>{d.classList.add('gen');if(C.icone){d.classList.add('c842ic');cl8El('i','c842em',C.icone,d);}cl8El('span','e7-gt',C.titulo||'',d);cl8El('span','e7-ga',C.sub||'',d);};
+  const urls=(Array.isArray(C.url)?C.url:[C.url]).map(u=>String(u||'').trim()).filter(u=>/^(https?:|data:image\/)/i.test(u));
+  if(urls.length){const im=cl8El('img',null,null,d);im.alt='';im.loading='lazy';im.decoding='async';im.referrerPolicy='no-referrer';let i=0;
+    im.addEventListener('error',()=>{i++;if(i<urls.length)im.src=urls[i];else{im.remove();gerada();}});im.src=urls[0];}else gerada();
+  return d;}
+function cl8MiniEstrelas(n){const s=cl8El('span','e7-ms');const v=Math.max(0,Math.min(5,+n||0));s.setAttribute('role','img');s.setAttribute('aria-label',cl8Dec(v,1).replace(/[.,]0$/,'')+' / 5');cl8El('span','e7-ms0','★★★★★',s);const f=cl8El('span','e7-ms1','★★★★★',s);f.style.width=(v/5*100)+'%';return s;}
+function cl8Estrelas(pai,get,set){const w=cl8El('div','e7-stars',null,pai);w.tabIndex=0;w.setAttribute('role','slider');w.setAttribute('aria-valuemin','0');w.setAttribute('aria-valuemax','5');w.setAttribute('aria-label',cl8T('Sua nota','Your rating','Tu nota'));const S=[];
+  for(let i=0;i<5;i++){const s=cl8El('span','e7-st',null,w);s.dataset.i=i;cl8El('span','e7-st0','★',s);S.push(cl8El('span','e7-st1','★',s));}
+  const paint=v=>{for(let i=0;i<5;i++)S[i].style.width=(Math.max(0,Math.min(1,v-i))*100)+'%';w.setAttribute('aria-valuenow',String(v));};
+  const val=ev=>{const s=ev.target.closest&&ev.target.closest('.e7-st');if(!s)return null;const r=s.getBoundingClientRect();return (+s.dataset.i)+((ev.clientX-r.left)<r.width/2?.5:1);};
+  w.addEventListener('pointermove',ev=>{const v=val(ev);if(v!=null)paint(v);});w.addEventListener('pointerleave',()=>paint(get()));
+  w.addEventListener('click',ev=>{const v=val(ev);if(v==null)return;set(v===get()?0:v);});
+  w.addEventListener('keydown',ev=>{let v=get();if(ev.key==='ArrowRight'||ev.key==='ArrowUp')v=Math.min(5,v+.5);else if(ev.key==='ArrowLeft'||ev.key==='ArrowDown')v=Math.max(0,v-.5);else if(ev.key==='Home')v=0;else if(ev.key==='End')v=5;else return;ev.preventDefault();set(v);});
+  return {w,paint};}
+function cl8Status(pai,ops,get,set){const box=cl8El('div','e7-fsts',null,pai);box.setAttribute('role','group');const bs=[];
+  const paint=()=>{const v=get();for(const b of bs){const a=b.dataset.s===v;b.classList.toggle('on',a);b.setAttribute('aria-pressed',a?'true':'false');}};
+  for(const [k,nome,g,c] of ops){const b=cl8Btn('','',box,()=>{set(k);paint();});b.dataset.s=k;b.style.setProperty('--c',c);cl8El('i',null,g,b);b.appendChild(document.createTextNode(nome));bs.push(b);}
+  return {box,paint};}
+function cl8Campo(pai,rot,tag,at,w){const l=cl8El('label',w?'w':null,null,pai);l.appendChild(document.createTextNode(rot));const c=cl8El(tag||'input',null,null,l);for(const k in (at||{}))c.setAttribute(k,at[k]);return c;}
+function cl8Opcoes(sel,ops,val){sel.replaceChildren();for(const [v,t] of ops){const o=cl8El('option',null,t,sel);o.value=v;}sel.value=val==null?'':String(val);if(sel.selectedIndex<0)sel.selectedIndex=0;}
+function cl8Subabas(pai,abas){const nav=cl8El('nav','e7-fabas',null,pai);nav.setAttribute('role','tablist');const panes={},bts={};
+  const mostra=k=>{for(const p in panes){panes[p].hidden=p!==k;bts[p].classList.toggle('on',p===k);bts[p].setAttribute('aria-selected',p===k?'true':'false');}};
+  for(const [k,n] of abas){bts[k]=cl8Btn('',n,nav,()=>mostra(k));bts[k].setAttribute('role','tab');panes[k]=cl8El('div','e7-fp',null,pai);}mostra(abas[0][0]);return {panes,mostra};}
+function cl8Excluir(b,txt,fn){b.addEventListener('click',()=>{if(b.dataset.conf!=='1'){b.dataset.conf='1';b.textContent=cl8T('Excluir mesmo?','Really delete?','¿Borrar de verdad?');b.classList.add('conf');
+    clearTimeout(b._t);b._t=setTimeout(()=>cl8ExcluirReset(b,txt),3500);return;}cl8ExcluirReset(b,txt);try{fn();}catch(e){cl8Erro('excluir',e);}});}
+function cl8ExcluirReset(b,txt){if(!b)return;clearTimeout(b._t);b.dataset.conf='';b.textContent=txt;b.classList.remove('conf');}
+function cl8Dica(p,t){if(!p)return;p.textContent=t||'';p.hidden=!t;}
+
+/* ---------- o painel ---------- */
+function cl8Painel(S){if(S.root)return S.root;const T=cl8T;
+  const a=document.createElement('aside');a.className='est c842on c842-'+S.k;a.id='col842'+S.k;a.hidden=true;a.setAttribute('aria-label',S.titulo());a.setAttribute('translate','no');
+  const R=S.R={};const root=cl8El('div','e7-root',null,a);
+  const top=cl8El('header','e7-top',null,root),ti=cl8El('div','e7-topin',null,top);const marca=cl8El('div','e7-marca',null,ti);
+  // o castelo dourado da Estante, com os ids do degradê trocados (o original fica dentro da Estante escondida, e um degradê escondido não pinta)
+  try{const sv=document.querySelector('#est .e7-marca svg');if(sv){let h=sv.outerHTML;for(const n of sv.querySelectorAll('[id]')){const id=n.id,novo=id+'-c842'+S.k;h=h.split('id="'+id+'"').join('id="'+novo+'"').split('url(#'+id+')').join('url(#'+novo+')');}marca.innerHTML=h;}}catch(e){cl8Erro('castelo',e);}
+  cl8El('span','e7-casa','Castelo de Papel',marca);cl8El('i','e7-sep',null,marca);R.tit=cl8El('h2','e7-tit',S.titulo(),marca);
+  const ac=cl8El('div','e7-acoes',null,ti);R.acoes=ac;cl8Btn('e7-ouro',S.txtNovo(),ac,()=>S.abrir(null));
+  for(const [txt,fn,tit] of (S.acoes||[]))cl8Btn('',txt(),ac,fn,tit&&tit());
+  cl8Btn('e7-x','×',ac,()=>cl8Fecha(S),T('Fechar','Close','Cerrar'));
+  const wrap=cl8El('div','e7-wrap',null,root),side=cl8El('aside','e7-side',null,wrap);
+  R.perfil=cl8El('section','e7-card e7-paper e7-perfil',null,side);R.prats=cl8El('nav','e7-paper e7-prats',null,side);R.prats.setAttribute('aria-label',T('Prateleiras','Shelves','Estantes'));
+  const main=cl8El('main','e7-main',null,wrap);R.main=main;R.placas=cl8El('div','e7-placas',null,main);
+  R.abas=cl8El('nav','e7-abas',null,main);R.abas.setAttribute('role','tablist');R.tabs={};R.tabBtn={};
+  for(const [k,nome] of S.abas){const b=cl8Btn('e7-aba','',R.abas,()=>{S.st.aba=k;cl8Render(S);});b.setAttribute('role','tab');b.dataset.k=k;b._nome=nome;R.tabBtn[k]=b;
+    const s=cl8El('section','e7-tab e7-paper',null,main);s.dataset.k=k;s.setAttribute('role','tabpanel');s.hidden=true;R.tabs[k]=s;}
+  const te=R.tabs[S.abas[0][0]];R.ferr=cl8El('div','e7-ferr',null,te);R.cats=cl8El('div','e7-cats',null,R.ferr);R.cats.setAttribute('role','group');
+  const bu=cl8El('div','e7-busca',null,R.ferr);R.q=cl8El('input',null,null,bu);R.q.type='search';R.q.placeholder=S.txtBusca();R.q.setAttribute('aria-label',R.q.placeholder);
+  let tq=0;R.q.addEventListener('input',()=>{clearTimeout(tq);tq=setTimeout(()=>{S.st.q=R.q.value;S.st.pag=0;cl8RenderEstante(S);},160);});
+  R.ordem=cl8El('select',null,null,R.ferr);R.ordem.setAttribute('aria-label',T('Ordenar','Sort','Ordenar'));cl8Opcoes(R.ordem,S.ordens.map(o=>[o[0],o[1]()]),S.st.ordem);
+  R.ordem.addEventListener('change',()=>{S.st.ordem=R.ordem.value;S.st.pag=0;cl8UIGrava(S);cl8RenderEstante(S);});
+  const vs=cl8El('div','e7-vistas',null,R.ferr);
+  R.vG=cl8Btn('','▦',vs,()=>{S.st.vista='grade';S.st.pag=0;cl8UIGrava(S);cl8RenderEstante(S);},T('Ver como estante','Shelf view','Ver como estante'));
+  R.vL=cl8Btn('','☰',vs,()=>{S.st.vista='lista';S.st.pag=0;cl8UIGrava(S);cl8RenderEstante(S);},T('Ver como lista','List view','Ver como lista'));
+  R.estante=cl8El('div','e7-estante',null,te);R.grade=cl8El('div','e7-grade',null,R.estante);R.grade.setAttribute('role','list');R.lista=cl8El('div','e7-lista',null,te);R.lista.hidden=true;
+  R.pags=cl8El('nav','e7-pags',null,te);R.pags.setAttribute('aria-label',T('Páginas','Pages','Páginas'));if(S.rodape)cl8El('p','rodape',S.rodape(),te);
+  // clicar (ou Enter) numa capa, numa linha ou numa resenha abre a ficha
+  const abreDe=ev=>{const t=ev.target,c=t&&t.closest&&t.closest('[data-id]');if(!c||!a.contains(c))return;const ia=t.closest('button,a,input,select,textarea');if(ia&&ia!==c&&c.contains(ia))return;
+    const x=S.itens().find(q=>q.id===c.dataset.id);if(x)S.abrir(x);};
+  for(const k in R.tabs)R.tabs[k].addEventListener('click',abreDe);
+  main.addEventListener('keydown',ev=>{if(ev.key!=='Enter')return;const c=ev.target.closest&&ev.target.closest('.e7-livro[data-id],.e7-linha[data-id]');if(c&&c===ev.target){ev.preventDefault();abreDe({target:c});}});
+  // a ficha
+  const m=cl8El('div','e7-modal',null,a);m.hidden=true;const dlg=cl8El('div','e7-dlg e7-paper e7-ficha',null,m);dlg.setAttribute('role','dialog');dlg.setAttribute('aria-modal','true');
+  const f=cl8El('form','c842form',null,dlg);f.autocomplete='off';f.noValidate=true;const fh=cl8El('div','e7-fh',null,f);R.fTit=cl8El('h3',null,'',fh);cl8Btn('e7-x','×',fh,()=>cl8FichaFecha(S),T('Fechar','Close','Cerrar'));
+  const fb=cl8El('div','e7-fb',null,f);R.fl=cl8El('div','e7-fl',null,fb);R.fr=cl8El('div','e7-fr',null,fb);R.facts=cl8El('div','acts',null,f);
+  m.addEventListener('click',ev=>{if(ev.target===m)cl8FichaFecha(S);});f.addEventListener('submit',ev=>{ev.preventDefault();try{S.salvar();}catch(e){cl8Erro('salvar '+S.k,e);}});
+  R.fichaM=m;R.form=f;
+  // nada do que acontece no painel chega ao jogo (andar, mirar, travar o mouse); o Esc é tratado na janela (ver a ligação)
+  for(const ev of ['pointerdown','pointerup','mousedown','mouseup','click','dblclick','wheel','touchstart','touchmove','touchend','keydown','keyup','keypress','contextmenu'])a.addEventListener(ev,e=>{if(!(ev==='keydown'&&e.key==='Escape'))e.stopPropagation();});
+  document.body.appendChild(a);S.root=a;try{S.montaFicha(R.fl,R.fr,R.facts);}catch(e){cl8Erro('ficha '+S.k,e);}return a;}
+function cl8Janela(S,cls,titulo){const m=cl8El('div','e7-modal',null,S.root);m.hidden=true;const d=cl8El('div','e7-dlg e7-paper e7-peq '+(cls||''),null,m);d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');
+  const h=cl8El('div','e7-dh',null,d);cl8El('h3',null,titulo,h);const fecha=()=>{m.hidden=true;};cl8Btn('e7-x','×',h,fecha,cl8T('Fechar','Close','Cerrar'));m.addEventListener('click',ev=>{if(ev.target===m)fecha();});
+  const corpo=cl8El('div','c842db',null,d);m._fecha=fecha;return {m,d,corpo,fecha};}
+function cl8Esc(S){const R=S.R;if(!R)return;const js=[...S.root.querySelectorAll('.e7-modal')].filter(m=>!m.hidden&&m!==R.fichaM);if(js.length){for(const m of js)m.hidden=true;return;}
+  if(!R.fichaM.hidden){cl8FichaFecha(S);return;}cl8Fecha(S);}
+function cl8FichaAbre(S,titulo){S.R.fTit.textContent=titulo;S.R.fichaM.hidden=false;S.R.fichaM.scrollTop=0;}
+function cl8FichaFecha(S){if(S.R&&S.R.fichaM)S.R.fichaM.hidden=true;S.ed=null;}
+function cl8Aberto(){return Object.values(CL842.P).some(S=>S.root&&!S.root.hidden);}
+function cl8Marca(){try{document.body.classList.toggle('c842aberto',cl8Aberto());}catch(e){}}
+function cl8Abre(S,prat,aba){if(!cl8Css())return false;cl8Painel(S);try{unlock();}catch(e){}if(!S.root.hidden){cl8FichaFecha(S);for(const m of S.root.querySelectorAll('.e7-modal'))m.hidden=true;}
+  try{const est=document.getElementById('est');if(est&&!est.hidden){const x=document.getElementById('estFechar');if(x)x.click();else if(window.__panel&&window.__panel.show)window.__panel.show(false);}}catch(e){}
+  for(const o of Object.values(CL842.P))if(o!==S&&o.root&&!o.root.hidden)cl8Fecha(o);
+  if(prat&&prat!==S.st.prat){S.st.prat=prat;S.st.cat='';S.st.q='';S.st.pag=0;}if(aba)S.st.aba=aba;
+  if(S.root.hidden)S.root.scrollTop=0;S.root.hidden=false;cl8Marca();cl8Render(S);CL842.stats.aberturas++;S.vezes=(S.vezes||0)+1;return true;}
+function cl8Fecha(S){if(!S.root)return;cl8FichaFecha(S);for(const m of S.root.querySelectorAll('.e7-modal'))m.hidden=true;S.root.hidden=true;cl8Marca();}
+
+/* ---------- desenhar ---------- */
+function cl8Render(S){const a=S.root;if(!a||a.hidden)return;const L=S.itens(),R=S.R;
+  try{cl8RenderPerfil(S,L);}catch(e){cl8Erro('perfil '+S.k,e);}try{cl8RenderPrats(S,L);}catch(e){cl8Erro('prateleiras '+S.k,e);}try{cl8RenderPlacas(S,L);}catch(e){cl8Erro('placas '+S.k,e);}
+  if(!R.tabs[S.st.aba])S.st.aba=S.abas[0][0];
+  for(const [k] of S.abas){const b=R.tabBtn[k];b.textContent=b._nome();const n=S.contaAba&&S.contaAba[k]?S.contaAba[k](L):null;if(n)cl8El('b',null,cl8Nf(n),b);b.classList.toggle('on',S.st.aba===k);b.setAttribute('aria-selected',S.st.aba===k?'true':'false');R.tabs[k].hidden=S.st.aba!==k;}
+  if(S.st.aba===S.abas[0][0])cl8RenderEstante(S,L);else try{S.abaRender[S.st.aba](R.tabs[S.st.aba],L);}catch(e){cl8Erro('aba '+S.st.aba,e);}}
+function cl8RenderPerfil(S,L){const p=S.R.perfil;p.replaceChildren();cl8El('div','e7-banner',null,p);const av=cl8El('div','e7-avatar',null,p);cl8El('span','c842av',S.avatar,av);
+  const P=S.perfil(L);cl8El('div','e7-nome',S.titulo(),p);if(P.frase)cl8El('p','e7-frase',P.frase,p);if(P.desde)cl8El('div','e7-desde',P.desde,p);}
+function cl8RenderPrats(S,L){const n=S.R.prats;n.replaceChildren();
+  for(const p of S.prats(L)){if(p[0]==='-'){cl8El('div','e7-psep',null,n);continue;}const [k,nome,ic,fn,cor]=p;
+    const b=cl8Btn(S.st.aba===S.abas[0][0]&&S.st.prat===k?'on':'','',n,()=>{S.st.prat=k;S.st.aba=S.abas[0][0];S.st.pag=0;cl8Render(S);});b.setAttribute('aria-pressed',S.st.prat===k?'true':'false');
+    const i=cl8El('i',cor?'c842dot':null,cor?'':ic,b);if(cor)i.style.setProperty('--c',cor);cl8El('span',null,nome,b);cl8El('b',null,cl8Nf(L.filter(fn).length),b);}}
+function cl8RenderPlacas(S,L){const c=S.R.placas;c.replaceChildren();const it=S.placas?S.placas(L):[];c.hidden=!it.length;if(!it.length)return;
+  c.style.gridTemplateColumns=innerWidth>1100?'repeat('+it.length+',minmax(0,1fr))':'';
+  for(const [k,ic,nome,v,ir] of it){const b=cl8El('button','e7-placa',null,c);b.type='button';const alvo=ir||k;
+    if(alvo.indexOf('aba:')===0?S.st.aba===alvo.slice(4):(S.st.aba===S.abas[0][0]&&S.st.prat===alvo))b.classList.add('on');
+    cl8El('i',null,ic,b);cl8El('b',null,typeof v==='number'?cl8Nf(v):v,b);cl8El('span',null,nome,b);b.title=nome+': '+(typeof v==='number'?cl8Nf(v):v);
+    b.addEventListener('click',()=>{if(alvo.indexOf('aba:')===0)S.st.aba=alvo.slice(4);else{S.st.aba=S.abas[0][0];S.st.prat=alvo;S.st.pag=0;}cl8Render(S);});}}
+function cl8Base(S,L){const p=S.prats(L).find(q=>q[0]===S.st.prat);if(!p){S.st.prat='todos';return L.slice();}return L.filter(p[3]);}
+function cl8PorPagina(S){if(innerWidth<=760)return 24;const w=S.R.grade.clientWidth||((S.root.clientWidth||1000)-360);const cols=Math.max(2,Math.floor((w+16)/128));return cols*6;}
+function cl8RenderEstante(S,L){const R=S.R,st=S.st;L=L||S.itens();const base=cl8Base(S,L);
+  const cats=S.cats?S.cats(base):[];if(st.cat&&!cats.some(c=>c[0]===st.cat))st.cat='';R.cats.replaceChildren();R.cats.hidden=!cats.length;
+  if(cats.length)for(const [k,nome] of [['',cl8T('Todos','All','Todos')]].concat(cats)){const n=k?base.filter(x=>S.naCat(x,k)).length:base.length;const b=cl8Btn(st.cat===k?'on':'',nome+' ',R.cats,()=>{st.cat=k;st.pag=0;cl8RenderEstante(S);});cl8El('b',null,cl8Nf(n),b);b.setAttribute('aria-pressed',st.cat===k?'true':'false');}
+  if(document.activeElement!==R.q)R.q.value=st.q;R.ordem.value=st.ordem;R.vG.classList.toggle('on',st.vista==='grade');R.vL.classList.toggle('on',st.vista==='lista');
+  R.vG.setAttribute('aria-pressed',st.vista==='grade'?'true':'false');R.vL.setAttribute('aria-pressed',st.vista==='lista'?'true':'false');
+  const q=String(st.q||'').trim().toLowerCase(),ord=(S.ordens.find(o=>o[0]===st.ordem)||S.ordens[0])[2];
+  const lista=base.filter(x=>(!st.cat||S.naCat(x,st.cat))&&(!q||S.busca(x,q))).sort(ord);
+  const N=st.vista==='grade'?cl8PorPagina(S):30,pages=Math.max(1,Math.ceil(lista.length/N));st.pag=Math.max(0,Math.min(st.pag,pages-1));const fatia=lista.slice(st.pag*N,(st.pag+1)*N);
+  const filtrado=!!(q||st.cat);
+  if(st.vista==='grade'){R.estante.hidden=false;R.lista.hidden=true;R.grade.replaceChildren(...fatia.map(x=>cl8Cartao(S,x)));
+    if(!fatia.length){const d=cl8El('div','e7-gvazio');cl8El('div',null,filtrado?S.txtVazioFiltro():S.txtVazio(),d);if(!filtrado&&st.prat==='todos')cl8Btn('',S.txtNovo(),d,()=>S.abrir(null));R.grade.appendChild(d);}}
+  else{R.estante.hidden=true;R.lista.hidden=false;R.lista.replaceChildren(...fatia.map(x=>cl8Linha(S,x)));if(!fatia.length)R.lista.appendChild(cl8El('p','e7-vazio',filtrado?S.txtVazioFiltro():S.txtVazio()));}
+  cl8RenderPags(S,pages,lista.length,()=>cl8RenderEstante(S));}
+function cl8RenderPags(S,pages,total,refaz){const c=S.R.pags;c.replaceChildren();const nome=n=>cl8Nf(n)+' '+S.txtItem(n);
+  if(pages<=1){if(total>0)cl8El('span',null,nome(total),c);return;}const st=S.st,vai=p=>{st.pag=p;refaz();try{S.R.ferr.scrollIntoView({block:'start'});}catch(e){}};
+  cl8Btn('','‹',c,()=>vai(st.pag-1),cl8T('Página anterior','Previous page','Anterior')).disabled=st.pag===0;
+  const ps=new Set([0,pages-1,st.pag-1,st.pag,st.pag+1]);let ult=-1;for(let i=0;i<pages;i++){if(!ps.has(i))continue;if(i-ult>1)cl8El('span',null,'…',c);const b=cl8Btn(i===st.pag?'on':'',String(i+1),c,()=>vai(i));if(i===st.pag)b.setAttribute('aria-current','page');ult=i;}
+  cl8Btn('','›',c,()=>vai(st.pag+1),cl8T('Próxima página','Next page','Siguiente')).disabled=st.pag>=pages-1;cl8El('span',null,nome(total),c);}
+function cl8Cartao(S,x){const c=cl8El('div','e7-livro');c.dataset.id=x.id;c.tabIndex=0;c.setAttribute('role','listitem');const dica=S.dica(x);c.title=dica;c.setAttribute('aria-label',dica);
+  const cv=cl8Capa(S.capa(x),'e7-cv');c.appendChild(cv);const f=S.fita&&S.fita(x);if(f){const fi=cl8El('i','e7-fita',f.g,cv);fi.style.setProperty('--c',f.c);fi.setAttribute('aria-hidden','true');}
+  const bs=S.selos?S.selos(x):[];if(bs.length){const bd=cl8El('span','e7-bdg',null,cv);for(const [g,t] of bs)cl8El('i',null,g,bd).title=t;}
+  const n=S.estrelas?S.estrelas(x):0;if(n>0){cv.classList.add('e7-comst');cl8El('span','e7-cvst',null,cv).appendChild(cl8MiniEstrelas(n));}
+  cl8El('span','e7-plaq',S.plaq(x),c);return c;}
+function cl8Linha(S,x,lado,L){const r=cl8El('div','e7-linha');if(x&&x.id)r.dataset.id=x.id;r.tabIndex=0;r.setAttribute('role','button');r.appendChild(cl8Capa(S.capa(x),'e7-cvs'));
+  L=L||S.linha(x);const inf=cl8El('div','e7-linf',null,r);const t=cl8El('b','e7-lt2',L.titulo,inf);t.title=L.titulo;cl8El('span','e7-la2',L.sub||'—',inf);
+  const m=cl8El('div','e7-lmeta',null,inf);for(const [txt,cor] of (L.pills||[])){const p=cl8El('span','e7-pill',null,m);if(cor)cl8El('i',null,null,p).style.setProperty('--c',cor);p.appendChild(document.createTextNode(txt));}
+  if(L.estrelas>0)m.appendChild(cl8MiniEstrelas(L.estrelas));for(const t2 of (L.extra||[]))if(t2)cl8El('span',null,t2,m);for(const tg of (L.tags||[]))if(tg)cl8El('span','e7-tag',tg,m);
+  if(lado){const ac=cl8El('div','e7-lac',null,r);lado(ac);}return r;}
+function cl8Vazio(sec,t){cl8El('p','e7-vazio',t,sec);}
+function cl8Cabeca(sec,titulo,n){const h=cl8El('div','e7-thead',null,sec);const h3=cl8El('h3','e7-h3',titulo+' ',h);if(n!=null)cl8El('b',null,'('+cl8Nf(n)+')',h3);return h;}
+const CL8_MEDALHA=['🥇','🥈','🥉'];
+
+/* ---------- FILMES (dados e busca da v838) ---------- */
+function cl8Filmes(){const T=cl8T;
+  const STF={visto:{n:()=>T('Assisti','Watched','Vista'),c:'#1f8f5a',g:'✓'},quero:{n:()=>T('Quero assistir','Want to watch','Quiero ver'),c:'#2a78d6',g:'☆'}};
+  const gens=f=>Array.isArray(f.generos)?f.generos:[];
+  const hueF=f=>gens(f).length?cl8HueCor(cn8GenCor(gens(f)[0])):cl8Hue(f.titulo);
+  const temRes=f=>!!String(f.resenha||'').trim();
+  const txtEx=T('Excluir','Delete','Borrar');
+  const S={k:'filmes',avatar:'🎬',
+    titulo:()=>T('Meus Filmes','My Movies','Mis Películas'),
+    txtNovo:()=>T('+ Adicionar filme','+ Add movie','+ Añadir película'),
+    txtBusca:()=>T('Buscar por título, ano ou estilo…','Search by title, year or genre…','Buscar por título, año o estilo…'),
+    txtItem:n=>n===1?T('filme','movie','película'):T('filmes','movies','películas'),
+    txtVazio:()=>T('Nenhum filme nesta prateleira ainda.','No movies on this shelf yet.','Ninguna película en este estante.'),
+    txtVazioFiltro:()=>T('Nenhum filme com esses filtros.','No movies match these filters.','Ninguna película con estos filtros.'),
+    abas:[['filmes',()=>T('Filmes','Movies','Películas')],['ranking',()=>T('Ranking','Ranking','Ranking')],['resenhas',()=>T('Resenhas','Reviews','Reseñas')]],
+    contaAba:{ranking:L=>L.filter(f=>f.status==='visto'&&f.nota>0).length,resenhas:L=>L.filter(temRes).length},
+    ordens:[['recentes',()=>T('Mais recentes','Most recent','Más recientes'),cn8PorData],['nota',()=>T('Maior nota','Highest rated','Mejor nota'),cn8PorNota],
+      ['titulo',()=>T('Título (A–Z)','Title (A–Z)','Título (A–Z)'),cn8PorTitulo],['ano',()=>T('Ano (mais novos)','Year (newest)','Año (más nuevas)'),cn8PorAno]],
+    itens:()=>cn8Dados().filmes,
+    prats:()=>[['todos',T('Todos','All','Todas'),'🎞️',()=>true],['visto',STF.visto.n(),'✓',f=>f.status==='visto'],['quero',STF.quero.n(),'☆',f=>f.status==='quero'],['-'],
+      ['avaliado',T('Avaliados','Rated','Con nota'),'★',f=>f.nota>0],['resenhado',T('Com resenha','Reviewed','Con reseña'),'✎',temRes]],
+    placas(L){const ns=L.filter(f=>f.nota>0),m=ns.length?ns.reduce((s,f)=>s+f.nota,0)/ns.length/2:0;
+      return [['todos','🎞️',T('Filmes','Movies','Películas'),L.length],['visto','✓',STF.visto.n(),L.filter(f=>f.status==='visto').length],['quero','☆',STF.quero.n(),L.filter(f=>f.status==='quero').length],
+        ['avaliado','★',T('Avaliados','Rated','Con nota'),ns.length],['resenhas','✎',T('Resenhas','Reviews','Reseñas'),L.filter(temRes).length,'aba:resenhas'],['media','🏆',T('Nota média','Average','Nota media'),m?cl8Dec(m,1):'—','aba:ranking']];},
+    perfil(L){const v=L.filter(f=>f.status==='visto').length,q=L.length-v;const d=L.map(f=>String(f.criado||'').slice(0,10)).filter(Boolean).sort()[0];
+      return {frase:cl8Plural(L.length,T('filme','movie','película'),T('filmes','movies','películas'))+' · '+cl8Nf(v)+' '+T('assistidos','watched','vistas')+' · '+cl8Nf(q)+' '+T('na lista','on the list','en la lista'),
+        desde:d?T('Desde ','Since ','Desde ')+cl8Data(d):''};},
+    cats(base){const c=cn8Contagem(base);let ks=c.ks.slice(0,4);if(S.st.cat&&c.c[S.st.cat]&&ks.indexOf(S.st.cat)<0)ks=ks.slice(0,3).concat([S.st.cat]);return ks.map(k=>[k,cn8GenNome(k)]);},
+    naCat:(f,k)=>gens(f).indexOf(k)>=0,
+    busca:(f,q)=>[f.titulo,f.ano||'',gens(f).map(cn8GenNome).join(' ')].join(' ').toLowerCase().indexOf(q)>=0,
+    capa:f=>({titulo:f.titulo,sub:f.ano?String(f.ano):'',url:f.poster,hue:hueF(f)}),
+    fita:f=>{const s=STF[f.status]||STF.visto;return {g:s.g,c:s.c};},
+    estrelas:f=>f.status==='visto'?f.nota/2:0,
+    plaq:f=>f.titulo,
+    dica:f=>f.titulo+(f.ano?' ('+f.ano+')':'')+' · '+(STF[f.status]||STF.visto).n()+(f.nota>0?' · ★ '+cn8NotaTxt(f.nota):''),
+    linha:f=>({titulo:f.titulo,sub:[f.ano?String(f.ano):'',gens(f).map(cn8GenNome).join(', ')].filter(Boolean).join(' · '),pills:[[(STF[f.status]||STF.visto).n(),(STF[f.status]||STF.visto).c]],
+      estrelas:f.status==='visto'?f.nota/2:0,extra:[f.status==='visto'&&f.visto?T('visto em ','watched on ','vista el ')+cl8Data(f.visto):''],tags:temRes(f)?[T('resenha','review','reseña')]:[]}),
+    rodape:()=>T('No Cinema da Minha Sala, os filmes que você viu viram cartazes nas paredes, separados por estilo; o telão passa um de cada vez, o TOP 10 mostra as melhores notas e o EM BREVE, a lista do quero assistir. Clique num cartaz (ou mire nele e aperte E) para abri-lo aqui.',
+      'In the Cinema in My Room, the movies you have seen become posters on the walls, grouped by genre; the screen shows one at a time, the TOP 10 shows the best ratings and COMING SOON your watchlist. Click a poster (or aim at it and press E) to open it here.',
+      'En el Cine de Mi Sala, las películas que viste se vuelven carteles en las paredes, separados por estilo; la pantalla pasa una a la vez, el TOP 10 muestra las mejores notas y PRÓXIMAMENTE tu lista de quiero ver. Haz clic en un cartel (o apúntalo y pulsa E) para abrirlo aquí.'),
+    abaRender:{
+      ranking(sec,L){sec.replaceChildren();const R=L.filter(f=>f.status==='visto'&&f.nota>0).sort(cn8PorNota);cl8Cabeca(sec,T('Ranking dos filmes','Movie ranking','Ranking de películas'),R.length);
+        if(!R.length){cl8Vazio(sec,T('Dê nota aos filmes que você viu (as estrelas da ficha) para montar o ranking.','Rate the movies you have seen (the stars on the card) to build the ranking.','Pon nota a las películas que viste (las estrellas de la ficha) para armar el ranking.'));return;}
+        const box=cl8El('div','e7-lista',null,sec);R.forEach((f,i)=>{const L0=S.linha(f);L0.titulo=(i<3?CL8_MEDALHA[i]+' ':(i+1)+'. ')+f.titulo;L0.estrelas=0;
+          box.appendChild(cl8Linha(S,f,ac=>{const p=cl8El('span','c842pts',cl8Dec(f.nota/2,1).replace(/[.,]0$/,'')+' ★',ac);cl8El('small',null,T('de 5','of 5','de 5'),p);},L0));});},
+      resenhas(sec,L){sec.replaceChildren();const R=L.filter(temRes).sort((a,b)=>String(b.atualizado||'').localeCompare(String(a.atualizado||'')));cl8Cabeca(sec,T('Resenhas','Reviews','Reseñas'),R.length);
+        if(!R.length){cl8Vazio(sec,T('Nenhuma resenha ainda. Abra um filme e escreva o que achou na aba «Resenha» da ficha.','No reviews yet. Open a movie and write what you thought in the “Review” tab.','Ninguna reseña todavía. Abre una película y escribe qué te pareció en la pestaña «Reseña».'));return;}
+        for(const f of R){const a=cl8El('article','e7-res',null,sec);a.dataset.id=f.id;const cv=cl8Capa(S.capa(f));cv.title=f.titulo;a.appendChild(cv);const d=cl8El('div',null,null,a);
+          cl8El('h4',null,f.titulo,d);cl8El('div','e7-rsub',[f.ano?String(f.ano):'',gens(f).map(cn8GenNome).join(', ')].filter(Boolean).join(' · '),d);
+          const ln=cl8El('div','e7-rlinha',null,d);if(f.nota>0)ln.appendChild(cl8MiniEstrelas(f.nota/2));const dd=cl8Data(f.visto||f.atualizado);if(dd)cl8El('span',null,dd,ln);
+          const tx=String(f.resenha).trim(),p=cl8El('p','e7-rtxt',tx,d);if(tx.length>480){p.classList.add('e7-corta');const lm=cl8Btn('e7-link',T('Ler mais','Read more','Leer más'),d,ev=>{ev.stopPropagation();p.classList.toggle('e7-corta');lm.textContent=p.classList.contains('e7-corta')?T('Ler mais','Read more','Leer más'):T('Ler menos','Read less','Leer menos');});}}}},
+    montaFicha(fl,fr,acts){const F=S.F={};
+      F.cv=cl8El('div','e7-fcv',null,fl);F.cv.title=T('Trocar o pôster','Change the poster','Cambiar el póster');F.cv.addEventListener('click',()=>{F.abas.mostra('dados');setTimeout(()=>{try{F.pos.focus();}catch(e){}},30);});
+      F.sb=cl8El('div','e7-fstarsbox',null,fl);F.stars=cl8Estrelas(F.sb,()=>S.ed?S.ed.nota/2:0,v=>{if(!S.ed)return;S.ed.nota=Math.round(v*2);F.pintaNota();});F.ntxt=cl8El('small','e7-fnota',null,F.sb);
+      F.sts=cl8Status(fl,[['visto',STF.visto.n(),STF.visto.g,STF.visto.c],['quero',STF.quero.n(),STF.quero.g,STF.quero.c]],()=>S.ed?S.ed.status:'visto',k=>{if(S.ed){S.ed.status=k;F.vis(true);}});
+      F.res=cl8El('div','e7-fresumo',null,fl);
+      const fid=cl8El('div','e7-fid',null,fr);F.tit=cl8Campo(fid,T('Título','Title','Título'),'input',{maxlength:'120',class:'c842tit'},true);
+      F.ano=cl8Campo(fid,T('Ano','Year','Año'),'input',{inputmode:'numeric',maxlength:'4',placeholder:T('ex.: 1999','e.g. 1999','ej.: 1999')});
+      F.bus=cl8Btn('btn c842buscar','🔎 '+T('Buscar dados','Look up','Buscar datos'),fid,()=>buscar(),T('Busca o título na Wikipédia: pôster, ano e estilos','Searches Wikipedia for the title: poster, year and genres','Busca el título en Wikipedia: póster, año y estilos'));
+      F.sug=cl8El('div','sug',null,fid);F.dica=cl8El('p','sugDica',null,fid);F.dica.hidden=true;
+      F.abas=cl8Subabas(fr,[['resenha',T('Resenha','Review','Reseña')],['dados',T('Dados','Details','Datos')]]);
+      F.resenha=cl8Campo(F.abas.panes.resenha,T('Sua resenha','Your review','Tu reseña'),'textarea',{rows:'8',maxlength:'6000'},true);
+      const g=cl8El('div','e7-fgrid',null,F.abas.panes.dados);F.g1=cl8Campo(g,T('Estilo','Genre','Estilo'),'select');F.g2=cl8Campo(g,T('Segundo estilo','Second genre','Segundo estilo'),'select');
+      F.visto=cl8Campo(g,T('Visto em','Watched on','Vista el'),'input',{type:'date'});F.vistoLab=F.visto.closest('label');
+      const lp=cl8El('label','w',null,F.abas.panes.dados);lp.appendChild(document.createTextNode(T('Pôster (link da imagem)','Poster (image link)','Póster (enlace de la imagen)')));
+      const row=cl8El('span','c842row',null,lp);F.pos=cl8El('input',null,null,row);F.pos.placeholder='https://…';F.prev=cl8El('img','c842prev',null,row);F.prev.alt='';F.prev.hidden=true;F.prev.referrerPolicy='no-referrer';
+      F.prev.addEventListener('error',()=>{F.prev.hidden=true;});F.prev.addEventListener('load',()=>{F.prev.hidden=false;});
+      const sv=cl8El('button','btn pri',T('Salvar','Save','Guardar'),acts);sv.type='submit';cl8Btn('btn',T('Cancelar','Cancel','Cancelar'),acts,()=>cl8FichaFecha(S));
+      F.ex=cl8Btn('btn danger',txtEx,acts);cl8Excluir(F.ex,txtEx,()=>excluir());
+      let tc=0;const capaJa=()=>{clearTimeout(tc);tc=setTimeout(()=>F.capa(),250);};
+      F.tit.addEventListener('input',capaJa);F.ano.addEventListener('input',()=>{const v=F.ano.value.replace(/\D/g,'').slice(0,4);if(v!==F.ano.value)F.ano.value=v;capaJa();});
+      F.pos.addEventListener('input',()=>{F.prevJa();capaJa();});F.g1.addEventListener('change',()=>{if(F.g2.value===F.g1.value)F.g2.value='';F.capa();});
+      F.pintaNota=()=>{const n=S.ed?S.ed.nota:0;F.stars.paint(n/2);F.ntxt.textContent=n?cn8NotaTxt(n):T('sem nota — clique nas estrelas','no rating — click the stars','sin nota — haz clic en las estrellas');};
+      F.vis=auto=>{const v=!S.ed||S.ed.status==='visto';F.sb.hidden=!v;F.vistoLab.hidden=!v;if(v&&!F.visto.value&&S.ed&&(auto||!S.ed.id))F.visto.value=cn8Hoje();};
+      F.prevJa=()=>{const u=F.pos.value.trim();if(/^(https?:\/\/|data:image\/)/i.test(u)){if(F.prev.getAttribute('src')!==u)F.prev.src=u;}else{F.prev.hidden=true;F.prev.removeAttribute('src');}};
+      F.capa=()=>{const g1=F.g1.value;F.cv.replaceChildren(cl8Capa({titulo:F.tit.value.trim()||T('Novo filme','New movie','Nueva película'),sub:F.ano.value,url:F.pos.value.trim(),hue:g1?cl8HueCor(cn8GenCor(g1)):cl8Hue(F.tit.value)},'e7-cvbig'));};
+      F.resumo=f=>{F.res.replaceChildren();if(!f){F.res.hidden=true;return;}F.res.hidden=false;
+        for(const t of [T('Na lista desde ','On the list since ','En la lista desde ')+cl8Data(f.criado),f.atualizado&&f.atualizado!==f.criado?T('Atualizado em ','Updated on ','Actualizado el ')+cl8Data(f.atualizado):'',f.wiki?T('Dados da Wikipédia','Data from Wikipedia','Datos de Wikipedia')+' ('+String(f.wiki).split(':')[0]+')':''])if(t)cl8El('div',null,t,F.res);};},
+    abrir(f){cl8Painel(S);const F=S.F;S.ed={id:f?f.id:null,nota:f?f.nota:0,status:f?f.status:(S.st.prat==='quero'?'quero':'visto'),wiki:f?f.wiki||'':'',qid:'',sug:null};
+      F.tit.value=f?f.titulo:'';F.ano.value=f&&f.ano?String(f.ano):'';const ops=CN8_GEN.map(g=>[g[0],cn8GenNome(g[0])]);
+      cl8Opcoes(F.g1,[['',T('— escolher —','— choose —','— elegir —')]].concat(ops),f&&gens(f)[0]);cl8Opcoes(F.g2,[['',T('nenhum','none','ninguno')]].concat(ops),f&&gens(f)[1]);
+      F.visto.value=f?(f.visto||''):'';F.pos.value=f?(f.poster||''):'';F.resenha.value=f?(f.resenha||''):'';F.sug.replaceChildren();
+      cl8Dica(F.dica,f?'':T('Escreva o título e toque em «🔎 Buscar dados»: a Wikipédia traz o pôster, o ano e os estilos. Ou preencha tudo à mão.','Type the title and tap «🔎 Look up»: Wikipedia brings the poster, year and genres. Or fill it all in by hand.','Escribe el título y toca «🔎 Buscar datos»: Wikipedia trae el póster, el año y los estilos. O rellénalo todo a mano.'));
+      F.ex.hidden=!f;cl8ExcluirReset(F.ex,txtEx);F.sts.paint();F.pintaNota();F.vis();F.prevJa();F.capa();F.resumo(f);F.abas.mostra('resenha');
+      cl8FichaAbre(S,f?T('Editar filme','Edit movie','Editar película'):T('Novo filme','New movie','Nueva película'));if(!f)setTimeout(()=>{try{F.tit.focus();}catch(e){}},40);},
+    salvar(){const F=S.F,E=S.ed;if(!E)return;const dica=t=>cl8Dica(F.dica,t);const tit=F.tit.value.trim().replace(/\s+/g,' ');
+      if(!tit){dica(T('Falta o título do filme.','The movie title is missing.','Falta el título de la película.'));F.tit.focus();return;}
+      const ano=F.ano.value.trim();if(ano&&!/^\d{4}$/.test(ano)){dica(T('O ano tem 4 algarismos (ex.: 1994).','The year has 4 digits (e.g. 1994).','El año tiene 4 cifras (ej.: 1994).'));F.ano.focus();return;}
+      const pos=F.pos.value.trim();if(pos&&!/^(https?:\/\/|data:image\/)/i.test(pos)){dica(T('O link do pôster precisa começar com https://','The poster link must start with https://','El enlace del póster debe empezar con https://'));F.abas.mostra('dados');F.pos.focus();return;}
+      const st=E.status==='quero'?'quero':'visto',g=[F.g1.value,F.g2.value].filter((x,i,arr)=>x&&arr.indexOf(x)===i);
+      const D=cn8Dados(),agora=new Date().toISOString(),i=E.id?D.filmes.findIndex(q=>q.id===E.id):-1,velho=i>=0?D.filmes[i]:null;
+      // os estilos além do segundo (vindos da v838) ficam, a não ser que o primeiro ou o segundo tenham mudado
+      const gen=velho&&velho.generos.slice(0,2).join()===g.join()?velho.generos.slice():g;
+      const base={titulo:tit,ano,status:st,generos:gen,nota:st==='visto'?E.nota:0,visto:st==='visto'?F.visto.value:'',poster:pos,resenha:F.resenha.value,wiki:E.wiki||(velho&&velho.wiki)||'',atualizado:agora};
+      let f;if(velho){f=cn8Normaliza(Object.assign({},velho,base,{id:velho.id,criado:velho.criado}));D.filmes[i]=f;}
+      else{if(D.filmes.some(q=>q.titulo.toLowerCase()===tit.toLowerCase()&&String(q.ano||'')===ano)){dica(T('Esse filme já está na sua lista — abra-o na estante para editar.','That movie is already on your list — open it from the shelf to edit.','Esa película ya está en tu lista — ábrela desde la estantería para editarla.'));return;}
+        f=cn8Normaliza(Object.assign(base,{id:cn8Id(),criado:agora}));D.filmes.push(f);}
+      const p=S.prats().find(q=>q[0]===S.st.prat);if(p&&!p[3](f))S.st.prat='todos';if(S.st.cat&&gens(f).indexOf(S.st.cat)<0)S.st.cat='';
+      cl8FichaFecha(S);cn8Salva();cl8Render(S);cl8Toast((st==='quero'?T('Na lista do quero assistir: ','On your watchlist: ','En tu lista de quiero ver: '):T('No seu cinema: ','In your cinema: ','En tu cine: '))+f.titulo,3200);}};
+  S.st=cl8Estado(S,{aba:'filmes',prat:'todos',ordem:'recentes'});
+  function excluir(){const E=S.ed,D=cn8Dados(),i=E&&E.id?D.filmes.findIndex(q=>q.id===E.id):-1;if(i<0)return;const f=D.filmes[i];D.filmes.splice(i,1);cl8FichaFecha(S);cn8Salva();cl8Render(S);cl8Toast(T('Excluído: ','Deleted: ','Borrada: ')+f.titulo,2600);}
+  async function buscar(){const F=S.F,E=S.ed;if(!E)return;const dica=t=>cl8Dica(F.dica,t);const q=F.tit.value.trim();
+    if(q.length<2){dica(T('Escreva pelo menos 2 letras do título.','Type at least 2 letters of the title.','Escribe al menos 2 letras del título.'));F.tit.focus();return;}
+    const SG=E.sug={q,res:[]};F.sug.replaceChildren(cl8El('p','sugCab',T('Procurando na Wikipédia…','Searching Wikipedia…','Buscando en Wikipedia…')));dica('');
+    try{const res=await cn8Busca(q);if(E.sug!==SG||S.ed!==E)return;SG.res=Array.isArray(res)?res:[];}catch(e){if(E.sug!==SG||S.ed!==E)return;F.sug.replaceChildren();dica(T('Não deu para falar com a Wikipédia agora — dá para preencher à mão.','Could not reach Wikipedia right now — you can fill it in by hand.','No se pudo conectar con Wikipedia — puedes rellenarlo a mano.'));return;}
+    if(!SG.res.length){F.sug.replaceChildren();dica(T('Nada encontrado — confira o título ou preencha à mão.','Nothing found — check the title or fill it in by hand.','No se encontró nada — revisa el título o rellénalo a mano.'));return;}
+    F.sug.replaceChildren(cl8El('p','sugCab',T('Da Wikipédia — escolha o filme certo','From Wikipedia — pick the right movie','De Wikipedia — elige la película correcta')));
+    const ph=b=>{const d=cl8El('div','cv gen','🎬',b);d.style.background='#3a2a20';return d;};
+    SG.res.forEach((r,i)=>{const b=cl8Btn('sugI','',F.sug,()=>escolhe(i));b.dataset.i=i;
+      if(r.poster){const im=cl8El('img',null,null,b);im.alt='';im.loading='lazy';im.referrerPolicy='no-referrer';im.addEventListener('error',()=>{const d=ph(b);b.insertBefore(d,im);im.remove();},{once:true});im.src=r.poster;}else ph(b);
+      const sp=cl8El('span',null,null,b),bb=cl8El('b',null,r.titulo,sp);if(r.ano){bb.appendChild(document.createTextNode(' '));cl8El('em',null,'('+r.ano+')',bb);}cl8El('small',null,r.desc||'',sp);cl8El('small','fonte','Wikipédia',sp);});}
+  async function escolhe(i){const F=S.F,E=S.ed,SG=E&&E.sug;if(!SG||!SG.res[i])return;const r=SG.res[i],dica=t=>cl8Dica(F.dica,t);
+    F.tit.value=r.titulo;if(r.ano)F.ano.value=String(r.ano);if(r.poster){F.pos.value=r.poster;F.prevJa();}E.wiki=r.wiki;E.qid=r.qid;F.capa();
+    for(const b of F.sug.querySelectorAll('.sugI'))b.style.borderColor=+b.dataset.i===i?'#a8822e':'';
+    const ok=T('Preenchido pela Wikipédia — confira e salve.','Filled in from Wikipedia — check it and save.','Rellenado desde Wikipedia — revísalo y guarda.');dica(ok);
+    if(!r.qid)return;try{const w=await cn8Wikidata(r.qid);if(S.ed!==E||E.qid!==r.qid||!w)return;let txt='';
+      if(w.generos&&w.generos.length&&!F.g1.value){F.g1.value=w.generos[0];if(w.generos[1]&&!F.g2.value)F.g2.value=w.generos[1];txt=T(' Estilos sugeridos pelo Wikidata.',' Genres suggested by Wikidata.',' Estilos sugeridos por Wikidata.');}
+      if(w.ano&&!F.ano.value)F.ano.value=String(w.ano);F.capa();if(txt)dica(ok+txt);}catch(e){}}
+  return S;}
+function cl8FilmesAbre(S,aba,id){const prat=aba==='vistos'?'visto':aba==='quero'?'quero':null,ab=aba==='ranking'?'ranking':(aba?'filmes':null);
+  if(!cl8Abre(S,prat,ab))return false;const f=id?cn8Dados().filmes.find(q=>q.id===id):null;
+  if(f){const p=S.prats().find(q=>q[0]===S.st.prat);if(p&&!p[3](f)){S.st.prat='todos';cl8Render(S);}S.abrir(f);}else if(aba==='novo')S.abrir(null);return true;}
+
+/* ---------- JOGOS (dados da v567: S567.dados.jogos, `castelo.jogos567.v1`) ---------- */
+function cl8Jogos(){const T=cl8T;const PL=k=>S567_PLAT[k]||S567_PLAT.outro;const txtEx=T('Tirar da estante','Remove from the shelf','Quitar de la estantería');
+  const porNome=(a,b)=>String(a.nome).localeCompare(String(b.nome),'pt',{sensitivity:'base'});
+  const porData=(a,b)=>String(b.criado||'').localeCompare(String(a.criado||''));
+  const capasDe=(link,j)=>{const l=String(link||'').trim(),ap=s567Appid(l);if(ap)return s567JogoCapas({appid:ap});if(/^(https?:\/\/|data:image\/)/i.test(l))return [l];return j?s567JogoCapas(j):[];};
+  const S={k:'jogos',avatar:'🎮',
+    titulo:()=>T('Meus Jogos','My Games','Mis Juegos'),
+    txtNovo:()=>T('+ Adicionar jogo','+ Add game','+ Añadir juego'),
+    acoes:[[()=>T('📥 Colar lista','📥 Paste a list','📥 Pegar lista'),()=>colar(),()=>T('Colar vários jogos de uma vez, um por linha','Paste several games at once, one per line','Pegar varios juegos a la vez, uno por línea')]],
+    txtBusca:()=>T('Buscar pelo nome ou pela plataforma…','Search by title or platform…','Buscar por nombre o plataforma…'),
+    txtItem:n=>n===1?T('jogo','game','juego'):T('jogos','games','juegos'),
+    txtVazio:()=>T('Nenhum jogo nesta prateleira ainda.','No games on this shelf yet.','Ningún juego en este estante.'),
+    txtVazioFiltro:()=>T('Nenhum jogo com essa busca.','No games match this search.','Ningún juego con esta búsqueda.'),
+    abas:[['jogos',()=>T('Jogos','Games','Juegos')]],
+    ordens:[['recentes',()=>T('Mais recentes','Most recent','Más recientes'),porData],['antigos',()=>T('Mais antigos','Oldest first','Más antiguos'),(a,b)=>-porData(a,b)],
+      ['nome',()=>T('Nome (A–Z)','Title (A–Z)','Nombre (A–Z)'),porNome],['plat',()=>T('Plataforma','Platform','Plataforma'),(a,b)=>String(PL(a.plat).n).localeCompare(String(PL(b.plat).n))||porNome(a,b)]],
+    itens:()=>(S567.dados&&Array.isArray(S567.dados.jogos))?S567.dados.jogos:[],
+    prats(L){L=L||S.itens();const out=[['todos',T('Todos','All','Todos'),'🎮',()=>true],['-']];
+      for(const k of Object.keys(S567_PLAT))if(L.some(j=>j.plat===k)||S.st.prat===k)out.push([k,PL(k).n,'',j=>j.plat===k,PL(k).c]);return out;},
+    placas(L){const c={};for(const j of L)c[j.plat]=(c[j.plat]||0)+1;const ks=Object.keys(c).sort((a,b)=>c[b]-c[a]).slice(0,6);
+      return [['todos','🎮',T('Jogos','Games','Juegos'),L.length]].concat(ks.map(k=>[k,'●',PL(k).n,c[k]]));},
+    perfil(L){const c={};for(const j of L)c[j.plat]=(c[j.plat]||0)+1;const ks=Object.keys(c).sort((a,b)=>c[b]-c[a]);
+      return {frase:cl8Plural(L.length,T('jogo jogado','game played','juego jugado'),T('jogos jogados','games played','juegos jugados'))+(ks.length?' · '+cl8Plural(ks.length,T('plataforma','platform','plataforma'),T('plataformas','platforms','plataformas')):''),
+        desde:ks.length?T('Mais jogada: ','Most played: ','Más jugada: ')+PL(ks[0]).n+' ('+cl8Nf(c[ks[0]])+')':''};},
+    cats:null,
+    busca:(j,q)=>(String(j.nome)+' '+PL(j.plat).n).toLowerCase().indexOf(q)>=0,
+    capa:j=>({titulo:j.nome,sub:PL(j.plat).n,url:s567JogoCapas(j),hue:cl8HueCor(PL(j.plat).c)}),
+    fita:j=>({g:String(PL(j.plat).n).charAt(0),c:PL(j.plat).c}),
+    plaq:j=>j.nome,
+    dica:j=>j.nome+' · '+PL(j.plat).n,
+    linha:j=>({titulo:j.nome,sub:j.criado?T('Na estante desde ','On the shelf since ','En la estantería desde ')+cl8Data(j.criado):'',pills:[[PL(j.plat).n,PL(j.plat).c]],extra:[j.appid?'Steam · app '+j.appid:'']}),
+    rodape:()=>T('No Fliperama da Minha Sala, a parede do fundo é a estante de jogos: cada jogo aparece de frente, com a capa (a da loja da Steam pelo link, ou uma desenhada na cor da plataforma). Clique numa caixa (ou mire nela e aperte E) para abri-la aqui; o quiosque «＋» abre este painel.',
+      'In the Arcade in My Room, the back wall is the games shelf: every game stands face out with its cover (the Steam store cover from the link, or one drawn in the platform colour). Click a box (or aim at it and press E) to open it here; the «＋» kiosk opens this panel.',
+      'En el Arcade de Mi Sala, la pared del fondo es la estantería de juegos: cada juego aparece de frente, con la portada (la de la tienda de Steam por el enlace, o una dibujada en el color de la plataforma). Haz clic en una caja (o apúntala y pulsa E) para abrirla aquí; el quiosco «＋» abre este panel.'),
+    montaFicha(fl,fr,acts){const F=S.F={};F.cv=cl8El('div','e7-fcv',null,fl);F.res=cl8El('div','e7-fresumo',null,fl);
+      const fid=cl8El('div','e7-fid',null,fr);F.nome=cl8Campo(fid,T('Nome do jogo','Game title','Nombre del juego'),'input',{maxlength:'90',class:'c842tit'},true);
+      F.plat=cl8Campo(fid,T('Plataforma','Platform','Plataforma'),'select');cl8Opcoes(F.plat,Object.keys(S567_PLAT).map(k=>[k,PL(k).n]),'steam');
+      F.link=cl8Campo(fid,T('Link da Steam ou da capa (opcional)','Steam link or cover URL (optional)','Enlace de Steam o de la portada (opcional)'),'input',{placeholder:'https://store.steampowered.com/app/…'});
+      F.dica=cl8El('p','sugDica',null,fid);F.dica.hidden=true;
+      const sv=cl8El('button','btn pri',T('Salvar','Save','Guardar'),acts);sv.type='submit';cl8Btn('btn',T('Cancelar','Cancel','Cancelar'),acts,()=>cl8FichaFecha(S));
+      F.ex=cl8Btn('btn danger',txtEx,acts);cl8Excluir(F.ex,txtEx,()=>excluir());
+      let tc=0;const capaJa=()=>{clearTimeout(tc);tc=setTimeout(()=>F.capa(),250);};
+      F.nome.addEventListener('input',capaJa);F.plat.addEventListener('change',()=>F.capa());F.link.addEventListener('input',()=>{if(s567Appid(F.link.value))F.plat.value='steam';capaJa();});
+      F.capa=()=>{const j=S.ed&&S.ed.id?S.itens().find(q=>q.id===S.ed.id):null,p=PL(F.plat.value);
+        F.cv.replaceChildren(cl8Capa({titulo:F.nome.value.trim()||T('Novo jogo','New game','Nuevo juego'),sub:p.n,url:capasDe(F.link.value,F.link.value.trim()?null:j),hue:cl8HueCor(p.c)},'e7-cvbig'));};
+      F.resumo=j=>{F.res.replaceChildren();if(!j){F.res.hidden=true;return;}F.res.hidden=false;
+        for(const t of [j.criado?T('Na estante desde ','On the shelf since ','En la estantería desde ')+cl8Data(j.criado):'',j.appid?'Steam · app '+j.appid:(j.capa?T('Capa pelo link','Cover from the link','Portada por el enlace'):T('Capa desenhada','Drawn cover','Portada dibujada'))])if(t)cl8El('div',null,t,F.res);};},
+    abrir(j){cl8Painel(S);const F=S.F;S.ed={id:j?j.id:null};F.nome.value=j?j.nome:'';F.plat.value=j?(S567_PLAT[j.plat]?j.plat:'outro'):(S567_PLAT[S.st.prat]?S.st.prat:'steam');
+      F.link.value=j?(j.appid?'https://store.steampowered.com/app/'+j.appid+'/':(j.capa||'')):'';
+      cl8Dica(F.dica,j?'':T('Com o link da loja da Steam, a capa vem sozinha. Sem link, o jogo ganha uma capa desenhada na cor da plataforma.','With the Steam store link, the cover comes by itself. Without a link, the game gets a cover drawn in the platform colour.','Con el enlace de la tienda de Steam, la portada viene sola. Sin enlace, el juego recibe una portada dibujada en el color de la plataforma.'));
+      F.ex.hidden=!j;cl8ExcluirReset(F.ex,txtEx);F.capa();F.resumo(j);cl8FichaAbre(S,j?T('Editar jogo','Edit game','Editar juego'):T('Novo jogo','New game','Nuevo juego'));if(!j)setTimeout(()=>{try{F.nome.focus();}catch(e){}},40);},
+    salvar(){const F=S.F,E=S.ed;if(!E)return;const dica=t=>cl8Dica(F.dica,t);const nome=F.nome.value.trim().replace(/\s+/g,' ').slice(0,90),link=F.link.value.trim();let plat=S567_PLAT[F.plat.value]?F.plat.value:'outro';
+      if(!nome){dica(T('Falta o nome do jogo.','The game title is missing.','Falta el nombre del juego.'));F.nome.focus();return;}
+      if(link&&!s567Appid(link)&&!/^(https?:\/\/|data:image\/)/i.test(link)){dica(T('O link precisa ser o da loja da Steam ou o de uma imagem (https://…).','The link must be the Steam store page or an image (https://…).','El enlace debe ser el de la tienda de Steam o el de una imagen (https://…).'));F.link.focus();return;}
+      const D=S567.dados;let j;
+      if(!E.id){j=s567Adiciona(nome,plat,link);if(!j){dica(T('Esse jogo já está na estante nessa plataforma.','That game is already on the shelf for this platform.','Ese juego ya está en la estantería en esa plataforma.'));return;}}
+      else{j=D.jogos.find(q=>q.id===E.id);if(!j)return;const ap=s567Appid(link);if(ap&&(plat==='outro'||plat==='pc'))plat='steam';
+        if(D.jogos.some(q=>q!==j&&q.nome.toLowerCase()===nome.toLowerCase()&&q.plat===plat)){dica(T('Esse jogo já está na estante nessa plataforma.','That game is already on the shelf for this platform.','Ese juego ya está en la estantería en esa plataforma.'));return;}
+        j.nome=nome;j.plat=plat;delete j.appid;delete j.capa;if(ap)j.appid=ap;else if(/^(https?:\/\/|data:image\/)/i.test(link))j.capa=link;}
+      S567.destaque=j.id;if(S.st.prat!=='todos'&&S.st.prat!==j.plat)S.st.prat='todos';cl8FichaFecha(S);s567JogosSalva();cl8Render(S);
+      cl8Toast((E.id?T('Atualizado: ','Updated: ','Actualizado: '):T('Na estante: ','On the shelf: ','En la estantería: '))+j.nome,3200);}};
+  S.st=cl8Estado(S,{aba:'jogos',prat:'todos',ordem:'recentes'});
+  function excluir(){const E=S.ed,D=S567.dados,i=E&&E.id?D.jogos.findIndex(q=>q.id===E.id):-1;if(i<0)return;const j=D.jogos[i];D.jogos.splice(i,1);cl8FichaFecha(S);s567JogosSalva();cl8Render(S);
+    cl8Toast(T('Tirado da estante: ','Removed from the shelf: ','Quitado de la estantería: ')+j.nome,2600);}
+  function colar(){if(!S.colar){const J=S.colar=cl8Janela(S,'c842colar',T('Colar uma lista de jogos','Paste a list of games','Pegar una lista de juegos'));
+      cl8El('p','e7-mut',T('Um jogo por linha. Pode colar o link da Steam ao lado do nome — a capa vem sozinha e a plataforma vira Steam.','One game per line. A Steam link may follow the title — the cover comes by itself and the platform becomes Steam.','Un juego por línea. Puedes pegar el enlace de Steam junto al nombre — la portada viene sola y la plataforma pasa a Steam.'),J.corpo);
+      J.tx=cl8El('textarea',null,null,J.corpo);J.tx.rows=8;J.tx.setAttribute('aria-label',T('Lista de jogos','List of games','Lista de juegos'));J.tx.placeholder=T('Hollow Knight\nCeleste https://store.steampowered.com/app/504230/','Hollow Knight\nCeleste https://store.steampowered.com/app/504230/');
+      const ln=cl8El('div','c842lin',null,J.corpo);const lb=cl8El('label',null,null,ln);lb.appendChild(document.createTextNode(T('Plataforma (sem link)','Platform (no link)','Plataforma (sin enlace)')));J.plat=cl8El('select',null,null,lb);cl8Opcoes(J.plat,Object.keys(S567_PLAT).map(k=>[k,PL(k).n]),'steam');
+      J.ok=cl8Btn('btn pri',T('Adicionar todos','Add all','Añadir todos'),ln,()=>{let n=0;for(const l0 of String(J.tx.value||'').split(/\r?\n/)){const l=l0.trim();if(!l)continue;const m=l.match(/(https?:\/\/\S+)/);
+          const nm=(m?l.replace(m[1],''):l).replace(/[|;\t]+\s*$/,'').replace(/\s*[|;\t-]+\s*$/,'').trim();if(s567Adiciona(nm,(m&&s567Appid(m[1]))?'steam':J.plat.value,m?m[1]:''))n++;}
+        if(n){J.tx.value='';s567JogosSalva();J.fecha();cl8Render(S);cl8Toast(n===1?T('1 jogo na estante','1 game on the shelf','1 juego en la estantería'):T(n+' jogos na estante',n+' games on the shelf',n+' juegos en la estantería'),3200);}
+        else cl8Toast(T('Nenhum jogo novo nessa lista.','No new games in that list.','Ningún juego nuevo en esa lista.'),2800);});}
+    S.colar.m.hidden=false;setTimeout(()=>{try{S.colar.tx.focus();}catch(e){}},40);}
+  return S;}
+function cl8JogosAbre(S,id){try{if(!S567.dados)S567.dados=s567JogosCarrega();}catch(e){cl8Erro('dados dos jogos',e);}if(!cl8Abre(S,null,'jogos'))return false;const j=id?S.itens().find(q=>q.id===id):null;
+  if(j){if(S.st.prat!=='todos'&&S.st.prat!==j.plat){S.st.prat='todos';cl8Render(S);}S.abrir(j);}else if(!id&&!S.itens().length)S.abrir(null);return true;}
+
+/* ---------- ESPORTES (dados, recordes e ranking da v840) ---------- */
+function cl8Esportes(){const T=cl8T;const ESP=k=>es8Esp(k);const txtEx=T('Excluir','Delete','Borrar');
+  const FITA={ouro:['1','#c9a227'],prata:['2','#8e98a3'],bronze:['3','#b5733a'],finisher:['✓','#7d8a6a'],t1:['1','#c9a227'],t2:['2','#8e98a3'],t3:['3','#b5733a'],t:['★','#a8832e']};
+  const TIPOS=[['prova',T('Prova ou competição','Race or competition','Prueba o competición'),'◆','#7a1e2c'],['treino',T('Treino','Workout','Entrenamiento'),'↻','#5e6a7a']];
+  const S={k:'esportes',avatar:'🏅',
+    titulo:()=>T('Meus Esportes','My Sports','Mis Deportes'),
+    txtNovo:()=>T('+ Adicionar registro','+ Add entry','+ Añadir registro'),
+    txtBusca:()=>T('Buscar evento, local ou esporte…','Search event, place or sport…','Buscar evento, lugar o deporte…'),
+    txtItem:n=>n===1?T('registro','entry','registro'):T('registros','entries','registros'),
+    txtVazio:()=>S.st.prat==='medalhas'?T('Nenhuma medalha ainda — registre uma prova com medalha e ela vai para a parede.','No medals yet — log a race with a medal and it goes on the wall.','Aún no hay medallas — registra una prueba con medalla e irá a la pared.')
+      :S.st.prat==='trofeus'?T('Nenhum troféu ainda — registre uma prova com troféu e ele vai para a estante.','No trophies yet — log a race with a trophy and it goes on the shelves.','Aún no hay trofeos — registra una prueba con trofeo e irá a la estantería.')
+      :T('Nenhum registro nesta prateleira ainda. Toque em «+ Adicionar registro» para lançar uma prova ou um treino.','No entries on this shelf yet. Tap «+ Add entry» to log a race or a workout.','Ningún registro en este estante. Toca «+ Añadir registro» para anotar una prueba o un entrenamiento.'),
+    txtVazioFiltro:()=>T('Nenhum registro com esses filtros.','No entries match these filters.','Ningún registro con estos filtros.'),
+    abas:[['registros',()=>T('Registros','Entries','Registros')],['recordes',()=>T('Recordes','Records','Récords')],['ranking',()=>T('Ranking','Ranking','Ranking')]],
+    contaAba:{recordes:()=>es8Recordes().reduce((s,x)=>s+x.L.length,0),ranking:()=>es8Ranking().length},
+    ordens:[['recentes',()=>T('Mais recentes','Most recent','Más recientes'),es8PorData],['antigos',()=>T('Mais antigos','Oldest first','Más antiguos'),(x,y)=>-es8PorData(x,y)],
+      ['premio',()=>T('Medalhas e troféus primeiro','Medals and trophies first','Medallas y trofeos primero'),(x,y)=>((ES8_PTS[y.premio]||0)-(ES8_PTS[x.premio]||0))||es8PorData(x,y)],
+      ['distancia',()=>T('Maior distância','Longest distance','Mayor distancia'),(x,y)=>(es8Km(y)-es8Km(x))||(y.valor-x.valor)||es8PorData(x,y)],
+      ['colocacao',()=>T('Melhor colocação','Best placing','Mejor puesto'),(x,y)=>((x.colocacao||1e9)-(y.colocacao||1e9))||es8PorData(x,y)]],
+    itens:()=>es8Dados().registros,
+    prats:()=>[['todos',T('Todos','All','Todos'),'🏅',()=>true],['provas',T('Provas','Races','Pruebas'),'◆',r=>r.tipo==='prova'],['treinos',T('Treinos','Workouts','Entrenos'),'↻',r=>r.tipo==='treino'],['-'],
+      ['medalhas',T('Medalhas','Medals','Medallas'),'🥇',r=>es8EhMedalha(r.premio)],['trofeus',T('Troféus','Trophies','Trofeos'),'🏆',r=>es8EhTrofeu(r.premio)]],
+    placas(L){const prov=L.filter(r=>r.tipo==='prova').length,km=L.reduce((s,r)=>s+es8Km(r),0);
+      return [['todos','🏅',T('Registros','Entries','Registros'),L.length],['provas','◆',T('Provas','Races','Pruebas'),prov],['treinos','↻',T('Treinos','Workouts','Entrenos'),L.length-prov],
+        ['medalhas','🥇',T('Medalhas','Medals','Medallas'),L.filter(r=>es8EhMedalha(r.premio)).length],['trofeus','🏆',T('Troféus','Trophies','Trofeos'),L.filter(r=>es8EhTrofeu(r.premio)).length],
+        ['recordes','⏱',T('Recordes','Records','Récords'),es8Recordes().reduce((s,x)=>s+x.L.length,0),'aba:recordes'],['km','📏','km',km?es8NumTxt(Math.round(km*10)/10):'0','aba:ranking']];},
+    perfil(L){const rk=es8Ranking()[0];
+      return {frase:cl8Plural(L.length,T('registro','entry','registro'),T('registros','entries','registros'))+' · '+cl8Plural(L.filter(r=>es8EhMedalha(r.premio)).length,T('medalha','medal','medalla'),T('medalhas','medals','medallas'))+' · '+cl8Plural(L.filter(r=>es8EhTrofeu(r.premio)).length,T('troféu','trophy','trofeo'),T('troféus','trophies','trofeos')),
+        desde:rk?T('Esporte nº 1: ','Top sport: ','Deporte n.º 1: ')+ESP(rk.e).ic+' '+ESP(rk.e).nome+' · '+es8PtsTxt(rk.c.pts)+' '+T('pontos','points','puntos'):''};},
+    cats(base){const c={};for(const r of base)c[r.esporte]=(c[r.esporte]||0)+1;let ks=Object.keys(c).sort((a,b)=>c[b]-c[a]||es8EspIdx(a)-es8EspIdx(b)).slice(0,4);
+      if(S.st.cat&&c[S.st.cat]&&ks.indexOf(S.st.cat)<0)ks=ks.slice(0,3).concat([S.st.cat]);return ks.map(k=>[k,ESP(k).ic+' '+es8EspCurto(k)]);},
+    naCat:(r,k)=>r.esporte===k,
+    busca:(r,q)=>[r.evento,r.local,r.categoria,ESP(r.esporte).nome,r.obs].join(' ').toLowerCase().indexOf(q)>=0,
+    capa:r=>({titulo:es8Titulo(r),sub:[cl8Data(r.data)||es8Ano(r),es8Marca(r)].filter(Boolean).join(' · '),icone:ESP(r.esporte).ic,hue:cl8HueCor(ESP(r.esporte).cor)}),
+    fita:r=>r.premio&&FITA[r.premio]?{g:FITA[r.premio][0],c:FITA[r.premio][1]}:(r.tipo==='treino'?{g:'↻',c:'#5e6a7a'}:null),
+    selos:r=>r.premio&&ES8_PREMIO_IC[r.premio]?[[ES8_PREMIO_IC[r.premio],es8PremioNome(r.premio)]]:[],
+    plaq:r=>es8Titulo(r),
+    dica:r=>[es8Titulo(r),ESP(r.esporte).nome,cl8Data(r.data),es8Marca(r),r.premio?es8PremioNome(r.premio):''].filter(Boolean).join(' · '),
+    linha:r=>({titulo:es8Titulo(r),sub:[ESP(r.esporte).nome,r.tipo==='treino'?T('treino','workout','entreno'):'',cl8Data(r.data),r.local].filter(Boolean).join(' · '),
+      pills:r.premio?[[ES8_PREMIO_IC[r.premio]+' '+es8PremioCurto(r.premio),(FITA[r.premio]||['',''])[1]]]:[[r.tipo==='treino'?T('Treino','Workout','Entreno'):T('Prova','Race','Prueba'),r.tipo==='treino'?'#5e6a7a':'#7a1e2c']],
+      extra:[es8Marca(r),es8Colocacao(r)],tags:r.categoria?[r.categoria]:[]}),
+    rodape:()=>T('Na Sala dos Esportes da Minha Sala, cada medalha fica pendurada na parede de medalhas, na fita da cor do esporte, e cada troféu vai para a estante de troféus; os placares mostram os recordes pessoais e o ranking dos esportes, e o pódio, os três primeiros. Clique numa medalha ou num troféu (ou mire e aperte E) para abri-lo aqui.',
+      'In the Sports Room in My Room, every medal hangs on the medal wall on a ribbon in the sport\'s colour and every trophy goes on the trophy shelves; the scoreboards show your personal records and the sports ranking, and the podium the top three. Click a medal or a trophy (or aim at it and press E) to open it here.',
+      'En la Sala de Deportes de Mi Sala, cada medalla cuelga en la pared de medallas, con la cinta del color del deporte, y cada trofeo va a la estantería de trofeos; los marcadores muestran tus récords personales y el ranking de deportes, y el podio, los tres primeros. Haz clic en una medalla o en un trofeo (o apúntalo y pulsa E) para abrirlo aquí.'),
+    abaRender:{
+      recordes(sec){sec.replaceChildren();const R=es8Recordes(),tot=R.reduce((s,x)=>s+x.L.length,0);cl8Cabeca(sec,T('Recordes pessoais','Personal records','Récords personales'),tot);
+        if(!R.length){cl8Vazio(sec,T('Os recordes aparecem quando há registros com distância e tempo, uma marca (kg, pontos, repetições) ou uma colocação.','Records show up once there are entries with distance and time, a mark (kg, points, reps) or a placing.','Los récords aparecen cuando hay registros con distancia y tiempo, una marca (kg, puntos, repeticiones) o un puesto.'));return;}
+        for(const g of R){const E=ESP(g.e);const h=cl8El('h3','e7-h3 c842sec',E.ic+' '+E.nome+' ',sec);cl8El('b',null,'('+cl8Plural(g.L.length,T('recorde','record','récord'),T('recordes','records','récords'))+')',h);
+          const box=cl8El('div','e7-lista',null,sec);for(const o of g.L){const r=o.r;box.appendChild(cl8Linha(S,r,null,{titulo:es8RecTxt(o),sub:[es8Titulo(r),cl8Data(r.data),r.local].filter(Boolean).join(' · ')}));}}},
+      ranking(sec){sec.replaceChildren();const R=es8Ranking();cl8Cabeca(sec,T('Ranking dos esportes','Sports ranking','Ranking de deportes'),R.length);
+        if(!R.length){cl8Vazio(sec,T('O ranking aparece com o primeiro registro: cada prova, treino, medalha e troféu vale pontos.','The ranking shows up with your first entry: every race, workout, medal and trophy scores points.','El ranking aparece con el primer registro: cada prueba, entrenamiento, medalla y trofeo suma puntos.'));return;}
+        const box=cl8El('div','e7-lista',null,sec);
+        R.forEach((x,i)=>{const E=ESP(x.e),c=x.c;const sub=[cl8Plural(c.provas,T('prova','race','prueba'),T('provas','races','pruebas')),cl8Plural(c.treinos,T('treino','workout','entreno'),T('treinos','workouts','entrenos')),c.km?es8NumTxt(c.km)+' km':''].filter(Boolean).join(' · ');
+          const pills=[['🥇',c.ouro],['🥈',c.prata],['🥉',c.bronze],['🎖️',c.finisher],['🏆',c.trofeus]].filter(m=>m[1]).map(m=>[m[0]+' '+m[1],'']);
+          const row=cl8Linha({capa:()=>({titulo:E.nome,icone:E.ic,hue:cl8HueCor(E.cor)})},null,ac=>{const p=cl8El('span','c842pts',es8PtsTxt(c.pts),ac);cl8El('small',null,T('pontos','points','puntos'),p);},
+            {titulo:(i<3?CL8_MEDALHA[i]+' ':(i+1)+'. ')+E.nome,sub,pills});
+          row.dataset.esp=x.e;row.title=T('Ver os registros de ','See the entries for ','Ver los registros de ')+E.nome;
+          const vai=()=>{S.st.aba='registros';S.st.prat='todos';S.st.cat=x.e;S.st.q='';S.st.pag=0;cl8Render(S);};row.addEventListener('click',vai);row.addEventListener('keydown',ev=>{if(ev.key==='Enter'){ev.preventDefault();vai();}});box.appendChild(row);});
+        cl8El('p','rodape',T('Pontos: medalha de ouro 5 · prata 3 · bronze 2 · participação 1 · troféu de 1.º lugar 6 · de 2.º 4 · de 3.º 3 · outro 2 · cada prova 1 · cada treino 0,2. Toque num esporte para ver os registros dele.',
+          'Points: gold medal 5 · silver 3 · bronze 2 · finisher 1 · 1st place trophy 6 · 2nd 4 · 3rd 3 · other 2 · each race 1 · each workout 0.2. Tap a sport to see its entries.',
+          'Puntos: medalla de oro 5 · plata 3 · bronce 2 · participación 1 · trofeo de 1.er puesto 6 · de 2.º 4 · de 3.º 3 · otro 2 · cada prueba 1 · cada entrenamiento 0,2. Toca un deporte para ver sus registros.'),sec);}},
+    montaFicha(fl,fr,acts){const F=S.F={};F.cv=cl8El('div','e7-fcv',null,fl);
+      F.sts=cl8Status(fl,TIPOS,()=>S.ed?S.ed.tipo:'prova',k=>{if(S.ed){S.ed.tipo=k;F.vis();F.resumo();}});F.res=cl8El('div','e7-fresumo',null,fl);
+      const fid=cl8El('div','e7-fid',null,fr);F.ev=cl8Campo(fid,T('Evento','Event','Evento'),'input',{maxlength:'120',class:'c842tit',placeholder:T('ex.: Meia Maratona da Cidade','e.g. City Half Marathon','ej.: Media Maratón de la Ciudad')},true);
+      F.esp=cl8Campo(fid,T('Esporte','Sport','Deporte'),'select');cl8Opcoes(F.esp,ES8_ESP.map(e=>[e[0],e[4]+' '+T(e[1],e[2],e[3])]),'corrida');
+      F.data=cl8Campo(fid,T('Data','Date','Fecha'),'input',{type:'date'});F.loc=cl8Campo(fid,T('Local','Place','Lugar'),'input',{maxlength:'80'},true);
+      F.dica=cl8El('p','sugDica',null,fid);F.dica.hidden=true;
+      F.abas=cl8Subabas(fr,[['resultado',T('Resultado','Result','Resultado')],['obs',T('Observações','Notes','Notas')]]);
+      const g=cl8El('div','e7-fgrid',null,F.abas.panes.resultado);
+      F.val=cl8Campo(g,T('Distância ou marca','Distance or mark','Distancia o marca'),'input',{inputmode:'decimal',placeholder:T('ex.: 21,1','e.g. 21.1','ej.: 21,1')});
+      F.un=cl8Campo(g,T('Unidade','Unit','Unidad'),'select');cl8Opcoes(F.un,[['','—']].concat(Object.keys(ES8_UN).map(u=>[u,es8UnNome(u)])),'');
+      F.tempo=cl8Campo(g,T('Tempo','Time','Tiempo'),'input',{placeholder:T('h:mm:ss ou mm:ss — ex.: 1:58:30','h:mm:ss or mm:ss — e.g. 1:58:30','h:mm:ss o mm:ss — ej.: 1:58:30')});
+      F.col=cl8Campo(g,T('Colocação','Placing','Puesto'),'input',{inputmode:'numeric',maxlength:'6',placeholder:T('ex.: 3','e.g. 3','ej.: 3')});
+      F.part=cl8Campo(g,T('Participantes','Participants','Participantes'),'input',{inputmode:'numeric',maxlength:'7'});
+      F.cat=cl8Campo(g,T('Categoria','Category','Categoría'),'input',{maxlength:'60',placeholder:T('ex.: 30–34 anos','e.g. 30–34','ej.: 30–34 años')});
+      F.prem=cl8Campo(g,T('Prêmio','Award','Premio'),'select');cl8Opcoes(F.prem,ES8_PREMIOS.map(p=>[p[0],(ES8_PREMIO_IC[p[0]]?ES8_PREMIO_IC[p[0]]+' ':'')+T(p[1],p[2],p[3])]),'');
+      F.soProva=[F.col,F.part,F.cat,F.prem].map(x=>x.closest('label'));
+      F.obs=cl8Campo(F.abas.panes.obs,T('Observações','Notes','Notas'),'textarea',{rows:'7',maxlength:'4000'},true);
+      const sv=cl8El('button','btn pri',T('Salvar','Save','Guardar'),acts);sv.type='submit';cl8Btn('btn',T('Cancelar','Cancel','Cancelar'),acts,()=>cl8FichaFecha(S));
+      F.ex=cl8Btn('btn danger',txtEx,acts);cl8Excluir(F.ex,txtEx,()=>excluir());
+      F.esp.addEventListener('change',()=>{const U=F.un;if(!U.value||U.value===ESP(F.esp.dataset.ant).un)U.value=ESP(F.esp.value).un;F.esp.dataset.ant=F.esp.value;F.capa();F.resumo();});
+      for(const x of [F.col,F.part])x.addEventListener('input',()=>{const v=x.value.replace(/\D/g,'');if(v!==x.value)x.value=v;F.resumo();});
+      for(const x of [F.val,F.tempo])x.addEventListener('input',()=>F.resumo());for(const x of [F.un,F.prem])x.addEventListener('change',()=>{F.resumo();F.capa();});
+      let tc=0;F.ev.addEventListener('input',()=>{clearTimeout(tc);tc=setTimeout(()=>F.capa(),250);});F.data.addEventListener('change',()=>F.capa());
+      F.vis=()=>{const pv=!S.ed||S.ed.tipo==='prova';for(const l of F.soProva)l.hidden=!pv;};
+      F.registro=()=>({esporte:F.esp.value,tipo:S.ed?S.ed.tipo:'prova',evento:F.ev.value.trim(),data:F.data.value,valor:es8Num(F.val.value),un:F.un.value,tempo:Math.max(0,es8Seg(F.tempo.value)),
+        colocacao:+F.col.value||0,participantes:+F.part.value||0,premio:(!S.ed||S.ed.tipo==='prova')?F.prem.value:''});
+      F.capa=()=>{const r=F.registro();F.cv.replaceChildren(cl8Capa({titulo:es8Titulo(r),sub:[cl8Data(r.data),es8Marca(r)].filter(Boolean).join(' · '),icone:ESP(r.esporte).ic,hue:cl8HueCor(ESP(r.esporte).cor)},'e7-cvbig'));};
+      F.resumo=()=>{const r=F.registro();F.res.replaceChildren();const L=[];const mk=es8Marca(r);if(mk)L.push('⏱ '+mk);const col=r.tipo==='prova'?es8Colocacao(r):'';if(col)L.push('◆ '+col);if(r.premio)L.push(ES8_PREMIO_IC[r.premio]+' '+es8PremioNome(r.premio));
+        if(!L.length)L.push(T('A marca, a colocação e o prêmio aparecem aqui.','The mark, the placing and the award show up here.','La marca, el puesto y el premio aparecen aquí.'));for(const t of L)cl8El('div',null,t,F.res);};},
+    abrir(r){cl8Painel(S);const F=S.F;const esp=r?r.esporte:(S.st.cat||((es8Ranking()[0]||{}).e)||'corrida');
+      S.ed={id:r?r.id:null,tipo:r?r.tipo:(S.st.prat==='treinos'?'treino':'prova')};F.esp.value=esp;F.esp.dataset.ant=esp;
+      F.ev.value=r?r.evento:'';F.data.value=r?r.data:cn8Hoje();F.loc.value=r?r.local:'';F.val.value=r&&r.valor?es8NumTxt(r.valor):'';F.un.value=r?r.un:ESP(esp).un;F.tempo.value=r&&r.tempo?es8Tempo(r.tempo):'';
+      F.col.value=r&&r.colocacao?String(r.colocacao):'';F.part.value=r&&r.participantes?String(r.participantes):'';F.cat.value=r?r.categoria:'';
+      F.prem.value=r?r.premio:(S.st.prat==='medalhas'?'finisher':S.st.prat==='trofeus'?'t1':'');F.obs.value=r?r.obs:'';
+      cl8Dica(F.dica,r?'':T('Só o esporte é obrigatório. Medalhas e troféus vão para as paredes da Sala dos Esportes; distância e tempo viram recordes.','Only the sport is required. Medals and trophies go on the walls of the Sports Room; distance and time become records.','Solo el deporte es obligatorio. Las medallas y los trofeos van a las paredes de la Sala de Deportes; la distancia y el tiempo se vuelven récords.'));
+      F.ex.hidden=!r;cl8ExcluirReset(F.ex,txtEx);F.sts.paint();F.vis();F.capa();F.resumo();F.abas.mostra('resultado');
+      cl8FichaAbre(S,r?T('Editar registro','Edit entry','Editar registro'):T('Novo registro','New entry','Nuevo registro'));if(!r)setTimeout(()=>{try{F.ev.focus();}catch(e){}},40);},
+    salvar(){const F=S.F,E=S.ed;if(!E)return;const dica=t=>cl8Dica(F.dica,t);
+      const tt=F.tempo.value.trim(),tempo=es8Seg(tt);if(tt&&tempo<=0){dica(T('O tempo vai como h:mm:ss ou mm:ss (ex.: 52:30 ou 1:58:30; centésimos com vírgula: 0:32,45).','Time goes as h:mm:ss or mm:ss (e.g. 52:30 or 1:58:30; hundredths after a dot: 0:32.45).','El tiempo va como h:mm:ss o mm:ss (ej.: 52:30 o 1:58:30; centésimas con coma: 0:32,45).'));F.abas.mostra('resultado');F.tempo.focus();return;}
+      const vt=F.val.value.trim(),valor=es8Num(vt);if(vt&&!valor){dica(T('A distância ou a marca é um número (ex.: 21,1).','The distance or mark is a number (e.g. 21.1).','La distancia o la marca es un número (ej.: 21,1).'));F.abas.mostra('resultado');F.val.focus();return;}
+      const tipo=E.tipo==='treino'?'treino':'prova',D=es8Dados(),agora=new Date().toISOString(),i=E.id?D.registros.findIndex(q=>q.id===E.id):-1,velho=i>=0?D.registros[i]:null;
+      const base={esporte:F.esp.value,tipo,evento:F.ev.value,data:F.data.value,local:F.loc.value,valor,un:F.un.value,tempo:Math.max(0,tempo),colocacao:F.col.value.trim(),participantes:F.part.value.trim(),categoria:F.cat.value,premio:F.prem.value,obs:F.obs.value,atualizado:agora};
+      let r;if(velho){r=es8Normaliza(Object.assign({},velho,base,{id:velho.id,criado:velho.criado}));D.registros[i]=r;}else{r=es8Normaliza(Object.assign(base,{id:cn8Id(),criado:agora}));D.registros.push(r);}
+      const p=S.prats().find(q=>q[0]===S.st.prat);if(p&&!p[3](r))S.st.prat=es8EhMedalha(r.premio)?'medalhas':es8EhTrofeu(r.premio)?'trofeus':'todos';if(S.st.cat&&S.st.cat!==r.esporte)S.st.cat='';
+      cl8FichaFecha(S);es8Salva();cl8Render(S);
+      cl8Toast((es8EhMedalha(r.premio)?T('Na parede de medalhas: ','On the medal wall: ','En la pared de medallas: '):es8EhTrofeu(r.premio)?T('Na estante de troféus: ','On the trophy shelves: ','En la estantería de trofeos: '):T('Registrado: ','Logged: ','Registrado: '))+es8Titulo(r),3200);}};
+  S.st=cl8Estado(S,{aba:'registros',prat:'todos',ordem:'recentes'});
+  function excluir(){const E=S.ed,D=es8Dados(),i=E&&E.id?D.registros.findIndex(q=>q.id===E.id):-1;if(i<0)return;const r=D.registros[i];D.registros.splice(i,1);cl8FichaFecha(S);es8Salva();cl8Render(S);cl8Toast(T('Excluído: ','Deleted: ','Borrado: ')+es8Titulo(r),2600);}
+  return S;}
+function cl8EsportesAbre(S,prat,id){const ab=prat==='recordes'?'recordes':prat==='ranking'?'ranking':(prat?'registros':null);const pr=['todos','provas','treinos','medalhas','trofeus'].indexOf(prat)>=0?prat:null;
+  if(!cl8Abre(S,pr,ab))return false;const r=id?es8Dados().registros.find(q=>q.id===id):null;
+  if(r){const p=S.prats().find(q=>q[0]===S.st.prat);if((p&&!p[3](r))||(S.st.cat&&S.st.cat!==r.esporte)){S.st.prat=es8EhMedalha(r.premio)?'medalhas':es8EhTrofeu(r.premio)?'trofeus':'todos';S.st.cat='';cl8Render(S);}S.abrir(r);}
+  else if(prat==='novo')S.abrir(null);return true;}
+
+/* ---------- ligar: os painéis antigos passam a abrir os novos (e voltam a ser eles mesmos se a Estante nova não existir) ---------- */
+if(CL842.on){
+  try{if(typeof CN838!=='undefined'&&CN838.on&&typeof cn8Dados==='function'&&typeof cn8UIAbre==='function'){const S=CL842.P.filmes=cl8Filmes();
+    const F0={cria:cn8UICria,render:cn8UIRender,abre:cn8UIAbre,fecha:cn8UIFecha};
+    cn8UICria=function(){return cl8Css()?cl8Painel(S):F0.cria.apply(this,arguments);};
+    cn8UIRender=function(){if(S.root)return cl8Render(S);return F0.render.apply(this,arguments);};
+    cn8UIAbre=function(aba,id){if(!cl8Css())return F0.abre.apply(this,arguments);cl8FilmesAbre(S,aba,id);};
+    cn8UIFecha=function(){if(S.root)cl8Fecha(S);return F0.fecha.apply(this,arguments);};}}catch(e){cl8Erro('filmes',e);}
+  try{if(typeof S567!=='undefined'&&S567.on&&typeof s567UIAbre==='function'&&typeof S567_PLAT!=='undefined'){const S=CL842.P.jogos=cl8Jogos();
+    const F0={cria:s567UICria,render:s567UIRender,abre:s567UIAbre,fecha:s567UIFecha};
+    s567UICria=function(){return cl8Css()?cl8Painel(S):F0.cria.apply(this,arguments);};
+    s567UIRender=function(){if(S.root)return cl8Render(S);return F0.render.apply(this,arguments);};
+    s567UIAbre=function(id){if(!cl8Css())return F0.abre.apply(this,arguments);cl8JogosAbre(S,id);};
+    s567UIFecha=function(){if(S.root)cl8Fecha(S);return F0.fecha.apply(this,arguments);};}}catch(e){cl8Erro('jogos',e);}
+  try{if(typeof ES840!=='undefined'&&ES840.on&&typeof es8Dados==='function'&&typeof es8Abre==='function'){const S=CL842.P.esportes=cl8Esportes();
+    const F0={cria:es8Cria,render:es8Render,abre:es8Abre,fecha:es8Fecha};
+    es8Cria=function(){return cl8Css()?cl8Painel(S):F0.cria.apply(this,arguments);};
+    es8Render=function(){if(S.root)return cl8Render(S);return F0.render.apply(this,arguments);};
+    es8Abre=function(prat,id){if(!cl8Css())return F0.abre.apply(this,arguments);cl8EsportesAbre(S,prat,id);};
+    es8Fecha=function(){if(S.root)cl8Fecha(S);return F0.fecha.apply(this,arguments);};}}catch(e){cl8Erro('esportes',e);}
+  // com um painel aberto o jogo fica parado (teclas, mira, clique) como com a Estante
+  try{const ub=uiBlocked;uiBlocked=function(){return ub.apply(this,arguments)||cl8Aberto();};}catch(e){cl8Erro('uiBlocked',e);}
+  // Esc: a janela pequena, depois a ficha, depois o painel
+  addEventListener('keydown',e=>{if(e.key!=='Escape')return;const S=Object.values(CL842.P).find(o=>o.root&&!o.root.hidden);if(!S)return;e.preventDefault();e.stopPropagation();cl8Esc(S);},true);
+  // abrir a Estante (botão, tecla B, atril…) fecha os painéis
+  try{const est=document.getElementById('est');if(est)new MutationObserver(()=>{if(!est.hidden)for(const S of Object.values(CL842.P))if(S.root&&!S.root.hidden)cl8Fecha(S);}).observe(est,{attributes:true,attributeFilter:['hidden']});}catch(e){cl8Erro('estante',e);}
+  // a janela mudou de largura: as placas e o número de capas por página acompanham
+  {let tr=0;addEventListener('resize',()=>{clearTimeout(tr);tr=setTimeout(()=>{for(const S of Object.values(CL842.P))if(S.root&&!S.root.hidden)try{cl8Render(S);}catch(e){}},200);});}
+}
+window.__colecoes842={estado:CL842,erros:CL842.erros,stats:CL842.stats,paineis:CL842.P,css:()=>cl8Css(),aberto:()=>cl8Aberto(),
+  abrir:(k,a,b)=>{const S=CL842.P[k];if(!S)return false;return k==='filmes'?cl8FilmesAbre(S,a,b):k==='jogos'?cl8JogosAbre(S,a):cl8EsportesAbre(S,a,b);},
+  fechar:k=>{for(const S of Object.values(CL842.P))if(!k||S.k===k)cl8Fecha(S);},ficha:(k,id)=>{const S=CL842.P[k];if(!S||!S.root)return false;const x=id?S.itens().find(q=>q.id===id):null;S.abrir(x||null);return true;}};
 
 window.__build434={revision:434,family:"web",edition:"en"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
