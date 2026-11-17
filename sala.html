@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v842</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v843</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -7748,6 +7748,25 @@ E, se você chegou até aqui, leitor, a sua já está lida. Amanhã tem outra.`}
 
 <script>
 (function(){
+/* v843 · NITIDEZ DOS TEXTOS — gancho de cedo (o resto no bloco `NT843`, no fim do script) */
+const NT843_CEDO=(function(){const R={on:!/[?&#]nitidez843=0/i.test(location.search+location.hash),aniso:4,vies:-0.5,telas:0,texturas:0,erros:[]};if(!R.on)return R;
+  try{const marca=c=>{if(c&&!c.__txt843){c.__txt843=1;R.telas++;}};
+    for(const C of [window.CanvasRenderingContext2D,window.OffscreenCanvasRenderingContext2D]){if(!C||!C.prototype)continue;const P=C.prototype;
+      for(const nm of ['fillText','strokeText']){const o=P[nm];if(typeof o!=='function'||o.__nt843)continue;const f=function(t){try{if((typeof t==='string'&&t.trim().length>1)||typeof t==='number')marca(this.canvas);}catch(e){}return o.apply(this,arguments);};f.__nt843=1;P[nm]=f;}
+      const di=P.drawImage;if(typeof di==='function'&&!di.__nt843){const f=function(src){try{if(src&&src.__txt843)marca(this.canvas);}catch(e){}return di.apply(this,arguments);};f.__nt843=1;P.drawImage=f;}
+      for(const nm of ['getImageData','putImageData','createImageData','setTransform','resetTransform']){const o=P[nm];if(typeof o!=='function'||o.__nt843)continue;const f=function(){try{const c=this.canvas;if(c)c.__pix843=1;}catch(e){}return o.apply(this,arguments);};f.__nt843=1;P[nm]=f;}}
+  }catch(e){R.erros.push('telas: '+(e&&e.message||e));}
+  try{const TP=THREE.Texture.prototype,d=Object.getOwnPropertyDescriptor(TP,'needsUpdate');if(d&&d.set){const s0=d.set;
+    Object.defineProperty(TP,'needsUpdate',{configurable:true,enumerable:false,get:d.get,set:function(v){try{if(v===true){const im=this.image;if(im&&im.__txt843){const u=this.userData||(this.userData={});if(!u.texto843){u.texto843=true;R.texturas++;}if(!(this.anisotropy>=R.aniso))this.anisotropy=R.aniso;if(!u.semTeto&&(im.width*im.height)<=2097152){u.semTeto=true;u.semTeto843=true;}}}}catch(e){}s0.call(this,v);}});}
+  }catch(e){R.erros.push('textura: '+(e&&e.message||e));}
+  try{const MP=THREE.Material.prototype,C=THREE.ShaderChunk,obc0=MP.onBeforeCompile,key0=MP.customProgramCacheKey,vs=R.vies.toFixed(2);
+    const MAPF=C.map_fragment.replace('texture2D( map, vUv )','texture2D( map, vUv, '+vs+' )'),EMF=C.emissivemap_fragment.replace('texture2D( emissiveMap, vUv )','texture2D( emissiveMap, vUv, '+vs+' )');
+    const txt=t=>!!(t&&t.userData&&t.userData.texto843);
+    if(MAPF!==C.map_fragment){
+      MP.onBeforeCompile=function(sh){try{let f=sh&&sh.fragmentShader;if(typeof f==='string'){if(txt(this.map)&&f.indexOf('#include <map_fragment>')>=0)f=f.replace('#include <map_fragment>',MAPF);if(txt(this.emissiveMap)&&EMF!==C.emissivemap_fragment&&f.indexOf('#include <emissivemap_fragment>')>=0)f=f.replace('#include <emissivemap_fragment>',EMF);sh.fragmentShader=f;}}catch(e){}return obc0.apply(this,arguments);};
+      MP.customProgramCacheKey=function(){const k=key0.apply(this,arguments);try{if(txt(this.map)||txt(this.emissiveMap))return k+'|nt843';}catch(e){}return k;};R.shader=true;}
+  }catch(e){R.erros.push('shader: '+(e&&e.message||e));}
+  return R;})();
 const TEMPOS={};function tmark(n){TEMPOS[n]=Math.round(performance.now());}tmark('cena');window.__tempos=TEMPOS;
 tp615Redondo.__gen=tp615RedondoG;tp615Passadeira.__gen=tp615PassadeiraG;tp615Trapo.__gen=tp615TrapoG;tp615Franjas.__gen=tp615FranjasG;tp615Faixa.__gen=tp615FaixaG;tp615Pelo.__gen=tp615PeloG;tp615Persa.__gen=tp615PersaG;tx610DesDamasco.__gen=tx610DesDamascoG;tx610DesTapete.__gen=tx610DesTapeteG;tx610Florzinha.__gen=tx610FlorzinhaG;tx610Folha.__gen=tx610FolhaG;tx610Lobado.__gen=tx610LobadoG;tx610Motivo.__gen=tx610MotivoG;tx610MotivoPath.__gen=tx610MotivoPathG;tx610Palmeta.__gen=tx610PalmetaG;tx610Rosa.__gen=tx610RosaG;
 rv530Campo.__gen=rv530CampoG;al521Mundo.__gen=al521MundoG;at529Monta.__gen=at529MontaG;at529Lugar.__gen=at529LugarG;sa2Campo.__gen=sa2CampoG;tp615Passada.__gen=tp615PassadaG;tp615Textura.__gen=tp615TexturaG;sa2Aplica.__gen=sa2AplicaG;qu649Heroi.__gen=qu649HeroiG;
@@ -8475,7 +8494,7 @@ function papelSync(t){const m=PAPEL_DE.get(t);if(!m||!m.isMaterial)return;
   for(const k of ['opacity','transparent','side','visible','emissiveIntensity','depthWrite','depthTest','alphaTest','wireframe']){const x=m[k];if(v[k]!==x){if((k==='transparent'||k==='side'||k==='alphaTest')&&t[k]!==x)t.needsUpdate=true;t[k]=x;v[k]=x;}}
   if(m.color&&m.color.isColor&&t.color!==m.color)t.color=m.color;if(m.emissive&&m.emissive.isColor&&t.emissive!==m.emissive)t.emissive=m.emissive;}
 const PAPEL_TEXKEYS=['map','emissiveMap','alphaMap','aoMap','lightMap','normalMap','roughnessMap','metalnessMap','bumpMap'];
-function papelTex(m,on){for(const k of PAPEL_TEXKEYS){const tx=m[k];if(!tx||!tx.isTexture)continue;
+function papelTex(m,on){for(const k of PAPEL_TEXKEYS){const tx=m[k];if(!tx||!tx.isTexture)continue;if(tx.userData&&tx.userData.texto843)continue;
   if(on){if(!PAPEL_ANISO.has(tx))PAPEL_ANISO.set(tx,tx.anisotropy);if(tx.anisotropy!==1){tx.anisotropy=1;tx.needsUpdate=true;}}
   else if(PAPEL_ANISO.has(tx)&&tx.anisotropy!==PAPEL_ANISO.get(tx)){tx.anisotropy=PAPEL_ANISO.get(tx);tx.needsUpdate=true;}}}
 // contorno de nanquim: casca invertida deslocada pela normal ANTES do skinning (acompanha os ossos)
@@ -9011,12 +9030,12 @@ function autoQIniciar(){AUTO_QUALITY=false;AUTO_MANUAL=false;AQ.ligado=true;AQ.b
 const PAPEL_AUTO={amostras:[],ruins:0,inicio:0,feito:false,viajou:false,ignorarAte:0,desligado:/[?&#]papelauto=0/i.test(location.search+location.hash)};
 // Resolução dinâmica do Papel: a cada ~60 quadros mede a mediana; acima de 22 ms desce a escala (até 0,55), abaixo de 12 ms por três janelas seguidas sobe de volta.
 // É o que mantém a fluidez em aparelho fraco sem mexer no traço — a imagem só fica um pouco mais macia.
-const DRS={escala:TOUCHDEV?0.8:0.85,max:TOUCHDEV?0.8:0.85,min:0.55,amostras:[],boas:0,mudou:0,desligado:/[?&#]drs=0/i.test(location.search+location.hash)};
+const DRS={escala:TOUCHDEV?0.8:0.85,max:TOUCHDEV?0.8:0.85,teto843:(TOUCHDEV||/[?&#]nitidez843=0/i.test(location.search+location.hash))?(TOUCHDEV?0.8:0.85):1,min:0.55,amostras:[],boas:0,mudou:0,desligado:/[?&#]drs=0/i.test(location.search+location.hash)};
 function drsAplicar(){try{const d=devicePixelRatio||1;renderer.setPixelRatio(Math.min(DRS.escala,d));renderer.setSize(innerWidth,innerHeight,false);Q.scale=Math.min(DRS.escala,d);}catch(e){}}
 function drs(dt){if(!Q.papel||DRS.desligado||!AQ.liberado||PERF130.busy||document.hidden)return;if(!(dt>0)||dt>0.5)return;if(typeof fadeOnAt!=='undefined'&&fadeOnAt){DRS.amostras.length=0;return;}
   DRS.amostras.push(dt);if(DRS.amostras.length<60)return;const s=DRS.amostras.slice().sort((a,b)=>a-b);const med=s[30]*1000;DRS.amostras.length=0;
   if(med>26&&DRS.escala>DRS.min+1e-6){DRS.escala=Math.max(DRS.min,+(DRS.escala-0.1).toFixed(2));DRS.boas=0;DRS.mudou++;drsAplicar();if(DRS.mudou===1)try{logAdd('Resolução do Papel ajustada para manter a fluidez ('+Math.round(med)+' ms por quadro)');}catch(e){}}
-  else if(med<=18&&s.filter(v=>v>.025).length<=1&&DRS.escala<DRS.max-1e-6){if(++DRS.boas>=6){DRS.boas=0;DRS.escala=Math.min(DRS.max,+(DRS.escala+0.05).toFixed(2));drsAplicar();}}else DRS.boas=0;}
+  else if(med<=18&&s.filter(v=>v>.025).length<=1&&DRS.escala<(DRS.teto843||DRS.max)-1e-6){if(++DRS.boas>=6){DRS.boas=0;DRS.escala=Math.min(DRS.teto843||DRS.max,+(DRS.escala+0.05).toFixed(2));drsAplicar();}}else DRS.boas=0;}
 function autoQFusaoOcupada201(now){try{if(now-AQ.calInicio>60000)return false;if(typeof fusaoPodeCena!=='function'||!fusaoPodeCena(ACTIVE))return false;const F=FUSAO.cenas.get(ACTIVE);return !F||F.fase!=='vigia';}catch(e){return false;}}
 function autoQ(){AQ.calibrando=false;AQ.ligado=false;}
 window.__autoq2=AQ2;
@@ -44336,7 +44355,7 @@ function aniso206(tx,v){if(tx.anisotropy===v)return;
       if(ext){renderer.state.bindTexture(gl.TEXTURE_2D,wt);gl.texParameterf(gl.TEXTURE_2D,ext.TEXTURE_MAX_ANISOTROPY_EXT,Math.max(1,Math.min(v,renderer.capabilities.getMaxAnisotropy())));pr.__currentAnisotropy=v;}
       tx.anisotropy=v;V206.anisoDireto++;return;}}catch(e){v206Erro('anisotropia',e);}
   tx.anisotropy=v;tx.needsUpdate=true;V206.anisoReenvio++;}
-papelTex=function(m,on){for(const k of PAPEL_TEXKEYS){const tx=m[k];if(!tx||!tx.isTexture)continue;
+papelTex=function(m,on){for(const k of PAPEL_TEXKEYS){const tx=m[k];if(!tx||!tx.isTexture)continue;if(tx.userData&&tx.userData.texto843)continue;
   if(on){if(!PAPEL_ANISO.has(tx))PAPEL_ANISO.set(tx,tx.anisotropy);if(tx.anisotropy!==1)aniso206(tx,1);}
   else if(PAPEL_ANISO.has(tx)&&tx.anisotropy!==PAPEL_ANISO.get(tx))aniso206(tx,PAPEL_ANISO.get(tx));}};
 /* ---- 2. o Leve preparado em segundo plano ---- */
@@ -110031,21 +110050,21 @@ function cn8DesenhaTop(){const Q=CN838.quadros.top10;if(!Q)return;const x=Q.x,W=
   const g=x.createRadialGradient(W/2,H*.35,40,W/2,H/2,W*.75);g.addColorStop(0,'#2a160c');g.addColorStop(1,'#0f0806');x.fillStyle=g;x.fillRect(0,0,W,H);
   x.strokeStyle='#c9a35a';x.lineWidth=6;x.strokeRect(14,14,W-28,H-28);x.lineWidth=2;x.strokeRect(26,26,W-52,H-52);
   x.textAlign='center';x.textBaseline='middle';x.fillStyle='#e6c878';x.font='bold 92px Georgia,serif';x.shadowColor='rgba(230,200,120,.45)';x.shadowBlur=18;x.fillText('TOP 10',W/2,92);x.shadowBlur=0;
-  x.font='italic 24px Georgia,serif';x.fillStyle='rgba(233,220,196,.75)';x.fillText(cn8T('os seus filmes mais bem avaliados','your best-rated movies','tus películas mejor valoradas'),W/2,150);
+  x.font='italic 25px Georgia,serif';x.fillStyle='rgba(233,220,196,.9)';x.fillText(cn8T('os seus filmes mais bem avaliados','your best-rated movies','tus películas mejor valoradas'),W/2,150);
   const L=cn8Vistos().filter(f=>f.nota>0).sort(cn8PorNota).slice(0,10);
   if(!L.length){x.font='26px Georgia,serif';x.fillStyle='rgba(233,220,196,.7)';cn8Linhas(x,cn8T('Dê notas aos filmes que você viu e o ranking aparece aqui.','Rate the movies you have seen and the ranking shows up here.','Puntúa las películas que viste y el ranking aparece aquí.'),560,4).forEach((s,i)=>x.fillText(s,W/2,360+i*38));Q.t.needsUpdate=true;return;}
   const y0=196,dy=54;L.forEach((f,i)=>{const y=y0+i*dy;
     x.fillStyle=i<3?['#e6c878','#c8ccd2','#c58a4a'][i]:'rgba(201,163,90,.55)';x.beginPath();x.arc(66,y+dy/2-4,20,0,Math.PI*2);x.fill();x.fillStyle='#1a0d0a';x.font='bold 22px Georgia,serif';x.textAlign='center';x.fillText(String(i+1),66,y+dy/2-3);
     const im=f.poster&&CN838.imgs.get(f.poster);x.fillStyle=cn8GenCor(f.generos[0]);x.fillRect(100,y+2,32,46);if(im)cn8Cobre(x,im,100,y+2,32,46);
     x.textAlign='left';x.fillStyle='#f3e6c8';x.font='bold 25px Georgia,serif';x.fillText(cn8Corta(x,f.titulo,400),148,y+16);
-    x.font='17px Georgia,serif';x.fillStyle='rgba(233,220,196,.6)';x.fillText(cn8Corta(x,[f.ano,(f.generos||[]).map(cn8GenNome).join(', ')].filter(Boolean).join(' · '),400),148,y+38);
+    x.font='19px Georgia,serif';x.fillStyle='rgba(233,220,196,.86)';x.fillText(cn8Corta(x,[f.ano,(f.generos||[]).map(cn8GenNome).join(', ')].filter(Boolean).join(' · '),400),148,y+38);
     x.textAlign='right';x.fillStyle='#e6c878';x.font='26px Georgia,serif';x.fillText(cn8EstrelasTxt(f.nota),W-48,y+dy/2-4);});
   Q.t.needsUpdate=true;}
 function cn8DesenhaBreve(){const Q=CN838.quadros.embreve;if(!Q)return;const x=Q.x,W=768,H=768;
   x.fillStyle='#141414';x.fillRect(0,0,W,H);for(let y=0;y<H;y+=12){x.fillStyle='rgba(255,255,255,.035)';x.fillRect(0,y,W,2);}
   x.strokeStyle='#b9bcc2';x.lineWidth=8;x.strokeRect(12,12,W-24,H-24);
   x.textAlign='center';x.textBaseline='middle';x.fillStyle='#f5f5f0';x.font='bold 74px "Courier New",Courier,monospace';x.fillText(cn8T('EM BREVE','COMING SOON','PRÓXIMAMENTE'),W/2,86);
-  x.font='italic 22px Georgia,serif';x.fillStyle='rgba(245,245,240,.6)';x.fillText(cn8T('a sua lista do «quero assistir»','your watchlist','tu lista de «quiero ver»'),W/2,140);
+  x.font='italic 24px Georgia,serif';x.fillStyle='rgba(245,245,240,.86)';x.fillText(cn8T('a sua lista do «quero assistir»','your watchlist','tu lista de «quiero ver»'),W/2,140);
   const L=cn8Quero().sort((a,b)=>String(b.criado).localeCompare(String(a.criado)));
   if(!L.length){x.font='bold 28px "Courier New",Courier,monospace';x.fillStyle='rgba(245,245,240,.75)';cn8Linhas(x,cn8T('MARQUE FILMES COMO «QUERO ASSISTIR» E ELES APARECEM AQUI','MARK MOVIES AS «WATCHLIST» AND THEY SHOW UP HERE','MARCA PELÍCULAS COMO «QUIERO VER» Y APARECEN AQUÍ'),600,5).forEach((s,i)=>x.fillText(s,W/2,330+i*44));Q.t.needsUpdate=true;return;}
   const n=Math.min(9,L.length),r=rnd(83809);x.font='bold 34px "Courier New",Courier,monospace';
@@ -111913,6 +111932,89 @@ if(CL842.on){
 window.__colecoes842={estado:CL842,erros:CL842.erros,stats:CL842.stats,paineis:CL842.P,css:()=>cl8Css(),aberto:()=>cl8Aberto(),
   abrir:(k,a,b)=>{const S=CL842.P[k];if(!S)return false;return k==='filmes'?cl8FilmesAbre(S,a,b):k==='jogos'?cl8JogosAbre(S,a):cl8EsportesAbre(S,a,b);},
   fechar:k=>{for(const S of Object.values(CL842.P))if(!k||S.k===k)cl8Fecha(S);},ficha:(k,id)=>{const S=CL842.P[k];if(!S||!S.root)return false;const x=id?S.itens().find(q=>q.id===id):null;S.abrir(x||null);return true;}};
+
+/* ===================== v843 · TEXTOS MAIS NÍTIDOS NAS PAREDES, NOS CARTAZES, NAS PLACAS E NOS PAINÉIS (bloco `NT843` + gancho de cedo) =====================
+   Pedido do Luiz (17/11): «agora deixe os textos nas paredes, posteres, e etc todos mais legíveis. não estão muito nítidos».
+   Por que borravam: quase todo texto do jogo é desenhado numa tela 2D (340 funções, ~960 chamadas de `fillText`) que vira textura; o
+   jogo começa no Papel, que (1) zera o filtro anisotrópico de todas as texturas — um letreiro visto de lado vira borrão —, (2) desenha
+   a cena a 0,85 da resolução da janela (na máquina do Luiz, com a tela a 1,25, isso dá 68 % da resolução de verdade), descendo até 0,55
+   se o aparelho não acompanha, e (3) redesenha pela metade toda textura de tela com mais de 1024 px de lado (teto de memória da v198:
+   o lema da Sala dos Esportes, 2048 × 96, virava 1024 × 48); e, em qualquer modo, (4) a textura de um letreiro visto de longe cai num
+   mipmap menor, que amacia as letras, e (5) os letreiros pequenos (512 × 128 e parecidos) e os painéis grandes ficam com poucos pixels
+   por letra quando o leitor chega perto.
+   O que muda, sem mexer nas 340 funções:
+   · GANCHO DE CEDO (troca no começo do script principal, `NT843_CEDO`): `fillText`/`strokeText` com texto (2 caracteres ou mais, ou
+     número) marcam a tela (`__txt843`); `drawImage` de uma tela marcada marca a de destino (atlas montados a partir de letreiros);
+     operações de pixel e de transformação também ficam anotadas (`__pix843`). A textura de uma tela marcada (no `needsUpdate`, que
+     toda textura de tela recebe ao nascer e ao ser redesenhada) ganha `userData.texto843`, filtro anisotrópico 4× no mínimo e, até
+     2 megapixels, `semTeto` (fica fora do teto de 1024 px — o mesmo mecanismo que a capa do livro na mão já usava); nos materiais cujo
+     `map` ou `emissiveMap` é texto, o shader lê a textura meio degrau de mipmap mais nítido (`texture2D(map, vUv, -0.5)`, no
+     `onBeforeCompile` do protótipo dos materiais, com chave de programa própria `|nt843`; os outros materiais não mudam).
+   · PAPEL: o `papelTex` (o original e o da v206) deixa de zerar o filtro das texturas de texto (as outras continuam zeradas).
+   · RESOLUÇÃO DO PAPEL: continua começando em 0,85 e descendo até 0,55 quando falta fôlego, mas pode SUBIR até 1 quando o aparelho tem
+     folga (a mesma regra de subida de antes: mediana ≤ 18 ms e no máximo 1 quadro acima de 25 ms em 60, seis vezes seguidas).
+   · ESTE BLOCO — superamostragem: os letreiros feitos pelo `t160Tex` (e `s567Tex`, `es8Tex`, `cn8Tex`, que passam por ele) e pelo
+     `txtTex` que levam texto e têm até 150 mil pixels são desenhados de novo em 2× (a mesma função de desenho, com a escala 2 na tela;
+     fica de fora quem lê ou escreve pixels, mexe na transformação ou consulta o tamanho da tela); os painéis da Minha Sala ficam em 2×
+     (TOP 10 e EM BREVE do Cinema, 768² → 1536²; o telão, 1024 × 440 → 2048 × 880; os placares de recordes e de ranking da Sala dos
+     Esportes, 1024 × 616 → 2048 × 1232), com o mesmo desenho; e uma varredura aos poucos da cena ativa liga a marca nas texturas que só
+     receberam a letra depois de criadas, devolve as que o teto já tinha reduzido e pede a recompilação do material uma vez (até 6 por vez).
+   `?nitidez843=0` desliga tudo. Gancho `window.__nitidez843`. */
+const NT843={on:typeof NT843_CEDO!=='undefined'&&NT843_CEDO.on,erros:[],stats:{varreduras:0,objetos:0,texturas:0,materiais:0,restauradas:0,dobradas:0,dobraRecusada:0,paineis:0},
+  fila:[],pend:[],cena:null,ver:new WeakSet(),timer:0,maxPx:150000};
+function nt843Erro(k,e){if(NT843.erros.length<30)NT843.erros.push(k+': '+(e&&e.message||e));try{console.warn('v843',k,e);}catch(x){}}
+function nt843Aniso(tx){try{const a=(NT843_CEDO&&NT843_CEDO.aniso)||4;if(tx.anisotropy>=a)return;if(typeof aniso206==='function')aniso206(tx,a);else{tx.anisotropy=a;tx.needsUpdate=true;}}catch(e){nt843Erro('aniso',e);}}
+function nt843Tex(tx){if(!tx||!tx.isTexture)return false;const im=tx.image;if(!im||!im.__txt843)return false;const u=tx.userData||(tx.userData={});
+  if(!u.texto843){u.texto843=true;NT843.stats.texturas++;}nt843Aniso(tx);
+  // a textura que o teto da v198 já tinha reduzido volta ao original (até 2 megapixels)
+  try{if(!u.semTeto&&u.mem198&&u.mem198.de&&u.mem198.de[0]*u.mem198.de[1]<=2097152){u.semTeto=true;u.semTeto843=true;if(typeof memReduz==='function'&&memReduz(tx,0))NT843.stats.restauradas++;}
+    else if(!u.semTeto&&(im.width*im.height)<=2097152){u.semTeto=true;u.semTeto843=true;}}catch(e){nt843Erro('teto',e);}
+  return true;}
+/* ---------- superamostragem dos letreiros pequenos ---------- */
+function nt843DesenhoSeguro(f){if(typeof f!=='function')return true;let src='';try{src=Function.prototype.toString.call(f);}catch(e){return false;}
+  return !/getImageData|putImageData|createImageData|setTransform|resetTransform|\.canvas\b|toDataURL|toBlob|\.width\s*=|\.height\s*=/.test(src);}
+function nt843Dobravel(c,w,h){return NT843.on&&c&&c.__txt843&&!c.__pix843&&w>=48&&h>=24&&w*h<=NT843.maxPx;}
+if(NT843.on&&typeof t160Tex==='function'&&typeof T160!=='undefined'){
+  try{t160Tex=function(chave,w,h,draw,rep){const k='t:'+chave;let t=T160.cache.get(k);if(t)return t;let c=can(w,h),x=c.getContext('2d');draw(x,w,h);
+      if(nt843Dobravel(c,w,h)&&nt843DesenhoSeguro(draw)){try{const c2=can(w*2,h*2),x2=c2.getContext('2d');x2.setTransform(2,0,0,2,0,0);c2.__pix843=0;draw(x2,w,h);
+          if(!c2.__pix843){c=c2;c2.__dobro843=1;NT843.stats.dobradas++;}else NT843.stats.dobraRecusada++;}catch(e){NT843.stats.dobraRecusada++;}}
+      t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=4;if(rep)t.repeat.set(rep[0],rep[1]);T160.cache.set(k,t);return t;};}catch(e){nt843Erro('t160Tex',e);}}
+if(NT843.on&&typeof txtTex==='function'){
+  try{const txt0=txtTex;txtTex=function(lines,o){o=o||{};const w=o.w||512,h=o.h||256;
+      if(w*h<=NT843.maxPx&&w>=48&&h>=24&&nt843DesenhoSeguro(o.draw)&&!o.semDobra843){try{const o2=Object.assign({},o,{w:w*2,h:h*2,bw:(o.bw||6)*2});if(o.fs)o2.fs=o.fs*2;if(typeof o.ls==='string'){const mm=o.ls.match(/^([\d.]+)px$/);if(mm)o2.ls=(2*parseFloat(mm[1]))+'px';}
+          if(o.draw){const d0=o.draw;o2.draw=(x,W,H)=>{x.save();x.scale(2,2);try{d0(x,w,h);}finally{x.restore();}};}
+          // a margem de 40 px do cálculo da letra vira 80 em 2×: compensa com a letra calculada na escala original
+          if(!o.fs){const L=Array.isArray(lines)?lines:[lines];const longest=Math.max(1,...L.map(s=>String(s).length));o2.fs=2*Math.min(h/(L.length+0.7),(w-40)/(longest*0.6));}
+          const t=txt0(lines,o2);try{if(t&&t.image)t.image.__dobro843=1;}catch(e){}NT843.stats.dobradas++;return t;}catch(e){nt843Erro('txtTex',e);}}
+      return txt0(lines,o);};}catch(e){nt843Erro('txtTex',e);}}
+/* ---------- os painéis da Minha Sala em 2× (mesmo desenho, escala 2 na tela) ---------- */
+function nt843Dobra(Q,W,H,f){if(!Q||!Q.t)return false;f=f||2;try{const c2=can(W*f,H*f),x2=c2.getContext('2d');x2.setTransform(f,0,0,f,0,0);
+    Q.c=c2;Q.x=x2;Q.t.image=c2;const u=Q.t.userData||(Q.t.userData={});u.semTeto=true;u.semTeto843=true;u.texto843=true;c2.__txt843=1;Q.t.needsUpdate=true;NT843.stats.paineis++;return true;}catch(e){nt843Erro('painel',e);return false;}}
+if(NT843.on){
+  try{if(typeof cn8Quadro==='function'){const q0=cn8Quadro;cn8Quadro=function(){const Q=q0.apply(this,arguments);nt843Dobra(Q,768,768);return Q;};}}catch(e){nt843Erro('quadros do cinema',e);}
+  try{if(typeof cn8Monta==='function'){const m0=cn8Monta;cn8Monta=function(){const r=m0.apply(this,arguments);try{const S=CN838.tela;if(S&&S.t&&!S.nt843&&typeof CN8_TELA!=='undefined'){if(nt843Dobra(S,CN8_TELA.cw,CN8_TELA.ch)){S.nt843=true;try{cn8DesenhaTela(CN838.t||0);}catch(e){CN838.telaI=-1;CN838.telaSuja=true;}}}}catch(e){nt843Erro('telão',e);}return r;};}}catch(e){nt843Erro('telão',e);}
+  try{if(typeof es8Monta==='function'){const m0=es8Monta;es8Monta=function(){const r=m0.apply(this,arguments);try{const P=typeof ES8_PLAC!=='undefined'?ES8_PLAC:null;let n=0;
+        for(const k of ['recordes','ranking']){const Q=ES840.quadros&&ES840.quadros[k];if(P&&Q&&!Q.nt843&&nt843Dobra(Q,P.cw,P.ch)){Q.nt843=true;n++;}}
+        if(n){try{es8DesenhaRecordes();}catch(e){}try{es8DesenhaRanking();}catch(e){}}}catch(e){nt843Erro('placares',e);}return r;};}}catch(e){nt843Erro('placares',e);}
+}
+/* ---------- varredura aos poucos da cena ativa ---------- */
+function nt843Varre(sc){if(!sc||!sc.isScene)return;NT843.cena=sc;NT843.fila.length=0;try{sc.traverse(o=>{if(o.isMesh||o.isSprite)NT843.fila.push(o);});}catch(e){nt843Erro('varrer',e);}NT843.stats.varreduras++;}
+function nt843Passo(){if(!NT843.on)return;try{const sc=(typeof ACTIVE!=='undefined')?ACTIVE:null;if(sc&&sc!==NT843.cena)nt843Varre(sc);
+    let n=0;while(NT843.fila.length&&n<300){const o=NT843.fila.pop();n++;const ms=Array.isArray(o.material)?o.material:[o.material];
+      for(const m of ms){if(!m||NT843.ver.has(m))continue;const a=nt843Tex(m.map),b=nt843Tex(m.emissiveMap);if(a||b){NT843.ver.add(m);if(!(m.userData&&m.userData.nt843)){(m.userData||(m.userData={})).nt843=true;NT843.pend.push(m);}}}}
+    NT843.stats.objetos+=n;
+    // o material que já tinha programa sem o viés é recompilado uma vez (aos poucos, para não travar)
+    let k=0;while(NT843.pend.length&&k<6){const m=NT843.pend.shift();try{m.needsUpdate=true;}catch(e){}k++;NT843.stats.materiais++;}
+  }catch(e){nt843Erro('passo',e);}}
+if(NT843.on){
+  NT843.timer=setInterval(nt843Passo,300);
+  // depois de uma sala acabar de montar (e das camadas que entram depois), a cena dela é varrida de novo
+  try{if(typeof finishRoom==='function'&&typeof fr8Wrap==='function'){const fr0=finishRoom;finishRoom=fr8Wrap(function*(key){const r=(yield* fr8Prev(fr0,this,arguments,"NT843"));
+      try{for(const ms of [2000,8000,20000])setTimeout(()=>{try{if(NT843.cena&&typeof ACTIVE!=='undefined'&&NT843.cena===ACTIVE)nt843Varre(ACTIVE);}catch(e){}},ms);}catch(e){}return r;});}}catch(e){nt843Erro('ligar',e);}
+}
+window.__nitidez843={estado:NT843,cedo:typeof NT843_CEDO!=='undefined'?NT843_CEDO:null,erros:NT843.erros,stats:NT843.stats,varrer:()=>{try{nt843Varre(ACTIVE);}catch(e){}},passo:()=>nt843Passo(),
+  drs:()=>{try{return {escala:DRS.escala,teto:DRS.teto843,max:DRS.max,min:DRS.min,pr:renderer.getPixelRatio()};}catch(e){return null;}},
+  contar:()=>{const r={texto:0,outras:0,materiaisTexto:0,semTeto:0,reduzidas:0};try{const vistos=new Set();ACTIVE.traverse(o=>{const ms=Array.isArray(o.material)?o.material:[o.material];for(const m of ms){if(!m)continue;let t=false;for(const k of ['map','emissiveMap']){const x=m[k];if(x&&x.isTexture){if(!vistos.has(x)){vistos.add(x);if(x.userData&&x.userData.texto843){r.texto++;if(x.userData.semTeto)r.semTeto++;if(x.userData.mem198)r.reduzidas++;}else r.outras++;}if(x.userData&&x.userData.texto843)t=true;}}if(t)r.materiaisTexto++;}});}catch(e){}return r;}};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
