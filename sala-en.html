@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v843</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v844</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -112015,6 +112015,241 @@ if(NT843.on){
 window.__nitidez843={estado:NT843,cedo:typeof NT843_CEDO!=='undefined'?NT843_CEDO:null,erros:NT843.erros,stats:NT843.stats,varrer:()=>{try{nt843Varre(ACTIVE);}catch(e){}},passo:()=>nt843Passo(),
   drs:()=>{try{return {escala:DRS.escala,teto:DRS.teto843,max:DRS.max,min:DRS.min,pr:renderer.getPixelRatio()};}catch(e){return null;}},
   contar:()=>{const r={texto:0,outras:0,materiaisTexto:0,semTeto:0,reduzidas:0};try{const vistos=new Set();ACTIVE.traverse(o=>{const ms=Array.isArray(o.material)?o.material:[o.material];for(const m of ms){if(!m)continue;let t=false;for(const k of ['map','emissiveMap']){const x=m[k];if(x&&x.isTexture){if(!vistos.has(x)){vistos.add(x);if(x.userData&&x.userData.texto843){r.texto++;if(x.userData.semTeto)r.semTeto++;if(x.userData.mem198)r.reduzidas++;}else r.outras++;}if(x.userData&&x.userData.texto843)t=true;}}if(t)r.materiaisTexto++;}});}catch(e){}return r;}};
+
+/* ===================== v844 · AS MECÂNICAS DA MINHA SALA, 1.ª RODADA: O FLIPERAMA, O CINEMA E A SALA DOS ESPORTES (bloco `MS844`) =====================
+   Pedidos do Luiz (17/11): «siga melhorando todas as mecânicas de Minha Sala começando pelas sub salas novas criadas» e, jogando,
+   «a sala de adicionar os jogos jogados, não fica claro como faço pra abrir o menu ali».
+   Levantamento no navegador (modos Gamer, Clique e 1.ª pessoa; auditoria de caminhada com o `moveTP` do jogo):
+   · nenhuma parede atravessada nem disco invadido no Cinema, na passagem, no corredor e na Sala dos Esportes; mas, encostado na
+     frente do palco ou numa fila de poltronas, o leitor TREMIA (entre dois discos de colisão vizinhos ele era empurrado de um para o outro);
+   · as paredes de MEDALHAS e de TROFÉUS não abriam com E em nenhum modo: o item delas mora em x = 1e9 (só a mira o acha) e a distância
+     até ele dava 1,4 bilhão de metros — o foco ficava sempre «aproxime-se»;
+   · um item LONGE na mira escondia o item que estava AO LADO (na frente dos Recordes, a mira pegava a Secretaria a 4 m e o E não fazia nada);
+   · no modo Gamer a câmera olha para a cintura do leitor: de perto não se mira nada acima de ~1 m, então os cartazes do Cinema e as
+     paredes de medalhas e troféus ficavam sem E;
+   · as poltronas e o telão eram só cenário;
+   · o Fliperama: o quiosque «Seus jogos» é o ÚNICO jeito de abrir o painel, e ele fica no fundo, a 20 m da entrada, atrás do boliche,
+     preto contra a estante escura; as 27 máquinas (que é onde a gente aperta E) não faziam nada; e o letreiro «INSIRA A FICHA» (e os
+     outros letreiros pendurados) aparecia ESPELHADO para quem entra.
+   O que muda:
+   · FLIPERAMA: um segundo quiosque «Seus jogos», igual ao do fundo, logo na entrada (à esquerda de quem entra, junto da máquina de
+     fichas), com o letreiro de néon «SEUS JOGOS +» em cima; QUALQUER máquina (as 16 de pé, os pinballs, a garra, o hóquei, as
+     corridas, a dança, o skee-ball e as cestas) abre o painel dos jogos com E ou clique; na primeira entrada da partida, um aviso
+     curto diz como abrir (na língua e no modo do jogador); os letreiros pendurados ficam com duas faces de verdade (lidos dos dois lados).
+   · CINEMA: as 48 poltronas são de sentar — E (ou clique) numa poltrona, ou E parado na fileira diante dela: o leitor vai até a frente
+     dela, senta virado para o telão e a câmera vai para trás, de frente para a tela; E (ou mexer-se, ou clicar noutro lugar) levanta, na
+     frente da poltrona (na 1.ª pessoa ele senta como nas poltronas da nave: a câmera passa para trás e volta à 1.ª pessoa ao levantar);
+     sentado no cinema o livro do colo não aparece. O TELÃO abre a ficha do filme que está passando (de qualquer lugar do cinema).
+     Diante de uma parede de cartazes, E abre a lista dos seus filmes daquele estilo. A frente do palco e cada bloco de poltronas viram
+     caixas de colisão retas (o leitor desliza rente a elas, sem tremer).
+   · SALA DOS ESPORTES: as paredes de medalhas e de troféus abrem com E quando o leitor está de frente para elas, em qualquer modo; a
+     mira nelas mede a distância até o lugar de pé diante do ponto mirado.
+   · TODAS AS SALAS DA MINHA SALA: quando a mira pega um item longe, o item que está ao lado ganha o foco (a regra do jogo para os moradores).
+     Ao fechar no × um painel de coleção (filmes, jogos, esportes) ou a Estante, nos modos Gamer e 1.ª pessoa o mouse volta a ficar preso
+     na tela (sem precisar de um clique a mais).
+   Chave: `?mecanicas844=0`. Gancho `window.__mecanicas844`. */
+const MS844={on:!/[?&#]mecanicas844=0/i.test(location.search+location.hash),erros:[],stats:{sentou:0,levantou:0,usos:0,dicas:0,prendeu:0,recusas:0,maquinas:0,caixas:0,placas:0},
+  sentado:null,voltaFP:false,pitch0:null,feitoCin:false,feitoFli:false,dica:{},pedindo:0,lay:null,layGer:-1,telao:null,caixas:null,quiosque:null,tmr:0};
+function ms8Erro(k,e){if(MS844.erros.length<30)MS844.erros.push(k+': '+(e&&e.message||e));try{console.warn('v844',k,e);}catch(x){}}
+function ms8T(pt,en,es){try{return s567T(pt,en,es===undefined?pt:es);}catch(e){return pt;}}
+// para onde o leitor está virado, no chão
+function ms8Frente(){if(typeof MODE!=='undefined'&&MODE==='fp')return [-Math.sin(P.yaw),-Math.cos(P.yaw)];return [Math.sin(CH.dir),Math.cos(CH.dir)];}
+function ms8Alvo(g,w,h,d,x,y,z){const m=new THREE.MeshBasicMaterial({visible:false});m.userData.papelKeep=true;m.name='844 alvo';const a=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);a.position.set(x,y,z);a.userData.noCam=true;a.__fusaoMoveu=9;g.add(a);return a;}
+function ms8NoCinema(x,z){try{const C=CN838.C;return x>C.x0&&x<C.x1&&z>C.z0&&z<C.z1;}catch(e){return false;}}
+function ms8Poe(tg){setFocus(tg);try{if(MARK.visible){const a=anchorOf(FOCUS);if(a)MARK.position.copy(a);else MARK.visible=false;}}catch(e){}}
+
+/* ---------- paredes (itens em x = 1e9): o lugar de pé diante do ponto mirado ---------- */
+function ms8Ponto(it,px,pz){const nx=it.ax-it.tx,nz=it.az-it.tz,l=Math.hypot(nx,nz)||1,ux=nx/l,uz=nz/l,tx=-uz,tz=ux,s=(px-it.tx)*tx+(pz-it.tz)*tz;
+  let sx=it.ax+tx*s,sz=it.az+tz*s;try{const c=WORLD.clamp(sx,sz,.9);sx=c[0];sz=c[1];}catch(e){}return [sx,sz];}
+function ms8ItemNoPonto(it,px,pz){const [sx,sz]=ms8Ponto(it,px,pz);return Object.assign({},it,{ax:sx,az:sz,x:sx,z:sz,tx:sx+(it.tx-it.ax),tz:sz+(it.tz-it.az)});}
+function ms8AlvoParede(r,pt){const p=s567Pos(),it2=ms8ItemNoPonto(r.item,pt.x,pt.z);return Object.assign({},r,{item:it2,dist:Math.hypot(p.x-it2.ax,p.z-it2.az)});}
+
+/* ---------- as poltronas do Cinema ---------- */
+const MS8_FILAS=['A','B','C','D'];   // da frente (perto do palco) para trás
+function ms8Poltrona(xr,lado,i){const C=CN838.C,cz=(C.z0+C.z1)/2,zc=cz+lado*(.91+i*.62),fi=CN8_FILAS.length-1-CN8_FILAS.indexOf(xr),num=lado>0?6-i:7+i,fila=MS8_FILAS[fi]||'';
+  const lab=ms8T('Sentar · fila ','Sit · row ','Sentarse · fila ')+fila+ms8T(', poltrona ',', seat ',', butaca ')+num;
+  return {kind:'ms844poltrona',xr,lado,i,fila,num,x:xr+.03,z:zc,ax:xr+.92,az:zc,tx:C.x1,tz:zc,dir:Math.PI/2,label:lab,tip:lab};}
+function ms8AlvoPoltrona(S,h){const C=CN838.C,cz=(C.z0+C.z1)/2;let i=Math.round((Math.abs(h.point.z-cz)-.91)/.62);i=Math.max(0,Math.min(5,i));const s=ms8Poltrona(S.xr,S.lado,i),p=s567Pos();
+  return {kind:'salas567',item:s,obj:null,label:s.label,tip:s.tip,dist:Math.hypot(p.x-s.ax,p.z-s.az)};}
+// parado na fileira, a poltrona logo à frente
+function ms8PoltronaPerto(p){if(typeof CN838==='undefined'||!CN838.feito||!ms8NoCinema(p.x,p.z))return null;const C=CN838.C,cz=(C.z0+C.z1)/2;let best=null,bd=.9;
+  for(const xr of CN8_FILAS){if(p.x<xr+.35||p.x>xr+1.55)continue;for(const lado of [-1,1]){const d0=(p.z-cz)*lado;if(d0<.4||d0>4.6)continue;let i=Math.round((d0-.91)/.62);i=Math.max(0,Math.min(5,i));
+      const s=ms8Poltrona(xr,lado,i),d=Math.hypot(p.x-s.ax,p.z-s.az);if(d<bd){bd=d;best=s;}}}return best;}
+const MS8_SEAT_Y=.5;
+function ms8Sentado(){const s=MS844.sentado;if(s&&(!CH.sitting||!s567Ativo()||Math.hypot(CH.x-s.x,CH.z-s.z)>1.2)){MS844.sentado=null;MS844.voltaFP=false;MS844.pitch0=null;return null;}return s;}
+function ms8Senta(s){if(!s)return;if(CH.sitting)standUp();
+  MS844.sentado=s;MS844.pitch0=CAM.pitch;CH.sitting=true;CH.sitT=0;CH.seatY=MS8_SEAT_Y;CH.target=null;CH.onArrive=null;CH.vx=CH.vz=0;CH.dir=s.dir;CH.x=s.x;CH.z=s.z;
+  // a câmera vai para trás do leitor, de frente para o telão, um pouco mais baixa (a tela inteira à vista)
+  {const C=CN838.C,fx=C.x1-s.x,fz=(C.z0+C.z1)/2-s.z;CAM.yaw=Math.atan2(-fx,-fz);}CAM.pitch=Math.min(CAM.pitch,.16);if(typeof MODE!=='undefined'&&MODE==='tp')CAM.pitch=Math.max(.12,CAM.pitch);
+  try{renderGoBar();}catch(e){}MS844.stats.sentou++;}
+// sentado no cinema (Gamer e Clique), a câmera fica logo atrás e acima da cabeça, por cima do encosto, olhando para a tela; o mouse
+// (ou o arrasto) gira e inclina o olhar; levantar devolve a câmera de sempre
+const MS8_CAM={pos:new THREE.Vector3(),alvo:new THREE.Vector3(),ok:false};
+function ms8CamCinema(dt){const s=MS844.sentado;if(!s||!CH.sitting||typeof MODE==='undefined'||MODE==='fp')return;
+  const fx=-Math.sin(CAM.yaw),fz=-Math.cos(CAM.yaw),hx=CH.px,hy=1.12,hz=CH.pz,e=Math.max(-.5,Math.min(.75,.38-CAM.pitch)),k=1-Math.exp(-(dt||.016)*6);
+  const C=MS8_CAM,px=hx-fx*1.55,py=hy+.58,pz=hz-fz*1.55,ax=hx+fx*8*Math.cos(e),ay=hy+8*Math.sin(e),az=hz+fz*8*Math.cos(e);
+  if(!C.ok){C.pos.copy(camera.position);C.alvo.set(ax,ay,az);C.ok=true;}
+  C.pos.x+=(px-C.pos.x)*k;C.pos.y+=(py-C.pos.y)*k;C.pos.z+=(pz-C.pos.z)*k;C.alvo.x+=(ax-C.alvo.x)*k;C.alvo.y+=(ay-C.alvo.y)*k;C.alvo.z+=(az-C.alvo.z)*k;
+  camera.position.copy(C.pos);camera.lookAt(C.alvo);}
+function ms8UsaPoltrona(s){
+  // na 1.ª pessoa, como nas poltronas da nave da Ficção: senta já (a câmera passa para trás do leitor) e volta à 1.ª pessoa ao levantar
+  if(typeof MODE!=='undefined'&&MODE==='fp'){try{setMode('gm');}catch(e){}MS844.voltaFP=true;ms8Senta(s);return;}
+  MS844.voltaFP=false;const p=s567Pos();if(Math.hypot(p.x-s.ax,p.z-s.az)<=.7)ms8Senta(s);else walkTo(s.ax,s.az,()=>ms8Senta(s));}
+
+/* ---------- o telão ---------- */
+function ms8FilmeTela(){try{const L=cn8TelaFilmes();if(!L.length)return null;return L[((CN838.telaI%L.length)+L.length)%L.length]||null;}catch(e){return null;}}
+function ms8TelaoLabel(){const f=ms8FilmeTela();return f?ms8T('Em cartaz: ','Now showing: ','En cartelera: ')+f.titulo+' · '+ms8T('ver a ficha','see details','ver la ficha'):ms8T('Telão · adicionar um filme','Screen · add a movie','Pantalla · añadir una película');}
+function ms8AlvoTelao(){const it=MS844.telao;if(!it)return null;const p=s567Pos();
+  return {kind:'salas567',item:it,obj:it.g,label:ms8TelaoLabel(),tip:ms8TelaoLabel(),dist:ms8NoCinema(p.x,p.z)?.5:Math.hypot(p.x-it.x,p.z-it.z)};}
+function ms8UsaTelao(){const f=ms8FilmeTela();try{if(f)cn8UIAbre('vistos',f.id);else cn8UIAbre('novo');}catch(e){ms8Erro('telão',e);}}
+
+/* ---------- as paredes de cartazes (por estilo), de medalhas e de troféus, de frente ---------- */
+function ms8Lay(){try{const g=CN838.cart&&CN838.cart.ger;if(MS844.lay&&MS844.layGer===g)return MS844.lay;MS844.lay=cn8Layout();MS844.layGer=g;return MS844.lay;}catch(e){return null;}}
+function ms8Secao(P,nf,px){const off=(P.nc-P.usadas)/2;let best=null,bd=1.0;
+  for(const s of P.secs){const nc=Math.ceil(((s.L&&s.L.length)||0)/Math.max(1,nf));if(!nc)continue;const c0=s.c0+off,c1=c0+nc-1;
+    const xa=P.dir<0?P.x1-(c1+1)*CN8_PASSO:P.x0+c0*CN8_PASSO,xb=P.dir<0?P.x1-c0*CN8_PASSO:P.x0+(c1+1)*CN8_PASSO;const d=px<xa?xa-px:(px>xb?px-xb:0);if(d<bd){bd=d;best={s,xa,xb};}}
+  if(!best)return null;const k=best.s.k,n=best.s.L.length,p=s567Pos(),zs=P.zw+P.dir*1.15,xs=Math.max(best.xa+.3,Math.min(best.xb-.3,px));
+  const lab=ms8T('Cartazes · ','Posters · ','Carteles · ')+cn8GenNome(k)+' ('+n+')';
+  return {kind:'salas567',item:{kind:'ms844genero',k,x:xs,z:zs,ax:xs,az:zs,tx:xs,tz:P.zw},obj:null,label:lab,tip:lab,dist:Math.hypot(p.x-xs,p.z-zs)};}
+function ms8ParedePerto(p){const f=ms8Frente();
+  try{if(typeof CN838!=='undefined'&&CN838.feito&&ms8NoCinema(p.x,p.z)){const L=ms8Lay();if(L&&L.par)for(const P of L.par){if(Math.abs(P.zw-p.z)>2.3||(-P.dir)*f[1]<.35)continue;const sec=ms8Secao(P,L.nf,p.x);if(sec)return sec;}}}catch(e){ms8Erro('cartazes',e);}
+  try{if(typeof ES840!=='undefined'&&ES840.feito){const C=ES840.C;if(p.x>C.x0&&p.x<C.x1&&p.z>C.z0&&p.z<C.z1){
+      const mk=it=>{const it2=ms8ItemNoPonto(it,p.x,p.z);return {kind:'salas567',item:it2,obj:it.g,label:it.label,tip:it.tip,dist:Math.hypot(p.x-it2.ax,p.z-it2.az)};};
+      if(ES840.itemMed&&C.z1-p.z<2.3&&f[1]>.35&&p.x>ES8_MED.x0-.4&&p.x<ES8_MED.x1+.4)return mk(ES840.itemMed);
+      if(ES840.itemTro&&C.x1-p.x<2.3&&f[0]>.35&&p.z>ES8_TRO.z0-.4&&p.z<ES8_TRO.z1+.4)return mk(ES840.itemTro);}}}catch(e){ms8Erro('paredes',e);}
+  return null;}
+function ms8FilmesGenero(k){try{const S=typeof CL842!=='undefined'&&CL842.P&&CL842.P.filmes;if(S&&cl8FilmesAbre(S,'vistos')){S.st.cat=k;S.st.q='';S.st.pag=0;cl8Render(S);return;}}catch(e){ms8Erro('estilo',e);}try{cn8UIAbre('vistos');}catch(e){}}
+
+/* ---------- o foco: sentado, longe × perto, e os novos «perto» ---------- */
+function ms8Perto(p){const s=ms8PoltronaPerto(p);if(s)return {kind:'salas567',item:s,obj:null,label:s.label,tip:s.tip,dist:Math.hypot(p.x-s.ax,p.z-s.az)};
+  try{const n=s567Near();if(n)return n;}catch(e){}return ms8ParedePerto(p);}
+function ms8Foco(){if(!MS844.on||!s567Ativo()||uiBlocked())return;const p=s567Pos();if(p.x<13.2)return;
+  if(ms8Sentado()){const tel=FOCUS&&FOCUS.kind==='salas567'&&FOCUS.item&&FOCUS.item.kind==='ms844telao'&&!FOCUS.far;if(!tel&&!(FOCUS&&FOCUS.kind==='stand'))ms8Poe({kind:'stand',label:ms8T('Levantar','Stand up','Levantarse')});return;}
+  // na fileira, a poltrona diante da qual o leitor está vale mais que a da fila da frente (para onde a mira aponta quando ele olha a tela)
+  if(FOCUS&&!FOCUS.far&&FOCUS.kind==='salas567'&&FOCUS.item&&FOCUS.item.kind==='ms844poltrona'){const ns=ms8PoltronaPerto(p),fi=FOCUS.item;
+    if(ns&&(ns.xr!==fi.xr||ns.lado!==fi.lado||ns.i!==fi.i))ms8Poe({kind:'salas567',item:ns,obj:null,label:ns.label,tip:ns.tip,dist:Math.hypot(p.x-ns.ax,p.z-ns.az)});return;}
+  if(FOCUS&&!FOCUS.far)return;const n=ms8Perto(p);if(n)ms8Poe(n);}
+
+/* ---------- o Fliperama: as máquinas abrem o painel dos jogos; o quiosque também na entrada; letreiros de duas faces; o aviso ---------- */
+// [x, z, largura x, altura, fundo z, x e z de quem usa (diante da máquina)]
+const MS8_MAQ=(()=>{const L=[];
+  for(const x of [16.25,17.9,19.55,21.2,22.85,24.5])L.push([x,-22.0,.82,1.95,.8,x,-20.95]);               // as seis de pé da parede do fundo
+  for(const z of [-10.6,-8.9])L.push([15.08,z,.8,1.95,.82,16.15,z]);                                     // as duas da parede da entrada
+  for(const x of [18.1,19.75,21.4,23.05]){L.push([x,-10.08,.82,1.95,.8,x,-9.0]);L.push([x,-11.14,.82,1.95,.8,x,-12.22]);} // a ilha (costas com costas)
+  L.push([21.4,2.75,.78,1.4,1.45,21.4,1.45],[23.0,2.75,.78,1.4,1.45,23.0,1.45]);                            // os dois pinballs
+  L.push([25.7,2.95,1.05,2.1,1.05,25.7,1.75]);                                                            // a garra
+  L.push([21.0,-6.0,2.3,1.0,1.25,21.0,-7.25]);                                                            // o hóquei de mesa
+  L.push([24.35,-5.85,1.0,1.6,1.6,24.35,-4.55],[25.5,-5.85,1.0,1.6,1.6,25.5,-4.55]);                        // as duas de corrida
+  L.push([25.0,-0.75,1.6,2.2,1.7,26.35,-0.75]);                                                           // a de dança
+  L.push([27.0,-10.55,1.0,1.5,3.8,27.0,-8.1],[28.25,-10.55,1.0,1.5,3.8,28.25,-8.1]);                        // skee-ball
+  L.push([27.0,-17.95,1.0,2.6,2.6,27.0,-16.1],[28.25,-17.95,1.0,2.6,2.6,28.25,-16.1]);                      // cestas
+  return L;})();
+const MS8_QE={x:16.35,z:-6.1,ry:-.64};   // o quiosque da entrada, virado para quem chega pela passagem
+function ms8QuiosqueEntrada(R){const T=THREE,sc=R.scene,W=R.world,it0=(S567.itens||[]).find(i=>i.kind==='quiosque');if(!it0||!it0.g)return false;
+  const Q=MS8_QE,ry0=it0.g.rotation.y,M=new T.Matrix4().makeTranslation(Q.x,0,Q.z).multiply(new T.Matrix4().makeRotationY(Q.ry-ry0)).multiply(new T.Matrix4().makeTranslation(-it0.x,0,-it0.z));
+  const pref=(typeof QI603!=='undefined'&&QI603.on&&QI603.feito)?/^603 quiosque/:/^567 quiosque/,lista=[];sc.traverse(o=>{if(o.isMesh&&pref.test(o.name||''))lista.push(o);});
+  const g=new T.Group();g.name='844 quiosque da entrada';sc.add(g);let n=0;
+  for(const o of lista){try{o.updateWorldMatrix(true,false);const c=o.clone();c.matrixAutoUpdate=false;c.matrix.copy(M).multiply(o.matrixWorld);c.matrixWorldNeedsUpdate=true;c.visible=true;c.__fusaoMoveu=9;c.userData.noCam=true;c.userData.ms844=true;c.raycast=()=>{};g.add(c);n++;}catch(e){ms8Erro('quiosque peça',e);}}
+  // a tela (o grupo do item: a mesma tela e o mesmo material do quiosque do fundo) e o alvo do totem inteiro
+  const gt=it0.g.clone(true);gt.name='844 quiosque da entrada · tela';gt.position.set(Q.x,0,Q.z);gt.rotation.y=Q.ry;gt.traverse(o=>{o.userData.ms844=true;o.userData.noCam=true;o.__fusaoMoveu=9;});sc.add(gt);ms8Alvo(gt,.8,1.9,.6,0,.95,0);
+  try{s567Halo(sc,0xff3ac8,1.2,.25,Q.x,.2,Q.z);}catch(e){}
+  const it={kind:'quiosque',x:Q.x,z:Q.z,g:gt,ax:Q.x+Math.sin(Q.ry)*.95,az:Q.z+Math.cos(Q.ry)*.95,tx:Q.x,tz:Q.z,label:s567T('Seus jogos · adicionar','Your games · add'),tip:s567T('Jogos','Games')};S567.itens.push(it);
+  try{W.obst.push([Q.x,Q.z,.42]);if(Array.isArray(S567.obst))S567.obst.push([Q.x,Q.z,.42]);W.__nav=null;W.__cl=null;}catch(e){}
+  // o letreiro de néon em cima (a placa da v580: cabos até o teto e o halo)
+  try{s580Placa(sc,ms8T('SEUS JOGOS +','YOUR GAMES +','TUS JUEGOS +'),'#ff3ac8','#3af0ff',Q.x+Math.sin(Q.ry)*.05,2.75,Q.z+Math.cos(Q.ry)*.05,Q.ry,2.3);}catch(e){ms8Erro('letreiro',e);}
+  MS844.quiosque={pecas:n,item:it};return true;}
+// as placas penduradas da v580 eram um plano de duas faces: de trás o néon aparecia espelhado; agora cada uma tem a frente e o verso
+function ms8PlacasDuasFaces(sc){const L=[];sc.traverse(o=>{if(o.isMesh&&o.userData&&o.userData.s580&&!o.userData.ms844verso&&o.material&&o.material.side===THREE.DoubleSide&&/placa n[eé]on/i.test(o.material.name||''))L.push(o);});
+  for(const o of L){try{o.material.side=THREE.FrontSide;o.material.needsUpdate=true;const v=o.clone();v.rotation.y=o.rotation.y+Math.PI;v.userData.ms844verso=true;o.userData.ms844verso=true;o.parent.add(v);}catch(e){ms8Erro('placa',e);}}
+  MS844.stats.placas+=L.length;}
+function ms8MontaFliperama(R){const T=THREE,sc=R.scene;let n=0;
+  for(const m of MS8_MAQ){const [x,z,sx,sy,sz,ax,az]=m;const g=new T.Group();g.name='844 máquina · alvo';sc.add(g);ms8Alvo(g,sx,sy,sz,x,sy/2,z);
+    S567.itens.push({kind:'ms844maquina',x,z,g,ax,az,tx:x,tz:z,label:ms8T('Seus jogos · abrir','Your games · open','Tus juegos · abrir'),tip:ms8T('Seus jogos','Your games','Tus juegos')});n++;}
+  MS844.stats.maquinas=n;
+  try{ms8QuiosqueEntrada(R);}catch(e){ms8Erro('quiosque',e);}
+  try{ms8PlacasDuasFaces(sc);}catch(e){ms8Erro('placas',e);}}
+function ms8FliPronto(){const ok=(o)=>typeof o==='undefined'||!o.on||o.feito;let q=true,a=true,s=true;try{q=ok(QI603);}catch(e){}try{a=ok(FA638);}catch(e){}try{s=ok(S580);}catch(e){}return q&&a&&s;}
+// o aviso da primeira entrada no Fliperama (uma vez por partida; não aparece se o painel dos jogos já foi aberto)
+function ms8Dica(){if(!MS844.on||MS844.dica.fli||S567.aqui!=='fli'||!s567Ativo())return;MS844.dica.fli=true;
+  try{const J=typeof CL842!=='undefined'&&CL842.P&&CL842.P.jogos;if(J&&J.vezes)return;}catch(e){}
+  const toque=typeof VJ!=='undefined'&&VJ.touch,clique=typeof MODE!=='undefined'&&MODE==='tp';let t;
+  if(toque)t=ms8T('🎮 Fliperama: chegue perto do quiosque «Seus jogos», logo aqui na entrada, ou de qualquer máquina e toque no botão E para abrir e adicionar os jogos que você jogou',
+    '🎮 Arcade: walk up to the «Your games» kiosk, right here by the entrance, or to any machine and tap the E button to open and add the games you have played',
+    '🎮 Arcade: acércate al quiosco «Tus juegos», aquí en la entrada, o a cualquier máquina y toca el botón E para abrir y añadir los juegos que has jugado');
+  else if(clique)t=ms8T('🎮 Fliperama: clique no quiosque «Seus jogos», logo aqui na entrada, ou em qualquer máquina para abrir e adicionar os jogos que você jogou',
+    '🎮 Arcade: click the «Your games» kiosk, right here by the entrance, or any machine to open and add the games you have played',
+    '🎮 Arcade: haz clic en el quiosco «Tus juegos», aquí en la entrada, o en cualquier máquina para abrir y añadir los juegos que has jugado');
+  else t=ms8T('🎮 Fliperama: aperte E no quiosque «Seus jogos», logo aqui na entrada, ou em qualquer máquina para abrir e adicionar os jogos que você jogou',
+    '🎮 Arcade: press E at the «Your games» kiosk, right here by the entrance, or at any machine to open and add the games you have played',
+    '🎮 Arcade: pulsa E en el quiosco «Tus juegos», aquí en la entrada, o en cualquier máquina para abrir y añadir los juegos que has jugado');
+  try{showToast(t,{ms:8000});MS844.stats.dicas++;}catch(e){ms8Erro('aviso',e);}}
+
+/* ---------- o Cinema: alvos das poltronas e do telão; caixas retas no palco e nos blocos de poltronas ---------- */
+function ms8Caixas(){const C=CN838.C,cz=(C.z0+C.z1)/2,B=[];
+  for(const xr of CN8_FILAS)for(const lado of [-1,1]){const a=cz+lado*.51,b=cz+lado*4.41;B.push([xr-.42,xr+.42,Math.min(a,b),Math.max(a,b)]);}
+  B.push([C.x1-1.2-.25,C.x1+.5,cz-5.85,cz+5.85]);   // a frente do palco: o leitor para 25 cm antes da borda
+  return B;}
+function ms8Clamp(W){if(!W||W.__ms844)return;W.__ms844=true;const B=ms8Caixas();MS844.caixas=B;const c0=W.clamp;
+  W.clamp=function(x,z,m){const r=c0.apply(this,arguments);if(!MS844.on||!r)return r;let px=r[0],pz=r[1];if(px<14||px>32||pz>-22||pz<-40)return r;
+    // sentado: o lugar da poltrona fica dentro da caixa do bloco e é válido (senão o resgate do jardim, v422, tiraria o leitor dela)
+    const st=MS844.sentado;if(st&&CH.sitting&&Math.abs(px-st.x)<.06&&Math.abs(pz-st.z)<.06)return r;
+    for(const b of B){if(px>b[0]&&px<b[1]&&pz>b[2]&&pz<b[3]){const dl=px-b[0],dr=b[1]-px,dd=pz-b[2],du=b[3]-pz,mn=Math.min(dl,dr,dd,du);
+        if(mn===dl)px=b[0];else if(mn===dr)px=b[1];else if(mn===dd)pz=b[2];else pz=b[3];return [px,pz];}}return r;};
+  W.__nav=null;W.__cl=null;MS844.stats.caixas=B.length;}
+function ms8MontaCinema(R){const T=THREE,C=CN838.C,cz=(C.z0+C.z1)/2;
+  const g=new T.Group();g.name='844 poltronas · alvo';CN838.g.add(g);
+  for(const xr of CN8_FILAS)for(const lado of [-1,1]){const a=ms8Alvo(g,.72,1.3,3.7,xr,.65,cz+lado*2.46);a.userData.ms844seat={xr,lado};}
+  S567.itens.push({kind:'ms844poltronas',x:1e9,z:1e9,g,ax:1e9,az:1e9,label:'',tip:''});
+  const S=CN8_TELA,gt=new T.Group();gt.name='844 telão · alvo';gt.position.set(C.x1-.12,0,cz);CN838.g.add(gt);const at=ms8Alvo(gt,.1,S.h,S.w,0,S.y0+S.h/2,0);at.userData.ms844telao=true;
+  const it={kind:'ms844telao',x:C.x1-1.6,z:cz,g:gt,ax:C.x1-2.2,az:cz,tx:C.x1,tz:cz};Object.defineProperty(it,'label',{get:ms8TelaoLabel,enumerable:true});Object.defineProperty(it,'tip',{get:ms8TelaoLabel,enumerable:true});
+  S567.itens.push(it);MS844.telao=it;
+  if(R.world&&R.world.__cn838)ms8Clamp(R.world);}
+function ms8Monta(){if(!MS844.on)return;const R=typeof ROOMS!=='undefined'?ROOMS.pessoal:null;if(!R||!R.scene||!R.world)return;
+  if(!MS844.feitoCin&&typeof CN838!=='undefined'&&CN838.feito&&CN838.g){MS844.feitoCin=true;try{ms8MontaCinema(R);}catch(e){ms8Erro('cinema',e);}}
+  if(!MS844.feitoFli&&typeof S567!=='undefined'&&S567.feito&&S567.R===R&&ms8FliPronto()){MS844.feitoFli=true;try{ms8MontaFliperama(R);}catch(e){ms8Erro('fliperama',e);}}}
+
+/* ---------- o mouse preso de novo ao fechar no × (modos Gamer e 1.ª pessoa) ---------- */
+function ms8Prende(){try{if(!MS844.on||typeof MODE==='undefined'||MODE==='tp'||locked||!lockOK)return;if(typeof VJ!=='undefined'&&VJ.touch)return;
+  if(typeof cl8Aberto==='function'&&cl8Aberto())return;const est=document.getElementById('est');if(est&&!est.hidden)return;if(uiBlocked())return;
+  MS844.pedindo=performance.now();const r=cv.requestPointerLock();MS844.stats.prendeu++;if(r&&r.catch)r.catch(()=>{});}catch(e){}}
+
+/* ---------- ligar ---------- */
+if(MS844.on&&typeof S567!=='undefined'&&S567.on){
+  // a mira: poltronas, telão e o ponto certo nas paredes
+  try{const al0=s567Alvo;s567Alvo=function(h){try{const o=h&&h.object,u=o&&o.userData;if(u&&u.ms844seat)return ms8AlvoPoltrona(u.ms844seat,h);if(u&&u.ms844telao)return ms8AlvoTelao();}catch(e){ms8Erro('mira',e);}
+      const r=al0.apply(this,arguments);try{if(r&&r.kind==='salas567'&&r.item&&r.item.x>=1e8&&r.item.ax<1e8&&r.item.tx!==undefined&&h&&h.point)return ms8AlvoParede(r,h.point);}catch(e){ms8Erro('parede',e);}return r;};}catch(e){ms8Erro('s567Alvo',e);}
+  // o «usar» dos itens novos
+  try{const u0=s567Usa;s567Usa=function(it){const k=it&&it.kind;if(typeof k==='string'&&k.indexOf('ms844')===0){try{
+        if(k!=='ms844poltrona'&&typeof MODE!=='undefined'&&MODE!=='fp'&&CH&&!CH.sitting)CH.dir=Math.atan2((it.tx!==undefined?it.tx:it.x)-CH.x,(it.tz!==undefined?it.tz:it.z)-CH.z);
+        if(k==='ms844poltrona')ms8UsaPoltrona(it);else if(k==='ms844telao')ms8UsaTelao();else if(k==='ms844maquina')s567UIAbre();else if(k==='ms844genero')ms8FilmesGenero(it.k);MS844.stats.usos++;}catch(e){ms8Erro('usar',e);}return;}
+      return u0.apply(this,arguments);};}catch(e){ms8Erro('s567Usa',e);}
+  // o foco (depois de todos: o da v567, o do cinema e o dos esportes)
+  try{const uf0=updateFocus;updateFocus=function(){uf0.apply(this,arguments);try{ms8Foco();}catch(e){ms8Erro('foco',e);}};}catch(e){ms8Erro('updateFocus',e);}
+  // levantar da poltrona: na frente dela; volta à 1.ª pessoa se foi de lá que sentou; o ângulo da câmera de antes
+  try{const st0=standUp;standUp=function(){const s=ms8Sentado();if(!s)return st0.apply(this,arguments);MS844.sentado=null;const vf=MS844.voltaFP;MS844.voltaFP=false;const r=st0.apply(this,arguments);
+      CH.x=CH.px=s.ax;CH.z=CH.pz=s.az;CH.vx=CH.vz=0;if(MS844.pitch0!==null){CAM.pitch=MS844.pitch0;MS844.pitch0=null;}MS844.stats.levantou++;if(vf){try{setMode('fp');}catch(e){}}return r;};}catch(e){ms8Erro('standUp',e);}
+  // o «Levantar» do jogo leva até a frente da poltrona de leitura: no cinema, só levanta
+  try{const a0=act;act=function(t){if(t&&t.kind==='stand'&&ms8Sentado()){standUp();return;}return a0.apply(this,arguments);};}catch(e){ms8Erro('act',e);}
+  // andar para outro lugar sentado no cinema: levanta antes (sem o desvio até a poltrona de leitura)
+  try{const w0=walkTo;walkTo=function(){if(ms8Sentado()){try{standUp();}catch(e){}}return w0.apply(this,arguments);};}catch(e){ms8Erro('walkTo',e);}
+  // sentado no cinema, a câmera de quem assiste
+  try{const c0=camTP;camTP=function(dt){const r=c0.apply(this,arguments);try{if(MS844.sentado&&CH.sitting)ms8CamCinema(dt);else MS8_CAM.ok=false;}catch(e){ms8Erro('câmera',e);}return r;};}catch(e){ms8Erro('camTP',e);}
+  // sentado no cinema, sem o livro aberto no colo
+  try{const p0=poseReader;poseReader=function(){const r=p0.apply(this,arguments);try{if(MS844.sentado&&CH.sitting)LIVRO_COLO.visible=false;}catch(e){}return r;};}catch(e){ms8Erro('poseReader',e);}
+  // o aviso do Fliperama
+  try{const t0=s567Tick;s567Tick=function(){const r=t0.apply(this,arguments);try{ms8Dica();}catch(e){ms8Erro('dica',e);}return r;};}catch(e){ms8Erro('s567Tick',e);}
+  // as caixas retas do cinema entram junto com o andar do cinema
+  try{if(typeof cn8Andar==='function'){const ca0=cn8Andar;cn8Andar=function(R){const r=ca0.apply(this,arguments);try{if(R&&R.world&&R.world.__cn838)ms8Clamp(R.world);}catch(e){ms8Erro('caixas',e);}return r;};}}catch(e){ms8Erro('cn8Andar',e);}
+  // o × dos painéis e da Estante
+  document.addEventListener('click',e=>{try{const b=e.target&&e.target.closest&&e.target.closest('button.e7-x,#estFechar');if(!b||b.closest('.e7-modal'))return;setTimeout(ms8Prende,0);}catch(x){}},true);
+  // se o navegador recusar (raro), o jogo não desliga o mouse preso por isso
+  window.addEventListener('pointerlockerror',e=>{if(MS844.pedindo&&performance.now()-MS844.pedindo<1500){MS844.pedindo=0;MS844.stats.recusas++;try{e.stopImmediatePropagation();}catch(x){}}},true);
+  document.addEventListener('pointerlockchange',()=>{if(MS844.pedindo&&document.pointerLockElement)MS844.pedindo=0;});
+  MS844.tmr=setInterval(()=>{try{ms8Monta();if(MS844.feitoCin&&MS844.feitoFli){clearInterval(MS844.tmr);MS844.tmr=0;}}catch(e){ms8Erro('montar',e);}},500);
+}else if(MS844.on){MS844.on=false;ms8Erro('ligar','sem a v567');}
+window.__mecanicas844={estado:MS844,stats:MS844.stats,erros:MS844.erros,maquinas:MS8_MAQ,caixas:()=>MS844.caixas,
+  senta:(fila,num)=>{const fi=MS8_FILAS.indexOf(fila);if(fi<0)return false;const xr=CN8_FILAS[CN8_FILAS.length-1-fi];const lado=num<=6?1:-1,i=num<=6?6-num:num-7;const s=ms8Poltrona(xr,lado,i);ms8UsaPoltrona(s);return s;},
+  levanta:()=>{if(ms8Sentado()){standUp();return true;}return false;},sentado:()=>ms8Sentado(),filme:()=>{const f=ms8FilmeTela();return f?f.titulo:null;},perto:()=>{try{return ms8Perto(s567Pos());}catch(e){return null;}},monta:ms8Monta};
 
 window.__build434={revision:434,family:"web",edition:"en"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
