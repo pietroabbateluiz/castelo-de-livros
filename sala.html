@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v838</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v839</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -110302,6 +110302,186 @@ window.__cinema838={estado:CN838,stats:CN838.stats,erros:CN838.erros,abrir:(aba,
   adiciona:f=>{const n=cn8Adiciona(f);if(n)cn8Salva();return n;},apaga:id=>{const D=cn8Dados(),i=D.filmes.findIndex(q=>q.id===id);if(i<0)return false;D.filmes.splice(i,1);cn8Salva();return true;},
   busca:q=>cn8Busca(q),wikidata:q=>cn8Wikidata(q),dentro:cn8Dentro,layout:()=>{const L=cn8Layout();return {fora:L.fora,paredes:L.par.map(p=>({id:p.id,nc:p.nc,usadas:p.usadas,secs:p.secs.map(s=>[s.k,s.L.length,s.total])}))};},
   ir:(x,z)=>{const X=[x!==undefined?x:17.6,z!==undefined?z:-27.2];CH.x=X[0];CH.z=X[1];if(CH.px!==undefined){CH.px=X[0];CH.pz=X[1];}return X;},generos:()=>CN8_GEN.map(g=>g[0])};
+
+/* ===================== v839 · O MENU DOS FILMES NA MESMA TOADA DO MENU DOS LIVROS (bloco `ME839`) =====================
+   Pedido do Luiz (17/11): «Depois deixe o menu dos filmes na mesma toada do menu de livros».
+   O painel do Cinema (v838) era uma janela no meio da tela, com abas. Agora é a mesma gaveta da Estante, à direita, com as mesmas
+   peças e classes dela (`.est`, `.prat`, `.tools`, `.lista`/`.livro`/`.cv`/`.inf`/`.meta`/`.pill`/`.st`, `.editor`, `.nota`,
+   `.acts`, `.sug`/`.sugI`, `.sugDica`, `.capaRow`, `.rodape`, `.vazio`):
+   · cabeçalho «🎬 Meus Filmes» com as contas (filmes · vistos · na lista) e o ×;
+   · prateleiras: Todos · Assisti · Quero assistir · Ranking (os vistos com nota, da maior para a menor, com 🥇🥈🥉 e o número);
+   · busca pelo título e «+ Filme»; logo abaixo, Estilo (todos ou um, com a conta) e Ordem (mais recentes, maior nota, título, ano);
+   · a lista em linhas como as dos livros: pôster (ou capa desenhada na cor do estilo), título, ano e estilos, a etiqueta da
+     prateleira (Assisti em verde, Quero assistir em bege), as estrelas (meia estrela vira «½») e a data em que viu;
+   · clicar num filme abre o editor embaixo da lista, como o do livro: Título, Ano, Prateleira, Estilo e Segundo estilo, Nota (as
+     cinco estrelas do livro; a metade esquerda de uma estrela dá meia), Visto em, Pôster (URL, com a miniatura), Resenha; Salvar,
+     🔎 Buscar dados (Wikipédia; as sugestões aparecem como as do livro e os estilos vêm do Wikidata), Cancelar e Excluir (com
+     segundo clique para confirmar); «+ Filme» abre o editor vazio;
+   · rodapé contando onde os filmes aparecem no Cinema.
+   O que abre o painel na sala continua igual (bilheteria → Assisti, ou o editor se ainda não há filmes; TOP 10 → Ranking;
+   EM BREVE → Quero assistir; cartaz → o filme no editor). Os dados, a busca e o Cinema são os da v838.
+   Chave: `?menu839=0` (volta a janela da v838). Gancho `window.__menu839`. */
+const ME839={on:!/[?&#]menu839=0/i.test(location.search+location.hash),prat:'todos',gen:'',ordem:'recentes',busca:'',ed:null,nota:0,sug:null,erros:[]};
+function me9Erro(k,e){if(ME839.erros.length<30)ME839.erros.push(k+': '+(e&&e.message||e));try{console.warn('v839',k,e);}catch(x){}}
+function me9Estrelas(n){n=Math.max(0,Math.min(10,n|0));const c=Math.floor(n/2),m=n%2;return '<span class="st">'+'★'.repeat(c)+(m?'½':'')+'<i>'+'★'.repeat(5-c-m)+'</i></span>';}
+function me9Capa(f){const cor=cn8GenCor(f.generos&&f.generos[0]),bg='linear-gradient('+cor+',#140c0c)';
+  if(f.poster)return '<img class="cv" src="'+cn8Esc(f.poster)+'" alt="'+cn8Esc(f.titulo)+'" loading="lazy" decoding="async" referrerpolicy="no-referrer" data-bg="'+cn8Esc(bg)+'">';
+  return '<div class="cv gen" style="background:'+bg+'"><b>'+cn8Esc(f.titulo)+'</b></div>';}
+function me9Css(){if(document.getElementById('me839css'))return;const st=document.createElement('style');st.id='me839css';
+  st.textContent='.me839 .me9fil{display:flex;gap:8px}.me839 .me9fil label{flex:1;display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}'+
+    '.me839 .me9fil select{background:rgba(0,0,0,.3);border:1px solid var(--line);color:var(--ink);font:inherit;font-size:13px;padding:6px 8px;border-radius:2px;text-transform:none;letter-spacing:0;min-width:0}'+
+    '.me839 .livro .me9rk{flex:none;width:26px;text-align:center;color:var(--gold2);font-size:15px;font-variant-numeric:tabular-nums}.me839 .inf small.me9g{white-space:normal}'+
+    '.me839 .nota button.meia{background:linear-gradient(90deg,var(--gold2) 50%,var(--ink3) 50%);-webkit-background-clip:text;background-clip:text;color:transparent}'+
+    '.me839 .nota small{align-self:center;margin-left:6px;font-size:11px;color:var(--ink3);text-transform:none;letter-spacing:0}.me839 .me9vis[hidden]{display:none!important}'+
+    '.me839 #me9prev{width:34px;height:50px;object-fit:cover;border:1px solid var(--line);flex:none}.me839 .me9lab{display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}.me839 .acts .btn.danger.conf{background:rgba(160,48,64,.35);color:#ffd0c8}.me839 .editor h3{display:flex;gap:8px;align-items:baseline}';
+  document.head.appendChild(st);}
+function me9Cria(){if(CN838.ui&&CN838.ui.classList.contains('me839'))return CN838.ui;me9Css();const T=cn8T;
+  const a=document.createElement('aside');a.className='est me839';a.id='filmes838';a.hidden=true;a.setAttribute('aria-label',T('Meus filmes','My movies','Mis películas'));a.setAttribute('translate','no');
+  a.innerHTML='<header><h2>🎬 '+T('Meus Filmes','My Movies','Mis Películas')+'</h2><div class="stats"><span><b id="me9n">0</b> '+T('filmes','movies','películas')+'</span><span><b id="me9v">0</b> '+T('vistos','watched','vistas')+'</span><span><b id="me9q">0</b> '+T('na lista','on the list','en la lista')+'</span></div><button class="x" id="me9x" type="button" aria-label="'+T('Fechar','Close','Cerrar')+'">×</button></header>'+
+    '<nav class="prat" id="me9prat" aria-label="'+T('Prateleiras','Shelves','Estantes')+'"></nav>'+
+    '<div class="tools"><input id="me9busca" type="search" placeholder="'+T('buscar título','search title','buscar título')+'" aria-label="'+T('Buscar','Search','Buscar')+'"><button id="me9novo" type="button">+ '+T('Filme','Movie','Película')+'</button></div>'+
+    '<div class="me9fil"><label>'+T('Estilo','Genre','Estilo')+'<select id="me9gen"></select></label><label>'+T('Ordem','Order','Orden')+'<select id="me9ord"><option value="recentes">'+T('Mais recentes','Most recent','Más recientes')+'</option><option value="nota">'+T('Maior nota','Highest rated','Mejor nota')+'</option><option value="titulo">'+T('Título','Title','Título')+'</option><option value="ano">'+T('Ano','Year','Año')+'</option></select></label></div>'+
+    '<div class="lista" id="me9lista"></div>'+
+    '<form class="editor" id="me9ed" hidden autocomplete="off"><h3 id="me9edT"></h3>'+
+      '<label class="w">'+T('Título','Title','Título')+'<input id="me9tit" maxlength="120"></label>'+
+      '<label>'+T('Ano','Year','Año')+'<input id="me9ano" inputmode="numeric" maxlength="4" placeholder="'+T('ex.: 1999','e.g. 1999','ej.: 1999')+'"></label>'+
+      '<label>'+T('Prateleira','Shelf','Estante')+'<select id="me9st"><option value="visto">'+T('Assisti','Watched','Vista')+'</option><option value="quero">'+T('Quero assistir','Want to watch','Quiero ver')+'</option></select></label>'+
+      '<div class="sug" id="me9sug"></div><p class="sugDica" id="me9dica" hidden></p>'+
+      '<label>'+T('Estilo','Genre','Estilo')+'<select id="me9g1"></select></label><label>'+T('Segundo estilo','Second genre','Segundo estilo')+'<select id="me9g2"></select></label>'+
+      '<div class="me9vis me9lab">'+T('Nota','Rating','Nota')+'<div class="nota" id="me9nota" role="group" aria-label="'+T('Nota','Rating','Nota')+'" tabindex="0"></div></div>'+
+      '<label class="me9vis">'+T('Visto em','Watched on','Vista el')+'<input id="me9data" type="date" style="color-scheme:dark"></label>'+
+      '<label class="w">'+T('Pôster (URL)','Poster (URL)','Póster (URL)')+'<span class="capaRow"><input id="me9pos" placeholder="https://…"><img id="me9prev" alt="" hidden></span></label>'+
+      '<label class="w">'+T('Resenha','Review','Reseña')+'<textarea id="me9res" rows="4" maxlength="6000"></textarea></label>'+
+      '<div class="acts"><button class="btn pri" type="submit">'+T('Salvar','Save','Guardar')+'</button><button class="btn" type="button" id="me9buscar" title="'+T('Busca o título na Wikipédia: pôster, ano e estilos','Searches Wikipedia for the title: poster, year and genres','Busca el título en Wikipedia: póster, año y estilos')+'">🔎 '+T('Buscar dados','Look up','Buscar datos')+'</button><button class="btn" type="button" id="me9cancelar">'+T('Cancelar','Cancel','Cancelar')+'</button><button class="btn danger" type="button" id="me9excluir" hidden>'+T('Excluir','Delete','Borrar')+'</button></div></form>'+
+    '<p class="rodape">'+T('No Cinema da Minha Sala, os filmes que você viu viram cartazes nas paredes, separados por estilo; o telão passa um de cada vez, o TOP 10 mostra as melhores notas e o EM BREVE, a lista do quero assistir. Clique num cartaz (ou mire nele e aperte E) para abri-lo aqui.',
+      'In the Cinema in My Room, the movies you have seen become posters on the walls, grouped by genre; the screen shows one at a time, the TOP 10 shows the best ratings and COMING SOON your watchlist. Click a poster (or aim at it and press E) to open it here.',
+      'En el Cine de Mi Sala, las películas que viste se vuelven carteles en las paredes, separados por estilo; la pantalla pasa una a la vez, el TOP 10 muestra las mejores notas y PRÓXIMAMENTE tu lista de quiero ver. Haz clic en un cartel (o apúntalo y pulsa E) para abrirlo aquí.')+'</p>';
+  document.body.appendChild(a);CN838.ui=a;const $=id=>a.querySelector('#'+id);
+  for(const ev of ['pointerdown','pointerup','mousedown','mouseup','click','dblclick','wheel','touchstart','touchmove','touchend','keydown','keyup','keypress','contextmenu'])a.addEventListener(ev,e=>{if(ev==='keydown'&&e.key==='Escape'){e.preventDefault();cn8UIFecha();}e.stopPropagation();});
+  $('me9x').addEventListener('click',()=>cn8UIFecha());
+  $('me9busca').addEventListener('input',e=>{ME839.busca=e.target.value;me9Lista();});
+  $('me9novo').addEventListener('click',()=>me9Editor(null));
+  $('me9gen').addEventListener('change',e=>{ME839.gen=e.target.value;me9Lista();});
+  $('me9ord').addEventListener('change',e=>{ME839.ordem=e.target.value;me9Lista();});
+  $('me9lista').addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.livro[data-id]');if(!b)return;const f=cn8Dados().filmes.find(q=>q.id===b.dataset.id);if(f)me9Editor(f);});
+  $('me9st').addEventListener('change',()=>me9Vis());
+  $('me9pos').addEventListener('input',()=>me9Prev());
+  $('me9ano').addEventListener('input',e=>{const v=e.target.value.replace(/\D/g,'').slice(0,4);if(v!==e.target.value)e.target.value=v;});
+  $('me9g1').addEventListener('change',()=>{if($('me9g2').value===$('me9g1').value)$('me9g2').value='';});
+  $('me9nota').addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button[data-i]');if(!b)return;e.preventDefault();const r=b.getBoundingClientRect(),i=+b.dataset.i;let v=(e.clientX-r.left)<r.width/2?i*2+1:i*2+2;if(v===ME839.nota)v=0;ME839.nota=v;me9Nota();});
+  $('me9nota').addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();ME839.nota=Math.max(0,Math.min(10,ME839.nota+(e.key==='ArrowRight'?1:-1)));me9Nota();}});
+  $('me9ed').addEventListener('submit',e=>{e.preventDefault();me9Salva();});
+  $('me9buscar').addEventListener('click',()=>me9Buscar());
+  $('me9cancelar').addEventListener('click',()=>{me9Fecha();});
+  $('me9excluir').addEventListener('click',e=>{const b=e.currentTarget;if(b.dataset.conf!=='1'){b.dataset.conf='1';b.textContent=cn8T('Excluir mesmo?','Really delete?','¿Borrar de verdad?');b.classList.add('conf');setTimeout(()=>{try{if(b.dataset.conf==='1'){b.dataset.conf='';b.textContent=cn8T('Excluir','Delete','Borrar');b.classList.remove('conf');}}catch(x){}},3500);return;}
+    const E=ME839.ed,D=cn8Dados(),i=E&&E.id?D.filmes.findIndex(q=>q.id===E.id):-1;if(i<0)return;const f=D.filmes[i];D.filmes.splice(i,1);me9Fecha();cn8Salva();try{showToast(cn8T('Excluído: ','Deleted: ','Borrada: ')+f.titulo,{ms:2600});}catch(x){}});
+  $('me9sug').addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.sugI[data-i]');if(b){e.preventDefault();me9Escolhe(+b.dataset.i);}});
+  return a;}
+function me9Opcoes(sel,vazio,val){sel.innerHTML='<option value="">'+cn8Esc(vazio)+'</option>'+CN8_GEN.map(g=>'<option value="'+g[0]+'">'+cn8Esc(cn8GenNome(g[0]))+'</option>').join('');sel.value=val||'';}
+function me9Render(){const a=CN838.ui;if(!a||a.hidden||!a.classList.contains('me839'))return;const $=id=>a.querySelector('#'+id),L=cn8Dados().filmes,V=L.filter(f=>f.status==='visto'),Q=L.filter(f=>f.status==='quero');
+  $('me9n').textContent=L.length;$('me9v').textContent=V.length;$('me9q').textContent=Q.length;
+  const P=$('me9prat');P.innerHTML='';const rk=V.filter(f=>f.nota>0).length;
+  for(const [k,nome,n] of [['todos',cn8T('Todos','All','Todas'),L.length],['visto',cn8T('Assisti','Watched','Vistas'),V.length],['quero',cn8T('Quero assistir','Watchlist','Quiero ver'),Q.length],['ranking',cn8T('Ranking','Ranking','Ranking'),rk]]){
+    const b=document.createElement('button');b.type='button';b.setAttribute('aria-pressed',ME839.prat===k?'true':'false');b.innerHTML=cn8Esc(nome)+' <b>'+n+'</b>';b.addEventListener('click',()=>{ME839.prat=k;me9Render();});P.appendChild(b);}
+  $('me9busca').value!==ME839.busca&&($('me9busca').value=ME839.busca);$('me9ord').value=ME839.ordem;$('me9ord').disabled=ME839.prat==='ranking';
+  me9Lista();}
+function me9Lista(){const a=CN838.ui;if(!a)return;const $=id=>a.querySelector('#'+id);const L=cn8Dados().filmes;
+  let base=ME839.prat==='visto'?L.filter(f=>f.status==='visto'):ME839.prat==='quero'?L.filter(f=>f.status==='quero'):ME839.prat==='ranking'?L.filter(f=>f.status==='visto'&&f.nota>0):L.slice();
+  const cont={};for(const f of base)for(const k of f.generos)cont[k]=(cont[k]||0)+1;if(ME839.gen&&!cont[ME839.gen])ME839.gen='';
+  const G=$('me9gen');G.innerHTML='<option value="">'+cn8Esc(cn8T('Todos os estilos','All genres','Todos los estilos'))+'</option>'+Object.keys(cont).sort((x,y)=>cont[y]-cont[x]||cn8GenIdx(x)-cn8GenIdx(y)).map(k=>'<option value="'+k+'">'+cn8Esc(cn8GenNome(k))+' ('+cont[k]+')</option>').join('');G.value=ME839.gen;
+  const q=ME839.busca.trim().toLowerCase();let lista=base.filter(f=>(!ME839.gen||f.generos.indexOf(ME839.gen)>=0)&&(!q||f.titulo.toLowerCase().includes(q)));
+  const ord=ME839.prat==='ranking'?cn8PorNota:({recentes:cn8PorData,nota:cn8PorNota,titulo:cn8PorTitulo,ano:cn8PorAno}[ME839.ordem]||cn8PorData);lista=lista.slice().sort(ord);
+  const U=$('me9lista');if(!lista.length){U.innerHTML='<p class="vazio">'+cn8Esc(ME839.prat==='ranking'?cn8T('Dê notas aos filmes que você viu e o ranking aparece aqui.','Rate the movies you have seen and the ranking shows up here.','Puntúa las películas que viste y el ranking aparece aquí.'):cn8T('Nenhum filme aqui ainda.','No movies here yet.','Aún no hay películas aquí.'))+'</p>';return;}
+  const sel=ME839.ed&&ME839.ed.id;
+  U.innerHTML=lista.map((f,i)=>{const gens=(f.generos||[]).map(cn8GenNome).join(', '),sub=[f.ano,gens].filter(Boolean).join(' · ');
+    return '<button type="button" class="livro'+(sel===f.id?' sel':'')+'" data-id="'+cn8Esc(f.id)+'">'+(ME839.prat==='ranking'?'<span class="me9rk">'+(i<3?['🥇','🥈','🥉'][i]:(i+1))+'</span>':'')+me9Capa(f)+
+      '<span class="inf"><b>'+cn8Esc(f.titulo)+'</b>'+(sub?'<small class="me9g">'+cn8Esc(sub)+'</small>':'')+'<span class="meta"><em class="pill '+(f.status==='visto'?'lido':'quero')+'">'+(f.status==='visto'?cn8T('Assisti','Watched','Vista'):cn8T('Quero assistir','Want to watch','Quiero ver'))+'</em>'+
+      (f.status==='visto'?me9Estrelas(f.nota):'')+(f.status==='visto'&&f.visto?'<em class="pill">'+cn8Esc(cn8DataBR(f.visto))+'</em>':'')+'</span></span></button>';}).join('');
+  for(const im of U.querySelectorAll('img.cv'))im.addEventListener('error',()=>{const d=document.createElement('div');d.className='cv gen';d.style.background=im.dataset.bg||'#4a3428';const b=document.createElement('b');b.textContent=im.alt||'';d.appendChild(b);im.replaceWith(d);},{once:true});}
+function me9Nota(){const a=CN838.ui;if(!a)return;const el=a.querySelector('#me9nota'),n=ME839.nota;let h='';for(let i=0;i<5;i++){const v=n-i*2;h+='<button type="button" data-i="'+i+'" class="'+(v>=2?'on':v===1?'meia':'')+'" aria-label="'+(i+1)+'">★</button>';}
+  h+='<small>'+(n?cn8NotaTxt(n):cn8T('sem nota','no rating','sin nota'))+'</small>';el.innerHTML=h;}
+function me9Vis(){const a=CN838.ui;if(!a)return;const vis=a.querySelector('#me9st').value==='visto';for(const el of a.querySelectorAll('.me9vis'))el.hidden=!vis;if(vis&&!a.querySelector('#me9data').value)a.querySelector('#me9data').value=cn8Hoje();}
+function me9Prev(){const a=CN838.ui;if(!a)return;const u=a.querySelector('#me9pos').value.trim(),im=a.querySelector('#me9prev');if(/^(https?:\/\/|data:image\/)/i.test(u)){im.onerror=()=>{im.hidden=true;};im.onload=()=>{im.hidden=false;};im.referrerPolicy='no-referrer';im.src=u;}else{im.hidden=true;im.removeAttribute('src');}}
+function me9Dica(t){const a=CN838.ui;if(!a)return;const p=a.querySelector('#me9dica');p.textContent=t||'';p.hidden=!t;}
+function me9Editor(f){const a=CN838.ui;if(!a)return;const $=id=>a.querySelector('#'+id);ME839.ed=f?{id:f.id,qid:'',wiki:f.wiki||''}:{id:null,qid:'',wiki:''};ME839.sug=null;
+  $('me9edT').textContent=f?cn8T('Editar filme','Edit movie','Editar película'):cn8T('Novo filme','New movie','Nueva película');
+  $('me9tit').value=f?f.titulo:'';$('me9ano').value=f&&f.ano?String(f.ano):'';$('me9st').value=f?f.status:(ME839.prat==='quero'?'quero':'visto');
+  me9Opcoes($('me9g1'),cn8T('— escolher —','— choose —','— elegir —'),f&&f.generos[0]);me9Opcoes($('me9g2'),cn8T('nenhum','none','ninguno'),f&&f.generos[1]);
+  ME839.nota=f?f.nota:0;me9Nota();$('me9data').value=f?(f.visto||''):'';$('me9pos').value=f?f.poster:'';$('me9res').value=f?f.resenha:'';
+  $('me9sug').innerHTML='';me9Dica(f?'':cn8T('Escreva o título e toque em «🔎 Buscar dados»: a Wikipédia traz o pôster, o ano e os estilos. Ou preencha tudo à mão.','Type the title and tap «🔎 Look up»: Wikipedia brings the poster, year and genres. Or fill it all in by hand.','Escribe el título y toca «🔎 Buscar datos»: Wikipedia trae el póster, el año y los estilos. O rellénalo todo a mano.'));
+  const ex=$('me9excluir');ex.hidden=!f;ex.dataset.conf='';ex.textContent=cn8T('Excluir','Delete','Borrar');ex.classList.remove('conf');
+  $('me9ed').hidden=false;me9Vis();me9Prev();me9Lista();setTimeout(()=>{try{$('me9ed').scrollIntoView({block:'start',behavior:'smooth'});if(!f)$('me9tit').focus();}catch(e){}},30);}
+function me9Fecha(){const a=CN838.ui;if(!a)return;a.querySelector('#me9ed').hidden=true;ME839.ed=null;ME839.sug=null;me9Lista();}
+async function me9Buscar(){const a=CN838.ui;if(!a||!ME839.ed)return;const $=id=>a.querySelector('#'+id),q=$('me9tit').value.trim(),E=ME839.ed;
+  if(q.length<2){me9Dica(cn8T('Escreva pelo menos 2 letras do título.','Type at least 2 letters of the title.','Escribe al menos 2 letras del título.'));$('me9tit').focus();return;}
+  const S=ME839.sug={q,res:[]};$('me9sug').innerHTML='<p class="sugCab">'+cn8Esc(cn8T('Procurando na Wikipédia…','Searching Wikipedia…','Buscando en Wikipedia…'))+'</p>';me9Dica('');
+  try{const res=await cn8Busca(q);if(ME839.sug!==S||ME839.ed!==E)return;S.res=res;}catch(e){if(ME839.sug!==S)return;$('me9sug').innerHTML='';me9Dica(cn8T('Não deu para falar com a Wikipédia agora — dá para preencher à mão.','Could not reach Wikipedia right now — you can fill it in by hand.','No se pudo conectar con Wikipedia — puedes rellenarlo a mano.'));return;}
+  if(!S.res.length){$('me9sug').innerHTML='';me9Dica(cn8T('Nada encontrado — confira o título ou preencha à mão.','Nothing found — check the title or fill it in by hand.','No se encontró nada — revisa el título o rellénalo a mano.'));return;}
+  $('me9sug').innerHTML='<p class="sugCab">'+cn8Esc(cn8T('Da Wikipédia — escolha o filme certo','From Wikipedia — pick the right movie','De Wikipedia — elige la película correcta'))+'</p>'+S.res.map((r,i)=>'<button type="button" class="sugI" data-i="'+i+'">'+(r.poster?'<img src="'+cn8Esc(r.poster)+'" alt="" loading="lazy" referrerpolicy="no-referrer">':'<div class="cv gen" style="background:#3a2a20">🎬</div>')+
+    '<span><b>'+cn8Esc(r.titulo)+(r.ano?' <em>('+r.ano+')</em>':'')+'</b><small>'+cn8Esc(r.desc)+'</small><small class="fonte">Wikipédia</small></span></button>').join('');
+  for(const im of $('me9sug').querySelectorAll('img'))im.addEventListener('error',()=>{const d=document.createElement('div');d.className='cv gen';d.style.background='#3a2a20';d.textContent='🎬';im.replaceWith(d);},{once:true});}
+async function me9Escolhe(i){const a=CN838.ui,S=ME839.sug,E=ME839.ed;if(!a||!S||!S.res[i]||!E)return;const $=id=>a.querySelector('#'+id),r=S.res[i];
+  $('me9tit').value=r.titulo;if(r.ano)$('me9ano').value=String(r.ano);if(r.poster){$('me9pos').value=r.poster;me9Prev();}E.wiki=r.wiki;E.qid=r.qid;
+  for(const b of $('me9sug').querySelectorAll('.sugI'))b.style.borderColor=+b.dataset.i===i?'var(--gold)':'';
+  me9Dica(cn8T('Preenchido pela Wikipédia — confira e salve.','Filled in from Wikipedia — check it and save.','Rellenado desde Wikipedia — revísalo y guarda.'));
+  if(!r.qid)return;try{const w=await cn8Wikidata(r.qid);if(ME839.ed!==E||E.qid!==r.qid||!w)return;let txt='';
+    if(w.generos.length&&!$('me9g1').value){$('me9g1').value=w.generos[0];if(w.generos[1]&&!$('me9g2').value)$('me9g2').value=w.generos[1];txt=cn8T(' Estilos sugeridos pelo Wikidata.',' Genres suggested by Wikidata.',' Estilos sugeridos por Wikidata.');}
+    if(w.ano&&!$('me9ano').value)$('me9ano').value=String(w.ano);if(txt)me9Dica(cn8T('Preenchido pela Wikipédia — confira e salve.','Filled in from Wikipedia — check it and save.','Rellenado desde Wikipedia — revísalo y guarda.')+txt);}catch(e){}}
+function me9Salva(){const a=CN838.ui,E=ME839.ed;if(!a||!E)return;const $=id=>a.querySelector('#'+id);const tit=$('me9tit').value.trim().replace(/\s+/g,' ');
+  if(!tit){me9Dica(cn8T('Falta o título do filme.','The movie title is missing.','Falta el título de la película.'));$('me9tit').focus();return;}
+  const ano=$('me9ano').value.trim();if(ano&&!/^\d{4}$/.test(ano)){me9Dica(cn8T('O ano tem 4 algarismos (ex.: 1994).','The year has 4 digits (e.g. 1994).','El año tiene 4 cifras (ej.: 1994).'));$('me9ano').focus();return;}
+  const pos=$('me9pos').value.trim();if(pos&&!/^(https?:\/\/|data:image\/)/i.test(pos)){me9Dica(cn8T('O link do pôster precisa começar com https://','The poster link must start with https://','El enlace del póster debe empezar con https://'));return;}
+  const st=$('me9st').value==='quero'?'quero':'visto',g=[$('me9g1').value,$('me9g2').value].filter((x,i,arr)=>x&&arr.indexOf(x)===i);
+  const D=cn8Dados(),agora=new Date().toISOString(),i=E.id?D.filmes.findIndex(q=>q.id===E.id):-1,velho=i>=0?D.filmes[i]:null;
+  // os estilos além do segundo (vindos da v838) ficam, a não ser que o primeiro ou o segundo tenham mudado
+  const gen=velho&&velho.generos.slice(0,2).join()===g.join()?velho.generos.slice():g;
+  const base={titulo:tit,ano,status:st,generos:gen,nota:st==='visto'?ME839.nota:0,visto:st==='visto'?$('me9data').value:'',poster:pos,resenha:$('me9res').value,wiki:E.wiki||(velho&&velho.wiki)||'',atualizado:agora};
+  let f;if(velho){f=cn8Normaliza(Object.assign({},velho,base,{id:velho.id,criado:velho.criado}));D.filmes[i]=f;}
+  else{if(D.filmes.some(q=>q.titulo.toLowerCase()===tit.toLowerCase()&&String(q.ano||'')===ano)){me9Dica(cn8T('Esse filme já está na sua lista — abra-o na lista para editar.','That movie is already on your list — open it from the list to edit.','Esa película ya está en tu lista — ábrela desde la lista para editarla.'));return;}
+    f=cn8Normaliza(Object.assign(base,{id:cn8Id(),criado:agora}));D.filmes.push(f);}
+  if(ME839.prat==='quero'&&st==='visto'||ME839.prat==='visto'&&st==='quero'||ME839.prat==='ranking'&&!(st==='visto'&&f.nota))ME839.prat=st;
+  $('me9ed').hidden=true;ME839.ed=null;ME839.sug=null;cn8Salva();
+  try{showToast((st==='quero'?cn8T('Na lista do quero assistir: ','On your watchlist: ','En tu lista de quiero ver: '):cn8T('No seu cinema: ','In your cinema: ','En tu cine: '))+f.titulo,{ms:3200});}catch(x){}
+  setTimeout(()=>{try{const el=a.querySelector('.livro[data-id="'+(window.CSS&&CSS.escape?CSS.escape(f.id):f.id)+'"]');if(el){el.classList.add('sel');el.scrollIntoView({block:'center'});setTimeout(()=>el.classList.remove('sel'),1600);}}catch(e){}},60);}
+function me9Abre(aba,id){const a=me9Cria();try{unlock();}catch(e){}try{const est=document.getElementById('est');if(est&&!est.hidden){const x=document.getElementById('estFechar');if(x)x.click();}}catch(e){}
+  if(aba==='vistos')ME839.prat='visto';else if(aba==='quero')ME839.prat='quero';else if(aba==='ranking')ME839.prat='ranking';
+  a.hidden=false;me9Render();const f=id?cn8Dados().filmes.find(q=>q.id===id):null;
+  if(f){if(ME839.prat!=='todos'&&!(ME839.prat===f.status||(ME839.prat==='ranking'&&f.status==='visto'&&f.nota)))ME839.prat='todos';me9Render();me9Editor(f);}
+  else if(aba==='novo')me9Editor(null);else{const ed=a.querySelector('#me9ed');if(ed&&!ed.hidden&&!ME839.ed)ed.hidden=true;}
+  CN838.stats.aberturas=(CN838.stats.aberturas||0)+1;}
+function me9FechaPainel(){const a=CN838.ui;if(a)a.hidden=true;}
+if(ME839.on&&typeof CN838!=='undefined'){
+  try{cn8UICria=me9Cria;cn8UIRender=me9Render;cn8UIAbre=me9Abre;cn8UIFecha=me9FechaPainel;}catch(e){me9Erro('ligar',e);}
+}
+window.__menu839={estado:ME839,erros:ME839.erros,abrir:(aba,id)=>cn8UIAbre(aba,id),fechar:()=>cn8UIFecha(),editor:id=>{const f=id?cn8Dados().filmes.find(q=>q.id===id):null;me9Editor(f);}};
+
+/* ===================== v839 · MENOS INIMIGOS NO 1.º E NO 2.º ANDAR (bloco `IN839`) =====================
+   Pedido do Luiz (17/11): «diminua os inimigos do primeiro andar para apenas um terço. E os do segundo andar para metade».
+   Os inimigos comuns de cada sala nascem em `caveirasRegistrar` (na montagem da sala), tantos quantos `CAV.porSala` (6); a regra por
+   andar da v450 (`D450[andar].inimigos`, aplicada no embrulho do `caveirasRegistrar`) já troca esse número no 5.º e no 7.º andar (7).
+   Agora o 1.º andar fica com 2 por sala (um terço de 6) e o 2.º com 3 (metade). Chefes, duelos, o javali, o lobisomem do
+   Paranormal e os outros inimigos especiais não mudam; a vida, o tiro e o resto da regra de cada andar também não.
+   Além disso o corte vai nos pontos de nascimento (`cavPontos`, embrulhado), porque a montagem fatiada das salas (v819+) chama o
+   registro sem passar pelo embrulho da v450 (no teste, a sala `lib` do 1.º andar nascia com 6): a sala do 1.º andar fica com os 2
+   primeiros pontos e a do 2.º com os 3 primeiros, pelo caminho que for. E há sala registrada ainda durante a carga do script, antes da
+   regra da v450 existir (a `lib`, Histórica, que nasce com 6 e com a vida sem a escala do andar até o leitor entrar): para essas, o
+   corte é feito no fim deste bloco e de novo ao entrar na sala (`cavEntrar` embrulhado), só nos inimigos comuns do registro (id
+   numérico pequeno, sem marca de chefe, robô, lobisomem, rival, aliado ou javali) — fica o de id menor, o resto sai da cena.
+   Chave: `?inimigos839=0` (volta aos 6). Gancho `window.__inimigos839`. */
+const IN839={on:!/[?&#]inimigos839=0/i.test(location.search+location.hash),antes:{},depois:{},erro:''};
+try{if(IN839.on&&typeof D450!=='undefined'&&typeof CAV!=='undefined'){const base=CAV.porSala||6;
+  for(const [f,div] of [[1,3],[2,2]]){if(!D450[f])continue;IN839.antes[f]=D450[f].inimigos||base;D450[f].inimigos=Math.max(1,Math.round(base/div));IN839.depois[f]=D450[f].inimigos;}}}catch(e){IN839.erro=String(e&&e.message||e);}
+window.__inimigos839=IN839;
+try{if(IN839.on&&typeof cavPontos==='function'&&typeof d450Andar==='function'){const cp0=cavPontos;IN839.cortes=0;
+  cavPontos=function(R,room){const pts=cp0.apply(this,arguments);try{const f=d450Andar(room),n=IN839.depois[f];if(n&&Array.isArray(pts)&&pts.length>n){IN839.cortes++;return pts.slice(0,n);}}catch(e){}return pts;};}}catch(e){IN839.erro=String(e&&e.message||e);}
+function in8Corta(room){try{const S=CAV.salas&&CAV.salas[room];if(!S||!Array.isArray(S.lista))return 0;const n=IN839.depois[d450Andar(room)];if(!n)return 0;
+  const comum=k=>k&&typeof k.id==='number'&&k.id<100&&!k.chefe201&&!k.robot315&&!k.para318&&!k.ally428&&!k.rival530&&!k.deity428&&k.tipo!=='farao';
+  const C=S.lista.filter(comum).sort((a,b)=>a.id-b.id);if(C.length<=n)return 0;let c=0;
+  for(const k of C.slice(n)){const i=S.lista.indexOf(k);if(i<0)continue;S.lista.splice(i,1);try{if(k.g&&k.g.parent)k.g.parent.remove(k.g);}catch(e){}c++;}
+  if(Array.isArray(S.pts)&&S.pts.length>n)S.pts=S.pts.slice(0,n);IN839.cortes+=c;IN839.salasCortadas=(IN839.salasCortadas||[]).concat([room+':'+c]);return c;}catch(e){return 0;}}
+try{if(IN839.on&&typeof CAV!=='undefined'&&typeof d450Andar==='function'){for(const r of Object.keys(CAV.salas||{}))in8Corta(r);
+  const ent=cavEntrar;cavEntrar=function(room){try{in8Corta(room);}catch(e){}return ent.apply(this,arguments);};if(window.__cav)window.__cav.entrar=cavEntrar;}}catch(e){IN839.erro=String(e&&e.message||e);}
+IN839.corta=in8Corta;
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
