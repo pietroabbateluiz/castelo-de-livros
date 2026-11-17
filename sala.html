@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v846</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v847</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -112399,6 +112399,106 @@ if(RG846.on){
 }
 window.__rodada846={estado:RG846,stats:RG846.stats,erros:RG846.erros,texturas:TX846,cena:tx846Cena,canon:tx846Canon,suja:tx846Suja,chaves:rg846Chaves,dentro:rg846Dentro};
 
+/* ===================== v847 · PROGRESSO E SALVAMENTO, 1.ª PARTE: O QUE A CÓPIA DO PROGRESSO DEIXAVA DE FORA E A GRAVAÇÃO QUE FALHA CALADA (bloco `PS847`) =====================
+   Plano de 24 h do Luiz (17/11), bloco 2 — «caçando todos os tipos de bugs e erros… apenas foque nas questões técnicas».
+   (1) A CÓPIA DO PROGRESSO DEIXAVA DADOS DE FORA. O jogo tem dois caminhos para levar o progresso: o «Exportar/Importar progresso completo»
+       do menu (v423, arquivo) e o pacote da v198 (`progColeta`: «baixar progresso», o código de progresso e o envio à nuvem). Os dois só
+       levam as chaves `mundo.*`, `bib*` e os jogos da v567 — e as coleções e marcas que vieram depois ficaram de fora: os FILMES da v838
+       (`castelo.filmes838.v1`), os ESPORTES da v840 (`castelo.esportes840.v1`), o tempo de permanência nas salas da v372
+       (`castelo_permanencia372`), o presente do Arqueiro da v258 (`castelo.arqueiro258`) e as preferências de tela das coleções e da lista
+       de leituras (`castelo.colecoes842.ui`, `castelo743.ui`). Quem exportava e importava noutro navegador (ou trocava de aparelho pela
+       nuvem) perdia todos os filmes e esportes cadastrados. Agora as seis entram nos dois caminhos (na importação, também).
+   (2) A GRAVAÇÃO QUE FALHA. Com o armazenamento do navegador cheio, cada `localStorage.setItem` lança um erro que o jogo engole (quase
+       todas as gravações estão num try/catch vazio); com os dados do site bloqueados, o próprio acesso ao `localStorage` lança — o jogo
+       abre e roda (conferido), mas não guarda nada. Nos dois casos o leitor seguia jogando e perdia o progresso ao fechar, sem saber.
+       Agora a primeira falha da partida mostra um aviso (na língua do jogo) com o caminho para salvar uma cópia — «Exportar progresso
+       completo», no menu; o erro continua chegando a quem gravou, como antes.
+   Chave: `?salvamento847=0`. Gancho `window.__salvamento847`. */
+const PS847={on:!/[?&#]salvamento847=0/i.test(location.search+location.hash),erros:[],stats:{falhas:0,ultima:null,aviso:false},
+  extras:['castelo.filmes838.v1','castelo.esportes840.v1','castelo.arqueiro258','castelo.colecoes842.ui','castelo743.ui','castelo_permanencia372']};
+function ps847Erro(k,e){if(PS847.erros.length<30)PS847.erros.push(k+': '+(e&&e.message||e));try{console.warn('v847',k,e);}catch(x){}}
+function ps847T(pt,en,es){const l=String(document.documentElement.lang||'').toLowerCase();return l.indexOf('en')===0?en:(l.indexOf('es')===0?es:pt);}
+function ps847Extra(k){return PS847.on&&typeof k==='string'&&PS847.extras.indexOf(k.replace(/^wm\./,''))>=0;}
+function ps847Falhou(k,e){PS847.stats.falhas++;PS847.stats.ultima=[String(k).slice(0,60),String(e&&e.name||e)];if(PS847.stats.aviso)return;PS847.stats.aviso=true;
+  const bloq=k==='localStorage';
+  const msg=bloq?ps847T('⚠ O navegador está bloqueando os dados deste site: o jogo funciona, mas nada do seu progresso fica salvo. Para guardar, permita cookies e dados de sites para esta página nas configurações do navegador e recarregue.',
+    '⚠ The browser is blocking this site\'s data: the game works, but none of your progress is saved. To keep it, allow cookies and site data for this page in the browser settings and reload.',
+    '⚠ El navegador está bloqueando los datos de este sitio: el juego funciona, pero tu progreso no se guarda. Para guardarlo, permite cookies y datos de sitios para esta página en la configuración del navegador y recarga.'):
+    ps847T('⚠ O navegador não está deixando o jogo salvar (armazenamento cheio ou bloqueado): o progresso de agora pode se perder ao fechar. Salve uma cópia no menu, em «Exportar progresso completo», e libere espaço do site nas configurações do navegador.',
+    '⚠ The browser is not letting the game save (storage full or blocked): your progress from now on may be lost when you close it. Save a copy from the menu with «Export complete progress» and free up site storage in the browser settings.',
+    '⚠ El navegador no deja que el juego guarde (almacenamiento lleno o bloqueado): el progreso de ahora puede perderse al cerrar. Guarda una copia en el menú, en «Exportar todo el progreso», y libera espacio del sitio en la configuración del navegador.');
+  setTimeout(()=>ps847Mostra(msg),0);}
+// direto no aviso grande (os filtros de avisos das v451/v546 não o calam na chegada a uma sala) e no Diário — depois da tela de abertura
+function ps847Mostra(msg,n){n=n||0;try{if(n<200&&((typeof LOADED!=='undefined'&&!LOADED)||(typeof AQ!=='undefined'&&AQ&&!AQ.liberado))){setTimeout(()=>ps847Mostra(msg,n+1),1500);return;}
+    if(typeof toastShow==='function'){toastShow(msg,12000,true);try{logAdd(msg,true);}catch(x){}}else showToast(msg,{big:true,ms:12000});}catch(x){try{showToast(msg);}catch(y){}}}
+if(PS847.on){
+  // (1) o pacote da v198 (baixar, código, nuvem): a lista de chaves é uma expressão regular num objeto — basta ampliá-la
+  try{if(typeof PROG!=='undefined'&&PROG&&PROG.rx instanceof RegExp){PS847.rx0=PROG.rx;PROG.rx=new RegExp('^(wm\\.)?(mundo\\.|bib|castelo\\.jogos567\\.|'+PS847.extras.map(k=>k.replace(/[.]/g,'\\.')+'$').join('|')+')');}}catch(e){ps847Erro('PROG',e);}
+  // (2) a gravação que falha: avisa uma vez e devolve o erro a quem gravou; e o armazenamento recusado de vez (o acesso ao `localStorage`
+  //     lança — dados do site bloqueados): o jogo abre e roda, mas não guarda nada — avisa também
+  try{void window.localStorage.length;}catch(e){ps847Falhou('localStorage',e);}
+  try{const SP=Storage.prototype,si=SP.setItem;SP.setItem=function(k,v){try{return si.call(this,k,v);}catch(e){let sess=false;try{sess=this===window.sessionStorage;}catch(x){}if(!sess)ps847Falhou(k,e);throw e;}};}catch(e){ps847Erro('setItem',e);}
+}
+window.__salvamento847={estado:PS847,stats:PS847.stats,erros:PS847.erros,extra:ps847Extra,falhou:ps847Falhou};
+
+/* ===================== v847 · AS TEXTURAS COMPARTILHADAS DA v846 SAEM DA PLACA NAS PURGAS DE MEMÓRIA (bloco `TX847`) =====================
+   Achado do plano de 24 h (bloco 2, revisando a v846): o jogo solta a memória de vídeo das cenas que não estão à vista — a purga da v198
+   (as cenas dos outros andares) e a da v659 (no Leve, as outras salas, 1,8 s depois de entrar numa) chamam `dispose()` nas texturas, e o
+   three.js sobe tudo de novo quando a cena volta a ser desenhada. Com a v846, uma textura que aponta para a textura compartilhada não
+   tem mais a sua própria na placa: o `dispose()` dela não apagava nada, e a compartilhada ficava na placa mesmo com a sala inteira solta —
+   as purgas deixavam de liberar a memória das salas visitadas (no Leve, salas e salas acumulando na placa de vídeo).
+   Agora: (1) cada textura compartilhada, ao ser descartada, larga a compartilhada e volta ao estado de «nunca enviada» (se for desenhada
+   de novo, o three.js sobe a dela, e o aquecimento seguinte volta a compartilhá-la); (2) quando a última textura de uma compartilhada é
+   descartada, a compartilhada sai da placa na hora (e o próximo aquecimento cria outra, se for preciso); (3) o contador de texturas do
+   three.js (`renderer.info.memory.textures`, que as purgas e os diagnósticos leem) fica certo: não desconta duas vezes a mesma textura.
+   O resto da v846 segue igual (a mesma varredura no `warmCollect`, com o orçamento de 50 ms e os grupos maiores primeiro).
+   Chave: `?texturas847=0` (volta à v846 pura). Gancho `window.__texturas847`. */
+const TX847={on:typeof TX846!=='undefined'&&TX846.on&&!/[?&#]texturas847=0/i.test(location.search+location.hash),erros:[],stats:{soltas:0,apagadas:0,recompartilhadas:0},
+  membros:new WeakMap(),ouvidos:new WeakSet(),mortas:new WeakSet()};
+function tx847Erro(k,e){if(TX847.erros.length<30)TX847.erros.push(k+': '+(e&&e.message||e));try{console.warn('v847 texturas',k,e);}catch(x){}}
+// a compartilhada sai da placa (por fim de uso ou porque ninguém mais a segura)
+function tx847Apaga(c,cp){try{const gt=cp&&cp.__webglTexture;if(gt&&!TX847.mortas.has(gt)){TX847.mortas.add(gt);renderer.getContext().deleteTexture(gt);renderer.info.memory.textures--;TX847.stats.apagadas++;}
+    renderer.properties.remove(c);for(const [k,r] of TX846.canon){const v=TX846.fim?(r&&r.deref&&r.deref()):r;if(v===c){TX846.canon.delete(k);break;}}}catch(e){tx847Erro('apaga',e);}}
+// uma textura que aponta para a compartilhada foi descartada
+function tx847Solta(ev){const t=ev&&ev.target;if(!t)return;try{t.removeEventListener('dispose',tx847Solta);}catch(e){}
+  try{const P=renderer.properties,c=TX846.dono.get(t),p=P.get(t),cp=c?P.get(c):null;
+    if(cp&&cp.__webglTexture&&p.__webglTexture===cp.__webglTexture&&!p.__webglInit){P.remove(t);TX847.stats.soltas++;
+      // o three.js, se já tinha enviado esta textura antes da v846 a compartilhar, acaba de descontá-la de novo do contador
+      if(TX847.ouvidos.has(t))renderer.info.memory.textures++;}
+    TX847.ouvidos.delete(t);TX846.dono.delete(t);
+    if(c){const S=TX847.membros.get(c);if(S){S.delete(t);if(!S.size){TX847.membros.delete(c);tx847Apaga(c,cp);}}}}catch(e){tx847Erro('solta',e);}}
+// a varredura da v846, agora registrando quem usa cada compartilhada
+function tx847Cena(sc,orc){if(!TX846.on||!sc||typeof renderer==='undefined')return;const t0=performance.now();orc=orc>0?orc:TX846.orc;const P=renderer.properties,gl=renderer.getContext(),G=new Map();
+  sc.traverse(o=>{const ms=o.material?(Array.isArray(o.material)?o.material:[o.material]):null;if(!ms)return;for(const m of ms){if(!m)continue;for(const k of TX846.slots){const t=m[k];if(!t||!t.isTexture)continue;const c=tx846Chave(t);if(!c)continue;let g=G.get(c);if(!g){g=new Set();G.set(c,g);}g.add(t);}}});
+  const GL=[...G].sort((a,b)=>b[1].size-a[1].size);
+  for(const [c,g] of GL){let canon=tx846Canon(c);if(canon&&TX847.mortas.has(P.get(canon).__webglTexture)){TX846.canon.delete(c);canon=null;}if(g.size<2&&!canon)continue;
+    try{let cp=canon?P.get(canon):null;
+      if(!canon||!cp.__webglTexture){
+        let adot=null;for(const t of g){const p=P.get(t);if(p.__webglInit&&p.__webglTexture&&p.__version===t.version){adot=[t,p];break;}}
+        if(!adot&&performance.now()-t0>orc){RG846.stats.adiadas++;continue;}
+        const t0m=g.values().next().value;canon=t0m.clone();canon.name='tx846 '+(t0m.name||'');canon.userData={tx846:true};canon.needsUpdate=true;cp=P.get(canon);
+        if(adot){cp.__webglTexture=adot[1].__webglTexture;cp.__webglInit=true;cp.__version=canon.version;cp.__currentAnisotropy=adot[1].__currentAnisotropy;adot[1].__webglInit=undefined;TX847.ouvidos.add(adot[0]);}
+        else{renderer.initTexture(canon);RG846.stats.enviadas++;}
+        cp=P.get(canon);if(!cp.__webglTexture)continue;
+        if(TX846.fim){TX846.canon.set(c,new WeakRef(canon));TX846.fim.register(canon,cp.__webglTexture);}else TX846.canon.set(c,canon);}
+      let S=TX847.membros.get(canon);if(!S){S=new Set();TX847.membros.set(canon,S);}
+      for(const t of g){if(t===canon)continue;const p=P.get(t);
+        if(p.__webglTexture===cp.__webglTexture&&p.__version===t.version){if(!S.has(t)){S.add(t);TX846.dono.set(t,canon);t.addEventListener('dispose',tx847Solta);}continue;}
+        if(p.__webglInit&&p.__webglTexture&&p.__webglTexture!==cp.__webglTexture){try{gl.deleteTexture(p.__webglTexture);renderer.info.memory.textures--;}catch(e){}RG846.stats.liberadas++;TX847.ouvidos.add(t);}
+        else if(p.__webglInit&&p.__webglTexture===cp.__webglTexture)TX847.ouvidos.add(t);
+        if(TX846.dono.get(t)&&TX846.dono.get(t)!==canon)TX847.stats.recompartilhadas++;
+        p.__webglInit=undefined;p.__webglTexture=cp.__webglTexture;p.__version=t.version;p.__currentAnisotropy=cp.__currentAnisotropy;RG846.stats.compartilhadas++;
+        TX846.dono.set(t,canon);S.add(t);t.addEventListener('dispose',tx847Solta);}
+      RG846.stats.grupos++;}catch(e){rg846Erro('textura',e);}}
+  const dt=performance.now()-t0;RG846.stats.cenas++;RG846.stats.ms+=Math.round(dt);if(dt>RG846.stats.maior)RG846.stats.maior=Math.round(dt);}
+if(TX847.on){
+  // o aquecimento chama `tx846Cena` pelo nome: basta trocar a função
+  try{tx846Cena=tx847Cena;}catch(e){tx847Erro('troca',e);}
+  // a coleta de lixo (uma compartilhada que ninguém mais segura) não desconta de novo o que a purga já apagou
+  try{if(TX846.fim&&typeof FinalizationRegistry==='function')TX846.fim=new FinalizationRegistry(gt=>{try{if(TX847.mortas.has(gt))return;TX847.mortas.add(gt);renderer.getContext().deleteTexture(gt);renderer.info.memory.textures--;RG846.stats.apagadas++;}catch(e){}});}catch(e){tx847Erro('registro',e);}
+}
+window.__texturas847={estado:TX847,stats:TX847.stats,erros:TX847.erros,cena:tx847Cena,solta:tx847Solta};
+
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
    familias:()=>SALA_FAM,famModelos:(f)=>SALA_FAM[f]?SALA_FAM[f].lista():null,
@@ -114314,7 +114414,7 @@ try{window.__ativos232&&window.__ativos232.fimDados&&window.__ativos232.fimDados
 /* Explicit local transfer: no account credentials, cloud tokens or profile scraping. */
 (function(){
  const english=()=>document.documentElement.lang.startsWith('en'),say=(pt,en)=>{if(english())return en;try{if(String(document.documentElement.lang||'').startsWith('es')){const d=window.__localeData428&&window.__localeData428.es,v=d&&d[pt];if(typeof v==='string')return v;}}catch(e){}return pt;};
- function allowed(k){const s=k.replace(/^wm\./,'');return typeof k==='string'&&k.length<=180&&(/^(mundo\.(?!nuvem(?:\.|$)|autoq(?:\.|$)|gpulost$|gpu670$|papel$)[a-zA-Z0-9_.:-]+|castelo\.jogos567\.v1)$/.test(s)||['bibamb','bibfonte','bibinv','bibmode2','bibmus','bibsens','bibsom','bibtema'].includes(s));}
+ function allowed(k){const s=k.replace(/^wm\./,'');return typeof k==='string'&&k.length<=180&&(/^(mundo\.(?!nuvem(?:\.|$)|autoq(?:\.|$)|gpulost$|gpu670$|papel$)[a-zA-Z0-9_.:-]+|castelo\.jogos567\.v1)$/.test(s)||!!(window.__salvamento847&&window.__salvamento847.extra(s))||['bibamb','bibfonte','bibinv','bibmode2','bibmus','bibsens','bibsom','bibtema'].includes(s));}
  function snapshot(){const entries={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(allowed(k))entries[k]=localStorage.getItem(k);}return {format:'castelo-de-papel-progress',version:1,createdAt:new Date().toISOString(),entries};}
  function validate(d){if(d?.tipo==='castelo-de-papel-progresso'&&d.dados&&typeof d.dados==='object'&&!Array.isArray(d.dados)){if(JSON.stringify(d).length>24*1024*1024)throw Error('Backup too large');const entries={};for(const [raw,value]of Object.entries(d.dados)){const k=d.webmaster&&(raw.startsWith('mundo.')||raw.startsWith('castelo.jogos567.'))?'wm.'+raw:raw;if(allowed(k))entries[k]=value;}d={format:'castelo-de-papel-progress',version:1,entries,legacy:true,legacyWebmaster:!!d.webmaster};}if(!d||d.format!=='castelo-de-papel-progress'||d.version!==1||!d.entries||Array.isArray(d.entries)||typeof d.entries!=='object')throw Error(say('Este arquivo não é um backup completo do Castelo de Papel.','This is not a complete Paper Castle progress backup.'));const keys=Object.keys(d.entries);if(!keys.length||keys.length>2048||JSON.stringify(d).length>24*1024*1024)throw Error(say('Backup vazio ou muito grande.','Empty or oversized backup.'));for(const k of keys)if(!allowed(k)||typeof d.entries[k]!=='string')throw Error(say('O backup contém um campo inválido.','The backup contains an invalid field.'));return d;}
  function restore(d){d=validate(d);const old=snapshot().entries,replace=Object.keys(old).filter(k=>!d.legacy||!/^(mundo\.|castelo\.jogos567\.)/.test(k.replace(/^wm\./,''))||k.startsWith('wm.')===d.legacyWebmaster),keys=new Set([...Object.keys(old),...Object.keys(d.entries)]);try{for(const k of replace)localStorage.removeItem(k);for(const [k,v]of Object.entries(d.entries))localStorage.setItem(k,v);}catch(error){for(const k of keys)localStorage.removeItem(k);for(const [k,v]of Object.entries(old))localStorage.setItem(k,v);throw error;}}
