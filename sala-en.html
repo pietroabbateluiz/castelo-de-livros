@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v835</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v836</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -109238,7 +109238,7 @@ function dc8Fits(R,id,g,x,z,lvl,route){const f=decorFloor128(R,lvl),old=g.positi
     let ok=Number.isFinite(P.hx+P.hz+y)&&P.alt<12;const marg=rug?.02:DC835.MARGEM;
     if(ok)for(const [px,pz] of dc8Pontos(O)){const c=f.world.clamp(px,pz,marg),cx=Array.isArray(c)?c[0]:c&&c.x,cz=Array.isArray(c)?c[1]:c&&c.z;if(!Number.isFinite(cx+cz)||Math.hypot(cx-px,cz-pz)>.02||Math.abs(f.floorY(px,pz)-y)>.22){ok=false;break;}}
     if(ok&&!rug){for(const o of f.baseObs){const r=+o[2];if(!(r>0))continue;if(dc8Dist(O,o[0],o[1])<Math.max(.03,r-DC835.FOLGA_BASE)){ok=false;break;}}
-      if(ok){const map=dc8Mapa(R),meus=dc8Desc(R,id);for(const k in R.placed){if(k===id||meus.has(k))continue;const s=R.placed[k];if(!s||!s.g||!s.g.visible||s.lvl!==lvl||!(s.radius>0))continue;if(map[k]&&map[k].sobre835&&R.placed[map[k].sobre835])continue;if(s.g.userData.parede747)continue;if(dc8Sobrepoe(O,dc8ObbDe(s),DC835.FOLGA)){ok=false;break;}}}
+      if(ok){const map=dc8Mapa(R),meus=dc8Desc(R,id);for(const k in R.placed){if(k===id||meus.has(k))continue;const s=R.placed[k];if(!s||!s.g||!s.g.visible||s.lvl!==lvl||!(s.radius>0))continue;if(map[k]&&map[k].sobre835&&R.placed[map[k].sobre835])continue;if(s.g.userData.parede747)continue;if(dc8Sobrepoe(O,dc8ObbDe(s),DC835.FOLGA)&&!(typeof tv8Debaixo==='function'&&tv8Debaixo(R,id,g,O,k,s))){ok=false;break;}}}
       if(ok)for(const p of decorProtected128(R))if(dc8Dist(O,p[0],p[1])<p[2]){ok=false;break;}
       if(ok&&CUR==='room'&&ROOM===R.room&&dc8Dist(O,CH.x,CH.z)<.35)ok=false;}
     if(ok&&route&&!rug){const ent=f.link?f.link.exit:[R.room.spawn.x,R.room.spawn.z];const prior=keyDistances(f.world,ent,f.floorY,0,lvl);
@@ -109361,6 +109361,89 @@ if(DC835.on){
 // a dica do rodapé do Decorar fala do girar e do pôr em cima
 if(DC835.on&&typeof setHint==='function'){const sh0=setHint;setHint=function(t){try{if(typeof t==='string'&&typeof SALA_ED!=='undefined'&&SALA_ED.ativo&&/^(Decorar · (escolha|arraste) uma peça|Decorate · (choose|drag) a piece)/.test(t))t=dc8T('Decorar · arraste uma peça para mudar de lugar (a roda do mouse ou R giram; solte sobre uma mesa para pôr em cima) · clique numa peça para editar · arraste o chão para olhar · Esc solta a peça ou sai','Decorate · drag a piece to move it (mouse wheel or R rotate it; drop it on a table to put it on top) · click a piece to edit it · drag the floor to look around · Esc deselects or exits','Decorar · arrastra una pieza para moverla (la rueda del ratón o R la giran; suéltala sobre una mesa para ponerla encima) · haz clic en una pieza para editarla · arrastra el suelo para mirar · Esc suelta la pieza o sale');}catch(e){}return sh0.apply(this,arguments);};}
 window.__decorar835={estado:DC835,stats:DC835.stats,erros:DC835.erros,pegada:dc8Pegada,obb:dc8ObbDe,discos:dc8Discos,sobrepoe:dc8Sobrepoe,dist:dc8Dist,fits:dc8Fits,cabeEm:dc8CabeEm,apoiado:dc8Apoiado,filhos:dc8Filhos,sinc:dc8Sinc,pega:dc8Pega,gira:dc8Gira,encosta:dc8Encosta,encaixa:dc8Encaixa};
+
+/* ===================== v836 · DECORAR: CADEIRAS DEBAIXO DA MESA E VISTA DE CIMA (bloco `TV836`) =====================
+   Pedido do Luiz (17/11): avaliadas as quatro ideias para a decoração, «ok, faça 1 e 2» — (1) cadeiras entrando debaixo da mesa e
+   (2) vista de cima no editor.
+   (1) CADEIRAS DEBAIXO DA MESA. Na v835 a cadeira encostava na borda do tampo (1 cm) e ficava com um vão. Agora uma peça que é assento
+       (pelo nome: cadeira, banqueta, banco, tamborete, pufe; não poltrona, sofá, rede, cadeira de balanço; até 1,5 m de altura e 1,3 m de
+       lado) pode entrar sob uma peça que é mesa (mesa, escrivaninha, secretária, bancada; não mesa de centro, de cabeceira ou lateral;
+       de 0,6 m a 1,25 m de altura) quando: está alinhada com a mesa (0°, 90°, 180° ou 270°, ±16°), está de frente para ela (a frente
+       da peça é o +z local, como nas peças do catálogo — conferido na cadeira de carvalho: o encosto fica no −z), fica entre as pernas
+       (a 12 cm dos cantos do tampo, ao longo do lado em que entra) e entra no máximo 85 % da meia fundura (e até 42 cm) — o encosto
+       nunca passa para baixo do tampo. Vale para arrastar, pôr com a peça na mão, ◀ ▶ e girar; a passagem continua conferida.
+   (2) VISTA DE CIMA. No Decorar, a tecla T (ou o botão «🔭 De cima» no alto do painel) põe a câmera no alto da sala, quase na
+       vertical (10° de inclinação), sem o forro, as vigas e os lustres (tudo o que começa acima de 2,7 m some enquanto a vista está
+       ligada; a névoa da sala também). WASD desliza a vista (Shift mais rápido) em vez de andar com o leitor; a roda do mouse aproxima e
+       afasta (6 a 48 m); arrastar o chão gira a vista; arrastar, girar (roda/R durante o arraste), pôr em cima e a peça na mão funcionam
+       daqui de cima. T de novo, Concluir ou sair da sala voltam à câmera de antes (V não troca o modo de câmera enquanto a vista de cima
+       está ligada).
+   Chaves: `?cadeiras836=0`, `?topo836=0`. Gancho `window.__decorar836` (`stats`, `erros`, `liga(on)`, `papel(R,id)`).
+   A regra das cadeiras entra no laço de peças do `dc8Fits` (v835) por uma troca de texto (`trocas836.py`). */
+const TV836={cadeiras:!/[?&#]cadeiras836=0/i.test(location.search+location.hash),topoOn:!/[?&#]topo836=0/i.test(location.search+location.hash),
+  topo:null,H:18,stats:{debaixo:0,topos:0,ocultos:0},erros:[]};
+function tv8Erro(o,e){try{if(TV836.erros.length<30)TV836.erros.push(o+': '+(e&&e.message||e));}catch(x){}}
+function tv8T(pt,en,es){try{if(typeof text428==='function')return text428(pt,en,es||pt);}catch(e){}return String(document.documentElement.lang||'').startsWith('en')?en:pt;}
+
+/* ---------- (1) cadeira debaixo da mesa ---------- */
+const TV8_ASSENTO=/cadeira|banqueta|tamborete|banquinho|\bbanco\b|pufe|\bchair|stool|bench|pouf/,TV8_NAOASSENTO=/balan|\brede\b|poltrona|sof[aá]|armchair|rocking|hammock|trono|throne/;
+const TV8_MESA=/\bmesa\b|escrivaninha|secret[aá]ria|bancada|\bdesk\b|\btable\b/,TV8_NAOMESA=/centro|cabeceira|lateral|\bapoio\b|coffee|bedside|side table|night/;
+function tv8Nome(R,id,g){try{const d=dc8Mapa(R)[id]||{};return String(d.name402||d.item402||d.fam||(g&&g.name)||'').toLowerCase();}catch(e){return '';}}
+function tv8Papel(R,id,g){try{const n=tv8Nome(R,id,g);const P=dc8Pegada(g);
+    if(TV8_ASSENTO.test(n)&&!TV8_NAOASSENTO.test(n)&&P.alt<=1.5&&Math.max(P.hx,P.hz)*2<=1.3)return 'assento';
+    if(TV8_MESA.test(n)&&!TV8_NAOMESA.test(n)&&P.alt>=.6&&P.alt<=1.25)return 'mesa';}catch(e){}return null;}
+// A e B se sobrepõem só como «cadeira debaixo da mesa»?
+function tv8Debaixo(R,idA,gA,OA,idB,sB){if(!TV836.cadeiras)return false;
+  try{const pa=tv8Papel(R,idA,gA),pb=tv8Papel(R,idB,sB.g);let C,T;
+    if(pa==='assento'&&pb==='mesa'){C=OA;T=dc8ObbDe(sB);}else if(pa==='mesa'&&pb==='assento'){C=dc8ObbDe(sB);T=OA;}else return false;
+    const al=Math.max(Math.abs(C.ux*T.ux+C.uz*T.uz),Math.abs(C.ux*T.vx+C.uz*T.vz));if(al<.96)return false;
+    const tx=T.x-C.x,tz=T.z-C.z;if(C.vx*tx+C.vz*tz<=0)return false; // de frente para a mesa
+    const m=dc8Mtv(C,T,0);if(!m)return true;const L=Math.hypot(m.x,m.z)||1,nx=m.x/L,nz=m.z/L;
+    const eu=Math.abs(nx*T.ux+nz*T.uz),ev=Math.abs(nx*T.vx+nz*T.vz);
+    const cantos=dc8Cantos(C).map(p=>{const dx=p[0]-T.x,dz=p[1]-T.z;return [dx*T.ux+dz*T.uz,dx*T.vx+dz*T.vz];});const M=.12;let meia;
+    if(ev>.95){if(cantos.some(c=>Math.abs(c[0])>T.a-M))return false;meia=Math.abs(C.ux*T.vx+C.uz*T.vz)>.9?C.a:C.b;}
+    else if(eu>.95){if(cantos.some(c=>Math.abs(c[1])>T.b-M))return false;meia=Math.abs(C.ux*T.ux+C.uz*T.uz)>.9?C.a:C.b;}
+    else return false;
+    if(m.pen>Math.min(.42,.85*meia))return false;TV836.stats.debaixo++;return true;}
+  catch(e){tv8Erro('debaixo',e);return false;}}
+
+/* ---------- (2) vista de cima ---------- */
+function tv8R(){try{if(typeof SALA_ED==='undefined'||!SALA_ED.ativo||CUR!=='room')return null;const R=DEC128.active;return R&&R.universal128&&R.room===ROOM?R:null;}catch(e){return null;}}
+function tv8Chao(R,x,z){try{return R.floors[0].floorY(x,z)||0;}catch(e){return 0;}}
+function tv8Liga(on){
+  if(on){if(!TV836.topoOn||TV836.topo)return false;const R=tv8R();if(!R)return false;
+    const fy=tv8Chao(R,CH.x,CH.z);const T={R,fy,ocultos:[],fog:R.scene.fog,fx:CH.x,fz:CH.z,H:TV836.H,modo:MODE};
+    try{const prot=new Set();for(const s of Object.values(R.placed))if(s&&s.g)s.g.traverse(o=>prot.add(o));try{READER.g.traverse(o=>prot.add(o));}catch(e){}
+      const bb=new THREE.Box3();R.scene.updateMatrixWorld(true);
+      R.scene.traverse(o=>{if(!(o.isMesh||o.isSprite||o.isPoints||o.isLine)||!o.visible||prot.has(o))return;try{bb.setFromObject(o);}catch(e){return;}if(!Number.isFinite(bb.min.y))return;if(bb.min.y>fy+2.7){o.visible=false;T.ocultos.push(o);}});}
+    catch(e){tv8Erro('ocultar',e);}
+    R.scene.fog=null;TV836.topo=T;TV836.stats.topos++;TV836.stats.ocultos=T.ocultos.length;try{CH.vx=CH.vz=0;CH.target=null;CH.onArrive=null;}catch(e){}tv8Botao();return true;}
+  const T=TV836.topo;if(!T)return false;TV836.topo=null;TV836.H=T.H;for(const o of T.ocultos)o.visible=true;try{T.R.scene.fog=T.fog;}catch(e){}try{camInit=false;}catch(e){}tv8Botao();return true;}
+if(TV836.topoOn&&typeof camTP==='function'){const ct0=camTP;camTP=function(dt){const T=TV836.topo;if(!T)return ct0.apply(this,arguments);
+    const R=tv8R();if(!R||R!==T.R){tv8Liga(false);return ct0.apply(this,arguments);}
+    try{for(const o of T.ocultos)if(o.visible)o.visible=false;const yaw=CAM.yaw,H=T.H,inc=.18;
+      camera.position.set(T.fx+Math.sin(yaw)*H*inc,T.fy+H,T.fz+Math.cos(yaw)*H*inc);camera.lookAt(T.fx,T.fy,T.fz);camera.updateMatrixWorld(true);try{setReaderOpacity(1);}catch(e){}}
+    catch(e){tv8Erro('câmera',e);}};}
+if(TV836.topoOn&&typeof moveTP==='function'){const mt0=moveTP;moveTP=function(dt){const T=TV836.topo;if(!T)return mt0.apply(this,arguments);
+    try{let f=0,s=0;if(keys['w'])f+=1;if(keys['s'])f-=1;if(keys['a'])s-=1;if(keys['d'])s+=1;const yaw=CAM.yaw,fx=-Math.sin(yaw),fz=-Math.cos(yaw),rx=Math.cos(yaw),rz=-Math.sin(yaw);
+      const sp=T.H*(keys['shift']?1.6:.8);const ext=Math.max(10,(T.R.room.world&&T.R.room.world.ext)||40);T.fx=Math.max(-ext,Math.min(ext,T.fx+(fx*f+rx*s)*sp*dt));T.fz=Math.max(-ext,Math.min(ext,T.fz+(fz*f+rz*s)*sp*dt));
+      CH.vx=CH.vz=0;CH.motionSpeed=0;CH.target=null;}catch(e){tv8Erro('pan',e);}};}
+// botão no alto do painel do Decorar
+function tv8Botao(){try{const p=typeof SALA_PAINEL!=='undefined'&&SALA_PAINEL;if(!p||!p.isConnected||typeof SALA_ED==='undefined'||!SALA_ED.ativo)return;let b=p.querySelector('#topo836');
+    if(!b){const row=[...p.children].find(c=>c.tagName==='DIV'&&[...c.querySelectorAll(':scope>button')].some(x=>/^✓/.test((x.textContent||'').trim())));if(!row)return;
+      b=document.createElement('button');b.id='topo836';b.type='button';b.setAttribute('translate','no');b.style.cssText='color:#ead8af;background:#32271b;border:1px solid #675335;border-radius:4px;padding:6px 8px;cursor:pointer;font:11px system-ui;margin:0 0 0 4px';
+      b.addEventListener('pointerdown',e=>e.stopPropagation());b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();tv8Liga(!TV836.topo);});
+      const btns=[...row.querySelectorAll(':scope>button')];const ref=btns[1]||btns[0];if(ref&&ref.nextSibling)row.insertBefore(b,ref.nextSibling);else row.appendChild(b);}
+    const on=!!TV836.topo;const t=on?tv8T('🔭 Normal','🔭 Normal','🔭 Normal'):tv8T('🔭 De cima','🔭 Top view','🔭 Desde arriba');if(b.textContent!==t)b.textContent=t;
+    b.title=tv8T('Tecla T','Key T','Tecla T');b.style.background=on?'#5a4426':'#32271b';b.style.borderColor=on?'#c9a45c':'#675335';}catch(e){tv8Erro('botão',e);}}
+if(TV836.topoOn){setInterval(()=>{try{if(typeof SALA_ED!=='undefined'&&SALA_ED.ativo)tv8Botao();else if(TV836.topo)tv8Liga(false);}catch(e){}},500);
+  addEventListener('keydown',e=>{try{const tg=e.target;if(tg&&(tg.tagName==='INPUT'||tg.tagName==='TEXTAREA'||tg.isContentEditable))return;const k=(e.key||'').toLowerCase();
+      if(TV836.topo&&k==='v'&&!e.ctrlKey&&!e.metaKey){e.preventDefault();e.stopImmediatePropagation();return;}
+      if(k!=='t'||e.ctrlKey||e.metaKey||e.altKey||e.repeat)return;if(!tv8R())return;e.preventDefault();e.stopImmediatePropagation();tv8Liga(!TV836.topo);}catch(x){tv8Erro('tecla',x);}},true);
+  addEventListener('wheel',e=>{const T=TV836.topo;if(!T)return;try{const M=window.__ms748;if(M&&M._drag&&M._drag())return;if(e.target&&e.target.closest&&e.target.closest('dialog,#salaDecorPanel'))return;
+      e.preventDefault();e.stopImmediatePropagation();T.H=Math.max(6,Math.min(48,T.H*(e.deltaY>0?1.12:1/1.12)));}catch(x){tv8Erro('roda',x);}},{capture:true,passive:false});
+  if(typeof decorToggle128==='function'){const tg0=decorToggle128;decorToggle128=function(on){try{if(!on&&TV836.topo)tv8Liga(false);}catch(e){}return tg0.apply(this,arguments);};}}
+window.__decorar836={estado:TV836,stats:TV836.stats,erros:TV836.erros,liga:tv8Liga,papel:(R,id)=>{try{return tv8Papel(R,id,R.placed[id].g);}catch(e){return null;}},debaixo:tv8Debaixo};
 
 window.__build434={revision:434,family:"web",edition:"en"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
