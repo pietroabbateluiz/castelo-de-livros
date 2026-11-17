@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v845</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v846</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -112299,6 +112299,105 @@ if(PC845.on){
   PC845.tmr=setInterval(pc845Tick,700);
 }
 window.__acumulador845={estado:PC845,stats:PC845.stats,erros:PC845.erros,pede:pc845Pede,falta:pc845Falta,tick:pc845Tick};
+
+/* ===================== v846 · RODADA GERAL DAS MECÂNICAS, 1.ª PARTE: TEXTURAS REPETIDAS, A SALA DO FAROESTE E AS CHAVES ESCONDIDAS (bloco `RG846`) =====================
+   Pedido do Luiz (17/11): «Faça uma nova rodada de analise e otimização e aprimoramentos em todas as mecânicas do jogo.»
+   VARREDURA (navegador sem placa, webmaster, `g846/varre.js`): as 35 salas montadas uma a uma, sem os bastidores; em cada uma, contagens
+   (malhas, triângulos, luzes, materiais, texturas, obstáculos), uma auditoria de caminhada de 40–60 percursos com o `moveTP` do jogo
+   (paredes atravessadas, discos invadidos, leitor preso ou tremendo) e o ALCANCE de verdade para quem anda (grade de 30 cm com o `clamp`
+   do jeito que o movimento o chama — `V222.jog` ligado — e os discos, a partir da entrada) até a porta, o conto, os dois baús e as duas
+   chaves. Caminhada: nenhuma parede atravessada, nenhum disco invadido em nenhuma sala (a Ficção Científica encosta 3 cm, na regra dela).
+   O que apareceu:
+   · FAROESTE (7.º andar) — a montagem quebrava no acabamento: o plano das chaves (`treasure391EnsureG` → `keyPlanG` → `keyDistances`)
+     partia da entrada em z = 29,1 quando o mundo da sala ainda tinha `ext` 24 (a grade de caminhos não chegava lá) e lançava «Entrada sem
+     acesso à malha da chave»; a sala ficava pronta SEM as duas chaves (o contador «faltam 70 chaves» nunca fecharia) e sem o resto daquela
+     camada. Agora, quando a entrada fica fora da grade, o mundo cresce o bastante para a conter e o plano é refeito na hora.
+   · CHAVES DENTRO DE MÓVEIS: quatro chaves planejadas antes de uma decoração posterior ficaram DENTRO dela — invisíveis (fotos):
+     Super-heróis (chave 1, dentro de um disco de 0,7 m), Autoajuda (chave 1, dentro das almofadas brancas, disco de 1,6 m), Teatro
+     (chave 1, dentro da mesa das marionetes, 1,6 m) e Quadrinhos (chave 2, 0,55 m). Agora, ao entrar na sala, a chave ainda não apanhada
+     cujo lugar caiu dentro de um obstáculo é replanejada pelo próprio planejador do jogo (com os obstáculos de agora, num canto
+     andável) e a chave muda para lá. As chaves de lugar fixo ficam onde estão.
+   · TEXTURAS REPETIDAS: a Sala do Acumulador tem 1.938 texturas nos materiais, mas só 161 imagens diferentes — cada peça carrega a sua
+     cópia (uma imagem de 256 × 256 está em 462 texturas, outra em 422…): 185 megapixels mandados para a placa de vídeo, ~1 GB com os
+     mipmaps, o grosso da preparação de ~55 s medida na v845. Agora as texturas que usam a MESMA imagem com os mesmos parâmetros de placa
+     (repetição de borda, filtros, formato, mipmap, anisotropia, codificação) passam a usar UMA textura na placa de vídeo (a primeira já
+     enviada, ou uma cópia nova), antes de cada aquecimento de cena (`warmCollect`: entrada nas salas e nos halls e preparação dos
+     bastidores, já depois da redução de imagens do modo leve); repetição, deslocamento e giro continuam por textura (são uniformes do
+     material). Se uma delas mudar depois (`needsUpdate`), ela volta a ter a sua própria textura na placa; descartar uma delas não apaga a
+     compartilhada; uma imagem redesenhada depois de vista (letreiros, relógios, placares: qualquer desenho no canvas, nova largura ou
+     novo `src`) sai do compartilhamento para sempre; a textura compartilhada é apagada da placa quando nenhuma das suas texturas existe
+     mais. Para não travar um quadro, cada aquecimento envia cópias novas por no máximo 50 ms (os grupos maiores primeiro: no Acumulador
+     os 5 maiores já são 73% das repetidas); o resto é deduplicado no aquecimento seguinte — a entrada na sala —, só adotando a textura
+     já enviada de uma e apagando as outras. Vale para todas as cenas.
+   Chave: `?rodada846=0` (tudo) · `?texturas846=0` (só as texturas). Gancho `window.__rodada846`. */
+const RG846={on:!/[?&#]rodada846=0/i.test(location.search+location.hash),erros:[],stats:{farwest:0,replanejadas:[],cenas:0,grupos:0,compartilhadas:0,liberadas:0,enviadas:0,adiadas:0,sujas:0,apagadas:0,ms:0,maior:0}};
+function rg846Erro(k,e){if(RG846.erros.length<30)RG846.erros.push(k+': '+(e&&e.message||e));try{console.warn('v846',k,e);}catch(x){}}
+const TX846={on:RG846.on&&!/[?&#]texturas846=0/i.test(location.search+location.hash),ids:new WeakMap(),nid:0,canon:new Map(),sujas:new WeakSet(),dono:new WeakMap(),orc:50,
+  fim:(typeof FinalizationRegistry==='function'&&typeof WeakRef==='function')?new FinalizationRegistry(gt=>{try{renderer.getContext().deleteTexture(gt);renderer.info.memory.textures--;RG846.stats.apagadas++;}catch(e){}}):null,
+  slots:['map','emissiveMap','normalMap','roughnessMap','metalnessMap','alphaMap','bumpMap','aoMap','lightMap','specularMap','displacementMap','gradientMap','matcap','clearcoatMap','clearcoatNormalMap','clearcoatRoughnessMap','transmissionMap']};
+
+/* ---------- (1) texturas: a mesma imagem, uma textura só na placa de vídeo ---------- */
+function tx846Chave(t){if(!t||!t.isTexture||t.isVideoTexture||t.isDataTexture||t.isCompressedTexture||t.isCubeTexture||t.isDepthTexture||t.isDataTexture2DArray||t.isDataTexture3D)return null;
+  if(!(t.version>0))return null;const im=t.image;if(!im||im.complete===false||!(im.width>0&&im.height>0))return null;if(t.userData&&t.userData.tx846)return null;
+  if(TX846.sujas.has(im))return null; // redesenhada depois de vista: cada textura com a sua
+  let id=TX846.ids.get(im);if(!id){id=++TX846.nid;TX846.ids.set(im,id);}
+  return id+'|'+[t.wrapS,t.wrapT,t.magFilter,t.minFilter,t.format,t.type,t.generateMipmaps?1:0,t.flipY?1:0,t.premultiplyAlpha?1:0,t.unpackAlignment,t.anisotropy,t.encoding,t.internalFormat||''].join(',');}
+// orc: tempo (ms) para enviar cópias novas nesta chamada — os grupos maiores primeiro; o que não couber é deduplicado na próxima varredura
+// (aí as texturas já foram enviadas pelo aquecimento: basta adotar uma e apagar as outras, sem envio nenhum)
+function tx846Cena(sc,orc){if(!TX846.on||!sc||typeof renderer==='undefined')return;const t0=performance.now();orc=orc>0?orc:TX846.orc;const P=renderer.properties,gl=renderer.getContext(),G=new Map();
+  sc.traverse(o=>{const ms=o.material?(Array.isArray(o.material)?o.material:[o.material]):null;if(!ms)return;for(const m of ms){if(!m)continue;for(const k of TX846.slots){const t=m[k];if(!t||!t.isTexture)continue;const c=tx846Chave(t);if(!c)continue;let g=G.get(c);if(!g){g=new Set();G.set(c,g);}g.add(t);}}});
+  const GL=[...G].sort((a,b)=>b[1].size-a[1].size);
+  for(const [c,g] of GL){let canon=tx846Canon(c);if(g.size<2&&!canon)continue;
+    try{let cp=canon?P.get(canon):null;
+      if(!canon||!cp.__webglTexture){
+        // a textura canônica é uma cópia que o jogo não conhece (ninguém a descarta); se um membro já foi enviado, ela adota a textura dele
+        let adot=null;for(const t of g){const p=P.get(t);if(p.__webglInit&&p.__webglTexture&&p.__version===t.version){adot=[t,p];break;}}
+        if(!adot&&performance.now()-t0>orc){RG846.stats.adiadas++;continue;}
+        const t0m=g.values().next().value;canon=t0m.clone();canon.name='tx846 '+(t0m.name||'');canon.userData={tx846:true};canon.needsUpdate=true;cp=P.get(canon);
+        if(adot){cp.__webglTexture=adot[1].__webglTexture;cp.__webglInit=true;cp.__version=canon.version;cp.__currentAnisotropy=adot[1].__currentAnisotropy;adot[1].__webglInit=undefined;}
+        else{renderer.initTexture(canon);RG846.stats.enviadas++;}
+        cp=P.get(canon);if(!cp.__webglTexture)continue;
+        // a cópia vive enquanto alguma das suas texturas viver (cada uma a segura); depois disso a textura dela sai da placa
+        if(TX846.fim){TX846.canon.set(c,new WeakRef(canon));TX846.fim.register(canon,cp.__webglTexture);}else TX846.canon.set(c,canon);}
+      for(const t of g){if(t===canon)continue;TX846.dono.set(t,canon);const p=P.get(t);if(p.__webglTexture===cp.__webglTexture&&p.__version===t.version)continue;
+        if(p.__webglInit&&p.__webglTexture&&p.__webglTexture!==cp.__webglTexture){try{gl.deleteTexture(p.__webglTexture);renderer.info.memory.textures--;}catch(e){}RG846.stats.liberadas++;}
+        // sem __webglInit: descartar esta textura não apaga a compartilhada; um needsUpdate faz o three criar uma própria para ela
+        p.__webglInit=undefined;p.__webglTexture=cp.__webglTexture;p.__version=t.version;p.__currentAnisotropy=cp.__currentAnisotropy;RG846.stats.compartilhadas++;}
+      RG846.stats.grupos++;}catch(e){rg846Erro('textura',e);}}
+  const dt=performance.now()-t0;RG846.stats.cenas++;RG846.stats.ms+=Math.round(dt);if(dt>RG846.stats.maior)RG846.stats.maior=Math.round(dt);}
+function tx846Canon(c){const r=TX846.canon.get(c);if(!r)return null;if(TX846.fim){const v=r.deref();if(!v)TX846.canon.delete(c);return v||null;}return r;}
+// uma imagem já vista (com chave) que é redesenhada — desenho no canvas, nova largura/altura, novo `src` — não é compartilhada de novo
+function tx846Suja(c){try{if(c&&TX846.ids.has(c)&&!TX846.sujas.has(c)){TX846.sujas.add(c);RG846.stats.sujas++;}}catch(e){}}
+function tx846Ganchos(){
+  try{const P2=CanvasRenderingContext2D.prototype;for(const k of ['fillRect','clearRect','strokeRect','fillText','strokeText','drawImage','putImageData','fill','stroke','reset']){const f=P2[k];if(typeof f!=='function')continue;P2[k]=function(){tx846Suja(this.canvas);return f.apply(this,arguments);};}}catch(e){rg846Erro('ganchos 2d',e);}
+  try{for(const k of ['width','height']){const d=Object.getOwnPropertyDescriptor(HTMLCanvasElement.prototype,k);if(!d||!d.set)continue;Object.defineProperty(HTMLCanvasElement.prototype,k,{configurable:true,enumerable:d.enumerable,get:d.get,set:function(v){tx846Suja(this);return d.set.call(this,v);}});}}catch(e){rg846Erro('ganchos canvas',e);}
+  try{const d=Object.getOwnPropertyDescriptor(HTMLImageElement.prototype,'src');if(d&&d.set)Object.defineProperty(HTMLImageElement.prototype,'src',{configurable:true,enumerable:d.enumerable,get:d.get,set:function(v){tx846Suja(this);return d.set.call(this,v);}});}catch(e){rg846Erro('ganchos img',e);}}
+
+/* ---------- (2) o plano das chaves com a entrada fora da grade (a Sala do Faroeste) ---------- */
+function rg846Cresce(world,entry){const m=Math.max(Math.abs(entry[0]),Math.abs(entry[1]))+2;if(!(world.ext>=m)){world.ext=Math.ceil(m);world.__nav=null;world.__navN=-1;world.__cl=null;return true;}return false;}
+
+/* ---------- (3) chaves que ficaram dentro de móveis: replanejar ao entrar na sala ---------- */
+function rg846Dentro(R,x,z){try{for(const o of R.world.obst){if(o.porta222)continue;if(Math.hypot(x-o[0],z-o[1])<o[2]-.08)return o;}}catch(e){}return null;}
+function rg846Chaves(){try{const room=coinKeyFor();if(!room)return;const R=ROOMS[room];if(!R||!R.ready||!R.world)return;
+    for(const slot of [1,2]){const PL=slot===2?KEY_PLANS2:KEY_PLANS,FIX=slot===2?(typeof KEY_FIXO2!=='undefined'?KEY_FIXO2:{}):KEY_FIXO;if(FIX&&FIX[room])continue;
+      const p=PL[room];if(!p||p.lvl)continue;const has=slot===2?hasKey2:hasKey;if(has(p.genre))continue;const ob=rg846Dentro(R,p.x,p.z);if(!ob)continue;
+      const antes=[+p.x.toFixed(2),+p.z.toFixed(2)];delete PL[room];let np=null;try{np=keyPlan(room,slot);}catch(e){rg846Erro('replanejar '+room,e);}
+      if(!np){PL[room]=p;continue;}
+      const items=slot===2?KEYS.items2:KEYS.items,it=items&&items[np.genre];if(it&&!it.got){Object.assign(it,{x:np.x,y:np.y,z:np.z,lvl:np.lvl});try{it.g.position.set(np.x,np.y,np.z);}catch(e){}}
+      if(RG846.stats.replanejadas.length<40)RG846.stats.replanejadas.push({sala:room,chave:slot,de:antes,para:[+np.x.toFixed(2),+np.z.toFixed(2)],disco:+ob[2].toFixed(2)});}}catch(e){rg846Erro('chaves',e);}}
+
+if(RG846.on){
+  // no aquecimento de cada cena (antes de compilar e enviar): entrada nas salas e halls, bastidores, portas — depois da redução do modo leve
+  try{if(TX846.on){tx846Ganchos();if(typeof warmCollect==='function'){const wc0=warmCollect;warmCollect=function(sc){try{tx846Cena(sc);}catch(e){rg846Erro('cena',e);}return wc0.apply(this,arguments);};}
+    else if(typeof travel434Prepare==='function'){const tp0=travel434Prepare;travel434Prepare=function(scene){try{tx846Cena(scene);}catch(e){rg846Erro('cena',e);}return tp0.apply(this,arguments);};}}}catch(e){rg846Erro('aquecimento',e);}
+  // antes de todo o acabamento, a grade de caminhos da sala tem de chegar à entrada e à porta (no Faroeste o mundo ainda tinha ext 24 com a
+  // entrada em z = 29,1: o plano das chaves e o lugar dos baús partiam de fora da grade)
+  try{const fr0=finishRoom;finishRoom=fr8Wrap(function*(key){try{const R=ROOMS[key];if(R&&R.world){const pts=[R.spawn&&[R.spawn.x,R.spawn.z],R.doorFront,R.room&&R.room.spawn&&[R.room.spawn.x,R.room.spawn.z]];for(const q of pts)if(q&&isFinite(q[0])&&isFinite(q[1])&&rg846Cresce(R.world,q))RG846.stats.farwest++;}}catch(e){rg846Erro('acabamento '+key,e);}
+    return (yield* fr8Prev(fr0,this,arguments,"RG846"));});}catch(e){rg846Erro('finishRoom',e);}
+  try{const kd0=keyDistances;keyDistances=function(world,entry){try{return kd0.apply(this,arguments);}catch(e){if(e&&/Entrada sem acesso/.test(e.message)&&world&&entry&&rg846Cresce(world,entry)){RG846.stats.farwest++;return kd0.apply(this,arguments);}throw e;}};}catch(e){rg846Erro('keyDistances',e);}
+  try{const ka0=keyActivate;keyActivate=function(){try{rg846Chaves();}catch(e){rg846Erro('ativa',e);}return ka0.apply(this,arguments);};}catch(e){rg846Erro('keyActivate',e);}
+}
+window.__rodada846={estado:RG846,stats:RG846.stats,erros:RG846.erros,texturas:TX846,cena:tx846Cena,canon:tx846Canon,suja:tx846Suja,chaves:rg846Chaves,dentro:rg846Dentro};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
