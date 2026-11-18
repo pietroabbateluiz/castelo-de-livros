@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v857</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v858</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -112859,6 +112859,27 @@ if(OL857.on&&typeof oil428Spot==='function'){
     }catch(e){ol857Erro('lugar',e);return s0.apply(this,arguments);}};}catch(e){ol857Erro('oil428Spot',e);}
 }
 window.__oleo857={estado:OL857,stats:OL857.stats,erros:OL857.erros,saltos:ol857Saltos,ligadas:ol857Ligadas};
+
+/* ===================== v858 · O DEUS TIRÂNICO ROBÔ (7.º ANDAR) FICAVA PARADO: A LUTA NUNCA ANDAVA (bloco `DT858`) =====================
+   Plano de 24 h do Luiz (18/11), bloco extra 8f — portões dos andares 2–7 e o chefe do 7.º andar.
+   COMO ERA: o chefe da v428 nasce com o papel 'deity' (`deity428Init` → `ally428Actor`), e o `ally428Actor` só cria a barra de vida
+   (`robot315Bar`) para os papéis 'enemy' e 'robotFriend'. Na fase de luta, o primeiro passo do `deity428Tick` é mostrar a barra
+   (`B.enemy.g.userData.barra.sp.visible=true`); sem barra, o erro interrompia o resto a cada quadro — e o laço do jogo o engolia
+   calado (`try{caveirasTick(dt);}catch(e){}`): o tirano não andava, não batia no chão nem atirava, os seis robôs aliados ficavam
+   parados à volta e a vida dele (30 000) não aparecia. Só os poderes do leitor o feriam, parado. Ninguém tinha chegado lá jogando
+   normalmente: o 7.º andar só abriu com a v857.
+   AGORA: o tirano ganha a barra de vida que o código dele espera — a mesma das outras máquinas inimigas, com o nome e a vida, acima
+   da cabeça —, e a luta segue o desenho da v428: ele persegue o leitor, bate no chão (o círculo vermelho; 45 de dano), atira (28),
+   e os robôs com óleo o rodeiam e atiram nele (65 por tiro).
+   Chave: `?deus858=0`. Gancho `window.__deus858`. */
+const DT858={on:!/[?&#]deus858=0/i.test(location.search+location.hash),erros:[],stats:{barras:0}};
+function dt858Erro(k,e){if(DT858.erros.length<20)DT858.erros.push(k+': '+(e&&e.message||e));try{console.warn('v858',k,e);}catch(x){}}
+function dt858Barra(){try{const B=DEITY428,k=B&&B.enemy;if(!k||!k.g||k.g.userData.barra)return;
+    robot315Bar(k,deity428Name(),'#e86879',3.5);const b=k.g.userData.barra;if(b&&b.sp)b.sp.position.y=(k.height||5.5)+.22;DT858.stats.barras++;}catch(e){dt858Erro('barra',e);}}
+if(DT858.on&&typeof deity428Tick==='function'){
+  try{const t0=deity428Tick;deity428Tick=function(dt){dt858Barra();return t0.apply(this,arguments);};}catch(e){dt858Erro('deity428Tick',e);}
+}
+window.__deus858={estado:DT858,stats:DT858.stats,erros:DT858.erros,barra:dt858Barra};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
