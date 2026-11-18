@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v852</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v853</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -112710,6 +112710,38 @@ if(FP852.on){
       return r;};}catch(e){fp852Erro('move',e);}
 }
 window.__primeira852={estado:FP852,stats:FP852.stats,erros:FP852.erros};
+
+/* ===================== v853 · COMBATE: INIMIGOS QUE NASCIAM DENTRO DOS MÓVEIS (bloco `CB853`) =====================
+   Plano de 24 h do Luiz (17–18/11), bloco extra 8b — combate, inimigos, chefes e morte (bateria de combate em todas as salas).
+   COMO ERA: os pontos de nascimento dos inimigos (`cavPontos`, na montagem da sala) saem da malha de caminhos daquele momento; os
+   móveis e enfeites postos depois pelas camadas de acabamento não entram nela — como as chaves da v846. Resultado: inimigos nascendo
+   DENTRO de móveis e dormindo ali até acordar (até ~10 s, porque cada um acorda 1,3 s depois do anterior), atravessados no móvel:
+   Minotauros na Mitologia, Máscaras oni na Autoajuda, Vilões mascarados nos Super-heróis, Cupidos no Romance, um Drone na Distopia…
+   (só ao acordar o passo de cada quadro os empurrava para fora).
+   AGORA: a cada entrada na sala (`cavEntrar`, depois de todos os embrulhos), o inimigo comum cujo ponto de nascimento caiu dentro de
+   um obstáculo (fora as portas) muda para o lugar livre mais perto — andável, com folga de 35 cm dos móveis e 1,2 m dos outros
+   inimigos, procurado em anéis de 30 cm até 6 m. Chefes, aliados, rivais e a nave da Ficção têm lugar próprio e ficam como estão.
+   O ponto novo vale para as próximas entradas (até recarregar a página, quando é refeito igual).
+   Chave: `?combate853=0`. Gancho `window.__combate853`. */
+const CB853={on:!/[?&#]combate853=0/i.test(location.search+location.hash),erros:[],stats:{movidos:0,semLugar:0,salas:{}}};
+function cb853Erro(k,e){if(CB853.erros.length<20)CB853.erros.push(k+': '+(e&&e.message||e));try{console.warn('v853',k,e);}catch(x){}}
+function cb853Fora(k){return !k||k.robot315||k.para318||k.ally428||k.rival530||k.ship316||k.chefe201||k.tipo==='farao'||k.tipo==='colecionador'||k.tipo==='428';}
+function cb853Dentro(W,x,z){for(const o of W.obst||[]){if(o.porta222)continue;if(Math.hypot(x-o[0],z-o[1])<(o[2]||.5)-0.05)return o;}return null;}
+function cb853Livre(W,x,z,S,k){const c=W.clamp(x,z,.9);const cx=Array.isArray(c)?c[0]:c.x,cz=Array.isArray(c)?c[1]:c.z;if(Math.abs(cx-x)>.02||Math.abs(cz-z)>.02)return false;
+  for(const o of W.obst||[]){if(o.porta222)continue;if(Math.hypot(x-o[0],z-o[1])<(o[2]||.5)+.35)return false;}
+  for(const q of S.lista){if(q===k||cb853Fora(q))continue;const qx=q.x0!==undefined?q.x0:q.x,qz=q.z0!==undefined?q.z0:q.z;if(Math.hypot(x-qx,z-qz)<1.2)return false;}return true;}
+function cb853Arruma(room){const S=CAV.salas[room],R=ROOMS[room];if(!S||!S.lista||!R||!R.world)return 0;const W=R.world;let n=0;
+  for(const k of S.lista){if(cb853Fora(k))continue;const x0=k.x0!==undefined?k.x0:k.x,z0=k.z0!==undefined?k.z0:k.z;if(!Number.isFinite(x0)||!Number.isFinite(z0)||!cb853Dentro(W,x0,z0))continue;
+    let best=null;for(let rr=.3;rr<=6.01&&!best;rr+=.3){const m=Math.max(8,Math.round(rr*2*Math.PI/.3));for(let i=0;i<m;i++){const a=i/m*2*Math.PI,x=x0+Math.cos(a)*rr,z=z0+Math.sin(a)*rr;if(cb853Livre(W,x,z,S,k)){best=[x,z,rr];break;}}}
+    if(!best){CB853.stats.semLugar++;continue;}
+    if(Array.isArray(S.pts))for(const p of S.pts){if(p&&Math.abs(p[0]-x0)<1e-6&&Math.abs(p[1]-z0)<1e-6){p[0]=best[0];p[1]=best[1];}}
+    k.x0=best[0];k.z0=best[1];const naOrigem=Math.hypot(k.x-x0,k.z-z0)<.05;if(naOrigem||!k.viva){k.x=best[0];k.z=best[1];if(k.g){k.g.position.x=best[0];k.g.position.z=best[1];}}
+    n++;CB853.stats.movidos++;const st=CB853.stats.salas[room]||(CB853.stats.salas[room]=[]);if(st.length<8)st.push([String(k.tipo||k.id),+x0.toFixed(1),+z0.toFixed(1),'→',+best[0].toFixed(1),+best[1].toFixed(1),+best[2].toFixed(1)]);}
+  return n;}
+if(CB853.on){
+  try{const en0=cavEntrar;cavEntrar=function(room){const r=en0.apply(this,arguments);try{cb853Arruma(room);}catch(e){cb853Erro('entrar',e);}return r;};if(window.__cav)window.__cav.entrar=cavEntrar;}catch(e){cb853Erro('cavEntrar',e);}
+}
+window.__combate853={estado:CB853,stats:CB853.stats,erros:CB853.erros,arruma:cb853Arruma};
 
 window.__build434={revision:434,family:"web",edition:"en"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
