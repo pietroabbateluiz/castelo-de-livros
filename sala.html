@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v847</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v848</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -112498,6 +112498,96 @@ if(TX847.on){
   try{if(TX846.fim&&typeof FinalizationRegistry==='function')TX846.fim=new FinalizationRegistry(gt=>{try{if(TX847.mortas.has(gt))return;TX847.mortas.add(gt);renderer.getContext().deleteTexture(gt);renderer.info.memory.textures--;RG846.stats.apagadas++;}catch(e){}});}catch(e){tx847Erro('registro',e);}
 }
 window.__texturas847={estado:TX847,stats:TX847.stats,erros:TX847.erros,cena:tx847Cena,solta:tx847Solta};
+
+/* ===================== v848 · MOVIMENTO: O LEITOR QUE TREMIA NOS CANTOS, A 1.ª PESSOA DENTRO DOS MÓVEIS E A MALHA DE CAMINHOS CURTA (bloco `MV848`) =====================
+   Plano de 24 h do Luiz (17/11), bloco 3 — «caçando todos os tipos de bugs e erros… apenas foque nas questões técnicas».
+   MEDIDO (navegador sem placa, `bat/mov.js`: em cada sala, 30 caminhadas no Gamer com o `moveTP` do jogo, 30 na 1.ª pessoa com o `move`
+   do jogo, 16 trajetos de clique — `walkTo` + `moveTP` entre pontos sorteados da grade alcançável — e uma sonda da área andável contra a
+   malha de caminhos):
+   (1) LEITOR TREMENDO NUM CANTO: encostado ao mesmo tempo numa parede e num móvel redondo, com a tecla apertada para dentro do canto, o
+       leitor ia e voltava 5–7 cm a cada 2–3 quadros sem parar (na sala pessoal, entre a parede z = −17,9 e uma fileira de discos de
+       0,62 m: o empurrão para fora do disco e o passo de lado da v832 o jogam contra a parede, a parede o devolve, e assim por diante;
+       a resolução de cantos da v834 não vê nada de errado porque cada posição é válida). Uma em cada 30 caminhadas na sala pessoal, na
+       Catedral, na Arena e na Digital. Agora, quando o passo vai e volta (3 inversões em 8 quadros, encostado, sem sair do lugar), o
+       leitor PARA no canto, como numa parede reta, com a animação de parado; volta a andar assim que a direção pedida muda (mais de 35°)
+       ou que solta a tecla; num trajeto de clique preso assim por 1 s, o trajeto é encerrado (como o jogo já faz com o leitor parado).
+       O mesmo detector vale para a 1.ª pessoa (com a resolução nova do item 2 ela também podia ir e voltar num canto: 2 de 30
+       caminhadas na Acrópole, num vale entre dois bancos: 9 mm para lá e para cá a cada quadro, a câmera vibrando).
+   (2) 1.ª PESSOA DENTRO DOS MÓVEIS: a regra da 1.ª pessoa (`move`) empurra o leitor para fora de cada disco um por um, sem a resolução
+       de cantos que a v834 deu ao Gamer: entre dois discos vizinhos ele ficava até ~10 cm dentro de um deles (na Digital, 150 quadros
+       em 30 caminhadas; no Faroeste 22, até 5 cm) — a câmera entrava no móvel. Agora a mesma resolução da v834 (paredes, depois discos,
+       até duas vezes; num canto sem saída fica onde estava) roda depois do passo da 1.ª pessoa, com a margem dela (1,0 m). Medido também
+       nas paredes: na Aventura a 1.ª pessoa entrava até 25 cm na parede (529 quadros em 30 caminhadas), na Biblioteca, na Fantasia e
+       na Ficção ~10 cm. Na nave da Ficção Científica os discos seguem com a regra própria; ali só as paredes são corrigidas.
+   (3) MALHA DE CAMINHOS MAIS CURTA QUE A SALA: a malha de 30 cm do clique, das chaves e dos baús cobre só até `world.ext`; em algumas
+       salas o chão andável vai além (o Faroeste até x = −35,8 com a malha em 33 — o conto da sala fica lá; a Arena e a Digital 3 m além,
+       no vestíbulo da porta). Ali o clique não achava caminho (andava em linha reta). Agora, na primeira entrada em cada sala, uma sonda
+       (120 raios) mede até onde o chão andável vai — sem contar o vestíbulo da porta, que quase todas as salas têm 3 m além da malha e que
+       se usa andando reto — e a malha cresce para cobri-lo (até 15 m a mais).
+   Chave: `?movimento848=0`. Gancho `window.__movimento848`. */
+const MV848={on:!/[?&#]movimento848=0/i.test(location.search+location.hash),erros:[],stats:{pinos:0,soltos:0,cliquesEncerrados:0,fp:0,malhas:[]},
+  tp:{hist:[],pino:null,pinoT:0,ult:null},fp:{hist:[],pino:null,pinoT:0,ult:null}};
+function mv848Erro(k,e){if(MV848.erros.length<30)MV848.erros.push(k+': '+(e&&e.message||e));try{console.warn('v848',k,e);}catch(x){}}
+// a resolução de cantos da v834, com a margem de parede de quem chama
+function mv848Resolve(nx,nz,ox0,oz0,m){const W=WORLD,ob=W.obst,jog=typeof V222!=='undefined'&&V222.jog;const fora=(a,b)=>{const q=W.clamp(a,b,m);return Math.abs(q[0]-a)>1e-4||Math.abs(q[1]-b)>1e-4?q:null;};
+  const pior=(a,b)=>{let p=0;for(const o of ob){if(jog&&o.porta222)continue;const d=o[2]-Math.hypot(a-o[0],b-o[1]);if(d>p)p=d;}return p;};
+  let q=fora(nx,nz);if(!q&&pior(nx,nz)<0.01)return null;
+  for(let it=0;it<2;it++){if(q){nx=q[0];nz=q[1];}let mexeu=false;for(const o of ob){if(jog&&o.porta222)continue;const dx=nx-o[0],dz=nz-o[1],d=Math.hypot(dx,dz);if(d<o[2]-1e-4){const ux=d>1e-6?dx/d:1,uz=d>1e-6?dz/d:0;nx=o[0]+ux*o[2];nz=o[1]+uz*o[2];mexeu=true;}}q=fora(nx,nz);if(!q&&!mexeu)break;}
+  if(q){nx=q[0];nz=q[1];}
+  if(pior(nx,nz)>0.03&&!fora(ox0,oz0)&&pior(ox0,oz0)<0.03)return [ox0,oz0];
+  return [nx,nz];}
+// a direção que o leitor está pedindo (teclas/controle na câmera, ou o destino do clique)
+function mv848Pedido(){let f=0,s=0;if(keys['w']||keys['arrowup'])f+=1;if(keys['s']||keys['arrowdown'])f-=1;if(keys['a']||keys['arrowleft'])s-=1;if(keys['d']||keys['arrowright'])s+=1;f-=PAD.mz;s+=PAD.mx;
+  if(Math.abs(f)>0.01||Math.abs(s)>0.01){const fx=-Math.sin(CAM.yaw),fz=-Math.cos(CAM.yaw),rx=Math.cos(CAM.yaw),rz=-Math.sin(CAM.yaw);const tx=fx*f+rx*s,tz=fz*f+rz*s,l=Math.hypot(tx,tz);return l>1e-6?[tx/l,tz/l]:null;}
+  if(CH.target){const dx=CH.target.x-CH.x,dz=CH.target.z-CH.z,d=Math.hypot(dx,dz);return d>1e-6?[dx/d,dz/d]:null;}return null;}
+// (1) o canto que fazia tremer — o mesmo detector para o Gamer/Clique (CH) e para a 1.ª pessoa (P)
+function mv848PedidoFP(){let f=0,s=0;if(keys['w']||keys['arrowup'])f+=1;if(keys['s']||keys['arrowdown'])f-=1;if(keys['a']||keys['arrowleft'])s-=1;if(keys['d']||keys['arrowright'])s+=1;f-=PAD.mz;s+=PAD.mx;try{f+=wheelV;}catch(e){}
+  if(Math.abs(f)<0.01&&Math.abs(s)<0.01)return null;const fx=-Math.sin(P.yaw),fz=-Math.cos(P.yaw),rx=Math.cos(P.yaw),rz=-Math.sin(P.yaw);const tx=fx*f+rx*s,tz=fz*f+rz*s,l=Math.hypot(tx,tz);return l>1e-6?[tx/l,tz/l]:null;}
+function mv848Osc(S,x,z,ox,oz,contato,ped,segura){const H=S.hist;const dx=x-ox,dz=z-oz;
+  // o leitor mudou de lugar entre um quadro e outro (entrou numa sala, foi levado): a história recomeça
+  const U=S.ult;if(U&&Math.hypot(ox-U[0],oz-U[1])>0.5){H.length=0;if(S.pino){S.pino=null;MV848.stats.soltos++;}}S.ult=[x,z];
+  if(!ped){H.length=0;if(S.pino){S.pino=null;MV848.stats.soltos++;}return false;}
+  const Pn=S.pino;
+  if(Pn){const ang=Math.acos(Math.max(-1,Math.min(1,ped[0]*Pn.ped[0]+ped[1]*Pn.ped[1])));
+    if(ang>0.61||Math.hypot(x-Pn.x,z-Pn.z)>0.25){S.pino=null;MV848.stats.soltos++;H.length=0;return false;}
+    segura(Pn.x,Pn.z);S.ult=[Pn.x,Pn.z];return true;}
+  H.push([dx,dz,contato?1:0,x,z]);if(H.length>8)H.shift();if(H.length<8)return false;
+  let inv=0,nc=0,cam=0;for(let i=0;i<8;i++){const h=H[i];nc+=h[2];cam+=Math.hypot(h[0],h[1]);if(i>0){const g=H[i-1];if(Math.hypot(h[0],h[1])>0.003&&Math.hypot(g[0],g[1])>0.003&&h[0]*g[0]+h[1]*g[1]<0)inv++;}}
+  const liq=Math.hypot(H[7][3]-H[0][3]+H[0][0],H[7][4]-H[0][4]+H[0][1]);
+  if(inv>=3&&nc>=3&&cam>0.03&&liq<0.06){S.pino={x,z,ped};S.pinoT=0;MV848.stats.pinos++;H.length=0;return true;}
+  return false;}
+function mv848Treme(ox,oz,contato,dt){const S=MV848.tp;const ped=CH.sitting?null:mv848Pedido();
+  const segura=mv848Osc(S,CH.x,CH.z,ox,oz,contato,ped,(px,pz)=>{CH.x=px;CH.z=pz;CH.vx*=0.5;CH.vz*=0.5;if(CUR==='room'&&ROOM&&ROOM.levelUpdate)ROOM.levelUpdate(px,pz);});
+  if(!segura){S.pinoT=0;return;}
+  CH.motionSpeed=0;
+  // um trajeto de clique preso num canto: encerra depois de 1 s (como o jogo faz com o leitor parado)
+  const manual=keys['w']||keys['s']||keys['a']||keys['d']||keys['arrowup']||keys['arrowdown']||keys['arrowleft']||keys['arrowright']||Math.abs(PAD.mx)>0.01||Math.abs(PAD.mz)>0.01;
+  if(CH.target&&!manual){S.pinoT+=dt;if(S.pinoT>1){CH.target=null;CH.onArrive=null;S.pinoT=0;MV848.stats.cliquesEncerrados++;}}}
+// (3) a malha de caminhos cobre o chão andável
+// o vestíbulo da porta (o corredor da v222 que leva ao hall) fica de fora: a porta se usa andando reto, sem a malha
+function mv848Sonda(W,R){const e0=W.ext||16;let max=0;const j=typeof V222!=='undefined'?V222.jog:false;if(typeof V222!=='undefined')V222.jog=true;
+  let df=null,dir=null;try{if(R&&R.doorFront&&R.spawn){df=R.doorFront;const vx=df[0]-R.spawn.x,vz=df[1]-R.spawn.z,l=Math.hypot(vx,vz);if(l>0.2)dir=[vx/l,vz/l];}}catch(e){}
+  const corredor=(x,z)=>{if(!df||!dir)return false;const px=x-df[0],pz=z-df[1],ao=px*dir[0]+pz*dir[1],lat=Math.abs(px*dir[1]-pz*dir[0]);return ao>-1&&lat<3.2;};
+  try{for(let a=0;a<120;a++){const ang=a*Math.PI/60,cx=Math.cos(ang),cz=Math.sin(ang);for(let r=Math.max(2,e0-2);r<e0+16;r+=0.5){const x=cx*r,z=cz*r;const c=W.clamp(x,z,.9);if(Math.abs(c[0]-x)<1e-3&&Math.abs(c[1]-z)<1e-3&&!corredor(x,z)){const mm=Math.max(Math.abs(x),Math.abs(z));if(mm>max)max=mm;}}}}
+  finally{if(typeof V222!=='undefined')V222.jog=j;}return max;}
+function mv848Malha(){try{if(CUR!=='room'||!ROOM||!ROOM.world)return;const W=ROOM.world;if(W.__mv848)return;W.__mv848=true;
+    const e0=W.ext||16;if(e0>=120)return; // as salas enormes (Fantasia, 198) já têm a malha grande; refazê-la custaria um engasgo
+    const max=mv848Sonda(W,ROOM);if(max>e0+1){const novo=Math.min(Math.ceil(max+2),Math.ceil(e0+15));if(novo>e0){W.ext=novo;W.__nav=null;W.__navN=-1;W.__cl=null;if(MV848.stats.malhas.length<40)MV848.stats.malhas.push([CUR_GENRE,+e0.toFixed(1),novo]);}}}catch(e){mv848Erro('malha',e);}}
+if(MV848.on){
+  try{const mt0=moveTP;moveTP=function(dt){const ox=CH.x,oz=CH.z,r0=(typeof PA834!=='undefined')?PA834.stats.rep:0;const r=mt0.apply(this,arguments);
+      try{if(MODE!=='fp'&&!(CUR==='room'&&ROOM===ROOMS.sci)){const d=dt||0.016,livre=Math.hypot(CH.x-(ox+CH.vx*d),CH.z-(oz+CH.vz*d))>1e-3;mv848Treme(ox,oz,livre||((typeof PA834!=='undefined')&&PA834.stats.rep>r0),d);}}catch(e){mv848Erro('treme',e);}return r;};}catch(e){mv848Erro('moveTP',e);}
+  try{const mv0=move;move=function(dt){const ox=P.x,oz=P.z;const r=mv0.apply(this,arguments);
+      try{if(MODE==='fp'&&!(typeof ASA246!=='undefined'&&ASA246.voo)){let q=null;
+          if(CUR==='room'&&ROOM===ROOMS.sci){ // a nave tem a regra própria para os discos: aqui só as paredes (e, se a parede o puser dentro de um disco, fica onde estava)
+            const W=WORLD,c=W.clamp(P.x,P.z,1.0);if(Math.abs(c[0]-P.x)>1e-4||Math.abs(c[1]-P.z)>1e-4){let den=false;for(const o of W.obst){if(o.porta222&&V222.jog)continue;if(Math.hypot(c[0]-o[0],c[1]-o[1])<o[2]-0.03){den=true;break;}}q=den?[ox,oz]:c;}}
+          else q=mv848Resolve(P.x,P.z,ox,oz,1.0);
+          if(q){P.x=q[0];P.z=q[1];MV848.stats.fp++;if(CUR==='room'&&ROOM.levelUpdate)ROOM.levelUpdate(P.x,P.z);}
+          // o mesmo detector de canto da 3.ª pessoa (a 1.ª pessoa, com a resolução nova, também pode ir e voltar num canto)
+          const d=dt||0.016,cont=!!q||Math.hypot(P.x-(ox+vx*d),P.z-(oz+vz*d))>1e-3;
+          mv848Osc(MV848.fp,P.x,P.z,ox,oz,cont,mv848PedidoFP(),(px,pz)=>{P.x=px;P.z=pz;vx*=0.5;vz*=0.5;if(CUR==='room'&&ROOM.levelUpdate)ROOM.levelUpdate(px,pz);});}}catch(e){mv848Erro('fp',e);}return r;};}catch(e){mv848Erro('move',e);}
+  try{const ka0=keyActivate;keyActivate=function(){try{mv848Malha();}catch(e){mv848Erro('ativa',e);}return ka0.apply(this,arguments);};}catch(e){mv848Erro('keyActivate',e);}
+}
+window.__movimento848={estado:MV848,stats:MV848.stats,erros:MV848.erros,resolve:mv848Resolve,sonda:mv848Sonda,malha:mv848Malha};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
