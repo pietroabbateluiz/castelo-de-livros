@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v856</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v857</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -112815,6 +112815,50 @@ if(PD856.on&&typeof p788Painel==='function'&&typeof p788Fecha==='function'){
       return f0.apply(this,arguments);};}catch(e){pd856Erro('p788Fecha',e);}
 }
 window.__controle856={estado:PD856,stats:PD856.stats,erros:PD856.erros,extras:pd856Extras};
+
+/* ===================== v857 · AS LATAS DE ÓLEO DA CASA DA CLAREIRA E DA CASA DOS PERGAMINHOS NUNCA APARECIAM (bloco `OL857`) =====================
+   Plano de 24 h do Luiz (18/11), bloco extra 8e — perfil de CPU por sala.
+   COMO ERA: a v428 pôs as seis latas de Óleo Mecânico nas casas — de colmo e da Clareira (Fantasia); do Tecelão, das Ervas, dos
+   Pergaminhos e a Pousada dos Viajantes (Histórica) — e o 7.º andar só abre com os seis robôs com óleo (`g444Pronto7`: seis entregues).
+   O lugar de cada lata é procurado na caixa da casa (`oil428Spot`) e só vale se estiver na MESMA parte da malha de caminhos que a
+   entrada da sala. Duas casas ficam em partes aonde só se chega por um salto: a Casa da Clareira (v355), pelo círculo luminoso do
+   bosque (`COZY355`), e a Casa dos Pergaminhos, na margem oeste do Nilo, pelos marcos do pulo do rio (v296, `RIO296`). Para a malha,
+   são outras partes — a procura nunca achava lugar e essas duas latas nunca apareciam: no máximo 4 de 6, e o 7.º andar não abria
+   jogando normalmente. E a procura que falhava se repetia a cada 0,25 s enquanto o leitor estivesse na sala (na Histórica, o maior
+   custo do quadro).
+   AGORA: a procura aceita também as partes da malha ligadas à da entrada por esses saltos (o lugar mais perto do ponto da casa, como
+   antes; as casas que já achavam lugar continuam com o MESMO ponto, porque a parte da entrada tem a preferência). Uma casa por vez a
+   cada volta do relógio do óleo (0,25 s), para não somar as procuras num quadro só, e uma procura que não acha lugar só se repete
+   15 s depois. Nada muda no desenho.
+   Chave: `?oleo857=0`. Gancho `window.__oleo857`. */
+const OL857={on:!/[?&#]oleo857=0/i.test(location.search+location.hash),erros:[],stats:{buscas:0,margem:0,adiadas:0,falhas:0,lugares:{}},espera:{},ultimo:-1e9};
+function ol857Erro(k,e){if(OL857.erros.length<20)OL857.erros.push(k+': '+(e&&e.message||e));try{console.warn('v857',k,e);}catch(x){}}
+// os saltos de cada sala: [x, z de saída, x, z de chegada]
+function ol857Saltos(R){const L=[];try{
+    if(typeof RIO296!=='undefined'&&R===ROOMS.cat)for(const m of RIO296.markers||[])if(m&&Number.isFinite(m.x)&&Number.isFinite(m.to))L.push([m.x,0,m.to,0]);
+    if(typeof COZY355!=='undefined'&&R===ROOMS.fant)for(const a of COZY355.markers||[])if(a&&Array.isArray(a.to)&&Number.isFinite(a.x)&&Number.isFinite(a.to[0]))L.push([a.x,a.z,a.to[0],a.to[1]]);
+  }catch(e){ol857Erro('saltos',e);}return L;}
+// as partes da malha que os saltos ligam à parte da entrada
+function ol857Ligadas(R,nav,comp,c0){const ok=new Set([c0]);try{const L=[];
+    for(const [xa,za,xb,zb] of ol857Saltos(R)){const a=keyNearestCell(nav,xa,za),b=keyNearestCell(nav,xb,zb);if(a.id>=0&&b.id>=0)L.push([comp[a.id],comp[b.id]]);}
+    let mudou=true;while(mudou){mudou=false;for(const [a,b] of L)if(ok.has(a)&&!ok.has(b)){ok.add(b);mudou=true;}}}catch(e){ol857Erro('ligadas',e);}return ok;}
+if(OL857.on&&typeof oil428Spot==='function'){
+  try{const s0=oil428Spot;oil428Spot=function(R,h){try{const agora=performance.now();
+      if((OL857.espera[h.id]||0)>agora)return null;                       // não achou há pouco: espera antes de varrer de novo
+      if(agora-OL857.ultimo<150){OL857.stats.adiadas++;return null;}       // uma casa por volta do relógio do óleo
+      OL857.ultimo=agora;OL857.stats.buscas++;
+      const [x0,x1,z0,z1]=h.box,nav=navFor(R.world),comp=navComp190(nav),start=keyNearestCell(nav,R.spawn?.x||0,R.spawn?.z||0);
+      if(start.id<0){OL857.espera[h.id]=agora+3000;return null;}
+      const c0=comp[start.id],lig=ol857Ligadas(R,nav,comp,c0);let best=null,score=Infinity,best2=null,score2=Infinity;
+      for(let x=x0;x<=x1;x+=.35)for(let z=z0;z<=z1;z+=.35){if(!ally428Free(R,x,z,.34))continue;const c=keyNearestCell(nav,x,z);if(c.id<0)continue;
+        const k=comp[c.id],d=Math.hypot(x-h.near[0],z-h.near[1]);
+        if(k===c0){if(d<score){score=d;best={x,z};}}else if(lig.has(k)&&d<score2){score2=d;best2={x,z};}}
+      if(best)return best;
+      if(best2){OL857.stats.margem++;OL857.stats.lugares[h.id]=[+best2.x.toFixed(2),+best2.z.toFixed(2)];return best2;}
+      OL857.stats.falhas++;OL857.espera[h.id]=agora+15000;return null;
+    }catch(e){ol857Erro('lugar',e);return s0.apply(this,arguments);}};}catch(e){ol857Erro('oil428Spot',e);}
+}
+window.__oleo857={estado:OL857,stats:OL857.stats,erros:OL857.erros,saltos:ol857Saltos,ligadas:ol857Ligadas};
 
 window.__build434={revision:434,family:"web",edition:"en"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
