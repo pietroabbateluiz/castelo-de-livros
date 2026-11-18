@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v851</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v852</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -112681,6 +112681,35 @@ if(DS851.on){
       return fr0.apply(this,arguments);};}catch(e){ds851Erro('frame',e);}
 }
 window.__desfoco851={estado:DS851,stats:DS851.stats,erros:DS851.erros};
+
+/* ===================== v852 · 1.ª PESSOA: O BONECO ACOMPANHA A CÂMERA (bloco `FP852`) =====================
+   Plano de 24 h do Luiz (17/11), bloco extra 8b — defeitos técnicos nas mecânicas.
+   COMO ERA: na 1.ª pessoa o jogo move só a câmera (`P`); o boneco (`CH`) fica parado onde o leitor estava quando trocou de modo (o
+   `setMode` copia um para o outro só na troca). Quase todos os sistemas já perguntam a posição certa (`cavPos()` ou
+   `MODE==='fp'?P.x:CH.x`), mas alguns ainda olham só o `CH` e, na 1.ª pessoa, não veem o leitor andar:
+   · a Chave da Sala do Acumulador no 2.º andar (`pr683ChaveTick`) não é apanhada — o progresso fica preso até trocar de modo;
+   · os rubis e as ampulhetas (`ruby422Tick`) não são recolhidos;
+   · o companheiro de chão (cachorro, sapo, capivara… `comp400Tick`/`seguir148`) fica parado onde o modo foi trocado;
+   · o dragão dos rubis (`ruby422BabyTick`) mira e mede o alcance a partir de lá; o empurrão dos tiros dos companheiros também;
+   · o prólogo não conta os passos (`proTick`): o roubo esperava o teto de 2 minutos em vez de 1 minuto e 20 m andados;
+   · o robô da Ficção Científica, os assentos da v495 e bichos de ambiente (gato da Biblioteca, sapos) ficavam para trás.
+   Os companheiros ainda olham a velocidade do boneco (`CH.vx`/`CH.vz`, sempre zero na 1.ª pessoa) para saber se o leitor está parado:
+   achando que ele nunca anda, iam farejar o chão em vez de segui-lo.
+   AGORA: na 1.ª pessoa, a cada quadro, depois do passo da câmera (o `move` com todos os embrulhos — asas, combate, cantos da v848),
+   o boneco vai para o mesmo lugar, a mesma direção e a mesma velocidade da câmera, como o `setMode` já fazia na troca. O boneco continua invisível
+   na 1.ª pessoa (o desenho dele não roda nesse modo) e nada muda nos outros modos.
+   Chave: `?primeira852=0`. Gancho `window.__primeira852`. */
+const FP852={on:!/[?&#]primeira852=0/i.test(location.search+location.hash),erros:[],stats:{quadros:0}};
+function fp852Erro(k,e){if(FP852.erros.length<20)FP852.erros.push(k+': '+(e&&e.message||e));try{console.warn('v852',k,e);}catch(x){}}
+if(FP852.on){
+  // o laço chama `move(dt)` pelo nome só na 1.ª pessoa: o embrulho fica por fora de todos os anteriores
+  try{const mv0=move;move=function(dt){const r=mv0.apply(this,arguments);
+      try{if(MODE==='fp'&&Number.isFinite(P.x)&&Number.isFinite(P.z)){CH.x=P.x;CH.z=P.z;const a=P.yaw+Math.PI;if(Number.isFinite(a))CH.dir=Math.atan2(Math.sin(a),Math.cos(a));
+        // a velocidade também: os companheiros acham que o leitor está parado quando ela é zero (e vão farejar em vez de seguir)
+        CH.vx=Number.isFinite(vx)?vx:0;CH.vz=Number.isFinite(vz)?vz:0;FP852.stats.quadros++;}}catch(e){fp852Erro('quadro',e);}
+      return r;};}catch(e){fp852Erro('move',e);}
+}
+window.__primeira852={estado:FP852,stats:FP852.stats,erros:FP852.erros};
 
 window.__build434={revision:434,family:"web",edition:"en"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
