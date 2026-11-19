@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v876</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v877</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -4884,7 +4884,7 @@ function inflateRawMini(src){
   P.getItem=function(k){if(this===LS&&tem(k))return OVER[nk(k)];return gi.call(this,k);};
   P.setItem=function(k,v){if(this===LS&&jogo.test(String(k))){if(tem(k))OVER[nk(k)]=String(v);return;}return si.call(this,k,v);};
   P.removeItem=function(k){if(this===LS&&jogo.test(String(k))){if(tem(k))OVER[nk(k)]=null;return;}return ri.call(this,k);};
-  window.VISITA={nome,room,codigo:(/^[A-Z2-9]{6}$/.test(String(p.c||'').toUpperCase())?String(p.c).toUpperCase():''),livros:livros.length,pecas:Object.keys(dec).length,lidos:Object.keys(lidos).length};
+  window.VISITA={fin877:(p.fin877&&typeof p.fin877==='object'&&!Array.isArray(p.fin877))?p.fin877:null,nome,room,codigo:(/^[A-Z2-9]{6}$/.test(String(p.c||'').toUpperCase())?String(p.c).toUpperCase():''),livros:livros.length,pecas:Object.keys(dec).length,lidos:Object.keys(lidos).length};
 }catch(e){console.warn('Link de visita inválido:',e&&e.message);window.VISITA_ERRO=true;}})();
 
 </script>
@@ -114908,6 +114908,292 @@ window.__ciclo876={estado:CV876,stats:CV876.stats,erros:CV876.erros,
   censo:()=>{const c=cv876Censo();return {geo:c.geo.size,mat:c.mat.size,tex:c.tex.size,esq:c.esq.size};},
   miniaturas:MI876,leitura:LE876};
 
+/* ===================== v877 · ARMAZENAMENTO E CÓPIA DO PROGRESSO: A VISITA NÃO ENTRA NA CÓPIA NEM GRAVA O QUE É SEU, O ENVIO DA SAÍDA NÃO SE PERDE CALADO, A IMPORTAÇÃO PROTEGE O WEBMASTER, O PACOTE DO WEBMASTER LEVA A DECORAÇÃO, A SALA VISITADA CHEGA COM OS ACABAMENTOS DO ANFITRIÃO E O «SUBSTITUIR» SUBSTITUI, COM CÓPIA DE SEGURANÇA (bloco `AR877`) =====================
+   Revisão só de leitura do armazenamento (relatório feito na v866, relocalizado na v869). O item 3 saiu na v868 (`PM868`); o item 8 (duas
+   abas abertas) é decisão do dono e fica de fora. Nada muda na jogabilidade; nenhuma chamada nova ao servidor (só o envio que já existia).
+   (1) VISITA × CÓPIA DO PROGRESSO.
+       COMO ERA: na visita (`#visita=`) a sobreposição da v401 troca, na leitura, a estante, os contos e a decoração pelas do anfitrião — e
+       «Exportar progresso completo» (v423), «Baixar arquivo» e «Copiar código» (v198) punham o castelo do AMIGO no backup; importar na
+       visita gravava só as chaves `castelo.*` (a trava engolia as `mundo.*`): importação pela metade, sem erro.
+       AGORA: exportar na visita lê o que está gravado de verdade (o progresso do próprio jogador; a leitura passa por baixo da
+       sobreposição, pelo acesso direto do `Storage`); importar na visita é recusado com um aviso claro (v423, e v198 arquivo/código/nuvem):
+       «Sair da visita» e importar de novo.
+   (2) ENVIO À NUVEM NA SAÍDA.
+       COMO ERA: ao esconder a aba, o envio sai com `keepalive`, que o navegador recusa com corpo acima de 64 KiB — com uma estante de
+       verdade o envio falhava calado; nada ficava gravado dizendo que a última sessão não subiu.
+       AGORA: acima de ~60 KB o envio da saída vai sem `keepalive` (conclui quando a página só foi escondida: troca de aba, celular em segundo
+       plano); a saída com mudanças por enviar deixa uma marca deste aparelho (`castelo877.nuvemPendente`, fora das cópias do progresso),
+       apagada quando um envio dá certo; na abertura seguinte, com a marca, o `nuvemEnviar` de sempre reenvia (6 s depois de o castelo abrir).
+       Dividir o pacote não dá: o servidor só aceita o pacote inteiro.
+   (4) «SUBSTITUIR» DA V198 (arquivo, código e nuvem).
+       COMO ERA: só sobrescrevia — o que o pacote não trazia ficava (portão do Torreão, Chave dos Ecos, decoração…), o resultado era um
+       progresso misto, e esse misto subia para a conta da nuvem no envio seguinte.
+       AGORA: aplicar um pacote da MESMA edição (o da nuvem conta como edição normal) tira também os registros de progresso e de decoração
+       deste navegador que o pacote não traz — antes, eles são guardados numa cópia de segurança local (`castelo877.substituicao`, `.wm` no
+       Webmaster; fora das cópias do progresso). Sem cópia gravada (armazenamento cheio), nada sai: fica a sobrescrita de antes. A estante,
+       as preferências, as marcas internas e as chaves `castelo.*` nunca saem (pacotes antigos não as traziam); no Webmaster, a decoração
+       (partilhada com a edição normal) também não. Recuperar: Controles › Progresso › «↩ Recuperar…» (devolve o que estiver faltando; não
+       sobrescreve o que existe). Depois da recarga, um aviso, uma vez.
+   (5) TRAVA DA VISITA.
+       COMO ERA: a trava cobria só `mundo.*` e `bib*`: as chaves `castelo.*` gravavam de verdade durante a visita (o presente do Bento
+       sumia: as 50 moedas não ficavam e `castelo.arqueiro258` ficava marcado; filmes, esportes, jogos e permanência também).
+       AGORA: na visita, as chaves `castelo*` do jogador (menos a marca do aparelho `castelo549.*`) ficam numa memória da visita: o jogo as lê
+       e grava normalmente enquanto visita, e nada chega ao armazenamento.
+   (6) MARCA DO WEBMASTER NA IMPORTAÇÃO.
+       COMO ERA: a importação completa grava as chaves `wm.*` mas não a marca `castelo549.wmZerado`; num navegador que nunca abriu o
+       Webmaster, o zerador da v549 (no `<head>`) apagava o Webmaster recém-importado na primeira abertura.
+       AGORA: na edição normal, gravar uma chave `wm.*` (só a importação faz isso) grava também a marca; no Webmaster, o mesmo durante uma
+       importação da v198.
+   (7) PACOTE DO WEBMASTER (v198: arquivo, código e nuvem).
+       COMO ERA: no Webmaster o pacote deixava de fora a decoração e as outras `mundo.*` que as duas edições partilham (sem `wm.`), e ao
+       aplicar gravava-as em chaves `wm.` que ninguém lê (o caminho legado da v423 repetia o prefixo).
+       AGORA: o pacote do Webmaster leva as partilhadas (lidas sem `wm.`; as cópias mortas `wm.mundo.sala.*` não entram) e aplicar grava-as
+       nas chaves sem `wm.`; a TROCA `troca877.py` faz o mesmo no caminho legado da v423. Como essas chaves são as mesmas da edição normal,
+       o valor que a aplicação troca vai antes para a cópia de segurança do item 4 (`sobrescritas`, com o antes e um resumo do depois) — o «Recuperar»
+       devolve o antigo se ninguém mexeu depois; sem cópia gravada, a decoração daqui não é trocada. As cópias mortas antigas ficam onde estão.
+   (9) A SALA VISITADA.
+       COMO ERA: só as peças (`dec`) do anfitrião viajavam; na Minha Sala visitada valiam os acabamentos de quem visita (paredes/piso/teto da
+       v493, luzes da v495, rádio da v496, cortinas da v837), e as marcas de mobília da v479/v526 de quem visita ainda mexiam nas peças.
+       AGORA: o pacote da sala (`social401Packet`, link e nuvem) leva os acabamentos do anfitrião (`fin877`); na visita eles valem na sala
+       visitada (anfitrião sem `fin877`: os padrões, nunca os de quem visita), e as marcas de mobília contam como já feitas. Os retratos
+       (fotos pessoais), os cartazes do cinema, os troféus e os jogos continuam sem viajar: expor essas coleções é decisão do dono.
+   A visita é lida pela TROCA do `troca877.py` no script da visita (`window.VISITA.fin877`).
+   Chaves: `?armazenamento877=0` (tudo), `?visitacopia877=0` (1), `?saidanuvem877=0` (2), `?substituir877=1` liga o 4 (vem desligado: muda o que o «substituir» apaga — decisão do Luiz), `?travavisita877=0` (5),
+   `?marcawm877=0` (6), `?pacotewm877=0` (7), `?salavisita877=0` (9). No 9, MANDAR os acabamentos no pacote da sala (link e nuvem) vem
+   desligado (`?salavisita877=1` liga) até conferir que o servidor aceita o campo novo; receber continua ligado. Gancho `window.__armazenamento877`.
+   REVISÃO (cópia corrigida, ag870/revisao/ar877 — ver REVISAO.md):
+   (7) as partilhadas de um pacote só valem nas chaves sem `wm.` quando o pacote diz de onde veio: da edição normal (`webmaster:false`)
+       ou do Webmaster já com esta coleta (marca `partilhadas877:1`, posta pela coleta do Webmaster). Pacote antigo do Webmaster (trazia
+       as cópias mortas `wm.mundo.sala.*` como `mundo.sala.*`) e pacote da nuvem (o `nuvemAplicar` não diz a edição): como na v873 (vão
+       para `wm.`) — antes, a cópia morta antiga trocava a decoração viva das duas edições. O gancho `partilhada(k,d)` só responde «sim»
+       com o pacote `d` marcado: com a TROCA original (sem `d`) o caminho legado da v423 fica como na v873.
+   (2) a marca do envio pendente é uma por edição (`castelo877.nuvemPendente`, `.wm` no Webmaster): uma edição não apaga mais a da outra.
+   (4)/(7) a cópia de segurança junta duas aplicações seguidas só se ninguém mexeu no valor entre elas (senão guarda o valor do jogador
+       de logo antes); sem cópia gravada (ou com erro no preparo), nenhum valor que já existe aqui com outro conteúdo é trocado.
+   (7) a cópia guarda o valor ANTIGO inteiro (é o que o «Recuperar» devolve) e, do valor novo, só um resumo (`dh`: tamanho e dois hashes
+       de 32 bits) — antes guardava os dois inteiros (com os retratos, o dobro das fotos, para sempre). A comparação do «Recuperar» («se
+       ninguém mexeu depois») passa a ser pelo resumo; o que o jogador vê não muda. Uma cópia no formato antigo ({antes, depois}) ainda vale. */
+const AR877_Q=location.search+location.hash;
+const AR877={on:!/[?&#]armazenamento877=0/i.test(AR877_Q),erros:[],real:0,importando:0,mem:new Map(),kaMax:60000,
+  stats:{visita:{exportReal:0,leiturasReais:0,importRecusado:0},saida:{tentativas:0,semKeepalive:0,ultimoBytes:0,pendenteMarcado:0,pendenteLimpo:0,pendenteNaAbertura:0,pendenteReenviado:0},
+    substituir:{removidas:0,copias:0,semCopia:0,recuperadas:0},trava:{travadas:0,lidasMem:0},marca:{wmMarcado:0},pacote:{coletadas:0,mortas:0,aplicadas:0,preservadas:0},sala:{enviada:0,servida:0,padrao:0,recebida:0}}};
+AR877.visita=AR877.on&&!/[?&#]visitacopia877=0/i.test(AR877_Q);AR877.saida=AR877.on&&!/[?&#]saidanuvem877=0/i.test(AR877_Q);
+AR877.subst=AR877.on&&/[?&#]substituir877=1/i.test(AR877_Q);AR877.trava=AR877.on&&!/[?&#]travavisita877=0/i.test(AR877_Q);
+AR877.marca=AR877.on&&!/[?&#]marcawm877=0/i.test(AR877_Q);AR877.wm=AR877.on&&!/[?&#]pacotewm877=0/i.test(AR877_Q);
+AR877.sala=AR877.on&&!/[?&#]salavisita877=0/i.test(AR877_Q);AR877.salaEnvia=AR877.sala&&/[?&#]salavisita877=1/i.test(AR877_Q);
+function ar877Erro(k,e){if(AR877.erros.length<40)AR877.erros.push(k+': '+(e&&e.message||e));try{console.warn('v877',k,e);}catch(x){}}
+function ar877T(pt,en,es){try{return text428(pt,en,es);}catch(e){return pt;}}
+function ar877Wm(){try{return typeof WEBMASTER!=='undefined'&&!!WEBMASTER;}catch(e){return false;}}
+let AR877_LS=null;try{AR877_LS=window.localStorage;}catch(e){}
+const AR877_SEGUE={};
+// chaves que as duas edições partilham (lidas e gravadas sem `wm.` também no Webmaster): a decoração e as preferências da sala, o catálogo,
+// os apelidos dos companheiros, o nome, o idioma e três marcas de interface
+const AR877_PARTILHADAS=/^mundo\.(sala\.|catalogo479\.|comp196\.nomes$|nome$|idioma428$|c191\.dica$|vida480$|clima491$)/;
+// o que o «substituir» pode tirar (lista positiva — o que não está aqui nunca sai): o progresso de jogo (com `wm.` no Webmaster)…
+const AR877_PROGRESSO=/^mundo\.(diario\.v1|moedas\.v1|rubis\.v1|chaves\.v1|loja\.v1|contos\.v1|caveiras\.v1|missoes\.v1|poderes\.v1|traje\.v1|dragoes\.v1|prologo\.v1|mimico\.(v1|intro)|asa246\.v1|esferas252\.v1|mestres392\.v1|masmorras395\.v1|inscricoes413\.[A-Za-z0-9_.:-]+|robos315|paranormal318|master428\.[A-Za-z0-9_.:-]+|deus428\.v1|horta428\.v1|javali428\.v1|lanternas428\.v1|oleo428\.v1|chaveEcos433\.v1|javali436\.v1|portao439\.v1|portao440\.v1|portoes444\.v1|coracoes449\.v1|combate452\.v1|estufa470\.v1|rubi504\.v1|reliquias529\.v1|rivais530\.v1|flores541\.v1|fagulha636\.v1|penas745\.v1)$/;
+// …e a decoração (só na edição normal: no Webmaster ela é partilhada com a edição normal e não sai)
+const AR877_DECORACAO=/^mundo\.(sala\.decor(\.(?!v679$|antes679$)[A-Za-z0-9]+)?|sala\.pessoal\.(acabamentos493|luzes495|radio496|cortinas837)|sala\.minha\.cortinas837|sala\.retratos492|catalogo479\.(fav|rec)|comp196\.nomes)$/;
+const AR877_TRAVA=/^(wm\.)?castelo(?!549\.)/;   // (5) as chaves castelo* do jogador; a marca do aparelho castelo549.* fica de fora
+const AR877_PEND='castelo877.nuvemPendente',AR877_ZERADO='castelo549.wmZerado';
+function ar877PendChave(){return AR877_PEND+(ar877Wm()?'.wm':'');}   // (revisão) uma marca por edição
+function ar877CopiaChave(){return 'castelo877.substituicao'+(ar877Wm()?'.wm':'');}
+// (revisão) as partilhadas de um pacote são valores VIVOS (as chaves sem `wm.`) só se o pacote veio da edição normal ou do Webmaster com a
+// coleta deste bloco; o pacote antigo do Webmaster trazia as cópias mortas `wm.mundo.sala.*` com o nome sem `wm.`, e o da nuvem não diz a edição
+function ar877PacoteVivo(d){return !!d&&typeof d==='object'&&(d.webmaster===false||d.partilhadas877===1);}
+// gancho da TROCA T2 (caminho legado da v423, só consultado para arquivos do Webmaster): «sim» só com o pacote `d` marcado pela coleta nova
+function ar877Partilhada(k,d){return !!AR877.wm&&typeof k==='string'&&AR877_PARTILHADAS.test(k)&&!!d&&typeof d==='object'&&d.partilhadas877===1;}
+
+// ---------- (1) a leitura de verdade (por baixo da sobreposição da visita) ----------
+// O acesso direto (`localStorage[k]`) usa o getter nomeado do Storage, que não passa por `Storage.prototype.getItem` (onde a visita se pendura).
+function ar877LeReal(k){try{const L=AR877_LS;if(!L)return null;k=String(k);const v=L[k];return (typeof v==='string'&&Object.prototype.hasOwnProperty.call(L,k))?v:null;}catch(e){return null;}}
+function ar877ComReal(fn){const v=!!window.VISITA&&AR877.visita;if(v){AR877.real++;AR877.stats.visita.exportReal++;}try{return fn();}finally{if(v)AR877.real--;}}
+function ar877MsgVisita(){return ar877T('Você está de visita na sala de outro leitor: durante a visita não dá para importar progresso — o castelo dele e o seu se misturariam. Use «Sair da visita» e importe de novo.',
+  'You are visiting another reader’s room: progress cannot be imported during a visit — their castle and yours would get mixed. Use «Leave the visit» and import again.',
+  'Estás de visita en la sala de otro lector: durante la visita no se puede importar progreso — su castillo y el tuyo se mezclarían. Usa «Salir de la visita» e importa de nuevo.');}
+function ar877Recusa(){if(!(window.VISITA&&AR877.visita))return false;AR877.stats.visita.importRecusado++;try{alert(ar877MsgVisita());}catch(e){}return true;}
+
+// ---------- (9) os acabamentos da sala (a mesma limpeza na ida e na volta) ----------
+function ar877FinLimpa(f){const o={};if(!f||typeof f!=='object'||Array.isArray(f))return o;
+  const id=(s,n)=>typeof s==='string'&&s.length>0&&s.length<=n&&/^[A-Za-z0-9_.:-]+$/.test(s);
+  if(f.ac&&typeof f.ac==='object'&&!Array.isArray(f.ac)){const a={};for(const t of ['parede','piso','teto'])if(id(f.ac[t],32))a[t]=f.ac[t];if(Object.keys(a).length)o.ac=a;}
+  if(f.lz&&typeof f.lz==='object'&&!Array.isArray(f.lz)){const l={};let n=0;for(const k of Object.keys(f.lz)){if(n>=200)break;const v=f.lz[k];if(id(k,96)&&(v===0||v===1)){l[k]=v;n++;}}o.lz=l;}
+  if(id(f.rd,32))o.rd=f.rd;if(id(f.ct,48))o.ct=f.ct;return o;}
+function ar877FinColeta(){const f={};const le=k=>{try{return localStorage.getItem(k);}catch(e){return null;}};
+  try{const a=JSON.parse(le('mundo.sala.pessoal.acabamentos493')||'null');if(a)f.ac=a;}catch(e){}
+  try{const l=JSON.parse(le('mundo.sala.pessoal.luzes495')||'null');if(l)f.lz=l;}catch(e){}
+  const r=le('mundo.sala.pessoal.radio496');if(r)f.rd=r;const c=le('mundo.sala.pessoal.cortinas837');if(c)f.ct=c;
+  const o=ar877FinLimpa(f);o.v=1;o.room='pessoal';return o;}
+const AR877_SALA_PES={'mundo.sala.pessoal.acabamentos493':'ac','mundo.sala.pessoal.luzes495':'lz','mundo.sala.pessoal.radio496':'rd','mundo.sala.pessoal.cortinas837':'ct','mundo.sala.pessoal.inicial479':'marca','mundo.sala.pessoal.vazia526':'marca'};
+let AR877_FIN=null;   // os acabamentos do anfitrião na visita (null: o anfitrião não mandou — valem os padrões)
+function ar877SalaCampo(k){const V=window.VISITA;if(!V)return null;if(V.room==='pessoal')return AR877_SALA_PES[k]||null;return k==='mundo.sala.minha.cortinas837'?'ct':null;}
+function ar877SalaValor(c){if(c==='marca')return 'visita877';const F=AR877_FIN;if(!F||F[c]===undefined)return null;return (c==='ac'||c==='lz')?JSON.stringify(F[c]):String(F[c]);}
+
+// ---------- (1)/(5)/(9) os embrulhos do armazenamento, só nas visitas ----------
+function ar877VisitaLe(k){if(AR877.real>0&&AR877.visita){AR877.stats.visita.leiturasReais++;return ar877LeReal(k);}
+  k=String(k);if(AR877.mem.has(k)){AR877.stats.trava.lidasMem++;return AR877.mem.get(k);}
+  if(AR877.sala){const c=ar877SalaCampo(k);if(c){AR877.stats.sala.servida++;return ar877SalaValor(c);}}
+  return AR877_SEGUE;}
+function ar877VisitaGrava(k,v,apaga){k=String(k);
+  if(AR877.trava&&AR877_TRAVA.test(k)){AR877.mem.set(k,apaga?null:String(v));AR877.stats.trava.travadas++;return true;}
+  if(AR877.sala&&ar877SalaCampo(k)){AR877.mem.set(k,apaga?null:String(v));return true;}
+  return false;}
+if(AR877.on&&AR877_LS&&window.VISITA){
+  try{const V=window.VISITA,f=V.fin877;if(f&&typeof f==='object'&&f.room===V.room){AR877_FIN=ar877FinLimpa(f);AR877.stats.sala.recebida=1;}else AR877.stats.sala.padrao=1;}catch(e){ar877Erro('fin877',e);}
+  try{const P=Storage.prototype,g0=P.getItem,s0=P.setItem,r0=P.removeItem;
+    P.getItem=function(k){if(this===AR877_LS){try{const r=ar877VisitaLe(k);if(r!==AR877_SEGUE)return r;}catch(e){ar877Erro('ler',e);}}return g0.apply(this,arguments);};
+    P.setItem=function(k,v){if(this===AR877_LS){try{if(ar877VisitaGrava(k,v,false))return;}catch(e){ar877Erro('gravar',e);}}return s0.apply(this,arguments);};
+    P.removeItem=function(k){if(this===AR877_LS){try{if(ar877VisitaGrava(k,null,true))return;}catch(e){ar877Erro('apagar',e);}}return r0.apply(this,arguments);};
+  }catch(e){ar877Erro('embrulho da visita',e);}
+  // (9) as luzes e o rádio da Minha Sala foram lidos na abertura, antes deste bloco: passam a ser os do anfitrião (ou os padrões)
+  if(AR877.sala&&window.VISITA.room==='pessoal'){
+    try{if(typeof MS495!=='undefined'&&MS495){const v=ar877SalaValor('lz');MS495.luzes=v?JSON.parse(v):{};}}catch(e){ar877Erro('luzes',e);}
+    try{if(typeof MS496!=='undefined'&&MS496&&typeof MS496_ESTACOES!=='undefined'){const v=ar877SalaValor('rd');MS496.estacao=(v&&MS496_ESTACOES.some(x=>x[0]===v))?v:'casa';}}catch(e){ar877Erro('rádio',e);}
+  }
+}
+
+// ---------- (6) a marca do Webmaster junto com as chaves `wm.*` importadas ----------
+function ar877MarcaWm(){try{if(localStorage.getItem(AR877_ZERADO)==='1')return;localStorage.setItem(AR877_ZERADO,'1');AR877.stats.marca.wmMarcado++;}catch(e){ar877Erro('marca wm',e);}}
+if(AR877.on&&AR877_LS){
+  try{const P=Storage.prototype,s1=P.setItem;let dentro=false;
+    P.setItem=function(k,v){const r=s1.apply(this,arguments);
+      try{if(!dentro&&AR877.marca&&this===AR877_LS&&typeof k==='string'&&k.charCodeAt(0)===119&&k.indexOf('wm.')===0&&!window.VISITA&&(!ar877Wm()||AR877.importando>0)){dentro=true;try{ar877MarcaWm();}finally{dentro=false;}}}catch(e){ar877Erro('marca',e);}
+      return r;};}catch(e){ar877Erro('embrulho da marca',e);}
+}
+
+// ---------- (4) o «substituir»: o que sai e a cópia de segurança ----------
+function ar877Removiveis(obj,wm){const out=[];try{if(!obj||!obj.dados||typeof obj.dados!=='object')return out;if(!!obj.webmaster!==!!wm)return out;   // só na mesma edição
+    const tem=k=>Object.prototype.hasOwnProperty.call(obj.dados,k);
+    for(let i=0;i<localStorage.length;i++){const L=localStorage.key(i);if(!L)continue;let kk=null;
+      if(wm){if(L.indexOf('wm.')===0&&AR877_PROGRESSO.test(L.slice(3)))kk=L.slice(3);}
+      else if(AR877_PROGRESSO.test(L)||AR877_DECORACAO.test(L))kk=L;
+      if(kk!==null&&!tem(kk))out.push(L);}}catch(e){ar877Erro('removíveis',e);}return out;}
+// A cópia de segurança (uma por edição; soma com a anterior): `chaves` = o que a substituição tirou; `sobrescritas` = a decoração partilhada
+// que uma aplicação no Webmaster trocou ({antes, dh}: `antes` inteiro; `dh` = resumo do valor que a aplicação gravou — só volta se ninguém
+// mexeu nela depois). (revisão B4) o valor novo não é mais guardado inteiro: só o resumo, para a comparação.
+// Resumo: tamanho + FNV-1a 32 + djb2 32, sobre as unidades UTF-16 (o mesmo texto dá sempre o mesmo resumo; texto diferente, na prática nunca).
+function ar877Resumo(s){if(typeof s!=='string')return '';let h1=2166136261,h2=5381;for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);h1^=c;h1=Math.imul(h1,16777619);h2=(Math.imul(h2,33)+c)|0;}
+  return s.length+':'+(h1>>>0).toString(36)+':'+(h2>>>0).toString(36);}
+function ar877ResumoDe(s){return (s&&typeof s==='object')?(typeof s.dh==='string'?s.dh:(typeof s.depois==='string'?ar877Resumo(s.depois):'')):'';}   // aceita a forma antiga {antes, depois}
+function ar877CopiaLe(){try{const C=JSON.parse(localStorage.getItem(ar877CopiaChave())||'null');if(C&&typeof C==='object'&&C.chaves&&typeof C.chaves==='object'&&!Array.isArray(C.chaves))return C;}catch(e){}return null;}
+function ar877CopiaN(C){return C?Object.keys(C.chaves).length+((C.sobrescritas&&typeof C.sobrescritas==='object')?Object.keys(C.sobrescritas).length:0):0;}
+function ar877CopiaGuarda(rem,sobre){const ant=ar877CopiaLe();const chaves=ant?Object.assign({},ant.chaves):{};
+  const sobrescritas=(ant&&ant.sobrescritas&&typeof ant.sobrescritas==='object')?Object.assign({},ant.sobrescritas):{};
+  for(const L of rem||[]){const v=localStorage.getItem(L);if(typeof v==='string')chaves[L]=v;}
+  // fica o «antes» mais antigo só se a cadeia continua (o valor de agora é o que a aplicação anterior gravou); se o jogador mexeu no meio,
+  // o que vale é o valor dele de logo antes desta aplicação (revisão: antes, «Recuperar» devolvia o mais antigo e o do meio sumia)
+  for(const L of Object.keys(sobre||{})){const s=sobre[L],a=sobrescritas[L],ra=ar877ResumoDe(a);
+    sobrescritas[L]={antes:(a&&typeof a.antes==='string'&&ra!==''&&ra===ar877Resumo(s.antes))?a.antes:s.antes,dh:ar877Resumo(s.depois)};}
+  const C={v:1,quando:Date.now(),wm:ar877Wm(),chaves,avisado:false};if(Object.keys(sobrescritas).length)C.sobrescritas=sobrescritas;const txt=JSON.stringify(C);
+  localStorage.setItem(ar877CopiaChave(),txt);if(localStorage.getItem(ar877CopiaChave())!==txt)throw new Error('a cópia de segurança não conferiu');return C;}
+function ar877Recupera(){const C=ar877CopiaLe();const r={n:0,ja:0,voltaram:0,mudaram:0,falhas:0};if(!C)return r;
+  for(const k of Object.keys(C.chaves)){const v=C.chaves[k];if(typeof v!=='string')continue;if(localStorage.getItem(k)!==null){r.ja++;continue;}try{localStorage.setItem(k,v);r.n++;}catch(e){r.falhas++;}}
+  const S=(C.sobrescritas&&typeof C.sobrescritas==='object')?C.sobrescritas:{};
+  for(const k of Object.keys(S)){const s=S[k];if(!s||typeof s.antes!=='string')continue;const rd=ar877ResumoDe(s),at=localStorage.getItem(k);
+    if(at===null||rd===''||ar877Resumo(at)!==rd){r.mudaram++;continue;}try{localStorage.setItem(k,s.antes);r.voltaram++;}catch(e){r.falhas++;}}   // (revisão B4) compara pelo resumo
+  if(!r.falhas){try{localStorage.removeItem(ar877CopiaChave());}catch(e){}}AR877.stats.substituir.recuperadas+=r.n+r.voltaram;return r;}
+function ar877ProgMsg(t){try{const m=document.getElementById('progMsg');if(m)m.textContent=t||'';}catch(e){}}
+function ar877BotaoRecupera(){try{const box=document.getElementById('progBox');if(!box)return;let b=document.getElementById('ar877Recupera');
+    const C=!window.VISITA?ar877CopiaLe():null,n=ar877CopiaN(C);
+    if(!n){if(b)b.hidden=true;return;}
+    if(!b){b=document.createElement('button');b.type='button';b.id='ar877Recupera';const ref=document.getElementById('progMsg');box.insertBefore(b,(ref&&ref.parentNode===box)?ref:null);
+      b.addEventListener('click',()=>{try{const n2=ar877CopiaN(ar877CopiaLe());if(!n2){ar877BotaoRecupera();return;}
+          if(!b.classList.contains('alerta')){b.classList.add('alerta');b.textContent=ar877T('Confirmar: recuperar '+n2+' registros','Confirm: restore '+n2+' records','Confirmar: recuperar '+n2+' registros');
+            ar877ProgMsg(ar877T('Volta o que estiver faltando neste navegador (e a decoração que uma importação no Webmaster trocou, se ninguém mexeu nela depois); nada mais é sobrescrito. Toque de novo para confirmar.',
+              'What is missing in this browser comes back (and the decoration a Webmaster import replaced, if nobody changed it since); nothing else is overwritten. Tap again to confirm.',
+              'Vuelve lo que falte en este navegador (y la decoración que una importación en el Webmaster cambió, si nadie la tocó después); nada más se sobrescribe. Toca de nuevo para confirmar.'));return;}
+          const r=ar877Recupera(),n3=r.n+r.voltaram,pul=r.ja+r.mudaram;ar877ProgMsg(ar877T('Recuperados '+n3+' registros','Restored '+n3+' records','Recuperados '+n3+' registros')+(pul?ar877T(' ('+pul+' já tinham outro valor e ficaram)',' ('+pul+' already had another value and were kept)',' ('+pul+' ya tenían otro valor y se quedaron)'):'')+'. '+ar877T('Recarregando…','Reloading…','Recargando…'));
+          setTimeout(()=>location.reload(),600);}catch(e){ar877ProgMsg(e&&e.message||String(e));}});}
+    b.hidden=false;b.classList.remove('alerta');b.textContent='↩ '+ar877T('Recuperar o que a última substituição tirou','Restore what the last replace removed','Recuperar lo que quitó la última sustitución')+' ('+n+')';
+  }catch(e){ar877Erro('botão recuperar',e);}}
+function ar877AvisoCopia(){try{if(window.VISITA)return;const C=ar877CopiaLe();if(!C||C.avisado||Date.now()-(+C.quando||0)>15*60000)return;
+    C.avisado=true;try{localStorage.setItem(ar877CopiaChave(),JSON.stringify(C));}catch(e){}const n=ar877CopiaN(C);
+    const t=ar877T('↩ A substituição do progresso guardou uma cópia do que tirou ou trocou neste navegador ('+n+' registros): para trazer de volta, Controles › Progresso › «Recuperar».',
+      '↩ Replacing the progress kept a copy of what it removed or replaced in this browser ('+n+' records): to bring it back, Controls › Progress › «Restore».',
+      '↩ La sustitución del progreso guardó una copia de lo que quitó o cambió en este navegador ('+n+' registros): para recuperarlo, Controles › Progreso › «Recuperar».');
+    if(typeof showToast==='function')showToast(t,{big:true,ms:9000});}catch(e){ar877Erro('aviso da cópia',e);}}
+
+// ---------- (1)/(7) o pacote da v198: coletar ----------
+function ar877PartilhadasColeta(o){const d=o.dados,vivas={};
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k||!AR877_PARTILHADAS.test(k)||PROG.local.test(k))continue;const v=localStorage.getItem(k);if(typeof v==='string')vivas[k]=v;}
+  for(const kk of Object.keys(d))if(AR877_PARTILHADAS.test(kk)&&!Object.prototype.hasOwnProperty.call(vivas,kk)){delete d[kk];AR877.stats.pacote.mortas++;}   // veio de uma cópia morta `wm.mundo.sala.*`
+  for(const k of Object.keys(vivas)){d[k]=vivas[k];AR877.stats.pacote.coletadas++;}
+  o.chaves=Object.keys(d).length;o.partilhadas877=1;return o;}   // (revisão) a marca diz que as partilhadas deste pacote são as vivas
+if(AR877.on&&typeof progColeta==='function'){
+  try{const pc0=progColeta;progColeta=function(){const self=this,args=arguments;return ar877ComReal(()=>{const o=pc0.apply(self,args);
+        try{if(AR877.wm&&ar877Wm()&&o&&o.dados&&typeof o.dados==='object')ar877PartilhadasColeta(o);}catch(e){ar877Erro('coleta do Webmaster',e);}return o;});};}catch(e){ar877Erro('progColeta',e);}
+}
+// ---------- (1)/(4)/(6)/(7) o pacote da v198: aplicar ----------
+if(AR877.on&&typeof progAplica==='function'){
+  try{const pa0=progAplica;progAplica=function(obj){
+      if(window.VISITA&&AR877.visita){AR877.stats.visita.importRecusado++;throw new Error(ar877MsgVisita());}
+      if(!obj||obj.tipo!=='castelo-de-papel-progresso'||!obj.dados||typeof obj.dados!=='object')return pa0.apply(this,arguments);   // a original lança o erro de sempre
+      const wm=ar877Wm();let alvo=obj,part=null;
+      // (7) no Webmaster, as partilhadas saem do pacote que a original aplica (ela poria `wm.`) e são gravadas aqui, sem `wm.` — só de pacote
+      //     que diz de onde veio (revisão): pacote antigo do Webmaster e pacote da nuvem ficam como na v873 (a original as põe em `wm.`)
+      if(AR877.wm&&wm&&ar877PacoteVivo(obj)){try{const d2=Object.create(null),p2=Object.create(null);let np=0;for(const kk of Object.keys(obj.dados)){if(AR877_PARTILHADAS.test(kk)){p2[kk]=obj.dados[kk];np++;}else d2[kk]=obj.dados[kk];}
+          if(np){alvo=Object.assign({},obj,{dados:d2});part=p2;}}catch(e){ar877Erro('separa as partilhadas',e);alvo=obj;part=null;}}
+      // (4) o que sai (mesma edição) e (7) a decoração partilhada que vai ser trocada: tudo numa cópia de segurança ANTES de mexer
+      let rem=[],sobre={},copiaOk=true;
+      try{if(AR877.subst&&!window.VISITA)rem=ar877Removiveis(obj,wm);
+        if(part)for(const kk of Object.keys(part)){const v=part[kk];if(typeof v!=='string'||PROG.local.test(kk))continue;const atual=localStorage.getItem(kk);if(atual!==null&&atual!==v)sobre[kk]={antes:atual,depois:v};}
+        if(rem.length||Object.keys(sobre).length){try{ar877CopiaGuarda(rem,sobre);AR877.stats.substituir.copias++;}catch(e){copiaOk=false;AR877.stats.substituir.semCopia++;ar877Erro('cópia de segurança',e);}}
+      }catch(e){ar877Erro('prepara a substituição',e);rem=[];copiaOk=false;}   // (revisão) erro no preparo = sem cópia: nada sai e nada que existe é trocado
+      AR877.importando++;
+      try{if(copiaOk&&rem.length){let k=0;for(const L of rem){try{localStorage.removeItem(L);k++;}catch(e){}}AR877.stats.substituir.removidas+=k;}   // sem cópia gravada, nada sai (fica a sobrescrita de antes)
+        let n=pa0.call(this,alvo);
+        if(part)for(const kk of Object.keys(part)){const v=part[kk];if(typeof v!=='string'||PROG.local.test(kk))continue;
+          if(!copiaOk){let at=null;try{at=localStorage.getItem(kk);}catch(e){}if(at!==null&&at!==v){AR877.stats.pacote.preservadas++;continue;}}   // sem cópia, a decoração daqui não é trocada
+          try{localStorage.setItem(kk,v);n++;AR877.stats.pacote.aplicadas++;}catch(e){}}
+        return n;}finally{AR877.importando--;}};}catch(e){ar877Erro('progAplica',e);}
+  try{if(window.__progresso){window.__progresso.coleta=progColeta;window.__progresso.aplica=progAplica;}}catch(e){}
+}
+
+// ---------- (1) o «Exportar/Importar progresso completo» da v423 (script próprio, no fim da página: os botões e o gancho dele) ----------
+function ar877Instala423(){try{const P=window.__progress423;
+    if(P&&!P.__ar877){P.__ar877=true;
+      for(const nm of ['snapshot','exportFile']){const f0=P[nm];if(typeof f0==='function')P[nm]=function(){const s=this,a=arguments;return ar877ComReal(()=>f0.apply(s,a));};}
+      const i0=P.importFile;if(typeof i0==='function')P.importFile=function(){if(ar877Recusa())return;return i0.apply(this,arguments);};
+      const r0=P.restore;if(typeof r0==='function')P.restore=function(){if(window.VISITA&&AR877.visita){AR877.stats.visita.importRecusado++;throw new Error(ar877MsgVisita());}AR877.importando++;try{return r0.apply(this,arguments);}finally{AR877.importando--;}};}
+    const be=document.getElementById('progress423Export'),bi=document.getElementById('progress423Import');
+    if(be&&!be.__ar877&&typeof be.onclick==='function'){const f0=be.onclick;be.onclick=function(ev){const s=this;return ar877ComReal(()=>f0.call(s,ev));};be.__ar877=1;}
+    if(bi&&!bi.__ar877&&typeof bi.onclick==='function'){const f0=bi.onclick;bi.onclick=function(ev){if(ar877Recusa())return;return f0.call(this,ev);};bi.__ar877=1;}
+    return !!(P&&P.__ar877&&be&&be.__ar877&&bi&&bi.__ar877);}catch(e){ar877Erro('v423',e);return true;}}
+if(AR877.on){try{let n=0;const t=setInterval(()=>{n++;if(ar877Instala423()||n>120)clearInterval(t);},500);document.addEventListener('DOMContentLoaded',()=>setTimeout(ar877Instala423,0));}catch(e){ar877Erro('instala v423',e);}}
+
+// ---------- (2) o envio da saída e o pendente ----------
+function ar877Bytes(o){try{const s=JSON.stringify(o||{});if(typeof Blob==='function')return new Blob([s]).size;return s.length*3;}catch(e){return Infinity;}}
+function ar877PendenteLe(){try{const o=JSON.parse(localStorage.getItem(ar877PendChave())||'null');return (o&&typeof o==='object')?o:null;}catch(e){return null;}}
+function ar877PendenteMarca(motivo){try{const E=nuvemLe();if(!E||!E.codigo)return;localStorage.setItem(ar877PendChave(),JSON.stringify({codigo:String(E.codigo),quando:Date.now(),motivo:String(motivo||'')}));AR877.stats.saida.pendenteMarcado++;}catch(e){ar877Erro('marca do pendente',e);}}
+function ar877PendenteLimpa(codigo){try{const o=ar877PendenteLe();if(!o)return;if(codigo&&o.codigo&&String(o.codigo)!==String(codigo))return;localStorage.removeItem(ar877PendChave());AR877.stats.saida.pendenteLimpo++;}catch(e){ar877Erro('limpa o pendente',e);}}
+function ar877SaidaMarca(){try{if(!AR877.saida||window.VISITA||typeof NUVEM==='undefined'||!NUVEM.sujo)return;if(!nuvemLigada()||!nuvemAtiva()||!nuvemLe().auto)return;ar877PendenteMarca('saida');}catch(e){ar877Erro('saída',e);}}
+function ar877PendenteReenvia(){try{const p=ar877PendenteLe();if(!p||!AR877.saida||window.VISITA||!nuvemAtiva())return false;   // na visita, fica para a próxima abertura
+    const E=nuvemLe();if(!nuvemLigada()||!E.auto||String(E.codigo)!==String(p.codigo)){ar877PendenteLimpa();return false;}   // outro código, desligado ou sem envio automático: a marca não vale mais
+    if(!NUVEM.sujo){NUVEM.sujo=true;NUVEM.sujoDesde=Date.now();}try{nuvemHud();}catch(e){}AR877.stats.saida.pendenteReenviado++;
+    AR877.reenvio=nuvemEnviar('pendente877',{forcar:true}).then(()=>{try{nuvemHud();}catch(e){}}).catch(e=>{try{nuvemErro('pendente877',e);nuvemHud();}catch(x){}});return true;}catch(e){ar877Erro('reenvio',e);return false;}}
+if(AR877.on&&typeof nuvemRpc==='function'&&typeof NUVEM!=='undefined'){
+  try{const rpc0=nuvemRpc;nuvemRpc=function(fn,params,opt){
+      if(fn==='castelo_enviar'&&AR877.saida&&opt&&opt.keepalive){try{AR877.stats.saida.tentativas++;const b=ar877Bytes(params);AR877.stats.saida.ultimoBytes=b;
+          if(b>AR877.kaMax){opt=Object.assign({},opt,{keepalive:false});AR877.stats.saida.semKeepalive++;}}catch(e){ar877Erro('tamanho do envio',e);}}
+      const pr=rpc0.call(this,fn,params,opt);
+      if(fn==='castelo_enviar'){try{const cod=params&&params.p_codigo;Promise.resolve(pr).then(()=>{if(AR877.saida)ar877PendenteLimpa(cod);},()=>{});}catch(e){}}
+      return pr;};}catch(e){ar877Erro('nuvemRpc',e);}
+  try{document.addEventListener('visibilitychange',()=>{if(document.hidden)ar877SaidaMarca();});addEventListener('pagehide',ar877SaidaMarca);}catch(e){ar877Erro('ouvintes da saída',e);}
+  try{if(AR877.saida&&ar877PendenteLe()){AR877.stats.saida.pendenteNaAbertura++;let n=0;const t=setInterval(()=>{n++;if(n>600){clearInterval(t);return;}if(!window.__ready)return;clearInterval(t);setTimeout(ar877PendenteReenvia,6000);},500);}}catch(e){ar877Erro('pendente na abertura',e);}
+}
+
+// ---------- (9) o pacote da sala leva os acabamentos do anfitrião ----------
+if(AR877.on&&typeof social401Packet==='function'){
+  try{const sp0=social401Packet;social401Packet=function(){const p=sp0.apply(this,arguments);
+      try{if(AR877.sala&&AR877.salaEnvia&&p&&typeof p==='object'&&!window.VISITA&&p.room==='pessoal'){p.fin877=ar877FinColeta();AR877.stats.sala.enviada++;}}catch(e){ar877Erro('pacote da sala',e);}return p;};}catch(e){ar877Erro('social401Packet',e);}
+}
+
+// ---------- (4) o botão de recuperar e o aviso, depois de o castelo abrir ----------
+if(AR877.on){try{let n=0;const t=setInterval(()=>{n++;if(n>600){clearInterval(t);return;}if(!window.__ready)return;clearInterval(t);ar877BotaoRecupera();setTimeout(ar877AvisoCopia,4000);},500);}catch(e){ar877Erro('recuperar',e);}}
+
+window.__armazenamento877={estado:AR877,stats:AR877.stats,erros:AR877.erros,partilhada:ar877Partilhada,leReal:ar877LeReal,comReal:ar877ComReal,
+  pendente:ar877PendenteLe,marcaSaida:ar877SaidaMarca,reenviaPendente:ar877PendenteReenvia,removiveis:ar877Removiveis,copia:ar877CopiaLe,recupera:ar877Recupera,
+  botaoRecupera:ar877BotaoRecupera,fin:()=>AR877_FIN,finColeta:ar877FinColeta,instala423:ar877Instala423,pacoteVivo:ar877PacoteVivo,resumo:ar877Resumo};
+
 window.__build434={revision:434,family:"web",edition:"en"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
    familias:()=>SALA_FAM,famModelos:(f)=>SALA_FAM[f]?SALA_FAM[f].lista():null,
@@ -116825,7 +117111,7 @@ try{window.__ativos232&&window.__ativos232.fimDados&&window.__ativos232.fimDados
  const english=()=>document.documentElement.lang.startsWith('en'),say=(pt,en)=>{if(english())return en;try{if(String(document.documentElement.lang||'').startsWith('es')){const d=window.__localeData428&&window.__localeData428.es,v=d&&d[pt];if(typeof v==='string')return v;}}catch(e){}return pt;};
  function allowed(k){const s=k.replace(/^wm\./,'');return typeof k==='string'&&k.length<=180&&(/^(mundo\.(?!nuvem(?:\.|$)|autoq(?:\.|$)|gpulost$|gpu670$|papel$)[a-zA-Z0-9_.:-]+|castelo\.jogos567\.v1)$/.test(s)||!!(window.__salvamento847&&window.__salvamento847.extra(s))||['bibamb','bibfonte','bibinv','bibmode2','bibmus','bibsens','bibsom','bibtema'].includes(s));}
  function snapshot(){const entries={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(allowed(k))entries[k]=localStorage.getItem(k);}return {format:'castelo-de-papel-progress',version:1,createdAt:new Date().toISOString(),entries};}
- function validate(d){if(d?.tipo==='castelo-de-papel-progresso'&&d.dados&&typeof d.dados==='object'&&!Array.isArray(d.dados)){if(JSON.stringify(d).length>24*1024*1024)throw Error('Backup too large');const entries={};for(const [raw,value]of Object.entries(d.dados)){const k=d.webmaster&&(raw.startsWith('mundo.')||raw.startsWith('castelo.jogos567.'))?'wm.'+raw:raw;if(allowed(k))entries[k]=value;}d={format:'castelo-de-papel-progress',version:1,entries,legacy:true,legacyWebmaster:!!d.webmaster};}if(!d||d.format!=='castelo-de-papel-progress'||d.version!==1||!d.entries||Array.isArray(d.entries)||typeof d.entries!=='object')throw Error(say('Este arquivo não é um backup completo do Castelo de Papel.','This is not a complete Paper Castle progress backup.'));const keys=Object.keys(d.entries);if(!keys.length||keys.length>2048||JSON.stringify(d).length>24*1024*1024)throw Error(say('Backup vazio ou muito grande.','Empty or oversized backup.'));for(const k of keys)if(!allowed(k)||typeof d.entries[k]!=='string')throw Error(say('O backup contém um campo inválido.','The backup contains an invalid field.'));return d;}
+ function validate(d){if(d?.tipo==='castelo-de-papel-progresso'&&d.dados&&typeof d.dados==='object'&&!Array.isArray(d.dados)){if(JSON.stringify(d).length>24*1024*1024)throw Error('Backup too large');const entries={};for(const [raw,value]of Object.entries(d.dados)){const k=d.webmaster&&(raw.startsWith('mundo.')||raw.startsWith('castelo.jogos567.'))&&!(window.__armazenamento877&&typeof window.__armazenamento877.partilhada==='function'&&window.__armazenamento877.partilhada(raw,d))?'wm.'+raw:raw;if(allowed(k))entries[k]=value;}d={format:'castelo-de-papel-progress',version:1,entries,legacy:true,legacyWebmaster:!!d.webmaster};}if(!d||d.format!=='castelo-de-papel-progress'||d.version!==1||!d.entries||Array.isArray(d.entries)||typeof d.entries!=='object')throw Error(say('Este arquivo não é um backup completo do Castelo de Papel.','This is not a complete Paper Castle progress backup.'));const keys=Object.keys(d.entries);if(!keys.length||keys.length>2048||JSON.stringify(d).length>24*1024*1024)throw Error(say('Backup vazio ou muito grande.','Empty or oversized backup.'));for(const k of keys)if(!allowed(k)||typeof d.entries[k]!=='string')throw Error(say('O backup contém um campo inválido.','The backup contains an invalid field.'));return d;}
  function restore(d){d=validate(d);const old=snapshot().entries,replace=Object.keys(old).filter(k=>!d.legacy||!/^(mundo\.|castelo\.jogos567\.)/.test(k.replace(/^wm\./,''))||k.startsWith('wm.')===d.legacyWebmaster),keys=new Set([...Object.keys(old),...Object.keys(d.entries)]);try{for(const k of replace)localStorage.removeItem(k);for(const [k,v]of Object.entries(d.entries))localStorage.setItem(k,v);}catch(error){for(const k of keys)localStorage.removeItem(k);for(const [k,v]of Object.entries(old))localStorage.setItem(k,v);throw error;}}
  function download(data,name){const u=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=u;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),30000);}
  const stamp=()=>new Date().toISOString().replace(/[:.]/g,'-');
