@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v875</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v876</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -114629,6 +114629,284 @@ if(VG875.on&&typeof goHall==='function'&&typeof enterRoom==='function'&&typeof f
 window.__filaviagem875={estado:VG875,stats:VG875.stats,erros:VG875.erros,hist:VG875.hist,
   pendente:()=>{const P=VG875.pend;return P?{tipo:P.tipo,alvo:P.args[0]===undefined?null:P.args[0],vezes:P.vezes,porta:P.porta?(P.porta.userData&&P.porta.userData.genre)||true:null,idadeMs:Math.round(performance.now()-P.t0),abertura:P.abertura}:null;},
   bloqueado:vg875Bloqueado,motivo:vg875Motivo,descartar:(m)=>vg875Descarta(m||'manual')};
+
+/* ===================== v876 · CICLO DE VIDA: O COMPANHEIRO E A LANTERNA TROCADOS SAEM DA PLACA DE VÍDEO, UM LAÇO SÓ NAS MINIATURAS, UMA LEITURA SÓ NO CONTO E A LISTA DOS SONS ESPARSOS SEM LIXO (bloco `CV876`) =====================
+   Revisão só de leitura do ciclo de vida (feita na v866, relocalizada na v869) — os quatro achados.
+   COMO ERA:
+   (1) trocar de companheiro (o voador `GEAR.pet`, o de chão `GEAR.bicho`, o dragão dos rubis na 3.ª vaga `GEAR.rubi530`) ou de lanterna
+       (`GEAR.lantern` e a luz `GEAR.lanternL`) tirava o modelo antigo da cena (`applyGear`, `rb530Sync`, `companion434Restore`) sem
+       `dispose`: as geometrias e as texturas que eram só dele ficavam na placa (e no cache de VAO do three) até recarregar a
+       página — cada troca prendia mais um modelo (a fada e os dragões pesam mais); os rastros de luz do vaga-lume, da mariposa e da fada
+       também saíam da cena sem descarte;
+   (2) aba Companheiros: cada `renderVisual` antes de a fila de miniaturas acabar (o `cc549Render` termina com
+       `requestAnimationFrame(cc549Processa)`, e o `cc549Processa` se reagenda) abria mais um laço em paralelo — 5 cliques, 6 laços, 6
+       miniaturas (montar o bicho + desenho WebGL + `toDataURL`) por quadro, e o jogo travava até a fila esvaziar;
+   (3) conto: 🔊 ⏹ 🔊 rápidos — o fim da fala cancelada chega depois (o `speechSynthesis.cancel()` avisa de forma assíncrona) com `TTS.on`
+       já verdadeiro de novo: o `seguinte` daquela fala avança `TTS.i` e chama `ttsProx`; ficavam duas leituras (o destaque corria um
+       parágrafo à frente da voz e, no fim, o `ttsStop()` cortava o último parágrafo);
+   (4) sons esparsos (a `agenda` dentro de `somToca`): cada tique punha `{t,tipo:'to'}` em `SOM.timers` e o que já tinha disparado nunca
+       saía (a limpeza `SOM._limpa` só roda quando o perfil muda) — a lista crescia sem teto enquanto se ficava na mesma cena (≈ 3600 por
+       hora no Hall 4, em Clássicos e em Ciência; ≈ 2400 na Minha Sala de dia).
+   AGORA:
+   (1) o modelo que sai de vez — fora de todas as vagas e de todas as cenas, conferido 1,5 s depois — é descartado com cuidado, só no que é
+       DELE: o recurso nasceu na montagem dele (a faixa de ids do three é anotada em `buildPet`, `buildBicho`, `buildLanterna` e
+       `ruby422Baby`), não apareceu em nenhum outro modelo montado (cache descoberto na 2.ª montagem), não está em nenhum cache conhecido
+       (T160, T162, DRG, COMP400, COMP405, CP579, BI622, VO623, DR624, as caixas do Papel, os emblemas — e os derivados deles: o toon do
+       Papel, o gêmeo de recorte da v829, a geometria subdividida da v566) e nenhuma peça de nenhuma cena viva usa; textura só se o three
+       consegue subir de novo (tela, imagem, bitmap ou dados); a geometria partilhada dos sprites, o GLOW e o degradê do Papel nunca. Vão
+       junto os rastros (vaga-lume, mariposa, fada), o fogo do dragão dos rubis, os ossos (boneTexture), as instâncias e o mapa de sombra
+       de uma luz que saiu. Ids e caches cobrem os clones (um clone partilha a geometria e o material do molde guardado);
+   (2) um laço só: o rAF entrega o mesmo carimbo de tempo a todas as chamadas do mesmo quadro — depois da primeira, as outras morrem ali,
+       sem se reagendar; a fila anda uma miniatura por quadro, como no primeiro clique;
+   (3) uma leitura só: cada fala é anotada ao ir para o `speechSynthesis.speak`; o fim (ou o erro) de uma fala que já não é a atual
+       (cancelada pelo ⏹ ou por um novo 🔊) é ignorado;
+   (4) os sons esparsos passam a ser agendados aqui, pela MESMA regra (mesmo sorteio do intervalo, mesma trava de perfil, mesma condição de
+       volume e de aba escondida) e cada tique tira o próprio registro da lista ao disparar: a lista fica do tamanho do perfil.
+   Nenhuma mudança de imagem nem de jogabilidade.
+   Os materiais NÃO são descartados por padrão (revisão de 19/11, B2): no three r128 o `dispose` do material solta o programa da placa e,
+   se o modelo era o único usuário, reequipar recompila (um tranco que a v873 não tinha); sem `dispose`, o material vai para o GC e o
+   programa fica no cache (as chaves de programa do jogo são textos fixos: o cache não cresce sem limite). `?materiais876=1` descarta também.
+   O equipamento já montado quando o bloco chega (arranque e «reaplicar» das v162/v163/v196) fica registrado sem faixa, mas com dono
+   (revisão de 19/11, B1).
+   Chaves: `?ciclo876=0` (tudo), `?descarte876=1` (o item 1 vem desligado, ver a nota do coordenador), `?miniaturas876=0`, `?leitura876=0`, `?sons876=0`, `?materiais876=1`. Com o bloco ligado, cada item também
+   pode ser desligado na hora (`__ciclo876.estado.descarte=false`, `.miniaturas`, `.leitura`, `.sons`) — o roteiro de teste compara antes e
+   depois na mesma página.
+   Gancho `window.__ciclo876` (`estado`, `stats`, `erros`, `fila`, `descartarAgora`, `janela`, `partilhado`, `censo`). */
+const CV876_Q=location.search+location.hash;
+const CV876={on:!/[?&#]ciclo876=0/i.test(CV876_Q),erros:[],stats:{
+  modelos:{montados:0,aposentados:0,ligados:0,descartados:0,voltaram:0,adiados:0,desistidos:0,geo:0,mat:0,tex:0,ossos:0,inst:0,sombras:0,
+    poupados:{cena:0,cache:0,partilhado:0,antigo:0,tipo:0,globais:0},rodadas:0,ms:0,ultimo:null},
+  miniaturas:{chamadas:0,passos:0,cortados:0,maxQuadro:0},
+  leitura:{falas:0,ignoradas:0},
+  sons:{agendados:0,tirados:0,maxLista:0}}};
+CV876.descarte=CV876.on&&/[?&#]descarte876=1/i.test(CV876_Q); /* coordenador (19/11 19:50): o item 1 vem DESLIGADO — no navegador, com ele ligado, 6 trocas de companheiro deixaram +220 geometrias, +46 texturas e +48 programas na placa (desligado: +0); fica para conferir. `?descarte876=1` liga. */
+CV876.miniaturas=CV876.on&&!/[?&#]miniaturas876=0/i.test(CV876_Q);
+CV876.leitura=CV876.on&&!/[?&#]leitura876=0/i.test(CV876_Q);
+CV876.sons=CV876.on&&!/[?&#]sons876=0/i.test(CV876_Q);
+CV876.mats=CV876.descarte&&/[?&#]materiais876=1/i.test(CV876_Q);   // revisão B2: materiais só com ?materiais876=1
+function cv876Erro(k,e){try{if(CV876.erros.length<30)CV876.erros.push(k+': '+(e&&e.message||e));console.warn('v876',k,e);}catch(x){}}
+
+// ---------- (1) o modelo trocado sai da placa ----------
+const CV876_VAGAS=['pet','bicho','lantern','lanternL','rubi530'];
+const CV876_JANELA=new WeakMap();   // modelo → {g,m,t,seq}: o 1.º id de geometria, de material e de textura da montagem dele
+const CV876_DONO=new WeakMap();     // recurso → n.º da 1.ª montagem em que apareceu (número: não segura o modelo na memória)
+const CV876_PARTILHA=new WeakSet(); // recurso visto em duas montagens (cache, molde, clone): nunca é descartado
+const CV876_FILA=new Map();         // objeto que saiu → {dono, vaga, tent}
+const CV876_MAPAS=['map','emissiveMap','alphaMap','normalMap','roughnessMap','metalnessMap','bumpMap','aoMap','lightMap','specularMap','envMap',
+  'gradientMap','displacementMap','clearcoatMap','clearcoatNormalMap','clearcoatRoughnessMap','matcap','transmissionMap','sheenColorMap',
+  'sheenRoughnessMap','thicknessMap','specularIntensityMap','specularColorMap','iridescenceMap','iridescenceThicknessMap'];
+let CV876_SEQ=0,CV876_TIMER=null;
+function cv876Ids(){try{return {g:new THREE.BufferGeometry().id,m:new THREE.Material().id,t:new THREE.Texture().id};}catch(e){return null;}}
+function cv876Novo(){return {geo:new Set(),mat:new Set(),tex:new Set(),esq:new Set()};}
+function cv876TexDe(m,S){if(!m)return;
+  for(const k of CV876_MAPAS){let t=null;try{t=m[k];}catch(e){}if(t&&t.isTexture)S.add(t);}
+  const u=m.uniforms;if(u&&typeof u==='object')for(const k in u){const v=u[k]&&u[k].value;if(v&&v.isTexture)S.add(v);else if(Array.isArray(v))for(const x of v)if(x&&x.isTexture)S.add(x);}}
+function cv876MatsDe(o){const L=[];const a=o.material;
+  if(Array.isArray(a)){for(const m of a)if(m&&m.isMaterial)L.push(m);}else if(a&&a.isMaterial)L.push(a);
+  try{const or=PAPEL_ORIG.get(o);if(or){if(Array.isArray(or)){for(const m of or)if(m&&m.isMaterial)L.push(m);}else if(or.isMaterial)L.push(or);}}catch(e){}
+  return L;}
+// os gêmeos de um material: o toon do Papel, o recorte da v829 (e o toon dele) e, se for um toon, o original
+function cv876Derivados(m,L){
+  try{const t=PAPEL_CACHE.get(m);if(t)L.push(t);}catch(e){}
+  try{const c=CR8_MAPA.get(m);if(c){L.push(c);try{const t2=PAPEL_CACHE.get(c);if(t2)L.push(t2);}catch(e){}}}catch(e){}
+  try{const d=PAPEL_DE.get(m);if(d)L.push(d);}catch(e){}}
+function cv876PoeMat(m,R){if(!m||!m.isMaterial||R.mat.has(m))return;const L=[m];cv876Derivados(m,L);
+  for(const x of L){if(!x||!x.isMaterial||R.mat.has(x))continue;R.mat.add(x);cv876TexDe(x,R.tex);}}
+// tudo o que uma árvore usa (geometria, materiais e gêmeos, texturas, esqueletos) — laço enxuto: o censo passa por todas as cenas
+function cv876Junta(raiz,R){if(!raiz||!raiz.isObject3D)return;
+  let PG=null,PO=null;try{PG=PAPEL_GEO;}catch(e){}try{PO=PAPEL_ORIG;}catch(e){}
+  raiz.traverse(o=>{try{
+    const g=o.geometry;if(g&&g.isBufferGeometry&&!o.isSprite)R.geo.add(g);
+    if(PG){const pg=PG.get(o);if(pg&&pg.g&&pg.g.isBufferGeometry)R.geo.add(pg.g);}
+    const a=o.material;if(a){if(Array.isArray(a)){for(let i=0;i<a.length;i++)cv876PoeMat(a[i],R);}else cv876PoeMat(a,R);}
+    if(PO){const or=PO.get(o);if(or){if(Array.isArray(or)){for(let i=0;i<or.length;i++)cv876PoeMat(or[i],R);}else cv876PoeMat(or,R);}}
+    if(o.isSkinnedMesh&&o.skeleton)R.esq.add(o.skeleton);
+  }catch(e){}});}
+// objetos fora da árvore do modelo que só existem por causa dele: rastros de luz e o fogo do dragão dos rubis
+function cv876Ligados(o){const L=[];const add=x=>{if(x&&x.isObject3D&&x!==o&&!L.includes(x))L.push(x);};
+  try{const u=o.userData||{};add(u.rastro&&u.rastro.pts);add(u.rastroPts);add(u.t162&&u.t162.rastro&&u.t162.rastro.pts);add(u.ruby422&&u.ruby422.fire);}catch(e){}
+  try{for(const R of T162_RASTROS)if(R&&R.dono===o)add(R.pts);}catch(e){}
+  try{for(const F of T162.fadas)if(F&&F.g===o)add(F.pts);}catch(e){}
+  return L;}
+function cv876Vivo(o){if(!o)return false;try{for(const k of CV876_VAGAS)if(GEAR[k]===o)return true;}catch(e){}return false;}
+function cv876NaCena(o){try{let p=o,n=0;while(p.parent&&n++<500)p=p.parent;return !!p.isScene;}catch(e){return true;}}
+// a montagem: anota a faixa de ids e quem mais usa cada recurso
+function cv876Registra(raiz,jan){try{if(!raiz||!raiz.isObject3D)return;
+    const ant=CV876_JANELA.get(raiz);let seq;
+    if(ant){seq=ant.seq;if(jan){ant.g=Math.min(ant.g,jan.g);ant.m=Math.min(ant.m,jan.m);ant.t=Math.min(ant.t,jan.t);}}
+    else{seq=++CV876_SEQ;CV876_JANELA.set(raiz,jan?{g:jan.g,m:jan.m,t:jan.t,seq}:{g:Infinity,m:Infinity,t:Infinity,seq,semFaixa:true});CV876.stats.modelos.montados++;}
+    const R=cv876Novo();cv876Junta(raiz,R);
+    for(const S of [R.geo,R.mat,R.tex])for(const r of S){const d=CV876_DONO.get(r);if(d===undefined)CV876_DONO.set(r,seq);else if(d!==seq)CV876_PARTILHA.add(r);}
+  }catch(e){cv876Erro('registra',e);}}
+function cv876Aposenta(o,vaga){try{if(!CV876.descarte||!o||!o.isObject3D||cv876Vivo(o))return;
+    if(!CV876_FILA.has(o)){CV876_FILA.set(o,{dono:o,vaga:vaga||'?',tent:0});CV876.stats.modelos.aposentados++;}
+    for(const x of cv876Ligados(o))if(!CV876_FILA.has(x)){CV876_FILA.set(x,{dono:o,vaga:(vaga||'?')+' · ligado',tent:0});CV876.stats.modelos.ligados++;}
+    cv876Agenda(1500);}catch(e){cv876Erro('aposenta',e);}}
+function cv876Agenda(ms){if(CV876_TIMER)return;try{CV876_TIMER=setTimeout(()=>{CV876_TIMER=null;try{cv876Processa();}catch(e){cv876Erro('processa',e);}},ms);}catch(e){}}
+// o que está vivo: todas as cenas, o leitor, os modelos nas vagas e os rastros deles
+function cv876Censo(){const R=cv876Novo();const raizes=new Set();
+  try{for(const sc of allScenes())raizes.add(sc);}catch(e){}
+  try{if(ACTIVE)raizes.add(ACTIVE);}catch(e){}
+  try{if(scene)raizes.add(scene);}catch(e){}
+  try{if(READER&&READER.g&&!cv876NaCena(READER.g))raizes.add(READER.g);}catch(e){}
+  for(const k of CV876_VAGAS){try{const o=GEAR[k];if(o&&o.isObject3D){if(!cv876NaCena(o))raizes.add(o);for(const x of cv876Ligados(o))if(!cv876NaCena(x))raizes.add(x);}}catch(e){}}
+  for(const r of raizes){try{cv876Junta(r,R);
+      if(r.isScene){for(const k of ['background','environment']){const t=r[k];if(t&&t.isTexture)R.tex.add(t);}if(r.overrideMaterial)cv876PoeMat(r.overrideMaterial,R);}}catch(e){}}
+  return R;}
+// os caches conhecidos (e os derivados deles) + os globais
+function cv876Caches(){const R=cv876Novo();const vistos=new Set();
+  const visita=(v,d)=>{if(!v||typeof v!=='object'||d>4||vistos.has(v))return;vistos.add(v);
+    if(v.isObject3D){cv876Junta(v,R);return;}
+    if(v.isBufferGeometry){R.geo.add(v);return;}
+    if(v.isMaterial){cv876PoeMat(v,R);return;}
+    if(v.isTexture){R.tex.add(v);return;}
+    if(v.isSkeleton){R.esq.add(v);return;}
+    if(v instanceof Map){for(const x of v.values())visita(x,d+1);return;}
+    if(v instanceof Set){for(const x of v)visita(x,d+1);return;}
+    if(Array.isArray(v)){for(const x of v)visita(x,d+1);return;}
+    const pr=Object.getPrototypeOf(v);if(pr===Object.prototype||pr===null){for(const k in v)visita(v[k],d+1);}};
+  const fontes=[];const f=g=>{try{const c=g();if(c)fontes.push(c);}catch(e){}};
+  f(()=>T160.cache);f(()=>T162.cache);f(()=>DRG.cache);f(()=>COMP400.cache);f(()=>COMP405.cache);f(()=>CP579.cache);f(()=>PELT411.cache);
+  f(()=>PAPEL_BOX);f(()=>EMB_TEX148);
+  f(()=>window.__companions400&&window.__companions400.state&&window.__companions400.state.cache);
+  f(()=>window.__comp579&&window.__comp579.estado&&window.__comp579.estado.cache);
+  f(()=>window.__bichos622&&window.__bichos622.cache);
+  f(()=>window.__voadores623&&window.__voadores623.cache);
+  f(()=>window.__dragoes624&&window.__dragoes624.cache);
+  for(const c of fontes)visita(c,0);
+  // a geometria subdividida (v566) de uma geometria de cache também é de cache
+  try{for(const g of [...R.geo]){const r=CM566.cache.get(g);if(r&&r.isBufferGeometry)R.geo.add(r);}}catch(e){}
+  const G=new Set();try{if(GLOW&&GLOW.isTexture)G.add(GLOW);}catch(e){}try{if(PAPEL_GRAD&&PAPEL_GRAD.isTexture)G.add(PAPEL_GRAD);}catch(e){}
+  R.globais=G;return R;}
+// textura que o three sobe de novo sozinho se alguém ainda a desenhar (tela, imagem, bitmap ou dados)
+function cv876TexOk(t){try{if(!t||!t.isTexture||t.isCubeTexture||t.isVideoTexture||t.isCompressedTexture||t.isDepthTexture||t.isDataTexture3D||t.isDataTexture2DArray)return false;
+    if(t.isDataTexture)return !!(t.image&&t.image.data);const im=t.image;if(!im)return false;
+    return (typeof HTMLCanvasElement!=='undefined'&&im instanceof HTMLCanvasElement)||(typeof HTMLImageElement!=='undefined'&&im instanceof HTMLImageElement)||
+      (typeof ImageBitmap!=='undefined'&&im instanceof ImageBitmap)||(typeof OffscreenCanvas!=='undefined'&&im instanceof OffscreenCanvas);}catch(e){return false;}}
+function cv876OssosDentro(k,raiz){try{if(!k.bones||!k.bones.length)return false;
+    for(const b of k.bones){let p=b,ok=false,n=0;while(p&&n++<500){if(p===raiz){ok=true;break;}p=p.parent;}if(!ok)return false;}return true;}catch(e){return false;}}
+function cv876Processa(){const S=CV876.stats.modelos;const t0=performance.now();if(!CV876_FILA.size)return 0;
+  const prontos=[];
+  for(const [o,info] of [...CV876_FILA]){try{
+      if(cv876Vivo(o)||cv876Vivo(info.dono)){CV876_FILA.delete(o);S.voltaram++;continue;}
+      if(cv876NaCena(o)){if(++info.tent>(info.dono===o?8:45)){CV876_FILA.delete(o);S.desistidos++;}else S.adiados++;continue;}
+      CV876_FILA.delete(o);prontos.push([o,info]);
+    }catch(e){CV876_FILA.delete(o);cv876Erro('fila',e);}}
+  let n=0;
+  if(prontos.length){
+    // candidatos: só o que está na árvore do objeto que saiu (e nos gêmeos dos materiais dela)
+    const cand={geo:new Map(),mat:new Map(),tex:new Map(),esq:new Map(),inst:new Set(),luz:new Set()};
+    for(const [o,info] of prontos){const jan=CV876_JANELA.get(info.dono)||CV876_JANELA.get(o)||null;
+      o.traverse(x=>{try{
+        if(x.geometry&&x.geometry.isBufferGeometry&&!x.isSprite&&!cand.geo.has(x.geometry))cand.geo.set(x.geometry,jan);
+        try{const pg=PAPEL_GEO.get(x);if(pg&&pg.g&&pg.g.isBufferGeometry&&!cand.geo.has(pg.g))cand.geo.set(pg.g,jan);}catch(e){}
+        const R=cv876Novo();for(const m of cv876MatsDe(x))cv876PoeMat(m,R);
+        for(const m of R.mat)if(!cand.mat.has(m))cand.mat.set(m,jan);
+        for(const t of R.tex)if(!cand.tex.has(t))cand.tex.set(t,jan);
+        if(x.isSkinnedMesh&&x.skeleton&&!cand.esq.has(x.skeleton))cand.esq.set(x.skeleton,o);
+        if(x.isInstancedMesh)cand.inst.add(x);
+        if(x.isLight&&x.shadow&&(x.shadow.map||x.shadow.mapPass))cand.luz.add(x);
+      }catch(e){}});}
+    const vivo=cv876Censo(),cache=cv876Caches();const P=S.poupados;
+    const pode=(r,jan,campo)=>{
+      if(cache.globais.has(r)){P.globais++;return false;}
+      if(vivo[campo].has(r)){P.cena++;return false;}
+      if(cache[campo].has(r)){P.cache++;return false;}
+      if(CV876_PARTILHA.has(r)){P.partilhado++;return false;}
+      const k=campo==='geo'?'g':campo==='mat'?'m':'t';
+      if(jan&&!jan.semFaixa&&typeof r.id==='number'&&r.id<jan[k]){P.antigo++;return false;}   // já existia antes da montagem: é de alguém
+      return true;};
+    let nG=0,nM=0,nT=0,nO=0,nI=0,nS=0;
+    for(const [g,jan] of cand.geo)if(pode(g,jan,'geo')){try{g.dispose();nG++;}catch(e){cv876Erro('geo',e);}}
+    if(CV876.mats)for(const [m,jan] of cand.mat)if(pode(m,jan,'mat')){try{m.dispose();nM++;}catch(e){cv876Erro('mat',e);}}
+    for(const [t,jan] of cand.tex){if(!cv876TexOk(t)){P.tipo++;continue;}if(pode(t,jan,'tex')){try{t.dispose();nT++;}catch(e){cv876Erro('tex',e);}}}
+    for(const [k,raiz] of cand.esq){if(vivo.esq.has(k)||cache.esq.has(k)||!cv876OssosDentro(k,raiz))continue;try{k.dispose();nO++;}catch(e){cv876Erro('ossos',e);}}
+    for(const x of cand.inst){try{x.dispose();nI++;}catch(e){cv876Erro('instâncias',e);}}
+    for(const L of cand.luz){try{const sh=L.shadow;if(sh.map){sh.map.dispose();sh.map=null;}if(sh.mapPass){sh.mapPass.dispose();sh.mapPass=null;}nS++;}catch(e){cv876Erro('sombra',e);}}
+    S.geo+=nG;S.mat+=nM;S.tex+=nT;S.ossos+=nO;S.inst+=nI;S.sombras+=nS;S.descartados+=prontos.length;n=nG+nM+nT+nO+nI+nS;
+    S.ultimo={objetos:prontos.map(([o,i])=>i.vaga+' · '+(o.name||(o.userData&&(o.userData.pet||o.userData.bicho))||o.type)).slice(0,8),geo:nG,mat:nM,tex:nT,ossos:nO,inst:nI,sombras:nS,
+      candidatos:{geo:cand.geo.size,mat:cand.mat.size,tex:cand.tex.size},ms:0};
+  }
+  if(CV876_FILA.size)cv876Agenda(2000);
+  S.rodadas++;S.ms=+(performance.now()-t0).toFixed(1);if(S.ultimo&&prontos.length)S.ultimo.ms=S.ms;
+  return n;}
+if(CV876.descarte){
+  // as montagens (a mais de fora: vê o que todas as camadas fizeram, gêmeos e subdivisões incluídos)
+  const cv876Emb=(nome,f0)=>function(){const j=cv876Ids();const r=f0.apply(this,arguments);
+      try{if(r&&r.isObject3D)cv876Registra(r,j);else if(r&&r.g&&r.g.isObject3D){cv876Registra(r.g,j);if(r.luz&&r.luz.isObject3D)cv876Registra(r.luz,j);}}catch(e){cv876Erro('montagem '+nome,e);}
+      return r;};
+  try{if(typeof buildPet==='function')buildPet=cv876Emb('pet',buildPet);}catch(e){cv876Erro('buildPet',e);}
+  try{if(typeof buildBicho==='function')buildBicho=cv876Emb('bicho',buildBicho);}catch(e){cv876Erro('buildBicho',e);}
+  try{if(typeof buildLanterna==='function')buildLanterna=cv876Emb('lanterna',buildLanterna);}catch(e){cv876Erro('buildLanterna',e);}
+  try{if(typeof ruby422Baby==='function')ruby422Baby=cv876Emb('rubi',ruby422Baby);}catch(e){cv876Erro('ruby422Baby',e);}
+  // quem tira modelos das vagas
+  try{const ag0=applyGear;applyGear=function(){let antes=null;try{if(CV876.descarte)antes=CV876_VAGAS.map(k=>GEAR[k]);}catch(e){}
+      const r=ag0.apply(this,arguments);
+      try{if(antes)for(let i=0;i<CV876_VAGAS.length;i++){const o=antes[i];if(o&&o!==GEAR[CV876_VAGAS[i]])cv876Aposenta(o,CV876_VAGAS[i]);}}catch(e){cv876Erro('applyGear',e);}
+      return r;};
+    try{if(window.__loja)window.__loja.aplicar=applyGear;}catch(e){}}catch(e){cv876Erro('applyGear0',e);}
+  try{if(typeof rb530Sync==='function'){const rs0=rb530Sync;rb530Sync=function(){let g=null;try{g=GEAR.rubi530;}catch(e){}const r=rs0.apply(this,arguments);
+      try{if(g&&GEAR.rubi530!==g)cv876Aposenta(g,'rubi530');}catch(e){}return r;};}}catch(e){cv876Erro('rb530Sync',e);}
+  try{if(typeof companion434Restore==='function'){const cr0=companion434Restore;companion434Restore=function(slot,g){const r=cr0.apply(this,arguments);
+      try{if(g&&slot&&GEAR[slot]!==g)cv876Aposenta(g,slot);}catch(e){}return r;};}}catch(e){cv876Erro('companion434Restore',e);}
+  // revisão B1: o equipamento já montado quando este bloco chega (arranque e «reaplicar» das v162/v163/v196) fica registrado sem faixa,
+  // mas com dono: um recurso dele que reapareça numa montagem posterior (miniatura, rival, a mesma espécie) vira «partilhado»
+  try{for(const k of CV876_VAGAS){const o=GEAR[k];if(o&&o.isObject3D&&!CV876_JANELA.has(o))cv876Registra(o,null);}}catch(e){cv876Erro('arranque',e);}
+}
+
+// ---------- (2) miniaturas da aba Companheiros: um laço só ----------
+const MI876={quadro:-1,n:0};
+if(CV876.miniaturas&&typeof cc549Processa==='function'){
+  try{const p0=cc549Processa;cc549Processa=function(ts){const S=CV876.stats.miniaturas;
+      try{S.chamadas++;
+        if(typeof ts==='number'){
+          if(ts===MI876.quadro){MI876.n++;if(MI876.n>S.maxQuadro)S.maxQuadro=MI876.n;
+            if(CV876.miniaturas){S.cortados++;return;}}   // outro laço no mesmo quadro: morre aqui, sem se reagendar
+          else{MI876.quadro=ts;MI876.n=1;if(S.maxQuadro<1)S.maxQuadro=1;}}
+      }catch(e){cv876Erro('miniaturas',e);}
+      S.passos++;return p0.apply(this,arguments);};}catch(e){cv876Erro('miniaturas0',e);}
+}
+
+// ---------- (3) leitura em voz alta: uma leitura só ----------
+const LE876={atual:null};
+function cv876Fala(u){try{if(!u||typeof u!=='object')return;LE876.atual=u;CV876.stats.leitura.falas++;
+    for(const k of ['onend','onerror']){const f=u[k];if(typeof f!=='function')continue;
+      u[k]=function(){if(CV876.leitura&&LE876.atual!==u){CV876.stats.leitura.ignoradas++;return;}return f.apply(this,arguments);};}
+  }catch(e){cv876Erro('fala',e);}}
+if(CV876.leitura&&typeof ttsProx==='function'&&typeof ttsStop==='function'){
+  try{const tp0=ttsProx;ttsProx=function(){if(!CV876.leitura)return tp0.apply(this,arguments);
+      let ss=null,proprio=false,fala0=null;
+      try{ss=window.speechSynthesis;if(ss&&typeof ss.speak==='function'){proprio=Object.prototype.hasOwnProperty.call(ss,'speak');fala0=ss.speak;
+          ss.speak=function(u){cv876Fala(u);return fala0.apply(this,arguments);};}else ss=null;}catch(e){ss=null;}
+      try{return tp0.apply(this,arguments);}
+      finally{try{if(ss){if(proprio)ss.speak=fala0;else delete ss.speak;}}catch(e){}}};}catch(e){cv876Erro('ttsProx',e);}
+  try{const ts0=ttsStop;ttsStop=function(){try{LE876.atual=null;}catch(e){}return ts0.apply(this,arguments);};}catch(e){cv876Erro('ttsStop',e);}
+  try{if(window.__tts)window.__tts.parar=ttsStop;}catch(e){}
+}
+
+// ---------- (4) sons esparsos: cada tique tira o próprio registro ----------
+function cv876SomTira(e){try{const L=SOM.timers;const i=L.indexOf(e);if(i>=0){L.splice(i,1);CV876.stats.sons.tirados++;}}catch(x){}}
+// a mesma regra da `agenda` da v198: intervalo sorteado entre min e max, trava do perfil, toca só com volume e aba à vista
+function cv876SomAgenda(chave,f,min,max){const e={t:0,tipo:'to'};const ms=(min+Math.random()*Math.max(0,max-min))*1000;
+  e.t=setTimeout(()=>{cv876SomTira(e);if(SOM.perfil!==chave)return;try{if(SOM.master.gain.value>0.001&&!document.hidden)f();}catch(x){}cv876SomAgenda(chave,f,min,max);},ms);
+  SOM.timers.push(e);const S=CV876.stats.sons;S.agendados++;if(SOM.timers.length>S.maxLista)S.maxLista=SOM.timers.length;}
+if(CV876.sons&&typeof somToca==='function'&&typeof SOM!=='undefined'&&typeof SOM_PERFIS!=='undefined'&&typeof SOM_ESPARSOS!=='undefined'){
+  try{const st0=somToca;somToca=function(chave){if(!CV876.sons)return st0.apply(this,arguments);
+      let P=null,s=null;try{P=SOM_PERFIS[chave]||SOM_PERFIS.padrao;s=P&&P.s;}catch(e){P=null;}
+      if(!P||!Array.isArray(s)||!s.length)return st0.apply(this,arguments);
+      let r;P.s=[];   // o original monta as camadas contínuas; os esparsos ficam com a agenda daqui
+      try{r=st0.apply(this,arguments);}finally{P.s=s;}
+      try{if(SOM.ctx&&SOM.pronto&&SOM.perfil===chave)for(const [nome,min,max] of s){const f=SOM_ESPARSOS[nome];if(f)cv876SomAgenda(chave,f,min,max);}}catch(e){cv876Erro('sons',e);}
+      return r;};
+    try{if(window.__som198)window.__som198.toca=somToca;}catch(e){}}catch(e){cv876Erro('sons0',e);}
+}
+
+window.__ciclo876={estado:CV876,stats:CV876.stats,erros:CV876.erros,
+  fila:()=>[...CV876_FILA].map(([o,i])=>({nome:o.name||o.type,vaga:i.vaga,tent:i.tent,naCena:cv876NaCena(o)})),
+  descartarAgora:()=>{try{if(CV876_TIMER){clearTimeout(CV876_TIMER);CV876_TIMER=null;}return cv876Processa();}catch(e){cv876Erro('agora',e);return -1;}},
+  janela:o=>CV876_JANELA.get(o)||null,partilhado:r=>CV876_PARTILHA.has(r),
+  censo:()=>{const c=cv876Censo();return {geo:c.geo.size,mat:c.mat.size,tex:c.tex.size,esq:c.esq.size};},
+  miniaturas:MI876,leitura:LE876};
 
 window.__build434={revision:434,family:"web",edition:"en"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
