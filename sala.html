@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v874</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v875</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -114452,6 +114452,183 @@ if(PA874.on){
 }
 window.__palco874={estado:PA874,stats:PA874.stats,erros:PA874.erros,geo:()=>PA874.geo,liga:()=>pa874Liga(true),desliga:()=>pa874Liga(false),
   altura:pa874Altura,empurra:pa874Empurra,tunel:pa874Tunel,desliza:pa874Desliza,aplica:pa874Aplica,confere:pa874Confere,ribalta:pa874Ribalta,alcapao:pa874Alcapao,decor:pa874Decor};
+
+/* ===================== v875 · A VIAGEM PEDIDA DURANTE A PREPARAÇÃO NÃO SE PERDE: O ÚLTIMO PEDIDO RECUSADO É FEITO ASSIM QUE A PREPARAÇÃO TERMINA (bloco `VG875`) =====================
+   Revisão das viagens (v866, revisão estática `relatorio_viagens.md`); aprovado pelo Luiz (19/11): guardar o ÚLTIMO pedido recusado e
+   fazê-lo assim que a preparação terminar.
+   COMO ERA: um pedido de viagem (mapa, elevador, menu «Ir para», portas do Hall, «⟵ Voltar ao Hall», B do controle, a porta de volta dentro
+   das salas) feito enquanto o castelo ainda preparava a viagem anterior — `QUIET434.job` ainda sem `fundo`, ou a abertura (`PERF130.busy`) —
+   era recusado pelo `fadeTo` base; a v677 (AN677) só trocou o silêncio por «Um instante — ainda preparando o castelo…», e o jogador tinha de
+   pedir de novo. A porta do Hall pedida nessa hora ficava «aberta»: `openDoor` põe `open=1` antes do pedido e só `placeHall` ou a volta pelo
+   arco (`v222Trocar('hall')`) zeram; a tecla E em 1.ª pessoa (`actFP`) e a entrada andando (v559) pulam porta aberta — nada funcionava nela
+   até voltar ao Hall. O mesmo com a porta recusada por uma tranca e com a viagem que falhava («Tente entrar novamente»).
+   AGORA:
+   (1) FILA DE UM LUGAR. O pedido que o `fadeTo` base recusaria (a mesma regra dele: abertura, ou viagem fora da fase de fundo cancelável)
+       fica guardado — o mais novo substitui o anterior — e o aviso passa a dizer «Um instante — ainda preparando o castelo… a viagem vem logo
+       em seguida.» (PT/EN/ES; uma vez por pedido: o mesmo pedido repetido a cada quadro, como o vão de uma porta sem vestíbulo, não repete o
+       aviso). Quando o `fadeTo` base passaria a aceitar (a viagem anterior chegou e entrou na fase de fundo, ou acabou) e a tela está livre
+       (`uiBlocked`), o pedido é refeito PELO MESMO CAMINHO: `goHall(n)`/`enterRoom(g)` de fora para dentro, com todos os embrulhos — as
+       trancas, o «Abrindo…» da v677, o aviso de missão da v198 (que a v863 segura até a chegada), a v867, a v720. Na fase de fundo ele
+       cancela o fundo, como qualquer pedido novo do jogador (v670).
+   (2) DESISTÊNCIA (em silêncio — o Luiz pediu menos mensagens): outra viagem que começa (`fadeTo` aceito que não seja troca de qualidade;
+       a escada que vai em frente); o leitor que muda de lugar por outro meio — o arco a pé (`v222Trocar`), `jump` que mexe no lugar (a morte
+       no hall, atalhos), a morte (`cavMorrer`); o pedido que deixou de valer na hora de refazer — já está lá, sala que não existe, sala
+       trancada (prólogo da v679, Sala do Acumulador da v683), andar trancado (grades das v372/v439/v440/v444, que dependem do andar onde se
+       está), leitor caído, visita diferente; a tela ocupada por mais de 30 s depois de a preparação acabar.
+   (3) A ESCADA NUNCA ENTRA NA FILA: `goHall(n, true)` (gatilho, clique ou entrada andando na escada) não é guardado — durante a preparação a
+       v868 (`EG868`) continua a ignorá-lo em silêncio (sem a v868, volta o aviso antigo da v677). A escada que vai em frente (sem preparação:
+       a subida da v720 ou o caminho antigo) é viagem nova e desfaz o guardado.
+   (4) A PORTA (chave própria). A porta cujo pedido não virou viagem nem ficou guardado fecha (`open=0`; o laço do Hall recolhe as folhas):
+       recusa de tranca, sala em construção, pedido guardado que foi substituído, cancelado ou não virou viagem ao ser refeito, e a viagem
+       que saiu pela porta e acabou sem chegar (falha ou «Não deu para montar esta sala» — esta volta sem lançar e o `fadeTo` base ainda
+       marca `fundo` com o leitor no Hall: chegar à fase de fundo SEM sair do Hall conta como não chegar). Com o pedido guardado a porta fica aberta.
+   (5) O VÃO QUE PEDE A CADA QUADRO (revisão de código): as portas sem vestíbulo (Minha Sala e Sala do Acumulador, sem `quad` → sem `vest222`)
+       e o vão de volta dentro dessas salas pedem a viagem a cada quadro enquanto o leitor está na faixa (laço `tick`). O pedido para o MESMO
+       destino da viagem que já está em preparo não é guardado nem avisado (como a escada na v868); o pedido feito dentro do laço que só repete
+       o de até 2 quadros antes não cria nem troca o pedido guardado — senão o vão apagava, no quadro seguinte, a escolha que o jogador acabou
+       de fazer no mapa (cliques, teclas, mapa e portas, fora do laço, seguem «o mais novo vence»).
+       Escolher de novo, num pedido isolado, o destino que já vem desfaz o guardado. O aviso sai uma vez por pedido guardado.
+   Fica como era: a recusa do alçapão das masmorras, da eclusa da Estufa (pedidos de `fadeTo` sem `goHall`/`enterRoom`) e da troca de
+   qualidade; a chegada da subida da v720, que chama o `goHall` de dentro dela (não passa por este embrulho).
+   Chaves: `?filaviagem875=0` (tudo — volta ao comportamento anterior; nas viagens, o da v869), `?porta875=0` (só a porta). Gancho `window.__filaviagem875`. */
+const VG875_Q=location.search+location.hash;
+const VG875={on:!/[?&#]filaviagem875=0/i.test(VG875_Q),erros:[],stats:{guardados:0,repetidos:0,substituidos:0,refeitos:0,naoViraram:0,cancelados:0,motivos:{},avisos:0,avisosCalados:0,escadaNaoGuardada:0,portasFechadas:0,portasMotivos:{},mesmoDestino:0,continuacoes:0},
+  pend:null,ctx:null,refazendo:false,portaCb:null,portaViagem:null,aviso:{chave:'',t:0},hist:[],ESPERA_JANELA:30000,AVISO_MS:2500,
+  quadro:0,noLaco:false,vistos:new Map(),emCurso:null}; // quadro: contador do `tick`; noLaco: dentro do `tick`; vistos: destino → último quadro pedido; emCurso: destino da viagem aceita com goHall/enterRoom
+VG875.porta=VG875.on&&!/[?&#]porta875=0/i.test(VG875_Q);
+function vg875Erro(k,e){if(VG875.erros.length<20)VG875.erros.push(k+': '+(e&&e.message||e));try{console.warn('v875',k,e);}catch(x){}}
+function vg875T(pt,en,es){try{return text428(pt,en,es);}catch(e){return pt;}}
+function vg875Nome(P){return P?(P.tipo+':'+(P.args[0]===undefined?'':P.args[0])):'';}
+function vg875Hist(ev,P,extra){try{VG875.hist.push({t:Math.round(performance.now()),ev,pedido:vg875Nome(P),extra:extra||''});if(VG875.hist.length>30)VG875.hist.shift();}catch(e){}}
+// a mesma regra do `fadeTo` base: recusa com a abertura (PERF130.busy) ou com uma viagem que não chegou à fase de fundo (que o port670 cancela)
+function vg875Bloqueado(){try{if(PERF130.busy)return true;const J=QUIET434.job;if(!J)return false;const P6=window.__port670;
+    return !(J.fundo&&!fadeOnAt&&P6&&typeof P6.cancelar==='function');}catch(e){vg875Erro('bloqueado',e);return false;}}
+function vg875Onde(){try{return CUR+'|'+(CUR==='hall'?HALLN:CUR_GENRE)+'|'+((ACTIVE&&ACTIVE.uuid)||'');}catch(e){return '';}}
+// o andar de destino, com a conta do goHall base e dos embrulhos das grades
+function vg875Andar(P){try{const a=P.args[0];if(P.tipo==='hall')return a||(CUR==='room'?GENRE_FLOOR(CUR_GENRE):HALLN);return GENRE_FLOOR(a)||1;}catch(e){return 1;}}
+function vg875AndarTrancado(n){
+  try{if(typeof gate372Blocked==='function'&&gate372Blocked(n))return true;}catch(e){}
+  try{if(typeof p439Blocked==='function'&&p439Blocked(n))return true;}catch(e){}
+  try{if(typeof r440Blocked==='function'&&r440Blocked(n))return true;}catch(e){}
+  try{if(typeof g444Blocked==='function'&&g444Blocked(n))return true;}catch(e){}
+  return false;}
+// por que o pedido guardado deixou de valer agora ('' = ainda vale); as mesmas trancas dos embrulhos, sem os avisos deles
+function vg875Motivo(P){try{
+    if(typeof CAV!=='undefined'&&CAV&&CAV.morto)return 'leitor caído';
+    if((window.VISITA||null)!==(P.visita||null))return 'visita';
+    const a=P.args[0];
+    if(typeof proTrancado==='function'&&proTrancado()&&!(P.tipo==='sala'&&a==='prologo'))return 'sala trancada';
+    if(P.tipo==='sala'){
+      if(typeof roomExists==='function'&&!roomExists(a))return 'sala inexistente';
+      if(a==='minha'&&typeof pr683Trancada==='function'&&pr683Trancada())return 'sala trancada';
+      if(CUR==='room'&&CUR_GENRE===a)return 'já está lá';
+    }else if(CUR==='hall'&&HALLN===vg875Andar(P))return 'já está lá';
+    if(vg875AndarTrancado(vg875Andar(P)))return 'andar trancado';
+  }catch(e){vg875Erro('motivo',e);}return '';}
+function vg875Aviso(P){try{if(P.avisou){VG875.stats.avisosCalados++;return;}P.avisou=true; // uma vez por pedido guardado
+    const k=vg875Nome(P),agora=performance.now();
+    if(VG875.aviso.chave===k&&agora-VG875.aviso.t<VG875.AVISO_MS){VG875.stats.avisosCalados++;return;}
+    VG875.aviso={chave:k,t:agora};VG875.stats.avisos++;
+    showToast(vg875T('Um instante — ainda preparando o castelo… a viagem vem logo em seguida.','One moment — still preparing the castle… your trip comes right after.','Un momento — todavía preparando el castillo… el viaje viene enseguida.'),{ms:VG875.AVISO_MS});
+  }catch(e){vg875Erro('aviso',e);}}
+// ---------- o vão que pede a cada quadro (revisão) ----------
+// o destino resolvido na hora do pedido (o goHall() sem andar vira o andar de onde se está, como na conta do goHall base)
+function vg875Chave(C){try{return C.tipo==='hall'?('hall:'+vg875Andar(C)):('sala:'+C.args[0]);}catch(e){return vg875Nome(C);}}
+// marca o destino neste quadro; true se é um pedido feito DENTRO do laço (`tick`: o vão sem vestíbulo) e o mesmo destino já tinha sido pedido
+// até 2 quadros antes — o pedido que se repete a cada quadro. Pedidos de clique, tecla, mapa e porta (fora do laço) nunca são «continuação».
+function vg875Continua(k){const q=VG875.quadro,M=VG875.vistos,u=M.get(k);M.set(k,q);
+  if(M.size>12)for(const [kk,qq] of M)if(q-qq>3)M.delete(kk);
+  return !!VG875.noLaco&&u!==undefined&&q-u<=2;}
+// a viagem em preparo (aceita por goHall/enterRoom) vai para este destino?
+function vg875EmCurso(k){const E=VG875.emCurso,J=QUIET434.job;return !!(E&&J&&J.id===E.id&&E.chave===k);}
+// o nome que os embrulhos da v677 guardaram para este pedido não vale (o pedido não virou viagem agora)
+function vg875SemDestino(){try{if(typeof AN677!=='undefined'&&AN677)AN677.destino=null;}catch(e){}}
+// ---------- a porta ----------
+function vg875FechaPorta(g,motivo){try{if(!VG875.porta||!g||!g.userData||!g.userData.open)return false;
+    g.userData.open=0;VG875.stats.portasFechadas++;VG875.stats.portasMotivos[motivo]=(VG875.stats.portasMotivos[motivo]||0)+1;
+    vg875Hist('porta fechada',null,(g.userData.genre||'')+' · '+motivo);return true;}catch(e){vg875Erro('porta',e);return false;}}
+// ---------- a fila ----------
+function vg875Descarta(motivo){const P=VG875.pend;if(!P)return;VG875.pend=null;
+  try{VG875.stats.cancelados++;VG875.stats.motivos[motivo]=(VG875.stats.motivos[motivo]||0)+1;vg875Hist('cancelado',P,motivo);
+    if(P.porta&&P.porta!==VG875.portaCb)vg875FechaPorta(P.porta,motivo);}catch(e){vg875Erro('descarta',e);}} // a porta do pedido que chega agora não fecha
+function vg875Guarda(C){const P0=VG875.pend,a=C.args[0];
+  if(P0&&P0.tipo===C.tipo&&P0.args[0]===a){ // o mesmo pedido de novo (o vão da porta pede a cada quadro): continua o mesmo
+    P0.vezes++;P0.t=performance.now();if(!P0.porta&&VG875.portaCb)P0.porta=VG875.portaCb;VG875.stats.repetidos++;if(!VG875.refazendo)vg875Aviso(P0);return P0;}
+  const agora=performance.now();
+  const P={tipo:C.tipo,args:[a],t0:agora,t:agora,vezes:1,porta:VG875.portaCb||null,visita:window.VISITA||null,livre:0,job:(QUIET434.job&&QUIET434.job.id)||0,abertura:!!PERF130.busy};
+  if(P0){VG875.stats.substituidos++;vg875Hist('substituído',P0,'pelo pedido mais novo');if(P0.porta&&P0.porta!==P.porta)vg875FechaPorta(P0.porta,'substituído');}
+  VG875.pend=P;VG875.stats.guardados++;vg875Hist('guardado',P,P.abertura?'abertura':'preparação');
+  try{if(typeof AN677!=='undefined'&&AN677){AN677.stats.recusadas=(AN677.stats.recusadas||0)+1;AN677.destino=null;}}catch(e){} // a v677 conta a recusa; o nome do destino volta quando o pedido for refeito
+  if(!VG875.refazendo)vg875Aviso(P);return P;}
+// refaz pelo caminho de sempre: o goHall/enterRoom de fora (com todos os embrulhos), como se o jogador pedisse agora
+function vg875Faz(P){VG875.pend=null;const s0=QUIET434.serial;VG875.refazendo=true;vg875Hist('refeito',P,'');
+  try{if(P.tipo==='hall'){if(P.args[0]===undefined)goHall();else goHall(P.args[0]);}else enterRoom(P.args[0]);}
+  catch(e){vg875Erro('refazer',e);}finally{VG875.refazendo=false;}
+  try{if(QUIET434.serial!==s0){VG875.stats.refeitos++;if(P.porta&&QUIET434.job)VG875.portaViagem={g:P.porta,id:QUIET434.job.id};}
+    else if(VG875.pend){if(P.porta&&!VG875.pend.porta)VG875.pend.porta=P.porta;} // recusado de novo e guardado outra vez: a porta continua com ele
+    else{VG875.stats.naoViraram++;vg875Hist('não virou viagem',P,'');if(P.porta)vg875FechaPorta(P.porta,'não virou viagem');}}catch(e){vg875Erro('depois de refazer',e);}}
+// a cada quadro: a porta da viagem que saiu por ela; o pedido guardado (espera a preparação, confere se ainda vale, espera a tela livre)
+function vg875Passo(){
+  const PV=VG875.portaViagem;
+  if(PV){const J=QUIET434.job;
+    if(J&&J.id===PV.id){if(J.fundo){VG875.portaViagem=null; // na fase de fundo: chegou — a porta fica como está (a volta ao Hall zera todas)…
+        if(CUR==='hall'&&!(VG875.pend&&VG875.pend.porta===PV.g))vg875FechaPorta(PV.g,'viagem sem chegada');}} // …a menos que o leitor continue no Hall («Não deu para montar esta sala»)
+    else{VG875.portaViagem=null;if(CUR==='hall'&&!(VG875.pend&&VG875.pend.porta===PV.g))vg875FechaPorta(PV.g,'viagem sem chegada');}}
+  const P=VG875.pend;if(!P||!VG875.on)return;
+  if(vg875Bloqueado()){P.livre=0;return;}
+  const agora=performance.now();if(!P.livre)P.livre=agora;
+  const m=vg875Motivo(P);if(m){vg875Descarta(m);return;}
+  let ui=false;try{ui=typeof uiBlocked==='function'&&!!uiBlocked();}catch(e){}
+  if(ui){if(agora-P.livre>VG875.ESPERA_JANELA)vg875Descarta('tela ocupada');return;}
+  vg875Faz(P);}
+if(VG875.on&&typeof goHall==='function'&&typeof enterRoom==='function'&&typeof fadeTo==='function'&&typeof QUIET434!=='undefined'&&typeof PERF130!=='undefined'){
+  // (a) quem pediu: o contexto vale só durante a chamada (síncrona) de goHall/enterRoom até o fadeTo
+  try{const gh0=goHall;goHall=function(n,viaStair){if(!VG875.on)return gh0.apply(this,arguments);let ctx=null;
+      try{if(viaStair){ // a escada nunca entra na fila (a v868 a ignora durante a preparação); se ela vai em frente, é a viagem mais nova
+          if(vg875Bloqueado())VG875.stats.escadaNaoGuardada++;else if(VG875.pend&&!VG875.refazendo)vg875Descarta('escada');}
+        ctx={tipo:'hall',args:[n],guardavel:!viaStair};}catch(e){vg875Erro('goHall',e);}
+      const c0=VG875.ctx;VG875.ctx=ctx;try{return gh0.apply(this,arguments);}finally{VG875.ctx=c0;}};}catch(e){vg875Erro('goHall0',e);}
+  try{const er0=enterRoom;enterRoom=function(genre){if(!VG875.on)return er0.apply(this,arguments);
+      const c0=VG875.ctx;VG875.ctx={tipo:'sala',args:[genre],guardavel:true};try{return er0.apply(this,arguments);}finally{VG875.ctx=c0;}};}catch(e){vg875Erro('enterRoom0',e);}
+  // (b) a recusa: guarda em vez de deixar a v677 recusar; uma viagem aceita torna velho o que estava guardado
+  try{const f0=fadeTo;fadeTo=function(fn,options){let k='',aceito=false,s0=0;
+      try{const C=VG875.ctx;VG875.ctx=null; // o contexto vale para este fadeTo só
+        if(VG875.on&&((options&&options.kind)||'travel')!=='quality'){
+          if(C)k=vg875Chave(C);
+          if(vg875Bloqueado()){if(C&&C.guardavel){const cont=vg875Continua(k);vg875SemDestino();
+              if(vg875EmCurso(k)){VG875.stats.mesmoDestino++; // o destino da viagem que já está em preparo: nada a guardar, nenhum aviso
+                if(!cont&&VG875.pend&&!VG875.refazendo)vg875Descarta('o destino da viagem em curso'); // escolhido de novo, num pedido isolado: o guardado fica velho
+                if(VG875.portaCb&&!VG875.portaViagem&&QUIET434.job)VG875.portaViagem={g:VG875.portaCb,id:QUIET434.job.id}; // a porta dele fica aberta com a viagem
+                return Promise.resolve();}
+              if(cont&&!(VG875.pend&&vg875Chave(VG875.pend)===k)){VG875.stats.continuacoes++;return Promise.resolve();} // o vão repetindo o pedido do quadro anterior não cria nem troca o guardado
+              vg875Guarda(C);return Promise.resolve();}} // escada, alçapão, eclusa, chegada da v720: a v677 recusa como antes
+          else{if(VG875.pend&&!VG875.refazendo)vg875Descarta('outra viagem');
+            if(C){vg875Continua(k);aceito=true;s0=QUIET434.serial;}}}}catch(e){vg875Erro('fadeTo',e);}
+      const r=f0.apply(this,arguments);
+      if(aceito)try{if(QUIET434.serial!==s0&&QUIET434.job)VG875.emCurso={chave:k,id:QUIET434.job.id};}catch(e){vg875Erro('em curso',e);} // o fadeTo base cria o job antes do 1.º await
+      return r;};}catch(e){vg875Erro('fadeTo0',e);}
+  // (c) o laço: espera a preparação e refaz
+  if(typeof tick==='function')try{const tk0=tick;tick=function(dt){VG875.quadro++;try{vg875Passo();}catch(e){vg875Erro('passo',e);}
+      const l0=VG875.noLaco;VG875.noLaco=true;try{return tk0.apply(this,arguments);}finally{VG875.noLaco=l0;}};}catch(e){vg875Erro('tick',e);} // noLaco: o pedido nasceu dentro do laço
+  // (d) o leitor mudou de lugar por outro meio: o pedido guardado fica velho
+  if(typeof v222Trocar==='function')try{const vt0=v222Trocar;v222Trocar=function(){try{if(VG875.pend)vg875Descarta('arco a pé');}catch(e){vg875Erro('arco',e);}return vt0.apply(this,arguments);};}catch(e){vg875Erro('v222Trocar',e);}
+  if(typeof jump==='function')try{const jp0=jump;jump=function(){const antes=vg875Onde();const r=jp0.apply(this,arguments);
+      try{if(VG875.pend&&vg875Onde()!==antes)vg875Descarta('salto');}catch(e){vg875Erro('salto',e);}return r;};}catch(e){vg875Erro('jump',e);}
+  if(typeof cavMorrer==='function')try{const cm0=cavMorrer;cavMorrer=function(){
+      try{if(VG875.pend&&!(typeof PAC!=='undefined'&&PAC&&PAC.on)&&!(typeof CAV!=='undefined'&&CAV&&CAV.morto))vg875Descarta('morte');}catch(e){vg875Erro('morte',e);}
+      return cm0.apply(this,arguments);};}catch(e){vg875Erro('cavMorrer',e);}
+  // (e) a porta: o pedido que sai dela (o callback do openDoor) virou viagem, ficou guardado — ou a porta fecha
+  if(VG875.porta&&typeof openDoor==='function')try{const od0=openDoor;openDoor=function(g,cb){
+      if(!VG875.porta||!g||typeof cb!=='function')return od0.apply(this,arguments);
+      const cb2=function(){const s0=QUIET434.serial,p0=VG875.portaCb;VG875.portaCb=g;
+        try{return cb.apply(this,arguments);}finally{VG875.portaCb=p0;
+          try{if(QUIET434.serial!==s0&&QUIET434.job)VG875.portaViagem={g,id:QUIET434.job.id};
+            else if(!(VG875.pend&&VG875.pend.porta===g)&&!(VG875.portaViagem&&VG875.portaViagem.g===g))vg875FechaPorta(g,'pedido recusado');}catch(e){vg875Erro('porta cb',e);}}};
+      return od0.call(this,g,cb2);};}catch(e){vg875Erro('openDoor',e);}
+}else if(VG875.on){VG875.on=false;VG875.porta=false;vg875Erro('instalar','faltam goHall/enterRoom/fadeTo/QUIET434');}
+window.__filaviagem875={estado:VG875,stats:VG875.stats,erros:VG875.erros,hist:VG875.hist,
+  pendente:()=>{const P=VG875.pend;return P?{tipo:P.tipo,alvo:P.args[0]===undefined?null:P.args[0],vezes:P.vezes,porta:P.porta?(P.porta.userData&&P.porta.userData.genre)||true:null,idadeMs:Math.round(performance.now()-P.t0),abertura:P.abertura}:null;},
+  bloqueado:vg875Bloqueado,motivo:vg875Motivo,descartar:(m)=>vg875Descarta(m||'manual')};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
