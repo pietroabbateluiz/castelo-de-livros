@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v867</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v868</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -113167,6 +113167,65 @@ if(MV867.hud&&typeof missHud==='function'){
   try{setInterval(()=>{if(mv867Vira())try{missHud();}catch(e){}},30000);}catch(e){}
 }
 window.__missoes867={estado:MV867,stats:MV867.stats,erros:MV867.erros,viavel:mv867Viavel,troca:mv867Troca};
+
+/* ===================== v868 · CONTROLE: O A QUE ABRE UMA JANELA NÃO APERTA MAIS O BOTÃO DE DENTRO DELA NO MESMO QUADRO (bloco `PE868`) =====================
+   Plano de 18 h do Luiz (18/11) — revisão do controle (agente de revisão estática, conferido no código e no navegador de testes).
+   COMO ERA: o A no mundo chama `doInteract()` (a borda do jogo, no `pollPad`), que abre a janela na hora (conversa com morador, ovo de
+   dragão, conto…); no MESMO quadro, a navegação das janelas da v788 (`p788Pad`) já vê a janela aberta e calcula a borda do A com
+   `MS788.prev` — que só é atualizado enquanto há janela aberta. Com o A solto desde a última janela (fechada com B, mouse ou teclado, ou no
+   começo do jogo), a borda saía verdadeira e o `p788Clique` apertava o botão focado: a conversa com o morador abria e fechava no mesmo
+   quadro («Entendi»), e o ovo de dragão entregava 10 rubis sozinho («Entregar 10», o 1.º botão que o `showModal` foca); LB/RB trocavam a
+   aba da janela que acabava de abrir.
+   AGORA: quando o quadro começa sem janela e a janela aparece durante ele, a v788 anota os botões como já apertados (sem agir); o A, LB/RB e
+   a cruz só valem na janela a partir do próximo toque. Teclado, mouse e toque não mudam.
+   Chave: `?pad868=0`. Gancho `window.__pad868`. */
+const PE868={on:!/[?&#]pad868=0/i.test(location.search+location.hash),novo:false,erros:[],stats:{ignorados:0}};
+function pe868Erro(k,e){if(PE868.erros.length<20)PE868.erros.push(k+': '+(e&&e.message||e));try{console.warn('v868',k,e);}catch(x){}}
+function pe868Gp(){try{const gps=navigator.getGamepads?navigator.getGamepads():null;if(gps)for(const g of gps){if(g&&g.connected)return g;}}catch(e){}return null;}
+if(PE868.on&&typeof pollPad==='function'&&typeof p788Pad==='function'&&typeof p788Painel==='function'&&typeof MS788!=='undefined'){
+  // o quadro do controle começa com ou sem janela?
+  try{const pp=pollPad;pollPad=function(){let antes=true;try{if(typeof PAD!=='undefined'&&PAD.on)antes=!!p788Painel();}catch(e){}
+      const n0=PE868.novo;PE868.novo=!antes;try{return pp.apply(this,arguments);}finally{PE868.novo=n0;}};}catch(e){pe868Erro('pollPad',e);}
+  // a janela apareceu neste quadro: os botões apertados agora pertencem ao mundo (anotados, sem agir)
+  try{const p0=p788Pad;p788Pad=function(){try{if(PE868.novo&&MS788.on&&typeof PAD!=='undefined'&&PAD.on&&p788Painel()){const gp=pe868Gp();
+          if(gp){const b=i=>!!(gp.buttons[i]&&(gp.buttons[i].pressed||gp.buttons[i].value>.4));for(const i of [0,4,5,12,13,14,15])MS788.prev[i]=b(i);
+            if(MS788.stick){MS788.stick.x=PAD.mx||0;MS788.stick.y=PAD.mz||0;}PE868.stats.ignorados++;}PE868.novo=false;}}catch(e){pe868Erro('pad',e);}
+      return p0.apply(this,arguments);};}catch(e){pe868Erro('p788Pad',e);}
+}
+window.__pad868={estado:PE868,stats:PE868.stats,erros:PE868.erros};
+
+/* ===================== v868 (2) · A IMPORTAÇÃO DO PROGRESSO NÃO É MAIS DESFEITA PELA PERMANÊNCIA DA V372 NA RECARGA (bloco `PM868`) =====================
+   Plano de 18 h do Luiz (18/11) — revisão do armazenamento (agente de revisão estática, conferido no código e no navegador de testes).
+   COMO ERA: o tempo nas salas do 1.º andar da v372 (`castelo_permanencia372`, que entra na cópia do progresso desde a v847) vive na memória
+   (`GATE372.seconds`, lido uma vez na abertura) e é regravado na descarga da página (`pagehide` e aba escondida → `gate372Save`). Depois de
+   importar o progresso (arquivo da v423, código/arquivo/nuvem da v198), o jogo recarrega — e a descarga regravava os segundos da página
+   velha por cima dos importados. Para o veterano que abriu o 2.º andar pelos 2 minutos em cada sala (a regra antiga, `JAV436.legacy`) e
+   nunca alimentou o javali, os andares 2–7 voltavam a trancar no aparelho novo (e os zeros subiam para a nuvem na sincronização seguinte).
+   AGORA: quando essa chave é gravada por outro caminho (a importação), a memória lê o valor novo na hora — a gravação da descarga regrava o
+   que foi importado. Nada muda no jogo. Chave: `?permanencia868=0`. Gancho `window.__permanencia868`. */
+const PM868={on:!/[?&#]permanencia868=0/i.test(location.search+location.hash),dentro:false,erros:[],stats:{sincronizadas:0}};
+function pm868Erro(k,e){if(PM868.erros.length<20)PM868.erros.push(k+': '+(e&&e.message||e));try{console.warn('v868',k,e);}catch(x){}}
+if(PM868.on&&typeof GATE372!=='undefined'&&GATE372&&typeof gate372Load==='function'){
+  try{const P=Storage.prototype,s0=P.setItem;P.setItem=function(k,v){const r=s0.apply(this,arguments);
+      try{if(k===GATE372.key&&!PM868.dentro&&this===window.localStorage){PM868.dentro=true;try{const antes=JSON.stringify(GATE372.seconds);gate372Load();if(JSON.stringify(GATE372.seconds)!==antes)PM868.stats.sincronizadas++;}finally{PM868.dentro=false;}}}catch(e){pm868Erro('sincroniza',e);}
+      return r;};}catch(e){pm868Erro('setItem',e);}
+}
+window.__permanencia868={estado:PM868,stats:PM868.stats,erros:PM868.erros};
+
+/* ===================== v868 (3) · NO FIM DA ESCADA, O GATILHO NÃO PEDE A VIAGEM DE NOVO A CADA QUADRO («Um instante…») (bloco `EG868`) =====================
+   Plano de 18 h do Luiz (18/11) — revisão das viagens (agente de revisão estática, conferido no código e no navegador de testes).
+   COMO ERA: o gatilho da escada no `tick` pede `goHall(andar, true)` a cada quadro em que o leitor está na faixa da escada (r > raio − 1,2 m,
+   no ângulo dela); a guarda dele (`!fadeOnAt`) morreu com a viagem sem fade. No fim da subida em 3.ª pessoa (v720), o leitor é posto de volta
+   na faixa (o limite da rotunda volta antes da viagem começar) e, durante toda a preparação da viagem, cada quadro pedia a viagem de novo —
+   recusada pela v677 com «Um instante — ainda preparando o castelo…» (o aviso ficava na tela até a viagem terminar). Em 1.ª pessoa, o mesmo.
+   AGORA: com uma viagem já em preparo, o pedido da escada é ignorado em silêncio (a viagem em curso continua). Chave: `?escada868=0`.
+   Gancho `window.__escada868`. */
+const EG868={on:!/[?&#]escada868=0/i.test(location.search+location.hash),erros:[],stats:{ignorados:0}};
+if(EG868.on&&typeof goHall==='function'){
+  try{const g0=goHall;goHall=function(n,viaStair){try{if(viaStair===true&&typeof QUIET434!=='undefined'&&QUIET434.job&&!QUIET434.job.fundo){EG868.stats.ignorados++;return Promise.resolve();}}catch(e){if(EG868.erros.length<20)EG868.erros.push('gatilho: '+(e&&e.message||e));}
+      return g0.apply(this,arguments);};}catch(e){EG868.erros.push('goHall: '+(e&&e.message||e));}
+}
+window.__escada868={estado:EG868,stats:EG868.stats,erros:EG868.erros};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
