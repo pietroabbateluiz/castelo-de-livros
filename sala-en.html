@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v873</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v874</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -113976,6 +113976,482 @@ function lt873Ajusta(x,L,fs,w,h,o){try{const S=lt873Estado();if(!S.on||!S.placas
   }catch(e){try{const S=lt873Estado();if(S.erros.length<20)S.erros.push('ajusta: '+(e&&e.message||e));}catch(_){}return fs;}}
 lt873Estado();
 window.__letreiros873={estado:LT873,stats:LT873.stats,lista:LT873.lista,erros:LT873.erros,get rede(){return window.__letreiros873rede||null;}};
+
+/* ===================== v874 · ROMANCE: O TAPETE DO MEIO COM ROSAS E CORAÇÕES (bloco `RM874`) =====================
+   Pedido do Luiz (19/11, 12:52, com foto): «mas o tapete de romance, esse do print, troque por uma figura com rosas e corações ou algo do tipo».
+   COMO ERA: o tapete de 5,1 × 8 m do meio do café do Romance (o da v111, redesenhado pela v615 — `tp615Persa`, tela de 1224 × 1920 na
+   proporção certa; 612 × 960 no Leve/Papel, pelo teto de 1024 px da v198) tinha um desenho de tapete persa genérico: campo azul-marinho
+   com losangos vermelhos e um medalhão oval vermelho e dourado.
+   AGORA: a mesma malha, no mesmo lugar e no mesmo tamanho, com um desenho próprio (tela 1224 × 1920, a proporção exata do tapete):
+   campo vinho com um damasco discreto de corações, moldura escura com filetes dourados e uma guirlanda de coraçõezinhos e botões de rosa,
+   corações nos cantos da moldura, quatro buquês nos cantos do campo, pétalas soltas e, no meio, um grande coração creme com moldura
+   dourada, coroado por rosas vermelhas, cor-de-rosa e coral, com uma rosa grande e dois corações pequenos no centro; buquês pequenos no
+   eixo, acima e abaixo; textura leve de lã por cima. Os tapetes redondos e a passadeira da sala continuam como estavam.
+   QUANDO (revisão da v874): a tela é desenhada UMA vez por sessão, em fatias na fila do fatiador (`fat8Go`: 4–12 ms de cada vez, urgente
+   com o Romance à vista), assim que o Romance existe — antes era de uma vez, dentro do quadro, no 1.º segundo dentro da sala (0,4–0,5 s
+   parados, medido em node). Com o teto da v198 (Leve/Papel) a tela já nasce no tamanho do teto (612 × 960). A troca é feita no `setActive`
+   do Romance (antes do original: o 1.º quadro já tem o desenho novo) e de segundo em segundo com o Romance à vista (fora dele, só até a
+   1.ª troca na cena); a malha fica guardada (não se varre a sala a cada segundo). A v615 mexe em cada tapete UMA vez (a malha ganha
+   `tp615`); a malha passa a levar `tp615` aqui também, para a varredura dela não a tocar. A textura que sai (a da v615 ou a roseta da v111)
+   sai da placa (`dispose`) se nenhuma outra peça da sala a usa, e sai do cache da v615. No Papel a troca vai também para o material
+   original por trás do toon (o `papelSync` e o `papelTex` ficam coerentes: anisotropia 1 no Papel, 8 fora dele).
+   Chave: `?taperomance874=0`. Gancho `window.__taperomance874` (`estado`, `stats`, `erros`, `aplica()`, `desenha(x,W,H,esc)`). */
+const RM874={on:!/[?&#]taperomance874=0/i.test(location.search+location.hash),erros:[],stats:{aplicado:0,reaplicado:0,procurado:0,descartadas:0,ms:0,tela:null},
+  tex:null,ult:0,malha:null,cena:null,cenaOk:null,tBusca:0,job:null,falhou:0};
+function rm874Erro(k,e){if(RM874.erros.length<20)RM874.erros.push(k+': '+(e&&e.message||e));}
+// o desenho, em fatias: W × H lógicos (1224 × 1920), a tela tem W·esc × H·esc; rende quando a fatia do fatiador acaba (`fat8Fim`)
+function* rm874DesenhaG(x,W,H,esc){esc=esc||1;
+  const PI2=Math.PI*2;const corte=()=>typeof fat8Fim!=='undefined'&&performance.now()>=fat8Fim;
+  const pausa=()=>{try{x.getImageData(0,0,1,1);}catch(e){}}; // antes de render: o que ficou gravado na tela é rasterizado nesta fatia, não numa só lá na frente
+  let sem=874;const rnd=()=>{sem=(sem*16807)%2147483647;return sem/2147483647;};const RR=(a,b)=>a+rnd()*(b-a);
+  x.save();if(esc!==1)x.scale(esc,esc);
+  // ---- fundo: vinho com degradê e um damasco discreto de corações ----
+  const g=x.createRadialGradient(W/2,H/2,W*.1,W/2,H/2,Math.hypot(W,H)*.6);g.addColorStop(0,'#8e2b42');g.addColorStop(.6,'#6e1f33');g.addColorStop(1,'#4a1222');x.fillStyle=g;
+  for(let y0=0;y0<H;y0+=240){x.fillRect(0,y0,W,Math.min(240,H-y0));if(corte()){pausa();yield 'rm874 degradê';}} // o mesmo degradê em faixas (pixel a pixel igual a um fillRect só)
+  const coracao=(cx,cy,w,h)=>{x.beginPath();x.moveTo(cx,cy+h*.3);x.bezierCurveTo(cx,cy,cx-w*.5,cy,cx-w*.5,cy+h*.32);x.bezierCurveTo(cx-w*.5,cy+h*.62,cx-w*.14,cy+h*.8,cx,cy+h);x.bezierCurveTo(cx+w*.14,cy+h*.8,cx+w*.5,cy+h*.62,cx+w*.5,cy+h*.32);x.bezierCurveTo(cx+w*.5,cy,cx,cy,cx,cy+h*.3);x.closePath();};
+  x.save();x.globalAlpha=.16;x.fillStyle='#d65a78';for(let j=0,y=40;y<H+60;y+=86,j++){for(let i=0,xx=(j%2)*55;xx<W+60;xx+=110,i++){coracao(xx,y-14,26,24);x.fill();}if(corte()){pausa();yield 'rm874 fundo';}}x.restore();
+  // ---- folhas e rosas ----
+  const folha=(cx,cy,len,ang,cor)=>{x.save();x.translate(cx,cy);x.rotate(ang);const gg=x.createLinearGradient(0,-len*.25,0,len*.25);gg.addColorStop(0,cor||'#6f9a4c');gg.addColorStop(1,'#2f5226');x.fillStyle=gg;x.beginPath();x.moveTo(0,0);x.quadraticCurveTo(len*.5,-len*.32,len,0);x.quadraticCurveTo(len*.5,len*.32,0,0);x.fill();x.strokeStyle='rgba(20,40,16,.55)';x.lineWidth=Math.max(1,len*.04);x.beginPath();x.moveTo(len*.05,0);x.lineTo(len*.92,0);x.stroke();x.restore();};
+  const PAL={rubi:['#c3233c','#7d0f22','#f0607a'],rosa:['#e0607f','#9e2c4b','#ffc0cf'],creme:['#f3d6c2','#c99178','#fff3ea'],coral:['#e8735f','#a33d2e','#ffc2a8']};
+  const rosa=(cx,cy,r,p)=>{const c=PAL[p]||PAL.rubi;
+    x.save();x.fillStyle='rgba(30,0,8,.28)';x.beginPath();x.arc(cx+r*.08,cy+r*.12,r*1.02,0,PI2);x.fill();x.restore();
+    const camada=(n,dist,rx,ry,rot,c0,c1)=>{for(let k=0;k<n;k++){const a=rot+k*PI2/n;x.save();x.translate(cx,cy);x.rotate(a);const gr=x.createRadialGradient(0,-dist*.4,r*.04,0,-dist,ry*1.1);gr.addColorStop(0,c1);gr.addColorStop(1,c0);x.fillStyle=gr;x.beginPath();x.ellipse(0,-dist,rx,ry,0,0,PI2);x.fill();x.strokeStyle='rgba(60,0,12,.35)';x.lineWidth=Math.max(1,r*.03);x.stroke();x.restore();}};
+    camada(6,r*.55,r*.46,r*.5,.25,c[1],c[0]);camada(5,r*.36,r*.36,r*.38,.9,c[0],c[2]);camada(4,r*.18,r*.24,r*.26,.4,c[0],c[2]);
+    const gc=x.createRadialGradient(cx-r*.05,cy-r*.05,1,cx,cy,r*.22);gc.addColorStop(0,c[2]);gc.addColorStop(1,c[1]);x.fillStyle=gc;x.beginPath();x.arc(cx,cy,r*.2,0,PI2);x.fill();
+    x.strokeStyle=c[1];x.lineWidth=Math.max(1,r*.045);for(let i=0;i<3;i++){x.beginPath();x.arc(cx,cy,r*(.06+i*.06),i*1.7,i*1.7+Math.PI*1.25);x.stroke();}};
+  const ramo=(cx,cy,r,ang,p)=>{for(const da of [-.9,.9,2.6])folha(cx+Math.cos(ang+da)*r*.7,cy+Math.sin(ang+da)*r*.7,r*1.25,ang+da,null);rosa(cx,cy,r,p);};
+  // ---- moldura: faixa escura, filetes dourados e uma guirlanda de coraçõezinhos e botões ----
+  const B1=54,B2=150;x.fillStyle='#3b0e1a';x.fillRect(0,0,W,B1);x.fillRect(0,H-B1,W,B1);x.fillRect(0,0,B1,H);x.fillRect(W-B1,0,B1,H);
+  x.fillStyle='#57172a';x.fillRect(B1,B1,W-2*B1,B2-B1);x.fillRect(B1,H-B2,W-2*B1,B2-B1);x.fillRect(B1,B1,B2-B1,H-2*B1);x.fillRect(W-B2,B1,B2-B1,H-2*B1);
+  x.strokeStyle='#d8b36a';x.lineWidth=7;x.strokeRect(B1+4,B1+4,W-2*B1-8,H-2*B1-8);x.lineWidth=3;x.strokeRect(B2-3,B2-3,W-2*B2+6,H-2*B2+6);x.strokeStyle='#f2dcc0';x.lineWidth=2;x.strokeRect(B2+9,B2+9,W-2*B2-18,H-2*B2-18);
+  const meio=(B1+B2)/2;const passo=92;
+  function* faixa(x0,y0,x1,y1){const L=Math.hypot(x1-x0,y1-y0),n=Math.floor(L/passo);for(let i=0;i<=n;i++){const t=n?i/n:0,px=x0+(x1-x0)*t,py=y0+(y1-y0)*t;if(i%2){x.fillStyle='#e8a1b3';coracao(px,py-17,30,30);x.fill();x.strokeStyle='#d8b36a';x.lineWidth=2;x.stroke();}else{const a=Math.atan2(y1-y0,x1-x0);folha(px-12*Math.cos(a),py-12*Math.sin(a),24,a+Math.PI-.5,null);folha(px+12*Math.cos(a),py+12*Math.sin(a),24,a+.5,null);rosa(px,py,15,i%4?'rosa':'creme');}if(corte()){pausa();yield 'rm874 moldura';}}}
+  yield* faixa(B2,meio,W-B2,meio);yield* faixa(B2,H-meio,W-B2,H-meio);yield* faixa(meio,B2,meio,H-B2);yield* faixa(W-meio,B2,W-meio,H-B2);
+  for(const [cx,cy] of [[meio,meio],[W-meio,meio],[meio,H-meio],[W-meio,H-meio]]){x.fillStyle='#c3233c';coracao(cx,cy-26,52,50);x.fill();x.strokeStyle='#d8b36a';x.lineWidth=3;x.stroke();}
+  if(corte()){pausa();yield 'rm874 cantos';}
+  // ---- pétalas soltas no campo ----
+  for(let i=0;i<70;i++){const px=RR(B2+30,W-B2-30),py=RR(B2+30,H-B2-30);if(Math.hypot((px-W/2)/(W*.38),(py-H/2)/(H*.3))<1)continue;x.save();x.translate(px,py);x.rotate(RR(0,PI2));x.fillStyle=rnd()<.5?'rgba(240,120,150,.55)':'rgba(255,205,215,.45)';x.beginPath();x.ellipse(0,0,RR(7,13),RR(4,7),0,0,PI2);x.fill();x.restore();if(corte()){pausa();yield 'rm874 pétalas';}}
+  // ---- os quatro buquês dos cantos do campo ----
+  const cq=B2+120;for(const [cx,cy,a] of [[cq,cq,.8],[W-cq,cq,2.35],[cq,H-cq,-.8],[W-cq,H-cq,-2.35]]){folha(cx,cy,110,a+Math.PI-.35,null);folha(cx,cy,100,a+Math.PI+.35,null);ramo(cx+Math.cos(a)*-6,cy+Math.sin(a)*-6,44,a,'rubi');rosa(cx+Math.cos(a+1.3)*58,cy+Math.sin(a+1.3)*58,30,'rosa');rosa(cx+Math.cos(a-1.3)*58,cy+Math.sin(a-1.3)*58,28,'creme');if(corte()){pausa();yield 'rm874 buquês';}}
+  // ---- o medalhão: um coração creme com moldura dourada e uma coroa de rosas ----
+  const cw=W*.66,ch=H*.42,cx0=W/2,cy0=H/2-ch*.5;
+  x.save();x.shadowColor='rgba(20,0,6,.55)';x.shadowBlur=30*esc;x.fillStyle='#d8b36a';coracao(cx0,cy0-16,cw+44,ch+40);x.fill();x.restore(); // o borrão da sombra é em pixel de tela (não segue o scale)
+  if(corte()){pausa();yield 'rm874 sombra do medalhão';}
+  const gm=x.createRadialGradient(W/2,H/2-ch*.08,20,W/2,H/2,cw*.6);gm.addColorStop(0,'#fbeee2');gm.addColorStop(.7,'#f1d3c1');gm.addColorStop(1,'#e2b6a1');x.fillStyle=gm;coracao(cx0,cy0,cw,ch);x.fill();
+  x.strokeStyle='#7d1f33';x.lineWidth=4;coracao(cx0+0,cy0+16,cw-34,ch-34);x.stroke();
+  // pontos ao longo do coração (para a coroa)
+  const pts=[];{const segs=[[[cx0,cy0+ch*.3],[cx0,cy0],[cx0-cw*.5,cy0],[cx0-cw*.5,cy0+ch*.32]],[[cx0-cw*.5,cy0+ch*.32],[cx0-cw*.5,cy0+ch*.62],[cx0-cw*.14,cy0+ch*.8],[cx0,cy0+ch]],[[cx0,cy0+ch],[cx0+cw*.14,cy0+ch*.8],[cx0+cw*.5,cy0+ch*.62],[cx0+cw*.5,cy0+ch*.32]],[[cx0+cw*.5,cy0+ch*.32],[cx0+cw*.5,cy0],[cx0,cy0],[cx0,cy0+ch*.3]]];
+    const bz=(p,t)=>{const u=1-t;return [u*u*u*p[0][0]+3*u*u*t*p[1][0]+3*u*t*t*p[2][0]+t*t*t*p[3][0],u*u*u*p[0][1]+3*u*u*t*p[1][1]+3*u*t*t*p[2][1]+t*t*t*p[3][1]];};
+    for(const s of segs)for(let i=0;i<60;i++)pts.push(bz(s,i/60));}
+  // encolhe para dentro (a coroa fica sobre a borda interna do creme)
+  const inn=pts.map(([px,py])=>[W/2+(px-W/2)*.86,(H/2-ch*.04)+(py-(H/2-ch*.04))*.86]);
+  let acc=0;const alvo=74;for(let i=1;i<inn.length;i++){acc+=Math.hypot(inn[i][0]-inn[i-1][0],inn[i][1]-inn[i-1][1]);if(acc>=alvo){acc=0;const [px,py]=inn[i],[qx,qy]=inn[i-1],a=Math.atan2(py-qy,px-qx);folha(px,py,40,a+.9,null);folha(px,py,36,a-2.3,null);if(corte()){pausa();yield 'rm874 folhas da coroa';}}}
+  acc=0;let k=0;for(let i=1;i<inn.length;i++){acc+=Math.hypot(inn[i][0]-inn[i-1][0],inn[i][1]-inn[i-1][1]);if(acc>=alvo){acc=0;const [px,py]=inn[i];rosa(px,py,k%3===1?24:30,['rubi','rosa','rubi','coral'][k%4]);k++;if(corte()){pausa();yield 'rm874 rosas da coroa';}}}
+  // a rosa grande do meio, com dois corações pequenos
+  const mx=W/2,my=H/2-ch*.02;for(const a of [.6,2.5,4.0,5.3])folha(mx+Math.cos(a)*70,my+Math.sin(a)*70,120,a,null);rosa(mx,my,96,'rubi');
+  for(const s of [-1,1]){x.fillStyle='#c3233c';coracao(mx+s*150,my-150,58,54);x.fill();x.strokeStyle='#d8b36a';x.lineWidth=3;x.stroke();}
+  if(corte()){pausa();yield 'rm874 centro';}
+  // ---- dois buquês pequenos no eixo, acima e abaixo do coração ----
+  for(const [cy,a] of [[B2+250,Math.PI/2],[H-B2-230,-Math.PI/2]]){folha(W/2,cy,90,a+Math.PI-.45,null);folha(W/2,cy,90,a+Math.PI+.45,null);rosa(W/2,cy,36,'rosa');rosa(W/2-46,cy+(a>0?-14:14),24,'creme');rosa(W/2+46,cy+(a>0?-14:14),24,'creme');if(corte()){pausa();yield 'rm874 eixo';}}
+  x.restore();
+  // ---- textura de lã por cima (pontinhos claros e escuros, bem leve): uma leitura e uma escrita da tela, o laço por pixel em fatias de
+  //      8 linhas (mesma ordem de sorteio do original) ----
+  const CW=Math.round(W*esc),CH=Math.round(H*esc);const img=x.getImageData(0,0,CW,CH),d=img.data,n4=d.length;
+  for(let i=0;i<n4;){const ate=Math.min(n4,i+CW*32);for(;i<ate;i+=4){const n=(rnd()-.5)*14;d[i]=Math.max(0,Math.min(255,d[i]+n));d[i+1]=Math.max(0,Math.min(255,d[i+1]+n));d[i+2]=Math.max(0,Math.min(255,d[i+2]+n));}if(corte())yield 'rm874 lã';}
+  x.putImageData(img,0,0);
+}
+// de uma vez (prévias e gancho)
+function rm874Desenha(x,W,H,esc){const it=rm874DesenhaG(x,W,H,esc||1);let r;do{r=it.next();}while(!r.done);}
+function rm874Pronta(c){if(RM874.tex)return RM874.tex;const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=8;t.wrapS=t.wrapT=THREE.ClampToEdgeWrapping;t.name='874 tapete do romance';
+  t.userData={rm874:true,tela:[c.width,c.height]};RM874.tex=t;return t;}
+// pede a tela (uma vez): na fila do fatiador, urgente com o Romance à vista; no teto da v198 (Leve/Papel) já no tamanho do teto
+function rm874Pede(){if(!RM874.on||RM874.tex||RM874.job||RM874.falhou>=2)return;try{
+    let cap=0;try{cap=typeof memCap==='function'?(memCap()||0):0;}catch(e){}let esc=1;while(cap>0&&1920*esc>cap&&esc>1/16)esc/=2;
+    const W=1224,H=1920,c=document.createElement('canvas');c.width=Math.round(W*esc);c.height=Math.round(H*esc);
+    const x=c.getContext('2d',{willReadFrequently:true})||c.getContext('2d');const t0=performance.now();const it=rm874DesenhaG(x,W,H,esc);
+    const fim=()=>{RM874.job=null;try{rm874Pronta(c);RM874.stats.ms=Math.round(performance.now()-t0);RM874.stats.tela=[c.width,c.height];rm874Aplica();}catch(e){rm874Erro('fim',e);}};
+    const erro=e=>{RM874.job=null;RM874.falhou++;rm874Erro('desenho',e);};
+    const vista=()=>{try{const R=rm874Sala();return !!(R&&typeof ACTIVE!=='undefined'&&ACTIVE===R.scene);}catch(e){return false;}};
+    if(typeof fat8Go==='function'){RM874.job=true;const J=fat8Go(it,{nome:'tapete do Romance 874',urgente:vista,fim,erro});if(RM874.job===true)RM874.job=J||null;}
+    else{let r;try{do{r=it.next();}while(!r.done);}catch(e){erro(e);return;}fim();}
+  }catch(e){RM874.job=null;RM874.falhou++;rm874Erro('pede',e);}}
+function rm874Sala(){try{const R=typeof ROOMS!=='undefined'?ROOMS.vila:null;return (R&&R.scene)?R:null;}catch(e){return null;}}
+// o tapete: a malha plana de 5,1 × 8 m em (0; 6,8) do Romance
+function rm874Acha(sc){let alvo=null;const T=THREE,b=new T.Box3(),ws=new T.Vector3();sc.traverse(o=>{if(alvo||!o.isMesh||!o.geometry||o.geometry.type!=='PlaneGeometry')return;const p=o.geometry.parameters;if(!p)return;
+    o.getWorldScale(ws);const w=p.width*Math.abs(ws.x),h=p.height*Math.abs(ws.y);if(Math.abs(Math.min(w,h)-5.1)>.15||Math.abs(Math.max(w,h)-8)>.15)return;
+    b.setFromObject(o);if(b.max.y>.08)return;const cx=(b.min.x+b.max.x)/2,cz=(b.min.z+b.max.z)/2;if(Math.hypot(cx-0,cz-6.8)>1.2)return;alvo=o;});return alvo;}
+// a malha guardada (procura de novo só se ela saiu da cena ou a cena mudou; sem malha, no máximo uma procura a cada 5 s)
+function rm874Malha(sc){const o=RM874.malha,agora=performance.now();if(RM874.cena===sc){if(o){let p=o;while(p.parent)p=p.parent;if(p===sc)return o;}else if(agora-RM874.tBusca<5000)return null;}
+  RM874.stats.procurado++;RM874.tBusca=agora;const n=rm874Acha(sc);RM874.malha=n;RM874.cena=sc;return n;}
+// alguma peça da cena ainda usa esta textura (no material ou no original por trás do toon do Papel)?
+function rm874Usada(sc,tex){let usada=false;try{sc.traverse(q=>{if(usada||!q.material)return;for(const mm of (Array.isArray(q.material)?q.material:[q.material])){if(!mm)continue;let b=null;try{b=(typeof PAPEL_DE!=='undefined'&&PAPEL_DE.get(mm))||null;}catch(e){}
+      for(const M of (b?[mm,b]:[mm]))if(M.map===tex||M.emissiveMap===tex){usada=true;return;}}});}catch(e){usada=true;}return usada;}
+function rm874Aplica(){try{if(!RM874.on)return;const R=rm874Sala();if(!R)return;const t=RM874.tex;if(!t){rm874Pede();return;}
+    if(!R.ready)return; // só com a sala acabada: as passadas de tapete do finishRoom (v354/v408, que reconhecem «tapete» no nome) já correram
+    const o=rm874Malha(R.scene);if(!o)return;const m=o.material;if(!m||Array.isArray(m))return;
+    let base=null;try{base=(typeof PAPEL_DE!=='undefined'&&PAPEL_DE.get(m))||null;}catch(e){}const alvos=(base&&base!==m)?[m,base]:[m];
+    o.userData.tp615=true; // a varredura da v615 não toca mais esta malha
+    if(alvos.every(M=>M.map===t)){RM874.cenaOk=R.scene;return;}
+    const velhos=new Set();for(const M of alvos){if(M.map&&M.map!==t)velhos.add(M.map);if(M.emissiveMap&&M.emissiveMap!==t)velhos.add(M.emissiveMap);}
+    const ref=(m.map&&m.map!==t)?m.map:((base&&base.map&&base.map!==t)?base.map:null);
+    if(ref){try{t.center.copy(ref.center);t.rotation=ref.rotation;t.repeat.copy(ref.repeat);t.offset.copy(ref.offset);}catch(e){}}
+    for(const M of alvos){M.map=t;if(M.emissiveMap)M.emissiveMap=t;if(M.color)M.color.set(0xffffff);M.needsUpdate=true;}
+    o.userData.rm874=true;RM874.cenaOk=R.scene;if(RM874.stats.aplicado)RM874.stats.reaplicado++;else RM874.stats.aplicado++;
+    // a textura que saiu: sai do cache da v615 e da placa, se nenhuma outra peça da sala a usa (o three sobe de novo se alguém voltar a usá-la)
+    for(const v of velhos){try{if(v.userData&&v.userData.rm874)continue;try{if(typeof TP615!=='undefined'&&TP615.tex){for(const kk in TP615.tex)if(TP615.tex[kk]===v)delete TP615.tex[kk];}}catch(e){}
+        if(!rm874Usada(R.scene,v)){v.dispose();RM874.stats.descartadas++;}}catch(e){rm874Erro('descarte',e);}}
+  }catch(e){rm874Erro('aplica',e);}}
+// de segundo em segundo: pede a tela assim que o Romance existe; troca com o Romance à vista, ou (fora dele) até a 1.ª troca na cena
+function rm874Vigia(){if(!RM874.on)return;const R=rm874Sala();if(!R)return;if(!RM874.tex){rm874Pede();return;}if(!R.ready)return;
+  const ativa=typeof ACTIVE!=='undefined'&&ACTIVE===R.scene;if(ativa||RM874.cenaOk!==R.scene)rm874Aplica();}
+if(RM874.on){
+  try{const tk=tick;tick=function(dt){const r=tk.apply(this,arguments);try{const t=performance.now();if(t-RM874.ult>1000){RM874.ult=t;rm874Vigia();}}catch(e){}return r;};}catch(e){rm874Erro('tick',e);}
+  // entrar no Romance: troca antes do setActive original (o 1.º quadro já tem o desenho novo); sem tela ainda, ela passa à frente na fila
+  try{const sa0=setActive;setActive=function(sc){try{const R=rm874Sala();if(R&&sc&&R.scene===sc&&R.ready)rm874Aplica();}catch(e){rm874Erro('setActive',e);}return sa0.apply(this,arguments);};}catch(e){rm874Erro('setActive0',e);}
+}
+window.__taperomance874={estado:RM874,stats:RM874.stats,erros:RM874.erros,aplica:rm874Aplica,desenha:rm874Desenha};
+
+/* ===================== v874 · OS DOIS PAINÉIS CLAROS DO CAMPO DOS RIVAIS NO 4.º E NO 5.º ANDAR SAEM (bloco `PB874`) =====================
+   Pergunta do Luiz (19/11, 12:23–12:26, com foto): «O que é esse negócio branco na sala de infantojuvenil: tem 2 deles. E tem na mitologia
+   tb», «poesia tb», «ciência e natureza tb».
+   O QUE É: a parede de «céu liso» do Campo dos Rivais (o mundo da direita da v530/v532, montado pelo `al521Mundo` com o material
+   `521 céu liso <sala>` — o gradiente do céu noturno, nove nuvens brancas, emissivo branco 0,55 e as duas faces desenhadas). Na face oeste do
+   campo (a que encosta na parede direita da sala, x0 = 20,04) o construtor só levanta parede onde a sala NÃO está («sala fantasma» de
+   z −21,2…21,2): com a sala de 42,4 m eram duas lajes de 0,3 m × 30 m de altura em z 21,2…33,3 e −33,3…−21,2, fora da sala e escondidas
+   atrás do céu pintado do campo (a face oeste do panorama da v532, em x = x0 + 0,22 = 20,26, que olha para dentro do campo).
+   COMO ERA: as dez salas do 4.º e do 5.º andar dobraram de comprimento (v672–v676 e v694–v698: 84,9 m, parede direita de z −42,4 a 42,4) e as
+   duas lajes ficaram DENTRO da sala, 6 cm à frente da parede direita (x 19,74) — o «paredão branco» que a v672 viu na Poesia. A correção da
+   v672 (e o `a4Paredes` das outras nove salas) empurrou os vértices com x < 19,95 para x = 20,3: atrás da parede da sala, mas 4 cm À FRENTE do
+   céu pintado. Desde então, de dentro do campo, as duas lajes aparecem como dois painéis claros de 12 m de largura e 30 m de altura atrás dos
+   cantos da muralha do lado da sala, por trás das árvores, com as nuvens do céu liso esticadas em manchas ovais (a textura quadrada de 256 px
+   cobre 12 × 30 m). Dois por campo — nas dez salas desses andares (Poesia, Mitologia, Infantojuvenil, Clássicos, Autoajuda, Biografias,
+   Crônicas, Ciência e Natureza, Filosofia, Cordel). No 2.º andar as salas cresceram também na largura e as lajes continuam fora da sala e atrás
+   do céu pintado (não aparecem); o 1.º e o 3.º andar têm outros campos.
+   AGORA: as duas lajes (e as tampas da ponta oeste das paredes norte e sul do campo, que ficam dentro da parede da sala) saem da malha do céu
+   liso — os triângulos com os três vértices junto da face oeste (x0 − 0,45 … x0 + 0,31) viram triângulos vazios —, só onde a parede direita da
+   sala cobre a face oeste inteira do campo (vai além de z0 − 0,25 e z1 + 0,25). De dentro do campo fica o céu pintado; de dentro da sala, a
+   parede da sala; nada mais muda (muralha, céu do teto, chão, portão, paredes norte, sul e leste do campo). Corre antes da troca de cena
+   (embrulho do `setActive`) e num vigia de 2 s (sala montada com o leitor dentro, campo que nasce depois, sala remontada depois de uma purga).
+   A malha do céu liso é única no campo (material próprio): não entra num grupo da fusão do Leve — se tiver entrado, os grupos da cena são
+   desfeitos (`fusaoLimpar`). Os triângulos tirados ficam guardados na malha, para a comparação antes/depois na mesma sessão.
+   Chave: `?paineis874=0`. Gancho `window.__paineis874` (`stats.salas[sala]` = malha, x0, parede da sala, estado de antes — «dentro da sala»
+   ou «à frente do céu pintado do campo» —, caixas das lajes do lado da porta (z +) e do fundo (z −), triângulos tirados; `aplica(sala)`,
+   `desfaz(sala)` (só para a foto de antes: a sala fica EM PAUSA — nem o vigia de 2 s nem o `setActive` refazem — até `aplica(sala)`),
+   `lajes(sala)`, `vigia()`). (Revisão: antes, o `desfaz` só limpava a marca da cena e o vigia tirava as lajes de novo em até 2 s.) */
+const PB874={on:!/[?&#]paineis874=0/i.test(location.search+location.hash),erros:[],iv:null,
+  salas:['poesia','mitologia','infantil','classicos','autoajuda','biografia','cronica','ciencia','filosofia','cordel'],
+  stats:{salas:{},triangulos:0,aplicadas:0,passos:0,setActive:0,vigia:0,desfeitas:0}};
+function pb874Erro(k,e){if(PB874.erros.length<20)PB874.erros.push(k+': '+(e&&e.message||e));}
+function pb874R(n){return +(+n).toFixed(3);}
+// a malha do céu liso do campo desta sala (uma por campo; nome do kit da v521: «521 <sala> · v160 · 521 céu liso <sala>»)
+function pb874Malhas(sc,k){const L=[];try{const fim='céu liso '+k,mat='v160 · 521 céu liso '+k;
+    sc.traverse(o=>{if(!o.isMesh||!o.geometry||!o.geometry.attributes||!o.geometry.attributes.position)return;const n=o.name||'',mn=(o.material&&!Array.isArray(o.material)&&o.material.name)||'';
+      if(n.slice(-fim.length)===fim||mn===mat)L.push(o);});}catch(e){pb874Erro('malhas '+k,e);}return L;}
+// a parede direita da sala: a caixa de 0,24 m da casca do mkRoom (o corte da v521 a esconde e põe três pedaços no lugar) — de que z a que z ela vai
+function pb874Parede(sc,x0){let r=null;try{const b=new THREE.Box3();sc.traverse(o=>{if(r||!o.isMesh||!o.geometry||o.geometry.type!=='BoxGeometry')return;const p=o.geometry.parameters;
+      if(!p||Math.abs(p.width-.24)>.06||!(p.depth>40))return;b.setFromObject(o);if(b.min.x>x0-.6&&b.max.x<x0+.3)r={z0:b.min.z,z1:b.max.z,x0:b.min.x,x1:b.max.x,escondida:!o.visible};});}catch(e){pb874Erro('parede',e);}return r;}
+// as lajes: triângulos com os três vértices junto da face oeste do campo; caixas por lado (z + = lado da porta da sala, z − = fundo)
+function pb874Lajes(M,x0){const out={tris:[],vazios:0,caixas:{frente:null,fundo:null}};try{const g=M.geometry,p=g.attributes.position,I=g.index?g.index.array:null;
+    const nt=I?Math.floor(g.index.count/3):Math.floor(p.count/3);M.updateMatrixWorld(true);const e=M.matrixWorld.elements;
+    const W=i=>{const x=p.getX(i),y=p.getY(i),z=p.getZ(i);return [e[0]*x+e[4]*y+e[8]*z+e[12],e[1]*x+e[5]*y+e[9]*z+e[13],e[2]*x+e[6]*y+e[10]*z+e[14]];};
+    for(let t=0;t<nt;t++){const a=I?I[t*3]:t*3,b=I?I[t*3+1]:t*3+1,c=I?I[t*3+2]:t*3+2;if(a===b&&b===c){out.vazios++;continue;}
+      const A=W(a),B=W(b),C=W(c);if(!I&&A[0]===B[0]&&A[1]===B[1]&&A[2]===B[2]&&A[0]===C[0]&&A[1]===C[1]&&A[2]===C[2]){out.vazios++;continue;}
+      let ok=true;for(const V of [A,B,C])if(!(V[0]>x0-.45&&V[0]<x0+.31))ok=false;if(!ok)continue;out.tris.push(t);
+      const lado=(A[2]+B[2]+C[2])>0?'frente':'fundo';let bx=out.caixas[lado];if(!bx)bx=out.caixas[lado]={tri:0,x:[1e9,-1e9],y:[1e9,-1e9],z:[1e9,-1e9]};bx.tri++;
+      for(const V of [A,B,C])for(let q=0;q<3;q++){const kk='xyz'[q];if(V[q]<bx[kk][0])bx[kk][0]=V[q];if(V[q]>bx[kk][1])bx[kk][1]=V[q];}}
+    for(const l of ['frente','fundo']){const bx=out.caixas[l];if(bx)for(const kk of ['x','y','z'])bx[kk]=bx[kk].map(pb874R);}}catch(e){pb874Erro('lajes',e);}return out;}
+function pb874Estado(bx,x0){if(!bx)return 'sem laje';if(bx.x[0]<x0-.2)return 'dentro da sala';if(bx.x[1]>x0+.235)return 'à frente do céu pintado do campo';return 'escondida';}
+function pb874Campo(k){try{const C=(typeof RV530!=='undefined'&&RV530&&RV530.campos)?RV530.campos[k]:null;if(!C||C.pendente||!C.cfg||!C.cfg.rects||!C.cfg.rects[0])return null;return C;}catch(e){return null;}}
+function pb874Aplica(k,origem){const t0=performance.now();try{
+    if(!PB874.on)return null;const R=(typeof ROOMS!=='undefined')?ROOMS[k]:null;if(!R||!R.scene)return null;const sc=R.scene;
+    if(sc.userData&&sc.userData.pb874Pausa){if(origem!=='manual')return null;delete sc.userData.pb874Pausa;} // depois do desfaz: só o aplica manual refaz
+    if(sc.userData&&sc.userData.pb874)return PB874.stats.salas[k]||null;
+    const C=pb874Campo(k);if(!C)return null; // o campo ainda não nasceu: o vigia tenta de novo
+    const q=C.cfg.rects[0],x0=q.x0;const st={sala:k,origem:origem||'',x0:pb874R(x0),campo:{x:[pb874R(q.x0),pb874R(q.x1)],z:[pb874R(q.z0),pb874R(q.z1)],h:q.h},malhas:[],tirados:0};
+    const par=pb874Parede(sc,x0);let cobre=false;
+    if(par){st.paredeDaSala={z:[pb874R(par.z0),pb874R(par.z1)],escondida:par.escondida};cobre=par.z0<=q.z0-.25&&par.z1>=q.z1+.25;}
+    else{try{const RD=sa2Dim(k)[1];st.paredeDaSala={z:[pb874R(-RD/2),pb874R(RD/2)],medida:'sa2Dim'};cobre=RD/2>=Math.max(-q.z0,q.z1)+.25;}catch(e){}}
+    sc.userData.pb874=true;
+    if(!cobre){st.pulada='a parede direita da sala não cobre a face oeste do campo';PB874.stats.salas[k]=st;return st;}
+    const Ms=pb874Malhas(sc,k);if(!Ms.length){st.pulada='sem a malha do céu liso';PB874.stats.salas[k]=st;return st;}
+    for(const M of Ms){const Lj=pb874Lajes(M,x0);const info={nome:M.name,material:(M.material&&M.material.name)||'',frente:Lj.caixas.frente,fundo:Lj.caixas.fundo,
+        estadoFrente:pb874Estado(Lj.caixas.frente,x0),estadoFundo:pb874Estado(Lj.caixas.fundo,x0),tirados:Lj.tris.length,vaziosAntes:Lj.vazios};
+      if(Lj.tris.length){const g=M.geometry;const guarda=(M.userData.pb874Orig=M.userData.pb874Orig||[]);
+        if(g.index){const I=g.index.array;for(const t of Lj.tris){guarda.push(t,I[t*3+1],I[t*3+2]);I[t*3+1]=I[t*3];I[t*3+2]=I[t*3];}g.index.needsUpdate=true;}
+        else{const P=g.attributes.position;for(const t of Lj.tris){const a=t*3;for(const i of [a+1,a+2]){guarda.push(i,P.getX(i),P.getY(i),P.getZ(i));P.setXYZ(i,P.getX(a),P.getY(a),P.getZ(a));}}P.needsUpdate=true;M.userData.pb874SemIndice=true;}
+        try{g.computeBoundingBox();g.computeBoundingSphere();}catch(e){}}
+      M.userData.pb874=Lj.tris.length;st.tirados+=Lj.tris.length;st.malhas.push(info);
+      // fusão do Leve: a malha tem material próprio e não entra num grupo; se entrou, os grupos da cena são desfeitos e refeitos pelo laço
+      try{if(typeof FUSAO!=='undefined'&&FUSAO&&FUSAO.cenas){const F=FUSAO.cenas.get(sc);if(F&&F.grupos&&F.grupos.some(G=>G&&G.originais&&G.originais.indexOf(M)>=0)&&typeof fusaoLimpar==='function'){fusaoLimpar(sc);st.fusaoLimpa=true;}}}catch(e){pb874Erro('fusão '+k,e);}}
+    try{if(typeof camBlockReset190==='function')camBlockReset190();}catch(e){}
+    st.estado=st.malhas.length?(st.malhas[0].estadoFrente+' / '+st.malhas[0].estadoFundo):'';
+    st.ms=+(performance.now()-t0).toFixed(1);PB874.stats.triangulos+=st.tirados;if(st.tirados)PB874.stats.aplicadas++;PB874.stats.salas[k]=st;return st;
+  }catch(e){pb874Erro('aplica '+k,e);return null;}}
+// só para a foto de antes, na mesma sessão: devolve os triângulos tirados (aplica(sala) tira de novo)
+function pb874Desfaz(k){try{const R=(typeof ROOMS!=='undefined')?ROOMS[k]:null;if(!R||!R.scene)return 0;let n=0;
+    for(const M of pb874Malhas(R.scene,k)){const G=M.userData.pb874Orig;if(!G||!G.length)continue;const g=M.geometry;
+      if(M.userData.pb874SemIndice){const P=g.attributes.position;for(let i=0;i+3<G.length;i+=4){P.setXYZ(G[i],G[i+1],G[i+2],G[i+3]);n++;}P.needsUpdate=true;}
+      else if(g.index){const I=g.index.array;for(let i=0;i+2<G.length;i+=3){const t=G[i];I[t*3+1]=G[i+1];I[t*3+2]=G[i+2];n++;}g.index.needsUpdate=true;}
+      try{g.computeBoundingBox();g.computeBoundingSphere();}catch(e){}M.userData.pb874Orig=null;M.userData.pb874=0;M.userData.pb874SemIndice=false;}
+    if(R.scene.userData){R.scene.userData.pb874=false;R.scene.userData.pb874Pausa=true;}try{if(typeof camBlockReset190==='function')camBlockReset190();}catch(e){}
+    const st=PB874.stats.salas[k];if(st)st.desfeita=(st.desfeita||0)+1;PB874.stats.desfeitas++;return n;}catch(e){pb874Erro('desfaz '+k,e);return 0;}}
+function pb874Vigia(){try{PB874.stats.passos++;if(!PB874.on||typeof ROOMS==='undefined')return;for(const k of PB874.salas){const R=ROOMS[k];if(!R||!R.scene||(R.scene.userData&&(R.scene.userData.pb874||R.scene.userData.pb874Pausa)))continue;
+      if(pb874Aplica(k,'vigia'))PB874.stats.vigia++;}}catch(e){pb874Erro('vigia',e);}}
+if(PB874.on){
+  try{const sa0=setActive;setActive=function(sc){try{if(sc&&sc.isScene&&!(sc.userData&&(sc.userData.pb874||sc.userData.pb874Pausa))&&typeof ROOMS!=='undefined'){for(const k of PB874.salas){const R=ROOMS[k];
+          if(R&&R.scene===sc){PB874.stats.setActive++;pb874Aplica(k,'setActive');break;}}}}catch(e){pb874Erro('setActive',e);}return sa0.apply(this,arguments);};}catch(e){pb874Erro('setActive0',e);}
+  try{PB874.iv=setInterval(pb874Vigia,2000);}catch(e){pb874Erro('vigia0',e);}
+  try{pb874Vigia();}catch(e){}
+}
+window.__paineis874={estado:PB874,stats:PB874.stats,erros:PB874.erros,aplica:k=>pb874Aplica(k,'manual'),desfaz:pb874Desfaz,vigia:pb874Vigia,
+  lajes:k=>{try{const R=ROOMS[k],C=pb874Campo(k);if(!R||!R.scene||!C)return null;const x0=C.cfg.rects[0].x0;return pb874Malhas(R.scene,k).map(M=>{const L=pb874Lajes(M,x0);return {nome:M.name,vivos:L.tris.length,vazios:L.vazios,frente:L.caixas.frente,fundo:L.caixas.fundo,estadoFrente:pb874Estado(L.caixas.frente,x0),estadoFundo:pb874Estado(L.caixas.fundo,x0)};});}catch(e){pb874Erro('lajes '+k,e);return null;}}};
+
+/* ===================== v874 · O TEATRO (7.º ANDAR): O LEITOR NÃO ENTRA MAIS DENTRO DO PALCO — UMA ESCADINHA NO FIM DA PASSADEIRA, O PALCO VIRA CHÃO E O TABLADO DO ALÇAPÃO FECHA NOS CANTOS (bloco `PA874`) =====================
+   Relato do Luiz (19/11): «teatro meu personagem entra dentro do palco...».
+   COMO ERA:
+   (1) O palco do Teatro é a caixa da v262 (`build262`, `K.box(28,.45,6,wood,0,.225,-D/2+4)`): 28 × 6 m e 0,45 m de altura, encostada
+       à parede do fundo. Com a sala triplicada da v710 (63,7 × 73,5 m, D = 73,48) fica em x −14…14 × z −35,74…−29,74 (a frente, onde
+       estão a ribalta e o filete da v365, em z = −D/2+7). As salas do 7.º andar são do kit (`mkRoom` + `registerKitRoom`): `ROOMS.teatro`
+       NÃO TEM `floorY` (o chão vale 0 em toda a sala) e o mundo é um `boxWorld` (só as quatro paredes) mais os discos de `obst`. Em cima
+       do palco havia só os discos dos dois púlpitos (x ±4, r 1,2) e das duas estantes da v349 (x ±11,8, r 0,8); nenhuma escada (conferido
+       em v262, v277, v279, v349, v362–v365, v382, v437, v710 e v814) e nenhum disco nas bordas. Resultado: vindo da plateia (pelo corredor
+       da passadeira, pela faixa diante da 1.ª fila, pelas coxias ao lado), o leitor atravessava a borda e andava com os pés a 0 m — 45 cm
+       DENTRO do palco —, no Gamer, no Clique e na 1.ª pessoa, até a parede do fundo, passando por baixo da cortina pregueada (z ≈ −30,2,
+       de 0,95 m para cima). O clique também levava para lá (a malha de caminhos via o palco como chão), e moedas, chaves e inimigos que
+       caíssem no palco ficavam a 0 m (uma moeda nascia a 0,5 m: escondida dentro da caixa).
+   (2) O outro estrado da sala é o tablado do alçapão da v814 (corredor direito; conjunto em 25,8; −21,0 virado −90°: x 24,9…27,9 ×
+       z −22,5…−19,5, 0,94 m, com o alçapão aberto e os degraus decorativos): os quatro discos de r 1 nos meios das bordas deixavam os
+       cantos de fora — o leitor entrava até 0,5 m em cada canto. Não há outros estrados nesta sala: os Camarins, a Sala de Ensaio, os
+       Bastidores e a Oficina da v710 não têm tablado (o «mezanino do diretor» e o «palquinho» são do Drama do 3.º andar, já na v528).
+   AGORA (o caminho da v528 no 3.º andar — palco que se sobe — com as bordas em caixas retas do `clamp`, como a frente do palco do
+   Cinema na v844, que acabou com o «treme» dos discos):
+   (1) ESCADINHA DISCRETA no fim da passadeira vermelha do corredor central da v710: 3,1 m de largura (|x| ≤ 1,55), dois degraus de 0,15 m
+       mais o espelho do palco (3 × 15 cm), 0,6 m de fundo, na mesma madeira e no mesmo latão do palco, com a passadeira subindo os degraus
+       e dois pilaretes de latão nos cantos de baixo. A lâmpada da ribalta que ficava bem no alto dela (x 0) sai — só ela; as outras dez
+       ficam (os vértices dela na malha fundida da v362 vão para um ponto: `pa874Ribalta`, com conferência e volta).
+   (2) O PALCO VIRA CHÃO: `ROOMS.teatro.floorY` = 0,45 em |x| ≤ 14, da frente até a parede do fundo, com a RAMPA da escada (0 → 0,45 em
+       0,6 m, |x| ≤ 1,63). Sobem o leitor (`floorAt`: Gamer, Clique e 1.ª pessoa), a câmera, as moedas, as chaves, os inimigos e os bichos.
+   (3) BORDAS em caixas retas no `W.clamp` (o leitor desliza rente a elas, sem os vales entre discos): na frente o leitor para a 0,3 m da
+       borda (do lado da plateia) e a 0,7 m (em cima), menos na escada; atrás da cortina e dos pilares (|x| 5,95…13,3) a 1,25 m; as laterais
+       com os pilares e os capitéis do proscénio (|x| 13,3…14,65) da parede do fundo até 0,55 m adiante da frente; e as duas faces da escada
+       (|x| 1,55…1,8, nos 0,3 m de baixo) — só se sobe por ela, de frente. Saindo de dentro de uma caixa, o leitor vai para a borda mais
+       perto da UNIÃO das caixas (`pa874Empurra`). Ficam livres a faixa diante da 1.ª fila (0,65 m), o corredor central, os corredores
+       laterais até as coxias e as portas das paredes divisórias (z −25).
+   (4) ALÇAPÃO: quatro discos de r 0,6 nos cantos do tablado (com os quatro da v814, ele fica todo fechado).
+   (5) TÚNEL: o dt do jogo vai até 0,1 s e, correndo de asas (ou de botas num aparelho lento), um passo pode passar da meia espessura
+       das caixas; um passo do Gamer/Clique ou da 1.ª pessoa que salte de fora do palco para cima dele (ou o contrário) sem passar pela
+       escada volta para onde estava (`moveTP`/`move` embrulhados por fora; não vale durante o voo das asas).
+   Malha de caminhos e aglomerados refeitos (`__nav`/`__cl`): o clique na plateia → palco sobe pela escada. Instala no fim do `finishRoom`
+   do teatro (a camada de fora), confere a cada entrada na sala (`setActive`, ANTES do original: a fusão do Leve começa depois dele) se as
+   caixas e o chão continuam na corrente do `clamp`/`floorY` (embrulha de novo se alguém trocou) e espera o alçapão da v814 (3–6 s).
+   Chaves: `?palco874=0` (tudo), `?escada874=0` (sem escada nem chão elevado: o palco só fica fechado na frente e nas laterais),
+   `?ribalta874=0` (não tira a lâmpada central da ribalta), `?alcapao874=0` (sem os discos do alçapão).
+   Gancho `window.__palco874`: `estado`, `stats`, `erros`, `geo()`, `liga()` / `desliga()` (o «antes» em tempo de execução: chão, caixas,
+   discos, escada e lâmpada), `altura(x,z)`, `empurra(x,z)`, `tunel(x0,z0,x1,z1)`, `aplica()`, `confere()`, `ribalta(apaga)`,
+   `alcapao()`; `stats.tuneis` conta os passos devolvidos.
+   REVISÃO (19/11, cópia corrigida): (a) as faces da escada passam a |x| 1,55…1,95 × z da frente+0,3 até a frente+0,62 — com 0,25 × 0,3 m
+   nenhuma célula de 0,3 m da malha de caminhos caía dentro delas e o clique (e os inimigos) que vinham pela faixa, pelos corredores ou
+   pelas coxias paravam encostados ao lado da escada; (b) a guarda do túnel não devolve um passo que COMEÇA dentro de uma caixa (depois
+   de `liga()` com o leitor ali, ou de qualquer deslocamento que não passe pelo clamp, a guarda desfazia o clamp a cada quadro e o
+   leitor ficava preso); (c) num passo devolvido o leitor ainda desliza no eixo que não cruza a borda (com quadros longos ele parava em
+   seco ao andar em diagonal contra a frente do palco); na 1.ª pessoa o CH volta junto com o P; (d) a decoração do leitor (DEC128,
+   registrada no `finishRoom` de base, antes deste bloco) passa a ver o chão do palco e as caixas, e os discos novos vão para a lista-base
+   da sala (como o `registerChest2`), não para a cópia que a decoração devolve quando há peças colocadas; (e) as caches da malha
+   (`__nv8`) também são zeradas. `stats.deslizes` conta os passos devolvidos que deslizaram num eixo. */
+const PA874_Q=location.search+location.hash;
+const PA874={on:!/[?&#]palco874=0/i.test(location.search+location.hash),ativo:true,feito:false,alcFeito:false,geo:null,discos:[],escadaG:null,erros:[],
+  stats:{aplicado:0,geo:null,caixas:0,escada:null,ribalta:null,alcapao:null,reembrulhos:0,tuneis:0,deslizes:0,decoracao:0,ms:0}};
+PA874.escada=PA874.on&&!/[?&#]escada874=0/i.test(PA874_Q);
+PA874.ribalta=PA874.escada&&!/[?&#]ribalta874=0/i.test(PA874_Q);
+PA874.alc=PA874.on&&!/[?&#]alcapao874=0/i.test(PA874_Q);
+function pa874Erro(k,e){if(PA874.erros.length<30)PA874.erros.push(k+': '+(e&&e.message||e));try{console.warn('v874',k,e);}catch(x){}}
+// a caixa do palco da v262 (28 × 6 m, 0,45 m, frente em −D/2+7, fundo em −D/2+1), a escada nova e o conjunto «alçapão» da v814
+const PA874_PALCO={meia:14,alt:.45,frente:7,fundo:1};
+// (as faces da escada têm de ser maiores que 0,3 m nos dois eixos: a malha de caminhos só vê a caixa que contém o centro de uma célula)
+const PA874_ESC={meia:1.55,prof:.6,folga:.08,bochecha:.4,bochechaZ:.02};
+const PA874_ALC={x:25.8,z:-21.0,ry:-Math.PI/2};
+// ---------- geometria (a partir da profundidade da sala; as medidas em x não mudam com a ampliação) ----------
+function pa874Geo(D){const P=PA874_PALCO,E=PA874_ESC,zF=-D/2+P.frente,z0=-D/2+P.fundo,ws=E.meia,cx=[];
+  // caixas [x0,x1,z0,z1] fechadas ao andar (o leitor fica fora de todas): frente, atrás da cortina, laterais com o proscénio, faces da escada
+  if(PA874.escada)cx.push([ws,5.95,zF-.7,zF+.3],[-5.95,-ws,zF-.7,zF+.3],[ws,ws+E.bochecha,zF+.3,zF+E.prof+E.bochechaZ],[-ws-E.bochecha,-ws,zF+.3,zF+E.prof+E.bochechaZ]);
+  else cx.push([-5.95,5.95,zF-.7,zF+.3]);
+  cx.push([5.95,13.3,zF-1.25,zF+.3],[-13.3,-5.95,zF-1.25,zF+.3],[13.3,14.65,-D/2-1,zF+.55],[-14.65,-13.3,-D/2-1,zF+.55]);
+  const bb=[Infinity,-Infinity,Infinity,-Infinity];for(const b of cx){bb[0]=Math.min(bb[0],b[0]);bb[1]=Math.max(bb[1],b[1]);bb[2]=Math.min(bb[2],b[2]);bb[3]=Math.max(bb[3],b[3]);}
+  return {D,zF,z0,zFundo:-D/2-1,xs:P.meia,h:P.alt,escada:PA874.escada,ws,wr:ws+E.folga,prof:E.prof,cx,bb,prova:[8,zF-.2]};}
+// ---------- (2) o chão do palco e a rampa da escada ----------
+function pa874Altura(x,z){const G=PA874.geo;if(!G||!G.escada)return null;const ax=Math.abs(x);
+  if(ax<=G.xs&&z<=G.zF&&z>=G.zFundo)return G.h;
+  if(ax<=G.wr&&z>G.zF&&z<G.zF+G.prof)return G.h*(1-(z-G.zF)/G.prof);
+  return null;}
+function pa874EmbrulhaChao(R,forca){if(!R)return false;if(!forca&&R.floorY&&R.floorY.__pa874)return true;const f0=R.floorY;
+  const f=function(x,z){if(PA874.ativo){try{const h=pa874Altura(x,z);if(h!==null)return h;}catch(e){}}return f0?f0.apply(this,arguments):0;};
+  f.__pa874=true;R.floorY=f;return true;}
+// ---------- (3) as caixas no clamp: o ponto dentro da união vai para a borda mais perto da união ----------
+function pa874Empurra(x,z){const G=PA874.geo;if(!G)return null;const bb=G.bb;if(!(x>bb[0]&&x<bb[1]&&z>bb[2]&&z<bb[3]))return null;
+  const CX=G.cx;let dentro=false;for(const b of CX)if(x>b[0]&&x<b[1]&&z>b[2]&&z<b[3]){dentro=true;break;}
+  if(!dentro)return null;
+  let best=null,bd=Infinity;const e=1e-3;
+  const tenta=(qx,qz)=>{for(const b of CX)if(qx>b[0]&&qx<b[1]&&qz>b[2]&&qz<b[3])return;const d=(qx-x)*(qx-x)+(qz-z)*(qz-z);if(d<bd){bd=d;best=[qx,qz];}};
+  for(const b of CX){const qz=Math.min(b[3],Math.max(b[2],z)),qx=Math.min(b[1],Math.max(b[0],x));tenta(b[0]-e,qz);tenta(b[1]+e,qz);tenta(qx,b[2]-e);tenta(qx,b[3]+e);}
+  return best;}
+function pa874EmbrulhaClamp(W,forca){if(!W||typeof W.clamp!=='function')return false;if(!forca&&W.clamp.__pa874)return true;const c0=W.clamp;
+  const f=function(x,z,m){const r=c0.apply(this,arguments);if(!PA874.ativo||!Array.isArray(r))return r;
+    try{const q=pa874Empurra(r[0],r[1]);if(q)return q;}catch(e){pa874Erro('clamp',e);}return r;};
+  f.__pa874=true;W.clamp=f;return true;}
+function pa874Caches(R){try{const W=R&&R.world;if(W){W.__nav=null;W.__cl=null;W.__nv8=null;}}catch(e){}
+  try{const D=(typeof DEC128!=='undefined')&&DEC128.rooms&&DEC128.rooms.teatro;if(D&&Array.isArray(D.floors))for(const f of D.floors)if(f&&f.world){f.world.__nav=null;f.world.__cl=null;f.world.__nv8=null;}}catch(e){}}
+// a lista-base de obstáculos da sala: com a decoração do leitor (DEC128) registrada, `R.world.obst` é um getter que devolve uma CÓPIA
+// (base + peças colocadas) quando há peças; um disco empurrado nela some na próxima mudança da decoração — o jogo usa a base (registerChest2)
+function pa874Base(R){try{const D=(typeof DEC128!=='undefined')&&DEC128.rooms&&DEC128.rooms.teatro;const b=D&&D.floors&&D.floors[0]&&D.floors[0].baseObs;if(Array.isArray(b))return b;}catch(e){}
+  const ob=R&&R.world&&R.world.obst;return Array.isArray(ob)?ob:null;}
+// a decoração do leitor guardou, no `finishRoom` de base (antes deste bloco), o chão (0 em toda a sala) e uma cópia do mundo com o clamp
+// SEM as caixas: a grade de decorar ficava escondida dentro do palco, as peças afundavam 0,45 m nele e o teste de rota da decoração
+// aprovava uma peça que tapasse a escada (o palco virava ilha). O chão e o clamp do piso 0 da decoração passam pelo PA874.
+function pa874Decor(){try{const D=(typeof DEC128!=='undefined')&&DEC128.rooms&&DEC128.rooms.teatro;if(!D||!Array.isArray(D.floors))return false;let mexeu=false;
+    for(const f of D.floors){if(!f||(f.lvl|0)!==0)continue;
+      if(f.world&&typeof f.world.clamp==='function'&&!f.world.clamp.__pa874){pa874EmbrulhaClamp(f.world,true);mexeu=true;}
+      if(PA874.geo&&PA874.geo.escada&&typeof f.floorY==='function'&&!f.floorY.__pa874){const f0=f.floorY;
+        const g=function(x,z){if(PA874.ativo){try{const h=pa874Altura(x,z);if(h!==null)return h;}catch(e){}}return f0.apply(this,arguments);};g.__pa874=true;f.floorY=g;mexeu=true;}}
+    if(mexeu){D.gridLevel=undefined;PA874.stats.decoracao++;}return mexeu;}catch(e){pa874Erro('decoração',e);return false;}}
+// guarda contra o «túnel»: o dt do jogo chega a 0,1 s e, correndo de asas (ou de botas num aparelho lento), um passo passa da meia
+// espessura das caixas (0,5 m) e o empurrão o jogaria do outro lado. Um passo de fora do palco para cima dele (ou de cima para fora)
+// que não passe pela escada volta para onde estava (sem a escada, `?escada874=0`, só não se entra).
+function pa874Zona(x,z){const G=PA874.geo,ax=Math.abs(x);if(ax<=G.xs&&z<=G.zF&&z>=G.zFundo)return 1;if(G.escada&&ax<=G.ws+.3&&z>G.zF&&z<G.zF+G.prof+.05)return 2;return 0;}
+function pa874Tunel(ox,oz,nx,nz){const G=PA874.geo;if(!PA874.ativo||!G)return false;const a=pa874Zona(ox,oz),b=pa874Zona(nx,nz);
+  if(a===b||a===2||b===2)return false;
+  // um passo que COMEÇA dentro de uma caixa não é túnel: o leitor foi posto ali sem passar pelo clamp (liga() com ele em cima da borda,
+  // um empurrão, um teletransporte) e o clamp o tira para a borda mais perto — devolver o passo o deixaria preso ali para sempre
+  if(pa874Empurra(ox,oz))return false;
+  if(!G.escada)return a===0&&b===1;
+  const L=Math.hypot(nx-ox,nz-oz),n=Math.max(2,Math.ceil(L/.05));for(let i=1;i<n;i++){const u=i/n;if(pa874Zona(ox+(nx-ox)*u,oz+(nz-oz)*u)===2)return false;}
+  return true;}
+// num passo devolvido, o eixo que não cruza a borda ainda anda: só o x novo ou só o z novo (tirados das caixas), sem túnel e fora dos
+// discos; sem isto, com quadros longos, quem anda em diagonal contra a frente do palco parava em seco em vez de deslizar até a escada
+function pa874Desliza(ox,oz,nx,nz){try{let best=null,bd=1e-4;const ob=(typeof WORLD!=='undefined'&&WORLD&&WORLD.obst)||[];
+    for(const eixo of ['x','z']){let cx=eixo==='x'?nx:ox,cz=eixo==='x'?oz:nz;const q=pa874Empurra(cx,cz);if(q){cx=q[0];cz=q[1];}
+      if(!Number.isFinite(cx)||!Number.isFinite(cz)||pa874Tunel(ox,oz,cx,cz))continue;
+      let livre=true;for(const o of ob){if(!o)continue;if(o.porta222&&typeof V222!=='undefined'&&V222.jog)continue;if(Math.hypot(cx-o[0],cz-o[1])<o[2]-.01){livre=false;break;}}
+      if(!livre)continue;const d=Math.hypot(cx-ox,cz-oz);if(d>bd){bd=d;best=[cx,cz,eixo];}}
+    return best;}catch(e){return null;}}
+function pa874Aqui(){try{const R=ROOMS.teatro;return PA874.ativo&&!!PA874.geo&&CUR==='room'&&!!R&&ROOM===R&&!(typeof ASA246!=='undefined'&&ASA246.voo);}catch(e){return false;}}
+// ---------- (1) a escadinha (malhas próprias, fora da fusão, para o «antes» poder escondê-la) ----------
+function pa874Escada(R){if(PA874.escadaG||!R||!R.scene)return;const G=PA874.geo,T=THREE,zF=G.zF,ws=G.ws,w=2*ws,pf=G.prof;
+  const K=t160Kit('v874 escada do palco');
+  const madeira=t160Madeiras('a262 wood 3',0x5e3827),latao=t160Std('a262 brass',0xb39252,.42,.55),tapete=t160Std('v710 tapete',0x3a1420,.95);
+  // dois degraus maciços (entram 1 cm no palco: sem fresta) — piso de baixo a 0,15, de cima a 0,30; o tampo do palco a 0,45
+  K.box(w,.15,pf+.01,madeira,0,.075,zF+(pf-.01)/2);
+  K.box(w,.15,pf/2+.01,madeira,0,.225,zF+(pf/2-.01)/2);
+  // focinhos de latão na quina de cada degrau
+  K.box(w+.02,.022,.04,latao,0,.161,zF+pf-.02);
+  K.box(w+.02,.022,.04,latao,0,.311,zF+pf/2-.02);
+  // a passadeira do corredor central (v710) sobe os degraus e entra um pouco no palco
+  const wt=2.0,e=.006;
+  K.box(wt,e,.26,tapete,0,.15+e/2,zF+pf*.75);
+  K.box(wt,e,.26,tapete,0,.30+e/2,zF+pf*.25);
+  K.box(wt,.15,e,tapete,0,.075,zF+pf+.004);
+  K.box(wt,.15,e,tapete,0,.225,zF+pf/2+.004);
+  K.box(wt,.15,e,tapete,0,.375,zF+.024);          // no espelho do palco, à frente do filete de latão da v365
+  K.box(wt,e,.9,tapete,0,.45+e/2,zF-.45);
+  // dois pilaretes de latão nos cantos de baixo (onde o clamp fecha as faces da escada)
+  for(const s of [-1,1]){const x=s*(ws+.12),z=zF+pf-.15;K.cyl(.035,.045,.55,latao,x,.275,z,10);K.sph(.06,latao,x,.58,z,1,1,1,10,8);K.cyl(.07,.08,.04,latao,x,.02,z,12);}
+  const g=new T.Group();g.name='v874 · escada do palco';R.scene.add(g);const ms=K.fim(g,{nome:'v874 · escada do palco',sombra:true});
+  g.__fusaoMoveu=9;g.userData.dynamic434=true;
+  g.traverse(o=>{o.__fusaoMoveu=9;if(o.userData){o.userData.papelKeepGeo=true;o.userData.noCam=true;o.userData.kit=true;}});
+  g.visible=PA874.ativo;PA874.escadaG=g;PA874.stats.escada={malhas:ms.length,largura:+w.toFixed(2),fundo:pf,degraus:3,x:[-ws,ws],z:[+zF.toFixed(2),+(zF+pf).toFixed(2)]};}
+// ---------- (1) a lâmpada central da ribalta (v362: cilindro .15/.19 × .13 a y .57 e esfera .1 a y .65, em x 0, z −D/2+7) ----------
+// Só as peças INTEIRAS dentro da caixa da lâmpada: os triângulos que tocam a caixa são ligados pelos vértices de mesma posição
+// (a tampa e o corpo do cilindro, a malha fundida sem índice) e uma peça só some se TODOS os vértices dela estão dentro — uma peça
+// vizinha que entra em parte na caixa não se mexe. A contagem é conferida (uma lâmpada tem dezenas a poucas centenas de vértices).
+// A fusão do Leve vê a versão nova da posição e refaz o grupo dela.
+const RB874={feitos:[]};
+function pa874Ribalta(apaga){const R=typeof ROOMS!=='undefined'&&ROOMS.teatro,G=PA874.geo;if(!R||!R.scene||!G)return 0;
+  if(!apaga){let n=0;for(const f of RB874.feitos){const pos=f.pos;for(let k=0;k<f.idx.length;k++){pos.setXYZ(f.idx[k],f.orig[3*k],f.orig[3*k+1],f.orig[3*k+2]);n++;}pos.needsUpdate=true;}
+    RB874.feitos.length=0;if(PA874.stats.ribalta)PA874.stats.ribalta.apagada=false;return n;}
+  if(RB874.feitos.length)return 0;
+  const X0=-.23,X1=.23,Y0=.49,Y1=.73,Z0=G.zF-.23,Z1=G.zF+.23,v=new THREE.Vector3(),novos=[];let total=0;
+  R.scene.updateMatrixWorld(true);
+  R.scene.traverse(m=>{if(!m.isMesh||m.isInstancedMesh||m.isSkinnedMesh||!m.geometry)return;if(m.userData&&(m.userData.fusao||m.userData.coin))return;
+    for(let p=m;p;p=p.parent)if(p===PA874.escadaG)return;
+    const g=m.geometry,pos=g.attributes&&g.attributes.position;if(!pos||pos.isInterleavedBufferAttribute||pos.itemSize!==3||pos.count<200)return;
+    if(!g.boundingBox)g.computeBoundingBox();const bb=g.boundingBox.clone().applyMatrix4(m.matrixWorld);
+    if(bb.max.x<X0||bb.min.x>X1||bb.max.y<Y0||bb.min.y>Y1||bb.max.z<Z0||bb.min.z>Z1)return;
+    const n=pos.count,den=new Uint8Array(n);let alg=0;
+    for(let i=0;i<n;i++){v.fromBufferAttribute(pos,i).applyMatrix4(m.matrixWorld);if(v.x>X0&&v.x<X1&&v.y>Y0&&v.y<Y1&&v.z>Z0&&v.z<Z1){den[i]=1;alg++;}}
+    if(!alg)return;
+    // os triângulos que tocam a caixa, ligados em peças pelos vértices de mesma posição (união-busca)
+    const ix=g.index?g.index.array:null,nt=ix?Math.floor(ix.length/3):Math.floor(n/3),tri=[];
+    for(let t=0;t<nt;t++){const a=ix?ix[3*t]:3*t,b=ix?ix[3*t+1]:3*t+1,c=ix?ix[3*t+2]:3*t+2;if(den[a]||den[b]||den[c])tri.push(a,b,c);}
+    const nT=tri.length/3,pai=new Int32Array(nT);for(let t=0;t<nT;t++)pai[t]=t;
+    const raiz=t=>{while(pai[t]!==t){pai[t]=pai[pai[t]];t=pai[t];}return t;};
+    const chave=i=>Math.round(pos.getX(i)*1e4)+','+Math.round(pos.getY(i)*1e4)+','+Math.round(pos.getZ(i)*1e4),visto=new Map();
+    for(let t=0;t<nT;t++)for(let k=0;k<3;k++){const ch=chave(tri[3*t+k]),o=visto.get(ch);if(o===undefined)visto.set(ch,t);else{const ra=raiz(o),rb=raiz(t);if(ra!==rb)pai[ra]=rb;}}
+    const fora=new Set();for(let t=0;t<nT;t++)if(!den[tri[3*t]]||!den[tri[3*t+1]]||!den[tri[3*t+2]])fora.add(raiz(t));
+    const marca=new Uint8Array(n);for(let t=0;t<nT;t++)if(!fora.has(raiz(t)))for(let k=0;k<3;k++)marca[tri[3*t+k]]=1;
+    const idx=[];for(let i=0;i<n;i++)if(marca[i])idx.push(i);
+    if(idx.length){novos.push({m,pos,idx});total+=idx.length;}});
+  if(total<20||total>3000){PA874.stats.ribalta={apagada:false,vertices:total,motivo:'contagem fora do esperado (20–3000)'};return 0;}
+  for(const f of novos){const {pos,idx}=f,orig=new Float32Array(idx.length*3),a0=idx[0],ax=pos.getX(a0),ay=pos.getY(a0),az=pos.getZ(a0);
+    for(let k=0;k<idx.length;k++){const i=idx[k];orig[3*k]=pos.getX(i);orig[3*k+1]=pos.getY(i);orig[3*k+2]=pos.getZ(i);pos.setXYZ(i,ax,ay,az);}
+    pos.needsUpdate=true;RB874.feitos.push({pos,idx,orig,nome:f.m.name});}
+  PA874.stats.ribalta={apagada:true,vertices:total,malhas:novos.length,nomes:novos.map(f=>f.m.name).slice(0,4)};return total;}
+// ---------- (4) os cantos do tablado do alçapão (só depois de a v814 o montar: os quatro discos de r 1 dela confirmam o lugar) ----------
+function pa874Alcapao(){if(!PA874.on||!PA874.alc||PA874.alcFeito)return false;const R=typeof ROOMS!=='undefined'&&ROOMS.teatro;if(!R||!R.world||!Array.isArray(R.world.obst))return false;
+  const ob=R.world.obst,C=PA874_ALC,cs=Math.cos(C.ry),sn=Math.sin(C.ry);
+  const mundo=(lx,lz)=>[+(C.x+lx*cs+lz*sn).toFixed(2),+(C.z-lx*sn+lz*cs).toFixed(2)];
+  const tem=(p,r)=>ob.some(o=>Math.abs(o[0]-p[0])<.06&&Math.abs(o[1]-p[1])<.06&&Math.abs(o[2]-r)<.02);
+  if(![[-1,-.6],[1,-.6],[0,-1.6],[0,.4]].every(q=>tem(mundo(q[0],q[1]),1.0)))return false;
+  PA874.alcFeito=true;const novos=[];
+  for(const q of [[-1.2,-1.8],[1.2,-1.8],[-1.2,.6],[1.2,.6]]){const p=mundo(q[0],q[1]),o=[p[0],p[1],.6];o.pa874=true;novos.push(o);}
+  const base=pa874Base(R)||ob;for(const o of novos){PA874.discos.push(o);if(PA874.ativo)base.push(o);}
+  pa874Caches(R);const a=mundo(-1.5,-2.1),b=mundo(1.5,.9);
+  PA874.stats.alcapao={discos:novos.length,tablado:{x:[Math.min(a[0],b[0]),Math.max(a[0],b[0])],z:[Math.min(a[1],b[1]),Math.max(a[1],b[1])],altura:.94},cantos:novos.map(o=>[o[0],o[1]])};
+  return true;}
+// ---------- instalação, conferência e o «antes» ----------
+function pa874Aplica(){if(!PA874.on||PA874.feito)return false;const R=typeof ROOMS!=='undefined'&&ROOMS.teatro;if(!R||!R.ready||!R.scene||!R.world)return false;
+  const t0=performance.now();let D=0;
+  try{const N=typeof NR!=='undefined'&&NR.teatro;if(N&&N.D>0)D=N.D;}catch(e){}
+  if(!(D>0))try{const a=AREA350.rooms.teatro;if(a&&a.depth>0)D=a.depth;}catch(e){}
+  if(!(D>0))try{D=30*Math.SQRT2*a7FzD('teatro');}catch(e){D=30*Math.SQRT2;}
+  PA874.feito=true;const G=PA874.geo=pa874Geo(D);
+  PA874.stats.geo={D:+D.toFixed(2),frente:+G.zF.toFixed(2),fundo:+G.z0.toFixed(2),x:[-G.xs,G.xs],altura:G.h,escada:G.escada?{x:[-G.ws,G.ws],z:[+G.zF.toFixed(2),+(G.zF+G.prof).toFixed(2)]}:null};
+  try{if(G.escada)pa874EmbrulhaChao(R);}catch(e){pa874Erro('chão',e);}
+  try{pa874EmbrulhaClamp(R.world);PA874.stats.caixas=G.cx.length;}catch(e){pa874Erro('caixas',e);}
+  try{if(G.escada)pa874Escada(R);}catch(e){pa874Erro('escada',e);}
+  try{if(PA874.ribalta)pa874Ribalta(true);}catch(e){pa874Erro('ribalta',e);}
+  try{if(PA874.alc)pa874Alcapao();}catch(e){pa874Erro('alçapão',e);}
+  pa874Decor();pa874Caches(R);PA874.stats.aplicado++;PA874.stats.ms=Math.round(performance.now()-t0);
+  // o alçapão da v814 entra 3–6 s depois de a sala ficar pronta (vigia de 2 s + 3,4 s, com novas tentativas): procura por até 2 min
+  if(PA874.alc&&!PA874.alcFeito)try{let n=0;const iv=setInterval(()=>{n++;try{if(PA874.alcFeito||n>80){clearInterval(iv);return;}pa874Alcapao();}catch(e){}},1500);}catch(e){}
+  return true;}
+function pa874Confere(){try{const R=typeof ROOMS!=='undefined'&&ROOMS.teatro,G=PA874.geo;if(!PA874.feito||!PA874.ativo||!R||!R.world||!G)return;
+    const q=R.world.clamp(G.prova[0],G.prova[1],.9);
+    if(Array.isArray(q)&&Math.abs(q[0]-G.prova[0])<1e-4&&Math.abs(q[1]-G.prova[1])<1e-4){pa874EmbrulhaClamp(R.world,true);PA874.stats.reembrulhos++;pa874Caches(R);}
+    if(G.escada){const h=R.floorY?R.floorY(0,G.zF-3):0;if(Math.abs(h-G.h)>1e-3){pa874EmbrulhaChao(R,true);PA874.stats.reembrulhos++;}}
+    if(pa874Decor())pa874Caches(R);
+    if(PA874.alc&&!PA874.alcFeito)pa874Alcapao();}catch(e){pa874Erro('confere',e);}}
+function pa874Liga(sim){sim=!!sim;try{if(!PA874.feito)pa874Aplica();if(!PA874.feito)return false;if(PA874.ativo===sim)return true;PA874.ativo=sim;
+    const R=ROOMS.teatro,base=pa874Base(R),ob=R&&R.world&&R.world.obst;
+    // os discos ficam na lista-base (e saem também da cópia que a decoração devolve, se for outra)
+    if(Array.isArray(base)){if(sim){for(const o of PA874.discos)if(base.indexOf(o)<0)base.push(o);}else{for(let i=base.length-1;i>=0;i--)if(base[i]&&base[i].pa874)base.splice(i,1);}}
+    if(!sim&&Array.isArray(ob)&&ob!==base){for(let i=ob.length-1;i>=0;i--)if(ob[i]&&ob[i].pa874)ob.splice(i,1);}
+    try{if(PA874.escadaG)PA874.escadaG.visible=sim;}catch(e){}
+    try{if(PA874.ribalta)pa874Ribalta(sim);}catch(e){pa874Erro('ribalta '+(sim?'liga':'desliga'),e);}
+    if(sim)pa874Confere();pa874Caches(R);return true;}catch(e){pa874Erro('liga',e);return false;}}
+if(PA874.on){
+  try{const fr0=finishRoom;finishRoom=fr8Wrap(function*(key){const r=(yield* fr8Prev(fr0,this,arguments,"PA874"));if(key==='teatro'){try{pa874Aplica();}catch(e){pa874Erro('aplica',e);}}return r;});}catch(e){pa874Erro('finishRoom',e);}
+  try{const sa0=setActive;setActive=function(sc){try{const R=typeof ROOMS!=='undefined'&&ROOMS.teatro;if(R&&sc&&R.scene===sc){if(!PA874.feito)pa874Aplica();else pa874Confere();}}catch(e){pa874Erro('setActive',e);}return sa0.apply(this,arguments);};}catch(e){pa874Erro('setActive0',e);}
+  // o túnel: depois do passo do Gamer/Clique (CH) e da 1.ª pessoa (P), por fora de todos os embrulhos
+  try{const mt0=moveTP;moveTP=function(dt){const aqui=pa874Aqui(),ox=CH.x,oz=CH.z;const r=mt0.apply(this,arguments);
+      try{if(aqui&&pa874Tunel(ox,oz,CH.x,CH.z)){const s=pa874Desliza(ox,oz,CH.x,CH.z);
+          if(s){CH.x=s[0];CH.z=s[1];if(s[2]==='x')CH.vz=0;else CH.vx=0;PA874.stats.deslizes++;}else{CH.x=ox;CH.z=oz;CH.vx=0;CH.vz=0;}PA874.stats.tuneis++;}}catch(e){pa874Erro('túnel',e);}return r;};}catch(e){pa874Erro('moveTP',e);}
+  // (na 1.ª pessoa o FP852, por dentro, já copiou o P para o CH: o CH volta junto)
+  try{const mv0=move;move=function(dt){const aqui=pa874Aqui(),ox=P.x,oz=P.z;const r=mv0.apply(this,arguments);
+      try{if(aqui&&pa874Tunel(ox,oz,P.x,P.z)){const s=pa874Desliza(ox,oz,P.x,P.z);
+          if(s){P.x=s[0];P.z=s[1];if(s[2]==='x')vz=0;else vx=0;PA874.stats.deslizes++;}else{P.x=ox;P.z=oz;vx=0;vz=0;}
+          if(MODE==='fp'){CH.x=P.x;CH.z=P.z;CH.vx=vx;CH.vz=vz;}PA874.stats.tuneis++;}}catch(e){pa874Erro('túnel 1.ª pessoa',e);}return r;};}catch(e){pa874Erro('move',e);}
+}
+window.__palco874={estado:PA874,stats:PA874.stats,erros:PA874.erros,geo:()=>PA874.geo,liga:()=>pa874Liga(true),desliga:()=>pa874Liga(false),
+  altura:pa874Altura,empurra:pa874Empurra,tunel:pa874Tunel,desliza:pa874Desliza,aplica:pa874Aplica,confere:pa874Confere,ribalta:pa874Ribalta,alcapao:pa874Alcapao,decor:pa874Decor};
 
 window.__build434={revision:434,family:"web",edition:"en"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
