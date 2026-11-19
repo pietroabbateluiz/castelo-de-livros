@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v866</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v867</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -113099,6 +113099,74 @@ if(AQ866.on&&typeof esc523Aquece==='function'&&typeof ESC523!=='undefined'&&ESC5
       return aq0.apply(this,arguments);};}catch(e){aq866Erro('embrulho',e);}
 }
 window.__aquece866={estado:AQ866,stats:AQ866.stats,erros:AQ866.erros,andar:aq866Andar};
+
+/* ===================== v867 · MISSÕES: SORTEIO VIÁVEL TAMBÉM NA ABERTURA, A CAPA AUTOMÁTICA NÃO CUMPRE «CADASTRAR UM LIVRO», A VOLTA AO HALL CONTA O ANDAR CERTO E O CONTADOR VIRA À MEIA-NOITE (bloco `MV867`) =====================
+   Plano de 18 h do Luiz (18/11) — revisão das missões (agente de revisão estática, conferido no código).
+   COMO ERA:
+   (1) o sorteio do dia acontece na abertura (`missMonta` → `missCarrega` → `missGaranteDia` → `missEscolheDia`) ANTES de existir o
+       `window.__pacifico` (o «Sem Inimigos» é lido depois) e antes de a v759 embrulhar o sorteio (a troca de «Subir a um andar acima do
+       Hall» enquanto o 2.º andar está fechado) — num dia novo, quem joga sem inimigos podia receber «Derrotar 5 inimigos» e quem ainda não
+       alimentou o javali, «Subir a um andar…»: missões impossíveis o dia todo (o dia fica gravado e não é sorteado de novo);
+   (2) «Abrir um baú» saía mesmo para quem já abriu todos os baús (dourados e de prata) — impossível;
+   (3) a busca automática de capas (v518, 5 s depois de abrir) grava o livro pelo `EST.upsert`, que avisa `mundo:livro`: a missão fixa
+       «Cadastrar ou atualizar um livro» (+10 moedas) se cumpria sozinha, sem o leitor tocar na Estante; o complemento de ISBN da v418 (que
+       grava depois, por conta própria) também avisava de novo;
+   (4) voltar ao Hall sem andar explícito (botão Hall, porta, B do controle) avisava `mundo:hall` com o andar de ANTES da viagem: quem
+       entrou numa sala do 2.º andar pelo mapa e saiu pelo botão Hall chegava à Galeria, mas o aviso dizia andar 1 e a v863 o descartava —
+       «Subir a um andar acima do Hall» não contava;
+   (5) o contador «Missões n/3» do HUD só virava o dia quando uma missão andava.
+   AGORA: (1)/(2) uma missão impossível (inimigos com «Sem Inimigos»; andar com o 2.º andar fechado; baú sem baú fechado) é trocada por outra
+   possível, no sorteio e, na abertura, no dia já gravado — só se ainda não tiver progresso; (3) as gravações automáticas de capa e de ISBN
+   não avisam `mundo:livro`; (4) o aviso leva o andar de destino (o mesmo cálculo do `goHall`); (5) o HUD confere a virada do dia.
+   Chaves: `?missoes867=0` (tudo), `?viavel867=0`, `?capas867=0`, `?hall867=0`, `?hud867=0`. Gancho `window.__missoes867`. */
+const MV867_Q=location.search+location.hash;
+const MV867={on:!/[?&#]missoes867=0/i.test(MV867_Q),erros:[],stats:{trocadasSorteio:0,trocadasAbertura:0,capasSilenciadas:0,isbnSilenciados:0,livroSuprimido:0,hallCorrigido:0,hudVirou:0}};
+MV867.viavel=MV867.on&&!/[?&#]viavel867=0/i.test(MV867_Q);MV867.capas=MV867.on&&!/[?&#]capas867=0/i.test(MV867_Q);
+MV867.hall=MV867.on&&!/[?&#]hall867=0/i.test(MV867_Q);MV867.hud=MV867.on&&!/[?&#]hud867=0/i.test(MV867_Q);
+function mv867Erro(k,e){if(MV867.erros.length<20)MV867.erros.push(k+': '+(e&&e.message||e));try{console.warn('v867',k,e);}catch(x){}}
+// ---- (1)/(2) viabilidade
+function mv867BauFechado(){try{if(typeof KEYS==='undefined'||!KEYS)return true;const B1=KEYS.baus||{},B2=KEYS.baus2||{};
+    return Object.keys(GENRE_ROOM).some(g=>{let ex=true;try{ex=roomExists(g);}catch(e){}return ex&&(!B1[g]||!B2[g]);});}catch(e){return true;}}
+function mv867Viavel(k){try{if(k==='inimigos5')return !missPacifico();if(k==='andar')return typeof elevAberto!=='function'||!!elevAberto(2);if(k==='bau')return mv867BauFechado();}catch(e){mv867Erro('viavel '+k,e);}return true;}
+function mv867Troca(L,prog,feitas){if(!Array.isArray(L))return L;const out=L.slice();let n=0;
+  for(let i=0;i<out.length;i++){const k=out[i];if(mv867Viavel(k))continue;if((prog&&prog[k])||(feitas&&feitas[k]))continue;
+    const alt=['salas3','moedas15','bau','minha'].find(a=>!out.includes(a)&&mv867Viavel(a));if(alt){out[i]=alt;n++;}}
+  return {lista:out,n};}
+if(MV867.viavel&&typeof missEscolheDia==='function'){
+  try{const me0=missEscolheDia;missEscolheDia=function(){const L=me0.apply(this,arguments);try{const r=mv867Troca(L);if(r.n){MV867.stats.trocadasSorteio+=r.n;return r.lista;}}catch(e){mv867Erro('sorteio',e);}return L;};}catch(e){mv867Erro('sorteio0',e);}
+  // o dia já gravado (sorteado na abertura, antes das travas existirem)
+  const mv867Abertura=()=>{try{const E=typeof MISS!=='undefined'&&MISS.estado,D=E&&E.dia;if(!D||!Array.isArray(D.ids)||D.chave!==v198Dia())return;
+      const r=mv867Troca(D.ids,D.prog,D.feitas);if(r.n){D.ids=r.lista;MV867.stats.trocadasAbertura+=r.n;missGrava();try{missHud();}catch(x){}}}catch(e){mv867Erro('abertura',e);}};
+  mv867Abertura();try{setTimeout(mv867Abertura,4000);}catch(e){}
+}
+// ---- (3) gravações automáticas de livro não avisam «mundo:livro»
+const AUTO867={n:0,dentro:0};
+if(MV867.capas&&window.EST&&typeof EST.upsert==='function'){
+  try{const up0=EST.upsert;EST.upsert=function(b){let auto=false;try{if(b&&b.capaAuto518&&b.capa&&typeof b.id==='string'){const ant=(EST.DB&&EST.DB.livros||[]).find(x=>x.id===b.id);auto=!!ant&&!ant.capa;}}catch(e){}
+      AUTO867.dentro++;if(auto){AUTO867.n++;MV867.stats.capasSilenciadas++;}try{return up0.apply(this,arguments);}finally{AUTO867.dentro--;if(auto)AUTO867.n--;}};}catch(e){mv867Erro('upsert',e);}
+  // o complemento de ISBN da v418 grava por conta própria, fora de qualquer EST.upsert do jogo
+  try{if(typeof BOOK418!=='undefined'&&BOOK418&&typeof BOOK418.save==='function'){const s0=BOOK418.save;BOOK418.save=function(){if(AUTO867.dentro>0)return s0.apply(this,arguments);
+        AUTO867.n++;MV867.stats.isbnSilenciados++;try{return s0.apply(this,arguments);}finally{AUTO867.n--;}};}}catch(e){mv867Erro('book418',e);}
+}
+// ---- (4) a volta ao Hall sem andar explícito avisa o andar de destino
+const GH867={alvo:null};
+if(MV867.hall&&typeof goHall==='function'){
+  try{const gh0=goHall;goHall=function(n){let alvo=null;try{alvo=n||(CUR==='room'?(typeof GENRE_FLOOR==='function'?GENRE_FLOOR(CUR_GENRE):HALLN):HALLN);}catch(e){}
+      const ant=GH867.alvo;GH867.alvo=alvo;try{return gh0.apply(this,arguments);}finally{GH867.alvo=ant;}};}catch(e){mv867Erro('goHall',e);}
+}
+if((MV867.capas||MV867.hall)&&typeof MEV==='function'){
+  try{const mv0=MEV;MEV=function(nome,dados){try{
+        if(nome==='livro'&&AUTO867.n>0){MV867.stats.livroSuprimido++;return;}
+        if(nome==='hall'&&GH867.alvo&&dados&&+dados.andar!==+GH867.alvo){MV867.stats.hallCorrigido++;dados=Object.assign({},dados,{andar:GH867.alvo});return mv0.call(this,nome,dados);}
+      }catch(e){mv867Erro('MEV',e);}return mv0.apply(this,arguments);};}catch(e){mv867Erro('MEV0',e);}
+}
+// ---- (5) o contador do HUD confere a virada do dia
+if(MV867.hud&&typeof missHud==='function'){
+  const mv867Vira=()=>{try{const D=MISS.estado&&MISS.estado.dia;if(D&&D.chave!==v198Dia()){missGaranteDia();MV867.stats.hudVirou++;return true;}}catch(e){mv867Erro('vira',e);}return false;};
+  try{const h0=missHud;missHud=function(){mv867Vira();return h0.apply(this,arguments);};}catch(e){mv867Erro('hud',e);}
+  try{setInterval(()=>{if(mv867Vira())try{missHud();}catch(e){}},30000);}catch(e){}
+}
+window.__missoes867={estado:MV867,stats:MV867.stats,erros:MV867.erros,viavel:mv867Viavel,troca:mv867Troca};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
