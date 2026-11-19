@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v864</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v865</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -113043,6 +113043,37 @@ if(DM864.on&&typeof missGaranteDia==='function'&&typeof setActive==='function'){
   try{const mv=MEV;MEV=function(nome){if(nome==='sala')dm864Garante();return mv.apply(this,arguments);};}catch(e){dm864Erro('MEV',e);}
 }
 window.__meianoite864={estado:DM864,stats:DM864.stats,erros:DM864.erros};
+
+/* ===================== v865 · NO CONTROLE, O B FECHA O CARTÃO DO COMPANHEIRO NOVO E O DECORAR, EM VEZ DE TIRAR O LEITOR DA SALA (bloco `CP865`) =====================
+   Plano de 18 h do Luiz (18/11), bloco 5 — controle, 2.ª passada (cartão do companheiro novo, Decorar, Pena Mágica).
+   COMO ERA: o B do controle passa primeiro pelas janelas que o controle conhece (v788: as listadas, os diálogos abertos e o Diário); se a
+   janela de cima não é uma delas, segue o B do jogo — e, dentro de uma sala, o B do jogo é «volta ao hall». Duas janelas da Minha Sala e
+   das salas ficavam de fora:
+   · o CARTÃO DO COMPANHEIRO NOVO (v548, depois de vencer um rival): o B levava o leitor de volta ao Hall com o cartão na tela, e o A fazia a
+     ação do mundo (interagir) atrás dele; o cartão só saía sozinho, em 15 s (ou com Esc/Enter no teclado);
+   · o DECORAR da Minha Sala: o B tirava o leitor da sala (o editor fechava na chegada ao Hall).
+   AGORA: com o cartão na tela, ele é a janela do controle — o foco vai para «Continuar», o A sem outro foco aperta «Continuar» (a cruz alcança
+   a chave «Usar este companheiro», e o A troca a chave focada) e o B fecha o cartão; no Decorar, o B fecha o editor e o leitor fica na sala. Teclado e mouse não mudam.
+   Chave: `?cartao865=0`. Gancho `window.__cartao865`. */
+const CP865={on:!/[?&#]cartao865=0/i.test(location.search+location.hash),erros:[],stats:{painel:0,fechaCartao:0,fechaDecorar:0,foco:0,continuar:0}};
+function cp865Erro(k,e){if(CP865.erros.length<20)CP865.erros.push(k+': '+(e&&e.message||e));try{console.warn('v865',k,e);}catch(x){}}
+function cp865Cartao(){try{const C=typeof RV548!=='undefined'&&RV548.card;return (C&&C.el&&C.el.isConnected&&p788Visivel(C.el))?C.el:null;}catch(e){return null;}}
+if(CP865.on&&typeof p788Painel==='function'&&typeof p788Fecha==='function'){
+  // o cartão entra como janela do controle (fica por cima das demais enquanto estiver na tela)
+  try{const pp=p788Painel;p788Painel=function(){const c=cp865Cartao();if(c){CP865.stats.painel++;return c;}return pp.apply(this,arguments);};}catch(e){cp865Erro('painel',e);}
+  // B: fecha o cartão (com a limpeza dele) e, no Decorar, fecha o editor — antes do B do jogo
+  try{const pf=p788Fecha;p788Fecha=function(){try{if(cp865Cartao()&&typeof rv548Fecha==='function'){rv548Fecha();CP865.stats.fechaCartao++;return true;}
+        if(typeof SALA_ED!=='undefined'&&SALA_ED.ativo&&CUR==='room'&&typeof salaDecorar==='function'){const outra=pf.apply(this,arguments);if(outra)return true;
+          // uma peça na mão volta (como o Esc do teclado) antes de o editor fechar
+          try{if(typeof DC835!=='undefined'&&DC835.carry){const M=window.__ms748,D=M&&M._drag&&M._drag();if(D&&D.carry835&&typeof dc8Desiste==='function')dc8Desiste(D);}}catch(x){}
+          salaDecorar(false);CP865.stats.fechaDecorar++;return true;}}catch(e){cp865Erro('fecha',e);}
+      return pf.apply(this,arguments);};}catch(e){cp865Erro('fechaEmbrulho',e);}
+  // A sem nada focado no cartão = «Continuar» (o 1.º focável do cartão é a chave «Usar este companheiro», que o A trocaria)
+  if(typeof p788Clique==='function')try{const pc=p788Clique;p788Clique=function(){try{const el=cp865Cartao();if(el){const a=document.activeElement;if(!(a&&el.contains(a)&&a!==el)){const ok=el.querySelector('.ok');if(ok){ok.click();CP865.stats.continuar=(CP865.stats.continuar||0)+1;return true;}}}}catch(e){cp865Erro('clique',e);}return pc.apply(this,arguments);};}catch(e){cp865Erro('cliqueEmbrulho',e);}
+  // o foco do controle já começa em «Continuar» (depois de o cartão aparecer: ele entra com uma transição de opacidade)
+  if(typeof rv548Card==='function')try{const rc=rv548Card;rv548Card=function(){const r=rc.apply(this,arguments);setTimeout(()=>{try{if(typeof PAD!=='undefined'&&PAD.on){const el=cp865Cartao(),ok=el&&el.querySelector('.ok');if(ok&&typeof p788Foca==='function'){p788Foca(ok);CP865.stats.foco++;}}}catch(e){cp865Erro('foco',e);}},450);return r;};}catch(e){cp865Erro('card',e);}
+}
+window.__cartao865={estado:CP865,stats:CP865.stats,erros:CP865.erros};
 
 window.__build434={revision:434,family:"web",edition:"en"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
