@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v869</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v870</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -113414,6 +113414,144 @@ if(OB869.on){
   try{const sa=setActive;setActive=function(sc){try{if(!OB869.feito&&typeof ROOMS!=='undefined'&&ROOMS.sci&&ROOMS.sci.scene===sc)ob869Aplica(ROOMS.sci);}catch(e){}return sa.apply(this,arguments);};}catch(e){OB869.erros.push('setActive: '+(e&&e.message||e));}
 }
 window.__pecas869={estado:OB869,stats:OB869.stats,erros:OB869.erros,aplica:ob869Aplica};
+
+/* ===================== v870 · AS 26 SOBRAS DE PORTUGUÊS NO INGLÊS (12 TAMBÉM NO ESPANHOL) (bloco `TR870`) =====================
+   Revisão só de leitura feita na v866 (relatorio_sobras_pt.md): no build em inglês ainda saíam 26 textos em português, quase todos em
+   código antigo; doze deles também no espanhol, que roda sobre o arquivo PT com o idioma 'es'. Relocalizados na v869.
+   COMO ERA:
+   (A) Minha Sala · Decorar: «tamanho», «largura», «profund.» (seção do tapete do `salaPainel`), o formato «Redondo», o cabeçalho
+       «default · Arabescos» e o modelo «Arabesco» (`SALA_FORMAS`/`SALA_TAPETES`), o papel de parede «Arabesco» (`SALA_PAPEIS`), a
+       escultura «Armadura» (`M164.escultura`), os rótulos «girar» e «ajustar» (v195, sala mobiliada original);
+   (B) Diário: as três linhas do javali do Hall do 1.º andar (v436: pede comida, comeu, derrubou a grade);
+   (C) Mapa das salas: a dica «trancada» do botão da Galeria e das salas do 2.º andar (a v750 só corrigiu o texto pequeno);
+   (D) Loja da Coruja: a dica «comprar» do botão de compra;
+   (E) inimigos: «Pistoleiro/pistoleiros/Pistoleiro derrotado» (Faroeste), «Minotauro/minotauros» (Mitologia) e os plurais dos
+       carcereiros da masmorra (`INI155`) — na dica da vida, na linha «💀 …» do Diário e nos troféus da Minha Sala («Trophy · … (Pistoleiro)»,
+       inclusive na plaquinha 3D); no espanhol a v784 traduz os inimigos UMA vez, na abertura, e o pistoleiro não está no dicionário; os
+       carcereiros nascem depois (na masmorra), fora do alcance dela; e os troféus do espanhol eram montados com o nome do inimigo já em
+       espanhol e o nome da sala em português — o tradutor não acha o pedaço «Faroeste (Pistolero)» nem «Terror e horror (Calavera)»;
+   (F) avisos: «🏆 Mestre do Paranormal · +250 gold coins!» e «🐉 Bond with Fagulha: 1/3 (duelo)»;
+   (G) quadros do Atlas (7.º andar): «A ESTRADA CONTINUA», «UM FUTURO CULTIVADO», «CADA SEMENTE É UMA IDEIA» (canvas do `atlas362Art`);
+   (H) menu: o botão «Visitar» da janela «🏡 Visit a friend» (`social401UI`);
+   (I) raros: o alerta «Não foi possível salvar o idioma.», o aria-label «Carregando» da abertura (no espanhol, «Progresso da etapa
+       atual»: a varredura de cedo do tradutor guarda o texto no `cache` antes de qualquer bloco) e o alt «Retrato da cena» (o tradutor
+       não olha o atributo alt).
+   AGORA:
+   (1) DICIONÁRIO: as frases inteiras entram no `__localeData428`, como nos blocos antigos, mas só no dicionário da língua do jogo (EN
+       no inglês; ES no espanhol, onde falta) — o tradutor procura a frase inteira, a frase sem o emoji do começo e cada pedaço entre
+       « · » / « — » pela chave exata (os mapas pré-calculados só contam para as buscas sem diferenciar maiúsculas, que as chaves novas
+       não usam). Vale para (A), (B), (C), (D), (F: Mestre), (G), (H) e o alerta de (I). Nenhum desses textos passa pelo tradutor antes
+       deste bloco (o tradutor do EN só varre o DOM no DOMContentLoaded; os quadros do Atlas nascem com a sala).
+   (2) INIMIGOS: nome, plural e queda de `INI155` trocados na fonte, só onde o valor ainda é exatamente o português (pistoleiro e
+       minotauro agora; os carcereiros logo depois de `dungeon395Build`). Os TROFÉUS são refeitos (`ms498Atualiza`, chamada uma vez
+       aqui) — no espanhol, montados com as partes já traduzidas: «Trofeo · Oeste (Pistolero)». O `name402` das peças já colocadas
+       acompanha: o catálogo regrava o nome a cada restauração da sala.
+   (3) «duelo» (o motivo do vínculo da Fagulha, `drgpGanha`): traduzido antes de virar aviso (no espanhol a palavra já serve).
+   (4) ABERTURA: o aria-label da tela de abertura (EN), o da barra de progresso (ES) e o alt do retrato trocados direto no elemento.
+   No português nada muda. Entradas que já existem no dicionário não são sobrescritas.
+   Chaves: `?traducao870=0` (tudo), `?dicionario870=0`, `?inimigos870=0` (inimigos e troféus), `?duelo870=0`, `?abertura870=0`.
+   Gancho `window.__traducao870` (`estado`, `stats`, `erros`, `dic`, `inimigos`, `motivos`, `aplicaInimigos`, `trofeus`, `motivo`,
+   `abertura`, `lingua`). */
+const TR870_Q=location.search+location.hash;
+const TR870={on:!/[?&#]traducao870=0/i.test(TR870_Q),erros:[],stats:{dicEn:0,dicEs:0,inimigos:0,trofeus:0,trofeusUlt:0,motivo:0,abertura:0}};
+TR870.dic=TR870.on&&!/[?&#]dicionario870=0/i.test(TR870_Q);TR870.inimigos=TR870.on&&!/[?&#]inimigos870=0/i.test(TR870_Q);
+TR870.duelo=TR870.on&&!/[?&#]duelo870=0/i.test(TR870_Q);TR870.abre=TR870.on&&!/[?&#]abertura870=0/i.test(TR870_Q);
+function tr870Erro(k,e){if(TR870.erros.length<30)TR870.erros.push(k+': '+(e&&e.message||e));try{console.warn('v870',k,e);}catch(x){}}
+// a língua do jogo: o tradutor põe 'en-US', 'pt-BR' ou 'es' no <html lang>
+function tr870Lingua(){try{const l=String(document.documentElement.lang||'');return l.startsWith('es')?'es':l.startsWith('en')?'en':'pt';}catch(e){return 'pt';}}
+// ---------- (1) dicionário: 'texto em português' → [inglês, espanhol] (null = o espanhol já tem, ou a palavra já é espanhola) ----------
+const TR870_DIC={
+  // (A) Minha Sala · Decorar — seção do tapete: subtítulo e rótulos dos controles deslizantes
+  'tamanho':['size','tamaño'],
+  'largura':['width','ancho'],
+  'profund.':['depth','fondo'],
+  // (A) formato «Redondo», cabeçalho «default · Arabescos» (o tradutor pega o pedaço depois do « · »), modelo de tapete e papel de parede «Arabesco»
+  'Redondo':['Round',null],
+  'Arabescos':['Arabesques',null],
+  'Arabesco':['Arabesque',null],
+  // (A) escultura do Decorar (também «Sculpture · Armadura» no catálogo)
+  'Armadura':['Suit of armor',null],
+  // (A) rótulos do bloco de posição da v195 (sala mobiliada original)
+  'girar':['rotate',null],
+  'ajustar':['nudge',null],
+  // (B) Diário — javali do Hall do 1.º andar (v436); sem o emoji do começo (o tradutor tira o emoji e procura a frase)
+  'O javali mecânico pede comida (8 frutas e legumes) para abrir o segundo andar':['The mechanical boar asks for food (8 fruits and vegetables) to open the second floor','El jabalí mecánico pide comida (8 frutas y verduras) para abrir el segundo piso'],
+  'Você deu de comer ao javali mecânico (8 frutas e legumes)':['You fed the mechanical boar (8 fruits and vegetables)','Le diste de comer al jabalí mecánico (8 frutas y verduras)'],
+  'O javali derrubou a grade: Galeria (2.º andar) aberta':['The boar knocked down the gate: the Gallery (2nd floor) is open','El jabalí derribó la reja: la Galería (2.º piso) está abierta'],
+  // (C) Mapa das salas — dica (title) do botão da Galeria e das salas do 2.º andar antes de a Galeria abrir
+  'trancada':['locked','cerrada'],
+  // (D) Loja da Coruja — dica (title) do botão de compra
+  'comprar':['buy',null],
+  // (F) aviso do chefe do Paranormal (o pedaço antes do « · +250 gold coins!»; o espanhol já traduz)
+  'Mestre do Paranormal':['Paranormal Master',null],
+  // (G) quadros das salas do Atlas (o canvas passa o texto inteiro pelo tradutor; o espanhol já tem os três)
+  'A ESTRADA CONTINUA':['THE ROAD GOES ON',null],
+  'UM FUTURO CULTIVADO':['A CULTIVATED FUTURE',null],
+  'CADA SEMENTE É UMA IDEIA':['EVERY SEED IS AN IDEA',null],
+  // (H) botão da janela «Visit a friend»
+  'Visitar':['Visit',null],
+  // (I) alerta raro (o navegador bloqueou o armazenamento ao trocar de idioma; o espanhol já tem)
+  'Não foi possível salvar o idioma.':['Could not save the language.',null],
+  // (I) aria-labels da tela de abertura (também trocados direto no elemento, em (4)); no arquivo EN a barra já vem em inglês
+  'Carregando':['Loading',null],
+  'Progresso da etapa atual':[null,'Progreso de la etapa actual']};
+// Só no dicionário da língua do jogo: o tradutor procura a chave nos DOIS dicionários (`Object.hasOwn`) antes de escolher a tradução,
+// e uma chave nova no outro dicionário desliga a busca sem diferenciar maiúsculas daquele texto (no espanhol, «comprar» virava
+// «Comprar» e «Mestre do Paranormal», «MAESTRO DE LO PARANORMAL»). No português nada entra.
+function tr870Dicionario(){if(!TR870.dic)return;try{const D=window.__localeData428;if(!D)return;const L=tr870Lingua(),col=L==='en'?0:L==='es'?1:-1,d=L==='en'?D.en:L==='es'?D.es:null;
+    if(col<0||!d)return;for(const k in TR870_DIC){const v=TR870_DIC[k][col];if(v&&!d[k]){d[k]=v;if(col)TR870.stats.dicEs++;else TR870.stats.dicEn++;}}
+  }catch(e){tr870Erro('dicionário',e);}}
+tr870Dicionario();
+// ---------- (2) inimigos: tipo → campo → [português, inglês, espanhol] (null = a palavra já serve nessa língua) ----------
+// só troca o valor que ainda está exatamente em português (no inglês os outros inimigos já vêm traduzidos; no espanhol, pela v784)
+const TR870_INI={
+  pistoleiro:{nome:['Pistoleiro','Gunslinger','Pistolero'],plural:['pistoleiros','gunslingers','pistoleros'],caiu:['Pistoleiro derrotado','Gunslinger defeated','Pistolero derrotado']},
+  minotauro:{nome:['Minotauro','Minotaur',null],plural:['minotauros','minotaurs',null]},
+  // masmorra (nascem em `dungeon395Build`): o modelo e os quatro guardas (no inglês: Ash Jailer, Chain Warden, Ossuary Sentinel,
+  // Cursed Scribe, Keeper of the Seals)
+  carcereiro395:{plural:['carcereiros','jailers','carceleros']},
+  carcereiro421_0:{plural:['carcereiros','wardens','carceleros']},
+  carcereiro421_1:{plural:['sentinelas','sentinels','centinelas']},
+  carcereiro421_2:{plural:['escribas','scribes',null]},
+  carcereiro421_3:{plural:['vigias','keepers','vigías']}};
+function tr870Inimigos(){let n=0;try{if(!TR870.inimigos||typeof INI155!=='object'||!INI155)return 0;const L=tr870Lingua();if(L==='pt')return 0;const col=L==='en'?1:2;
+    for(const tipo in TR870_INI){const I=INI155[tipo];if(!I||typeof I!=='object')continue;const F=TR870_INI[tipo];
+      for(const c in F){const v=F[c][col];if(v&&I[c]===F[c][0]){I[c]=v;n++;}}}
+  }catch(e){tr870Erro('inimigos',e);}TR870.stats.inimigos+=n;return n;}
+// troféus do espanhol: «Trofeo · <sala traduzida> (<inimigo>)» — o original junta «Troféu · » + a sala em português + o inimigo, que a
+// v784 já deixou em espanhol; o tradutor da tela não acha esse pedaço misturado
+function tr870Trofeus(){let n=0;try{if(!TR870.inimigos||tr870Lingua()!=='es'||typeof MS498==='undefined'||!MS498||!Array.isArray(MS498.itens))return 0;
+    const LC=window.__locale428,tr=LC&&typeof LC.translate==='function'?LC.translate:null;
+    for(const it of MS498.itens){if(!it||!it.room||typeof it.name!=='string')continue;
+      const tipo=(typeof ROOM_INI155!=='undefined'&&ROOM_INI155&&ROOM_INI155[it.room])||'caveira';const I=(typeof INI155!=='undefined'&&INI155&&INI155[tipo])||{};
+      let sala=it.room;try{sala=ms498NomeSala(it.room);}catch(e){}try{if(tr)sala=tr(sala);}catch(e){}
+      const nome='Trofeo · '+sala+' ('+(I.nome||tipo)+')';if(it.name!==nome){it.name=nome;n++;}}
+  }catch(e){tr870Erro('troféus',e);}TR870.stats.trofeus+=n;TR870.stats.trofeusUlt=n;return n;}
+if(TR870.inimigos){
+  tr870Inimigos();
+  // os carcereiros da masmorra nascem dentro de dungeon395Build (já embrulhada por outros blocos; este é o de fora)
+  try{if(typeof dungeon395Build==='function'){const db0=dungeon395Build;dungeon395Build=function(){const r=db0.apply(this,arguments);try{tr870Inimigos();}catch(e){tr870Erro('masmorra',e);}return r;};}}catch(e){tr870Erro('dungeon395Build',e);}
+  try{if(typeof ms498Atualiza==='function'){const at0=ms498Atualiza;ms498Atualiza=function(){const r=at0.apply(this,arguments);try{tr870Trofeus();}catch(e){tr870Erro('troféus',e);}return r;};
+      try{if(window.__minha498)window.__minha498.atualizar=ms498Atualiza;}catch(e){}
+      // a lista dos troféus foi montada na abertura, antes deste bloco: refeita agora (só com a v498 ligada — ela registra o catálogo)
+      if(typeof MS498!=='undefined'&&MS498&&MS498.on&&tr870Lingua()!=='pt')ms498Atualiza();}}catch(e){tr870Erro('ms498Atualiza',e);}
+}
+// ---------- (3) o motivo do vínculo do dragão (o aviso «🐉 Bond with …: n/3 (motivo)») ----------
+const TR870_MOTIVO={'duelo':['duel',null]};
+function tr870Motivo(m){try{if(typeof m!=='string'||!TR870.duelo)return m;const L=tr870Lingua();if(L==='pt')return m;const t=TR870_MOTIVO[m];const v=t&&t[L==='en'?0:1];if(v){TR870.stats.motivo++;return v;}}catch(e){tr870Erro('motivo',e);}return m;}
+if(TR870.duelo&&typeof drgpGanha==='function'){
+  try{const dg0=drgpGanha;drgpGanha=function(id,n,motivo){const a=Array.prototype.slice.call(arguments);if(a.length>2)a[2]=tr870Motivo(a[2]);return dg0.apply(this,a);};
+    try{if(window.__dragpoder201)window.__dragpoder201.ganha=drgpGanha;}catch(e){}}catch(e){tr870Erro('drgpGanha',e);}
+}
+// ---------- (4) atributos da tela de abertura e do retrato (no HTML estático, antes deste script) ----------
+function tr870Abertura(){let n=0;try{if(!TR870.abre)return 0;const L=tr870Lingua();if(L==='pt')return 0;
+    const troca=(id,attr,pt,en,es)=>{try{const el=document.getElementById(id);if(!el||el.getAttribute(attr)!==pt)return;const t=L==='en'?en:es;if(t&&t!==pt){el.setAttribute(attr,t);n++;}}catch(e){tr870Erro('abertura '+id,e);}};
+    troca('load','aria-label','Carregando','Loading','Cargando');
+    troca('loadTrack424','aria-label','Progresso da etapa atual','Progress of the current stage','Progreso de la etapa actual');
+    troca('retImg','alt','Retrato da cena','Portrait of the scene','Retrato de la escena');
+  }catch(e){tr870Erro('abertura',e);}TR870.stats.abertura+=n;return n;}
+tr870Abertura();
+window.__traducao870={estado:TR870,stats:TR870.stats,erros:TR870.erros,dic:TR870_DIC,inimigos:TR870_INI,motivos:TR870_MOTIVO,aplicaInimigos:tr870Inimigos,trofeus:tr870Trofeus,motivo:tr870Motivo,abertura:tr870Abertura,lingua:tr870Lingua};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
