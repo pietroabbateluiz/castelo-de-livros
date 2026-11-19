@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v871</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v872</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -59592,7 +59592,7 @@ async function travel434Prepare(scene,revision=PERF130.revision,doorways=true){
  // the camera blocker list belonging to the currently visible scene.
  const meshes=[];scene.traverseVisible(o=>{if(!o.isMesh||!o.geometry||o.isSkinnedMesh||o.userData.noCam||o.userData.portal||o.userData.dynamic434)return;for(let parent=o.parent;parent&&parent!==scene;parent=parent.parent)if(parent===READER.g||parent.userData.noCam||parent.userData.dynamic434)return;meshes.push(o);});
  deadline=performance.now()+1.25;
- for(const mesh of meshes){camBvh190(mesh.geometry);if(performance.now()>=deadline){await travel434Yield();prepCheck131(revision);deadline=performance.now()+1.25;}}
+ for(const mesh of meshes){if(!(typeof me872BvhPula==='function'&&me872BvhPula(mesh)))camBvh190(mesh.geometry);if(performance.now()>=deadline){await travel434Yield();prepCheck131(revision);deadline=performance.now()+1.25;}}
  await gpuReady130(revision);prepCheck131(revision);
  QUIET434.prepared.set(scene,revision+'|'+key);if(GPU_FRACA&&!doorways){if(window.__port670)window.__port670.pronto(scene,key);}else SCENE_READY133.set(scene,key);
  if(doorways){const sources=new Set(PORTALS.filter(p=>p.sceneA===scene&&p.sceneB&&p.sceneB!==scene).map(p=>p.sceneB));for(const source of sources){await travel434Prepare(source,revision,false);prepCheck131(revision);}}
@@ -113665,6 +113665,266 @@ window.__rosa871={estado:RO871,stats:RO871.stats,erros:RO871.erros,casa:ro871Cas
 const LB871={on:!/[?&#]lobo871=0/i.test(location.search+location.hash),tirado:0};
 function lb871SemLobo(){try{if(!LB871.on)return false;LB871.tirado++;return true;}catch(e){return false;}}
 window.__lobo871={estado:LB871};
+
+/* ===================== v872 · MEMÓRIA: AS REDUÇÕES SEGURAS DO RELATÓRIO DE HEAP (bloco `ME872`) =====================
+   Pedido do Luiz (19/11, «ok, siga com todos»): as reduções de memória do relatório de heap da v868 (análise só de leitura do código) que
+   não mudam a imagem. A imagem fica idêntica. O achado lateral (o teto de 1024 px do Leve/Papel, que se desfaz na 1.ª entrada de cada
+   sala) está pronto, mas vem DESLIGADO: ligado, as telas grandes ficariam pela metade dentro das salas no Leve/Papel — é decisão do Luiz
+   (`?teto872=1` liga; ver «teto» abaixo).
+   COMO ERA:
+   (1) `cat217Juntar` (as células dos pátios da Histórica, v217) alocava cada atributo para TODOS os vértices das peças do balde
+       (`new Float32Array(maxV*it)`) e guardava só o começo com `subarray`: a vista prendia o buffer inteiro, em cada balde
+       (material × faixa sul/meio/norte) — dezenas de MB só na Histórica;
+   (2) `state354` (acabamento de tapetes e paredes, v354) guardava a tela ORIGINAL como chave de `Map` forte (`textures`, `cloth`)
+       depois de trocá-la pela cópia tecida: em todas as salas, W×H×4 por original que só o Map segurava;
+   (3) as trocas de textura da Biblioteca e do Fliperama do Acumulador/Minha Sala (v592, v597, v600, v603, v605, v610) punham a textura
+       nova no material (as outras soltavam a velha da placa com `dispose`; o `bb592Materiais` da v592 não solta), mas o `T160.cache` (chaves `t:`) e o `BB592.dam` continuavam segurando
+       a tela velha (≈ 19 MB: papel de parede, parquet e os dois tapetes persas antigos, o damasco da v592, laterais, quadros, quiosque);
+   (4) a BVH da câmera (`camBvh190`) guardava os triângulos em `Uint32Array` (12 B/tri) mesmo com menos de 65 536 vértices, montava um
+       temporário `TV` do mesmo tamanho, e o `travel434Prepare` montava BVH para toda malha visível — também as que a colisão da câmera
+       nunca usa (transparentes, menores que 0,35 m, da FUSÃO, efeitos: o filtro `camAceita190` da lista de colisão);
+   (8) as copas distantes da Fantasia: 16 lotes por camada, cada `InstancedMesh` alocado com a contagem da camada inteira (matriz 64 B +
+       cor 12 B por instância) e usando ~1/16 (≈ 1 MB parado);
+   (teto) no Leve/Papel, o teto de 1024 px da v198 (`memReduz`) se desfazia na 1.ª entrada de cada sala: o `setActive` chama o
+       `refineAssetsV118`, que faz `needsUpdate` em toda textura nova (para valer o filtro anisotrópico e o mipmap), e o `memReduz` lia
+       essa mudança de versão como «o autor redesenhou a tela» (relógio, letreiro vivo): devolvia a fonte inteira à placa, a cópia reduzida
+       virava lixo e a textura ficava marcada como dinâmica para sempre (no Papel, o `aniso206` do `papelTex` fazia o mesmo).
+   AGORA:
+   (1) `cat217Juntar` conta os vértices de cada balde antes de alocar (a mesma regra de mapa da montagem) e aloca o tamanho exato — sem
+       `subarray`, sem buffer de sobra e sem cópia extra; a geometria sai idêntica (mesma ordem de vértices e índices);
+   (2) `textures` e `cloth` da v354 viram `WeakMap` (só se usa get/set: ninguém itera, usa `.size` nem `.delete`); as entradas que já
+       existiam (os halls) são copiadas; um original que só o mapa segurava sai no próximo GC;
+   (3) logo depois de cada troca (v592, v597, v600, v603, v605, v610), a chave `t:` do `T160.cache` que aponta para a textura velha sai
+       do cache — só se nenhum material do cache ainda a usar — e o `BB592.dam` (o damasco da v592, substituído pelo da v610) é solto;
+   (4) BVH da câmera: `Uint16Array` quando o índice cabe (≤ 65 535 vértices), sem o temporário `TV` (a mesma ordem de Morton, os mesmos
+       blocos: o raio dá o mesmo resultado); a TROCA do `troca872.py` faz o `travel434Prepare` pular as malhas que o `camAceita190`
+       recusa (a lista da colisão nunca as consulta; se uma geometria for pedida, a BVH é montada na hora, como antes);
+   (8) logo depois do `ForestWorkshop.greatTreeLife`, cada lote das copas distantes fica com a matriz e a cor do tamanho da contagem
+       real (cópia das instâncias usadas, antes de ir à placa); o embaralhamento da v239 e o Papel só mexem dentro da contagem;
+   (teto) o `needsUpdate` feito DENTRO do `refineAssetsV118` ou do `aniso206` (só parâmetros: filtro, mipmap, anisotropia) sobre uma
+       textura já reduzida e em dia passa a atualizar a versão guardada pelo `memReduz` — a imagem continua a reduzida —, desde que a
+       tela-fonte não tenha sido desenhada desde a redução (o contexto 2D da fonte é vigiado; se foi, nada muda: o `memReduz` devolve a
+       fonte como antes). Uma textura mantida assim que o autor redesenha depois (desenho na fonte ou `needsUpdate` fora do refine) volta
+       NA HORA à fonte viva e fica dinâmica — o mesmo que o `memReduz` faria na passada seguinte, sem quadro congelado. Texturas que
+       compartilham a mesma fonte, reduzidas na mesma passada, compartilham a cópia reduzida (sem isso, cada cópia de textura teria a
+       sua e o TX846 não poderia juntá-las na placa).
+       O que o jogador vê: no Leve/Papel (e com `MUNDO_TEX_CAP`), as telas com lado maior que 1024 px ficam pela metade (ou um quarto)
+       dentro das salas — céus 2048 × 1024 → 1024 × 512, tapetes 1280 × 1920 → 640 × 960 etc. —, como já ficavam no hall e pelas portas;
+       os textos até 2 MP (v843, `semTeto`), as capas, as texturas de dados/cubo/vídeo e as telas vivas continuam inteiros. No Alto nada
+       muda (não há teto). Custo: a cópia reduzida fica no heap (+¼ da fonte por textura mantida); ganho: −¾ da textura na placa.
+   Itens 5, 6, 7, 9 e 10 do relatório: não entram (ver RELATORIO.md: FUSÃO precisa medir FPS; céus/lustres e o clone da v526 têm
+   caminhos que religam ou mexem nas instâncias; o 9 só baixa pico; o 10 mexe em obstáculos e animações por sala).
+   Chaves: `?memoria872=0` (tudo), `?juntar872=0` (1), `?fraco872=0` (2), `?caches872=0` (3), `?bvh872=0` (4, inclui o filtro),
+   `?bvhfiltro872=0` (só o filtro do travel434Prepare), `?copas872=0` (8); o teto vem desligado (`?teto872=1` liga, para o Luiz decidir).
+   Gancho `window.__memoria872` (estado, stats, erros, resumo()). Os contadores de bytes são estimativas (telas: W×H×4); «coletados» conta
+   o que o GC de fato levou (FinalizationRegistry). TROCA: `troca872.py` (o laço de BVH do `travel434Prepare`). */
+const ME872_Q=location.search+location.hash;
+const ME872={on:!/[?&#]memoria872=0/i.test(ME872_Q),erros:[],stats:{
+  juntar:{baldes:0,vertices:0,verticesAntes:0,bytesPoupados:0,recaidas:0},
+  fraco:{convertidos:0,originais:0,bytesOriginais:0,soltosNaConversao:0,bytesSoltosNaConversao:0,coletados:0,bytesColetados:0},
+  caches:{trocas:0,texturas:0,bytesSoltos:0,emUso:0,bb592dam:0,chaves:[],coletados:0,bytesColetados:0},
+  bvh:{construidas:0,u16:0,bytesPoupadosU16:0,temporarioPoupado:0,puladas:0,bytesPulados:0},
+  copas:{lotes:0,instancias:0,bytesPoupados:0},
+  teto:{reduzidas:0,mantidas:0,bytesCopiasMantidas:0,bytesPlacaPoupados:0,recusadasFonteDesenhada:0,devolvidasAutor:0,devolvidasDesenho:0,partilhadas:0,bytesPartilha:0}}};
+ME872.juntar=ME872.on&&!/[?&#]juntar872=0/i.test(ME872_Q);ME872.fraco=ME872.on&&!/[?&#]fraco872=0/i.test(ME872_Q);
+ME872.caches=ME872.on&&!/[?&#]caches872=0/i.test(ME872_Q);ME872.bvh=ME872.on&&!/[?&#]bvh872=0/i.test(ME872_Q);
+ME872.bvhFiltro=ME872.bvh&&!/[?&#]bvhfiltro872=0/i.test(ME872_Q);ME872.copas=ME872.on&&!/[?&#]copas872=0/i.test(ME872_Q);
+ME872.teto=ME872.on&&/[?&#]teto872=1/i.test(ME872_Q);
+function me872Erro(k,e){try{if(ME872.erros.length<40)ME872.erros.push(k+': '+(e&&e.message||e));console.warn('v872',k,e);}catch(x){}}
+// bytes de uma tela (as telas fora do DOM ficam na CPU desde a v816: W×H×4)
+function me872Px(im){try{if(!im)return 0;const w=im.width||im.naturalWidth||0,h=im.height||im.naturalHeight||0;return Math.round(w*h*4)||0;}catch(e){return 0;}}
+// o que o GC de fato levou (só conta; não segura nada)
+const ME872_FR=(typeof FinalizationRegistry==='function')?new FinalizationRegistry(v=>{try{const s=ME872.stats[v.i];if(s){s.coletados++;s.bytesColetados+=v.b;}}catch(e){}}):null;
+function me872Vigia(obj,item,bytes){try{if(ME872_FR&&obj&&typeof obj==='object')ME872_FR.register(obj,{i:item,b:bytes||0});}catch(e){}}
+
+// ---------- (1) células dos pátios da Histórica: alocação do tamanho exato ----------
+const ME872_JUNTAR0=typeof cat217Juntar==='function'?cat217Juntar:null;
+function me872Juntar(partes){ // partes: [{m, bandas(Uint8Array por triângulo), bd}] — a mesma saída do cat217Juntar da v217
+  const nomes=[];for(const n of ['position','normal','uv','color']){if(partes.every(p=>p.m.geometry.attributes[n]))nomes.push(n);}
+  let maxV=0,nI=0;for(const p of partes){maxV+=p.m.geometry.attributes.position.count;for(let t=0;t<p.bandas.length;t++)if(p.bandas[t]===p.bd)nI+=3;}
+  // 1.ª passada: os vértices distintos de cada peça dentro da faixa (a mesma regra do mapa da 2.ª passada, peça por peça)
+  let nV=0;
+  for(const p of partes){const g=p.m.geometry,P=g.attributes.position,ind=g.index?g.index.array:null;const vis=new Int32Array(P.count).fill(-1);const nT=p.bandas.length;
+    for(let t=0;t<nT;t++){if(p.bandas[t]!==p.bd)continue;for(let k=0;k<3;k++){const src=ind?ind[t*3+k]:t*3+k;if(vis[src]<0){vis[src]=0;nV++;}}}}
+  const out={};for(const n of nomes){const it=partes[0].m.geometry.attributes[n].itemSize;out[n]={it,arr:new Float32Array(nV*it)};}
+  // 2.ª passada: idêntica à da v217
+  const idx=new Uint32Array(nI);let vo=0,io=0;const V=new THREE.Vector3(),NM=new THREE.Matrix3();
+  for(const p of partes){const g=p.m.geometry,P=g.attributes.position,ind=g.index?g.index.array:null;const map=new Int32Array(P.count).fill(-1);const M=p.m.matrixWorld;const ident=M.equals(new THREE.Matrix4());if(!ident)NM.getNormalMatrix(M);
+    const nT=p.bandas.length;
+    for(let t=0;t<nT;t++){if(p.bandas[t]!==p.bd)continue;for(let k=0;k<3;k++){const src=ind?ind[t*3+k]:t*3+k;let dst=map[src];
+        if(dst<0){dst=vo++;map[src]=dst;for(const n of nomes){const A=g.attributes[n],o=out[n];const it=o.it;
+            if(n==='position'&&!ident){V.fromBufferAttribute(A,src).applyMatrix4(M);o.arr[dst*3]=V.x;o.arr[dst*3+1]=V.y;o.arr[dst*3+2]=V.z;}
+            else if(n==='normal'&&!ident){V.fromBufferAttribute(A,src).applyMatrix3(NM).normalize();o.arr[dst*3]=V.x;o.arr[dst*3+1]=V.y;o.arr[dst*3+2]=V.z;}
+            else{for(let q=0;q<it;q++)o.arr[dst*it+q]=A.array[src*it+q];}}}
+        idx[io++]=dst;}}}
+  if(vo!==nV)throw new Error('contagem de vértices '+vo+' ≠ '+nV);
+  const geo=new THREE.BufferGeometry();for(const n of nomes){const o=out[n];geo.setAttribute(n,new THREE.BufferAttribute(o.arr,o.it));}
+  geo.setIndex(new THREE.BufferAttribute(vo>65535?idx:Uint16Array.from(idx),1));geo.computeBoundingBox();geo.computeBoundingSphere();
+  let its=0;for(const n of nomes)its+=out[n].it;const S=ME872.stats.juntar;S.baldes++;S.vertices+=vo;S.verticesAntes+=maxV;S.bytesPoupados+=(maxV-vo)*its*4;
+  return geo;}
+if(ME872.juntar&&ME872_JUNTAR0){
+  try{cat217Juntar=function(partes){try{return me872Juntar(partes);}catch(e){ME872.stats.juntar.recaidas++;me872Erro('juntar',e);return ME872_JUNTAR0.apply(this,arguments);}};}catch(e){me872Erro('juntar0',e);}
+}
+
+// ---------- (2) os mapas da v354 viram WeakMap ----------
+function me872Original354(nome,k,v){return nome==='textures'?!!(v&&v.image&&v.image!==k):(v!==k);} // a chave é a tela original (não a cópia tecida)
+function me872ImagensEmUso(){const S=new Set();try{for(const sc of allScenes())for(const t of memTexturasDe(sc))if(t&&t.image)S.add(t.image);}catch(e){}return S;}
+function me872Fraca(S){
+  try{if(!S||typeof S!=='object')return S;
+    for(const nome of ['textures','cloth']){const M=S[nome];if(!(M instanceof Map))continue;
+      const W=new WeakMap(),st=ME872.stats.fraco;let emUso=null;
+      for(const [k,v] of M){if(k===null||(typeof k!=='object'&&typeof k!=='function'))continue;WeakMap.prototype.set.call(W,k,v);st.convertidos++;
+        if(me872Original354(nome,k,v)){const b=me872Px(k);st.originais++;st.bytesOriginais+=b;me872Vigia(k,'fraco',b);
+          if(emUso===null)emUso=me872ImagensEmUso();if(!emUso.has(k)){st.soltosNaConversao++;st.bytesSoltosNaConversao+=b;}}}
+      // o weave354/wall354 só fazem get/set: o set conta os originais novos (para o resumo) e recusa chave que não seja objeto (nunca acontece)
+      W.set=function(k,v){if(k===null||(typeof k!=='object'&&typeof k!=='function'))return this;
+        try{if(me872Original354(nome,k,v)&&!WeakMap.prototype.has.call(this,k)){const b=me872Px(k),st2=ME872.stats.fraco;st2.originais++;st2.bytesOriginais+=b;me872Vigia(k,'fraco',b);}}catch(e){}
+        return WeakMap.prototype.set.call(this,k,v);};
+      S[nome]=W;}
+  }catch(e){me872Erro('fraco',e);}
+  return S;}
+if(ME872.fraco&&typeof state354==='function'){
+  try{const s0=state354;state354=function(){return me872Fraca(s0.apply(this,arguments));};}catch(e){me872Erro('state354',e);}
+  try{if(window.__architecture354)me872Fraca(window.__architecture354);}catch(e){me872Erro('fraco início',e);}
+}
+
+// ---------- (3) caches que seguravam as texturas trocadas ----------
+const ME872_SLOTS=['map','normalMap','roughnessMap','emissiveMap','bumpMap','alphaMap','aoMap','metalnessMap','lightMap','specularMap'];
+const me872EhMat=k=>typeof k==='string'&&k.charCodeAt(0)===109&&k.charCodeAt(1)===58; // 'm:'
+const me872EhTex=k=>typeof k==='string'&&k.charCodeAt(0)===116&&k.charCodeAt(1)===58; // 't:'
+// retrato (material, slot, textura) de todos os materiais do T160.cache antes da troca
+function me872Retrato(){const L=[];try{if(typeof T160==='undefined'||!T160.cache)return L;for(const [k,m] of T160.cache){if(!me872EhMat(k)||!m||!m.isMaterial)continue;for(const s of ME872_SLOTS){const t=m[s];if(t&&t.isTexture)L.push(m,s,t);}}}catch(e){me872Erro('retrato',e);}return L;}
+function me872Solta(L,onde){
+  try{if(!L||!L.length)return;const velhas=new Set();for(let i=0;i<L.length;i+=3){if(L[i][L[i+1]]!==L[i+2])velhas.add(L[i+2]);}
+    if(!velhas.size)return;const C=T160.cache,S=ME872.stats.caches;S.trocas++;
+    // tudo o que os materiais do cache usam agora: uma textura velha que ainda aparece em algum material fica (soltar a chave não soltaria a tela)
+    const usadas=new Set();for(const [k,m] of C){if(!me872EhMat(k)||!m||!m.isMaterial)continue;for(const s of ME872_SLOTS){const t=m[s];if(t&&t.isTexture)usadas.add(t);}}
+    for(const [k,v] of C){if(!me872EhTex(k)||!velhas.has(v))continue;
+      if(usadas.has(v)){S.emUso++;continue;}
+      C.delete(k);const b=me872Px(v.image);S.texturas++;S.bytesSoltos+=b;if(S.chaves.length<40)S.chaves.push(onde+' '+k.slice(2));me872Vigia(v.image,'caches',b);}
+    // o damasco da v592 (mapa + relevo), trocado pelo da v610: o BB592.dam é o único que ainda o segurava
+    if(typeof BB592!=='undefined'&&BB592&&BB592.dam){const D=BB592.dam,ts=[D.map,D.normalMap].filter(Boolean);
+      if(ts.some(t=>velhas.has(t))&&!ts.some(t=>usadas.has(t))){let b=0;for(const t of ts){const bt=me872Px(t.image);b+=bt;me872Vigia(t.image,'caches',bt);}BB592.dam=null;S.bb592dam++;S.texturas+=ts.length;S.bytesSoltos+=b;if(S.chaves.length<40)S.chaves.push(onde+' BB592.dam');}}
+  }catch(e){me872Erro('solta '+onde,e);}}
+function me872Troca(f0,onde,quando){return function(){let L=null;try{if(ME872.caches&&(!quando||quando()))L=me872Retrato();}catch(e){}try{return f0.apply(this,arguments);}finally{if(L)me872Solta(L,onde);}};}
+if(ME872.caches&&typeof T160!=='undefined'&&T160&&T160.cache){
+  try{if(typeof bb592Materiais==='function')bb592Materiais=me872Troca(bb592Materiais,'v592');}catch(e){me872Erro('v592',e);}
+  try{if(typeof ar597Aplica==='function')ar597Aplica=me872Troca(ar597Aplica,'v597',()=>typeof AR597==='undefined'||!AR597.feito);}catch(e){me872Erro('v597',e);}
+  try{if(typeof qu600Aplica==='function')qu600Aplica=me872Troca(qu600Aplica,'v600',()=>typeof QU600==='undefined'||!QU600.feito);}catch(e){me872Erro('v600',e);}
+  try{if(typeof qi603Aplica==='function')qi603Aplica=me872Troca(qi603Aplica,'v603',()=>typeof QI603==='undefined'||!QI603.feito);}catch(e){me872Erro('v603',e);}
+  try{if(typeof gl605Aplica==='function')gl605Aplica=me872Troca(gl605Aplica,'v605',()=>typeof GL605==='undefined'||!GL605.feito);}catch(e){me872Erro('v605',e);}
+  try{if(typeof tx610Aplica==='function')tx610Aplica=me872Troca(tx610Aplica,'v610',()=>typeof TX610==='undefined'||!TX610.feito);}catch(e){me872Erro('v610',e);}
+}
+
+// ---------- (4) BVH da câmera: Uint16 quando cabe, sem o temporário; o travel434Prepare pula o que a colisão recusa ----------
+const ME872_BVH0=typeof camBvh190==='function'?camBvh190:null;
+function me872Bvh(g){const pos=g&&g.attributes&&g.attributes.position;if(!pos||pos.isInterleavedBufferAttribute||pos.itemSize!==3)return null;const I=g.index?g.index.array:null;const nIdx=g.index?g.index.count:pos.count;
+  let b=CAMBVH190.get(g);if(b&&b.v===pos.version&&b.n===pos.count&&b.ni===nIdx&&b.iv===(g.index?g.index.version:-1))return b;
+  const P=pos.array,nt=(nIdx/3)|0;const cx=new Float32Array(nt),cy=new Float32Array(nt),cz=new Float32Array(nt);let x0=1e30,y0=1e30,z0=1e30,x1=-1e30,y1=-1e30,z1=-1e30;
+  for(let t=0;t<nt;t++){const a=I?I[t*3]:t*3,bb=I?I[t*3+1]:t*3+1,c=I?I[t*3+2]:t*3+2;const x=(P[a*3]+P[bb*3]+P[c*3])/3,y=(P[a*3+1]+P[bb*3+1]+P[c*3+1])/3,z=(P[a*3+2]+P[bb*3+2]+P[c*3+2])/3;cx[t]=x;cy[t]=y;cz[t]=z;if(x<x0)x0=x;if(y<y0)y0=y;if(z<z0)z0=z;if(x>x1)x1=x;if(y>y1)y1=y;if(z>z1)z1=z;}
+  const sx=1023/Math.max(1e-6,x1-x0),sy=1023/Math.max(1e-6,y1-y0),sz=1023/Math.max(1e-6,z1-z0);const esp=(v)=>{v&=1023;v=(v|(v<<16))&0x030000FF;v=(v|(v<<8))&0x0300F00F;v=(v|(v<<4))&0x030C30C3;v=(v|(v<<2))&0x09249249;return v;};
+  const code=new Uint32Array(nt),ord=new Array(nt);for(let t=0;t<nt;t++){code[t]=(esp((cx[t]-x0)*sx)|(esp((cy[t]-y0)*sy)<<1)|(esp((cz[t]-z0)*sz)<<2))>>>0;ord[t]=t;}ord.sort((u,v)=>code[u]-code[v]);
+  // os triângulos na ordem de Morton, direto do índice (sem o TV); Uint16 se todo índice couber
+  let T=pos.count<=65535?new Uint16Array(nt*3):null;
+  if(T){for(let k=0;k<nt;k++){const t=ord[k];const a=I?I[t*3]:t*3,bb=I?I[t*3+1]:t*3+1,c=I?I[t*3+2]:t*3+2;if(!(a>=0&&a<=65535&&bb>=0&&bb<=65535&&c>=0&&c<=65535)){T=null;break;}T[k*3]=a;T[k*3+1]=bb;T[k*3+2]=c;}}
+  if(!T){T=new Uint32Array(nt*3);for(let k=0;k<nt;k++){const t=ord[k];T[k*3]=I?I[t*3]:t*3;T[k*3+1]=I?I[t*3+1]:t*3+1;T[k*3+2]=I?I[t*3+2]:t*3+2;}}
+  const CH=48,nc=Math.ceil(nt/CH),BX=new Float32Array(nc*6);
+  for(let c=0;c<nc;c++){let a0=1e30,b0=1e30,c0=1e30,a1=-1e30,b1=-1e30,c1=-1e30;for(let k=c*CH,f=Math.min(nt,k+CH);k<f;k++)for(let j=0;j<3;j++){const v=T[k*3+j]*3,x=P[v],y=P[v+1],z=P[v+2];if(x<a0)a0=x;if(y<b0)b0=y;if(z<c0)c0=z;if(x>a1)a1=x;if(y>b1)b1=y;if(z>c1)c1=z;}
+    BX[c*6]=a0;BX[c*6+1]=b0;BX[c*6+2]=c0;BX[c*6+3]=a1;BX[c*6+4]=b1;BX[c*6+5]=c1;}
+  b={v:pos.version,n:pos.count,ni:nIdx,iv:g.index?g.index.version:-1,P,T,BX,nt,nc,CH};CAMBVH190.set(g,b);
+  const S=ME872.stats.bvh;S.construidas++;S.temporarioPoupado+=nt*12;if(T.BYTES_PER_ELEMENT===2){S.u16++;S.bytesPoupadosU16+=nt*6;}
+  return b;}
+if(ME872.bvh&&ME872_BVH0&&typeof CAMBVH190!=='undefined'){
+  try{camBvh190=function(g){try{return me872Bvh(g);}catch(e){me872Erro('bvh',e);return ME872_BVH0.apply(this,arguments);}};}catch(e){me872Erro('bvh0',e);}
+}
+// chamada pela TROCA no laço de BVH do travel434Prepare: true = não montar a BVH desta malha agora
+const ME872_PULADAS=new WeakSet();
+function me872BvhPula(o){if(!ME872.bvhFiltro)return false;
+  try{if(typeof camAceita190!=='function'||!o||camAceita190(o))return false;const g=o.geometry;
+    if(g&&typeof CAMBVH190!=='undefined'&&!CAMBVH190.has(g)&&!ME872_PULADAS.has(g)){ME872_PULADAS.add(g);const pos=g.attributes&&g.attributes.position;const nt=((g.index?g.index.count:(pos?pos.count:0))/3)|0;
+      const S=ME872.stats.bvh;S.puladas++;S.bytesPulados+=nt*3*((ME872.bvh&&pos&&pos.count<=65535)?2:4)+Math.ceil(nt/48)*24;}
+    return true;}catch(e){return false;}}
+
+// ---------- (8) copas distantes da Fantasia: cada lote com o tamanho da contagem real ----------
+function me872CopasEm(raiz){let n=0;raiz.traverse(o=>{if(!o.isInstancedMesh||!/^(Copas distantes|Distant canopies)/.test(o.name||''))return;const c=o.count,im=o.instanceMatrix;
+    if(!im||!im.array||im.itemSize!==16||!(c>0)||im.count<=c)return;
+    const T=THREE,nm=new T.InstancedBufferAttribute(im.array.slice(0,c*16),16);nm.usage=im.usage;let b=(im.array.length-c*16)*im.array.BYTES_PER_ELEMENT;o.instanceMatrix=nm;
+    const ic=o.instanceColor;if(ic&&ic.array&&ic.count>c){const nc=new T.InstancedBufferAttribute(ic.array.slice(0,c*ic.itemSize),ic.itemSize);nc.usage=ic.usage;b+=(ic.array.length-c*ic.itemSize)*ic.array.BYTES_PER_ELEMENT;o.instanceColor=nc;}
+    const S=ME872.stats.copas;S.lotes++;S.instancias+=c;S.bytesPoupados+=b;n++;});return n;}
+function me872Copas(sc){if(!ME872.copas||!sc)return 0;
+  try{let n=0;const vistas=sc.children.filter(o=>/^(Floresta distante|Distant forest)/.test(o.name||''));for(const v of vistas)n+=me872CopasEm(v);if(!vistas.length)n+=me872CopasEm(sc);return n;}catch(e){me872Erro('copas',e);return 0;}}
+if(ME872.copas){
+  // logo depois de criadas (dentro do build_fant, antes de qualquer envio à placa)
+  try{const FW=window.ForestWorkshop;if(FW&&typeof FW.greatTreeLife==='function'){const g0=FW.greatTreeLife;FW.greatTreeLife=function(scene){const r=g0.apply(this,arguments);try{me872Copas(scene);}catch(e){me872Erro('copas',e);}return r;};}}catch(e){me872Erro('copas0',e);}
+  try{if(typeof ROOMS!=='undefined'&&ROOMS.fant&&ROOMS.fant.scene)me872Copas(ROOMS.fant.scene);}catch(e){}
+}
+
+// ---------- (teto) o teto de 1024 px do Leve/Papel não se desfaz com o needsUpdate de parâmetros ----------
+// estado do memReduz (v425): MEM425_IMAGES.get(textura) = {source, reduced, version, dynamic}
+const ME872_TETO={dentro:0,mantidas:new WeakMap(),marca:new WeakMap(),sujo:new WeakMap(),vigiadas:new WeakSet(),contadas:new WeakSet(),porFonte:new WeakMap(),passo:new Map(),limpeza:false,gancho:false};
+// a tela-fonte foi desenhada? (contador por tela, atualizado pelo contexto 2D da própria fonte)
+function me872TetoSuja(c){try{ME872_TETO.sujo.set(c,(ME872_TETO.sujo.get(c)||0)+1);const L=ME872_TETO.porFonte.get(c);if(!L)return;ME872_TETO.porFonte.delete(c);
+    // as texturas que o 872 mantinha reduzidas com esta fonte voltam já à fonte viva (o autor está desenhando)
+    for(const w of L){const t=w&&w.deref?w.deref():null;if(!t)continue;const st=MEM425_IMAGES.get(t);if(st&&ME872_TETO.mantidas.get(t)===st&&!st.dynamic&&st.reduced&&t.image===st.reduced){ME872_TETO.mantidas.delete(t);me872TetoDevolve(t,st);ME872.stats.teto.devolvidasDesenho++;}}}catch(e){me872Erro('teto suja',e);}}
+const ME872_DESENHO=['fillRect','clearRect','strokeRect','fillText','strokeText','drawImage','putImageData','fill','stroke','reset','drawFocusIfNeeded'];
+function me872TetoVigia(c){ // embrulha os métodos que pintam no contexto DESTA tela (só nas fontes de texturas reduzidas; o protótipo não muda)
+  if(ME872_TETO.vigiadas.has(c))return true;
+  try{const x=c.getContext('2d');if(!x)return false;
+    // chama o método do protótipo vigente na hora (os embrulhos da v843/v846, ou de quem vier depois, continuam valendo)
+    for(const nm of ME872_DESENHO){if(typeof x[nm]!=='function')continue;const proprio=Object.prototype.hasOwnProperty.call(x,nm)?x[nm]:null;
+      x[nm]=function(){me872TetoSuja(c);const f=proprio||Object.getPrototypeOf(x)[nm];return f.apply(this,arguments);};}
+    const desc=k=>{for(let p=Object.getPrototypeOf(c);p;p=Object.getPrototypeOf(p)){const d=Object.getOwnPropertyDescriptor(p,k);if(d)return d;}return null;};
+    for(const k of ['width','height']){const d0=desc(k);if(!d0||!d0.set||!d0.get)continue;
+      Object.defineProperty(c,k,{configurable:true,enumerable:!!d0.enumerable,get:function(){return desc(k).get.call(this);},set:function(v){me872TetoSuja(c);return desc(k).set.call(this,v);}});}
+    ME872_TETO.vigiadas.add(c);return true;}catch(e){me872Erro('teto vigia',e);return false;}}
+// o mesmo ramo «autor» do memReduz: a fonte viva, para sempre
+function me872TetoDevolve(t,st){t.image=st.source;t.needsUpdate=true;st.reduced=null;st.dynamic=true;st.version=t.version;if(t.userData)delete t.userData.mem198;}
+function me872TetoBump(t,st,v0){try{
+  if(MEM425_IMAGES.get(t)!==st||st.dynamic||!st.reduced||t.image!==st.reduced)return;
+  if(ME872_TETO.dentro>0){ // dentro do refineAssetsV118/aniso206: só parâmetros — a imagem continua a reduzida, se a fonte não mudou desde a redução
+    if(st.version!==v0)return; // já havia um needsUpdate de autor pendente: o memReduz decide, como antes
+    const m=ME872_TETO.marca.get(st);if(m===undefined)return; // fonte sem vigia (não deu para olhar o contexto): fica como antes
+    if(m!==(ME872_TETO.sujo.get(st.source)||0)){ME872.stats.teto.recusadasFonteDesenhada++;return;}
+    st.version=t.version;
+    if(ME872_TETO.mantidas.get(t)!==st){ME872_TETO.mantidas.set(t,st);const S=ME872.stats.teto;S.mantidas++;
+      // bytes contados uma vez por cópia reduzida (as cópias compartilhadas e o TX846 juntam as texturas da mesma tela na placa)
+      if(!ME872_TETO.contadas.has(st.reduced)){ME872_TETO.contadas.add(st.reduced);const br=me872Px(st.reduced),bs=me872Px(st.source);S.bytesCopiasMantidas+=br;S.bytesPlacaPoupados+=Math.round((bs-br)*4/3);}
+      if(typeof WeakRef==='function'){let L=ME872_TETO.porFonte.get(st.source);if(!L){L=[];ME872_TETO.porFonte.set(st.source,L);}L.push(new WeakRef(t));}}
+    return;}
+  if(ME872_TETO.mantidas.get(t)===st){ // needsUpdate de autor numa textura que só o 872 mantinha reduzida: a fonte viva já (o memReduz faria na próxima passada)
+    ME872_TETO.mantidas.delete(t);ME872.stats.teto.devolvidasAutor++;me872TetoDevolve(t,st);}
+}catch(e){me872Erro('teto',e);}}
+// depois de cada redução nova: vigia a fonte e compartilha a cópia com as texturas da mesma fonte reduzidas na mesma passada (síncrona)
+function me872TetoNova(t,st0){try{
+  const st=MEM425_IMAGES.get(t);if(!st||st===st0||st.dynamic||!st.reduced||t.image!==st.reduced||!st.source)return;
+  ME872.stats.teto.reduzidas++;
+  if(me872TetoVigia(st.source))ME872_TETO.marca.set(st,ME872_TETO.sujo.get(st.source)||0);
+  const w=st.reduced.width,h=st.reduced.height,P=ME872_TETO.passo;let L=P.get(st.source);
+  if(L){for(const e of L){if(e.w===w&&e.h===h&&e.c!==st.reduced){t.image=e.c;st.reduced=e.c;ME872.stats.teto.partilhadas++;ME872.stats.teto.bytesPartilha+=w*h*4;return;}}}
+  else{L=[];P.set(st.source,L);if(!ME872_TETO.limpeza){ME872_TETO.limpeza=true;const fim=()=>{ME872_TETO.passo.clear();ME872_TETO.limpeza=false;};try{queueMicrotask(fim);}catch(e){Promise.resolve().then(fim);}}}
+  L.push({w,h,c:st.reduced});
+}catch(e){me872Erro('teto nova',e);}}
+if(ME872.teto&&typeof MEM425_IMAGES!=='undefined'&&typeof memReduz==='function'&&typeof refineAssetsV118==='function'){
+  try{const r0=refineAssetsV118;refineAssetsV118=function(){ME872_TETO.dentro++;try{return r0.apply(this,arguments);}finally{ME872_TETO.dentro--;}};}catch(e){me872Erro('refine',e);}
+  try{if(typeof aniso206==='function'){const a0=aniso206;aniso206=function(){ME872_TETO.dentro++;try{return a0.apply(this,arguments);}finally{ME872_TETO.dentro--;}};}}catch(e){me872Erro('aniso206',e);}
+  try{const m0=memReduz;memReduz=function(t){const st0=t?MEM425_IMAGES.get(t):undefined;const r=m0.apply(this,arguments);if(r&&t)me872TetoNova(t,st0);return r;};}catch(e){me872Erro('memReduz',e);}
+  // o needsUpdate das texturas (encadeado ao da v843, que já embrulha o setter do protótipo)
+  try{const TP=THREE.Texture.prototype;let d=Object.getOwnPropertyDescriptor(TP,'needsUpdate');
+    if(d&&d.set){const s0=d.set;Object.defineProperty(TP,'needsUpdate',{configurable:true,enumerable:!!d.enumerable,get:d.get,set:function(v){let st=null,v0=0;
+        if(v===true){try{st=MEM425_IMAGES.get(this)||null;if(st&&(st.dynamic||!st.reduced||this.image!==st.reduced))st=null;if(st)v0=this.version;}catch(e){st=null;}}
+        s0.call(this,v);if(st)me872TetoBump(this,st,v0);}});ME872_TETO.gancho=true;}
+    else me872Erro('teto','sem o setter needsUpdate');}catch(e){me872Erro('needsUpdate',e);}
+}
+
+// ---------- gancho ----------
+function me872Resumo(){const S=ME872.stats;const mb=b=>+((b||0)/1048576).toFixed(2);
+  return {ligado:{juntar:ME872.juntar,fraco:ME872.fraco,caches:ME872.caches,bvh:ME872.bvh,bvhFiltro:ME872.bvhFiltro,copas:ME872.copas,teto:ME872.teto&&ME872_TETO.gancho},
+    mbHeapSoltos:{juntar:mb(S.juntar.bytesPoupados),fracoNaConversao:mb(S.fraco.bytesSoltosNaConversao),fracoColetados:mb(S.fraco.bytesColetados),caches:mb(S.caches.bytesSoltos),cachesColetados:mb(S.caches.bytesColetados),
+      bvhU16:mb(S.bvh.bytesPoupadosU16),bvhPuladas:mb(S.bvh.bytesPulados),copas:mb(S.copas.bytesPoupados),tetoCustoCopias:-mb(S.teto.bytesCopiasMantidas)},
+    mbPlacaPoupados:{teto:mb(S.teto.bytesPlacaPoupados)},texturasMantidasReduzidas:S.teto.mantidas,erros:ME872.erros.length};}
+window.__memoria872={estado:ME872,stats:ME872.stats,erros:ME872.erros,resumo:me872Resumo,teto:ME872_TETO,
+  juntar:me872Juntar,fraca:me872Fraca,retrato:me872Retrato,solta:me872Solta,bvh:me872Bvh,bvhPula:me872BvhPula,copas:me872Copas,
+  mantida:(t)=>{try{const st=MEM425_IMAGES.get(t);return !!(st&&ME872_TETO.mantidas.get(t)===st);}catch(e){return false;}}};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
