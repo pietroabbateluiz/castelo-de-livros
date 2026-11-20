@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v877</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v878</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -57977,7 +57977,7 @@ const QUILL413_ITEM={id:'pena_magica',cat:'Relíquias',slot:'pena413',nome:'Pena
 if(MASTER392.earned.colecionador&&!LOJA.itens.pena_magica)quill413Grant();
 function quill413Model(){const T=THREE,g=new T.Group(),K=t160Kit('Pena Mágica'),ivory=t160Std('413 pearl feather',0xe7dcf1,.62),plum=t160Std('413 plum feather',0x9d72bd,.64),gold=t160Std('413 golden nib',0xc8a65d,.35,.7);g.name='Pena Mágica · Acumulador de Histórias';K.cone(.034,.19,gold,0,-.10,0,8,0,0,Math.PI);K.tube([[0,0,0],[.03,.30,0],[.10,.68,0]],.014,gold,12,7);for(let i=0;i<22;i++)for(const side of [-1,1]){const y=.12+i*.023,len=.045+.14*Math.sin((i+1)/24*Math.PI),shape=new T.Shape();shape.moveTo(0,0);shape.quadraticCurveTo(side*len*.5,.06,side*len,.09);shape.quadraticCurveTo(side*len*.5,.035,0,.012);const m=i%5?ivory:plum;m.side=T.DoubleSide;K.add(new T.ShapeGeometry(shape,4),m,.025+y*.10,y,0);}K.tor(.035,.01,gold,0,.04,0,Math.PI*2,0,Math.PI/2,0,6,12);K.fim(g);return{g,mats:[ivory,plum,gold]};}
 CATALOG402.factories.set('new413:reliquias',{id:'new413:reliquias',name:'Relíquias mágicas',items:[{id:'quill413_decor',source:'new413:reliquias',name:'Pena Mágica · decoração',build:quill413Model}]});
-function quill413Scope(){if(CUR==='hall')return 'hall:'+HALLN;if(typeof DUNGEON395!=='undefined'&&DUNGEON395.active)return 'room:dungeon395';const key=Object.keys(ROOMS).find(k=>ROOMS[k]===ROOM);return key?'room:'+key:null;}
+function quill413Scope(){if(CUR==='hall')return 'hall:'+HALLN;if(typeof DUNGEON395!=='undefined'&&DUNGEON395.active)return 'room:dungeon395';const key=hi878Sala();return key?'room:'+key:null;}
 function quill413Valid(v){if(!v||typeof v.text!=='string'||!v.text.trim()||v.text.length>240||!/^#[\da-f]{6}$/i.test(v.color)||!Number.isInteger(v.font)||v.font<0||v.font>=QUILL413.fonts.length||!Number.isFinite(v.width)||v.width<.6||v.width>4)return false;if(v.pos&&(!Array.isArray(v.pos)||v.pos.length!==3||!v.pos.every(Number.isFinite)))return false;if(v.normal&&(!Array.isArray(v.normal)||v.normal.length!==3||!v.normal.every(Number.isFinite)||Math.abs(v.normal[1])>.45||Math.hypot(...v.normal)<.99))return false;return true;}
 function quill413Data(scope){if(!QUILL413.records.has(scope)){let data=[];try{data=JSON.parse(localStorage.getItem(SKEY('mundo.inscricoes413.'+scope))||'[]');}catch(e){}QUILL413.records.set(scope,Array.isArray(data)?data.filter(v=>quill413Valid(v)&&v.pos&&v.normal&&typeof v.id==='string').slice(0,80):[]);}return QUILL413.records.get(scope);}
 function quill413Save(scope){try{localStorage.setItem(SKEY('mundo.inscricoes413.'+scope),JSON.stringify(quill413Data(scope)));return true;}catch(e){showToast('Não foi possível salvar a inscrição neste navegador.');return false;}}
@@ -59402,7 +59402,7 @@ function oil428Spot(R,h){const [x0,x1,z0,z1]=h.box,nav=navFor(R.world),comp=navC
 function oil428Build(room){const R=ROOMS[room];if(!R)return;for(const h of OIL428.homes){if(h.room!==room||OIL428.items[h.id])continue;const at=oil428Spot(R,h);if(!at)continue;const g=oil428Model();g.name='Óleo Mecânico · '+text428(...h.name);g.position.set(at.x,ally428Floor(R,at.x,at.z)+.04,at.z);R.scene.add(g);OIL428.items[h.id]={g,at,h};}}
 function oil428Collect(item){const s=OIL428.save;if(!item||CUR!=='room'||ROOM!==ROOMS[item.h.room]||s.collected.includes(item.h.id))return false;const p=cavPos();if(Math.hypot(p.x-item.at.x,p.z-item.at.z)>1.05||Math.abs((p.fy||0)-ally428Floor(ROOM,item.at.x,item.at.z))>1)return false;if(!oil428Save({...s,collected:[...s.collected,item.h.id]}))return false;item.g.visible=false;showToast(text428('Óleo Mecânico encontrado! Entregue uma unidade a cada robô do hall.','Mechanical Oil found! Give one can to each hall robot.','¡Aceite Mecánico encontrado! Entrega una unidad a cada robot del vestíbulo.')+' '+OIL428.save.collected.length+'/6',{ms:6500});return true;}
 function oil428Crew(){if(CUR!=='hall'||HALLN!==6||OIL428.crew.length>=6)return;const R={scene:ACTIVE,world:WORLD,floorY:()=>0,spawn:{x:0,z:2.6}},i=OIL428.crew.length,id=OIL428.ids[i];let at=null;for(let j=0;j<48;j++){const a=i*Math.PI/3+j*.09,x=Math.sin(a)*6,z=Math.cos(a)*6;if(ally428Free(R,x,z,.75)&&OIL428.crew.every(k=>Math.hypot(k.x-x,k.z-z)>1.6)){at={x,z};break;}}if(!at)return;const m=a232Malha(id);if(!m)return;const g=new THREE.Group();m.position.set(0,0,0);delete m.userData.anim232;g.add(m);g.updateMatrixWorld(true);const box=new THREE.Box3().setFromObject(m),height=box.max.y-box.min.y;if(height>0){m.scale.multiplyScalar(1.65/height);m.position.y=-box.min.y*1.65/height;}g.position.set(at.x,0,at.z);R.scene.add(g);g.traverse(o=>{o.__fusaoMoveu=9;o.userData.papelKeepGeo=true;});const name=text428('Robô aliado ','Robot ally ','Robot aliado ')+(i+1),n=npcAdd('hall6',g,name,{genre:'ciencia',hall347:6,oil428:id});OIL428.crew.push({g,n,...at,id});}
-function oil428Tick(dt){OIL428.clock+=dt;if(OIL428.clock<.25)return;OIL428.clock=0;if(document.hidden)return;oil428Crew();if(CUR==='room'){const room=Object.keys(ROOMS).find(k=>ROOMS[k]===ROOM);if(OIL428.homes.some(h=>h.room===room))oil428Build(room);}for(const item of Object.values(OIL428.items)){item.g.visible=!OIL428.save.collected.includes(item.h.id);if(item.g.visible&&!uiBlocked()&&!CAV.morto)oil428Collect(item);}}
+function oil428Tick(dt){OIL428.clock+=dt;if(OIL428.clock<.25)return;OIL428.clock=0;if(document.hidden)return;oil428Crew();if(CUR==='room'){const room=hi878Sala();if(OIL428.homes.some(h=>h.room===room))oil428Build(room);}for(const item of Object.values(OIL428.items)){item.g.visible=!OIL428.save.collected.includes(item.h.id);if(item.g.visible&&!uiBlocked()&&!CAV.morto)oil428Collect(item);}}
 function oil428Install(){oil428Read();const lines=npcLines;npcLines=function(n){const id=oil428Robot(n);if(!id)return lines.apply(this,arguments);const ready=OIL428.save.given.includes(id);return {text:ready?text428('Recebi meu óleo. Vou ajudar você contra o Deus Tirânico Robô no sétimo andar.','I have my oil. I will help you against the Tyrannical Robot God on floor seven.','Ya tengo mi aceite. Te ayudaré contra el Dios Robot Tiránico en el séptimo piso.'):text428('Se você me trouxesse um Óleo Mecânico, eu poderia ajudar até contra o Deus Tirânico Robô. Cada robô precisa de uma unidade.','Bring me one Mechanical Oil can and I can help even against the Tyrannical Robot God. Each robot needs one can.','Si me trajeras un Aceite Mecánico, podría ayudarte incluso contra el Dios Robot Tiránico. Cada robot necesita una unidad.'),extra:text428('Procure nas casas: de colmo e da Clareira em Fantasia; do Tecelão, das Ervas, dos Pergaminhos e Pousada dos Viajantes em Histórica. Os seis aliados também esperam no hall do sexto andar.','Look inside the thatched and Clearing houses in Fantasy; the Weaver’s, Herbalist’s and Scroll houses and Travelers’ Inn in Historical. All six allies also wait in the floor-six hall.','Busca dentro de las casas de paja y del Claro en Fantasía; del Tejedor, de las Hierbas, de los Pergaminos y Posada de los Viajeros en Histórica. Los seis aliados también esperan en el vestíbulo del sexto piso.')+' · '+text428('Óleos na mochila: ','Oil cans carried: ','Aceites en la mochila: ')+oil428Count()+' · '+OIL428.save.given.length+'/6'};};const talk=npcTalk;npcTalk=function(n){document.getElementById('oil428Give')?.remove();const result=talk.apply(this,arguments),id=oil428Robot(n);if(NPC127.open&&id&&!OIL428.save.given.includes(id)){const b=document.createElement('button');b.id='oil428Give';b.type='button';b.textContent=text428('Entregar 1 Óleo Mecânico','Give 1 Mechanical Oil','Entregar 1 Aceite Mecánico');b.disabled=oil428Count()<1;b.style.cssText='padding:12px;margin:12px;background:#315459;color:#fff0c9;border:1px solid #caa763';b.onclick=()=>{if(oil428Give(n)){b.disabled=true;b.textContent=text428('Aliado recrutado','Ally recruited','Aliado reclutado');}};document.getElementById('npcDone').parentElement.append(b);}return result;};const tick=coinTick;coinTick=function(dt){tick.apply(this,arguments);oil428Tick(dt);};window.__oil428={state:OIL428,give:oil428Give,collect:oil428Collect,tick:oil428Tick};}
 oil428Install();
 
@@ -69526,7 +69526,7 @@ function rv530Registra(key){try{if(!RV530.on||RV530.rivais[key])return;const C=R
 function rv530Pena(k,def,cor,tam){try{const R=ROOM;const T=THREE;const g=new T.Group();const m=new T.Mesh(new T.ConeGeometry(tam||.09,.5,6),t160Brilho('530 pena '+cor,cor,1.4));m.rotation.x=Math.PI/2;g.add(m);const sp=rkSprite(g,cor,.6,.5,0,0,0);g.traverse(o=>{if(o.isMesh)o.raycast=()=>{};});
     const y0=k.g.position.y+1.1;g.position.set(k.x,y0,k.z);R.scene.add(g);const ty=(CH.fy||0)+1.0;let dx=CH.x-k.x,dz=CH.z-k.z,d=Math.hypot(dx,dz);const vel=9;const Tt=Math.max(.3,d/vel);const lx=CH.x+(CH.vx||0)*Tt*.7,lz=CH.z+(CH.vz||0)*Tt*.7;dx=lx-k.x;dz=lz-k.z;d=Math.hypot(dx,dz);const T2=Math.max(.3,d/vel);
     g.rotation.y=Math.atan2(dx,dz);CAV.ossos.push({g,x:k.x,y:y0,z:k.z,vx:dx/T2,vy:(ty-y0)/T2,vz:dz/T2,t:0,vida:T2+.6,grav:0,scene:R.scene});}catch(e){rv530Erro('pena',e);}}
-function rv530Tick(dt){try{if(!RV530.on||CUR!=='room'||!ROOM)return;const key=Object.keys(ROOMS).find(k=>ROOMS[k]===ROOM);if(!key)return;
+function rv530Tick(dt){try{if(!RV530.on||CUR!=='room'||!ROOM)return;const key=hi878Sala();if(!key)return;
     if(RV530.campos[key]&&!RV530.rivais[key]&&CAV.salas[key])rv530Registra(key);const RV=RV530.rivais[key];if(!RV)return;RV530.t+=dt;const t=RV530.t;
     const k=RV.k,k2=RV.k2,def=RV.def,R=ROOM,W=R.world;const fy=(x,z)=>(R.floorY?R.floorY(x,z):0);const bloq=CAV.morto||uiBlocked()||CH.sitting||document.hidden;
     const pl=cavPos();const px=pl.x,pz=pl.z;const noCampo=px>20.6;
@@ -69783,7 +69783,7 @@ function rv532Onda(R,x,y,z,cor,raio,vida){try{const T=THREE;const g=new T.Group(
     CAV.tiros.push({g,t:0,vida:vida||.7,tipo:'vento',scene:R.scene});}catch(e){rv532Erro('onda',e);}}
 function rv532Empurra(dx,dz){try{if(typeof MODE!=='undefined'&&MODE==='fp'&&typeof P!=='undefined'){P.x+=dx;P.z+=dz;return;}CH.x+=dx;CH.z+=dz;const W=ROOM&&ROOM.world;if(W&&W.clamp){const c=W.clamp(CH.x,CH.z,.4);CH.x=Array.isArray(c)?c[0]:c.x;CH.z=Array.isArray(c)?c[1]:c.z;}}catch(e){}}
 /* ---------- o combate (substitui rv530Tick) ---------- */
-function rv532Tick(dt){try{if(!RV530.on||CUR!=='room'||!ROOM)return;const key=Object.keys(ROOMS).find(k=>ROOMS[k]===ROOM);if(!key)return;
+function rv532Tick(dt){try{if(!RV530.on||CUR!=='room'||!ROOM)return;const key=hi878Sala();if(!key)return;
     if(RV530.campos[key]&&!RV530.rivais[key]&&CAV.salas[key])rv530Registra(key);const RV=RV530.rivais[key];if(!RV)return;RV530.t+=dt;const t=RV530.t;
     const k=RV.k,k2=RV.k2,def=RV.def,R=ROOM,W=R.world;const fy=(x,z)=>(R.floorY?R.floorY(x,z):0);const bloq=CAV.morto||uiBlocked()||CH.sitting||document.hidden;
     const pl=cavPos();const px=pl.x,pz=pl.z;const C=RV530.campos[key];const mur=C&&C.mur;const noCampo=(C&&C.box)?(px>C.box.x0&&px<C.box.x1&&pz>C.box.z0&&pz<C.box.z1):px>20.6;
@@ -70042,7 +70042,7 @@ if(DU535.on&&typeof RV532!=='undefined'&&RV532.on){
         else if(q.sono&&Math.hypot(o.x-pl.x,o.z-pl.z)<1.0&&Math.abs(o.y-(pl.fy+1))<1.6){delete o.rv535;o.t=o.vida;try{if(!DU535.sono){DU535.sono={v:CH.speed};CH.speed=CH.speed*.55;showToast('💤 '+co523T('Pó de sono: você fica mais lento por 2,5 s','Sleep dust: you move slower for 2.5 s','Polvo de sueño: te mueves más lento 2,5 s'),{ms:2500});}DU535.sonoT=2.5;}catch(e){}}}
       if(DU535.sono){DU535.sonoT-=dt;if(DU535.sonoT<=0){CH.speed=DU535.sono.v;DU535.sono=null;}}
       // se o rival morre a meio de um especial, a névoa e o anel do raio saem
-      const key=Object.keys(ROOMS).find(k=>ROOMS[k]===ROOM);const RV=key&&RV530.rivais[key];if(RV&&RV.k&&!RV.k.viva&&RV.k.esp){const E=RV.k.esp;try{if(E.anel)R.scene.remove(E.anel);const Z=RV530.campos[key]&&RV530.campos[key].cfg.rv532;if(Z)Z.nevoa=1;}catch(e){}RV.k.esp=null;}
+      const key=hi878Sala();const RV=key&&RV530.rivais[key];if(RV&&RV.k&&!RV.k.viva&&RV.k.esp){const E=RV.k.esp;try{if(E.anel)R.scene.remove(E.anel);const Z=RV530.campos[key]&&RV530.campos[key].cfg.rv532;if(Z)Z.nevoa=1;}catch(e){}RV.k.esp=null;}
     }catch(e){du535Erro('tick',e);}return r;};rv530Tick=rv532Tick;}catch(e){du535Erro('instalar tick',e);}
   window.__duelo535={estado:DU535,erros:DU535.erros,stats:DU535.stats,escolhe:rv535Escolhe,especial:rv535Especial,mordida:rv535Mordida,latido:rv535Latido,compEspecial:rv535CompEspecial};}else{window.__duelo535={estado:DU535,erros:DU535.erros,stats:DU535.stats};}
 try{if(typeof NOVIDADES198!=='undefined')NOVIDADES198.v535=co523T('⚔ Mais difícil até o 2.º andar: o golpe único fica só no Hall 1, inimigos com mais vida e mira, chefes mais resistentes e rápidos · todos os Campos dos Rivais à noite, com lampiões · cada rival e cada companheiro tem um poder especial próprio','⚔ Harder up to floor 2: the one-hit rule stays only in Hall 1, enemies with more health and aim, tougher and faster bosses · all Fields of Rivals at night, with lanterns · every rival and companion has a signature power','⚔ Más difícil hasta el 2.º piso: el golpe único solo en el Hall 1, enemigos con más vida y puntería, jefes más resistentes y rápidos · todos los Campos de los Rivales de noche, con farolas · cada rival y compañero tiene un poder propio');}catch(e){}
@@ -70161,7 +70161,7 @@ function rv536Campo(R,key){try{if(!CP536.on||!RV530.on||RV530.campos[key]||!R||!
     RV530.campos[key]={P:PL,cfg,ax:sp[0]-7,az:sp[1]+2,spawn:sp,mur,box,h:Z.h,T,portal,entrada,volta,yawCampo:Math.atan2(-Math.cos(T.ry),Math.sin(T.ry)),lado:1};RV530.stats.campos++;
     CP536.stats[key]=Object.assign(CP536.stats[key]||{},{portal:[+pt.x.toFixed(1),+pt.z.toFixed(1)],box:[+box.x0.toFixed(0),+box.x1.toFixed(0),+box.z0.toFixed(0),+box.z1.toFixed(0)]});}catch(e){cp536Erro('campo '+key,e);try{delete RV530.campos[key];}catch(x){}}}
 function rv536Teleporta(x,z,yaw){try{if(typeof MODE!=='undefined'&&MODE==='fp'&&typeof P!=='undefined'){P.x=x;P.z=z;if(yaw!==undefined)P.yaw=yaw-Math.PI;}CH.x=x;CH.z=z;CH.px=x;CH.pz=z;CH.vx=0;CH.vz=0;CH.target=null;try{if(typeof CAM!=='undefined'&&yaw!==undefined)CAM.yaw=yaw;}catch(e){}try{CH.fy=floorAt(x,z)||0;}catch(e){}try{syncP();}catch(e){}}catch(e){cp536Erro('teleporta',e);}}
-function rv536Tick(dt){try{if(!CP536.on||CUR!=='room'||!ROOM)return;CP536.tele=Math.max(0,(CP536.tele||0)-dt);if(CP536.tele>0)return;const key=Object.keys(ROOMS).find(k=>ROOMS[k]===ROOM);const C=key&&RV530.campos[key];if(!C||!C.portal||uiBlocked()||CH.sitting)return;
+function rv536Tick(dt){try{if(!CP536.on||CUR!=='room'||!ROOM)return;CP536.tele=Math.max(0,(CP536.tele||0)-dt);if(CP536.tele>0)return;const key=hi878Sala();const C=key&&RV530.campos[key];if(!C||!C.portal||uiBlocked()||CH.sitting)return;
     const pl=cavPos();const pr=C.portal;
     if(Math.hypot(pl.x-pr.x,pl.z-pr.z)<1.05){CP536.tele=2.0;rv536Teleporta(C.entrada[0],C.entrada[1],C.yawCampo);try{if(!CP536.avisou){CP536.avisou=true;showToast('🌀 '+co523T('O portal leva ao Campo dos Rivais — o disco do portão traz de volta.','The portal leads to the Field of Rivals — the gate\'s disc brings you back.','El portal lleva al Campo de los Rivales — el disco del portón te trae de vuelta.'),{ms:5000});}if(window.__mus199)window.__mus199.sfx('conquista');}catch(e){}return;}
     if(Math.hypot(pl.x-C.volta[0],pl.z-C.volta[1])<1.05){CP536.tele=2.0;rv536Teleporta(pr.fora[0],pr.fora[1],pr.ry);try{if(window.__mus199)window.__mus199.sfx('conquista');}catch(e){}}}catch(e){cp536Erro('tick',e);}}
@@ -70804,7 +70804,7 @@ if(CP539.on&&typeof RV530!=='undefined'&&RV530.on&&typeof rv530Tick==='function'
   try{const fin0=finishRoom;finishRoom=fr8Wrap(function*(k){const rv=(yield* fr8Prev(fin0,this,arguments,"L57829"));try{if(k==='cat'||k==='fant'||k==='adv')setTimeout(()=>cp539Campo(k),300);}catch(e){}return rv;});}catch(e){cp539Erro('finishRoom',e);}
   try{for(const k of ['cat','fant','adv']){const R=ROOMS[k];if(R&&R.ready)setTimeout(()=>cp539Campo(k),400);}}catch(e){}
   // relógio: caixa da arena só com o rival vivo; névoa base sempre a do cenário fora da arena; noite no céu e nas luzes; vaga-lumes
-  try{const tk0=rv530Tick;rv530Tick=function(dt){let C=null,key=null;try{if(CUR==='room'&&ROOM){key=Object.keys(ROOMS).find(k=>ROOMS[k]===ROOM);C=key&&RV530.campos[key];if(C&&C.cp539){const RV=RV530.rivais[key];const vivo=!RV||(RV.k&&RV.k.viva)||(RV.k2&&RV.k2.viva);C.box=vivo?C.box539:C.boxNada;const Z=C.cfg.rv532;if((Z.mix||0)<.002){const p=cavPos();const b=C.box;if(!(p.x>b.x0&&p.x<b.x1&&p.z>b.z0&&p.z<b.z1))Z.fog0=null;}}else C=null;}}catch(e){}
+  try{const tk0=rv530Tick;rv530Tick=function(dt){let C=null,key=null;try{if(CUR==='room'&&ROOM){key=hi878Sala();C=key&&RV530.campos[key];if(C&&C.cp539){const RV=RV530.rivais[key];const vivo=!RV||(RV.k&&RV.k.viva)||(RV.k2&&RV.k2.viva);C.box=vivo?C.box539:C.boxNada;const Z=C.cfg.rv532;if((Z.mix||0)<.002){const p=cavPos();const b=C.box;if(!(p.x>b.x0&&p.x<b.x1&&p.z>b.z0&&p.z<b.z1))Z.fog0=null;}}else C=null;}}catch(e){}
       const rv=tk0.apply(this,arguments);
       if(C)try{cp539Mix(C,ROOM);}catch(e){cp539Erro('noite',e);}
       try{if(key==='fant'&&CP539.fadas){const t=performance.now()/1000;for(const f of CP539.fadas){f.sp.position.set(f.x+Math.sin(t*f.v+f.f)*.6,f.y+Math.sin(t*f.v*1.3+f.f)*.35,f.z+Math.cos(t*f.v*.8+f.f)*.6);}}}catch(e){}
@@ -70859,7 +70859,7 @@ function cl540Camada(nome,alvo){try{if(typeof SOM==='undefined'||!SOM.ctx||!SOM.
     if(!L){if(alvo<.01)return null;L=somCamada(nome,alvo);L.g.gain.value=0;SOM.camadas.push(L);L.ult=-1;if(nome==='chuva')CL540.camada=L;else CL540.vento=L;}
     if(Math.abs((L.ult||0)-alvo)>.015){L.ult=alvo;L.g.gain.setTargetAtTime(alvo,SOM.ctx.currentTime,.4);}return L;}catch(e){cl540Erro('som '+nome,e);return null;}}
 function cl540Ceu(key,C){const out=[];try{for(let s=0;s<4;s++){const m=T160.cache.get('m:532 ceu '+key+' '+s);if(m)out.push(m);}const z=T160.cache.get('m:532 zenite '+key);if(z)out.push(z);if(C&&C.escuro&&C.escuro.mats)for(const m of C.escuro.mats)if(!out.includes(m))out.push(m);}catch(e){}return out;}
-function cl540Tick(dt){if(!CL540.on||CUR!=='room'||!ROOM)return;const key=Object.keys(ROOMS).find(k=>ROOMS[k]===ROOM);const tipo=key&&CL540.tipos[key];
+function cl540Tick(dt){if(!CL540.on||CUR!=='room'||!ROOM)return;const key=hi878Sala();const tipo=key&&CL540.tipos[key];
   const C=key&&RV530.campos[key];const Z=C&&C.cfg&&C.cfg.rv532;
   if(!tipo||!Z||C.pendente){cl552Esconde(key);cl540Camada('chuva',0);cl540Camada('ventoForte',0);return;}
   if(typeof DUNGEON395!=='undefined'&&DUNGEON395.active&&ROOM===DUNGEON395.room){cl552Esconde(key);cl540Camada('chuva',0);cl540Camada('ventoForte',0);return;}
@@ -70883,7 +70883,7 @@ function cl540Tick(dt){if(!CL540.on||CUR!=='room'||!ROOM)return;const key=Object
 if(CL540.on&&typeof RV530!=='undefined'&&typeof rv530Tick==='function'){
   try{const tk0=rv530Tick;rv530Tick=function(dt){const rv=tk0.apply(this,arguments);try{cl540Tick(Math.min(.1,dt||.016));}catch(e){cl540Erro('tick',e);}return rv;};}catch(e){cl540Erro('instalar',e);}
 }
-window.__clima540={estado:CL540,erros:CL540.erros,stats:CL540.stats,tick:cl540Tick,raio:()=>{const k=Object.keys(ROOMS).find(k=>ROOMS[k]===ROOM);const E=CL540.salas[k];if(E){E.prox=0;E.longe=0;}return !!E;}};
+window.__clima540={estado:CL540,erros:CL540.erros,stats:CL540.stats,tick:cl540Tick,raio:()=>{const k=hi878Sala();const E=CL540.salas[k];if(E){E.prox=0;E.longe=0;}return !!E;}};
 try{if(typeof NOVIDADES198!=='undefined')NOVIDADES198.v540=co523T('⛈ Chuva e tempestade nos Campos dos Rivais: em umas arenas chove forte, noutras caem relâmpagos com clarões e trovões','⛈ Rain and storms in the Fields of Rivals: heavy rain in some arenas, lightning, flashes and thunder in others','⛈ Lluvia y tormenta en los Campos de los Rivales: lluvia intensa en unas arenas, relámpagos con destellos y truenos en otras');}catch(e){}
 
 /* ===================== v541 · FLORES E POÇÕES NO 1.º E 2.º ANDAR; A LIRA E A ROSA PEDEM-NAS ANTES DE AJUDAR (bloco `FL541`) =====================
@@ -70948,7 +70948,7 @@ function fl541Paga541(tg){const A=tg.A,s=FL541.save,P=FL541.PRECO[A.quem];const 
   try{showToast(A.quem==='bruxa'?fl541T('Lira: «Obrigada! Agora luto ao seu lado.»','Lira: “Thank you! Now I fight beside you.”'):fl541T('Rosa: «Que lindas! Agora eu ajudo.»','Rosa: “How lovely! Now I will help.”'),{ms:3500});}catch(e){}try{window.__mus199&&window.__mus199.sfx('cura');}catch(e){}}
 /* ---------- o relógio: aparecer, girar, apanhar ---------- */
 function fl541Tick(dt){if(!FL541.on)return;if(FL541.save.dia!==cavDia()){FL541.save.dia=cavDia();FL541.save.apanhados={};fl541Grava();}fl541Hud();
-  let G=null;try{if(CUR==='room'&&ROOM){const key=Object.keys(ROOMS).find(k=>ROOMS[k]===ROOM);if(key&&FL541.salas.includes(key)&&ROOM.ready&&!(typeof DUNGEON395!=='undefined'&&DUNGEON395.active&&ROOM===DUNGEON395.room))G=fl541Espalha('sala:'+key,ROOM.scene,ROOM.world,ROOM.spawn,ROOM.floorY?(x,z)=>ROOM.floorY(x,z):null,key,3,2);}
+  let G=null;try{if(CUR==='room'&&ROOM){const key=hi878Sala();if(key&&FL541.salas.includes(key)&&ROOM.ready&&!(typeof DUNGEON395!=='undefined'&&DUNGEON395.active&&ROOM===DUNGEON395.room))G=fl541Espalha('sala:'+key,ROOM.scene,ROOM.world,ROOM.spawn,ROOM.floorY?(x,z)=>ROOM.floorY(x,z):null,key,3,2);}
     else if(CUR==='hall'&&(HALLN===1||HALLN===2)&&HALLS[HALLN]&&HALLS[HALLN].scene){G=fl541Espalha('hall:'+HALLN,HALLS[HALLN].scene,WORLD,{x:0,z:0},null,null,2,1);}}catch(e){fl541Erro('espalhar',e);}
   if(!G)return;const t=performance.now()/1000;const p=cavPos();let mud=false;
   for(const it of G.lista){if(!it.g.visible)continue;it.g.rotation.y+=dt*1.3;it.g.position.y=it.y+.07*Math.sin(t*2+it.ph);
@@ -70983,7 +70983,7 @@ function cp542Placas(R){return;if(CP542.placas)return;CP542.placas=true;const sc
   // à frente do tombadilho, virada para a proa (quem está no convés principal vê)
   cp542Placa(sc,t+'  ↓',3.4,3.3,12.2,Math.PI,3.2,0,R);}
 /* ---------- o botão «⚔ Duelo» na barra «Ir para» ---------- */
-function cp542Alvo(){try{if(CUR!=='room'||!ROOM)return null;const key=Object.keys(ROOMS).find(k=>ROOMS[k]===ROOM);const C=key&&RV530.campos[key];if(!C||C.pendente)return null;
+function cp542Alvo(){try{if(CUR!=='room'||!ROOM)return null;const key=hi878Sala();const C=key&&RV530.campos[key];if(!C||C.pendente)return null;
     if(key==='adv'&&typeof CP539_ILHA!=='undefined')return (typeof CP544!=='undefined'&&CP544.on)?{key,x:CP544.deck[0],z:CP544.deck[1]}:{key,x:(CP539_ILHA.dx0+CP539_ILHA.dx1)/2,z:CP539_ILHA.zBordo-.3};
     if(C.entrada)return {key,x:C.entrada[0],z:C.entrada[1]};const zc=C.P&&C.P.c!==undefined?C.P.c:0;return {key,x:21.6,z:zc};}catch(e){return null;}}
 function cp542Botao(){try{if(!goList)return;const A=cp542Alvo();if(!A)return;const RV=RV530.rivais[A.key];const feito=RV&&RV.k&&!RV.k.viva&&RV.k2&&!RV.k2.viva;
@@ -72127,7 +72127,7 @@ function rv555CompVoo(k2,k,def,dt,px,pz,pl,R,fy,d2){if(!RV555.on)return false;le
     if(P.t>.9){k2.pic555=null;k2.h555=null;return false;}}
   return true;}
 /* ---------- relógio ---------- */
-function rv555Chave(){try{return Object.keys(ROOMS).find(k=>ROOMS[k]===ROOM);}catch(e){return null;}}
+function rv555Chave(){try{return hi878Sala();}catch(e){return null;}}
 function rv555Pre(){if(CUR!=='room'||!ROOM)return;const RV=RV530.rivais[rv555Chave()];if(!RV)return;const k=RV.k;const D=k.g&&k.g.userData.rival530;if(D&&D.arma555&&!k.arma555){k.arma555=D.arma555.tipo;k.alc555=RV555_ALC[D.arma555.tipo]||1.7;}if(k.fase!=='picada'){k.pic555=null;k.alt555=null;}
   const k2=RV.k2;if(k2&&k2.pic555&&!(k.ativo)){k2.pic555=null;k2.h555=null;}}
 function rv555Tick(dt){dt=Math.min(.1,dt||.016);for(let i=RV555.fx.length-1;i>=0;i--){const f=RV555.fx[i];f.t+=dt;f.m.material.opacity=.7*(1-f.t/f.vida);if(f.t>=f.vida){if(f.m.parent)f.m.parent.remove(f.m);try{f.m.geometry.dispose();f.m.material.dispose();}catch(e){}RV555.fx.splice(i,1);}}
@@ -74433,7 +74433,7 @@ function cm572Aplica(k,f){const L=cm572Malhas(k);for(const m of L){const u=m.use
     if(f>.01){if(!u.cm572||(m.material!==u.cm572.orig&&m.material!==u.cm572.clone)){const c=m.material.clone();c.transparent=true;c.depthWrite=false;u.cm572={orig:m.material,clone:c,op:m.material.opacity===undefined?1:m.material.opacity};}
       if(m.material===u.cm572.orig)m.material=u.cm572.clone;if(m.material===u.cm572.clone)u.cm572.clone.opacity=u.cm572.op*(1-.75*f);}
     else if(u.cm572&&m.material===u.cm572.clone){m.material=u.cm572.orig;}}}
-function cm572Tick(dt){if(!CM572.on||CUR!=='room'||!ROOM)return;dt=Math.min(.1,dt||.016);const key=Object.keys(ROOMS).find(q=>ROOMS[q]===ROOM);if(!key)return;const S=CAV&&CAV.salas&&CAV.salas[key];if(!S||!S.lista)return;
+function cm572Tick(dt){if(!CM572.on||CUR!=='room'||!ROOM)return;dt=Math.min(.1,dt||.016);const key=hi878Sala();if(!key)return;const S=CAV&&CAV.salas&&CAV.salas[key];if(!S||!S.lista)return;
   const pl=cavPos(),C=camera.position;const Hx=pl.x,Hy=(pl.fy||0)+1.3,Hz=pl.z;const vx=Hx-C.x,vy=Hy-C.y,vz=Hz-C.z,L2=vx*vx+vy*vy+vz*vz||1;
   let fx=Hx-C.x,fz=Hz-C.z;const fl=Math.hypot(fx,fz)||1;fx/=fl;fz/=fl;
   for(const k of S.lista){if(!k||!k.g)continue;const vis=k.viva!==false&&k.g.visible;
@@ -108956,7 +108956,7 @@ if(CI830.on){
   try{const fr0=finishRoom;finishRoom=fr8Wrap(function*(key){const r=(yield* fr8Prev(fr0,this,arguments,"ci830"));try{ci8Sala(key);}catch(e){ci8Erro('sala '+key,e);}return r;});}catch(e){ci8Erro('finishRoom',e);}
   try{const g0=gearTick;gearTick=function(dt){const r=g0.apply(this,arguments);
       try{if(CUR==='room'&&ROOM&&ROOM.scene){const q=(CI830.n=(CI830.n+1)%90);
-          if(q===0){let key=CI830.chave;if(!key||ROOMS[key]!==ROOM)key=CI830.chave=Object.keys(ROOMS).find(k=>ROOMS[k]===ROOM);if(key)ci8Sala(key);}
+          if(q===0){let key=CI830.chave;if(!key||ROOMS[key]!==ROOM)key=CI830.chave=hi878Sala();if(key)ci8Sala(key);}
           const E=CI830.cenas.get(ROOM.scene);if(E&&E.inst)ci8Poe(E,false);if(CI830.halo)ci8Halo(dt);}}catch(e){if(!CI830.avisou){CI830.avisou=true;ci8Erro('quadro',e);}}
       return r;};}catch(e){ci8Erro('gearTick',e);}
   // salas que já existem quando o bloco chega (a Biblioteca)
@@ -112778,7 +112778,7 @@ window.__combate853={estado:CB853,stats:CB853.stats,erros:CB853.erros,arruma:cb8
    Chave: `?penas854=0`. Gancho `window.__penas854`. */
 const PN854={on:!/[?&#]penas854=0/i.test(location.search+location.hash),erros:[],stats:{conferidas:0,movidas:[],semLugar:0}};
 function pn854Erro(k,e){if(PN854.erros.length<20)PN854.erros.push(k+': '+(e&&e.message||e));try{console.warn('v854',k,e);}catch(x){}}
-function pn854Sala(){if(CUR!=='room'||!ROOM)return 0;const key=Object.keys(ROOMS).find(k=>ROOMS[k]===ROOM);if(!key)return 0;const R=ROOMS[key];if(!R||!R.world||!Array.isArray(R.world.obst))return 0;
+function pn854Sala(){if(CUR!=='room'||!ROOM)return 0;const key=hi878Sala();if(!key)return 0;const R=ROOMS[key];if(!R||!R.world||!Array.isArray(R.world.obst))return 0;
   const P=window.__penas745;if(!P||!P.lugares)return 0;const ach=(P.estado&&P.estado.save&&P.estado.save.achados)||{};const W=R.world;let nav=null,comp=null,start=null,n=0;
   const livreMovel=(x,z,f)=>!W.obst.some(o=>!o.porta222&&Math.hypot(x-o[0],z-o[1])<(o[2]||.5)+f);
   for(const id of Object.keys(P.lugares)){const L=P.lugares[id];if(!L||L.onde!=='sala'||L.sala!==key||ach[id]||L.pn854)continue;PN854.stats.conferidas++;
@@ -115193,6 +115193,344 @@ if(AR877.on){try{let n=0;const t=setInterval(()=>{n++;if(n>600){clearInterval(t)
 window.__armazenamento877={estado:AR877,stats:AR877.stats,erros:AR877.erros,partilhada:ar877Partilhada,leReal:ar877LeReal,comReal:ar877ComReal,
   pendente:ar877PendenteLe,marcaSaida:ar877SaidaMarca,reenviaPendente:ar877PendenteReenvia,removiveis:ar877Removiveis,copia:ar877CopiaLe,recupera:ar877Recupera,
   botaoRecupera:ar877BotaoRecupera,fin:()=>AR877_FIN,finColeta:ar877FinColeta,instala423:ar877Instala423,pacoteVivo:ar877PacoteVivo,resumo:ar877Resumo};
+
+/* ===================== v878 · A SALA HISTÓRICA MAIS LEVE NO PROCESSADOR: BASTIDORES CURTOS DENTRO DA SALA, PROGRAMAS DA PLACA EM PARALELO DEPOIS DA PASSAGEM, ESQUELETOS FORA DE VISTA PARADOS, LUZES E CENSO DA CENA EM FATIAS, MÁSCARAS DA GRADE POR CHAVE, CAMINHO DO COMPANHEIRO NO TEMPO DO JOGO E MIUDEZAS (bloco `HI878`) =====================
+   Origem: análise só de leitura da v868 (`relatorio_cpu_historica.md`, seção 6 — o Luiz aprovou todas as propostas). Medido na Histórica
+   (gênero `catedral`, sala `cat`) no Leve, no navegador sem placa: 16 ms de lógica por quadro em média e picos de ~80 ms em 10 % dos quadros
+   (a máquina do Luiz tem Intel UHD, que o jogo trata como placa fraca). A imagem fica a mesma; só muda quando e quantas vezes o trabalho é feito.
+   (6.1) BASTIDORES — COMO ERA: abaixo de 20 qps o FA821 dava à obra das salas nos bastidores (ESC523) um quarto do intervalo entre quadros,
+         até 40 ms, em todo quadro — também com o leitor dentro de uma sala; a fila do fatiador (FAT818), sem tempo livre, idem.
+         AGORA: com o leitor numa sala (CUR 'room'), a obra fica com 10 ms por quadro lento (`window.__historica878.bastidores.fatiaSala`) e a
+         fila volta à fatia normal (5 ms; 12 ms se o trabalho está à vista); no Hall e na escada continuam os 40 ms. A cena do prólogo (HL686,
+         que fixa 12 ms) não muda. Risco: a sala em obra fica pronta mais tarde enquanto o leitor está numa sala.
+   (6.2) AQUECIMENTO DEPOIS DA PASSAGEM — opção (c) do relatório, a mais segura: os mesmos programas, sem mudar quando nem quanto se prepara.
+         COMO ERA: depois de cruzar a passagem (v222Trocar → `V222.warmPend`), a camada da v222 compilava UM programa por quadro dentro do `tick`,
+         de forma síncrona (`warmStep` → `renderer.compile`): cada programa novo era um quadro travado (no Leve, Standard com 12 luzes).
+         AGORA: onde o navegador oferece KHR_parallel_shader_compile, esse passo usa o caminho paralelo que a tela de carregamento já usa
+         (`warmCall210`/`warmPoll210` do v210): o pedido sai, o three.js para antes de ler os uniformes, a placa compila por conta própria e,
+         quando avisa que acabou, o ensaio é refeito (só lê o resultado); até 2 programas em paralelo, ~2 ms de pedidos por quadro. Sem a
+         extensão, nada muda. Se a sala desenhar um material ainda em compilação, o three.js espera ali mesmo — como antes, sem erro.
+         Por que não (a) nem (b): (a) aqueceria as camadas 2 e 3 de toda sala vista pelos vãos — mais trabalho no Hall e programas de salas
+         onde o leitor nem entra (o v670 limitou isso de propósito); (b) só troca a ordem e cria o tropeço quando uma parte da sala aparece.
+   (6.3) ESQUELETOS FORA DE VISTA — COMO ERA: os 10 visitantes (catTick) e os 6 moradores dos pátios (V224) faziam o `rig.pose` completo em
+         todo quadro (mixer de 26 trilhas, 25–50 slerp, 2 updateMatrixWorld(true) da armação, 5 getWorldPosition), na tela ou não.
+         AGORA (só no Leve e no Papel — sem sombra nem reflexo —, só no tick da sala ativa): o boneco cuja esfera da malha (a da v238, já com
+         0,7 m de folga, + 0,5 m) está fora do tronco de visão da câmera, ou que tem um ancestral escondido, não é animado: o tempo do quadro
+         é acumulado com o mesmo teto do `rig.pose` (0,05 por quadro) e, quando ele volta — no próprio tick ou, se entrar no quadro depois do
+         tick, logo antes do desenho principal (`renderer.render` da cena ativa) —, o mixer anda a soma e a pose é refeita: os clipes são
+         cíclicos e os pesos fixos (velocidade 0, sentado constante), e o resto da pose só depende do instante. `visible` não é tocado (a
+         sombra de contato do CI830 lê a visibilidade); os temporários do teste são reaproveitados. O rival do Egito (rv530/532) usa o
+         `rebuiltReader` (molas + uniformes do sombreador, sem mixer nem ossos): é barato e o estado das molas depende de cada quadro — fica.
+   (6.4) LUZES (v226) — COMO ERA: a cada 4 s o `l226Lista` varria a cena inteira (`traverse`) de uma vez; a cada 0,4 s o `l226Aplicar` criava
+         um `Map`, três arrays (`filter`) e duas funções. AGORA: a lista é refeita por um censo da cena em fatias de 0,4 ms por quadro (mesma
+         ordem do `traverse`, mesmo filtro; a lista velha vale até o censo acabar) e o `l226Aplicar` reaproveita os arrays da cena (mesma
+         seleção: mesmos critérios, mesma ordem estável). Com `forcar` (entrada, preparação, troca de qualidade) tudo continua de uma vez.
+   (6.5) UM CENSO SÓ POR CENA — o mesmo censo em fatias serve também o `cull670Lista` (miúdos da placa fraca, a cada 4 s) e a varredura
+         periódica do Papel (`papelPasso190`, a cada 40 quadros), que faziam cada um o seu `traverse` inteiro no desenho. Ficam de fora:
+         `camBlockList190` (já é fatiado, 0,4 ms, e poda os galhos escondidos e mede as esferas na hora — outra regra de frescor) e o
+         `s227Lista` (a ordem da varredura decide a ordem de criação dos lotes de sprites e dos pontos de cada lote: a ordem de mistura).
+   (6.6) GRADE DE CAMINHOS — COMO ERA: o v820 guardava UMA máscara por mundo (`world.__nv8`); a chave da Histórica muda ao entrar e sair das
+         casas da vila e ao trocar de andar nelas (e com o Nilo, v252), e cada troca refazia a máscara inteira (~427 mil chamadas a `clamp`).
+         AGORA: no mundo da Histórica as máscaras ficam num `Map` por chave (até 8, a mais antiga sai), com a mesma premissa da v820 (mesma
+         função `clamp`, mesma chave, mesmo tamanho) e a mesma conferência de 1 célula em 64 a cada reaproveitamento.
+   (6.7) CAMINHO DO COMPANHEIRO — COMO ERA: `c191Rumo` refazia o caminho a cada 650 ms de relógio, sem o teto de 2 caminhos por quadro (a 3 qps,
+         a cada 2 quadros). AGORA: 0,65 s de tempo de jogo e o teto `caminhoVez190` (o mesmo dos inimigos). Igual a 60 qps; com quadro lento,
+         recalcula menos (não é 100 % idêntico, como o relatório avisou). O resto do `c191Rumo` é o texto original da função.
+   (6.8) MIUDEZAS — (a) a chave da sala ativa (`Object.keys(ROOMS).find(… ===ROOM)` em 15 funções, várias chamadas a cada quadro) vem de `hi878Sala()`, guardada
+         e invalidada no `setActive` (TROCA); (b) `npcDistance` sem `new Vector3` (o `npcPosition` fica, porque o `resolveAt` altera o vetor);
+         (c) o laço de opacidade da decoração (v128) não cria `Object.values` quando a sala não tem peças; (d) `cavDia()` guardado por segundo
+         do relógio (o dia só pode virar na passagem de um segundo: o resultado é o mesmo).
+   Chaves: `?historica878=0` (tudo — nada é embrulhado), `?bastidores878=0`, `?aquece878=0`, `?esqueletos878=0`, `?luzes878=0`, `?censo878=0`,
+   `?grade878=0`, `?companheiro878=0`, `?miudezas878=0` (e, dentro dela, `?salaativa878=0`, `?vetores878=0`, `?decor878=0`, `?cavdia878=0`).
+   Para medir na mesma sessão, `window.__historica878.liga(item, false|true)` liga e desliga cada item em tempo de execução.
+   TROCA (`troca878.py`, depois do patch_bloco): as 15 cópias de `Object.keys(ROOMS).find(…===ROOM)` viram `hi878Sala()` (14 + 1 nos dois arquivos).
+   Gancho `window.__historica878` (`estado`, `stats`, `erros`, `itens`, `liga`, `medir`, e um objeto por item).
+   REVISÃO (cópia opcional, `revisao/hi878/REVISAO.md`; só defeitos baixos): D1 — os bonecos pendentes também são refeitos quando a
+   Histórica é desenhada fora da cena ativa (vão do Hall: `ES878.cena`); D2 — a varredura do Papel só aceita um censo começado depois do
+   fim da espera de 40 quadros (`P.hi878` marcado no 40.º); D3 — a lista do l226 tirada do censo não repete uma luz que mudou de pai no
+   meio da caminhada (`__c878`); D4 — programa da placa que não conclui em `AQ878.prazo` (8 s; material descartado) sai da espera e do
+   `WARM210.programas`; D5 — a fatia de 10 ms dentro de sala não vale no corredor do prólogo (`CUR_GENRE` 'prologo') nem para a sala
+   pedida de propósito na fila do ESC523 (a Sala do Acumulador da v845): ali os bastidores continuam com até 40 ms. */
+const HI878={on:!/[?&#]historica878=0/i.test(location.search+location.hash),erros:[],stats:{}};
+const HI878_Q=location.search+location.hash;
+HI878.emTick=false;HI878.quadro=0;HI878.instalados=[];
+HI878.itens={};
+for(const k of ['bastidores','aquece','esqueletos','luzes','censo','grade','companheiro','miudezas'])HI878.itens[k]=HI878.on&&!new RegExp('[?&#]'+k+'878=0','i').test(HI878_Q);
+HI878.mi={};
+for(const k of ['salaativa','vetores','decor','cavdia'])HI878.mi[k]=HI878.itens.miudezas&&!new RegExp('[?&#]'+k+'878=0','i').test(HI878_Q);
+function hi878Erro(k,e){if(HI878.erros.length<30)HI878.erros.push(k+': '+(e&&e.message||e));try{console.warn('v878',k,e);}catch(x){}}
+
+/* ---------- (6.8a) a chave da sala ativa, guardada — chamada pelas TROCAS (pode correr antes deste bloco: o estado mora na própria função) ---------- */
+function hi878Sala(){const C=hi878Sala;
+  try{if(C.ativo===true&&ROOM&&C.r===ROOM&&C.k!==undefined&&ROOMS[C.k]===ROOM&&Object.prototype.propertyIsEnumerable.call(ROOMS,C.k)){C.hits=(C.hits|0)+1;return C.k;}}catch(e){}
+  const k=Object.keys(ROOMS).find(c=>ROOMS[c]===ROOM);
+  if(C.ativo===true){C.miss=(C.miss|0)+1;if(ROOM){C.r=ROOM;C.k=k;}else{C.r=null;C.k=undefined;}}
+  return k;}
+function hi878SalaLimpa(){hi878Sala.r=null;hi878Sala.k=undefined;}
+
+/* ---------- (6.1) bastidores: 10 ms por quadro lento com o leitor numa sala ---------- */
+const BA878={fatiaSala:10,stats:{quadrosSala:0,msCortadosEst:0,filaSala:0}};
+if(HI878.on&&typeof esc523Passo==='function'&&typeof ESC523!=='undefined'&&typeof FA821!=='undefined'){
+  try{const ep0=esc523Passo;esc523Passo=function(dt){let cap=0;
+      try{if(HI878.itens.bastidores&&!FA821.livre&&FA821.obra&&CUR==='room'&&CUR_GENRE!=='prologo'&&FA821.quadro>50&&buildIt&&ESC523.fila.indexOf(buildKey)<0&&!ESC523.fatiaFixa)cap=BA878.fatiaSala;}catch(e){cap=0;}
+      if(!cap)return ep0.apply(this,arguments);
+      const E=ESC523;E.fatiaFixa=cap;BA878.stats.quadrosSala++;BA878.stats.msCortadosEst+=Math.max(0,Math.min(40,FA821.quadro*.25)-cap);
+      try{return ep0.apply(this,arguments);}finally{if(E.fatiaFixa===cap)E.fatiaFixa=0;}};
+    HI878.instalados.push('esc523Passo');}catch(e){hi878Erro('bastidores',e);}
+  // a fila do fatiador num quadro lento sem tempo livre: dentro de sala, sem a fatia de 40 ms (o FA821 só a dá com `quadro` > 50)
+  if(typeof fat8Passo==='function')try{const fp0=fat8Passo;fat8Passo=function(dl){let q=0;
+      try{if(HI878.itens.bastidores&&CUR==='room'&&CUR_GENRE!=='prologo'&&FA821.quadro>50){let livre=0;try{if(dl&&typeof dl.timeRemaining==='function'&&!dl.didTimeout)livre=dl.timeRemaining();}catch(e){}
+          if(livre<=0){q=FA821.quadro;FA821.quadro=50;BA878.stats.filaSala++;}}}catch(e){q=0;}
+      try{return fp0.apply(this,arguments);}finally{if(q)FA821.quadro=q;}};
+    HI878.instalados.push('fat8Passo');}catch(e){hi878Erro('bastidores fila',e);}
+}
+
+/* ---------- (6.2) aquecimento depois da passagem pelo caminho paralelo (KHR_parallel_shader_compile) ---------- */
+const AQ878={lim:2,prazo:8000,espera:[],khr:null,stats:{khr:null,disparos:0,paralelos:0,diretos:0,concluidos:0,descartados:0,erros:0,msDisparo:0,maxEspera:0,vagas:0,sincronos:0}};
+function hi878AqKhr(){if(AQ878.khr===null){try{AQ878.khr=(typeof warmExt210==='function'&&warmExt210())||false;}catch(e){AQ878.khr=false;}AQ878.stats.khr=!!AQ878.khr;}return AQ878.khr;}
+function hi878AqPode(){try{if(!HI878.itens.aquece||!HI878.emTick||PERF130.busy||!AQ.liberado||!ACTIVE)return false;
+    const gl=renderer.getContext(),own=Object.prototype.hasOwnProperty;if(own.call(gl,'linkProgram')||own.call(gl,'getProgramParameter'))return false; // outro ensaio a meio
+    return !!hi878AqKhr();}catch(e){return false;}}
+function hi878AqDispara(it){const ext=hi878AqKhr(),a=performance.now();AQ878.stats.disparos++;
+  try{warmCall210(it,ext);AQ878.stats.diretos++;}
+  catch(e){if(e===PEND210){AQ878.espera.push({it,p:WARM210.ultimo,t0:a,fora:false});AQ878.stats.paralelos++;if(AQ878.espera.length>AQ878.stats.maxEspera)AQ878.stats.maxEspera=AQ878.espera.length;}
+    else{AQ878.stats.erros++;hi878Erro('aquece',e);}}
+  AQ878.stats.msDisparo+=performance.now()-a;}
+// no fim do tick: consulta a placa (no máximo 2 programas, com a cadência do v210), refaz o ensaio dos que acabaram e pede mais, até 2 em paralelo
+function hi878AqPasso(){if(!AQ878.espera.length&&!HI878.itens.aquece)return;const ext=hi878AqKhr();if(!ext)return;const a=performance.now(),lim=a+2;
+  if(AQ878.espera.length){
+    try{warmPoll210(ext,lim);}catch(e){AQ878.stats.erros++;hi878Erro('aquece consulta',e);}
+    for(let i=AQ878.espera.length-1;i>=0;i--){const w=AQ878.espera[i];if(w.p&&WARM210.programas.has(w.p)){if(a-w.t0<=AQ878.prazo)continue;WARM210.programas.delete(w.p);w.fora=true;}AQ878.espera.splice(i,1);
+      if(w.fora){AQ878.stats.descartados++;continue;}
+      try{warmCall210(w.it,ext);AQ878.stats.concluidos++;}
+      catch(e){if(e===PEND210)AQ878.espera.push({it:w.it,p:WARM210.ultimo,t0:w.t0,fora:false});else{AQ878.stats.erros++;hi878Erro('aquece fim',e);}}
+      if(performance.now()>lim)break;}}
+  if(hi878AqPode()){while(AQ878.espera.length<AQ878.lim&&performance.now()<lim){let i=-1;for(let j=0;j<warmQ.length;j++)if(warmQ[j].source===ACTIVE){i=j;break;}if(i<0)break;hi878AqDispara(warmQ.splice(i,1)[0]);}}}
+if(HI878.on&&typeof warmStep==='function'&&typeof warmCall210==='function'&&typeof warmPoll210==='function'&&typeof PEND210!=='undefined'&&typeof WARM210!=='undefined'){
+  // o passo da camada da v222 (dentro do tick, item da cena ativa à frente da fila): em vez de compilar aqui, pede à placa e segue
+  try{const ws0=warmStep;warmStep=function(){
+      try{if(HI878.emTick&&HI878.itens.aquece&&warmQ.length&&warmQ[0]&&warmQ[0].source===ACTIVE){if(hi878AqPode()){if(AQ878.espera.length<AQ878.lim)hi878AqDispara(warmQ.shift());else AQ878.stats.vagas++;return true;} // (sem vaga: o item espera na fila)
+          if(AQ878.khr===false&&AQ.liberado&&!PERF130.busy)AQ878.stats.sincronos++;}}catch(e){hi878Erro('aquece passo',e);} // (sem a extensão: o passo síncrono de sempre)
+      return ws0.apply(this,arguments);};
+    HI878.instalados.push('warmStep');}catch(e){hi878Erro('aquece embrulho',e);}
+  // descarte da fila (fim da abertura): os itens em espera também deixam de contar como aquecidos (como o discardWarm131 faz com a fila)
+  if(typeof discardWarm131==='function')try{const dw0=discardWarm131;discardWarm131=function(){try{for(const w of AQ878.espera)if(!w.fora){w.fora=true;try{w.it.set.delete(w.it.key);}catch(x){}}}catch(e){}return dw0.apply(this,arguments);};}catch(e){hi878Erro('aquece descarte',e);}
+}
+
+/* ---------- (6.3) esqueletos fora de vista: o tempo acumula e a pose é refeita quando eles voltam ---------- */
+const ES878={margem:.5,n:-1,rigs:new Set(),pendentes:new Set(),forca:new Map(),qFr:-1,
+  fr:new THREE.Frustum(),fr2:new THREE.Frustum(),m:new THREE.Matrix4(),s:new THREE.Sphere(),
+  stats:{rigs:0,pulos:0,recuperadosTick:0,recuperadosDesenho:0,nReal:0,msReal:0,get msPoupadoEst(){return this.nReal?+(this.pulos*this.msReal/this.nReal).toFixed(1):0;}}};
+function hi878EsqPode(S){return HI878.itens.esqueletos&&HI878.emTick&&Q.lite&&!Q.refl&&!renderer.shadowMap.enabled&&!PERF130.busy&&CUR==='room'&&!!ROOM&&ROOM.scene===ACTIVE&&S.sc===ACTIVE;}
+function hi878EsqFrustum(fr,cam){ES878.m.multiplyMatrices(cam.projectionMatrix,cam.matrixWorldInverse);fr.setFromProjectionMatrix(ES878.m);}
+// fora = um ancestral escondido (não é desenhado) ou a esfera da malha + margem fora do tronco de visão; só para bonecos pendurados na cena ativa
+function hi878EsqFora(rig,fr){const m=rig.mesh;if(!m||!m.geometry)return false;let oculto=false,raiz=null;for(let p=m;p;p=p.parent){if(!p.visible)oculto=true;raiz=p;}
+  if(raiz!==ACTIVE)return false;if(oculto)return true;if(m.frustumCulled===false)return false;const bs=m.geometry.boundingSphere;if(!bs)return false;
+  const s=ES878.s.copy(bs).applyMatrix4(m.matrixWorld);s.radius+=ES878.margem;return !fr.intersectsSphere(s);}
+// a chamada de verdade: antes dela, o mixer anda o que faltou (soma dos quadros pulados, com o teto de 0,05 de cada um, menos o passo que o
+// próprio rig.pose vai dar agora a partir da última chamada de verdade); `contado` = o passo deste quadro já está na soma (recuperação no desenho)
+function hi878EsqReal(rig,S,self,args,time,contado){
+  if(S.acc>0){try{if(rig.mixer){const dtA=contado?0:(S.ult===null?.016:Math.min(.05,Math.max(0,time-S.ult)));const dtO=S.ultReal===null?.016:Math.min(.05,Math.max(0,time-S.ultReal));
+        const X=S.acc+dtA-dtO;if(X>1e-9)rig.mixer.update(X);}}catch(e){hi878Erro('esqueleto recupera',e);}
+    if(contado)ES878.stats.recuperadosDesenho++;else ES878.stats.recuperadosTick++;}
+  S.acc=0;S.pend=false;S.ult=time;S.ultReal=time;S.primeira=false;ES878.pendentes.delete(rig);
+  const a=performance.now();try{return S.p0.apply(self,args);}finally{ES878.stats.nReal++;ES878.stats.msReal+=performance.now()-a;}}
+function hi878EsqEmbrulha(rig,sc){if(!rig||rig.__hi878||typeof rig.pose!=='function')return;ES878.cena=sc;
+  const S={p0:rig.pose,sc,acc:0,ult:null,ultReal:null,primeira:true,pend:false,tP:0,sP:false};rig.__hi878=S;ES878.rigs.add(rig);ES878.stats.rigs=ES878.rigs.size;
+  rig.pose=function(time,seated){let pula=false;
+    try{if(!S.primeira&&rig.ready&&rig.mixer&&hi878EsqPode(S)){if(ES878.forca.has(rig))pula=true;else{if(ES878.qFr!==HI878.quadro){hi878EsqFrustum(ES878.fr,camera);ES878.qFr=HI878.quadro;}pula=hi878EsqFora(rig,ES878.fr);}}}
+    catch(e){pula=false;hi878Erro('esqueleto teste',e);}
+    if(pula){const dt=S.ult===null?.016:Math.min(.05,Math.max(0,time-S.ult));S.ult=time;S.acc+=dt;S.pend=true;S.tP=time;S.sP=seated;ES878.pendentes.add(rig);ES878.stats.pulos++;return;}
+    return hi878EsqReal(rig,S,this,arguments,time,false);};}
+function hi878EsqGarante(){const R=ROOMS.cat;if(!R||!R.scene)return;const a=R.visitors,b=(typeof V224!=='undefined'&&V224.rigs)||null;const n=(a?a.length:0)+(b?b.length:0);if(n===ES878.n)return;ES878.n=n;
+  if(a)for(const r of a)hi878EsqEmbrulha(r,R.scene);if(b)for(const r of b)hi878EsqEmbrulha(r,R.scene);}
+// logo antes do desenho da cena ativa: quem foi pulado no tick e agora está à vista (a câmera pode ter andado depois do tick) é refeito aqui
+function hi878EsqAntesDoDesenho(cam,scene){const principal=cam===camera&&(scene===undefined||scene===ACTIVE);let fr=null;
+  if(principal){if(cam.parent===null)cam.updateMatrixWorld();hi878EsqFrustum(ES878.fr2,cam);fr=ES878.fr2;}
+  for(const rig of ES878.pendentes){const S=rig.__hi878;if(!S||!S.pend){ES878.pendentes.delete(rig);continue;}
+    let ve=true;try{if(principal)ve=ES878.forca.get(rig)==='tudo'?false:!hi878EsqFora(rig,fr);}catch(e){ve=true;}
+    if(ve)hi878EsqReal(rig,S,rig,[S.tP,S.sP],S.tP,true);}}
+if(HI878.on&&typeof renderer!=='undefined'&&renderer&&typeof renderer.render==='function'){
+  try{const rr0=renderer.render;renderer.render=function(scene,cam){if(ES878.pendentes.size&&(scene===ACTIVE||(ES878.cena&&scene===ES878.cena))){try{hi878EsqAntesDoDesenho(cam,scene);}catch(e){hi878Erro('esqueleto desenho',e);}}return rr0.apply(this,arguments);};
+    HI878.instalados.push('renderer.render');}catch(e){hi878Erro('esqueleto render',e);}
+}
+
+/* ---------- (6.4)/(6.5) censo da cena em fatias (mesma ordem do traverse) e quem o usa ---------- */
+const CE878={cenas:new WeakMap(),orc:.4,stats:{censos:0,nos:0,msAndar:0,passos:0,reinicios:0,l226:0,cull670:0,papel:0}};
+function hi878CensoEstado(sc){let C=CE878.cenas.get(sc);if(!C){C={walk:null,ult:null};CE878.cenas.set(sc,C);}return C;}
+function hi878CensoPede(sc){const C=hi878CensoEstado(sc);if(C.walk)return;const todos=!!(HI878.itens.censo&&Q.lite);
+  C.walk={pilha:[sc],luzes:[],miudos:[],todos:todos?[]:null,tIni:performance.now(),n:0};}
+// anda o censo da cena ativa (orc em ms; Infinity = até o fim)
+function hi878CensoPasso(orc){const sc=ACTIVE;if(!sc)return null;const C=CE878.cenas.get(sc);if(!C||!C.walk)return null;let W=C.walk;
+  if(performance.now()-W.tIni>20000){C.walk=null;hi878CensoPede(sc);W=C.walk;CE878.stats.reinicios++;} // parado tempo demais (o leitor saiu e voltou): recomeça
+  const P=W.pilha,T=W.todos,a=performance.now();let n=0;
+  while(P.length){const o=P.pop();if(T)T.push(o);if(o.isPointLight)W.luzes.push(o);else if(o.isMesh&&(o.layers.mask===4||o.layers.mask===16))W.miudos.push(o);
+    const c=o.children;for(let i=c.length-1;i>=0;i--)P.push(c[i]);if((++n&63)===0&&performance.now()-a>orc)break;}
+  W.n+=n;CE878.stats.passos++;CE878.stats.msAndar+=performance.now()-a;
+  if(!P.length){C.ult={tIni:W.tIni,tFim:performance.now(),luzes:W.luzes,miudos:W.miudos,todos:W.todos,n:W.n};C.walk=null;CE878.stats.censos++;CE878.stats.nos=W.n;return C.ult;}
+  return null;}
+// (6.4) a lista do l226 a partir do censo: o mesmo filtro do l226Lista (sem as de enchimento, sem as que viajam com o leitor)
+function hi878L226DoCenso(sc,E,U){const leitor=(typeof READER!=='undefined'&&READER.g)||null;const L=[];const marca=CE878.marca=(CE878.marca|0)+1;
+  for(const o of U.luzes){if(o.__c878===marca)continue;o.__c878=marca;const u=o.userData;if(u.padLight)continue;if(u.rectSub&&!Q.lite)continue;let raiz=o,fora=false;for(let p=o.parent;p;p=p.parent){if(p===leitor){fora=true;break;}raiz=p;}
+    if(fora||raiz!==sc)continue;if(u.i0===undefined)u.i0=o.intensity;L.push(o);}
+  E.lista=L;E.tl=U.tIni;CE878.stats.l226++;return L;}
+function hi878PorS(a,b){return a.__s878-b.__s878;}
+function hi878PorSDesc(a,b){return b.__s878-a.__s878;}
+function hi878L226Liga(E,o,forcar){o.visible=true;o.userData.l226Off=false;o.userData.liteOff=false;for(let i=E.fades.length-1;i>=0;i--)if(E.fades[i].o===o)E.fades.splice(i,1);if(forcar)o.intensity=o.userData.i0;else{o.intensity=0;E.fades.push({o,u:0});}}
+function hi878L226Desliga(o){o.visible=false;o.userData.l226Off=true;o.userData.liteOff=true;}
+let l226Lista0=null,l226Aplicar0=null;
+if(HI878.on&&typeof l226Lista==='function'&&typeof l226Aplicar==='function'&&typeof L226!=='undefined'){
+  try{l226Lista0=l226Lista;l226Lista=function(sc,E,forcar){
+      try{if(!HI878.itens.luzes||forcar||!E||!E.lista||sc!==ACTIVE)return l226Lista0.apply(this,arguments);
+        if(performance.now()-E.tl<4000)return E.lista;
+        const C=hi878CensoEstado(sc);if(C.ult&&C.ult.tIni>E.tl)return hi878L226DoCenso(sc,E,C.ult);
+        hi878CensoPede(sc);return E.lista;}catch(e){hi878Erro('luzes lista',e);return l226Lista0.apply(this,arguments);}};
+    // o mesmo l226Aplicar, sem Map, sem filter e sem funções novas a cada 0,4 s (a pontuação fica na própria luz, em `__s878`)
+    l226Aplicar0=l226Aplicar;l226Aplicar=function(sc,cx,cy,cz,forcar){if(!HI878.itens.luzes)return l226Aplicar0.apply(this,arguments);try{
+      const E=l226Estado(sc);const all=l226Lista(sc,E,forcar);const L=E.hiL||(E.hiL=[]);L.length=0;
+      for(let i=0;i<all.length;i++){const o=all[i];if(o.userData.interior276&&!o.userData.interiorActive276){o.visible=false;continue;}L.push(o);}
+      const N=l226Cap();
+      if(L.length<=N){for(let i=0;i<L.length;i++){const o=L[i];if(o.userData.l226Off){o.userData.l226Off=false;o.userData.liteOff=false;o.visible=true;o.intensity=o.userData.i0;}}L.length=0;return 0;}
+      for(let i=0;i<L.length;i++){const o=L[i];o.__s878=l226Pont(o,E,cx,cy,cz);}
+      const vis=E.hiV||(E.hiV=[]),inv=E.hiI||(E.hiI=[]);vis.length=0;inv.length=0;
+      for(let i=0;i<L.length;i++){const o=L[i];if(o.visible)vis.push(o);else inv.push(o);}
+      vis.sort(hi878PorS);inv.sort(hi878PorSDesc);   // acesas da mais fraca para a mais forte; apagadas da mais forte para a mais fraca
+      let trocas=0,a=0,b=0;
+      while(vis.length-a>N){hi878L226Desliga(vis[a++]);trocas++;}
+      while(vis.length-a<N&&b<inv.length){const o=inv[b++];hi878L226Liga(E,o,forcar);vis.push(o);trocas++;}
+      const H=forcar?1:L226.HIST;
+      while(b<inv.length&&a<vis.length){const c=inv[b],s=vis[a];if(c.__s878>s.__s878*H+1e-6){hi878L226Desliga(s);hi878L226Liga(E,c,forcar);b++;a++;trocas++;}else break;}
+      if(trocas){L226.estat.trocas+=trocas;L226.estat.aplicacoes++;}
+      L.length=0;vis.length=0;inv.length=0;return trocas;}catch(e){hi878Erro('luzes aplicar',e);return 0;}};
+    HI878.instalados.push('l226Lista','l226Aplicar');}catch(e){hi878Erro('luzes',e);}
+}
+// (6.5) os miúdos da placa fraca (v670) a partir do censo — o mesmo filtro e o mesmo raio do cull670Lista
+const HI878_VS=new THREE.Vector3();let cull670Lista0=null,papelPasso1900=null;
+if(HI878.on&&typeof cull670Lista==='function'&&typeof GPU670S!=='undefined'){
+  try{cull670Lista0=cull670Lista;cull670Lista=function(sc){
+      try{if(!HI878.itens.censo||sc!==ACTIVE)return cull670Lista0.apply(this,arguments);
+        const Cc=GPU670S.cull,e=Cc.cenas.get(sc);if(!e)return cull670Lista0.apply(this,arguments);
+        if(performance.now()-e.t<4000)return e.lista;
+        const C=hi878CensoEstado(sc);
+        if(C.ult&&C.ult.tIni>e.t){const lista=[],s=HI878_VS;
+          for(const o of C.ult.miudos){if(!o.isMesh||(o.layers.mask!==4&&o.layers.mask!==16))continue;
+            if(o.userData.r670===undefined){const g=o.geometry;let r=-1;if(g&&g.boundingSphere&&isFinite(g.boundingSphere.radius)){o.getWorldScale(s);r=g.boundingSphere.radius*Math.max(Math.abs(s.x),Math.abs(s.y),Math.abs(s.z));}
+              const m=Array.isArray(o.material)?o.material[0]:o.material;if(m&&m.emissive&&m.emissive.getHex()!==0&&(m.emissiveIntensity===undefined||m.emissiveIntensity>0))r=-1;if(o.userData.fx||o.userData.hitProxy||o.userData.camProxy)r=-1;o.userData.r670=r;}
+            if(o.userData.r670>0)lista.push(o);}
+          e.t=C.ult.tIni;e.lista=lista;Cc.lista=lista.length;CE878.stats.cull670++;return lista;}
+        hi878CensoPede(sc);return e.lista;}catch(err){hi878Erro('censo cull670',err);return cull670Lista0.apply(this,arguments);}};
+    HI878.instalados.push('cull670Lista');}catch(e){hi878Erro('censo cull670',e);}
+}
+// (6.5) a varredura periódica do Papel (v190): a lista inteira da cena vem do censo; o resto (papelUm em fatias de 1 ms) é o mesmo
+if(HI878.on&&typeof papelPasso190==='function'&&typeof PAPEL_INC190!=='undefined'&&typeof papelUm==='function'){
+  try{papelPasso1900=papelPasso190;papelPasso190=function(){
+      try{if(!HI878.itens.censo)return papelPasso1900.apply(this,arguments);
+        const sc=ACTIVE;if(!sc)return;const P=PAPEL_INC190;if(P.sc!==sc){P.sc=sc;P.lista=null;P.i=0;P.espera=0;P.hi878=0;}
+        if(!P.lista){if(P.espera<40){P.espera++;if(P.espera<40)return;P.hi878=performance.now();}
+          const C=hi878CensoEstado(sc);if(C.ult&&C.ult.todos&&C.ult.tIni>=(P.hi878||0)){P.espera=0;P.lista=C.ult.todos;P.i=0;CE878.stats.papel++;return;}
+          hi878CensoPede(sc);return;}
+        const on=!!Q.papel,L=P.lista,a=performance.now();
+        while(P.i<L.length){const o=L[P.i++];try{papelUm(o,on);}catch(e){}if((P.i&15)===0&&performance.now()-a>1)break;}
+        if(P.i>=L.length)P.lista=null;}catch(e){hi878Erro('censo papel',e);}};
+    HI878.instalados.push('papelPasso190');}catch(e){hi878Erro('censo papel',e);}
+}
+
+/* ---------- (6.6) as máscaras da grade de caminhos da Histórica num Map pela chave ---------- */
+const GR878={max:8,mundo:null,stats:{mundos:0,guardadas:0,reusos:0,descartadas:0,msPoupadoEst:0}};
+function hi878GradeInstala(world){if(!world||world.__nv8m)return;const mapa=new Map();let atual=world.__nv8;
+  try{delete world.__nv8;}catch(e){}
+  Object.defineProperty(world,'__nv8',{configurable:true,enumerable:false,get(){return atual;},
+    set(B){atual=B;try{if(HI878.itens.grade&&B&&B.base&&B.nk!==undefined){const k=B.N+'|'+B.nk;if(!mapa.has(k))GR878.stats.guardadas++;mapa.delete(k);mapa.set(k,B);
+        while(mapa.size>GR878.max){mapa.delete(mapa.keys().next().value);GR878.stats.descartadas++;}}}catch(e){hi878Erro('grade guarda',e);}}});
+  Object.defineProperty(world,'__nv8m',{configurable:true,enumerable:false,value:mapa});
+  if(atual)world.__nv8=atual;GR878.stats.mundos++;}
+function hi878GradeGarante(){const R=ROOMS.cat;const W=R&&R.world;if(!W||W===GR878.mundo)return;GR878.mundo=W;try{hi878GradeInstala(W);}catch(e){hi878Erro('grade instala',e);}}
+if(HI878.on&&typeof nv8Guardada==='function'&&typeof NV820!=='undefined'){
+  try{const ng0=nv8Guardada;nv8Guardada=function(world,N,nk,conta){
+      try{const M=HI878.itens.grade&&world&&world.__nv8m;if(M){const B=M.get(N+'|'+nk);if(B&&B.base&&B.N===N&&B.nk===nk&&B.clamp===world.clamp){
+            if(world.__nv8!==B){world.__nv8=B;GR878.stats.reusos++;const S=NV820.stats;if(S.inteiras>0)GR878.stats.msPoupadoEst+=S.msInteira/S.inteiras;}return B;}}}catch(e){hi878Erro('grade',e);}
+      return ng0.apply(this,arguments);};
+    HI878.instalados.push('nv8Guardada');}catch(e){hi878Erro('grade embrulho',e);}
+}
+
+/* ---------- (6.7) o caminho do companheiro: 0,65 s de tempo de jogo e o teto de 2 caminhos por quadro ---------- */
+const CP878={ok:false,stats:{caminhos:0,adiados:0}};
+function hi878CompVez(){if(caminhoVez190())return true;CP878.stats.adiados++;return false;}
+if(HI878.on&&typeof c191Rumo==='function'&&typeof caminhoVez190==='function'){
+  try{const src=String(c191Rumo);
+    const de='if(!R.cam||agora-R.t>650||Math.hypot(tx-R.tx,tz-R.tz)>1.0){R.t=agora;R.tx=tx;R.tz=tz;let c=null;try{c=findPath(G.x,G.z,tx,tz);}catch(e){}R.cam=c;R.i=0;}';
+    const para='if((!R.cam||R.t878===undefined||t-R.t878>.65||Math.hypot(tx-R.tx,tz-R.tz)>1.0)&&hi878CompVez()){R.t=agora;R.t878=t;R.tx=tx;R.tz=tz;let c=null;try{c=findPath(G.x,G.z,tx,tz);}catch(e){}R.cam=c;R.i=0;CP878.stats.caminhos++;}';
+    if(src.split(de).length===2){const novo=eval('('+src.replace(de,para)+')');const cr0=c191Rumo;
+      c191Rumo=function(){return (HI878.itens.companheiro?novo:cr0).apply(this,arguments);};CP878.ok=true;HI878.instalados.push('c191Rumo');}
+    else hi878Erro('companheiro','trecho do c191Rumo não encontrado (a função mudou?)');}catch(e){hi878Erro('companheiro',e);}
+}
+
+/* ---------- (6.8) miudezas ---------- */
+const MI878={cdSeg:-1,cdVal:'',stats:{cavDiaGuardado:0,decorSalas:0,decorPulos:0,npcDist:0}};
+hi878Sala.ativo=!!HI878.mi.salaativa;
+if(HI878.on&&typeof setActive==='function'){
+  try{const sa0=setActive;setActive=function(){try{return sa0.apply(this,arguments);}finally{hi878SalaLimpa();}};HI878.instalados.push('setActive');}catch(e){hi878Erro('sala ativa',e);}
+}
+// (b) a distância até um morador sem criar vetor (o mesmo getWorldPosition; se alguém embrulhar o npcPosition depois, volta ao original)
+const HI878_VN=new THREE.Vector3();
+if(HI878.on&&typeof npcDistance==='function'&&typeof npcPosition==='function'){
+  try{const nd0=npcDistance,np0=npcPosition;npcDistance=function(n){if(!HI878.mi.vetores||npcPosition!==np0)return nd0.apply(this,arguments);
+      try{const p=n.g.getWorldPosition(HI878_VN),x=MODE==='fp'?P.x:CH.x,z=MODE==='fp'?P.z:CH.z;MI878.stats.npcDist++;return Math.hypot(x-p.x,z-p.z);}catch(e){hi878Erro('vetores',e);return nd0.apply(this,arguments);}};
+    HI878.instalados.push('npcDistance');}catch(e){hi878Erro('vetores',e);}
+}
+// (c) a decoração (v128): o tick que ela põe na sala, sem o Object.values quando não há peças (o mesmo corpo do decorRegister128)
+if(HI878.on&&typeof decorRegister128==='function'&&typeof DEC128!=='undefined'){
+  try{const dr0=decorRegister128;decorRegister128=function(key){const room=(typeof ROOMS!=='undefined')?ROOMS[key]:null;const antes=room&&room.tick;const tinha=!!DEC128.rooms[key];
+      const r=dr0.apply(this,arguments);
+      try{const R=DEC128.rooms[key];if(HI878.mi.decor&&room&&!tinha&&key!=='minha'&&R&&R.room===room&&typeof antes==='function'&&room.tick!==antes){const tick0=antes;
+          room.tick=dt=>{tick0(dt);if(DEC128.active===R&&decorLevel128(R)!==1&&R.gridLevel!==decorLevel128(R))decorGrid128(R);const Pl=R.placed;let tem=false;for(const k in Pl){tem=true;break;}
+            if(!tem){MI878.stats.decorPulos++;return;}
+            for(const s of Object.values(Pl))if(s.g.visible)s.g.traverse(o=>{if(o.isSprite&&o.userData.decorOpacity128!==undefined)o.material.opacity=o.userData.decorOpacity128*(.9+.1*Math.sin(t*7+o.id));});};
+          MI878.stats.decorSalas++;}}catch(e){hi878Erro('decor',e);}
+      return r;};
+    HI878.instalados.push('decorRegister128');}catch(e){hi878Erro('decor embrulho',e);}
+}
+// (d) cavDia() guardado pelo segundo do relógio: a data local só vira na passagem de um segundo inteiro — o resultado é o mesmo
+if(HI878.on&&typeof cavDia==='function'){
+  try{const cd0=cavDia;cavDia=function(){if(!HI878.mi.cavdia)return cd0.apply(this,arguments);const s=Math.floor(Date.now()/1000);
+      if(s===MI878.cdSeg){MI878.stats.cavDiaGuardado++;return MI878.cdVal;}const v=cd0.apply(this,arguments);MI878.cdSeg=s;MI878.cdVal=v;return v;};
+    HI878.instalados.push('cavDia');}catch(e){hi878Erro('cavDia',e);}
+}
+
+/* ---------- o quadro: antes (instalações), depois (aquecimento e censo) e a medição ---------- */
+const MED878={on:false,n:0,cap:2400,tk:new Float32Array(2400),dr:new Float32Array(2400),it:new Float32Array(2400),ult:0};
+function hi878Antes(){if(CUR==='room'&&ROOM&&ROOMS.cat&&ROOM===ROOMS.cat){if(HI878.itens.esqueletos)hi878EsqGarante();if(HI878.itens.grade)hi878GradeGarante();}}
+function hi878Depois(){if(AQ878.espera.length||HI878.itens.aquece){try{hi878AqPasso();}catch(e){hi878Erro('aquece driver',e);}}
+  if(HI878.itens.luzes||HI878.itens.censo){try{hi878CensoPasso(CE878.orc);}catch(e){hi878Erro('censo',e);}}}
+if(HI878.on){
+  try{const tk0=tick;tick=function(dt){HI878.quadro++;const a=performance.now();HI878.emTick=true;let r;
+      try{try{hi878Antes();}catch(e){hi878Erro('antes',e);}r=tk0.apply(this,arguments);try{hi878Depois();}catch(e){hi878Erro('depois',e);}}
+      finally{HI878.emTick=false;if(MED878.on){const i=MED878.n%MED878.cap;MED878.tk[i]=performance.now()-a;MED878.it[i]=MED878.ult?a-MED878.ult:0;MED878.dr[i]=0;MED878.n++;}MED878.ult=a;}
+      return r;};HI878.instalados.push('tick');}catch(e){hi878Erro('tick',e);}
+  try{const dw0=draw;draw=function(){if(!MED878.on)return dw0.apply(this,arguments);const a=performance.now();try{return dw0.apply(this,arguments);}finally{MED878.dr[(MED878.n+MED878.cap-1)%MED878.cap]=performance.now()-a;}};HI878.instalados.push('draw');}catch(e){hi878Erro('draw',e);}
+}
+function hi878Est(arr,n){const v=Array.from(arr.subarray(0,n)).sort((x,y)=>x-y);if(!v.length)return null;const q=f=>+v[Math.min(v.length-1,Math.floor(f*(v.length-1)+.5))].toFixed(2);
+  let s=0;for(const x of v)s+=x;return {media:+(s/v.length).toFixed(2),p50:q(.5),p90:q(.9),p99:q(.99),max:+v[v.length-1].toFixed(2)};}
+function hi878Resumo(){const n=Math.min(MED878.n,MED878.cap);const S=ES878.stats;const med=S.nReal?S.msReal/S.nReal:0;
+  return {quadros:n,tick:hi878Est(MED878.tk,n),draw:hi878Est(MED878.dr,n),intervalo:hi878Est(MED878.it,n),
+    esqueletos:{pulos:S.pulos,msPorPoseReal:+med.toFixed(3),msPoupadoEst:+(S.pulos*med).toFixed(1)}};}
+HI878.stats.bastidores=BA878.stats;HI878.stats.aquece=AQ878.stats;HI878.stats.esqueletos=ES878.stats;HI878.stats.censo=CE878.stats;
+HI878.stats.grade=GR878.stats;HI878.stats.companheiro=CP878.stats;HI878.stats.miudezas=MI878.stats;
+function hi878Liga(nome,on){on=!!on;if(!HI878.on)return false;
+  if(nome==='tudo'){for(const k in HI878.itens)HI878.itens[k]=on;for(const k in HI878.mi)HI878.mi[k]=on;}
+  else if(nome in HI878.itens){HI878.itens[nome]=on;if(nome==='miudezas')for(const k in HI878.mi)HI878.mi[k]=on;}
+  else if(nome in HI878.mi){HI878.mi[nome]=on&&HI878.itens.miudezas;}else return false;
+  hi878Sala.ativo=!!HI878.mi.salaativa;hi878SalaLimpa();return true;}
+window.__historica878={estado:HI878,stats:HI878.stats,erros:HI878.erros,itens:HI878.itens,miudezas:HI878.mi,instalados:HI878.instalados,
+  liga:hi878Liga,medir:{inicia(){MED878.n=0;MED878.ult=0;MED878.on=true;},para(){MED878.on=false;},resumo:hi878Resumo,estado:MED878},
+  bastidores:BA878,aquece:AQ878,
+  esqueletos:{estado:ES878,rigs:()=>Array.from(ES878.rigs),forca(rig,modo){if(modo)ES878.forca.set(rig,modo);else ES878.forca.delete(rig);},garante:hi878EsqGarante},
+  luzes:{lista0:()=>l226Lista0,aplicar0:()=>l226Aplicar0,doCenso:hi878L226DoCenso},
+  censo:{estado:CE878,pede:hi878CensoPede,cenaDe:hi878CensoEstado,agora(sc){sc=sc||ACTIVE;const C=hi878CensoEstado(sc);C.walk=null;hi878CensoPede(sc);const W=C.walk;
+      if(sc!==ACTIVE){const P=W.pilha;while(P.length){const o=P.pop();if(W.todos)W.todos.push(o);if(o.isPointLight)W.luzes.push(o);else if(o.isMesh&&(o.layers.mask===4||o.layers.mask===16))W.miudos.push(o);const c=o.children;for(let i=c.length-1;i>=0;i--)P.push(c[i]);}
+        C.ult={tIni:W.tIni,tFim:performance.now(),luzes:W.luzes,miudos:W.miudos,todos:W.todos,n:0};C.walk=null;return C.ult;}
+      return hi878CensoPasso(Infinity);},cull0:()=>cull670Lista0,papel0:()=>papelPasso1900},
+  grade:{estado:GR878,instala:hi878GradeInstala},companheiro:CP878,miudezasStats:MI878,sala:hi878Sala};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
