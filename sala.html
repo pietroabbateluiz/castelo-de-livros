@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v880</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v881</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -119321,6 +119321,1435 @@ if(EG880.on||EG880.porta){
 }
 window.__egito880={estado:EG880,stats:EG880.stats,erros:EG880.erros,reg:()=>EG880.reg,aplica:()=>{EG880.manual=false;const ok=eg880Aplica('gancho');try{if(ok&&ROOMS.cat)eg880Caches(ROOMS.cat);}catch(e){}return ok;},desfaz:eg880Desfaz,fotos:eg880Fotos,
   cestos:EG880_CESTOS.map(c=>({de:[c[0],c[1]],para:[c[2],c[3]]}))};
+
+/* ===================== v881 · AS SALAS PESADAS DOS ANDARES 5–7 (E A FICÇÃO E OS QUADRINHOS) MAIS LEVES NO PROCESSADOR: AS DECORAÇÕES TARDIAS PREPARADAS DEBAIXO DA VIAGEM, A BVH DA CÂMERA POR RADIX E NOS BASTIDORES, A LUZ DO LEITOR SEM O PAPEL INTEIRO E OS MORADORES DO 6.º ANDAR PARADOS FORA DE VISTA (bloco `DB881`) =====================
+   Origem: medidas do coordenador no Leve, no navegador sem placa (a máquina do Luiz tem Intel UHD, que o jogo trata como placa fraca): nos
+   andares 1–4 a lógica do quadro fica em 2–7 ms; nos andares 5–7, de 2,7 a 8 ms de média; a sala das VIAGENS (Literatura de Viagens, 7.º
+   andar) teve picos de 182 ms. Mesma régua da v878 (`HI878`): a imagem e a jogabilidade ficam as mesmas; só muda quando e quantas vezes o
+   trabalho é feito. Reaproveita a v878 onde serve (o embrulho de esqueletos `hi878EsqEmbrulha`, o teste do tronco e a recuperação antes do
+   desenho), sem repetir o que ela já faz em todas as salas (bastidores, aquecimento paralelo, censo das luzes, miúdos e Papel, companheiro).
+   (1) DECORAÇÕES TARDIAS — COMO ERA: as Viagens recebem três decorações DEPOIS de prontas, cada uma de uma vez (síncrona): a v708 (Estação dos
+       Balões, Caravana, Acampamento, Observatório, Mercado, Miniaturas — e, embrulhada nela, a varredura de materiais da v861), pelo
+       `setInterval` de 1 s da própria v708 ou 1,5 s depois do `finishRoom`; a v669 (poste, carrinho, canoa, binóculo, pegadas) a 1,5 s; e a
+       v812/`SG801` (oito conjuntos, com telas 2D, a fusão do kit, `lightBudget` = papel da cena inteira + 4 varreduras, e `fusaoLimpar`) a 3,4 s.
+       Medido em node (CPU, só geometria e kit: sem telas 2D de verdade, papel, fusão nem placa): ~20–50, ~70–90 e ~35–100 ms; somam 246
+       objetos, 38 mil triângulos (30,6 mil na colisão da câmera) e 130 obstáculos. No navegador cada uma é uma tarefa longa de ~0,1–0,25 s.
+       Com os bastidores parados (como nas medições) ou quando o leitor entra antes de a obra acabar, a sala é montada NA ENTRADA e as três caem
+       com o leitor já dentro, nos primeiros 1–4 s (é o quadro de ~180 ms mais provável; ver o RELATORIO). O mesmo vale, menor, para a Ficção
+       (v642 a 1,5 s e v740 a 3,4 s) e os Quadrinhos (v649 e v658 a 1,5 s, v841 a 1,6 s e v805/`SG801` a 3,4 s).
+       AGORA: quando a viagem prepara uma dessas salas (`travel434Prepare` da cena da sala, com `doorways`, antes da troca de cena — a mesma fase
+       em que o jogo compila os programas, sobe texturas e monta a BVH), as decorações que ainda não correram correm ali, uma por quadro, na
+       ordem dos temporizadores; depois de 300 ms do fim do acabamento, para os temporizadores mais curtos do acabamento (o campo de duelo dos
+       Quadrinhos, a 120/200 ms) correrem antes, como sempre; se alguma correu, a preparação guardada da cena é refeita (`QUIET434.prepared`),
+       para as peças novas entrarem nela. Os temporizadores originais encontram cada uma feita e não fazem nada. O que muda:
+       as peças tardias já estão lá no primeiro quadro dentro da sala (antes apareciam 1–4 s depois) e entram na preparação da viagem
+       (programas, texturas, BVH). Com a sala montada nos bastidores (o caso normal), nada muda: as decorações já correram. Nenhuma das sete
+       funções lê `CUR`/`ROOM`/`ACTIVE`/câmera (conferido), e nenhuma usa os obstáculos das outras para escolher lugar.
+       Diagnóstico sempre ligado (também com `?tardias881b=0`): cada uma dessas decorações registra quando correu, quanto tempo levou e se o
+       leitor estava dentro da sala (`window.__desempenho881b.tardias.log`).
+   (2) BVH DA CÂMERA — COMO ERA: `camBvh190` (com a forma da v872 `me872Bvh`) ordena os triângulos pela curva de Morton com
+       `Array.prototype.sort` e um comparador; é chamada na preparação da viagem (malha a malha), no preparo do vestíbulo e, para geometria nova
+       (decoração tardia, geometria clonada), na hora, dentro do quadro (`camHit` da câmera e `m790Raio` da visão dos inimigos).
+       AGORA: a mesma ordenação por radix estável (3 passadas de 10 bits sobre o código de 30 bits): a BVH sai IDÊNTICA (mesmos Uint16/Uint32,
+       mesmas caixas, mesmas estatísticas da v872; conferido em node com 10 geometrias de teste e as 170 malhas das três decorações das
+       Viagens) e ~2,3× mais barata em CPU nas malhas do kit (48 mil triângulos: 13,1 → 5,1 ms; 144 mil: 41,9 → 18,4 ms). E a geometria que o
+       kit t160 funde com o leitor numa sala (decoração tardia) entra numa fila e ganha a BVH nos bastidores, em fatias de 2 ms no fim do
+       quadro, antes de a câmera precisar dela; se a câmera pedir no meio, o resto é feito na hora (o mesmo resultado).
+   (3) LUZ DO LEITOR — COMO ERA: quando a câmera chega a ~0,56 m do leitor (braço curto contra parede ou peça), `setReaderOpacity` esconde ou
+       mostra o leitor e chama `lightBudget(ACTIVE)`, que faz o `papelApply` da CENA INTEIRA (papelUm em cada objeto) e mais quatro varreduras —
+       só para refazer a formação das luzes (a lanterna/luz do leitor entra ou sai da conta). Encostado numa parede, isso pode repetir a cada
+       ida e volta do braço. AGORA: nessa chamada (só a da distância da câmera, nunca a que vem de `refreshReaderMats`), o `lightBudget` corre
+       sem o `papelApply` — o mesmo que o próprio jogo já faz em `pri6Orcamento`. A formação das luzes é a mesma; o papel das peças novas
+       continua com a varredura periódica (v190/v878), como acontece em todo quadro em que o leitor não muda de visibilidade.
+   (4) MORADORES DO 6.º ANDAR — COMO ERA: os seis habitantes articulados da v224 (`a6xGente`: Inês e Dona Remédios no Realismo, Mestre Horácio
+       no Steampunk, Iara no Solarpunk, Detetive Barreto no Noir, o Sonhador no Surrealismo) fazem o `rig.pose` completo em todo quadro (mixer de
+       26 trilhas, 25–50 slerp, duas updateMatrixWorld(true), cinco getWorldPosition), na tela ou não. AGORA: a mesma regra da v878 (só no Leve e
+       no Papel, sem sombra nem reflexo, só no tick da sala ativa): fora do tronco de visão, o boneco não é animado; o tempo acumula com o teto
+       do `rig.pose` e a pose é refeita quando ele volta (no tick ou logo antes do desenho). Usa as funções da v878 (`hi878EsqEmbrulha`, o teste
+       do tronco, a recuperação antes do desenho); a cena do vão (Hall 6) também recupera os pendentes antes de desenhar a sala.
+       Depende da v878 ligada (`?historica878=0` ou `?esqueletos878=0` também param este item).
+   Ficam de fora (ver o RELATORIO): fatiar as decorações tardias (os gêmeos geradores existem, mas a v821 deixou o sequenciador desligado por
+   causa da corrida com o Papel); a varredura coplanar da v879 (`ZF879`, no desenho; a da v874 tinha passos de até ~0,26 s na Utopia); a vigia de
+   240 quadros da fusão do Leve; inimigos e caminhos (já com teto de 2 caminhos por quadro).
+   Chaves: `?desempenho881b=0` (tudo — nada é embrulhado), `?tardias881b=0`, `?bvh881b=0`, `?luzleitor881b=0`, `?esqueletos881b=0`.
+   Gancho `window.__desempenho881b` (`estado`, `itens`, `stats`, `erros`, `instalados`, `liga(item, bool)`, e um objeto por item).
+   REVISÃO (cópia opcional, `revisao/db881/REVISAO.md`; só defeitos baixos): D1 — antes da 1.ª decoração antecipada, uma volta do laço de
+   eventos (`setTimeout` 0): os temporizadores já vencidos do acabamento (o duelo dos Quadrinhos a 120/200 ms) correm antes mesmo quando os
+   300 ms passaram sem o laço girar (trabalho síncrono depois do acabamento); D2 — a luz do leitor sem o papel só no Leve e no Papel
+   (`Q.lite`), onde a varredura periódica do Papel (v190/v878) cobre as peças novas — fora do Leve não há essa varredura e o lightBudget da
+   troca segue completo, como sempre; D3 — com o fatiador da v821 ligado (`?fatias821=1`) as decorações não são antecipadas (lá elas só
+   entram na fila de fatias e a viagem não ganharia nada), e a preparação só é refeita se alguma decoração ficou pronta de fato. */
+const DB881_Q=location.search+location.hash;
+const DB881={on:!/[?&#]desempenho881b=0/i.test(DB881_Q),erros:[],stats:{},itens:{},instalados:[],quadro:0};
+for(const k of ['tardias','bvh','luzleitor','esqueletos'])DB881.itens[k]=DB881.on&&!new RegExp('[?&#]'+k+'881b=0','i').test(DB881_Q);
+function db881Erro(k,e){if(DB881.erros.length<40)DB881.erros.push(k+': '+(e&&e.message||e));try{console.warn('v881b',k,e);}catch(x){}}
+
+/* ---------- (1) decorações tardias: preparadas debaixo da viagem ---------- */
+// por sala, na ordem dos temporizadores do acabamento (mesmo prazo: a camada mais antiga primeiro); `feito()` = já correu ou está desligada
+const DB881_TD={espera:300,fim:{},log:[],stats:{viagens:0,feitas:0,ms:0,esperas:0},salas:{
+  viagens:[{nome:'v669',atraso:1500,f:'vg669Aplica',feito:()=>typeof VG669==='undefined'||!VG669.on||VG669.feito,faz:()=>vg669Aplica()},
+    {nome:'v708',atraso:1500,f:'vg708Aplicar',feito:()=>typeof VG708==='undefined'||!VG708.on||VG708.feito,faz:()=>vg708Aplicar()},
+    {nome:'v812',atraso:3400,f:'sg801Tenta',feito:()=>db881Sg801Feito('viagens'),faz:()=>sg801Tenta('viagens')}],
+  sci:[{nome:'v642',atraso:1500,f:'fc642Aplica',feito:()=>typeof FC642==='undefined'||!FC642.on||FC642.feito,faz:()=>fc642Aplica()},
+    {nome:'v740',atraso:3400,f:'fc740Tenta',feito:()=>typeof FC740==='undefined'||!FC740.on||FC740.feito,faz:()=>fc740Tenta()}],
+  quadrinhos:[{nome:'v649',atraso:1500,f:'qu649Aplica',feito:()=>typeof QU649==='undefined'||!QU649.on||QU649.feito,faz:()=>qu649Aplica()},
+    {nome:'v658',atraso:1500,f:'gb658Aplica',feito:()=>typeof GB658==='undefined'||!GB658.on||GB658.feito,faz:()=>gb658Aplica()},
+    {nome:'v841',atraso:1600,f:'gb841Aplica',feito:()=>{if(typeof GB841==='undefined'||!GB841.on)return true;const R=ROOMS.quadrinhos;return !!(R&&R.scene&&R.scene.userData.gb841);},faz:()=>gb841Aplica()},
+    {nome:'v805',atraso:3400,f:'sg801Tenta',feito:()=>db881Sg801Feito('quadrinhos'),faz:()=>sg801Tenta('quadrinhos')}]}};
+function db881Sg801Feito(key){try{if(typeof SG801==='undefined'||!SG801.on)return true;const S=SG801.salas[key];return !S||!!S.feito;}catch(e){return true;}}
+function db881TdPendentes(key){const L=DB881_TD.salas[key];if(!L)return 0;let n=0;for(const d of L){try{if(!d.feito())n++;}catch(e){}}return n;}
+function db881TdSala(sc){for(const k in DB881_TD.salas){const R=ROOMS[k];if(R&&R.scene===sc)return k;}return null;}
+function db881TdDentro(key){try{return CUR==='room'&&!!ROOM&&ROOM===ROOMS[key];}catch(e){return false;}}
+// corre as pendentes da sala, na ordem, uma por quadro (antes da troca de cena; `motivo` só para o registro)
+async function db881TdEscoa(key,motivo){const L=DB881_TD.salas[key],R=ROOMS[key];if(!L||!R||!R.ready||!R.scene||!db881TdPendentes(key))return 0;
+  const f=DB881_TD.fim[key];if(f===undefined)return 0;   // acabamento não visto por este bloco: os temporizadores fazem como sempre
+  const t0=performance.now();if(performance.now()-f<DB881_TD.espera){DB881_TD.stats.esperas++;while(performance.now()-f<DB881_TD.espera&&performance.now()-t0<2000)await new Promise(r=>setTimeout(r,40));}
+  // (revisão D1) uma volta do laço antes da 1.ª: os temporizadores vencidos do acabamento correm antes, mesmo se os 300 ms passaram sem o laço girar
+  await new Promise(r=>setTimeout(r,0));if(!db881TdPendentes(key))return 0;
+  DB881_TD.stats.viagens++;let n=0;
+  for(const d of L){let pend=false;try{pend=!d.feito();}catch(e){}if(!pend)continue;
+    try{d.antecipada=motivo;d.faz();}catch(e){db881Erro('tardias '+d.nome,e);}finally{d.antecipada=null;}let fez=false;try{fez=d.feito();}catch(e){}if(fez)n++;
+    try{await travel434Yield();}catch(e){}}
+  return n;}
+// diagnóstico: cada decoração registra quando correu de verdade (feito passou de falso a verdadeiro), quanto levou e onde estava o leitor
+function db881TdRegistra(key,d){try{const nome=d.f;if(!/^[a-z0-9]+$/i.test(nome)||eval('typeof '+nome)!=='function')return;const f0=eval(nome);if(f0.__db881)return;
+    const novo=function(){let antes=true;try{antes=d.feito();}catch(e){}const a=performance.now();try{return f0.apply(this,arguments);}
+      finally{let depois=antes;try{depois=d.feito();}catch(e){}if(!antes&&depois){const ms=performance.now()-a;DB881_TD.stats.feitas++;DB881_TD.stats.ms+=ms;
+          if(DB881_TD.log.length<60)DB881_TD.log.push({sala:key,peca:d.nome,ms:Math.round(ms),t:Math.round(a),dentroDaSala:db881TdDentro(key),porque:d.antecipada||'temporizador'});}}};
+    novo.__db881=true;if(f0.__gen)novo.__gen=f0.__gen;eval(nome+'=novo');}catch(e){db881Erro('tardias registro '+d.f,e);}}
+if(DB881.on){
+  try{const vistos=new Set();for(const k in DB881_TD.salas)for(const d of DB881_TD.salas[k]){const id=d.f+'|'+k;if(vistos.has(id))continue;vistos.add(id);
+      if(d.f==='sg801Tenta'){if(!vistos.has('sg801Tenta')){vistos.add('sg801Tenta');db881TdRegistraSg();}}else db881TdRegistra(k,d);}
+    DB881.instalados.push('tardias (registro)');}catch(e){db881Erro('tardias registro',e);}
+  // o fim do acabamento de cada sala (a 1.ª vez): a espera de 300 ms conta dali
+  if(typeof finishRoom==='function'&&typeof fr8Wrap==='function'&&typeof fr8Prev==='function')try{const fr0=finishRoom;
+      finishRoom=fr8Wrap(function*(key){const r=(yield* fr8Prev(fr0,this,arguments,'DB881'));try{if(DB881_TD.salas[key]&&!(key in DB881_TD.fim)&&ROOMS[key]&&ROOMS[key].ready)DB881_TD.fim[key]=performance.now();}catch(e){}return r;});
+      DB881.instalados.push('finishRoom');}catch(e){db881Erro('tardias acabamento',e);}
+  // a viagem que prepara a cena da sala (antes da troca): as pendentes correm ali
+  if(typeof travel434Prepare==='function')try{const tp0=travel434Prepare;
+      travel434Prepare=async function(scene,revision,doorways){
+        if(DB881.itens.tardias&&doorways!==false&&scene&&scene!==ACTIVE&&!(typeof FA821!=='undefined'&&FA821&&FA821.on)){let key=null;try{key=db881TdSala(scene);}catch(e){}
+          // se correu alguma, a preparação desta cena é refeita (a guardada não tinha as peças novas: programas, texturas, BVH)
+          if(key&&!db881TdDentro(key)){try{const n=await db881TdEscoa(key,'viagem');if(n>0&&typeof QUIET434!=='undefined'&&QUIET434.prepared)QUIET434.prepared.delete(scene);}catch(e){db881Erro('tardias viagem',e);}}}
+        return tp0.apply(this,arguments);};
+      DB881.instalados.push('travel434Prepare');}catch(e){db881Erro('tardias viagem',e);}
+}
+// o sg801Tenta serve às duas salas (Viagens e Quadrinhos): um registro só, que descobre a sala pelo argumento
+function db881TdRegistraSg(){try{if(typeof sg801Tenta!=='function'||sg801Tenta.__db881)return;const f0=sg801Tenta;
+    sg801Tenta=function(key){const L=DB881_TD.salas[key];const d=L&&L.find(x=>x.f==='sg801Tenta');if(!d)return f0.apply(this,arguments);
+      let antes=true;try{antes=d.feito();}catch(e){}const a=performance.now();try{return f0.apply(this,arguments);}
+      finally{let depois=antes;try{depois=d.feito();}catch(e){}if(!antes&&depois){const ms=performance.now()-a;DB881_TD.stats.feitas++;DB881_TD.stats.ms+=ms;
+          if(DB881_TD.log.length<60)DB881_TD.log.push({sala:key,peca:d.nome,ms:Math.round(ms),t:Math.round(a),dentroDaSala:db881TdDentro(key),porque:d.antecipada||'temporizador'});}}};
+    sg801Tenta.__db881=true;}catch(e){db881Erro('tardias registro sg801',e);}}
+
+/* ---------- (2) BVH da câmera: a mesma, com radix; e nos bastidores para o que o kit funde com o leitor na sala ---------- */
+const DB881_BV={u16:false,cb0:null,fila:[],emCurso:new Map(),orc:2,minTri:1500,
+  stats:{sincronas:0,msSincronas:0,maiorSincrona:0,triSincronas:0,fatiadas:0,msFatiadas:0,completadasNaHora:0,descartadas:0,enfileiradas:0,original:0}};
+// gerador: o mesmo cálculo do me872Bvh (u16) ou do camBvh190 da v190 (Uint32), com a ordem de Morton por radix; rende quando passa de `prazo()`
+function* db881BvhGen(g,u16,prazo){
+  const pos=g.attributes.position;const I=g.index?g.index.array:null;const nIdx=g.index?g.index.count:pos.count;
+  const P=pos.array,nt=(nIdx/3)|0,CH=48;const cx=new Float32Array(nt),cy=new Float32Array(nt),cz=new Float32Array(nt);
+  const TV=u16?null:new Uint32Array(nt*3);let x0=1e30,y0=1e30,z0=1e30,x1=-1e30,y1=-1e30,z1=-1e30;const PASSO=2048;
+  for(let t0=0;t0<nt;t0+=PASSO){const tf=Math.min(nt,t0+PASSO);
+    for(let t=t0;t<tf;t++){const a=I?I[t*3]:t*3,bb=I?I[t*3+1]:t*3+1,c=I?I[t*3+2]:t*3+2;if(TV){TV[t*3]=a;TV[t*3+1]=bb;TV[t*3+2]=c;}
+      const x=(P[a*3]+P[bb*3]+P[c*3])/3,y=(P[a*3+1]+P[bb*3+1]+P[c*3+1])/3,z=(P[a*3+2]+P[bb*3+2]+P[c*3+2])/3;cx[t]=x;cy[t]=y;cz[t]=z;
+      if(x<x0)x0=x;if(y<y0)y0=y;if(z<z0)z0=z;if(x>x1)x1=x;if(y>y1)y1=y;if(z>z1)z1=z;}
+    if(performance.now()>=prazo())yield 'centros';}
+  const sx=1023/Math.max(1e-6,x1-x0),sy=1023/Math.max(1e-6,y1-y0),sz=1023/Math.max(1e-6,z1-z0);
+  const esp=(v)=>{v&=1023;v=(v|(v<<16))&0x030000FF;v=(v|(v<<8))&0x0300F00F;v=(v|(v<<4))&0x030C30C3;v=(v|(v<<2))&0x09249249;return v;};
+  const code=new Uint32Array(nt);
+  for(let t0=0;t0<nt;t0+=PASSO){const tf=Math.min(nt,t0+PASSO);for(let t=t0;t<tf;t++)code[t]=(esp((cx[t]-x0)*sx)|(esp((cy[t]-y0)*sy)<<1)|(esp((cz[t]-z0)*sz)<<2))>>>0;
+    if(performance.now()>=prazo())yield 'codigos';}
+  // radix LSD estável, 3 passadas de 10 bits: a mesma ordem do sort estável do jogo (código e, no empate, o índice)
+  let ord=new Uint32Array(nt),tmp=new Uint32Array(nt);for(let t=0;t<nt;t++)ord[t]=t;const cnt=new Uint32Array(1024);
+  for(let sh=0;sh<30;sh+=10){cnt.fill(0);for(let k=0;k<nt;k++)cnt[(code[ord[k]]>>>sh)&1023]++;let s=0;for(let b=0;b<1024;b++){const c=cnt[b];cnt[b]=s;s+=c;}
+    for(let k0=0;k0<nt;k0+=PASSO*4){const kf=Math.min(nt,k0+PASSO*4);for(let k=k0;k<kf;k++){const t=ord[k];tmp[cnt[(code[t]>>>sh)&1023]++]=t;}if(performance.now()>=prazo())yield 'radix';}
+    const w=ord;ord=tmp;tmp=w;}
+  let T;
+  if(u16){T=pos.count<=65535?new Uint16Array(nt*3):null;
+    if(T){for(let k0=0;k0<nt&&T;k0+=PASSO){const kf=Math.min(nt,k0+PASSO);for(let k=k0;k<kf;k++){const t=ord[k];const a=I?I[t*3]:t*3,bb=I?I[t*3+1]:t*3+1,c=I?I[t*3+2]:t*3+2;if(!(a>=0&&a<=65535&&bb>=0&&bb<=65535&&c>=0&&c<=65535)){T=null;break;}T[k*3]=a;T[k*3+1]=bb;T[k*3+2]=c;}
+        if(T&&performance.now()>=prazo())yield 'triangulos';}}
+    if(!T){T=new Uint32Array(nt*3);for(let k0=0;k0<nt;k0+=PASSO){const kf=Math.min(nt,k0+PASSO);for(let k=k0;k<kf;k++){const t=ord[k];T[k*3]=I?I[t*3]:t*3;T[k*3+1]=I?I[t*3+1]:t*3+1;T[k*3+2]=I?I[t*3+2]:t*3+2;}if(performance.now()>=prazo())yield 'triangulos';}}}
+  else{T=new Uint32Array(nt*3);for(let k0=0;k0<nt;k0+=PASSO){const kf=Math.min(nt,k0+PASSO);for(let k=k0;k<kf;k++){const t=ord[k];T[k*3]=TV[t*3];T[k*3+1]=TV[t*3+1];T[k*3+2]=TV[t*3+2];}if(performance.now()>=prazo())yield 'triangulos';}}
+  const nc=Math.ceil(nt/CH),BX=new Float32Array(nc*6);
+  for(let c0=0;c0<nc;c0+=256){const cf=Math.min(nc,c0+256);
+    for(let c=c0;c<cf;c++){let a0=1e30,b0=1e30,e0=1e30,a1=-1e30,b1=-1e30,e1=-1e30;for(let k=c*CH,f=Math.min(nt,k+CH);k<f;k++)for(let j=0;j<3;j++){const v=T[k*3+j]*3,x=P[v],y=P[v+1],z=P[v+2];if(x<a0)a0=x;if(y<b0)b0=y;if(z<e0)e0=z;if(x>a1)a1=x;if(y>b1)b1=y;if(z>e1)e1=z;}
+      BX[c*6]=a0;BX[c*6+1]=b0;BX[c*6+2]=e0;BX[c*6+3]=a1;BX[c*6+4]=b1;BX[c*6+5]=e1;}
+    if(performance.now()>=prazo())yield 'caixas';}
+  return {v:pos.version,n:pos.count,ni:nIdx,iv:g.index?g.index.version:-1,P,T,BX,nt,nc,CH};}
+function db881BvhChave(g){const pos=g.attributes.position;return [pos.version,pos.count,g.index?g.index.count:pos.count,g.index?g.index.version:-1,pos.array];}
+function db881BvhValida(g,k){try{const pos=g.attributes&&g.attributes.position;if(!pos)return false;return pos.version===k[0]&&pos.count===k[1]&&(g.index?g.index.count:pos.count)===k[2]&&(g.index?g.index.version:-1)===k[3]&&pos.array===k[4];}catch(e){return false;}}
+// guarda como o jogo guarda (e, na forma da v872, as mesmas estatísticas da v872)
+function db881BvhGuarda(g,b){CAMBVH190.set(g,b);
+  if(DB881_BV.u16){try{const S=ME872.stats.bvh;S.construidas++;S.temporarioPoupado+=b.nt*12;if(b.T.BYTES_PER_ELEMENT===2){S.u16++;S.bytesPoupadosU16+=b.nt*6;}}catch(e){}}return b;}
+function db881BvhAgora(g){const it=db881BvhGen(g,DB881_BV.u16,()=>Infinity);let r;do{r=it.next();}while(!r.done);return r.value;}
+if(DB881.on&&typeof camBvh190==='function'&&typeof CAMBVH190!=='undefined'){
+  try{const cb0=camBvh190;DB881_BV.cb0=cb0;
+    // a forma ativa: a da v872 (Uint16 quando cabe) se ela embrulhou o camBvh190; senão a da v190 (Uint32)
+    DB881_BV.u16=!!(typeof ME872!=='undefined'&&ME872&&ME872.bvh&&typeof ME872_BVH0==='function'&&ME872_BVH0!==cb0);
+    camBvh190=function(g){if(!DB881.itens.bvh){DB881_BV.stats.original++;return cb0.apply(this,arguments);}
+      try{const pos=g&&g.attributes&&g.attributes.position;if(!pos||pos.isInterleavedBufferAttribute||pos.itemSize!==3)return null;const nIdx=g.index?g.index.count:pos.count;
+        let b=CAMBVH190.get(g);if(b&&b.v===pos.version&&b.n===pos.count&&b.ni===nIdx&&b.iv===(g.index?g.index.version:-1))return b;
+        const a=performance.now();const J=DB881_BV.emCurso.get(g);
+        if(J&&db881BvhValida(g,J.chave)){let r;J.prazo=Infinity;do{r=J.it.next();}while(!r.done);DB881_BV.emCurso.delete(g);J.feito=true;b=db881BvhGuarda(g,r.value);DB881_BV.stats.completadasNaHora++;}
+        else{if(J){DB881_BV.emCurso.delete(g);J.feito=true;}b=db881BvhGuarda(g,db881BvhAgora(g));}
+        const d=performance.now()-a;const S=DB881_BV.stats;S.sincronas++;S.msSincronas+=d;S.triSincronas+=b.nt;if(d>S.maiorSincrona)S.maiorSincrona=d;return b;}
+      catch(e){db881Erro('bvh',e);return cb0.apply(this,arguments);}};
+    DB881.instalados.push('camBvh190');}catch(e){db881Erro('bvh embrulho',e);}
+  // o que o kit funde com o leitor numa sala: a geometria vai para a fila dos bastidores (a câmera só a vê na próxima varredura, a cada 3 s)
+  if(typeof t160Kit==='function')try{const k0=t160Kit;t160Kit=function(){const K=k0.apply(this,arguments);
+      try{if(K&&typeof K.fim==='function'){const f0=K.fim;K.fim=function(){const out=f0.apply(this,arguments);try{if(DB881.itens.bvh&&CUR==='room'&&Array.isArray(out)&&out.length)db881BvhEnfileira(out);}catch(e){db881Erro('bvh kit',e);}return out;};}}catch(e){}
+      return K;};DB881.instalados.push('t160Kit');}catch(e){db881Erro('bvh kit',e);}
+}
+function db881BvhEnfileira(malhas){const t=performance.now();for(const m of malhas){try{if(!m||!m.isMesh||!m.geometry||!camAceita190(m))continue;const g=m.geometry,pos=g.attributes.position;
+      const nt=((g.index?g.index.count:pos.count)/3)|0;if(nt<DB881_BV.minTri||DB881_BV.emCurso.has(g)||CAMBVH190.has(g))continue;if(DB881_BV.fila.length>=64)break;
+      DB881_BV.fila.push({m,g,t});DB881_BV.stats.enfileiradas++;}catch(e){}}}
+// no fim do quadro, com o leitor numa sala: até `orc` ms de BVH nos bastidores (só malhas já penduradas na cena ativa)
+function db881BvhPasso(){const F=DB881_BV.fila;if(!F.length&&!DB881_BV.emCurso.size)return;if(!DB881.itens.bvh||CUR!=='room'||(typeof PERF130!=='undefined'&&PERF130.busy))return;
+  const a=performance.now(),lim=a+DB881_BV.orc;let soltas=0;
+  while(F.length&&performance.now()<lim&&soltas<F.length){const E=F[0];
+    if(!E.J){let raiz=null;for(let p=E.m;p;p=p.parent)raiz=p;const g=E.g;
+      if(E.m.geometry!==g||CAMBVH190.has(g)||DB881_BV.emCurso.has(g)){F.shift();continue;}
+      // ainda não pendurada na cena ativa: espera até 3 s (vai para o fim da fila); depois sai (a preparação da viagem ou a câmera fazem)
+      if(raiz!==ACTIVE){if(a-E.t>3000){F.shift();DB881_BV.stats.descartadas++;}else{F.push(F.shift());soltas++;}continue;}
+      const pos=g.attributes.position;if(!pos||pos.isInterleavedBufferAttribute||pos.itemSize!==3){F.shift();continue;}
+      const J={g,chave:db881BvhChave(g),prazo:0,it:null,ms:0,feito:false};J.it=db881BvhGen(g,DB881_BV.u16,()=>J.prazo);E.J=J;DB881_BV.emCurso.set(g,J);}
+    const J=E.J;if(J.feito){F.shift();continue;}
+    if(!db881BvhValida(J.g,J.chave)||E.m.geometry!==J.g){DB881_BV.emCurso.delete(J.g);J.feito=true;F.shift();DB881_BV.stats.descartadas++;continue;}
+    const b0=performance.now();J.prazo=lim;let r;try{r=J.it.next();}catch(e){db881Erro('bvh fatia',e);DB881_BV.emCurso.delete(J.g);J.feito=true;F.shift();continue;}J.ms+=performance.now()-b0;
+    if(r.done){DB881_BV.emCurso.delete(J.g);J.feito=true;F.shift();if(!CAMBVH190.has(J.g)&&db881BvhValida(J.g,J.chave))db881BvhGuarda(J.g,r.value);DB881_BV.stats.fatiadas++;DB881_BV.stats.msFatiadas+=J.ms;}}}
+
+/* ---------- (3) a luz do leitor: o lightBudget da distância da câmera sem o papelApply da cena inteira ---------- */
+const DB881_LZ={stats:{trocas:0,papelPulado:0,msUltima:0}};
+if(DB881.on&&typeof setReaderOpacity==='function'&&typeof papelApply==='function'){
+  try{const so0=setReaderOpacity;setReaderOpacity=function(op){let pula=false;
+      try{if(DB881.itens.luzleitor&&Q.lite&&readerOp!==-1&&READER&&READER.g&&!(Math.abs(op-readerOp)<0.01&&(op>0.99)===(readerOp>0.99))){const vis=(MODE!=='fp')&&op>0.02;if(READER.g.visible!==vis)pula=true;}}catch(e){pula=false;}
+      if(!pula)return so0.apply(this,arguments);
+      const pa=papelApply,a=performance.now();DB881_LZ.stats.trocas++;papelApply=function(){DB881_LZ.stats.papelPulado++;};
+      try{return so0.apply(this,arguments);}finally{papelApply=pa;DB881_LZ.stats.msUltima=+(performance.now()-a).toFixed(2);}};
+    DB881.instalados.push('setReaderOpacity');}catch(e){db881Erro('luz do leitor',e);}
+}
+
+/* ---------- (4) os moradores do 6.º andar fora de vista: a regra da v878 ---------- */
+const DB881_ES={salas:['realismo','steampunk','solarpunk','noir','surrealismo'],n:{},cenas:new Set(),rigs:new Set(),stats:{rigs:0,recuperadosVao:0}};
+function db881EsqGarante(){if(typeof ES878==='undefined'||typeof hi878EsqEmbrulha!=='function'||!ROOM)return;
+  for(const k of DB881_ES.salas){const R=ROOMS[k];if(!R||R!==ROOM||!R.scene)continue;const r=(typeof NR!=='undefined')?NR[k]:null;const L=r&&r.rigs224;if(!L||L.length===DB881_ES.n[k])continue;
+    DB881_ES.n[k]=L.length;const c0=ES878.cena;
+    try{for(const rig of L){if(!rig||rig.__hi878)continue;hi878EsqEmbrulha(rig,R.scene);if(rig.__hi878){rig.__hi878.db881=true;DB881_ES.rigs.add(rig);}}}finally{ES878.cena=c0;}
+    DB881_ES.cenas.add(R.scene);DB881_ES.stats.rigs=DB881_ES.rigs.size;}}
+if(DB881.on&&typeof hi878EsqPode==='function'&&typeof ES878!=='undefined'){
+  // a chave deste item vale só para os bonecos que ele embrulhou (os da Histórica seguem a da v878)
+  try{const ep0=hi878EsqPode;hi878EsqPode=function(S){if(S&&S.db881&&!DB881.itens.esqueletos)return false;return ep0.apply(this,arguments);};DB881.instalados.push('hi878EsqPode');}catch(e){db881Erro('esqueletos pode',e);}
+  // a sala do 6.º andar desenhada pelo vão (fora da cena ativa): os pendentes são refeitos antes, como a v878 faz com a Histórica
+  if(typeof renderer!=='undefined'&&renderer&&typeof renderer.render==='function')try{const rr0=renderer.render;
+      renderer.render=function(scene,cam){if(DB881_ES.cenas.size&&scene&&scene!==ACTIVE&&DB881_ES.cenas.has(scene)&&ES878.pendentes.size){try{hi878EsqAntesDoDesenho(cam,scene);DB881_ES.stats.recuperadosVao++;}catch(e){db881Erro('esqueletos vão',e);}}
+        return rr0.apply(this,arguments);};DB881.instalados.push('renderer.render');}catch(e){db881Erro('esqueletos render',e);}
+}
+
+/* ---------- o quadro: antes (bonecos) e depois (BVH nos bastidores) ---------- */
+function db881Antes(){if(DB881.itens.esqueletos&&CUR==='room'){try{db881EsqGarante();}catch(e){db881Erro('esqueletos',e);}}}
+function db881Depois(){if(DB881_BV.fila.length||DB881_BV.emCurso.size){try{db881BvhPasso();}catch(e){db881Erro('bvh passo',e);}}}
+if(DB881.on){
+  try{const tk0=tick;tick=function(dt){DB881.quadro++;try{db881Antes();}catch(e){db881Erro('antes',e);}let r;try{r=tk0.apply(this,arguments);}finally{try{db881Depois();}catch(e){db881Erro('depois',e);}}return r;};
+    DB881.instalados.push('tick');}catch(e){db881Erro('tick',e);}
+}
+DB881.stats.tardias=DB881_TD.stats;DB881.stats.bvh=DB881_BV.stats;DB881.stats.luzleitor=DB881_LZ.stats;DB881.stats.esqueletos=DB881_ES.stats;
+function db881Liga(nome,on){on=!!on;if(!DB881.on)return false;
+  if(nome==='tudo'){for(const k in DB881.itens)DB881.itens[k]=on;return true;}
+  if(!(nome in DB881.itens))return false;DB881.itens[nome]=on;return true;}
+window.__desempenho881b={estado:DB881,itens:DB881.itens,stats:DB881.stats,erros:DB881.erros,instalados:DB881.instalados,liga:db881Liga,
+  tardias:{estado:DB881_TD,log:DB881_TD.log,pendentes:db881TdPendentes,escoa:db881TdEscoa},
+  bvh:{estado:DB881_BV,gerador:db881BvhGen,agora:db881BvhAgora,original:()=>DB881_BV.cb0},
+  luzleitor:DB881_LZ,esqueletos:{estado:DB881_ES,garante:db881EsqGarante}};
+
+/* ===================== v881 · A AVENTURA E A FANTASIA MAIS LEVES NO PROCESSADOR: AS NORMAIS DOS PANOS PELO CAMINHO CURTO, OS PANOS FORA DE VISTA PARADOS, O CHÃO DA FANTASIA COM O CAMINHO DA ALDEIA POR GRADE E A GRADE DE CAMINHOS POR CHAVE (bloco `DA881`) =====================
+   Origem: a mesma análise de processador da v878 (bloco `HI878`, Histórica), feita na AVENTURA (gênero `navegacoes`, sala `adv`: o galeão
+   Boa Ventura) e na FANTASIA (gênero `castelo`, sala `fant`: a floresta da grande árvore e a aldeia). Medidas do coordenador no Leve, no
+   navegador sem placa: Aventura 7,2 ms de lógica por quadro em média, Fantasia 5,8 ms (a máquina do Luiz tem Intel UHD, que o jogo trata
+   como placa fraca). Perfil de CPU no node, com o jogo inteiro «sem cabeça» e uma sala por processo (ver `RELATORIO.md`): na Aventura o
+   maior custo próprio é o tique do galeão (velas e bandeiras: ~1,3–1,8 ms por quadro no node); na Fantasia, a altura do chão. Mesma
+   régua da v878: a imagem e a jogabilidade ficam as mesmas — só muda quando e quantas vezes o trabalho é feito. O que a v878 já faz em
+   todas as salas (bastidores, aquecimento paralelo, luzes e censo em fatias, companheiro, miudezas) não é repetido aqui.
+   (1) NORMAIS DOS PANOS (Aventura) — COMO ERA: a cada quadro o `advTick` (fechado dentro do construtor da sala) refaz a forma das 8 velas e
+       das 3 bandeiras (`setZ` em ~1 900 vértices) e chama `computeVertexNormals()` em cada uma; no three r128 esse método passa vértice a
+       vértice por Vector3 e BufferAttribute (`fromBufferAttribute`, `cross`, `add`, `setXYZ`, `normalize`): ~0,55 ms por quadro só nas velas.
+       AGORA: as geometrias que o tique da sala recalcula a cada quadro são achadas por uma sonda de 3 quadros (o método do protótipo é
+       embrulhado só durante a chamada do tique da sala) e ganham um `computeVertexNormals` próprio que faz a MESMA conta — mesma ordem,
+       mesmas leituras e gravações em Float32, lê os três vértices antes de gravar, normaliza com `1/(comprimento||1)` — direto nos arrays
+       (~6× mais rápido). Cada geometria é conferida bit a bit contra o método original nas 3 primeiras chamadas; uma diferença a devolve
+       ao original para sempre. (Conferido no node: 1,2 milhão de valores, nenhuma diferença.)
+   (2) PANOS FORA DE VISTA (Aventura; só no Leve e no Papel — sem sombra nem reflexo — e sem varredura de coplanares a meio) — COMO ERA:
+       as velas e bandeiras eram refeitas em todo quadro, na tela ou não (do convés, as velas altas e as de trás quase nunca estão no quadro).
+       AGORA: a forma deles só depende do relógio `t` (as velas: `S.B*(1+0,06·sen(0,7t+ph))`, sen/pow de u,v e ondulação; as bandeiras:
+       duas senoides de u e t). O pano cuja esfera da malha (+1 m) está fora do tronco de visão da câmera, ou que tem um ancestral escondido,
+       fica com a contagem de vértices em 0 só durante a chamada do tique da sala (o laço do `advTick` não roda) e as normais não são
+       refeitas; o instante do quadro fica guardado. Ele é refeito com a mesma conta e esse instante quando voltaria a ser usado: logo antes
+       de qualquer desenho da cena da Aventura (câmera principal: os que entram no quadro; outra câmera ou o vão do Hall: todos), antes do
+       teste de colisão da câmera (`camHit`) cuja esfera o alcance, e quando o item é desligado ou a qualidade muda. As constantes de cada
+       pano (largura, altura, fase do mastro, bojo; largura e fase da bandeira) vêm da geometria e da malha e são conferidas bit a bit contra
+       o que o `advTick` gravou em 3 quadros antes de o pano poder ser pulado. Se o tique da sala não chegar ao `advTick` (diálogo aberto), o
+       pano fica como o original deixaria (a pose do último tique). `visible` não é tocado; o `needsUpdate` das posições continua a cada
+       quadro (a fusão e a BVH da câmera veem a mesma versão).
+   (3) O CHÃO DA FANTASIA — COMO ERA: a altura do chão (`ForestWorkshop.terrainV58`, da Oficina da Floresta, chamado pelo `terrainH` da sala
+       e daí por `FANT.floorY`) soma, ao sul da árvore (z < −15), a distância ao caminho da aldeia: um laço por 251 pontos com `Math.hypot`
+       (~38–70 µs por chamada no node). Fadas, andarilhos, coelhos, penas, dragões adormecidos e o leitor pedem ~28 alturas por quadro.
+       AGORA: `ForestWorkshop.terrainV58` passa a ser uma réplica com o mesmo texto e a mesma ordem das contas; só a distância ao caminho
+       consulta uma grade de 54 × 54 casas de 1,5 m com os pontos candidatos de cada casa (os mesmos pontos, a mesma conta; o mínimo é o mesmo;
+       fora da grade, o laço inteiro) — ~6× mais rápido. Antes de valer: 600 chamadas reais calculadas pelos dois e comparadas bit a bit, e
+       uma grade de 1 440 pontos da floresta e da aldeia em fatias de 3 ms; uma diferença devolve o original para sempre. Ligada, uma memória
+       de 1 024 casas guarda o resultado de cada (x, z) exato com a mesma função de base (coisas paradas — penas, dragões que dormem, o leitor
+       quieto — pedem sempre o mesmo ponto). (Conferido no node: 1,38 milhão de pontos, três bases, NaN e infinitos: nenhuma diferença.)
+   (4) GRADE DE CAMINHOS POR CHAVE NA AVENTURA E NA FANTASIA — estende o (6.6) da v878 (`hi878GradeInstala`, o mesmo `Map` por chave e a
+       mesma conferência de 1 célula em 64) aos mundos dessas duas salas. A Fantasia tem `ext` 198 (o recanto da v359): 1 320 × 1 320 = 1,74
+       milhão de células, e a chave muda a cada andar da árvore (`f0`/`f1`/`f2`) — cada troca com inimigo ou companheiro pedindo caminho
+       refazia a máscara inteira (no node sem placa: ~7 s na Fantasia, ~0,3 s na Aventura; com o Map, a volta a uma chave vista custa
+       0,2 s e 8 ms). Na Aventura a chave muda a cada salto (galeão, navio preto, ilhas). Só vale com a grade da v878 ligada.
+   Chaves: `?desempenho881=0` (tudo — nada é embrulhado), `?normais881=0`, `?panos881=0`, `?chao881=0` (e, dentro dela, `?memo881=0`),
+   `?grade881=0`. Para medir na mesma sessão, `window.__desempenho881.liga(item, false|true)` liga e desliga cada item (e `'tudo'`).
+   Gancho `window.__desempenho881` (`estado`, `itens`, `liga`, `stats`, `erros`, `medir`, `panos`, `chao`, `grade`).
+   REVISÃO (revisao/da881/REVISAO.md) — quatro consertos, nada mais muda:
+   R1 (chão) a grade de candidatos do caminho da aldeia era montada inteira na 1.ª chamada da réplica (2 916 casas × 251 pontos × 5
+      `Math.hypot`: ~0,5 s de uma vez no node) — e essa 1.ª chamada cai no 1.º passo da montagem da Fantasia, que desde a v524 corre nos
+      bastidores, com o leitor já no Hall (um tranco de ~0,5–1 s em toda sessão). AGORA cada casa ganha os seus candidatos na 1.ª consulta
+      dela (~0,2 ms; a mesma conta e a mesma lista, casa a casa).
+   R2 (panos) um pano refeito DURANTE o tique da sala (um `camHit` ou um desenho da cena da Aventura chamado por uma camada do tique) com o
+      pano pulado nesse tique ficava com `position.count=0` para sempre (o `finally` só devolvia a contagem a quem ainda estava pulado): as
+      velas congelavam até recarregar, mesmo com o item desligado. AGORA o refazer devolve a contagem, usa o `t` do quadro se o `advTick` já
+      passou pelo pano (senão o instante guardado), e os ganchos também cuidam dos panos pulados no tique em curso.
+   R3 (panos) quem lê as velas pelo raio rápido da câmera fora do `camHit` — a visão dos inimigos e os projéteis (`m790Raio`, v790) e a copa
+      da v232 (`g232Raio`), com origem fora da câmera — via a forma velha de um pano pendente. AGORA o `camRaio190` (o trecho comum dos três)
+      refaz antes o pano pendente da malha que ele vai ler.
+   R4 (panos) a sonda de 3 quadros caía às vezes com um diálogo aberto (o `advTick` não roda): nenhum pano achado e o item perdido até
+      recarregar. AGORA ela espera o diálogo fechar e, se ainda assim não achar nenhum pano tipado, tenta de novo (até 5 vezes). */
+const DA881_Q=location.search+location.hash;
+const DA881={on:!/[?&#]desempenho881=0/i.test(DA881_Q),erros:[],stats:{},emTick:false,quadro:0,instalados:[],itens:{},mi:{}};
+for(const k of ['normais','panos','chao','grade'])DA881.itens[k]=DA881.on&&!new RegExp('[?&#]'+k+'881=0','i').test(DA881_Q);
+DA881.mi.memo=DA881.itens.chao&&!/[?&#]memo881=0/i.test(DA881_Q);
+function da881Erro(k,e){if(DA881.erros.length<30)DA881.erros.push(k+': '+(e&&e.message||e));try{console.warn('v881',k,e);}catch(x){}}
+
+/* ---------- (1)/(2) os panos da Aventura: sonda, normais rápidas conferidas, forma refeita só quando vai ser vista ---------- */
+const PA881={sala:null,embrulho:null,dentro:false,rodou:false,faltas:0,espera:0,sondas:0,rodadasSonda:0,vistos:null,panos:[],porGeo:new Map(),porMalha:new Map(),pendentes:new Set(),pulados:new Set(),
+  fr:new THREE.Frustum(),fr2:new THREE.Frustum(),m:new THREE.Matrix4(),s:new THREE.Sphere(),v:new THREE.Vector3(),margem:1.0,tmp:null,
+  stats:{panos:0,velas:0,bandeiras:0,embrulhos:0,sondas:0,normaisRapidas:0,normaisOriginais:0,normaisConferidas:0,normaisRecusadas:0,
+    elegiveis:0,recusasForma:0,pulos:0,quadrosPulando:0,recuperadosDesenho:0,recuperadosCamera:0,recuperadosRaio:0,recuperadosOutros:0,refeitosNoTique:0}};
+// a réplica só serve para malha indexada com atributos simples em Float32 (o caso das velas e bandeiras)
+function da881NormaisPode(geo){const pos=geo.attributes.position,nor=geo.attributes.normal,idx=geo.index;
+  return !!(pos&&nor&&idx&&!pos.isInterleavedBufferAttribute&&!nor.isInterleavedBufferAttribute&&!idx.isInterleavedBufferAttribute&&pos.itemSize===3&&nor.itemSize===3&&idx.itemSize===1&&
+    pos.array instanceof Float32Array&&nor.array instanceof Float32Array&&nor.count===pos.count&&(idx.array instanceof Uint16Array||idx.array instanceof Uint32Array));}
+// a mesma conta do BufferGeometry.computeVertexNormals + normalizeNormals do r128 (ramo indexado), sem Vector3 nem BufferAttribute no meio
+function da881NormaisConta(geo){const P=geo.attributes.position.array,nor=geo.attributes.normal,N=nor.array,I=geo.index.array,nc=nor.count*3,ic=geo.index.count;
+  for(let i=0;i<nc;i++)N[i]=0;
+  for(let i=0;i<ic;i+=3){const a=I[i]*3,b=I[i+1]*3,c=I[i+2]*3;
+    const cbx=P[c]-P[b],cby=P[c+1]-P[b+1],cbz=P[c+2]-P[b+2],abx=P[a]-P[b],aby=P[a+1]-P[b+1],abz=P[a+2]-P[b+2];
+    const x=cby*abz-cbz*aby,y=cbz*abx-cbx*abz,z=cbx*aby-cby*abx;
+    const ax=N[a]+x,ay=N[a+1]+y,az=N[a+2]+z,bx=N[b]+x,by=N[b+1]+y,bz=N[b+2]+z,cx=N[c]+x,cy=N[c+1]+y,cz=N[c+2]+z; // lê os três antes de gravar, como o original
+    N[a]=ax;N[a+1]=ay;N[a+2]=az;N[b]=bx;N[b+1]=by;N[b+2]=bz;N[c]=cx;N[c+1]=cy;N[c+2]=cz;}
+  for(let i=0;i<nc;i+=3){const x=N[i],y=N[i+1],z=N[i+2];const s=1/(Math.sqrt(x*x+y*y+z*z)||1);N[i]=x*s;N[i+1]=y*s;N[i+2]=z*s;}
+  nor.needsUpdate=true;}
+// o computeVertexNormals próprio de cada pano: pulado fora de vista; conferido 3 vezes; depois, a réplica
+function da881PanoNormais(geo,P){P.chamado=true;if(P.pula)return;
+  const proto=THREE.BufferGeometry.prototype.computeVertexNormals;
+  if(!DA881.itens.normais||P.rapida===false||!da881NormaisPode(geo)){PA881.stats.normaisOriginais++;return proto.call(geo);}
+  if(P.rapida!==true){proto.call(geo);const N=geo.attributes.normal.array;const ref=(P.ref&&P.ref.length===N.length)?P.ref:(P.ref=new Float32Array(N.length));ref.set(N);
+    da881NormaisConta(geo);let ok=true;for(let i=0;i<N.length;i++){if(!Object.is(N[i],ref[i])){ok=false;break;}}PA881.stats.normaisConferidas++;
+    if(!ok){N.set(ref);geo.attributes.normal.needsUpdate=true;P.rapida=false;PA881.stats.normaisRecusadas++;da881Erro('normais','diferença na conferência ('+(P.tipo||'pano')+')');}
+    else if(++P.confN>=3){P.rapida=true;P.ref=null;}
+    return;}
+  da881NormaisConta(geo);PA881.stats.normaisRapidas++;}
+// a forma do pano no instante t (o mesmo texto do advTick): grava z em arr[i*st+of]
+function da881PanoForma(P,t,arr,st,of){const p=P.geo.attributes.position,S=P.S,n=p.count;
+  if(P.tipo==='vela'){const B=S.B*(1+0.06*Math.sin(t*0.7+S.ph));for(let i=0;i<n;i++){const u=p.getX(i)/S.w+0.5,v=p.getY(i)/S.h+0.5;const b=B*Math.sin(Math.PI*u)*(0.3+0.7*Math.sin(Math.PI*v))*(1-Math.pow(v,6));const rip=Math.sin(u*9+t*2.2+S.ph)*0.02*(1-v)+Math.sin(v*7-t*1.7)*0.012;arr[i*st+of]=-(b+rip*b*3);}}
+  else if(P.tipo==='bandeira'){for(let i=0;i<n;i++){const u=p.getX(i)/S.w;const w=Math.sin(u*7-t*6+S.ph)*0.12*u+Math.sin(u*13-t*9)*0.03*u;arr[i*st+of]=w;}}}
+function da881PanoNovo(geo){const R=PA881.sala;const meshes=[];try{R.scene.traverse(o=>{if(o.isMesh&&o.geometry===geo)meshes.push(o);});}catch(e){}
+  const P={geo,meshes,tipo:null,S:null,rapida:null,confN:0,confP:0,eleg:false,instalado:false,pula:false,cnt:0,chamado:false,pend:false,tPend:0,ref:null};
+  try{const pr=geo.parameters||{},m=meshes[0];
+    if(meshes.length===1&&geo.type==='PlaneGeometry'&&pr.widthSegments===16&&pr.heightSegments===9&&m.parent){P.tipo='vela';P.S={w:pr.width,h:pr.height,ph:m.parent.position.z*0.7,B:0.28+pr.height*0.09};}
+    else if(meshes.length===1&&geo.type==='PlaneGeometry'&&pr.widthSegments===18&&pr.heightSegments===8){P.tipo='bandeira';P.S={w:pr.width,ph:m.position.x+m.position.z};}}catch(e){P.tipo=null;}
+  return P;}
+function da881PanoInstala(P){const geo=P.geo;if(Object.prototype.hasOwnProperty.call(geo,'computeVertexNormals'))return false; // alguém já trocou: fica como está
+  geo.computeVertexNormals=function(){return da881PanoNormais(this,P);};P.instalado=true;return true;}
+// sonda: durante a chamada do tique da sala, quem pede computeVertexNormals (3 quadros; fica quem pediu nos três)
+function da881Sonda(){const proto=THREE.BufferGeometry.prototype,orig=proto.computeVertexNormals,lista=new Set();
+  const rec=function(){try{lista.add(this);}catch(e){}return orig.apply(this,arguments);};proto.computeVertexNormals=rec;
+  return {lista,fim(){if(proto.computeVertexNormals===rec)proto.computeVertexNormals=orig;else da881Erro('sonda','o protótipo mudou durante a sonda');}};}
+function da881SondaFim(lista){PA881.sondas++;PA881.stats.sondas++;const atual=new Set();for(const g of lista)if(g&&g.isBufferGeometry)atual.add(g);
+  if(!PA881.vistos)PA881.vistos=atual;else for(const g of Array.from(PA881.vistos))if(!atual.has(g))PA881.vistos.delete(g);
+  if(PA881.sondas<3)return;
+  for(const g of PA881.vistos){if(PA881.porGeo.has(g))continue;const P=da881PanoNovo(g);if(!P.meshes.length)continue;if(!da881PanoInstala(P))P.tipo=null;PA881.panos.push(P);PA881.porGeo.set(g,P);if(P.tipo&&P.meshes[0])PA881.porMalha.set(P.meshes[0],P);}
+  const S=PA881.stats;S.panos=PA881.panos.length;S.velas=PA881.panos.filter(P=>P.tipo==='vela').length;S.bandeiras=PA881.panos.filter(P=>P.tipo==='bandeira').length;PA881.vistos=null;
+  // R4: nenhum pano tipado (diálogo aberto nos 3 quadros: o advTick não rodou) → sonda de novo, até 5 rodadas
+  if(!PA881.panos.some(P=>P.tipo)&&PA881.rodadasSonda<5){PA881.rodadasSonda++;PA881.sondas=0;}}
+function da881PanosPode(){try{return !!(DA881.itens.panos&&Q.lite&&!Q.refl&&!renderer.shadowMap.enabled&&!PERF130.busy&&!(typeof C465!=='undefined'&&C465.job));}catch(e){return false;}}
+function da881Tronco(fr,cam){PA881.m.multiplyMatrices(cam.projectionMatrix,cam.matrixWorldInverse);fr.setFromProjectionMatrix(PA881.m);return fr;}
+// fora = um ancestral escondido (não é desenhado) ou a esfera da malha + margem fora do tronco; só para panos pendurados na cena da Aventura
+function da881PanoFora(P,fr){const m=P.meshes[0],bs=P.geo.boundingSphere;if(!m||!bs)return false;let oculto=false,raiz=null;for(let p=m;p;p=p.parent){if(!p.visible)oculto=true;raiz=p;}
+  if(!PA881.sala||raiz!==PA881.sala.scene)return false;if(oculto)return true;if(m.frustumCulled===false)return false;
+  const s=PA881.s.copy(bs).applyMatrix4(m.matrixWorld);s.radius+=PA881.margem;return !fr.intersectsSphere(s);}
+// R2: chamado durante o tique da sala com o pano PULADO nesse tique (contagem em 0): devolve a contagem e tira o pulo; se o advTick já passou por
+// ele (chamado), a forma é a do t deste quadro (a que o original teria agora); senão, a do instante guardado (e o advTick ainda o refaz com t)
+function da881PanoRefaz(P,porque){const emPulo=!!P.pula;if(!P.pend&&!(emPulo&&P.chamado))return;const pos=P.geo.attributes.position;const tq=(emPulo&&P.chamado)?t:P.tPend;
+  try{if(emPulo){pos.count=P.cnt;PA881.pulados.delete(P);PA881.stats.refeitosNoTique++;}P.pula=false;da881PanoForma(P,tq,pos.array,3,2);pos.needsUpdate=true;P.geo.computeVertexNormals();}catch(e){da881Erro('panos refaz',e);}
+  P.pend=false;PA881.pendentes.delete(P);const S=PA881.stats;if(porque==='desenho')S.recuperadosDesenho++;else if(porque==='camera')S.recuperadosCamera++;else if(porque==='raio')S.recuperadosRaio++;else S.recuperadosOutros++;}
+function da881PanosRefazTodos(porque){for(const P of Array.from(PA881.pendentes))da881PanoRefaz(P,porque);}
+// quem pode estar com a forma atrasada agora: os pendentes e, durante o tique da sala, os pulados por onde o advTick já passou
+function da881PanosAtrasados(){const L=Array.from(PA881.pendentes);if(PA881.pulados.size)for(const P of PA881.pulados)if(!P.pend&&P.chamado)L.push(P);return L;}
+function da881PanosHa(){return PA881.pendentes.size>0||PA881.pulados.size>0;}
+// conferência da forma (antes de um pano poder ser pulado): o que o advTick gravou neste quadro = a conta acima com o t deste quadro, 3 vezes
+function da881PanosConfere(){for(const P of PA881.panos){if(!P.tipo||P.eleg||!P.chamado||!P.instalado)continue;const pos=P.geo.attributes.position,n=pos.count;
+    const tmp=(PA881.tmp&&PA881.tmp.length>=n)?PA881.tmp:(PA881.tmp=new Float32Array(Math.max(n,512)));da881PanoForma(P,t,tmp,1,0);
+    let ok=true;const A=pos.array;for(let i=0;i<n;i++){if(!Object.is(A[i*3+2],tmp[i])){ok=false;break;}}
+    if(!ok){P.tipo=null;PA881.stats.recusasForma++;continue;}if(++P.confP>=3){P.eleg=true;PA881.stats.elegiveis++;}}}
+// o tique da sala da Aventura (embrulhado de fora): sonda, pulos e conferência — só no tique principal com o leitor na sala
+function da881AdvTick(self,args,t0){const R=ROOMS.adv;PA881.sala=R;
+  const ativo=DA881.emTick&&CUR==='room'&&ROOM===R&&ACTIVE===R.scene&&!PERF130.busy;
+  if(!ativo)return t0.apply(self,args); // vão do Hall e afins: como antes (os pendentes são refeitos antes do desenho)
+  if(PA881.sondas<3&&(DA881.itens.normais||DA881.itens.panos)){let npc=false;try{npc=!!NPC127.open;}catch(e){}if(npc)return t0.apply(self,args); // R4: com diálogo aberto o advTick não roda — a sonda espera
+    const S=da881Sonda();let r;try{r=t0.apply(self,args);}finally{S.fim();}try{da881SondaFim(S.lista);}catch(e){da881Erro('sonda fim',e);}return r;}
+  const L=PA881.panos;if(!L.length)return t0.apply(self,args);
+  const pode=da881PanosPode();if(!pode&&PA881.pendentes.size)da881PanosRefazTodos('outros');
+  for(const P of L){P.chamado=false;P.pula=false;}
+  if(pode){let fr=null;for(const P of L){if(!P.eleg)continue;let fora=false;try{if(!fr)fr=da881Tronco(PA881.fr,camera);fora=da881PanoFora(P,fr);}catch(e){fora=false;}
+      if(fora){const pos=P.geo.attributes.position;P.cnt=pos.count;pos.count=0;P.pula=true;PA881.pulados.add(P);}}}
+  let r;
+  try{r=t0.apply(self,args);}
+  finally{let pulou=0;for(const P of L){if(P.pula){P.geo.attributes.position.count=P.cnt;P.pula=false;if(P.chamado){P.pend=true;P.tPend=t;PA881.pendentes.add(P);pulou++;PA881.stats.pulos++;}}
+      else if(P.chamado&&P.pend){P.pend=false;PA881.pendentes.delete(P);}}
+    PA881.pulados.clear();if(pulou)PA881.stats.quadrosPulando++;}
+  try{da881PanosConfere();}catch(e){da881Erro('panos conferência',e);}
+  return r;}
+function da881AdvEmbrulha(){const R=ROOMS.adv;if(!R||typeof R.tick!=='function')return;const t0=R.tick;
+  const w=function(dt){if(PA881.dentro)return t0.apply(this,arguments);PA881.dentro=true;PA881.rodou=true;try{return da881AdvTick(this,arguments,t0);}finally{PA881.dentro=false;}};
+  w.__da881=true;R.tick=w;PA881.embrulho=w;PA881.stats.embrulhos++;}
+// com o leitor na Aventura há ~90 quadros (as camadas da sala já se embrulharam): embrulha; se o embrulho cair (uma camada trocou o tique sem
+// chamar o anterior), embrulha de novo — só o de fora age (`dentro`)
+function da881PanosAntes(){PA881.rodou=false;const R=ROOMS.adv;if(!R||!R.ready||!R.scene||CUR!=='room'||ROOM!==R||ACTIVE!==R.scene)return;
+  if(!(DA881.itens.normais||DA881.itens.panos))return;if(!PA881.embrulho){if(++PA881.espera>=90)da881AdvEmbrulha();}}
+function da881PanosDepois(){const R=ROOMS.adv;if(!PA881.embrulho||!R||CUR!=='room'||ROOM!==R||ACTIVE!==R.scene||PERF130.busy)return;
+  let npc=false;try{npc=!!NPC127.open;}catch(e){}if(PA881.rodou||npc){PA881.faltas=0;return;}if(++PA881.faltas>=3){PA881.faltas=0;da881AdvEmbrulha();}}
+// antes do desenho da cena da Aventura: câmera principal → os pendentes que entram no quadro; outra câmera (o vão do Hall…) → todos
+function da881PanosAntesDoDesenho(scene,cam){const principal=cam===camera&&scene===ACTIVE;let fr=null;
+  if(principal){if(cam.parent===null)cam.updateMatrixWorld();fr=da881Tronco(PA881.fr2,cam);}
+  for(const P of da881PanosAtrasados()){let ve=true;if(principal){try{ve=!da881PanoFora(P,fr);}catch(e){ve=true;}}if(ve)da881PanoRefaz(P,'desenho');}}
+// antes do teste de colisão da câmera: o pendente cuja esfera (a mesma do camHit: raio × escala + 0,4, + margem) o raio alcança é refeito
+function da881PanosCamera(ox,oy,oz,dx,dy,dz,dist){for(const P of da881PanosAtrasados()){const m=P.meshes[0],bs=P.geo.boundingSphere;if(!m||!bs){da881PanoRefaz(P,'camera');continue;}
+    const e=m.matrixWorld.elements,c=bs.center,X=e[0]*c.x+e[4]*c.y+e[8]*c.z+e[12],Y=e[1]*c.x+e[5]*c.y+e[9]*c.z+e[13],Z=e[2]*c.x+e[6]*c.y+e[10]*c.z+e[14];
+    const r=(isFinite(bs.radius)?bs.radius:1e4)*Math.max(Math.hypot(e[0],e[1],e[2]),Math.hypot(e[4],e[5],e[6]),Math.hypot(e[8],e[9],e[10]))+0.4+PA881.margem;
+    const cx=X-ox,cy=Y-oy,cz=Z-oz,tt=cx*dx+cy*dy+cz*dz;if(tt<-r||tt>dist+r)continue;if(cx*cx+cy*cy+cz*cz-tt*tt>r*r)continue;da881PanoRefaz(P,'camera');}}
+if(DA881.on&&typeof renderer!=='undefined'&&renderer&&typeof renderer.render==='function'){
+  try{const rr0=renderer.render;renderer.render=function(scene,cam){if(da881PanosHa()&&PA881.sala&&scene===PA881.sala.scene){try{da881PanosAntesDoDesenho(scene,cam);}catch(e){da881Erro('panos desenho',e);}}return rr0.apply(this,arguments);};
+    DA881.instalados.push('renderer.render');}catch(e){da881Erro('panos render',e);}
+}
+if(DA881.on&&typeof camHit==='function'){
+  try{const ch0=camHit;camHit=function(ox,oy,oz,dx,dy,dz,dist){if(da881PanosHa()&&PA881.sala&&ACTIVE===PA881.sala.scene){try{da881PanosCamera(ox,oy,oz,dx,dy,dz,dist);}catch(e){da881Erro('panos câmera',e);}}return ch0.apply(this,arguments);};
+    DA881.instalados.push('camHit');}catch(e){da881Erro('panos camHit',e);}
+}
+// R3: o raio rápido da câmera (camRaio190) é o trecho comum do camHit, da visão dos inimigos e dos projéteis (m790Raio, v790) e da copa da
+// v232 (g232Raio) — os dois últimos com origem fora da câmera: antes de ler uma vela pendente (ou pulada no tique em curso), ela é refeita
+if(DA881.on&&typeof camRaio190==='function'){
+  try{const cr0=camRaio190;camRaio190=function(o){if(o&&da881PanosHa()){const P=PA881.porMalha.get(o);if(P&&(P.pend||(P.pula&&P.chamado))){try{da881PanoRefaz(P,'raio');}catch(e){da881Erro('panos raio',e);}}}return cr0.apply(this,arguments);};
+    DA881.instalados.push('camRaio190');}catch(e){da881Erro('panos camRaio190',e);}
+}
+
+/* ---------- (3) o chão da Fantasia: réplica do ForestWorkshop.terrainV58 com o caminho da aldeia por grade ---------- */
+const CH881={estado:'espera',orig:null,rep:null,fw:null,base:null,gradeI:0,gradeTotal:30*48,gradeOk:false,info:null,
+  stats:{chamadas:0,rapidas:0,originais:0,conferidas:0,diferencas:0,gradePontos:0,memoAcertos:0,memoGuardados:0}};
+const CH881_MX=new Float64Array(1024),CH881_MZ=new Float64Array(1024),CH881_MV=new Float64Array(1024),CH881_MB=new Array(1024).fill(null),CH881_F=new Float64Array(2),CH881_U=new Uint32Array(CH881_F.buffer);
+// o texto da Oficina da Floresta v58 (terrainV58, smooth, lakeDistance, transitionRelief e os pontos do caminho), com a distância ao caminho por grade
+function da881ChaoCria(T){
+  const FOREST_LAKE={x:-10.2,z:-10.5,rx:4.5,rz:3.8};
+  const TRANSITION_HOMES=[[-12,-34,5],[12,-34,5],[-14,-45,5],[13,-46,5],[-5.3,-52,5],[5.5,-53,5],[0,-60,6]];
+  const smooth=x=>{x=Math.max(0,Math.min(1,x));return x*x*(3-2*x);};
+  function lakeDistance(x,z){return Math.hypot((x-FOREST_LAKE.x)/FOREST_LAKE.rx,(z-FOREST_LAKE.z)/FOREST_LAKE.rz);}
+  const v=(x,y,z)=>new T.Vector3(x,y,z);
+  const G={pts:null,PX:null,PZ:null,x0:-40,z0:-90,c:1.5,nx:54,nz:54,cel:null,feitas:0,cand:0,cheias:0,fora:0};
+  // os mesmos pontos (CatmullRom a cada ~0,65 m), uma vez (como a Oficina faz na 1.ª chamada dela)
+  function pontos(){if(G.pts)return;const pts=[];const lines=[[[-7,-17],[-9,-24],[-8,-31],[-6,-38],[0,-43],[0,-49]],[[8,-17],[10,-24],[9,-31],[6,-38],[0,-43]]];
+    const yaw=[.5,-.5,.6,-.5,.15,-.15,0];TRANSITION_HOMES.forEach(([hx,hz],i)=>lines.push([[0,-43],[hx*.55,(hz+2-43)/2],[hx+Math.sin(yaw[i])*2.5,hz+Math.cos(yaw[i])*2.5]]));
+    for(const points of lines){const c=new T.CatmullRomCurve3(points.map(p=>v(p[0],0,p[1]))),n=Math.ceil(c.getLength()/.65);for(let i=0;i<=n;i++)pts.push(c.getPoint(i/n));}
+    const N=pts.length,PX=new Float64Array(N),PZ=new Float64Array(N);for(let k=0;k<N;k++){PX[k]=pts[k].x;PZ[k]=pts[k].z;}
+    G.pts=pts;G.PX=PX;G.PZ=PZ;G.cel=new Array(G.nx*G.nz).fill(null);}
+  // R1 (revisão): os candidatos de uma casa só na 1.ª consulta dela (~0,2 ms) — antes, as 2 916 casas de uma vez (~0,5 s num passo só).
+  // Para a casa: os pontos que podem ser o mais perto de algum ponto dela: U = o menor «ponto mais longe da casa»; candidato = quem fica a
+  // até U (+1e-6) da casa. A mesma conta e a mesma lista (em ordem de índice) da montagem de uma vez.
+  function casa(i,j){const ci=j*G.nx+i;let L=G.cel[ci];if(L)return L;const {x0,z0,c,PX,PZ}=G,N=PX.length,EPS=1e-6;
+    const ax=x0+i*c,bx=ax+c,az=z0+j*c,bz=az+c;let U=Infinity;
+    for(let k=0;k<N;k++){const px=PX[k],pz=PZ[k];const m=Math.max(Math.hypot(px-ax,pz-az),Math.hypot(px-bx,pz-az),Math.hypot(px-ax,pz-bz),Math.hypot(px-bx,pz-bz));if(m<U)U=m;}
+    const tmp=[];for(let k=0;k<N;k++){const px=PX[k],pz=PZ[k];const dx=Math.max(ax-px,0,px-bx),dz=Math.max(az-pz,0,pz-bz);if(Math.hypot(dx,dz)<=U+EPS)tmp.push(k);}
+    L=G.cel[ci]=Int32Array.from(tmp);G.feitas++;G.cand+=L.length;return L;}
+  function transitionPathDistance(x,z){pontos();const {x0,z0,c,nx,nz,PX,PZ}=G;
+    if(x>=x0&&x<=x0+nx*c&&z>=z0&&z<=z0+nz*c){let i=Math.floor((x-x0)/c),j=Math.floor((z-z0)/c);if(i>=nx)i=nx-1;if(j>=nz)j=nz-1;
+      const L=casa(i,j);let d=Infinity;for(let q=0;q<L.length;q++){const k=L[q];d=Math.min(d,Math.hypot(x-PX[k],z-PZ[k]));}G.cheias++;return d;}
+    G.fora++;let d=Infinity;for(const p of G.pts)d=Math.min(d,Math.hypot(x-p.x,z-p.z));return d;}
+  function transitionRelief(x,z){
+   if(z>=-15)return 0;
+   const blend=smooth((-z-15)/12),tree=smooth((Math.hypot(x,z+23)-7.4)/3.5),path=smooth((transitionPathDistance(x,z)-1.2)/2.2);
+   let homes=1;for(const [hx,hz,r] of TRANSITION_HOMES)homes*=smooth((Math.hypot(x-hx,z-hz)-r)/3);
+   const plaza=smooth((Math.hypot(x,z+43)-4.5)/3),edge=smooth((29-Math.hypot(x,z-Math.max(-43,Math.min(0,z))))/5);
+   return blend*tree*path*homes*plaza*edge*(.13+.10*Math.sin(x*.22+z*.11)*Math.sin(z*.19-x*.07));
+  }
+  function terrainV58(base,x,z){const h=base(x,z),r=Math.hypot(x,z),path=1-Math.exp(-x*x/4.5),oldLake=smooth((Math.hypot(x-5.4,z-2.2)-3.65)/2.1),tree=smooth((Math.hypot(x,z+23)-7)/3),edge=smooth((24-r)/5),door=smooth((Math.hypot(x,z-19)-3)/3),mask=path*oldLake*tree*edge*door;
+   let out=h+mask*(.34*Math.sin(x*.35+z*.18)*Math.sin(z*.4-x*.11)+.045*Math.sin(x*1.4)*Math.sin(z*1.7)+1.18*Math.exp(-((x-13)*(x-13)+(z-8)*(z-8))/25)+.95*Math.exp(-((x+15)*(x+15)+(z-9)*(z-9))/20)+.72*Math.exp(-((x-6)*(x-6)+(z-12)*(z-12))/13)+.60*Math.exp(-((x+7)*(x+7)+(z+3)*(z+3))/15));
+   const d=lakeDistance(x,z);if(d<1.42){const shore=smooth((d-.85)/.52);out=(-.80+.13*Math.sin(x*.45)*Math.sin(z*.5))*(1-shore)+out*shore;}return out+transitionRelief(x,z);
+  }
+  terrainV58.info=()=>({pontos:G.pts?G.pts.length:0,casasProntas:G.feitas,casas:G.nx*G.nz,candidatosMedios:G.feitas?+(G.cand/G.feitas).toFixed(1):null,naGrade:G.cheias,foraDaGrade:G.fora});
+  return terrainV58;}
+// memória exata: (x, z) com os mesmos bits (zero com sinal) e a mesma função de base
+function da881ChaoMemo(base,x,z){CH881_F[0]=x;CH881_F[1]=z;const U=CH881_U;let h=Math.imul(U[0]^U[1],0x9E3779B1)^Math.imul(U[2]^U[3],0x85EBCA77);h=(h^(h>>>16))&1023;
+  if(CH881_MB[h]===base&&CH881_MX[h]===x&&CH881_MZ[h]===z&&(x!==0||Object.is(CH881_MX[h],x))&&(z!==0||Object.is(CH881_MZ[h],z))){CH881.stats.memoAcertos++;return CH881_MV[h];}
+  const v=CH881.rep(base,x,z);CH881_MB[h]=base;CH881_MX[h]=x;CH881_MZ[h]=z;CH881_MV[h]=v;CH881.stats.memoGuardados++;CH881.stats.rapidas++;return v;}
+function da881Chao(base,x,z){const C=CH881;C.stats.chamadas++;
+  if(!DA881.itens.chao||C.estado==='recusado'){C.stats.originais++;return C.orig(base,x,z);}
+  if(C.estado==='ligado'){if(DA881.mi.memo&&base===C.base)return da881ChaoMemo(base,x,z);C.stats.rapidas++;return C.rep(base,x,z);}
+  const a=C.orig(base,x,z);C.stats.originais++;if(C.base===null)C.base=base;
+  if(base===C.base){let b;try{b=C.rep(base,x,z);}catch(e){C.estado='recusado';da881Erro('chão réplica',e);return a;}
+    C.stats.conferidas++;if(!Object.is(a,b)){C.stats.diferencas++;C.estado='recusado';da881Erro('chão','diferença em ('+x+', '+z+'): '+a+' × '+b);}
+    else if(C.stats.conferidas>=600&&C.gradeOk)C.estado='ligado';}
+  return a;}
+function da881ChaoInstala(){if(CH881.fw)return true;let FW=null;try{FW=window.ForestWorkshop;}catch(e){}if(!FW||typeof FW.terrainV58!=='function'||FW.terrainV58.__da881)return false;
+  try{CH881.orig=FW.terrainV58;CH881.rep=da881ChaoCria(THREE);const f=function(base,x,z){return da881Chao(base,x,z);};f.__da881=true;f.original=CH881.orig;FW.terrainV58=f;CH881.fw=FW;CH881.estado='conferindo';DA881.instalados.push('ForestWorkshop.terrainV58');return true;}
+  catch(e){da881Erro('chão instala',e);return false;}}
+// a grade de conferência (30 × 48 pontos da floresta e da aldeia), em fatias de 3 ms nos quadros, com a base das chamadas reais
+function da881ChaoGradePasso(){const C=CH881;if(C.estado!=='conferindo'||C.base===null||C.gradeOk||!DA881.itens.chao)return;const a=performance.now();
+  while(C.gradeI<C.gradeTotal&&performance.now()-a<3){const i=C.gradeI++;const x=-30+(i%30)*2.07+0.13,z=-70+Math.floor(i/30)*1.93+0.07;let o,r;
+    try{o=C.orig(C.base,x,z);r=C.rep(C.base,x,z);}catch(e){C.estado='recusado';da881Erro('chão grade',e);return;}C.stats.gradePontos++;
+    if(!Object.is(o,r)){C.estado='recusado';C.stats.diferencas++;da881Erro('chão','diferença na grade em ('+x+', '+z+')');return;}}
+  if(C.gradeI>=C.gradeTotal){C.gradeOk=true;if(C.stats.conferidas>=600)C.estado='ligado';}}
+if(DA881.on&&DA881.itens.chao)try{da881ChaoInstala();}catch(e){da881Erro('chão',e);}
+
+/* ---------- (4) a grade de caminhos por chave também nos mundos da Aventura e da Fantasia (o Map da v878) ---------- */
+const GD881={mundos:new Map(),stats:{mundos:0,semV878:0}};
+function da881GradeV878(){try{return typeof HI878!=='undefined'&&HI878.on&&HI878.itens.grade&&HI878.instalados.indexOf('nv8Guardada')>=0&&typeof hi878GradeInstala==='function';}catch(e){return false;}}
+function da881GradeGarante(){if(!DA881.itens.grade||CUR!=='room')return;const R=ROOM;if(!R||(R!==ROOMS.adv&&R!==ROOMS.fant))return;const W=R.world;if(!W||GD881.mundos.has(W))return;
+  if(!da881GradeV878()){GD881.stats.semV878++;GD881.mundos.set(W,null);return;}
+  try{hi878GradeInstala(W);GD881.mundos.set(W,W.__nv8m||null);GD881.stats.mundos++;}catch(e){da881Erro('grade',e);GD881.mundos.set(W,null);}}
+// desligar em tempo de execução: o Map sai do mundo (a v878 volta a ver só a máscara da v820); ligar: volta
+function da881GradeLiga(on){for(const [W,M] of GD881.mundos){if(!M)continue;try{if(on){if(!W.__nv8m)Object.defineProperty(W,'__nv8m',{configurable:true,enumerable:false,value:M});}else if(W.__nv8m===M)delete W.__nv8m;}catch(e){da881Erro('grade liga',e);}}}
+
+/* ---------- o quadro: antes (embrulho da sala, grade, chão), depois (conferências) e a medição ---------- */
+const MD881={on:false,n:0,cap:2400,tk:new Float32Array(2400),dr:new Float32Array(2400),it:new Float32Array(2400),ult:0};
+function da881Antes(){try{da881PanosAntes();}catch(e){da881Erro('panos antes',e);}
+  if(DA881.itens.grade){try{da881GradeGarante();}catch(e){da881Erro('grade antes',e);}}
+  if(DA881.itens.chao&&!CH881.fw){try{da881ChaoInstala();}catch(e){}}}
+function da881Depois(){try{da881PanosDepois();}catch(e){da881Erro('panos depois',e);}
+  if(CH881.estado==='conferindo'){try{da881ChaoGradePasso();}catch(e){da881Erro('chão grade',e);}}}
+if(DA881.on){
+  try{const tk0=tick;tick=function(dt){DA881.quadro++;const a=performance.now();DA881.emTick=true;let r;
+      try{try{da881Antes();}catch(e){da881Erro('antes',e);}r=tk0.apply(this,arguments);try{da881Depois();}catch(e){da881Erro('depois',e);}}
+      finally{DA881.emTick=false;if(MD881.on){const i=MD881.n%MD881.cap;MD881.tk[i]=performance.now()-a;MD881.it[i]=MD881.ult?a-MD881.ult:0;MD881.dr[i]=0;MD881.n++;}MD881.ult=a;}
+      return r;};DA881.instalados.push('tick');}catch(e){da881Erro('tick',e);}
+  try{const dw0=draw;draw=function(){if(!MD881.on)return dw0.apply(this,arguments);const a=performance.now();try{return dw0.apply(this,arguments);}finally{MD881.dr[(MD881.n+MD881.cap-1)%MD881.cap]=performance.now()-a;}};DA881.instalados.push('draw');}catch(e){da881Erro('draw',e);}
+}
+function da881Est(arr,n){const v=Array.from(arr.subarray(0,n)).sort((x,y)=>x-y);if(!v.length)return null;const q=f=>+v[Math.min(v.length-1,Math.floor(f*(v.length-1)+.5))].toFixed(2);
+  let s=0;for(const x of v)s+=x;return {media:+(s/v.length).toFixed(2),p50:q(.5),p90:q(.9),p99:q(.99),max:+v[v.length-1].toFixed(2)};}
+function da881Resumo(){const n=Math.min(MD881.n,MD881.cap);return {quadros:n,tick:da881Est(MD881.tk,n),draw:da881Est(MD881.dr,n),intervalo:da881Est(MD881.it,n)};}
+DA881.stats.panos=PA881.stats;DA881.stats.chao=CH881.stats;DA881.stats.grade=GD881.stats;
+function da881Liga(nome,on){on=!!on;if(!DA881.on)return false;
+  const antes={panos:DA881.itens.panos,grade:DA881.itens.grade};
+  if(nome==='tudo'){for(const k in DA881.itens)DA881.itens[k]=on;DA881.mi.memo=on;}
+  else if(nome in DA881.itens){DA881.itens[nome]=on;if(nome==='chao')DA881.mi.memo=on;}
+  else if(nome==='memo'){DA881.mi.memo=on&&DA881.itens.chao;}else return false;
+  try{if(antes.panos&&!DA881.itens.panos)da881PanosRefazTodos('outros');}catch(e){da881Erro('liga panos',e);}
+  try{if(antes.grade!==DA881.itens.grade)da881GradeLiga(DA881.itens.grade);}catch(e){da881Erro('liga grade',e);}
+  return true;}
+window.__desempenho881={estado:DA881,stats:DA881.stats,erros:DA881.erros,itens:DA881.itens,miudezas:DA881.mi,instalados:DA881.instalados,liga:da881Liga,
+  medir:{inicia(){MD881.n=0;MD881.ult=0;MD881.on=true;},para(){MD881.on=false;},resumo:da881Resumo,estado:MD881},
+  panos:{estado:PA881,lista:()=>PA881.panos.slice(),pendentes:()=>Array.from(PA881.pendentes),atrasados:da881PanosAtrasados,refaz:da881PanoRefaz,refazTodos:da881PanosRefazTodos,forma:da881PanoForma,
+    normaisConta:da881NormaisConta,normaisPode:da881NormaisPode,fora:da881PanoFora,tronco:da881Tronco,embrulha:da881AdvEmbrulha},
+  chao:{estado:CH881,instala:da881ChaoInstala,cria:da881ChaoCria,info:()=>CH881.rep&&CH881.rep.info?CH881.rep.info():null},
+  grade:{estado:GD881,garante:da881GradeGarante,liga:da881GradeLiga}};
+
+/* ===================== v881 · CONTROLE (GAMEPAD) PARA A STEAM: ONZE PONTOS, CADA UM COM CHAVE PRÓPRIA (bloco `CT881`) =====================
+   Pedido do Luiz (19/11): atacar os pontos de CONTROLE que a revisão da rodada de 18 h listou («Para a etapa dos controles (Steam)»).
+   Isto muda interface: o Luiz viu a proposta (19/11, 14:48–15:10) e escolheu os ONZE itens — vêm todos LIGADOS (`CT881.padrao`).
+   COMO ERA / AGORA (resumo; o detalhe de cada item está no comentário da seção dele, abaixo):
+   · decorar     — COMO ERA: no Decorar só o B (v865) responde ao controle; escolher, mover, girar e empilhar só com mouse, toque ou teclado,
+                   e a cruz ainda trocava de andar (PageUp/PageDown) por trás do editor. AGORA: cursor na sala pelo analógico esquerdo
+                   (encostado na borda, o leitor anda; a cruz também anda com ele), A pega/põe a peça, LT/RT giram 15°, a cruz faz o ajuste fino
+                   da peça escolhida, X retira, LB desfaz,
+                   RB duplica (a cópia vem na mão), Y passa para o painel (cruz/A/LB/RB nele) e volta, B cancela/solta/sai.
+   · pena        — COMO ERA: a janela abre e fecha com o controle, mas escrever pede teclado e escolher a parede pede apontar (o A mirava o
+                   centro da tela, que na 3.ª pessoa é o próprio leitor); a cor abria o seletor do sistema. AGORA: A no campo de texto abre
+                   um teclado do jogo (cruz escolhe a tecla, A digita, X apaga, Y espaço, LT maiúsculas, RT acentos, LB/RB cursor,
+                   Start OK, B fecha); ←/→ ou A na cor trocam a tinta numa paleta; na mira, a parede é a que está à frente do leitor
+                   (prévia na parede), A escreve, B cancela, LT/RT tamanho, ↑/↓ altura.
+   · mapa        — COMO ERA: o Mapa cobre a tela, não tem «×» (no toque, fecha com um toque no fundo) e abre sem o contorno dourado do
+                   controle. AGORA: «×» no canto (no toque e com o controle; com o controle mostra «B Fechar»), contorno no cartão de onde
+                   você está e LB/RB pulam de andar em andar.
+   · camera      — COMO ERA: no toque, arrastar só gira para os lados (a inclinação é só do mouse; o direcional direito do controle já
+                   inclina — conferido no `pollPad`). AGORA: no toque, arrastar para cima/baixo também inclina (mesmos limites do mouse).
+   · conto       — COMO ERA: o 1.º toque da cruz ou do A focava o botão de tema; com «Concluir» aceso o A trocava o tema; a cruz não
+                   alcançava «Concluir». AGORA: ↑/↓ rolam; no fim do texto o contorno vai sozinho para «Concluir» (e ↓ no fim também);
+                   A conclui (antes do fim, vira a página); ←/→ passam pelos botões de cima e por «Concluir»; o A só aperta um botão de
+                   cima quando você foi até ele com ←/→.
+   · chaves      — COMO ERA: as chaves de companheiro (Visual › Companheiros e «Usar este companheiro» do cartão novo) têm o `input` com
+                   opacidade 0 e a v788 só anda pelo que é visível. AGORA: a cruz alcança essas chaves (o contorno vai no rótulo) e o A troca.
+   · hud         — COMO ERA: comer abóbora, plantar/colher a horta do Bento, as páginas da estante da sala, «Sair da visita», Missões e
+                   Grimório só no botão da tela. AGORA: com o controle ligado, o ☰ Menu (X) ganha a linha «Na tela» com esses botões.
+   · deslizantes — COMO ERA: a cruz não muda sensibilidade, som, música nem a nota em estrelas. AGORA: ←/→ mudam o valor com o foco nele.
+   · dialogos    — COMO ERA: «Remover da estante» e «+pág.» abrem `confirm()`/`prompt()` do navegador, que o controle não opera (e o jogo
+                   congela até alguém usar o mouse). AGORA: apertados pelo controle, abrem uma janela do próprio jogo (cruz/A/B; na página,
+                   −100 −10 −1 +1 +10 +100); no OK, o botão original roda com a resposta. Com o mouse, nada muda.
+   · estantey    — COMO ERA: o Y abria a Estante por trás de conto, Lojinha, Diário, Mapa ou conversa, e com a ficha aberta fechava tudo sem
+                   o aviso de alterações por salvar. AGORA: com outra janela aberta o Y não faz nada; com a Estante aberta o Y fecha como o
+                   B (ficha primeiro, com o aviso).
+   · intro       — COMO ERA: a caixa da história do prólogo (`#intro681`) não fechava pelo controle e ←/→ abriam Diário e Visual por trás.
+                   AGORA: A, B, X, Y ou Start continuam (quando a caixa já deixa continuar), os demais botões ficam presos nela e a dica
+                   diz «aperte A para continuar».
+   Regra comum: só o que vem do controle muda — mouse e teclado continuam iguais; o toque só muda nos itens «camera» e no «×» do «mapa».
+   As partes que dependem do «estado do controle» (cursor do Decorar, mira da Pena, contorno do Mapa) só aparecem depois de um toque no
+   controle e somem com um movimento do mouse, um toque na tela ou uma tecla (`CT881.ultimo`).
+   Chaves: `?controle881=0` desliga todos; `?controle881=1` liga todos; `?ct881_<item>=1` liga um; `?ct881_<item>=0` desliga um
+   (também os da lista `CT881.padrao`, onde estão os onze que o Luiz escolheu para virem ligados).
+   Itens: decorar, pena, mapa, camera, conto, chaves, hud, deslizantes, dialogos, estantey, intro.
+   Gancho `window.__controle881` (`estado`, `on`, `itens`, `liga(item)`, `desliga(item)`, `stats`, `erros` e auxiliares para o teste).
+   Ganchos para a Steam: `window.__controle881.tecladoExterno = function(campo){…}` (se existir e não devolver false, é usado no lugar do
+   teclado do jogo — por exemplo, o teclado da Steam pelo Steamworks); `window.__controle881.dialogosAlvos` (seletores dos botões cujo
+   confirm()/prompt() vira janela do jogo).
+   REVISÃO (19/11, cópia corrigida): (1) pena — a prévia na parede e o tamanho por LT/RT usam o gancho `window.__penas745` (o `PN` e o
+   `pnTamanho` da v745 não são alcançáveis daqui); (2) decorar — o arraste começado pelo controle é cancelado quando o editor fecha por
+   outro caminho, quando o mouse/dedo tocam a tela ou quando o controle some (antes ficava preso no `MS748.drag`); (3) decorar — na
+   volta do painel à sala, a cruz apertada no mesmo quadro não vaza para o elevador. Detalhes nos comentários «REVISÃO» de cada seção. */
+const CT881={
+  itens:['decorar','pena','mapa','camera','conto','chaves','hud','deslizantes','dialogos','estantey','intro'],
+  // os itens que o Luiz escolher entram aqui (ligados sem chave na URL; `?ct881_<item>=0` desliga um deles). Vazio = tudo desligado.
+  padrao:['decorar','pena','mapa','camera','conto','chaves','hud','deslizantes','dialogos','estantey','intro'],
+  on:{},inst:{},prev:{},rep:{},ultimo:'',tPad:0,noPad:0,semDec:false,ajuda:null,tec:null,tecladoExterno:null,
+  dlgAlvos:['#btnExcluir','.e516-acoes > button'],
+  dec:{ativo:false,modo:'sala',x:0,y:0,pid:8811,tMove:0,tHover:0,sobre:null,borda:[0,0]},
+  pena:{altura:1.35,parede:null,t:0},
+  conto:{expl:false,aberto:false,fimAntes:true},
+  toque:{},erros:[],
+  stats:{pad:0,consumidos:0,intro:0,introPreso:0,estanteY:0,estanteFecha:0,deslizante:0,estrela:0,chaves:0,contoFim:0,contoPagina:0,contoFoco:0,
+    mapaX:0,mapaAndar:0,mapaFoco:0,cameraToque:0,hudMenu:0,hudClique:0,dialogo:0,dialogoOk:0,teclado:0,tecla:0,cor:0,
+    penaMira:0,penaEscreve:0,penaCancela:0,penaTamanho:0,decLimpa:0,decCursor:0,decPega:0,decSolta:0,decCancela:0,decGiro:0,decFino:0,decRetira:0,decDesfaz:0,decDuplica:0,
+    decPainel:0,decSala:0,decFecha:0,decClique:0,decAnda:0}
+};
+(function(){try{const s=location.search+location.hash,todos=/[?&#]controle881=1/i.test(s),nenhum=/[?&#]controle881=0/i.test(s);
+  for(const k of CT881.itens){const um=new RegExp('[?&#]ct881_'+k+'=([01])','i').exec(s);CT881.on[k]=um?um[1]==='1':(!nenhum&&(todos||CT881.padrao.includes(k)));}}catch(e){}})();
+function ct881Erro(k,e){try{if(CT881.erros.length<40)CT881.erros.push(k+': '+String(e&&e.message||e));console.warn('v881',k,e);}catch(x){}}
+function ct881T(pt,en,es){try{if(typeof text428==='function')return text428(pt,en,es||pt);}catch(e){}const l=String(document.documentElement.lang||'');return /^en/i.test(l)?en:(/^es/i.test(l)?(es||pt):pt);}
+function ct881Gp(){try{const gps=navigator.getGamepads?navigator.getGamepads():null;if(gps)for(const g of gps){if(g&&g.connected)return g;}}catch(e){}return null;}
+function ct881Bt(gp,i){const b=gp&&gp.buttons&&gp.buttons[i];return !!(b&&(b.pressed||b.value>.4));}
+function ct881Algum(){for(const k of CT881.itens)if(CT881.on[k])return true;return false;}
+function ct881Pad(){try{return typeof PAD!=='undefined'&&PAD.on&&CT881.ultimo==='pad';}catch(e){return false;}}
+function ct881Dz(v){v=+v||0;return Math.abs(v)<.16?0:(v-Math.sign(v)*.16)/.84;}
+// repetição de um botão segurado: o toque vale na hora e, segurando, repete (depois de 0,38 s, a cada 0,11 s)
+function ct881Rep(gp,i,agora){const b=ct881Bt(gp,i);const r=CT881.rep[i]||(CT881.rep[i]={on:false,tn:0});if(!b){r.on=false;return false;}
+  if(!r.on){r.on=true;r.tn=agora+380;return true;}if(agora>=r.tn){r.tn=agora+110;return true;}return false;}
+// o botão apertado agora fica «já visto» para o jogo (pollPad, v787, v788, v789, combate): quem tratou foi este bloco
+function ct881Consome(gp,lista){for(const i of lista){if(!ct881Bt(gp,i))continue;
+  try{PAD.prev[i]=true;}catch(e){}try{if(typeof MS787!=='undefined')MS787.prev[i]=true;}catch(e){}try{if(typeof MS788!=='undefined')MS788.prev[i]=true;}catch(e){}
+  if(i===2)try{if(typeof MS789!=='undefined')MS789.prevX=true;}catch(e){}
+  if(i===7)try{if(typeof C452!=='undefined')C452.rtAntes=true;}catch(e){}
+  CT881.stats.consumidos++;}}
+// de onde veio a última entrada (controle, mouse, toque, teclado): só eventos de verdade (os sintéticos do jogo não contam)
+function ct881Fontes(){if(CT881.fontes)return;CT881.fontes=true;
+  try{addEventListener('pointerdown',e=>{if(!e.isTrusted)return;CT881.ultimo=e.pointerType==='touch'?'toque':'mouse';},{capture:true,passive:true});
+    addEventListener('pointermove',e=>{if(!e.isTrusted||e.pointerType==='touch')return;if(Math.abs(e.movementX||0)+Math.abs(e.movementY||0)<3)return;CT881.ultimo='mouse';},{capture:true,passive:true});
+    addEventListener('keydown',e=>{if(!e.isTrusted)return;CT881.ultimo='teclado';},{capture:true,passive:true});}catch(e){ct881Erro('fontes',e);}}
+
+/* ---------- estilo comum (glifos dos botões, cursor, barra de ajuda, janelas do bloco) ---------- */
+function ct881Css(){if(document.getElementById('ct881Css'))return;const st=document.createElement('style');st.id='ct881Css';st.textContent=
+  '.ct881g{display:inline-flex;align-items:center;justify-content:center;min-width:1.55em;height:1.55em;padding:0 .32em;border-radius:.8em;font:700 11px/1 system-ui,sans-serif;color:#fff;background:#3b3b3b;border:1px solid rgba(255,255,255,.45);vertical-align:middle;box-sizing:border-box;margin-right:3px}'+
+  '.ct881gA{background:#2e7d32}.ct881gB{background:#b3261e}.ct881gX{background:#1d5fae}.ct881gY{background:#a8820c}'+
+  '#ct881Cursor{position:fixed;left:0;top:0;width:34px;height:34px;margin:-17px 0 0 -17px;border:2px solid #ffd76a;border-radius:50%;box-shadow:0 0 0 2px rgba(0,0,0,.5),0 0 12px rgba(255,215,106,.55);pointer-events:none;z-index:2147482500;display:none;box-sizing:border-box}'+
+  '#ct881Cursor::after{content:"";position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:#ffd76a}'+
+  '#ct881Cursor.peca{border-color:#8fe38f;box-shadow:0 0 0 2px rgba(0,0,0,.5),0 0 14px rgba(143,227,143,.7)}#ct881Cursor.peca::after{background:#8fe38f}'+
+  '#ct881Cursor.mao{border-style:dashed;width:44px;height:44px;margin:-22px 0 0 -22px}'+
+  '#ct881Ajuda{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:2147482000;max-width:min(96vw,1000px);padding:6px 12px;border-radius:10px;background:rgba(16,12,9,.88);border:1px solid #b8964f;color:#ead8af;font:12px/1.7 system-ui,sans-serif;display:flex;flex-wrap:wrap;gap:2px 12px;justify-content:center;pointer-events:none;box-sizing:border-box}'+
+  '#ct881Ajuda[hidden]{display:none}#ct881Ajuda span.it{white-space:nowrap}'+
+  '.ct881rotulo{outline:3px solid #ffd76a!important;outline-offset:2px!important;box-shadow:0 0 0 5px rgba(255,215,106,.25)!important}'+
+  '.ct881mapaX{position:sticky;top:0;align-self:flex-end;z-index:3;margin:-8px -10px -30px 0;padding:6px 12px;border-radius:999px;border:1px solid var(--line2,#b8964f);background:rgba(20,15,10,.92);color:var(--gold2,#e8c46a);font:600 13px system-ui,sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:4px}'+
+  '.ct881mapaX[hidden]{display:none}'+
+  'dialog.ct881dlg,dialog.ct881tec{background:#1d1712;color:#f3e7cf;border:1px solid #c9a24a;border-radius:14px;padding:18px 20px;box-shadow:0 14px 50px rgba(0,0,0,.7);font:15px/1.5 Georgia,serif;max-width:min(560px,94vw)}'+
+  'dialog.ct881dlg::backdrop,dialog.ct881tec::backdrop{background:rgba(6,4,3,.55)}'+
+  'dialog.ct881dlg button,dialog.ct881tec button{font:600 14px system-ui,sans-serif;color:#f3e7cf;background:#3a2a18;border:1px solid #8a6a3a;border-radius:8px;padding:8px 12px;cursor:pointer;min-width:2.6em}'+
+  'dialog.ct881dlg .ct881msg{margin:0 0 12px}dialog.ct881dlg .ct881num{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap;margin:6px 0 14px}'+
+  'dialog.ct881dlg output{min-width:6em;text-align:center;font:700 22px system-ui,sans-serif;color:#ffe3a0}dialog.ct881dlg .ct881bts{display:flex;gap:10px;justify-content:flex-end}'+
+  'dialog.ct881tec{max-width:min(720px,96vw)}dialog.ct881tec .ct881tecVer{min-height:2.6em;max-height:7em;overflow:auto;white-space:pre-wrap;word-break:break-word;background:#0f0b08;border:1px solid #5a4630;border-radius:8px;padding:8px 10px;margin-bottom:10px;font:16px/1.45 Georgia,serif}'+
+  'dialog.ct881tec .ct881tecVer .cur{color:#ffd76a}dialog.ct881tec .ct881tecTeclas{display:grid;grid-template-columns:repeat(10,1fr);gap:5px}dialog.ct881tec .ct881tecTeclas button{padding:9px 0;font-size:16px}'+
+  'dialog.ct881tec .ct881tecAcoes{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}dialog.ct881tec .ct881tecAcoes button{flex:1 1 auto}dialog.ct881tec .ct881tecAcoes .esp{flex:3 1 auto}'+
+  'dialog.ct881tec .ct881tecAcoes button.on{background:#c9a24a;color:#1d1712}dialog.ct881tec .ct881tecDica{margin-top:9px;font:11.5px/1.7 system-ui,sans-serif;color:#cdb894;display:flex;flex-wrap:wrap;gap:2px 10px}'+
+  '#ct881Atalhos{margin:10px 0 4px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}#ct881Atalhos[hidden]{display:none}#ct881Atalhos .ct881atalhosT{width:100%;font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.8}';
+  document.head.appendChild(st);}
+function ct881Glifo(g){const c={A:'ct881gA',B:'ct881gB',X:'ct881gX',Y:'ct881gY'}[g]||'';return '<span class="ct881g '+c+'">'+g+'</span>';}
+// a barra de ajuda do controle (embaixo, no meio): um texto por situação
+function ct881AjudaItens(k){const T=ct881T;switch(k){
+  case 'decSala':return [['A',T('pegar a peça','pick up the piece','coger la pieza')],['LT/RT',T('girar','rotate','girar')],['✚',T('mover o cursor','move the cursor','mover el cursor')],['X',T('retirar','remove','quitar')],['LB',T('desfazer','undo','deshacer')],['RB',T('duplicar','duplicate','duplicar')],['Y',T('painel','panel','panel')],['B',T('sair','exit','salir')]];
+  case 'decSel':return [['A',T('pegar a peça','pick up the piece','coger la pieza')],['LT/RT',T('girar','rotate','girar')],['✚',T('ajuste fino','nudge','ajuste fino')],['X',T('retirar','remove','quitar')],['LB',T('desfazer','undo','deshacer')],['RB',T('duplicar','duplicate','duplicar')],['Y',T('painel','panel','panel')],['B',T('soltar a escolha','deselect','soltar la selección')]];
+  case 'decArrasto':return [['A',T('pôr aqui','place here','poner aquí')],['LT/RT',T('girar','rotate','girar')],['✚',T('passo fino','fine step','paso fino')],['B',T('cancelar','cancel','cancelar')]];
+  case 'decPainel':return [['✚',T('escolher','choose','elegir')],['A',T('apertar','press','pulsar')],['LB/RB',T('abas','tabs','pestañas')],['Y',T('voltar à sala','back to the room','volver a la sala')],['B',T('voltar à sala','back to the room','volver a la sala')]];
+  case 'penaMira':return [['A',T('escrever aqui','write here','escribir aquí')],['LT/RT',T('tamanho','size','tamaño')],['✚',T('↑/↓ altura','↑/↓ height','↑/↓ altura')],['B',T('cancelar','cancel','cancelar')]];
+  case 'teclado':return [['A',T('tecla','key','tecla')],['X',T('apagar','delete','borrar')],['Y',T('espaço','space','espacio')],['LT',T('maiúsculas','capitals','mayúsculas')],['RT',T('acentos','accents','acentos')],['LB/RB',T('cursor','cursor','cursor')],['Start','OK'],['B',T('fechar','close','cerrar')]];}
+  return [];}
+function ct881AjudaHtml(k){return ct881AjudaItens(k).map(([g,t])=>'<span class="it">'+ct881Glifo(g)+t+'</span>').join('');}
+function ct881Ajuda(k){let h=document.getElementById('ct881Ajuda');if(!k){if(h&&!h.hidden)h.hidden=true;CT881.ajuda=null;return;}
+  if(!h){ct881Css();h=document.createElement('div');h.id='ct881Ajuda';h.setAttribute('translate','no');document.body.appendChild(h);}
+  if(CT881.ajuda!==k){CT881.ajuda=k;h.innerHTML=ct881AjudaHtml(k);}if(h.hidden)h.hidden=false;}
+
+/* ---------- o laço do controle: um embrulho por fora do pollPad (antes de tudo o que o jogo faz com o controle) ---------- */
+function ct881InstalaPad(){if(CT881.padInst)return;CT881.padInst=true;ct881Fontes();
+  try{const pp=pollPad;pollPad=function(dt){let gp=null,ctx=null;
+      if(ct881Algum()){try{gp=ct881Gp();if(gp)ctx=ct881Antes(gp,dt);}catch(e){ct881Erro('antes',e);}}
+      const r=pp.apply(this,arguments);
+      if(gp){try{ct881Depois(gp,dt,ctx);}catch(e){ct881Erro('depois',e);}}
+      return r;};}catch(e){ct881Erro('pollPad',e);}}
+// a navegação das janelas (v788) chamada pelo controle: as extensões deste bloco só valem dentro dela (Tab e setas do teclado não mudam)
+function ct881InstalaPadJanela(){if(CT881.padJanInst)return;CT881.padJanInst=true;
+  try{const p0=p788Pad;p788Pad=function(){CT881.noPad++;try{return p0.apply(this,arguments);}finally{CT881.noPad--;}};}catch(e){ct881Erro('p788Pad',e);}}
+function ct881Antes(gp,dt){const agora=performance.now(),pv=CT881.prev;const b=i=>ct881Bt(gp,i);
+  let ativo=false;for(let i=0;i<17;i++)if(b(i)){ativo=true;break;}if(!ativo&&gp.axes)for(let k=0;k<4;k++)if(Math.abs(gp.axes[k]||0)>.3){ativo=true;break;}
+  if(ativo){if(CT881.ultimo!=='pad')CT881.stats.pad++;CT881.ultimo='pad';CT881.tPad=agora;}
+  const E={};for(let i=0;i<17;i++)E[i]=b(i)&&!pv[i];
+  try{return ct881Trata(gp,E,b,dt,agora);}finally{for(let i=0;i<17;i++)pv[i]=b(i);}}
+function ct881Trata(gp,E,b,dt,agora){
+  // (1) a caixa da história do prólogo: o controle fica nela
+  if(ct881IntroAtiva())return ct881IntroTrata(gp,E);
+  // (2) o teclado do jogo (item pena): atalhos além da cruz/A/B, que a v788 já leva às teclas
+  if(CT881.tec&&CT881.tec.d&&CT881.tec.d.open){ct881TecTrata(gp,E);return null;}
+  // (3) o conto: o contorno vai para «Concluir» quando ele acende
+  if(CT881.on.conto)try{ct881ContoVigia();}catch(e){ct881Erro('conto vigia',e);}
+  // (4) o Decorar
+  if(ct881DecAtivo()){const r=ct881DecTrata(gp,E,b,dt,agora);if(r)return r;}else if(CT881.dec.ativo){CT881.dec.ativo=false;ct881DecUI(false);}
+  // (5) a mira da Pena Mágica
+  if(CT881.on.pena){if(ct881PenaMirando())return ct881PenaTrata(gp,E,agora);if(CT881.ajuda==='penaMira')ct881Ajuda(null);}
+  // (6) o Y da Estante
+  if(CT881.on.estantey&&E[3]&&!b(4)&&!b(5))ct881EstanteY(gp);
+  return null;}
+function ct881Depois(gp,dt,ctx){if(!ctx)return;
+  if(ctx.cam){try{CAM.yaw=ctx.cam[0];CAM.pitch=ctx.cam[1];P.yaw=ctx.cam[2];P.pitch=ctx.cam[3];PAD.mx=PAD.mz=0;}catch(e){}}
+  if(ctx.dec){const bd=CT881.dec.borda||[0,0];PAD.mx=bd[0];PAD.mz=bd[1];if(bd[0]||bd[1])CT881.stats.decAnda++;}}
+// a janela de cima, do jeito que o jogo vê, sem o painel do Decorar que este bloco empresta ao controle
+function ct881PainelJogo(){CT881.semDec=true;try{return typeof p788Painel==='function'?p788Painel():null;}catch(e){return null;}finally{CT881.semDec=false;}}
+function ct881MeuDialogo(){for(const id of ['ct881Teclado','ct881Dlg']){const d=document.getElementById(id);if(d&&d.open)return d;}return null;}
+// as janelas deste bloco (teclado, confirmação) ficam por cima de todas; no Decorar, com o controle no painel, o painel é a janela
+function ct881InstalaPainel(){if(CT881.painelInst)return;CT881.painelInst=true;
+  try{const pp=p788Painel;p788Painel=function(){try{const meu=ct881MeuDialogo();if(meu)return meu;
+        if(!CT881.semDec&&CT881.on.decorar&&CT881.dec.ativo&&CT881.dec.modo==='painel'&&ct881Pad()&&typeof SALA_ED!=='undefined'&&SALA_ED.ativo&&typeof SALA_PAINEL!=='undefined'&&SALA_PAINEL&&p788Visivel(SALA_PAINEL)){
+          const r=pp.apply(this,arguments);return r||SALA_PAINEL;}}catch(e){ct881Erro('painel',e);}
+      return pp.apply(this,arguments);};}catch(e){ct881Erro('p788Painel',e);}}
+
+/* ===================== item «intro» — a caixa da história do prólogo (#intro681) =====================
+   COMO ERA: ela fecha num clique/tecla (quando o texto acabou e a sala está pronta) ou sozinha 3,5 s depois; o controle não fechava, e a
+   cruz (←/→ = Diário e Visual da v787, por teclas sintéticas) abria janelas por trás dela; o analógico direito girava a câmera atrás.
+   AGORA: A, B, X, Y ou Start fecham quando a caixa já deixa continuar (antes disso, não fazem nada); todos os botões ficam presos na caixa;
+   a câmera não gira; a dica vira «aperte A para continuar» com o controle ligado. */
+function ct881IntroAtiva(){try{return !!CT881.on.intro&&typeof PRO681!=='undefined'&&!!PRO681.ativo;}catch(e){return false;}}
+function ct881IntroTrata(gp,E){try{if([0,1,2,3,9].some(i=>E[i])){if(PRO681.acabou&&PRO681.pronto){CT881.stats.intro++;pro681Fechar();}else CT881.stats.introPreso++;}}catch(e){ct881Erro('intro',e);}
+  ct881Consome(gp,[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]);let cam=null;try{cam=[CAM.yaw,CAM.pitch,P.yaw,P.pitch];}catch(e){}return cam?{cam}:null;}
+function ct881InstalaIntro(){if(typeof pro681Confere!=='function')return;
+  try{const pc=pro681Confere;pro681Confere=function(){const r=pc.apply(this,arguments);try{if(CT881.on.intro&&typeof PAD!=='undefined'&&PAD.on&&PRO681.ativo&&PRO681.acabou&&PRO681.pronto&&PRO681.el){
+          const d=PRO681.el.querySelector('.dica'),t=ct881T('aperte A para continuar','press A to continue','pulsa A para continuar');if(d&&d.textContent!==t)d.textContent=t;}}catch(e){}return r;};}catch(e){ct881Erro('intro dica',e);}}
+
+/* ===================== item «estantey» — o Y da Estante respeita as janelas =====================
+   COMO ERA: o Y do `pollPad` chama `window.__panel.toggle()` sem olhar o que está aberto: abria a Estante por trás de conto, Lojinha,
+   Diário, Mapa ou conversa; com a ficha aberta, fechava a Estante inteira sem o aviso de «alterações por salvar».
+   AGORA: com a Estante como janela de cima, o Y faz o mesmo que o B (a ficha primeiro, com o aviso; depois a Estante); com qualquer outra
+   janela aberta (ou conversa), o Y não faz nada; sem janela, abre a Estante como antes. LB/RB + Y (poderes) não mudam. */
+function ct881EstanteY(gp){try{const root=ct881PainelJogo();
+    if(root){if(root.id==='est'){CT881.stats.estanteFecha++;try{p788Fecha();}catch(e){ct881Erro('estante fecha',e);}}else CT881.stats.estanteY++;ct881Consome(gp,[3]);return;}
+    if(typeof NPC127!=='undefined'&&NPC127.open){CT881.stats.estanteY++;ct881Consome(gp,[3]);}}catch(e){ct881Erro('estante Y',e);}}
+
+/* ===================== item «deslizantes» (e a cor da Pena / do Decorar) — ←/→ mudam o valor do que tem o foco =====================
+   COMO ERA: a cruz da v788 só passava de um botão a outro: com o foco num controle deslizante (sensibilidade, som ambiente, música) ou
+   na nota em estrelas (role="slider", na ficha da Estante, dos filmes, dos jogos), ←/→ saíam dele, e o A não mudava nada.
+   AGORA: ←/→ mudam o valor (o passo do próprio controle; meia estrela na nota), com os mesmos eventos do mouse/teclado; ↑/↓ continuam
+   saindo dele. Só pela navegação do controle (o teclado não muda). */
+function ct881InstalaMover(){if(CT881.moverInst)return;CT881.moverInst=true;ct881InstalaPadJanela();
+  try{const pm=p788Mover;p788Mover=function(dx,dy){try{if(CT881.noPad>0){const root=p788Painel();if(root){
+          if(CT881.on.conto&&root.id==='leitura'){const r=ct881ContoMover(root,dx,dy);if(r!==undefined)return r;}
+          const a=document.activeElement,dentro=!!(a&&a!==document.body&&root.contains(a));
+          if(dx&&dentro){
+            if(ct881CorCampo(root,a)){ct881CorPasso(a,dx);return true;}
+            if(CT881.on.deslizantes&&a.tagName==='INPUT'&&String(a.type).toLowerCase()==='range'){ct881Range(a,dx);return true;}
+            if(CT881.on.deslizantes&&a.getAttribute&&a.getAttribute('role')==='slider'){ct881Slider(a,dx);return true;}}}}}catch(e){ct881Erro('mover',e);}
+      return pm.apply(this,arguments);};}catch(e){ct881Erro('p788Mover',e);}}
+function ct881Range(a,dx){try{if(dx>0)a.stepUp();else a.stepDown();}catch(e){const st=parseFloat(a.step)||1;a.value=String((parseFloat(a.value)||0)+dx*st);}
+  try{a.dispatchEvent(new Event('input',{bubbles:true}));a.dispatchEvent(new Event('change',{bubbles:true}));}catch(e){}CT881.stats.deslizante++;}
+// a nota em estrelas responde às setas do teclado: a seta vai só para ela (sem borbulhar até o atalho do jogo, que andaria com o leitor)
+function ct881Slider(a,dx){const k=dx>0?'ArrowRight':'ArrowLeft';try{a.dispatchEvent(new KeyboardEvent('keydown',{key:k,code:k,bubbles:false,cancelable:true}));a.dispatchEvent(new KeyboardEvent('keyup',{key:k,code:k,bubbles:false,cancelable:true}));}catch(e){ct881Erro('estrela',e);}CT881.stats.estrela++;}
+// cor (Pena Mágica e painel do Decorar): o seletor de cor do sistema não anda com o controle — ←/→ (ou A) trocam a tinta numa paleta
+const CT881_CORES=['#59385d','#1f1a17','#7a1f1f','#b5462e','#c98a2b','#e3c15a','#2f5d3a','#1f4f6b','#3b3f8f','#6b2f6b','#8a6a4a','#e8dcc0','#ffffff'];
+function ct881CorCampo(root,el){try{if(!el||el.tagName!=='INPUT'||String(el.type).toLowerCase()!=='color')return false;
+    if(CT881.on.pena&&typeof QUILL413!=='undefined'&&QUILL413.dialog&&root===QUILL413.dialog)return true;
+    if(CT881.on.decorar&&typeof SALA_PAINEL!=='undefined'&&SALA_PAINEL&&root===SALA_PAINEL)return true;}catch(e){}return false;}
+function ct881CorPasso(el,d){const L=CT881_CORES;let i=L.indexOf(String(el.value||'').toLowerCase());i=i<0?(d>0?0:L.length-1):(i+d+L.length)%L.length;el.value=L[i];
+  try{el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));}catch(e){}CT881.stats.cor++;}
+
+/* ===================== item «chaves» — as chaves de companheiro (input com opacidade 0) =====================
+   COMO ERA: em Visual › Companheiros (`.cc549`) e no cartão do companheiro novo (`#rv548`, «Usar este companheiro») a chave é um
+   `label` com o `input` transparente por cima (opacidade 0) e o desenho ao lado; a v788 só anda pelo que é visível — a cruz pulava a
+   chave, e não dava para trocar nem recusar companheiro pelo controle (a Lojinha › Companheiros funciona).
+   AGORA: a cruz também para nessas chaves (o contorno dourado vai no rótulo, que é o que se vê) e o A troca a chave (o mesmo clique do
+   mouse, com o evento «change» de sempre). Só pela navegação do controle (o Tab do teclado não muda).
+   (Coordenador, 22/11: no navegador o cartão do companheiro novo não respondia — ele não era janela da v788. Agora, com o item ligado, o
+   cartão à vista é a janela de cima: a cruz chega à chave e ao «Continuar», o A troca, o B fecha.) */
+function ct881InstalaChaves(){if(CT881.chavesInst)return;CT881.chavesInst=true;ct881InstalaPadJanela();ct881Css();
+  try{const pf=p788Focaveis;p788Focaveis=function(root){const L=pf.apply(this,arguments);if(!CT881.on.chaves||CT881.noPad<=0||!root||!root.querySelectorAll)return L;
+      try{const extra=[];for(const inp of root.querySelectorAll('input[type=checkbox],input[type=radio]')){if(L.includes(inp)||inp.disabled||inp.closest('[hidden]'))continue;
+          const lab=inp.closest('label');if(!lab||!p788Visivel(lab))continue;const cs=getComputedStyle(inp);if(cs.display==='none'||cs.visibility==='hidden')continue;extra.push(inp);}
+        if(!extra.length)return L;const todos=L.concat(extra);todos.sort((a,c)=>a===c?0:((a.compareDocumentPosition(c)&4)?-1:1));return todos;}catch(e){ct881Erro('chaves lista',e);return L;}};}catch(e){ct881Erro('p788Focaveis',e);}
+  try{const fo=p788Foca;p788Foca=function(el){const r=fo.apply(this,arguments);try{ct881RotuloSync(el);}catch(e){}return r;};}catch(e){ct881Erro('p788Foca',e);}
+  // (coordenador, 22/11, teste no navegador) o cartão do companheiro novo (`#rv548`, v548) não é janela da v788: a cruz não chegava à chave
+  // «Usar este companheiro» e o B não fechava. Com o item ligado, o cartão à vista vira a janela de cima (z-index 70) e o B o fecha (`rv548Fecha`).
+  try{const pp=p788Painel;p788Painel=function(){const r=pp.apply(this,arguments);try{if(!CT881.on.chaves||typeof RV548==='undefined'||!RV548.card)return r;const c=RV548.card.el;
+        if(!c||!c.isConnected||!p788Visivel(c))return r;if(!r)return c;const zr=parseInt(getComputedStyle(r).zIndex)||0,zc=parseInt(getComputedStyle(c).zIndex)||0;return zc>=zr?c:r;}catch(e){return r;}};}catch(e){ct881Erro('p788Painel',e);}
+  try{const pf=p788Fecha;p788Fecha=function(){try{if(CT881.on.chaves&&typeof RV548!=='undefined'&&RV548.card&&typeof rv548Fecha==='function'){const r=p788Painel();if(r&&r===RV548.card.el){rv548Fecha();CT881.stats.chaves++;return true;}}}catch(e){ct881Erro('chaves fecha',e);}return pf.apply(this,arguments);};}catch(e){ct881Erro('p788Fecha',e);}
+  try{addEventListener('pointerdown',()=>{try{for(const x of document.querySelectorAll('.ct881rotulo'))x.classList.remove('ct881rotulo');}catch(e){}},{capture:true,passive:true});}catch(e){}}
+function ct881RotuloSync(el){for(const x of document.querySelectorAll('.ct881rotulo'))x.classList.remove('ct881rotulo');
+  if(!CT881.on.chaves||!el||el.tagName!=='INPUT'||!/^(checkbox|radio)$/i.test(el.type||''))return;let op=1;try{op=+getComputedStyle(el).opacity;}catch(e){}if(op>.05)return;
+  const lab=el.closest('label');if(lab){lab.classList.add('ct881rotulo');CT881.stats.chaves++;}}
+
+/* ===================== item «conto» — o leitor de contos no controle =====================
+   COMO ERA (v788): com nada focado, o 1.º toque da cruz (←/→) ou do A focava o 1.º botão (☾ tema); depois, com «Concluir» aceso, o A
+   apertava o botão focado (trocava o tema) em vez de concluir; ↑/↓ só rolavam o texto e ←/→ ficavam na linha de cima — «Concluir» (no
+   rodapé, à direita, abaixo) não era alcançável. Saída: B e reabrir.
+   AGORA: ↑/↓ rolam (como antes); quando «Concluir» acende, o contorno vai sozinho para ele (e ↓ no fim do texto também o alcança); o A
+   conclui quando «Concluir» está aceso e, antes disso, vira a página; ←/→ passam pelos botões de cima (☾ 🔊 A− A+ ×) e por «Concluir»,
+   e só aí o A aperta o botão escolhido. B continua fechando. */
+function ct881ContoBotoes(root){const L=[...root.querySelectorAll('.leiTools button')].filter(b=>!b.disabled&&!b.hidden&&p788Visivel(b));const f=document.getElementById('leiFim');if(f&&!f.disabled&&p788Visivel(f))L.push(f);return L;}
+function ct881ContoMover(root,dx,dy){const fim=document.getElementById('leiFim'),tx=document.getElementById('leiTexto');
+  if(dy){CT881.conto.expl=false;if(dy>0&&fim&&!fim.disabled&&tx&&tx.scrollTop+tx.clientHeight>=tx.scrollHeight-4){p788Foca(fim);CT881.stats.contoFoco++;return true;}return undefined;}
+  if(dx){const T=ct881ContoBotoes(root);if(!T.length)return true;const a=document.activeElement;let i=T.indexOf(a);i=i<0?(dx>0?0:T.length-1):(i+dx+T.length)%T.length;p788Foca(T[i]);CT881.conto.expl=true;CT881.stats.contoFoco++;return true;}
+  return undefined;}
+function ct881ContoA(root,alvo){const fim=document.getElementById('leiFim');
+  if(alvo&&alvo===fim)return undefined;                                   // «Concluir» focado: o clique de sempre
+  if(alvo&&CT881.conto.expl&&root.contains(alvo))return undefined;        // botão de cima escolhido com ←/→: aperta
+  if(fim&&!fim.disabled){fim.click();CT881.stats.contoFim++;return true;}
+  const tx=document.getElementById('leiTexto');if(tx){try{tx.scrollBy({top:tx.clientHeight*.8,behavior:'instant'});}catch(e){tx.scrollTop+=tx.clientHeight*.8;}CT881.stats.contoPagina++;}
+  return true;}
+function ct881ContoVigia(){const lei=document.getElementById('leitura'),aberto=!!(lei&&!lei.hidden);if(aberto&&!CT881.conto.aberto){CT881.conto.expl=false;CT881.conto.fimAntes=true;}CT881.conto.aberto=aberto;
+  if(!aberto)return;const fim=document.getElementById('leiFim'),apagado=!fim||fim.disabled;
+  if(!apagado&&CT881.conto.fimAntes&&!CT881.conto.expl&&ct881Pad()){const top=ct881PainelJogo();if(top&&top.id==='leitura'){p788Foca(fim);CT881.stats.contoFoco++;}}
+  CT881.conto.fimAntes=apagado;}
+
+/* ===================== o A das janelas (v788) para os itens conto, pena e dialogos ===================== */
+function ct881InstalaClique(){if(CT881.cliqueInst)return;CT881.cliqueInst=true;ct881InstalaPadJanela();
+  try{const pc=p788Clique;p788Clique=function(){if(CT881.noPad<=0)return pc.apply(this,arguments);
+      let root=null,alvo=null;try{root=p788Painel();if(root)alvo=p788Atual(root,p788Focaveis(root));}catch(e){}
+      try{if(root){
+          if(CT881.on.conto&&root.id==='leitura'){const r=ct881ContoA(root,alvo);if(r!==undefined)return r;}
+          if(alvo&&ct881CorCampo(root,alvo)){ct881CorPasso(alvo,1);return true;}
+          if(CT881.on.pena&&alvo&&ct881PenaCampo(root,alvo)){ct881TecladoAbre(alvo);return true;}
+          if(CT881.on.dialogos&&alvo&&ct881DlgAlvo(alvo))return ct881DlgSonda(pc,this,arguments,alvo);}}catch(e){ct881Erro('clique',e);}
+      return pc.apply(this,arguments);};}catch(e){ct881Erro('p788Clique',e);}}
+
+/* ===================== item «dialogos» — confirm()/prompt() do navegador viram janela do jogo (só quando o controle aperta) =====================
+   COMO ERA: «Remover da estante» (ficha) chama confirm() e «+pág.» (livro em leitura, na lista da Estante) chama prompt(): o navegador
+   abre uma caixa que o controle não opera, e a página congela até alguém usar o mouse ou o teclado.
+   AGORA: quando o A do controle aperta um desses botões, o pedido é lido sem abrir a caixa do navegador (a primeira passada responde
+   «cancelar», e esses botões não fazem nada com «cancelar») e aparece uma janela do jogo, navegável pela cruz, com a MESMA pergunta:
+   «Sim / Cancelar» (o foco começa em «Cancelar»), ou o número com −100 −10 −1 +1 +10 +100 (limite tirado da pergunta: «de N» ou %).
+   No «Sim»/«OK», o botão original roda de novo com a resposta. O mouse e o teclado continuam com a caixa do navegador.
+   Os botões tratados estão em `CT881.dlgAlvos` (gancho `dialogosAlvos`). */
+function ct881DlgAlvo(el){try{return !!(el&&el.matches&&CT881.dlgAlvos.some(s=>{try{return el.matches(s);}catch(e){return false;}}));}catch(e){return false;}}
+function ct881DlgSonda(pc,self,args,alvo){let pedido=null;const c0=window.confirm,p0=window.prompt,a0=window.alert;
+  window.confirm=function(m){if(!pedido)pedido={tipo:'confirm',msg:String(m==null?'':m)};return false;};
+  window.prompt=function(m,d){if(!pedido)pedido={tipo:'prompt',msg:String(m==null?'':m),def:d==null?'':String(d)};return null;};
+  window.alert=function(m){if(!pedido)pedido={tipo:'alert',msg:String(m==null?'':m)};};
+  let r;try{r=pc.apply(self,args);}finally{window.confirm=c0;window.prompt=p0;window.alert=a0;}
+  if(pedido){CT881.stats.dialogo++;ct881DlgAbre(pedido,alvo);}return r;}
+function ct881DlgRepete(alvo,valor){const c0=window.confirm,p0=window.prompt;window.confirm=function(){return valor===true;};window.prompt=function(){return typeof valor==='string'?valor:null;};
+  try{alvo.click();CT881.stats.dialogoOk++;}catch(e){ct881Erro('repetir',e);}finally{window.confirm=c0;window.prompt=p0;}}
+function ct881DlgAbre(pedido,alvo){try{ct881Css();const velho=document.getElementById('ct881Dlg');if(velho){try{velho.close();}catch(e){}try{velho.remove();}catch(e){}}
+    const d=document.createElement('dialog');d.id='ct881Dlg';d.className='ct881dlg';d.setAttribute('translate','no');d.style.zIndex='2147483000';
+    const msg=document.createElement('p');msg.className='ct881msg';msg.textContent=pedido.msg;d.appendChild(msg);
+    let valor=0,max=null;const out=document.createElement('output');
+    if(pedido.tipo==='prompt'){valor=Math.max(0,Math.round(+String(pedido.def).replace(',','.'))||0);const mm=/\((?:de|of)\s+(\d+)\)/i.exec(pedido.msg);if(mm)max=+mm[1];else if(/%/.test(pedido.msg))max=100;if(max!=null)valor=Math.min(max,valor);
+      const linha=document.createElement('div');linha.className='ct881num';const pinta=()=>{out.textContent=String(valor)+(max!=null?' / '+max:'');};
+      for(const dl of [-100,-10,-1,null,1,10,100]){if(dl===null){linha.appendChild(out);continue;}const bt=document.createElement('button');bt.type='button';bt.textContent=(dl>0?'+':'−')+Math.abs(dl);
+        bt.addEventListener('click',()=>{valor=Math.max(0,valor+dl);if(max!=null)valor=Math.min(max,valor);pinta();});linha.appendChild(bt);}
+      pinta();d.appendChild(linha);}
+    const bts=document.createElement('div');bts.className='ct881bts';
+    const ok=document.createElement('button');ok.type='button';ok.className='ct881ok';ok.textContent=pedido.tipo==='confirm'?ct881T('Sim','Yes','Sí'):'OK';
+    const no=document.createElement('button');no.type='button';no.className='ct881no';no.textContent=ct881T('Cancelar','Cancel','Cancelar');
+    bts.appendChild(ok);if(pedido.tipo!=='alert')bts.appendChild(no);d.appendChild(bts);
+    ok.addEventListener('click',()=>{try{d.close('ok');}catch(e){}});no.addEventListener('click',()=>{try{d.close('no');}catch(e){}});
+    d.addEventListener('close',()=>{const res=d.returnValue;try{d.remove();}catch(e){}
+      if(res==='ok'){if(pedido.tipo==='confirm')ct881DlgRepete(alvo,true);else if(pedido.tipo==='prompt')ct881DlgRepete(alvo,String(valor));}
+      setTimeout(()=>{try{if(alvo&&alvo.isConnected&&p788Visivel(alvo))p788Foca(alvo);}catch(e){}},30);});
+    d.addEventListener('keydown',e=>e.stopPropagation());
+    document.body.appendChild(d);d.showModal();CT881.ultimoDlg=d;
+    setTimeout(()=>{try{p788Foca(pedido.tipo==='confirm'?no:ok);}catch(e){}},0);return d;}catch(e){ct881Erro('diálogo',e);return null;}}
+
+/* ===================== item «pena» — Pena Mágica no controle =====================
+   COMO ERA: a janela da Pena abre e fecha pelo controle (é um <dialog>), mas: o texto pede teclado (no Steam Deck, só com o teclado da
+   Steam aberto à mão, STEAM+X); a cor abre o seletor do sistema; e, depois de «Escrever na parede», o A (v745) mira o CENTRO da tela —
+   que na 3.ª pessoa é o próprio leitor («Aponte para uma parede próxima») — e o B tirava o leitor da sala.
+   AGORA (só pelo controle):
+   · A no campo de texto abre o TECLADO DO JOGO (uma janela por cima, com prévia e cursor): a cruz/analógico escolhe a tecla, A digita,
+     X apaga, Y espaço, LT maiúsculas, RT acentos e símbolos, LB/RB movem o cursor, Start ou «✓ OK» fecham, B fecha. O texto entra no campo
+     na hora (o limite de 240 letras vale). Se a Steam der um teclado próprio (`window.__controle881.tecladoExterno`), ele é usado.
+   · Na cor, ←/→ (ou A) trocam a tinta numa paleta de 13 cores (sem o seletor do sistema).
+   · Na mira: a parede é a que está À FRENTE do leitor, na direção da câmera, a até 5,5 m (na 1.ª pessoa, o centro da tela); a prévia
+     transparente da v746 aparece nela (vermelha quando não cabe); A escreve; B cancela (como o Esc); LT/RT diminuem/aumentam (como a roda);
+     ↑/↓ sobem e descem a altura da mira. A barra de ajuda mostra os botões.
+   REVISÃO (ct881 corrigido): o estado `PN` e o `pnTamanho` da v745/v746 vivem DENTRO da função própria do bloco das penas
+   (`(function(){ … })()`), fora do alcance deste bloco — `typeof PN` dava 'undefined' (a prévia nunca aparecia na 3.ª pessoa) e
+   `pnTamanho` lançava ReferenceError, engolido pelo try (LT/RT não mudavam o tamanho). Agora os dois vêm pelo gancho público
+   `window.__penas745` (`estado` = o PN, `tamanho(f)` = o pnTamanho); sem parede na mira, a prévia é apagada na hora. */
+function ct881Penas(){try{const G=window.__penas745;return (G&&G.estado&&typeof G.estado==='object')?G:null;}catch(e){return null;}}
+function ct881PenaCampo(root,el){try{return !!(root&&typeof QUILL413!=='undefined'&&QUILL413.dialog&&root===QUILL413.dialog&&el&&(el.tagName==='TEXTAREA'||(el.tagName==='INPUT'&&/^(text|search)$/i.test(el.type||'text'))));}catch(e){return false;}}
+function ct881PenaMirando(){try{return typeof QUILL413!=='undefined'&&!!QUILL413.pending&&ct881Pad()&&!locked&&!(QUILL413.dialog&&QUILL413.dialog.open)&&!ct881PainelJogo()&&!uiBlocked();}catch(e){return false;}}
+function ct881PenaAtor(o){for(let p=o;p;p=p.parent){const u=p.userData||{};if(u.npc||u.aiCharacter||u.wing399||u.coin||p.isSkinnedMesh)return true;}return false;}
+function ct881PenaParede(){
+  if(MODE==='fp'){const tg=resolveAt(0,0,true);return tg&&tg.kind==='quill413'?tg.wall:null;}
+  const yaw=CAM.yaw,fx=-Math.sin(yaw),fz=-Math.cos(yaw),y0=(CH.fy||0)+CT881.pena.altura;
+  const n0=ray.near,f0=ray.far;let w=null;
+  try{ray.set(new THREE.Vector3(CH.x+fx*.3,y0,CH.z+fz*.3),new THREE.Vector3(fx,0,fz));try{ray.camera=camera;}catch(e){}ray.near=0;ray.far=6;
+    const hits=ray.intersectObjects(ACTIVE.children,true);
+    for(const h of hits){const o=h.object;if(!o)continue;let meu=false;for(let p=o;p;p=p.parent)if(p===READER.g){meu=true;break;}if(meu)continue;
+      if(!quill413Surface(h)||o.userData.quill413||o.userData.hitProxy||o.userData.fx||o.isSprite)continue;
+      w=quill413Wall(h);if(w||!ct881PenaAtor(o))break;}}
+  finally{ray.near=n0;ray.far=f0;}
+  return w;}
+function ct881PenaTrata(gp,E,agora){const S=CT881.pena;try{mouseIn=false;}catch(e){}
+  // o raio da mira corre a cada 80 ms (e na hora do A); a prévia da v746 vale por 500 ms
+  let w=S.parede;if(E[0]||!S.t||agora-S.t>80){S.t=agora;w=null;try{w=ct881PenaParede();}catch(e){ct881Erro('mira',e);}S.parede=w;}
+  const G=ct881Penas();
+  if(w){try{if(G&&('mira' in G.estado))G.estado.mira={wall:w,t:performance.now()};}catch(e){}CT881.stats.penaMira++;}
+  else if(G&&MODE!=='fp'){try{if(G.estado.mira)G.estado.mira=null;}catch(e){}} // sem parede: a prévia some na hora (na 1.ª pessoa quem cuida é o resolveAt da v746)
+  if(E[0]){if(w){try{if(quill413Place(w))CT881.stats.penaEscreve++;}catch(e){ct881Erro('escrever',e);}}
+    else{try{showToast(ct881T('Chegue mais perto de uma parede (até 5,5 m), de frente para ela.','Get closer to a wall (up to 5.5 m), facing it.','Acércate a una pared (hasta 5,5 m), de frente.'));}catch(e){}}}
+  else if(E[1]){try{QUILL413.pending=null;if(QUILL413.pen)QUILL413.pen.visible=false;CT881.stats.penaCancela++;showToast(ct881T('Escrita cancelada.','Writing cancelled.','Escritura cancelada.'));}catch(e){ct881Erro('cancelar',e);}}
+  {const lt=ct881Rep(gp,6,agora),rt=ct881Rep(gp,7,agora);
+    if((lt||rt)&&G&&typeof G.tamanho==='function'){try{if(lt)G.tamanho(1/1.1);if(rt)G.tamanho(1.1);CT881.stats.penaTamanho=(CT881.stats.penaTamanho||0)+1;}catch(e){ct881Erro('tamanho',e);}}}
+  if(MODE!=='fp'){if(ct881Rep(gp,12,agora))S.altura=Math.min(2.6,S.altura+.15);if(ct881Rep(gp,13,agora))S.altura=Math.max(.5,S.altura-.15);}
+  ct881Ajuda(QUILL413.pending?'penaMira':null);
+  ct881Consome(gp,[0,1,6,7,12,13,14,15]);return {pena:true};}
+
+/* ---------- o teclado do jogo (item pena) ---------- */
+const CT881_TEC={abc:[['1','2','3','4','5','6','7','8','9','0'],['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l','ç'],['z','x','c','v','b','n','m',',','.','?']],
+  sim:[['á','à','â','ã','é','ê','í','ó','ô','õ'],['ú','ü','ñ','!','¡','¿',"'",'"','(',')'],['-','_',':',';','/','@','#','&','+','='],['*','%','$','€','…','«','»','<','>','~']]};
+function ct881TecladoAbre(campo){try{
+    if(typeof CT881.tecladoExterno==='function'){let r;try{r=CT881.tecladoExterno(campo);}catch(e){ct881Erro('teclado externo',e);r=false;}if(r!==false)return;}
+    ct881Css();const velho=document.getElementById('ct881Teclado');if(velho){try{velho.close();}catch(e){}try{velho.remove();}catch(e){}}
+    const d=document.createElement('dialog');d.id='ct881Teclado';d.className='ct881tec';d.setAttribute('translate','no');d.style.zIndex='2147483000';
+    d.innerHTML='<div class="ct881tecVer"></div><div class="ct881tecTeclas"></div><div class="ct881tecAcoes"></div><div class="ct881tecDica"></div>';
+    CT881.tec={d,campo,maius:false,pag:'abc',pos:String(campo.value||'').length};
+    const ac=d.querySelector('.ct881tecAcoes');const acao=(txt,cls,fn)=>{const b=document.createElement('button');b.type='button';b.textContent=txt;if(cls)b.className=cls;b.addEventListener('click',fn);ac.appendChild(b);return b;};
+    acao('⇧','maius',()=>ct881TecMaius());acao('áé','pag',()=>ct881TecPagina());acao(ct881T('espaço','space','espacio'),'esp',()=>ct881TecInsere(' '));
+    acao('⌫','',()=>ct881TecInsere(null));acao('↵','',()=>ct881TecInsere('\n'));acao('◀','',()=>ct881TecCursor(-1));acao('▶','',()=>ct881TecCursor(1));acao('✓ OK','ok',()=>{try{d.close('ok');}catch(e){}});
+    d.querySelector('.ct881tecDica').innerHTML=ct881AjudaHtml('teclado');
+    d.addEventListener('close',()=>{CT881.tec=null;try{d.remove();}catch(e){}setTimeout(()=>{try{if(campo.isConnected&&p788Visivel(campo))p788Foca(campo);}catch(e){}},30);});
+    // teclado físico (se houver): digita no mesmo lugar
+    d.addEventListener('keydown',e=>{try{e.stopPropagation();if(e.ctrlKey||e.metaKey||e.altKey)return;const k=e.key;if(k==='Escape')return;
+        if(k==='Backspace'){e.preventDefault();ct881TecInsere(null);}else if(k==='Enter'){e.preventDefault();ct881TecInsere('\n');}else if(k==='ArrowLeft'&&e.shiftKey){e.preventDefault();ct881TecCursor(-1);}else if(k==='ArrowRight'&&e.shiftKey){e.preventDefault();ct881TecCursor(1);}
+        else if(k.length===1){e.preventDefault();ct881TecInsere(k);}}catch(x){}});
+    document.body.appendChild(d);d.showModal();ct881TecTeclas();ct881TecPinta();CT881.stats.teclado++;
+    setTimeout(()=>{try{const k=d.querySelector('.ct881tecTeclas button[data-i="10"]')||d.querySelector('.ct881tecTeclas button');if(k)p788Foca(k);}catch(e){}},0);}catch(e){ct881Erro('teclado',e);}}
+function ct881TecTeclas(foco){try{const s=CT881.tec;if(!s)return;const box=s.d.querySelector('.ct881tecTeclas');box.replaceChildren();let i=0;
+  for(const linha of CT881_TEC[s.pag])for(const c of linha){const b=document.createElement('button');b.type='button';const ch=s.maius?c.toLocaleUpperCase('pt-BR'):c;b.textContent=ch;b.dataset.i=String(i++);b.addEventListener('click',()=>ct881TecInsere(b.textContent));box.appendChild(b);}
+  const m=s.d.querySelector('.ct881tecAcoes .maius'),p=s.d.querySelector('.ct881tecAcoes .pag');if(m)m.classList.toggle('on',!!s.maius);if(p)p.textContent=s.pag==='abc'?'áé':'abc';
+  if(foco!=null){const k=box.querySelector('button[data-i="'+foco+'"]');if(k)try{p788Foca(k);}catch(e){}}}catch(e){ct881Erro('teclas',e);}}
+function ct881TecFocoIdx(){try{const a=document.activeElement;return a&&a.dataset&&a.dataset.i!=null&&CT881.tec&&CT881.tec.d.contains(a)?+a.dataset.i:null;}catch(e){return null;}}
+function ct881TecPinta(){try{const s=CT881.tec;if(!s)return;const v=String(s.campo.value||''),el=s.d.querySelector('.ct881tecVer');el.replaceChildren();
+  el.appendChild(document.createTextNode(v.slice(0,s.pos)));const c=document.createElement('span');c.className='cur';c.textContent='▏';el.appendChild(c);el.appendChild(document.createTextNode(v.slice(s.pos)));}catch(e){ct881Erro('prévia do teclado',e);}}
+function ct881TecInsere(txt){try{const s=CT881.tec;if(!s)return;const c=s.campo;let v=String(c.value||'');s.pos=Math.max(0,Math.min(v.length,s.pos));
+  if(txt===null){if(s.pos>0){v=v.slice(0,s.pos-1)+v.slice(s.pos);s.pos--;}}
+  else{const max=c.maxLength>0?c.maxLength:1e9;if(v.length+txt.length>max)return;v=v.slice(0,s.pos)+txt+v.slice(s.pos);s.pos+=txt.length;}
+  c.value=v;try{c.dispatchEvent(new Event('input',{bubbles:true}));}catch(e){}CT881.stats.tecla++;ct881TecPinta();}catch(e){ct881Erro('tecla',e);}}
+function ct881TecMaius(){try{const s=CT881.tec;if(!s)return;s.maius=!s.maius;ct881TecTeclas(ct881TecFocoIdx());}catch(e){ct881Erro('maiúsculas',e);}}
+function ct881TecPagina(){try{const s=CT881.tec;if(!s)return;s.pag=s.pag==='abc'?'sim':'abc';ct881TecTeclas(ct881TecFocoIdx());}catch(e){ct881Erro('acentos',e);}}
+function ct881TecCursor(d){try{const s=CT881.tec;if(!s)return;s.pos=Math.max(0,Math.min(String(s.campo.value||'').length,s.pos+d));ct881TecPinta();}catch(e){ct881Erro('cursor do teclado',e);}}
+function ct881TecTrata(gp,E){try{if(E[2])ct881TecInsere(null);if(E[3])ct881TecInsere(' ');if(E[6])ct881TecMaius();if(E[7])ct881TecPagina();if(E[4])ct881TecCursor(-1);if(E[5])ct881TecCursor(1);
+    if(E[9]&&CT881.tec)CT881.tec.d.close('ok');}catch(e){ct881Erro('teclado botões',e);}
+  ct881Consome(gp,[2,3,4,5,6,7,9]);}
+
+/* ===================== item «mapa» — o Mapa no toque e no controle =====================
+   COMO ERA: o Mapa cobre a tela e não tem «×»: no toque, fecha com um toque no fundo (fora do painel), coisa que ninguém adivinha; no
+   controle, fecha com B (v788) e abre com o foco no cartão de onde você está (v800), mas sem o contorno dourado (o foco do navegador
+   quase não aparece) — e para chegar a outro andar é preciso descer cartão a cartão.
+   AGORA: um «×» fixo no canto de cima do painel (no toque e com o controle conectado; com o controle mostra «B Fechar»); aberto pelo
+   controle, o cartão de onde você está ganha o contorno; LB/RB pulam para o andar anterior/seguinte (o cartão do hall do andar); a linha
+   de ajuda do título fala dos botões do controle. Mouse e teclado: nada muda. */
+function ct881InstalaMapa(){if(CT881.mapaInst)return;CT881.mapaInst=true;ct881InstalaPadJanela();
+  try{const om=openMap;openMap=function(){const r=om.apply(this,arguments);try{ct881MapaX();ct881MapaDica();
+        if(CT881.on.mapa&&ct881Pad())setTimeout(()=>{try{if(!mapOpen)return;const a=document.activeElement;const c=(a&&ringEl&&ringEl.contains(a))?a:(ringEl&&(ringEl.querySelector('button.card.here')||ringEl.querySelector('button.card:not(.locked)')));if(c){p788Foca(c);CT881.stats.mapaFoco++;}}catch(e){}},80);}catch(e){ct881Erro('mapa abrir',e);}return r;};}catch(e){ct881Erro('openMap',e);}
+  try{const pa=p788Aba;p788Aba=function(d){try{if(CT881.on.mapa&&CT881.noPad>0){const root=p788Painel();if(root&&root.id==='map')return ct881MapaAndar(d);}}catch(e){ct881Erro('mapa andar',e);}return pa.apply(this,arguments);};}catch(e){ct881Erro('p788Aba',e);}}
+function ct881MapaX(){const inn=mapEl&&mapEl.querySelector('.mapIn');if(!inn)return null;let b=document.getElementById('ct881MapaX');
+  if(!b){ct881Css();b=document.createElement('button');b.id='ct881MapaX';b.type='button';b.className='ct881mapaX';b.setAttribute('aria-label',ct881T('Fechar','Close','Cerrar'));
+    b.addEventListener('click',e=>{e.stopPropagation();try{closeMap();CT881.stats.mapaX++;}catch(x){}});inn.insertBefore(b,inn.firstChild);}
+  const pad=typeof PAD!=='undefined'&&PAD.on;const mostra=!!CT881.on.mapa&&(TOUCHDEV||(typeof VJ!=='undefined'&&VJ.touch)||pad);b.hidden=!mostra;
+  b.innerHTML=(pad&&CT881.ultimo==='pad')?ct881Glifo('B')+ct881T('Fechar','Close','Cerrar'):'✕';return b;}
+function ct881MapaDica(){const sm=mapEl&&mapEl.querySelector('.mapT small');if(!sm)return;if(sm.dataset.ct881orig==null)sm.dataset.ct881orig=sm.textContent;
+  sm.textContent=(CT881.on.mapa&&ct881Pad())?ct881T('✚ escolhe a sala · A viaja · LB/RB trocam de andar · B fecha','✚ picks a room · A travels · LB/RB change floor · B closes','✚ elige la sala · A viaja · LB/RB cambian de piso · B cierra'):sm.dataset.ct881orig;}
+function ct881MapaAndar(d){if(!ringEl)return false;const C=[...ringEl.querySelectorAll('button.card')].filter(p788Visivel);if(!C.length)return false;
+  const H=[];C.forEach((c,k)=>{if(c.classList.contains('hub'))H.push(k);});if(!H.length)return false;const a=document.activeElement;let i=C.indexOf(a);if(i<0)i=0;
+  let h=0;for(let k=0;k<H.length;k++)if(H[k]<=i)h=k;const nh=(h+(d>0?1:-1)+H.length)%H.length;p788Foca(C[H[nh]]);CT881.stats.mapaAndar++;return true;}
+
+/* ===================== item «camera» — a inclinação pelo dedo =====================
+   COMO ERA: no toque, arrastar na tela gira a câmera só para os lados (escolha do código: «no toque fica travada nesse ângulo»);
+   a inclinação era só do mouse. O direcional direito do controle JÁ inclina (pollPad: CAM.pitch com o eixo 3, limites −0,45…1,35 no
+   Gamer e 0,12…1,35 no Clique; a opção «inverter» vale) — conferido, nada muda nele.
+   AGORA: no toque, arrastar para cima/baixo também inclina, com a mesma conta e os mesmos limites do arrastar do mouse; um arrasto quase
+   na horizontal (|dy| < metade de |dx|) não mexe na inclinação, para o giro não tremer. Ao entrar numa sala o ângulo do toque volta ao de
+   sempre (como hoje). */
+function ct881InstalaCamera(){if(CT881.cameraInst)return;CT881.cameraInst=true;ct881Fontes();
+  try{cv.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')CT881.toque[e.pointerId]={x:e.clientX,y:e.clientY};},{capture:true,passive:true});
+    cv.addEventListener('pointermove',e=>{try{if(e.pointerType!=='touch')return;const q=CT881.toque[e.pointerId];if(!q)return;const dx=e.clientX-q.x,dy=e.clientY-q.y;q.x=e.clientX;q.y=e.clientY;
+        if(!CT881.on.camera||!dragging||locked||(MODE!=='tp'&&MODE!=='gm'))return;if(Math.abs(dy)<Math.abs(dx)*.5||!dy)return;
+        if(typeof SALA_ED!=='undefined'&&SALA_ED.ativo&&window.__ms748&&window.__ms748._drag&&window.__ms748._drag())return;
+        const iy=SET.invY?-1:1;if(MODE==='tp')CAM.pitch=Math.max(0.12,Math.min(1.3,CAM.pitch+dy*0.003*SET.sens));else CAM.pitch=Math.max(-0.45,Math.min(1.35,CAM.pitch+dy*0.003*SET.sens*iy));
+        CT881.stats.cameraToque++;}catch(x){ct881Erro('câmera toque',x);}},{capture:true,passive:true});
+    const fim=e=>{try{delete CT881.toque[e.pointerId];}catch(x){}};cv.addEventListener('pointerup',fim,{capture:true,passive:true});cv.addEventListener('pointercancel',fim,{capture:true,passive:true});}catch(e){ct881Erro('câmera',e);}}
+
+/* ===================== item «hud» — os botões que só existiam na tela entram no ☰ Menu =====================
+   COMO ERA: comer abóbora e plantar/colher a horta do Bento (caixa `#escort428`), as páginas da estante da sala (`#shelf401Controls`,
+   «← Livros / Livros →», perto de uma estante com mais de uma página), «Sair da visita» (`#visSair`), Missões (`#btnMissoes`) e o
+   Grimório (📜 na barra de poderes) eram botões da tela, que o controle não alcança (no celular, parte deles já mora no ☰ Menu).
+   AGORA: com o controle conectado, ao abrir o ☰ Menu (X) aparece a linha «Na tela (controle)» com os que valem naquele momento (a abóbora
+   com a contagem e apagada quando não pode; a horta só junto dela; as páginas só perto da estante); A fecha o Menu e aperta o botão
+   original. Sem controle (mouse, teclado, toque), o Menu não muda. */
+function ct881InstalaHud(){if(CT881.hudInst)return;CT881.hudInst=true;
+  try{const ms=menuShow;menuShow=function(on){let col=null;if(on&&CT881.on.hud&&typeof PAD!=='undefined'&&PAD.on){try{col=ct881HudColeta();}catch(e){ct881Erro('hud coleta',e);}}
+      const r=ms.apply(this,arguments);try{ct881HudMonta(on?col:null);}catch(e){ct881Erro('hud monta',e);}return r;};}catch(e){ct881Erro('menuShow',e);}}
+function ct881HudColeta(){const L=[];const noMenu=el=>!!(menuOv&&menuOv.contains(el));
+  const vis=el=>{try{return !!(el&&el.isConnected&&!el.hidden&&getComputedStyle(el).display!=='none'&&el.getClientRects().length);}catch(e){return false;}};
+  try{const E=typeof ESCORT428!=='undefined'&&ESCORT428,u=E&&E.ui&&E.ui.use;if(u&&E.save&&E.save.awarded&&!u.hidden)L.push({id:'abobora',txt:u.textContent,dis:!!u.disabled,fn:()=>u.click()});}catch(e){}
+  try{const F=typeof FARM428!=='undefined'&&FARM428.ui&&FARM428.ui.button;if(F&&!F.hidden&&ESCORT428.save.taught&&typeof farm428AtGarden==='function'&&farm428AtGarden())L.push({id:'horta',txt:F.textContent,dis:!!F.disabled,fn:()=>F.click()});}catch(e){}
+  try{const R=CUR==='room'?ROOM:null,S=R&&R.shelf401;if(S&&S.pages>1&&R.shelf&&R.shelf.g){const p=R.shelf.g.getWorldPosition(new THREE.Vector3()),q=asaPos();
+      if(Math.hypot(p.x-q.x,p.z-q.z)<5){const box=document.getElementById('shelf401Controls'),bs=box?[...box.querySelectorAll('button')]:[];
+        if(bs[0])L.push({id:'livrosAnt',txt:'📚 '+bs[0].textContent+' · '+(S.page+1)+'/'+S.pages,fn:()=>bs[0].click()});if(bs[1])L.push({id:'livrosProx',txt:'📚 '+bs[1].textContent,fn:()=>bs[1].click()});}}}catch(e){}
+  try{const v=document.getElementById('visSair');if(v&&!v.hidden&&!noMenu(v)&&window.VISITA)L.push({id:'visita',txt:v.textContent,fn:()=>v.click()});}catch(e){}
+  try{const m=document.getElementById('btnMissoes');if(m&&vis(m)&&!noMenu(m))L.push({id:'missoes',txt:(m.textContent||'🎯').trim()||'🎯',fn:()=>m.click()});}catch(e){}
+  try{const bar=document.getElementById('podBar'),g=bar&&!bar.hidden&&bar.querySelector('.podBt.grim');if(g&&!noMenu(g))L.push({id:'grimorio',txt:'📜 '+ct881T('Grimório','Grimoire','Grimorio'),fn:()=>g.click()});}catch(e){}
+  return L;}
+function ct881HudMonta(L){let box=document.getElementById('ct881Atalhos');if(!L||!L.length){if(box)box.hidden=true;return;}
+  const host=menuOv&&menuOv.querySelector('.menuIn');if(!host)return;ct881Css();
+  if(!box){box=document.createElement('div');box.id='ct881Atalhos';box.setAttribute('translate','no');const t=document.createElement('div');t.className='ct881atalhosT';box.appendChild(t);
+    const mg=document.getElementById('menuGo');if(mg&&mg.parentNode===host)mg.after(box);else host.appendChild(box);}
+  box.firstChild.textContent=ct881T('Na tela (controle)','On screen (controller)','En pantalla (mando)');while(box.childNodes.length>1)box.removeChild(box.lastChild);
+  for(const it of L){const b=document.createElement('button');b.type='button';b.className='lojaBtn ct881atalho';b.dataset.ct881=it.id;b.textContent=it.txt;b.disabled=!!it.dis;
+    b.addEventListener('click',ev=>{ev.stopPropagation();try{menuShow(false);}catch(x){}setTimeout(()=>{try{it.fn();CT881.stats.hudClique++;}catch(x){ct881Erro('hud '+it.id,x);}},0);});box.appendChild(b);}
+  box.hidden=false;CT881.stats.hudMenu++;}
+
+/* ===================== item «decorar» — o Decorar no controle =====================
+   COMO ERA: no Decorar (painel à direita + clique/arraste no mundo), o controle só tinha o B (v865: fecha o editor; com peça na mão, ela
+   volta antes). Escolher, mover, girar e empilhar só com mouse, toque ou teclado. Pior: com o editor aberto, a cruz continuava com os
+   atalhos da v787 — ↑/↓ trocavam de ANDAR (PageUp/PageDown) e ←/→ abriam Diário e Visual —, e o painel do Decorar não era janela da v788.
+   AGORA (só com o controle; o mouse continua igual, e mexer no mouse esconde o cursor do controle):
+   · CURSOR NA SALA: um anel dourado que o analógico esquerdo move pela tela (fica verde sobre uma peça); encostado na borda, o leitor
+     anda naquela direção (a câmera vai junto); o analógico direito gira a câmera como sempre.
+   · A sobre uma peça: pega a peça (o mesmo arraste do mouse da v748/v835: passo de 10 cm, encosta na parede, encaixa ao lado de outra,
+     pousa no tampo de mesa/aparador/estante, verde onde cabe e vermelha onde não cabe, a de baixo leva as de cima); o cursor leva a peça;
+     A de novo põe (onde não cabe, a peça volta — a peça nova do catálogo continua na mão); tapetes: o 1.º A escolhe, o 2.º pega (como o mouse).
+     A no chão com uma peça escolhida: o clique de sempre (leva a peça para aquele quadrado; numa superfície, escolhe a superfície).
+   · LT/RT: giram 15° (na mão ou a peça escolhida; peça de parede vira). Cruz: sem peça escolhida, o cursor anda em passos de 32 px;
+     com peça escolhida, ajuste fino de 25 cm na direção da tela (peça de parede: ←/→ correm pela parede, ↑/↓ sobem e descem); com a
+     peça na mão, a cruz dá passos finos (8 px) no cursor.
+   · X retira a peça escolhida; LB desfaz; RB duplica (a cópia vem na mão, no cursor).
+   · Y passa o controle para o PAINEL (cruz escolhe, A aperta, LB/RB trocam de aba — Editar, Adicionar, Sala —, analógico direito rola; a
+     cor abre a paleta em vez do seletor do sistema); Y ou B voltam à sala. Escolhida no catálogo, a peça nova vem na mão, no cursor.
+   · B: com a peça na mão, cancela (volta ao lugar; a nova sai); com uma peça escolhida, solta a escolha; sem nada, sai do Decorar.
+   · A cruz não troca mais de andar nem abre Diário/Visual com o editor aberto. Uma barra embaixo mostra os botões de cada momento. */
+function ct881DecAtivo(){try{return !!CT881.on.decorar&&typeof SALA_ED!=='undefined'&&SALA_ED.ativo&&CUR==='room'&&ct881Pad();}catch(e){return false;}}
+function ct881DecR(){try{const R=DEC128.active;return (R&&R.universal128&&typeof ROOMS!=='undefined'&&ROOMS.pessoal&&R.scene===ROOMS.pessoal.scene)?R:null;}catch(e){return null;}}
+function ct881M(){const M=window.__ms748;return (M&&M._inicia&&M._move&&M._fim&&M._poe&&M._drag&&M._raio&&M._caixa)?M:null;}
+function ct881Arrasto(){const M=ct881M();if(!M)return null;const D=M._drag();return D&&D.iniciado?D:null;}
+/* REVISÃO (ct881 corrigido): o arraste que o CONTROLE começa (A sobre uma peça) usa um ponteiro inventado (pid 8811), que nenhum
+   pointerup de verdade encerra. Se o editor fechasse por outro caminho com a peça na mão — Start → Mapa → viagem, Esc do teclado,
+   «✓ Concluir» com o mouse, o cursor na borda levando o leitor pelo portal (troca de cena) — o `MS748.drag` ficava preso: a peça
+   continuava tingida e fora do lugar, e o mouse não arrastava mais nenhuma peça no Decorar (o pointerdown da v748 sai cedo enquanto
+   há arraste). Agora esse arraste (só o do controle; a peça nova na mão da v835 já é tratada pelo próprio DC835) é cancelado — a
+   peça volta ao lugar — quando o editor fecha, quando o mouse ou o dedo tocam a tela, e, por segurança, quando o controle se
+   desconecta ou o item é desligado. */
+function ct881DecMeu(){try{const M=ct881M(),D=M&&M._drag();return (D&&D.pid===CT881.dec.pid&&!D.carry835)?D:null;}catch(e){return null;}}
+function ct881DecLimpa(motivo){try{const M=ct881M(),D=ct881DecMeu();if(!M||!D)return false;M._fim({pointerId:D.pid,stopImmediatePropagation(){}},true);CT881.stats.decLimpa++;return true;}catch(e){ct881Erro('arraste preso ('+motivo+')',e);return false;}}
+function ct881InstalaDecFecha(){if(CT881.decFechaInst)return;CT881.decFechaInst=true;
+  try{const tg=decorToggle128;decorToggle128=function(on){if(!on){try{ct881DecLimpa('editor fechou');}catch(e){}}return tg.apply(this,arguments);};}catch(e){ct881Erro('decorToggle128',e);}
+  try{addEventListener('pointerdown',e=>{try{if(e.isTrusted&&ct881DecMeu())ct881DecLimpa('mouse/toque');}catch(x){}},{capture:true,passive:true});}catch(e){ct881Erro('arraste preso (ouvinte)',e);}}
+function ct881PecaEm(R,px,py){const M=ct881M();if(!M||!R||!R.placed)return null;const rc=M._raio(px,py);let best=null;
+  for(const [id,s] of Object.entries(R.placed)){if(!s||!s.g||!s.g.visible)continue;const bx=M._caixa(R,id,s);if(!Number.isFinite(bx.min.x)||!rc.ray.intersectsBox(bx))continue;
+    let h=null;try{h=rc.intersectObject(s.g,true).find(x=>x.object&&x.object.visible!==false&&!x.object.isSprite);}catch(e){h=null;}if(h&&(!best||h.distance<best.d))best={id,d:h.distance};}
+  return best;}
+function ct881Chato(R,id){try{const s=R.placed[id];if(!s)return false;if(typeof SALA_TAP_BASE!=='undefined'&&SALA_TAP_BASE[id])return true;if(s.g.userData.floorCover411)return true;
+    const M=ct881M();if(!M)return false;const b=M._caixa(R,id,s);return (b.max.y-b.min.y)<.12;}catch(e){return false;}}
+function ct881DecTrata(gp,E,b,dt,agora){const D=CT881.dec;
+  if(!D.ativo){D.ativo=true;D.modo='sala';if(!ct881DecMeu()){D.x=innerWidth/2;D.y=innerHeight*.62;}D.sobre=null;CT881.stats.decCursor++;} // com a peça do controle na mão, o cursor continua onde estava
+  // outra janela por cima (catálogo, Menu, um aviso): o controle é dela
+  if(ct881PainelJogo()){ct881DecUI('oculto');return null;}
+  const arr=ct881Arrasto();if(arr&&D.modo!=='sala'){D.modo='sala';CT881.stats.decSala++;}
+  if(D.modo==='painel'){
+    if(!(typeof SALA_PAINEL!=='undefined'&&SALA_PAINEL&&p788Visivel(SALA_PAINEL))){D.modo='sala';}
+    else{if(E[1]||E[3]){D.modo='sala';CT881.stats.decSala++;try{const a=document.querySelector('.p788foco');if(a)a.classList.remove('p788foco');if(document.activeElement&&SALA_PAINEL.contains(document.activeElement))document.activeElement.blur();}catch(e){}ct881Consome(gp,[0,1,2,3,4,5,6,7,12,13,14,15]);ct881DecUI(true);return null;} // REVISÃO: tudo o que a sala consome (a cruz apertada junto com o B não vira PageUp/PageDown neste quadro)
+      ct881Consome(gp,[2]);ct881DecUI('painel');return null;}}
+  // ---- sala: o cursor ----
+  const R=DEC128.active,R8=ct881DecR(),M=ct881M();
+  const ax=ct881Dz(gp.axes&&gp.axes[0]),ay=ct881Dz(gp.axes&&gp.axes[1]),vel=900*Math.min(.1,Math.max(0,dt||0));
+  let nx=D.x+Math.sign(ax)*Math.pow(Math.abs(ax),1.6)*vel,ny=D.y+Math.sign(ay)*Math.pow(Math.abs(ay),1.6)*vel;
+  if(arr){if(ct881Rep(gp,12,agora))ny-=8;if(ct881Rep(gp,13,agora))ny+=8;if(ct881Rep(gp,14,agora))nx-=8;if(ct881Rep(gp,15,agora))nx+=8;}
+  const mg=24,W=innerWidth,H=innerHeight;let bx=0,by=0;
+  if(nx<mg){if(ax<0)bx=ax;nx=mg;}if(nx>W-mg){if(ax>0)bx=ax;nx=W-mg;}if(ny<mg){if(ay<0)by=ay;ny=mg;}if(ny>H-mg){if(ay>0)by=ay;ny=H-mg;}
+  const mudou=nx!==D.x||ny!==D.y;D.x=nx;D.y=ny;D.borda=[bx,by];
+  try{if(typeof DC835!=='undefined'){DC835.mx=D.x;DC835.my=D.y;}}catch(e){}
+  if(arr&&M&&(mudou||agora-D.tMove>150)&&agora-D.tMove>(arr.parede?33:16)){D.tMove=agora;try{M._move(arr,{clientX:D.x,clientY:D.y,altKey:false,shiftKey:false});}catch(e){ct881Erro('mover peça',e);}}
+  // ---- sala: os botões ----
+  if(E[0])ct881DecA(R,R8,arr);
+  else if(E[1])ct881DecB(arr);
+  // o B (ou outra coisa) fechou o editor neste quadro: o cursor e a barra saem, e os botões continuam deste quadro
+  if(!(typeof SALA_ED!=='undefined'&&SALA_ED.ativo)){D.ativo=false;D.modo='sala';ct881Consome(gp,[0,1,2,3,4,5,6,7,12,13,14,15]);ct881DecUI(false);return {dec:true};}
+  if(!arr){
+    if(E[2])ct881DecRetira(R);
+    if(E[3]){D.modo='painel';CT881.stats.decPainel++;ct881DecPainelFoco();ct881Consome(gp,[0,1,2,3,4,5,6,7,12,13,14,15]);ct881DecUI('painel');return {dec:true};}
+    if(E[4]){try{ms497Desfazer();CT881.stats.decDesfaz++;}catch(e){ct881Erro('desfazer',e);}}
+    if(E[5]){try{ms497Duplicar();CT881.stats.decDuplica++;}catch(e){ct881Erro('duplicar',e);}}
+    const sel=R&&SALA_ED.sel&&R.placed&&R.placed[SALA_ED.sel],parede=!!(sel&&sel.g.userData.parede747);
+    if(parede){if(E[6])ct881DecGira(-1,null);if(E[7])ct881DecGira(1,null);}else{if(ct881Rep(gp,6,agora))ct881DecGira(-1,null);if(ct881Rep(gp,7,agora))ct881DecGira(1,null);}
+    // cruz: com peça escolhida, ajuste fino da peça; sem peça, o cursor anda em passos de 32 px (quem prefere a cruz ao analógico)
+    const c12=ct881Rep(gp,12,agora),c13=ct881Rep(gp,13,agora),c14=ct881Rep(gp,14,agora),c15=ct881Rep(gp,15,agora);
+    if(sel){if(c12)ct881DecFino('cima');if(c13)ct881DecFino('baixo');if(c14)ct881DecFino('esq');if(c15)ct881DecFino('dir');}
+    else{if(c12)D.y=Math.max(mg,D.y-32);if(c13)D.y=Math.min(H-mg,D.y+32);if(c14)D.x=Math.max(mg,D.x-32);if(c15)D.x=Math.min(W-mg,D.x+32);if(c12||c13||c14||c15)D.tHover=0;}}
+  else{if(!arr.parede){if(ct881Rep(gp,6,agora))ct881DecGira(-1,arr);if(ct881Rep(gp,7,agora))ct881DecGira(1,arr);}}
+  if(agora-D.tHover>100){D.tHover=agora;try{D.sobre=R8?ct881PecaEm(R8,D.x,D.y):null;}catch(e){D.sobre=null;}}
+  ct881Consome(gp,[0,1,2,3,4,5,6,7,12,13,14,15]);
+  ct881DecUI(true);return {dec:true};}
+function ct881DecA(R,R8,arr){const D=CT881.dec,M=ct881M();try{
+    if(arr){CT881.stats.decSolta++;M._fim({pointerId:arr.pid,stopImmediatePropagation(){}},false);return;}
+    if(R8&&M){const hit=ct881PecaEm(R8,D.x,D.y);
+      if(hit){if(ct881Chato(R8,hit.id)&&SALA_ED.sel!==hit.id){SALA_ED.sel=hit.id;SALA_ED.fam=null;try{salaRealce(hit.id);}catch(e){}try{salaPainelEstado();}catch(e){}CT881.stats.decClique++;return;}
+        const Dd={R:R8,id:hit.id,x:D.x,y:D.y,pid:D.pid,iniciado:false};M._poe(Dd);
+        if(M._inicia(Dd,{clientX:D.x,clientY:D.y})){CT881.stats.decPega++;D.tMove=0;}else M._poe(null);return;}}
+    CT881.stats.decClique++;salaClicar(D.x,D.y);}catch(e){ct881Erro('decorar A',e);}}
+function ct881DecB(arr){const M=ct881M();try{
+    if(arr){CT881.stats.decCancela++;if(arr.carry835&&typeof dc8Desiste==='function')dc8Desiste(arr);else if(M)M._fim({pointerId:arr.pid,stopImmediatePropagation(){}},true);return;}
+    if(SALA_ED.sel){SALA_ED.sel=null;SALA_ED.fam=null;try{salaRealce(null);}catch(e){}try{salaPainelEstado();}catch(e){}return;}
+    CT881.stats.decFecha++;salaDecorar(false);try{renderGoBar();}catch(e){}CT881.dec.ativo=false;ct881DecUI(false);}catch(e){ct881Erro('decorar B',e);}}
+function ct881DecRetira(R){try{const id=SALA_ED.sel;if(!R||!id||!R.placed||!R.placed[id]){showToast(ct881T('Escolha uma peça com A antes de retirar.','Pick a piece with A before removing it.','Elige una pieza con A antes de quitarla.'));return;}
+    if(decorDelete128(id,R)){SALA_ED.sel=null;SALA_ED.fam=null;try{salaRealce(null);}catch(e){}try{salaPainelEstado();}catch(e){}CT881.stats.decRetira++;}}catch(e){ct881Erro('retirar',e);}}
+function ct881DecGira(sinal,arr){const ang=sinal*Math.PI/12;try{
+    if(arr){if(typeof dc8Gira==='function'&&dc8Gira(arr,ang))CT881.stats.decGiro++;return;}
+    const R=DEC128.active,id=SALA_ED.sel,s=R&&id&&R.placed&&R.placed[id];if(!s)return;
+    let ok=false;if(typeof ms497Girar==='function')ok=!!ms497Girar(ang);if(!ok&&typeof ms497R==='function'&&!ms497R())ok=!!decorRotate128();
+    if(ok)CT881.stats.decGiro++;try{salaPainelEstado();}catch(e){}}catch(e){ct881Erro('girar',e);}}
+// ajuste fino de 25 cm: na direção da tela (o eixo do mundo mais perto dela); peça de parede: ao longo da parede ou para cima/baixo
+function ct881DecFino(dir){try{const R=DEC128.active,id=SALA_ED.sel,s=R&&id&&R.placed&&R.placed[id];if(!s)return;const yaw=CAM.yaw;
+    const fx=-Math.sin(yaw),fz=-Math.cos(yaw),rx=Math.cos(yaw),rz=-Math.sin(yaw);let dx=0,dz=0;
+    if(s.g.userData.parede747){const d=salaMapa128(R)[id]||{},n=d.n747||[0,1],tg=[-n[1],n[0]];
+      if(dir==='esq'||dir==='dir'){const sg=(tg[0]*rx+tg[1]*rz)>=0?1:-1,k=(dir==='dir'?1:-1)*sg*.25;dx=tg[0]*k;dz=tg[1]*k;}else{const k=dir==='cima'?-.25:.25;dx=n[0]*k;dz=n[1]*k;}}
+    else{let vx,vz;if(dir==='cima'){vx=fx;vz=fz;}else if(dir==='baixo'){vx=-fx;vz=-fz;}else if(dir==='dir'){vx=rx;vz=rz;}else{vx=-rx;vz=-rz;}
+      if(Math.abs(vx)>=Math.abs(vz))dx=Math.sign(vx)*.25;else dz=Math.sign(vz)*.25;}
+    if(typeof ms497Mover==='function'&&ms497Mover(dx,dz))CT881.stats.decFino++;}catch(e){ct881Erro('fino',e);}}
+function ct881DecPainelFoco(){try{const p=SALA_PAINEL;if(!p)return;const L=p788Focaveis(p);const t=L.find(x=>x.getAttribute&&x.getAttribute('aria-selected')==='true')||L[0];if(t)p788Foca(t);}catch(e){ct881Erro('painel foco',e);}}
+function ct881DecUI(modo){let c=document.getElementById('ct881Cursor');
+  if(modo===false){if(c)c.style.display='none';if(CT881.ajuda&&/^dec/.test(CT881.ajuda))ct881Ajuda(null);return;}
+  if(!c){ct881Css();c=document.createElement('div');c.id='ct881Cursor';document.body.appendChild(c);}
+  const D=CT881.dec;
+  if(modo===true){const arr=ct881Arrasto();c.style.display='block';c.style.transform='translate('+Math.round(D.x)+'px,'+Math.round(D.y)+'px)';c.classList.toggle('mao',!!arr);c.classList.toggle('peca',!!D.sobre&&!arr);
+    ct881Ajuda(arr?'decArrasto':(SALA_ED.sel?'decSel':'decSala'));}
+  else{c.style.display='none';if(modo==='painel')ct881Ajuda('decPainel');else if(CT881.ajuda&&/^dec/.test(CT881.ajuda))ct881Ajuda(null);}}
+// o cursor e a barra somem quando o editor fecha ou o controle sai de cena (mouse, toque, teclado, controle desligado)
+function ct881Vigia(){if(CT881.vigiaInst)return;CT881.vigiaInst=true;
+  setInterval(()=>{try{if(!ct881DecAtivo()){const c=document.getElementById('ct881Cursor');if(CT881.dec.ativo||(c&&c.style.display!=='none')){CT881.dec.ativo=false;CT881.dec.modo='sala';ct881DecUI(false);}}
+      // REVISÃO: rede de segurança do arraste do controle (editor fechado por fora, controle desconectado, item desligado)
+      if(ct881DecMeu()&&!(CT881.on.decorar&&typeof SALA_ED!=='undefined'&&SALA_ED.ativo&&typeof PAD!=='undefined'&&PAD.on))ct881DecLimpa('vigia');
+      if(CT881.ajuda==='penaMira'&&!(CT881.on.pena&&ct881PenaMirando()))ct881Ajuda(null);}catch(e){}},300);}
+
+/* ===================== instalação, chaves e gancho ===================== */
+const CT881_INST={
+  decorar:()=>{ct881InstalaPad();ct881InstalaPainel();ct881InstalaClique();ct881InstalaMover();ct881InstalaDecFecha();ct881Vigia();},
+  pena:()=>{ct881InstalaPad();ct881InstalaPainel();ct881InstalaClique();ct881InstalaMover();ct881Vigia();},
+  mapa:()=>{ct881InstalaPad();ct881InstalaMapa();},
+  camera:()=>{ct881InstalaCamera();},
+  conto:()=>{ct881InstalaPad();ct881InstalaClique();ct881InstalaMover();},
+  chaves:()=>{ct881InstalaChaves();},
+  hud:()=>{ct881InstalaHud();},
+  deslizantes:()=>{ct881InstalaMover();},
+  dialogos:()=>{ct881InstalaPainel();ct881InstalaClique();},
+  estantey:()=>{ct881InstalaPad();},
+  intro:()=>{ct881InstalaPad();ct881InstalaIntro();}
+};
+function ct881Liga(k){if(!CT881_INST[k])return false;CT881.on[k]=true;if(!CT881.inst[k]){CT881.inst[k]=true;try{CT881_INST[k]();}catch(e){ct881Erro('instalar '+k,e);}}return true;}
+function ct881Desliga(k){if(!(k in CT881.on))return false;CT881.on[k]=false;
+  try{if(k==='decorar'){ct881DecLimpa('desligado');CT881.dec.ativo=false;CT881.dec.modo='sala';ct881DecUI(false);}if(k==='pena'&&CT881.ajuda==='penaMira')ct881Ajuda(null);
+    if(k==='mapa'){const b=document.getElementById('ct881MapaX');if(b)b.hidden=true;ct881MapaDica();}if(k==='hud'){const x=document.getElementById('ct881Atalhos');if(x)x.hidden=true;}}catch(e){}return true;}
+for(const k of CT881.itens)if(CT881.on[k]){CT881.on[k]=false;ct881Liga(k);}
+window.__controle881={estado:CT881,on:CT881.on,itens:CT881.itens.slice(),stats:CT881.stats,erros:CT881.erros,liga:ct881Liga,desliga:ct881Desliga,
+  get tecladoExterno(){return CT881.tecladoExterno;},set tecladoExterno(f){CT881.tecladoExterno=typeof f==='function'?f:null;},dialogosAlvos:CT881.dlgAlvos,
+  // auxiliares (teste e conferência)
+  decorar:{cursor:(x,y)=>{if(Number.isFinite(x))CT881.dec.x=x;if(Number.isFinite(y))CT881.dec.y=y;return [CT881.dec.x,CT881.dec.y];},modo:()=>CT881.dec.modo,ativo:()=>CT881.dec.ativo,pecaEm:(x,y)=>{const R=ct881DecR();return R?ct881PecaEm(R,x,y):null;}},
+  pena:{parede:()=>{try{return ct881PenaParede();}catch(e){return 'erro '+e.message;}},altura:v=>{if(Number.isFinite(v))CT881.pena.altura=v;return CT881.pena.altura;},teclado:()=>CT881.tec?{texto:CT881.tec.campo.value,pos:CT881.tec.pos,maius:CT881.tec.maius,pag:CT881.tec.pag}:null},
+  conto:CT881.conto,dialogoAberto:()=>{const d=document.getElementById('ct881Dlg');return d&&d.open?{msg:(d.querySelector('.ct881msg')||{}).textContent,valor:(d.querySelector('output')||{}).textContent||null}:null;}};
+
+/* ===================== v881 · MEMÓRIA, FASE C: AS SALAS DOS ANDARES DISTANTES DEVOLVEM O QUE PESA NO HEAP — SEM DESMONTAR NADA (bloco `MC881`) =====================
+   Pedido: a «Fase C — memória» da proposta de pré-carregamento gradual (aprovada pelo Luiz em 19/11). DESLIGADO POR PADRÃO.
+   COMO ERA: nada era descarregado. O heap fica em 500–670 MB na abertura e cada sala visitada soma (no Leve, de +18 MB no Drama a
+     +491 MB na Histórica; as 17 salas dos três primeiros andares, ~2 GB): uma sessão longa chega perto do limite do Chrome (~4 GB). As
+     purgas da v198 (`memPurga`, ao trocar de andar) e da v659 (Leve) soltam só a PLACA (`dispose`); os arrays dos atributos e as telas
+     ficam no heap, porque é deles que o three.js sobe tudo de novo. Desmontar a sala e remontar (a ideia da proposta) não é seguro hoje:
+     ~70 camadas do `finishRoom` marcam «já fiz» em estado GLOBAL (`XX.feito=true`, `X.feitas[key]`, `SHIP302.ready`…) e não voltariam
+     numa sala refeita, e dezenas de registros globais (portais, baús, atris, NPC, lanternas, troféus, campos…) guardam peças da cena velha.
+   AGORA (só com `?memoria881=1`): a sala NÃO é desmontada — cena, objetos, materiais, registros e lógica ficam onde estão. Saem do heap
+     só os BYTES grandes que ninguém usa enquanto o andar está longe: os arrays dos atributos de geometria (posição, normal, uv, cor,
+     índice, matrizes e cores das instâncias) vão para um `Blob` (memória do navegador fora do heap da aba; o Chrome pode levá-la ao
+     disco) e, no lugar de cada array, fica um «procurador» (`Proxy`) do mesmo tipo. A BVH da câmera dessas geometrias é largada
+     (refeita sob demanda, como sempre foi). Os limites (`boundingSphere/Box`) ficam prontos antes, para o recorte não precisar dos arrays.
+     · QUANDO: o vigia (a cada 4 s; nada por quadro) estima o heap — `performance.memory` quando os valores andam (Chrome com memória
+       precisa) ou a soma do que cada sala montada segura (censo próprio, em fatias) — e, acima do limiar (1500 MB), solta UMA sala por
+       vez, do andar mais longe primeiro (e a maior primeiro), até ficar abaixo de 85 % do limiar. Nunca o andar atual nem o vizinho
+       (distância ≥ 2), nunca a cena ativa, nunca a Minha Sala, o Acumulador, a sala principal (`lib`) ou o prólogo; os halls só com
+       `?halls881=1`. Nada é solto com obra em curso (montagem, acabamento, viagem) nem numa sala que ficou pronta há menos de 60 s.
+     · A VOLTA: (1) ao chegar a um andar, as salas soltas dele e dos vizinhos voltam nos bastidores (leitura assíncrona do Blob e cópia
+       em fatias de 4 ms); (2) uma viagem direta (mapa, Tomé, chave, escada) espera a volta dentro do `travel434Prepare` (também as salas
+       vistas pelos vãos do hall) e do `ensureRoom130`, atrás do fade; (3) REDE DE SEGURANÇA: qualquer código que toque um array solto
+       (raio do clique, colisão, Papel, fusão, varredores, um clone…) e o three.js que precise subi-lo de novo à placa depois de uma
+       purga (`bufferData` interceptado) recebem o array verdadeiro na hora — se ainda estiver vivo, é o MESMO objeto (zero custo); se o
+       coletor já o levou, é lido do Blob de forma síncrona (XHR síncrono de `blob:`; se falhar, zeros + leitura assíncrona que preenche
+       o mesmo array e o sobe de novo).
+     · IDENTIDADE: um array só é coletado quando NENHUM outro código o segura (fechos de animação, varredores, caches). Se alguém o
+       segura, o heap não ganha nada com ele, mas a volta devolve o MESMO objeto — nada fica dessincronizado. O ganho real é contado pelo
+       coletor (`FinalizationRegistry`), à parte do que foi entregue.
+     · O `lightBudget` (luzes e Papel) de uma cena solta que não é a ativa fica para a volta (o Papel leria os índices de tudo de novo).
+   O que NÃO muda: a imagem, a lógica, o estado do jogador (baús, chaves, moedas continuam no localStorage), as purgas da placa, as telas.
+   Partes (chaves): `?memoria881=1` liga; `?geo881=0` (arrays), `?bvh881=0` (BVH), `?auto881=0` (sem o vigia: só pelo gancho),
+     `?halls881=1` (inclui os halls distantes), `?limiar881=<MB>` (1500), `?min881=<bytes>` (8192: arrays menores ficam).
+   Gancho `window.__memoria881`: `estado`, `stats` (MB entregues, MB coletados de fato, salas soltas, recargas, emergências), `erros`,
+     `soltar(sala[,{forcar:true}])` e `restaurar(sala)` (Promises), `unidades()`, `censo(sala)`, `heap()`, `vigia()`.
+   REVISÃO (19/11, revisão/mc881): (1) a solta espera a vez na fila do FAT818 (um trabalho por vez): se o leitor viajasse para a sala nesse
+     meio-tempo, ninguém a cancelava (a unidade ainda estava «montada») e a sala ATIVA era solta depois — agora o gerador confere de novo ao
+     começar (cancelada, cena ativa, andar perto sem `forcar`), `mc881Pede` cancela a solta enfileirada e a volta de uma solta que não começou
+     não espera a fila; (2) a BVH da câmera nunca guarda um procurador (`camBvh190` recebe o array verdadeiro); (3) a estimativa e o censo
+     das outras cenas não tocam procuradores (cada toque era uma emergência); (4) o `lightBudget` adiado que volta por uma emergência (p. ex.
+     dentro do `gl.bufferData`, no meio do desenho) corre no próximo tique; (5) o procurador devolve `constructor` sem `bind` (antes,
+     `arr.constructor!==Float32Array`); (6) duas chaves de `ROOMS` com a mesma cena viram uma unidade só. */
+const MC881=(function(){const q=location.search+location.hash;const n=(re,d)=>{const m=q.match(re);return m?Math.max(0,+m[1]||0):d;};
+  return {on:/[?&#]memoria881=1/i.test(q),geo:!/[?&#]geo881=0/i.test(q),bvh:!/[?&#]bvh881=0/i.test(q),auto:!/[?&#]auto881=0/i.test(q),halls:/[?&#]halls881=1/i.test(q),
+    limiarMB:n(/[?&#]limiar881=(\d+)/i,1500)||1500,alvo:.85,minB:n(/[?&#]min881=(\d+)/i,8192),blocoB:2*1048576,dist:2,periodo:4000,calmaMs:60000,voltaMs:30000,
+    base:550,unidades:new Map(),cenas:new WeakMap(),prox:new WeakMap(),fr:null,timer:null,andar:null,pm:{ult:null,mudou:-1e12},leSync:null,instalado:false,aliviando:false,
+    stats:{soltas:0,restauradas:0,entregueB:0,coletadoB:0,coletados:0,arrays:0,blobs:0,blobB:0,reatados:0,lidosBlob:0,emergencias:0,emergenciaFalhas:0,placa:0,luzAdiada:0,
+      vigias:0,canceladas:0,msSoltar:0,msRestaurar:0,preenchidos:0,quem:[],ultimo:null},semSync:false,erros:[]};})();
+const MC881_FORA=new Set(['lib','prologo','minha','pessoal']);
+function mc881Erro(k,e){try{if(MC881.erros.length<40)MC881.erros.push(k+': '+(e&&e.message||e));console.warn('v881 memória',k,e);}catch(x){}}
+function mc881MB(b){return +((b||0)/1048576).toFixed(1);}
+/* ---------- o procurador: um Proxy do mesmo tipo de array; qualquer toque devolve (ou busca) o array verdadeiro ---------- */
+// um manipulador para todos (o alvo de cada procurador é um array vazio próprio, que leva ao registro): ~150 bytes por array solto
+const MC881_ALVO_REC=new WeakMap();
+const MC881_MANIP={
+  get(t,k){const a=mc881Real(MC881_ALVO_REC.get(t),'toque');const v=Reflect.get(a,k,a);return (typeof v==='function'&&k!=='constructor')?v.bind(a):v;},
+  set(t,k,v){const a=mc881Real(MC881_ALVO_REC.get(t),'toque');a[k]=v;return true;},
+  has(t,k){return Reflect.has(mc881Real(MC881_ALVO_REC.get(t),'toque'),k);},
+  ownKeys(t){return Reflect.ownKeys(mc881Real(MC881_ALVO_REC.get(t),'toque'));},
+  getOwnPropertyDescriptor(t,k){const d=Reflect.getOwnPropertyDescriptor(mc881Real(MC881_ALVO_REC.get(t),'toque'),k);if(d)d.configurable=true;return d;},
+  defineProperty(t,k,d){return Reflect.defineProperty(mc881Real(MC881_ALVO_REC.get(t),'toque'),k,d);},
+  deleteProperty(t,k){return Reflect.deleteProperty(mc881Real(MC881_ALVO_REC.get(t),'toque'),k);}};
+function mc881Prox(r){const t=new r.C(0);MC881_ALVO_REC.set(t,r);return new Proxy(t,MC881_MANIP);}
+// síncrono: devolve o array verdadeiro (o mesmo objeto se ainda vive; senão lê do Blob)
+function mc881Real(r,motivo){if(r.arr)return r.arr;let a=null,fonte='vivo',zerado=false;const U=r.u,blob=U&&U.blobs[r.b];
+  try{a=r.w&&r.w.deref();}catch(e){a=null;}
+  if(!a){fonte='blob';try{if(MC881.semSync&&typeof MC881.leSync!=='function')throw new Error('sem leitura síncrona neste navegador');a=mc881LeSync(r);}
+    catch(e){if(!MC881.semSync)mc881Erro('leitura síncrona '+r.nome,e);MC881.stats.emergenciaFalhas++;a=new r.C(r.n);zerado=true;mc881SemSync();}}
+  mc881Pronto(r,a,fonte);
+  if(motivo!=='volta'){MC881.stats.emergencias++;if(motivo==='placa')MC881.stats.placa++;MC881.stats.ultimo={emergencia:r.nome,unidade:U&&U.id,motivo,fonte,t:Date.now()};
+    // quem tocou (as 10 primeiras): para achar leitores que o bloco ainda não conhece
+    if(MC881.stats.quem.length<10){let pilha='';try{pilha=String(new Error().stack||'').split('\n').slice(3,7).map(x=>x.trim()).join(' < ');}catch(e){}MC881.stats.quem.push({array:r.nome,unidade:U&&U.id,motivo,fonte,pilha:pilha.slice(0,400)});}}
+  if(zerado)mc881Preenche(r,blob);
+  return a;}
+// sem leitura síncrona (o XHR síncrono de blob: não funciona aqui): a rede de segurança perde a garantia → o vigia para de soltar e as
+// salas soltas voltam todas nos bastidores
+function mc881SemSync(){if(MC881.semSync)return;MC881.semSync=true;try{for(const U of MC881.unidades.values())if(U.estado!=='montada')mc881Restaura(U,false);}catch(e){mc881Erro('sem leitura síncrona',e);}}
+function mc881LeSync(r){const U=r.u,blob=U&&U.blobs[r.b];if(!blob)throw new Error('sem blob');
+  if(typeof MC881.leSync==='function')return MC881.leSync(r,blob);
+  const url=URL.createObjectURL(blob.slice(r.off,r.off+r.bytes));
+  try{const x=new XMLHttpRequest();x.open('GET',url,false);x.overrideMimeType('text/plain; charset=x-user-defined');x.send(null);
+    const s=x.responseText||'';if(s.length!==r.bytes)throw new Error('lidos '+s.length+' de '+r.bytes+' bytes');
+    const u8=new Uint8Array(r.bytes);for(let i=0;i<r.bytes;i++)u8[i]=s.charCodeAt(i)&255;return new r.C(u8.buffer,0,r.n);}
+  finally{try{URL.revokeObjectURL(url);}catch(e){}}}
+// leitura que falhou: os zeros entregues agora são preenchidos (o MESMO array) assim que o Blob for lido, e sobem de novo à placa
+const MC881_PREENCHE=new Map(); // Blob → registros entregues com zeros (cada Blob é lido UMA vez para todos)
+function mc881Preenche(r,blob){if(!blob)return;r.zerado=true;let L=MC881_PREENCHE.get(blob);if(L){L.push(r);return;}L=[r];MC881_PREENCHE.set(blob,L);
+  blob.arrayBuffer().then(ab=>{MC881_PREENCHE.delete(blob);for(const x of L){try{new Uint8Array(x.arr.buffer,x.arr.byteOffset,x.bytes).set(new Uint8Array(ab,x.off,x.bytes));x.zerado=false;for(const at of x.as)at.needsUpdate=true;MC881.stats.preenchidos++;}catch(e){mc881Erro('preencher',e);}}},
+    e=>{MC881_PREENCHE.delete(blob);mc881Erro('preencher',e);});}
+function mc881Pronto(r,a,fonte){r.arr=a;r.w=null;for(const at of r.as){try{if(at.array===r.p)at.array=a;}catch(e){}}
+  if(fonte==='vivo'){try{MC881.fr.unregister(r);}catch(e){}} // o mesmo array volta: não conta como coletado se for solto outra vez
+  if(fonte==='vivo')MC881.stats.reatados++;else MC881.stats.lidosBlob++;
+  const U=r.u;if(U){if(U.pend>0)U.pend--;if(!U.pend&&U.estado!=='soltando'&&!U.prom)mc881Montada(U,true);}}
+// adiaLuz: a última peça voltou por uma emergência (pode ser dentro do `gl.bufferData`, no meio do desenho) → o lightBudget adiado
+// (Papel, luzes, cascas) não mexe na cena durante o desenho: corre no próximo tique
+function mc881Montada(U,adiaLuz){U.recs=[];U.blobs=[];U.pend=0;U.solto=0;U.estado='montada';U.tVolta=performance.now();
+  if(U.luz){U.luz=false;const luz=()=>{try{lightBudget(U.cena);}catch(e){mc881Erro('luzes '+U.id,e);}};if(adiaLuz){try{setTimeout(luz,0);}catch(e){luz();}}else luz();}}
+/* ---------- as unidades: uma por sala montada (e por hall, com ?halls881=1) ---------- */
+function mc881Unidades(){const M=MC881.unidades,halls=new Set(),vistos=new Set(),cenasVistas=new Set();
+  try{for(const n in HALLS){const s=HALLS[n]&&HALLS[n].scene;if(s)halls.add(s);}}catch(e){}
+  const poe=(id,tipo,chave,andar,cena)=>{vistos.add(id);let U=M.get(id);
+    if(U&&U.cena!==cena){M.delete(id);U=null;} // cena refeita: a unidade velha sai da lista (os procuradores dela continuam a funcionar)
+    if(!U){U={id,tipo,chave,andar,cena,estado:'montada',recs:[],blobs:[],pend:0,solto:0,est:null,luz:false,prom:null,job:null,cancel:false,t0:performance.now(),tVolta:-1e9,soltas:0,voltas:0};M.set(id,U);MC881.cenas.set(cena,U);}
+    U.andar=andar;return U;};
+  try{if(MC881.halls)for(const n in HALLS){const s=HALLS[n]&&HALLS[n].scene;if(s)poe('hall:'+n,'hall',n,+n,s);}}catch(e){mc881Erro('halls',e);}
+  try{for(const k in ROOMS){const R=ROOMS[k];if(!R||!R.scene||!R.scene.isScene||R.ready===false||MC881_FORA.has(k))continue;if(halls.has(R.scene)||R.scene===scene)continue;
+      if(cenasVistas.has(R.scene))continue;cenasVistas.add(R.scene); // duas chaves com a mesma cena (apelido): uma unidade só (o `cenas` aponta para ela)
+      poe('sala:'+k,'sala',k,memAndarDaSala(k),R.scene);}}catch(e){mc881Erro('salas',e);}
+  for(const [id,U] of M)if(!vistos.has(id)&&U.estado==='montada')M.delete(id);
+  return M;}
+function mc881Unidade(sala){if(sala&&typeof sala==='object'){mc881Unidades();return MC881.cenas.get(sala)||null;}const M=mc881Unidades();const s=String(sala||'');
+  return M.get(s)||M.get('sala:'+s)||M.get('hall:'+s)||(GENRE_ROOM[s]&&M.get('sala:'+GENRE_ROOM[s]))||null;}
+function mc881DaCena(sc){return sc?MC881.cenas.get(sc)||null:null;}
+// posição e índice de uma geometria com o array verdadeiro (para quem guarda o array: a BVH da câmera)
+function mc881Desembrulha(g){const p=g&&g.attributes&&g.attributes.position,i=g&&g.index;
+  if(p&&!p.isInterleavedBufferAttribute&&p.array&&MC881.prox.has(p.array))mc881Real(MC881.prox.get(p.array),'toque');
+  if(i&&i.array&&MC881.prox.has(i.array))mc881Real(MC881.prox.get(i.array),'toque');}
+function mc881AndarAtual(){try{return memAndarAtual();}catch(e){return null;}}
+/* ---------- soltar: censo do que as outras cenas usam, candidatos, limites, Blobs de até 2 MB e a troca pelo procurador ---------- */
+// (um procurador de outra unidade não é tocado: `x.buffer` nele seria uma emergência; ele já está solto e não é candidato)
+function mc881Uso(o,S){const ad=x=>{if(x&&typeof x==='object'&&!MC881.prox.has(x)&&x.buffer)S.add(x.buffer);};const g=o.geometry;
+  if(g&&g.attributes){for(const k in g.attributes){const a=g.attributes[k];ad(a&&(a.isInterleavedBufferAttribute?a.data&&a.data.array:a.array));}
+    if(g.index)ad(g.index.array);if(g.morphAttributes)for(const k in g.morphAttributes)for(const a of g.morphAttributes[k]||[])if(a)ad(a.array);}
+  if(o.isInstancedMesh){if(o.instanceMatrix)ad(o.instanceMatrix.array);if(o.instanceColor)ad(o.instanceColor.array);}}
+function mc881Cand(a,nome,prot,vistos,L,porArr){if(!a||vistos.has(a))return false;vistos.add(a);if(a.isInterleavedBufferAttribute)return false;const x=a.array;
+  if(!x||!ArrayBuffer.isView(x)||x instanceof DataView||MC881.prox.has(x))return false;
+  if(a.usage===THREE.DynamicDrawUsage)return false;if(a.updateRange&&a.updateRange.count!==-1)return false;
+  if(x.byteLength<MC881.minB||prot.has(x.buffer))return false;
+  const j=porArr.get(x);if(j){j.as.push(a);return true;} // outro atributo com o MESMO array: o mesmo procurador
+  const r={a,as:[a],orig:x,C:x.constructor,n:x.length,bytes:x.byteLength,nome:nome+' ('+x.length+')',u:null,b:-1,off:0,w:null,p:null,arr:null,zerado:false};porArr.set(x,r);L.push(r);return true;}
+function mc881Perto(U){const a=mc881AndarAtual();return a!=null&&Math.abs(U.andar-a)<MC881.dist;}
+function* mc881SoltaG(U){const t0=performance.now();let ms=0,a0=t0;const passo=(rot)=>{const d=performance.now()-a0;ms+=d;return rot;};
+  // a solta esperou a vez na fila do FAT818 (um trabalho por vez): antes de mexer, confere de novo — cancelada pela volta, a cena virou a
+  // ativa (viagem direta enquanto esperava), o leitor chegou perto ou a leitura síncrona falhou nesse meio-tempo (sem `forcar`) → não solta nada
+  const forcar=!!U.forcar;U.forcar=false;
+  if(U.cancel||U.cena===ACTIVE||(!forcar&&(MC881.semSync||mc881Perto(U)))){MC881.stats.canceladas++;return null;}
+  U.estado='soltando';
+  // 1) o que as OUTRAS cenas montadas usam não sai (geometria partilhada entre salas, kits)
+  const prot=new Set(),soltas=new Set();for(const V of MC881.unidades.values())if(V!==U&&V.estado!=='montada')soltas.add(V.cena);
+  for(const sc of allScenes()){if(sc===U.cena||soltas.has(sc))continue;for(const o of fat8Trav(sc)){mc881Uso(o,prot);if(performance.now()>=fat8Fim){yield passo('mc881 protegidas');a0=performance.now();if(U.cancel)break;}}if(U.cancel)break;}
+  try{if(READER&&READER.g)READER.g.traverse(o=>mc881Uso(o,prot));}catch(e){}
+  // 2) os candidatos desta cena
+  const L=[],vistos=new Set(),geos=new Set(),porArr=new Map();
+  if(!U.cancel)for(const o of fat8Trav(U.cena)){const ud=o.userData||{};
+    if(!ud.fusao&&!ud.mc881Nao){const g=o.geometry;
+      if(g&&g.isBufferGeometry){let tem=false;for(const k in g.attributes)if(mc881Cand(g.attributes[k],k,prot,vistos,L,porArr))tem=true;if(g.index&&mc881Cand(g.index,'índice',prot,vistos,L,porArr))tem=true;if(tem)geos.add(g);}
+      if(o.isInstancedMesh){mc881Cand(o.instanceMatrix,'instâncias',prot,vistos,L,porArr);if(o.instanceColor)mc881Cand(o.instanceColor,'cores',prot,vistos,L,porArr);}}
+    if(performance.now()>=fat8Fim){yield passo('mc881 candidatos');a0=performance.now();if(U.cancel)break;}}
+  // 3) limites prontos (o recorte do three.js e o raio não precisam dos arrays)
+  if(!U.cancel)for(const g of geos){try{if(!g.boundingSphere)g.computeBoundingSphere();}catch(e){}if(performance.now()>=fat8Fim){yield passo('mc881 limites');a0=performance.now();if(U.cancel)break;}
+    try{if(!g.boundingBox)g.computeBoundingBox();}catch(e){}if(performance.now()>=fat8Fim){yield passo('mc881 limites');a0=performance.now();if(U.cancel)break;}}
+  // 4) Blobs de até 2 MB; a troca só acontece depois de o Blob existir
+  let lote=[],lb=0;
+  const fecha=()=>{if(!lote.length)return;const partes=[];let off=0;for(const r of lote){r.off=off;off+=r.bytes;partes.push(new Uint8Array(r.orig.buffer,r.orig.byteOffset,r.bytes));}
+    const blob=new Blob(partes);const b=U.blobs.length;U.blobs.push(blob);MC881.stats.blobs++;MC881.stats.blobB+=off;
+    for(const r of lote){r.as=r.as.filter(at=>at.array===r.orig);if(!r.as.length){r.orig=null;continue;} // mudou no meio da obra: fica como está
+      r.b=b;r.u=U;r.w=new WeakRef(r.orig);try{MC881.fr.register(r.orig,{b:r.bytes,u:U.id},r);}catch(e){}
+      r.p=mc881Prox(r);MC881.prox.set(r.p,r);for(const at of r.as)at.array=r.p;r.orig=null;U.recs.push(r);U.pend++;U.solto+=r.bytes;MC881.stats.arrays++;MC881.stats.entregueB+=r.bytes;}
+    lote=[];lb=0;};
+  if(!U.cancel&&MC881.geo)for(const r of L){if(lb+r.bytes>MC881.blocoB)fecha();lote.push(r);lb+=r.bytes;if(performance.now()>=fat8Fim){fecha();yield passo('mc881 blob');a0=performance.now();if(U.cancel)break;}}
+  fecha();
+  // 5) a BVH da câmera segura o array da posição: sai (refeita sob demanda)
+  if(MC881.bvh)for(const g of geos){try{const p=g.attributes.position;if(p&&MC881.prox.has(p.array))CAMBVH190.delete(g);}catch(e){}}
+  passo('fim');U.estado='solta';U.soltas++;if(U.cancel)MC881.stats.canceladas++;
+  MC881.stats.soltas++;MC881.stats.msSoltar+=ms;U.ultimaSolta={arrays:U.recs.length,MB:mc881MB(U.solto),blobs:U.blobs.length,msCPU:Math.round(ms),relogio:Math.round(performance.now()-t0)};
+  if(!U.pend)mc881Montada(U);
+  return U.ultimaSolta;}
+function mc881Soltar(U,forcar){if(!U)return Promise.resolve(null);if(U.job)return U.job;if(U.estado!=='montada'||U.prom)return Promise.resolve(null);
+  U.cancel=false;U.forcar=!!forcar;U.job=new Promise(res=>{let feito=false;const fim=v=>{if(feito)return;feito=true;U.job=null;res(v===undefined?null:v);};
+    try{fat8Go(mc881SoltaG(U),{nome:'memória 881 · soltar '+U.id,cedo:true,fim,erro:e=>{mc881Erro('soltar '+U.id,e);if(U.estado==='soltando')U.estado=U.recs.length?'solta':'montada';fim(null);}});}
+    catch(e){mc881Erro('fat8Go',e);U.estado=U.recs.length?'solta':'montada';fim(null);}});
+  return U.job;}
+/* ---------- a volta: vivos devolvidos na hora; os coletados, um Blob de cada vez (assíncrono), em fatias ---------- */
+function mc881Respira(urg){return new Promise(res=>{try{if(!urg&&typeof requestIdleCallback==='function')requestIdleCallback(()=>res(),{timeout:120});else setTimeout(res,0);}catch(e){setTimeout(res,0);}});}
+async function mc881Materializa(recs,U){let fatia=performance.now();const orc=()=>(U&&U.urg)?12:4,urg=()=>!!(U&&U.urg);
+  for(const r of recs){if(r.arr)continue;let a=null;try{a=r.w&&r.w.deref();}catch(e){}if(a)mc881Pronto(r,a,'vivo');if(performance.now()-fatia>orc()){await mc881Respira(urg());fatia=performance.now();}}
+  const porBlob=new Map();for(const r of recs){if(r.arr||!r.u)continue;const k=r.u.blobs[r.b];if(!k)continue;if(!porBlob.has(k))porBlob.set(k,[]);porBlob.get(k).push(r);}
+  for(const [blob,L] of porBlob){let ab=null;try{ab=await blob.arrayBuffer();}catch(e){mc881Erro('ler blob',e);}
+    for(const r of L){if(r.arr)continue;
+      if(ab){try{const a=new r.C(r.n);new Uint8Array(a.buffer).set(new Uint8Array(ab,r.off,r.bytes));mc881Pronto(r,a,'blob');}catch(e){mc881Erro('copiar '+r.nome,e);mc881Real(r,'volta');}}else mc881Real(r,'volta');
+      if(performance.now()-fatia>orc()){await mc881Respira(urg());fatia=performance.now();}}
+    ab=null;}}
+function mc881Restaura(U,urg){if(!U)return Promise.resolve(false);
+  // montada com uma solta ainda na fila (não começou: o gerador marca «soltando» no 1.º passo): cancela e não espera a fila
+  if(U.estado==='montada'){if(U.job)U.cancel=true;return Promise.resolve(true);}
+  if(U.prom){if(urg)U.urg=true;return U.prom;}
+  U.cancel=true;U.urg=!!urg;const t0=performance.now();
+  U.prom=(async()=>{if(U.job){try{await U.job;}catch(e){}}U.estado='restaurando';
+    await mc881Materializa(U.recs.slice(),U);
+    // procuradores de OUTRAS unidades que esta cena também usa (geometria partilhada entre andares)
+    const alheios=[];try{U.cena.traverse(o=>{const g=o.geometry;const ve=a=>{const r=a&&a.array&&MC881.prox.get(a.array);if(r&&!r.arr&&r.u!==U)alheios.push(r);};
+      if(g&&g.attributes){for(const k in g.attributes)ve(g.attributes[k]);ve(g.index);}if(o.isInstancedMesh){ve(o.instanceMatrix);ve(o.instanceColor);}});}catch(e){mc881Erro('alheios',e);}
+    if(alheios.length)await mc881Materializa(alheios,U);
+    for(const r of U.recs)if(!r.arr)mc881Real(r,'volta');
+    U.voltas++;MC881.stats.restauradas++;MC881.stats.msRestaurar+=performance.now()-t0;U.ultimaVolta={ms:Math.round(performance.now()-t0),urgente:!!U.urg};
+    U.prom=null;mc881Montada(U);return true;})().catch(e=>{mc881Erro('restaurar '+U.id,e);U.prom=null;return false;});
+  return U.prom;}
+// uma cena vai ser usada: a unidade dela volta (urgente); com os vãos, também as salas vistas pelas portas desse hall
+function mc881Pede(sc,urg){const U=mc881DaCena(sc);if(U&&(U.estado!=='montada'||U.job))return mc881Restaura(U,urg);return null;}
+async function mc881GaranteCena(sc,vaos){const L=[];const p=mc881Pede(sc,true);if(p)L.push(p);
+  if(vaos){try{for(const P of PORTALS)if(P.sceneA===sc&&P.sceneB&&P.sceneB!==sc){const q=mc881Pede(P.sceneB,true);if(q)L.push(q);}}catch(e){}}
+  if(L.length)await Promise.all(L);}
+/* ---------- quanto a sala segura (estimativa leve, para o vigia e o censo) ---------- */
+function* mc881EstimaG(U){let geo=0,telas=0;const B=new Set(),I=new Set();
+  for(const o of fat8Trav(U.cena)){const g=o.geometry;const ve=a=>{const x=a&&(a.isInterleavedBufferAttribute?a.data&&a.data.array:a.array);if(x&&!MC881.prox.has(x)&&x.buffer&&!B.has(x.buffer)){B.add(x.buffer);geo+=x.buffer.byteLength;}};
+    if(g&&g.attributes){for(const k in g.attributes)ve(g.attributes[k]);if(g.index)ve(g.index);}if(o.isInstancedMesh){ve(o.instanceMatrix);ve(o.instanceColor);}
+    const ms=o.material?(Array.isArray(o.material)?o.material:[o.material]):[];for(const m of ms){if(!m)continue;for(const k of MEM_MAPAS){const t=m[k];const im=t&&t.isTexture&&t.image;if(im&&!I.has(im)&&im.width&&im.height){I.add(im);telas+=(im.data&&im.data.byteLength)||im.width*im.height*4;}}}
+    if(performance.now()>=fat8Fim)yield 'mc881 estimativa';}
+  U.est=geo+telas;U.estGeo=geo;U.estTelas=telas;return U.est;}
+function mc881Estimar(U){if(!U||U.estJob)return U&&U.estJob;U.estJob=new Promise(res=>{const fim=v=>{U.estJob=null;res(v);};try{fat8Go(mc881EstimaG(U),{nome:'memória 881 · estimativa '+U.id,cedo:true,fim,erro:e=>{mc881Erro('estimativa',e);fim(null);}});}catch(e){fim(null);}});return U.estJob;}
+function mc881Heap(){let pm=null;try{const m=performance.memory;if(m&&m.usedJSHeapSize)pm=m.usedJSHeapSize/1048576;}catch(e){}
+  const P=MC881.pm;if(pm!==null){if(P.ult!==null&&pm!==P.ult)P.mudou=performance.now();P.ult=pm;}
+  const vivo=pm!==null&&performance.now()-P.mudou<60000; // o Chrome comum só atualiza (e arredonda) de tempos em tempos: valor parado não decide
+  let est=MC881.base,salas=0,semEst=0;for(const U of MC881.unidades.values()){if(U.est==null){semEst++;continue;}salas++;est+=Math.max(0,U.est-(U.estado==='montada'?0:U.solto))/1048576;}
+  return {mb:Math.round(Math.max(vivo?pm:0,est)),pm:pm===null?null:Math.round(pm),pmVivo:vivo,estimativa:Math.round(est),salas,semEst,limiar:MC881.limiarMB};}
+/* ---------- o vigia (a cada 4 s): volta do que ficou perto; acima do limiar, solta a sala mais longe ---------- */
+function mc881Ocupado(){try{if(buildIt||fadeOnAt||(PERF130&&PERF130.busy)||(QUIET434&&QUIET434.job))return true;if(typeof FR819!=='undefined'&&FR819.atual)return true;}catch(e){}return false;}
+function mc881Troca(){const a=mc881AndarAtual();if(a==null||a===MC881.andar)return;MC881.andar=a;
+  for(const U of mc881Unidades().values())if(U.estado!=='montada'&&Math.abs(U.andar-a)<MC881.dist)mc881Restaura(U,false);}
+function mc881Vigia(){if(!MC881.on)return null;MC881.stats.vigias++;let r=null;
+  try{if(typeof LOAD424!=='undefined'&&!LOAD424.finished)return null;mc881Troca();const a=MC881.andar;if(a==null)return null;
+    const M=mc881Unidades();
+    // uma estimativa por vez para as unidades novas (só quando pode precisar)
+    for(const U of M.values())if(U.est==null&&!U.estJob){mc881Estimar(U);break;}
+    // histerese: começa acima do limiar e continua (uma sala a cada passada) até ficar abaixo de 85 % dele
+    const h=mc881Heap();r={heap:h};if(MC881.semSync)return r;
+    if(h.mb>MC881.limiarMB)MC881.aliviando=true;else if(h.mb<=MC881.limiarMB*MC881.alvo)MC881.aliviando=false;
+    if(!MC881.aliviando)return r;
+    for(const U of M.values())if(U.job||U.prom)return r; // uma obra de cada vez
+    if(mc881Ocupado())return r;
+    const agora=performance.now(),cand=[];
+    for(const U of M.values()){if(U.estado!=='montada'||U.cena===ACTIVE)continue;const d=Math.abs(U.andar-a);if(d<MC881.dist)continue;
+      if(agora-U.t0<MC881.calmaMs||agora-U.tVolta<MC881.voltaMs)continue;cand.push({U,d,b:U.est||0});}
+    cand.sort((x,y)=>(y.d-x.d)||(y.b-x.b));if(!cand.length)return r;
+    r.solta=cand[0].U.id;mc881Soltar(cand[0].U).then(v=>{MC881.stats.ultimo={soltou:cand[0].U.id,resumo:v,heap:h,t:Date.now()};});}
+  catch(e){mc881Erro('vigia',e);}
+  return r;}
+/* ---------- o censo de uma sala (gancho e teste) ---------- */
+function mc881Censo(sala){const U=mc881Unidade(sala);if(!U)return null;const prot=new Set(),soltas=new Set();for(const V of MC881.unidades.values())if(V!==U&&V.estado!=='montada')soltas.add(V.cena);
+  for(const sc of allScenes()){if(sc===U.cena||soltas.has(sc))continue;sc.traverse(o=>mc881Uso(o,prot));}
+  const mot={},B=new Set();let tot=0,ok=0,n=0,prox=0;const add=(k,b)=>{mot[k]=(mot[k]||0)+b;};
+  const ve=(a)=>{if(!a)return;const x=a.isInterleavedBufferAttribute?a.data&&a.data.array:a.array;if(!x)return;if(MC881.prox.has(x)){prox++;return;}if(!x.buffer||B.has(x.buffer))return;B.add(x.buffer);const b=x.byteLength;tot+=b;n++;
+    if(a.isInterleavedBufferAttribute)add('intercalado',b);else if(a.usage===THREE.DynamicDrawUsage)add('dinâmico',b);else if(a.updateRange&&a.updateRange.count!==-1)add('parcial',b);else if(prot.has(x.buffer))add('partilhado',b);else if(b<MC881.minB)add('pequeno',b);else{add('elegível',b);ok+=b;}};
+  U.cena.traverse(o=>{if(o.userData&&o.userData.fusao)return;const g=o.geometry;if(g&&g.attributes){for(const k in g.attributes)ve(g.attributes[k]);ve(g.index);}if(o.isInstancedMesh){ve(o.instanceMatrix);ve(o.instanceColor);}});
+  let bvh=0,bvhN=0;const vb=new Set();U.cena.traverse(o=>{const b=o.geometry&&CAMBVH190.get(o.geometry);if(b&&!vb.has(b)){vb.add(b);bvhN++;bvh+=(b.T?b.T.byteLength:0)+(b.BX?b.BX.byteLength:0);}});
+  // telas (só informação: esta versão não as solta) — cada imagem uma vez, W×H×4; «sóDela» = nenhuma outra cena montada usa
+  const usoTx=new Set();for(const sc of allScenes()){if(sc===U.cena)continue;sc.traverse(o=>{const ms=o.material?(Array.isArray(o.material)?o.material:[o.material]):[];for(const m of ms){if(!m)continue;for(const k of MEM_MAPAS){const t=m[k];if(t&&t.isTexture&&t.image)usoTx.add(t.image);}}});}
+  let telas=0,telasSo=0,nTelas=0;const vi=new Set();U.cena.traverse(o=>{const ms=o.material?(Array.isArray(o.material)?o.material:[o.material]):[];for(const m of ms){if(!m)continue;for(const k of MEM_MAPAS){const t=m[k];const im=t&&t.isTexture&&t.image;
+      if(!im||vi.has(im)||!im.width||!im.height||im.data)continue;vi.add(im);nTelas++;const b=im.width*im.height*4;telas+=b;if(!usoTx.has(im))telasSo+=b;}}});
+  return {unidade:U.id,andar:U.andar,estado:U.estado,arrays:n,procuradores:prox,geoMB:mc881MB(tot),elegivelMB:mc881MB(ok),porMotivoMB:Object.fromEntries(Object.entries(mot).map(([k,v])=>[k,mc881MB(v)])),bvhMB:mc881MB(bvh),bvhN,soltoMB:mc881MB(U.solto),
+    telas:{n:nTelas,MB:mc881MB(telas),soDelaMB:mc881MB(telasSo),nota:'informação: esta versão não solta telas'}};}
+/* ---------- instalação (só com ?memoria881=1) ---------- */
+function mc881Instala(){if(MC881.instalado)return;MC881.instalado=true;
+  try{MC881.fr=new FinalizationRegistry(v=>{MC881.stats.coletados++;MC881.stats.coletadoB+=(v&&v.b)||0;const U=v&&MC881.unidades.get(v.u);if(U)U.coletado=(U.coletado||0)+((v&&v.b)||0);});}catch(e){mc881Erro('FinalizationRegistry',e);MC881.fr={register(){},unregister(){}};}
+  // viagens: a sala (e as vistas pelos vãos do hall) voltam antes da preparação, atrás do fade
+  try{const tp0=travel434Prepare;travel434Prepare=async function(sc,revision,doorways){try{await mc881GaranteCena(sc,doorways!==false);}catch(e){mc881Erro('travel434Prepare',e);}return tp0.apply(this,arguments);};}catch(e){mc881Erro('travel434Prepare 0',e);}
+  try{const e130=ensureRoom130;ensureRoom130=async function(key){const R=await e130.apply(this,arguments);try{if(R&&R.scene)await mc881GaranteCena(R.scene,false);}catch(e){mc881Erro('ensureRoom130',e);}return R;};}catch(e){mc881Erro('ensureRoom130 0',e);}
+  try{const e0=ensureRoom;ensureRoom=function(key){const R=e0.apply(this,arguments);try{if(R&&R.scene)mc881Pede(R.scene,true);}catch(e){mc881Erro('ensureRoom',e);}return R;};}catch(e){mc881Erro('ensureRoom 0',e);}
+  // a cena que fica ativa volta já (o que for tocado antes chega pela rede de segurança); a troca de andar traz os vizinhos
+  try{const sa0=setActive;setActive=function(sc){try{mc881Pede(sc,true);}catch(e){mc881Erro('setActive pede',e);}const r=sa0.apply(this,arguments);try{mc881Troca();}catch(e){mc881Erro('setActive troca',e);}return r;};}catch(e){mc881Erro('setActive 0',e);}
+  // luzes/Papel de uma cena solta (que não é a ativa) ficam para a volta
+  try{const lb0=lightBudget;lightBudget=fr8Wrap(function*(sc){try{const U=mc881DaCena(sc);if(U&&U.estado!=='montada'&&sc!==ACTIVE){U.luz=true;MC881.stats.luzAdiada++;return;}}catch(e){}return (yield* fr8Prev(lb0,this,arguments,'MC881'));});}catch(e){mc881Erro('lightBudget 0',e);}
+  // a placa: o three.js sobe de novo um atributo solto (depois de uma purga) → recebe o array verdadeiro
+  try{const gl=renderer.getContext();if(gl&&!gl.__mc881){const bd=gl.bufferData,bs=gl.bufferSubData;
+      gl.bufferData=function(t,d){if(d&&typeof d==='object'&&MC881.prox.has(d))arguments[1]=mc881Real(MC881.prox.get(d),'placa');return bd.apply(this,arguments);};
+      gl.bufferSubData=function(t,o,d){if(d&&typeof d==='object'&&MC881.prox.has(d))arguments[2]=mc881Real(MC881.prox.get(d),'placa');return bs.apply(this,arguments);};
+      gl.__mc881=true;}}catch(e){mc881Erro('placa',e);}
+  // a BVH da câmera guarda o array da posição (`P`) e é lida a cada raio: nunca um procurador (cada leitura passaria pelo Proxy, para
+  // sempre) — o array verdadeiro antes de montar, e uma BVH já guardada com procurador é consertada
+  try{if(typeof camBvh190==='function'){const cb0=camBvh190;camBvh190=function(g){try{mc881Desembrulha(g);}catch(e){}const b=cb0.apply(this,arguments);
+      try{if(b&&b.P&&typeof b.P==='object'&&MC881.prox.has(b.P))b.P=mc881Real(MC881.prox.get(b.P),'toque');}catch(e){}return b;};}}catch(e){mc881Erro('camBvh190 0',e);}
+  if(MC881.auto){try{MC881.timer=setInterval(mc881Vigia,MC881.periodo);}catch(e){mc881Erro('vigia 0',e);}}}
+if(MC881.on){try{mc881Instala();}catch(e){mc881Erro('instalar',e);}}
+window.__memoria881={estado:MC881,stats:MC881.stats,erros:MC881.erros,
+  soltar:(sala,op)=>{if(!MC881.on||!MC881.instalado)return Promise.resolve({erro:'desligado (use ?memoria881=1)'});const U=mc881Unidade(sala);if(!U)return Promise.resolve({erro:'sala não montada ou fora da lista: '+sala});
+    if(U.cena===ACTIVE)return Promise.resolve({erro:'é a cena ativa'});const a=mc881AndarAtual();if(!(op&&op.forcar)&&a!=null&&Math.abs(U.andar-a)<MC881.dist)return Promise.resolve({erro:'andar atual ou vizinho (use {forcar:true})'});
+    return mc881Soltar(U,!!(op&&op.forcar));},
+  restaurar:(sala)=>{const U=mc881Unidade(sala);return U?mc881Restaura(U,true):Promise.resolve(false);},
+  unidades:()=>Array.from(mc881Unidades().values()).map(U=>({id:U.id,andar:U.andar,estado:U.estado,estMB:U.est==null?null:mc881MB(U.est),soltoMB:mc881MB(U.solto),coletadoMB:mc881MB(U.coletado),arrays:U.recs.length,pendentes:U.pend,soltas:U.soltas,voltas:U.voltas,ultimaSolta:U.ultimaSolta||null,ultimaVolta:U.ultimaVolta||null})),
+  censo:mc881Censo,heap:mc881Heap,vigia:mc881Vigia,resumo:()=>({entregueMB:mc881MB(MC881.stats.entregueB),coletadoMB:mc881MB(MC881.stats.coletadoB),soltas:MC881.stats.soltas,restauradas:MC881.stats.restauradas,emergencias:MC881.stats.emergencias,falhas:MC881.stats.emergenciaFalhas,heap:mc881Heap()})};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
