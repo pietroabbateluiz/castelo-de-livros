@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v881</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v882</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -120750,6 +120750,156 @@ window.__memoria881={estado:MC881,stats:MC881.stats,erros:MC881.erros,
   restaurar:(sala)=>{const U=mc881Unidade(sala);return U?mc881Restaura(U,true):Promise.resolve(false);},
   unidades:()=>Array.from(mc881Unidades().values()).map(U=>({id:U.id,andar:U.andar,estado:U.estado,estMB:U.est==null?null:mc881MB(U.est),soltoMB:mc881MB(U.solto),coletadoMB:mc881MB(U.coletado),arrays:U.recs.length,pendentes:U.pend,soltas:U.soltas,voltas:U.voltas,ultimaSolta:U.ultimaSolta||null,ultimaVolta:U.ultimaVolta||null})),
   censo:mc881Censo,heap:mc881Heap,vigia:mc881Vigia,resumo:()=>({entregueMB:mc881MB(MC881.stats.entregueB),coletadoMB:mc881MB(MC881.stats.coletadoB),soltas:MC881.stats.soltas,restauradas:MC881.stats.restauradas,emergencias:MC881.stats.emergencias,falhas:MC881.stats.emergenciaFalhas,heap:mc881Heap()})};
+
+/* ===================== v882 · O COMPANHEIRO E A LANTERNA TROCADOS SAEM DA PLACA SÓ NO QUE DE FATO ESTÁ NELA, E O QUE VOLTA NUNCA MAIS É DESCARTADO (bloco `CD882`) =====================
+   Substitui o item 1 («descarte») do bloco `CV876`, que a v879 deixou desligado depois do teste no navegador de 19/11
+   (`teste_876.js`, Leve, Webmaster: com o item ligado, 6 trocas «subiram» +220 geometrias, +46 texturas e +48 programas).
+   O QUE SE APUROU (arnês em node com o three r128 do jogo, o código real das montagens — fada da Oficina da Floresta, dragões da v624/v628,
+   gato da v162/v579, lanternas — e a cadeia real do `applyGear`, num renderer r128 de verdade sobre um contexto WebGL de mentira):
+   · o descarte do CV876 fez no node exatamente o que fez no navegador (27 objetos, 153 geometrias, 9 esqueletos; poupados 29/44/1 por
+     rodada — o navegador teve 2 rodadas: 58/88/2) e, com o leitor à vista, soltou exatamente o que as 6 trocas tinham prendido
+     (+150 geometrias, +9 texturas de ossos, +1,6 MB de vértices → 0), sem nenhum reenvio e sem nenhum programa novo;
+   · no r128 o `dispose` só desconta: geometria/textura descartada e desenhada de novo volta ao mesmo número (nunca passa dele), e programa
+     só nasce de material ou de luz nova — o descarte não cria nenhum dos dois. Os +220/+46/+48 não vieram do descarte: no «antes» o
+     teste mediu +0 (com o leitor à vista o node mede +150: no navegador os companheiros não estavam sendo desenhados — 1.ª pessoa ou leitor
+     esmaecido pela câmera perto), e o «depois» durou ~4 s a mais (espera 1700 + 2200 ms) sem uma janela de controle do mesmo tamanho:
+     o que subiu foi a preparação de fundo do jogo (o «ruidoParado» já mostrava +3 programas sozinho).
+   COMO ERA (CV876, item 1): o modelo que saía de vez era descartado 1,5 s depois da 1.ª troca (o relógio não era rearmado: numa sequência
+   de trocas lentas a rodada caía no meio); toda geometria candidata levava `dispose`, mesmo a que nunca tinha subido para a placa (no
+   navegador quase todas, então o número «153 descartadas» não dizia nada sobre memória); um recurso de cache desconhecido descartado na
+   1.ª montagem subia de novo sem ninguém saber; e o censo de todas as cenas rodava mesmo quando não havia nada na placa para soltar.
+   AGORA:
+   (1) mesmas montagens, mesmas regras de proteção do CV876 (faixa de ids da montagem, «visto em duas montagens», caches conhecidos e os
+       derivados deles, censo de todas as cenas, globais) — o bloco usa as funções do CV876 (`cv876Registra`, `cv876Censo`, `cv876Caches`…);
+   (2) só o que ESTÁ NA PLACA entra: geometria que o three registrou, textura com textura de placa, ossos com textura de ossos; o resto
+       fica para o coletor de lixo (não ocupa a placa) e é contado em `semPlaca`. Sem nada na placa, nem censo nem `dispose`;
+   (3) o que volta nunca mais sai: cada recurso descartado fica vigiado; se o three o registrar de novo (alguém ainda o desenhava ou um cache
+       desconhecido o devolveu), conta em `voltaram`, vira «partilhado» e nenhum descarte posterior o toca — no máximo UM reenvio por recurso;
+   (4) a rodada espera 1,5 s depois da ÚLTIMA troca (relógio rearmado; numa rajada de trocas sem fim, roda assim mesmo 6 s depois da 1.ª);
+   (5) as contas dizem o que saiu da placa: `liberados` (geometrias, texturas, ossos, MB de vértices) × `semPlaca` × `poupados` × `voltaram`.
+   Os materiais seguem sem `dispose` (o programa fica no cache; as chaves do jogo são fixas — revisão da v876, B2).
+   CONVIVÊNCIA com o dragão prismático novo da v880 (bloco `DP880`): o modelo novo (`userData.dp880`) fica FORA deste descarte — as
+   geometrias, os materiais e as texturas dele estão em `CP579.cache` (cache conhecido: nunca sairiam) e é o próprio `DP880` que solta a
+   textura dos ossos e as faíscas dos que saíram das vagas; contado em `deixados.dp880`. O modelo antigo (`?dragao880=0`) segue a regra geral.
+   Chaves: `?descarte882=0` (e também a chave-mestra do CV876, `?ciclo876=0`) desliga este bloco (volta ao CV876 da v879, com o item 1 desligado; `?descarte876=1` liga o item antigo);
+   com este bloco ligado o item 1 do CV876 fica desligado mesmo com `?descarte876=1` (este o substitui). Na hora: `CD882.on=false`.
+   Gancho `window.__descarte882` (`estado`, `stats`, `erros`, `fila`, `descartarAgora`, `naPlaca`, `voltou`). 
+   REVISÃO (revisao/cd882/REVISAO.md; sem crítico nem médio) — entraram os dois consertos baixos testados no arnês: B1, uma troca com um
+   objeto ainda em cena esperando na fila voltava a ser descartada em ~80 ms em vez de 1,5 s (o marco da 1.ª troca agora zera a cada rodada);
+   B2, `CD882.on=false` esvazia a fila (antes o que já estava nela era descartado mesmo assim). */
+const CD882_Q=location.search+location.hash;
+const CD882={on:!/[?&#](descarte882|ciclo876)=0/i.test(CD882_Q),instalado:false,substituiu876:false,erros:[],
+  stats:{montados:0,aposentados:0,ligados:0,rodadas:0,objetos:0,voltaramAVaga:0,adiados:0,desistidos:0,deixados:{dp880:0},
+    liberados:{geo:0,tex:0,ossos:0,inst:0,sombras:0,mb:0},semPlaca:{geo:0,tex:0,ossos:0},
+    poupados:{cena:0,cache:0,partilhado:0,antigo:0,tipo:0,globais:0,voltou:0},voltaram:{geo:0,tex:0},ms:0,maiorMs:0,ultimo:null}};
+function cd882Erro(k,e){try{if(CD882.erros.length<30)CD882.erros.push(k+': '+(e&&e.message||e));console.warn('v882',k,e);}catch(x){}}
+const CD882_FILA=new Map();   // objeto que saiu → {dono, vaga, tent, t}
+const CD882_VOLTA=new WeakSet();   // recurso que foi descartado e o three registrou de novo: nunca mais é descartado
+let CD882_TIMER=null,CD882_PRIMEIRO=0;
+// na placa? (geometria: o three põe um ouvinte de 'dispose' ao registrá-la; textura: tem textura de placa — própria ou partilhada da v846)
+function cd882GeoNaPlaca(g){try{const L=g&&g._listeners&&g._listeners.dispose;return !!(L&&L.length);}catch(e){return false;}}
+function cd882TexNaPlaca(t){try{if(!t||!t.isTexture)return false;const p=renderer.properties.get(t);return !!(p&&(p.__webglInit||p.__webglTexture));}catch(e){return false;}}
+function cd882Bytes(g){let n=0;try{if(g.index&&g.index.array)n+=g.index.array.byteLength;for(const k in g.attributes){const a=g.attributes[k];const arr=a&&(a.array||(a.data&&a.data.array));if(arr)n+=arr.byteLength;}}catch(e){}return n;}
+// vigia: se o three registrar de novo o recurso descartado, ele «voltou» — fica partilhado para sempre
+function cd882Vigia(x,campo){try{if(!x||Object.prototype.hasOwnProperty.call(x,'addEventListener'))return;
+    x.addEventListener=function(tipo,f){try{if(tipo==='dispose'){delete x.addEventListener;CD882_VOLTA.add(x);try{CV876_PARTILHA.add(x);}catch(e){}CD882.stats.voltaram[campo]++;}}catch(e){}
+      return Object.getPrototypeOf(x).addEventListener.call(this,tipo,f);};}catch(e){cd882Erro('vigia',e);}}
+// o dragão prismático novo (v880, `DP880`): geometrias, materiais e texturas dele são de cache (`CP579.cache`) e é o próprio bloco dele
+// que solta a textura dos ossos e as faíscas dos que saíram — este descarte não toca nele nem no que só existe por causa dele (o fogo)
+function cd882DoDP880(o){try{return !!(o&&o.userData&&o.userData.dp880);}catch(e){return false;}}
+function cd882Aposenta(o,vaga){try{if(!CD882.on||!o||!o.isObject3D||cv876Vivo(o))return;const S=CD882.stats;const agora=performance.now();
+    if(cd882DoDP880(o)){S.deixados.dp880++;return;}
+    if(!CD882_FILA.has(o)){CD882_FILA.set(o,{dono:o,vaga:vaga||'?',tent:0,t:agora});S.aposentados++;}
+    for(const x of cv876Ligados(o))if(!CD882_FILA.has(x)){CD882_FILA.set(x,{dono:o,vaga:(vaga||'?')+' · ligado',tent:0,t:agora});S.ligados++;}
+    if(!CD882_PRIMEIRO)CD882_PRIMEIRO=agora;
+    cd882Agenda(agora-CD882_PRIMEIRO>6000?0:1500,true);}catch(e){cd882Erro('aposenta',e);}}
+function cd882Agenda(ms,rearma){try{if(CD882_TIMER){if(!rearma)return;clearTimeout(CD882_TIMER);}
+    CD882_TIMER=setTimeout(()=>{CD882_TIMER=null;try{cd882Processa();}catch(e){cd882Erro('processa',e);}},ms);}catch(e){cd882Erro('agenda',e);}}
+function cd882Processa(){const S=CD882.stats;if(!CD882.on||!CD882_FILA.size){CD882_FILA.clear();CD882_PRIMEIRO=0;return 0;}const t0=performance.now();const prontos=[];
+  for(const [o,info] of [...CD882_FILA]){try{
+      if(cv876Vivo(o)||cv876Vivo(info.dono)){CD882_FILA.delete(o);S.voltaramAVaga++;continue;}
+      if(cd882DoDP880(o)||cd882DoDP880(info.dono)){CD882_FILA.delete(o);S.deixados.dp880++;continue;}
+      if(cv876NaCena(o)){if(++info.tent>(info.dono===o?8:45)){CD882_FILA.delete(o);S.desistidos++;}else S.adiados++;continue;}
+      CD882_FILA.delete(o);prontos.push([o,info]);
+    }catch(e){CD882_FILA.delete(o);cd882Erro('fila',e);}}
+  let n=0;
+  if(prontos.length){
+    // candidatos: só o que está na árvore do objeto que saiu E na placa
+    const cand={geo:new Map(),tex:new Map(),esq:new Map(),inst:new Set(),luz:new Set()};const sem=S.semPlaca;const vistosSem=new Set();
+    for(const [o,info] of prontos){const jan=CV876_JANELA.get(info.dono)||CV876_JANELA.get(o)||null;
+      o.traverse(x=>{try{
+        const gs=[];if(x.geometry&&x.geometry.isBufferGeometry&&!x.isSprite)gs.push(x.geometry);
+        try{const pg=PAPEL_GEO.get(x);if(pg&&pg.g&&pg.g.isBufferGeometry)gs.push(pg.g);}catch(e){}
+        for(const g of gs){if(cand.geo.has(g)||vistosSem.has(g))continue;if(cd882GeoNaPlaca(g))cand.geo.set(g,jan);else{vistosSem.add(g);sem.geo++;}}
+        const R=cv876Novo();for(const m of cv876MatsDe(x))cv876PoeMat(m,R);
+        for(const t of R.tex){if(cand.tex.has(t)||vistosSem.has(t))continue;if(cd882TexNaPlaca(t))cand.tex.set(t,jan);else{vistosSem.add(t);sem.tex++;}}
+        if(x.isSkinnedMesh&&x.skeleton&&!cand.esq.has(x.skeleton)){const k=x.skeleton;if(k.boneTexture&&cd882TexNaPlaca(k.boneTexture))cand.esq.set(k,o);else if(!vistosSem.has(k)){vistosSem.add(k);sem.ossos++;}}
+        if(x.isInstancedMesh&&cd882GeoNaPlaca(x.geometry))cand.inst.add(x);
+        if(x.isLight&&x.shadow&&(x.shadow.map||x.shadow.mapPass))cand.luz.add(x);
+      }catch(e){}});}
+    let nG=0,nT=0,nO=0,nI=0,nS=0,bytes=0;
+    if(cand.geo.size||cand.tex.size||cand.esq.size||cand.inst.size||cand.luz.size){
+      const vivo=cv876Censo(),cache=cv876Caches();const P=S.poupados;
+      const pode=(r,jan,campo)=>{
+        if(CD882_VOLTA.has(r)){P.voltou++;return false;}
+        if(cache.globais.has(r)){P.globais++;return false;}
+        if(vivo[campo].has(r)){P.cena++;return false;}
+        if(cache[campo].has(r)){P.cache++;return false;}
+        if(CV876_PARTILHA.has(r)){P.partilhado++;return false;}
+        const k=campo==='geo'?'g':'t';
+        if(jan&&!jan.semFaixa&&typeof r.id==='number'&&r.id<jan[k]){P.antigo++;return false;}   // já existia antes da montagem: é de alguém
+        return true;};
+      for(const [g,jan] of cand.geo)if(pode(g,jan,'geo')){try{const b=cd882Bytes(g);g.dispose();cd882Vigia(g,'geo');nG++;bytes+=b;}catch(e){cd882Erro('geo',e);}}
+      for(const [t,jan] of cand.tex){if(!cv876TexOk(t)){P.tipo++;continue;}if(pode(t,jan,'tex')){try{t.dispose();cd882Vigia(t,'tex');nT++;}catch(e){cd882Erro('tex',e);}}}
+      for(const [k,raiz] of cand.esq){if(vivo.esq.has(k)||cache.esq.has(k)||!cv876OssosDentro(k,raiz))continue;try{k.dispose();nO++;}catch(e){cd882Erro('ossos',e);}}
+      for(const x of cand.inst){try{x.dispose();nI++;}catch(e){cd882Erro('instâncias',e);}}
+      for(const L of cand.luz){try{const sh=L.shadow;if(sh.map){sh.map.dispose();sh.map=null;}if(sh.mapPass){sh.mapPass.dispose();sh.mapPass=null;}nS++;}catch(e){cd882Erro('sombra',e);}}
+    }
+    const Lb=S.liberados;Lb.geo+=nG;Lb.tex+=nT;Lb.ossos+=nO;Lb.inst+=nI;Lb.sombras+=nS;Lb.mb=+(Lb.mb+bytes/1048576).toFixed(3);
+    S.objetos+=prontos.length;n=nG+nT+nO+nI+nS;
+    S.ultimo={objetos:prontos.map(([o,i])=>i.vaga+' · '+(o.name||(o.userData&&(o.userData.pet||o.userData.bicho))||o.type)).slice(0,8),
+      liberados:{geo:nG,tex:nT,ossos:nO,inst:nI,sombras:nS,mb:+(bytes/1048576).toFixed(3)},candidatosNaPlaca:{geo:cand.geo.size,tex:cand.tex.size,ossos:cand.esq.size},ms:0};
+  }
+  CD882_PRIMEIRO=0;if(CD882_FILA.size)cd882Agenda(2000,false);
+  S.rodadas++;const ms=+(performance.now()-t0).toFixed(1);S.ms=ms;if(ms>S.maiorMs)S.maiorMs=ms;if(S.ultimo&&prontos.length)S.ultimo.ms=ms;
+  return n;}
+// instalação: as funções e o registro do CV876 precisam existir (v876+)
+try{if(CD882.on){
+  const fs={cv876Registra:typeof cv876Registra,cv876Ids:typeof cv876Ids,cv876Censo:typeof cv876Censo,cv876Caches:typeof cv876Caches,cv876Ligados:typeof cv876Ligados,
+    cv876Vivo:typeof cv876Vivo,cv876NaCena:typeof cv876NaCena,cv876TexOk:typeof cv876TexOk,cv876OssosDentro:typeof cv876OssosDentro,cv876MatsDe:typeof cv876MatsDe,
+    cv876PoeMat:typeof cv876PoeMat,cv876Novo:typeof cv876Novo};
+  const falta=Object.keys(fs).filter(n=>fs[n]!=='function');
+  if(falta.length||typeof CV876_JANELA==='undefined'||typeof CV876_PARTILHA==='undefined'||typeof CV876_VAGAS==='undefined'){CD882.on=false;cd882Erro('instalação','sem o CV876: '+falta.join(','));}
+}}catch(e){CD882.on=false;cd882Erro('instalação',e);}
+if(CD882.on){
+  // o item antigo sai de cena (os embrulhos dele, se instalados, olham `CV876.descarte` a cada chamada)
+  try{if(typeof CV876!=='undefined'&&CV876.descarte){CV876.descarte=false;CD882.substituiu876=true;}}catch(e){}
+  const cd882Emb=(nome,f0)=>function(){let j=null,n0=0;try{j=cv876Ids();n0=CV876.stats.modelos.montados;}catch(e){}const r=f0.apply(this,arguments);
+      try{
+        if(r&&r.isObject3D)cv876Registra(r,j);else if(r&&r.g&&r.g.isObject3D){cv876Registra(r.g,j);if(r.luz&&r.luz.isObject3D)cv876Registra(r.luz,j);}
+        CD882.stats.montados+=CV876.stats.modelos.montados-n0;}catch(e){cd882Erro('montagem '+nome,e);}
+      return r;};
+  try{if(typeof buildPet==='function')buildPet=cd882Emb('pet',buildPet);}catch(e){cd882Erro('buildPet',e);}
+  try{if(typeof buildBicho==='function')buildBicho=cd882Emb('bicho',buildBicho);}catch(e){cd882Erro('buildBicho',e);}
+  try{if(typeof buildLanterna==='function')buildLanterna=cd882Emb('lanterna',buildLanterna);}catch(e){cd882Erro('buildLanterna',e);}
+  try{if(typeof ruby422Baby==='function')ruby422Baby=cd882Emb('rubi',ruby422Baby);}catch(e){cd882Erro('ruby422Baby',e);}
+  try{const ag0=applyGear;applyGear=function(){let antes=null;try{if(CD882.on)antes=CV876_VAGAS.map(k=>GEAR[k]);}catch(e){}
+      const r=ag0.apply(this,arguments);
+      try{if(antes)for(let i=0;i<CV876_VAGAS.length;i++){const o=antes[i];if(o&&o!==GEAR[CV876_VAGAS[i]])cd882Aposenta(o,CV876_VAGAS[i]);}}catch(e){cd882Erro('applyGear',e);}
+      return r;};
+    try{if(window.__loja)window.__loja.aplicar=applyGear;}catch(e){}}catch(e){cd882Erro('applyGear0',e);}
+  try{if(typeof rb530Sync==='function'){const rs0=rb530Sync;rb530Sync=function(){let g=null;try{g=GEAR.rubi530;}catch(e){}const r=rs0.apply(this,arguments);
+      try{if(g&&GEAR.rubi530!==g)cd882Aposenta(g,'rubi530');}catch(e){}return r;};}}catch(e){cd882Erro('rb530Sync',e);}
+  try{if(typeof companion434Restore==='function'){const cr0=companion434Restore;companion434Restore=function(slot,g){const r=cr0.apply(this,arguments);
+      try{if(g&&slot&&GEAR[slot]!==g)cd882Aposenta(g,slot);}catch(e){}return r;};}}catch(e){cd882Erro('companion434Restore',e);}
+  // o equipamento já montado quando o bloco chega fica registrado sem faixa, mas com dono (como a revisão B1 da v876)
+  try{for(const k of CV876_VAGAS){const o=GEAR[k];if(o&&o.isObject3D&&!CV876_JANELA.has(o))cv876Registra(o,null);}}catch(e){cd882Erro('arranque',e);}
+  CD882.instalado=true;
+}
+window.__descarte882={estado:CD882,stats:CD882.stats,erros:CD882.erros,
+  fila:()=>[...CD882_FILA].map(([o,i])=>({nome:o.name||o.type,vaga:i.vaga,tent:i.tent,naCena:(()=>{try{return cv876NaCena(o);}catch(e){return null;}})()})),
+  descartarAgora:()=>{try{if(CD882_TIMER){clearTimeout(CD882_TIMER);CD882_TIMER=null;}return cd882Processa();}catch(e){cd882Erro('agora',e);return -1;}},
+  naPlaca:r=>r&&r.isBufferGeometry?cd882GeoNaPlaca(r):cd882TexNaPlaca(r),voltou:r=>CD882_VOLTA.has(r)};
 
 window.__build434={revision:434,family:"web",edition:"en"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
