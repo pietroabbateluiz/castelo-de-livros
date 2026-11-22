@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v882</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v883</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -120900,6 +120900,160 @@ window.__descarte882={estado:CD882,stats:CD882.stats,erros:CD882.erros,
   fila:()=>[...CD882_FILA].map(([o,i])=>({nome:o.name||o.type,vaga:i.vaga,tent:i.tent,naCena:(()=>{try{return cv876NaCena(o);}catch(e){return null;}})()})),
   descartarAgora:()=>{try{if(CD882_TIMER){clearTimeout(CD882_TIMER);CD882_TIMER=null;}return cd882Processa();}catch(e){cd882Erro('agora',e);return -1;}},
   naPlaca:r=>r&&r.isBufferGeometry?cd882GeoNaPlaca(r):cd882TexNaPlaca(r),voltou:r=>CD882_VOLTA.has(r)};
+
+/* ===================== v883 · O JOGO ABERTO EM DUAS ABAS: A ABA MAIS ANTIGA AVISA E PARA DE GRAVAR (bloco `AB883`) =====================
+   Decisão (22/11, o Luiz: «faça o que achar melhor» sobre o item 4 de «Para o Luiz decidir» do relatório de 24 h).
+   COMO ERA: com a mesma edição aberta em duas abas, cada aba gravava o que tinha na memória por cima do que a outra gravou — chaves,
+   moedas, baús, Estante, decoração, tempo das salas do 1.º andar (e a nuvem recebia o pacote da aba que gravou por último). Jogando
+   alternado, o progresso de uma aba apagava o da outra; e a aba antiga, ao ser fechada depois de jogar na nova, gravava a versão velha.
+   O jogo não percebia a outra aba.
+   AGORA: cada aba, ao abrir, se anuncia (`BroadcastChannel` «castelo-abas-883»; a chave `castelo.abas883` do armazenamento serve de
+   reserva para navegador sem o canal). A aba MAIS ANTIGA da mesma edição (a normal e o Webmaster são edições diferentes e continuam
+   podendo ficar abertos juntos) recebe o anúncio e:
+   · para de gravar no armazenamento do navegador (`setItem`, `removeItem`, `clear` viram nada nesta aba) e de mandar o pacote para a
+     nuvem (`nuvemEnviar`) — nada do que ela tem na memória cai por cima do que a aba nova grava;
+   · para o jogo (o laço deixa de desenhar: `window.__pause`) e solta o mouse preso;
+   · mostra: «O Castelo foi aberto em outra aba — continue nela. Esta aba parou de salvar para não apagar o seu progresso.», com o botão
+     «Jogar nesta aba», que recarrega a página: ela lê o que foi gravado e passa a ser a aba mais nova (a outra é que para).
+   A visita à sala de outro leitor (`window.VISITA`) não se anuncia nem trava: ela não grava o progresso de ninguém.
+   Na Steam o jogo roda numa janela só: lá não há outra aba para anunciar, então o aviso nunca aparece.
+   REVISÃO (revisao/v883/REVISAO.md; sem crítico nem médio) — entraram três ressalvas baratas: o som ambiente também é calado (A6), uma
+   janela modal aberta é fechada para não ficar por cima do aviso (A2) e as teclas não chegam ao jogo com a aba travada (A3). Ficou de
+   fora: o controle não aperta «Jogar nesta aba» (o controle é lido no laço, que parou; mouse, teclado e toque funcionam).
+   Chave: `?abas883=0`. Gancho `window.__abas883` (`estado`, `stats`, `erros`, `travar(motivo)` — para teste —, `anunciar()`). */
+const AB883=(()=>{const q=location.search+location.hash;return {on:!/[?&#]abas883=0/i.test(q),travada:false,id:Math.random().toString(36).slice(2,10),
+  t0:Date.now(),ed:null,canal:null,erros:[],stats:{anuncios:0,recebidos:0,ignorados:0,bloqueadas:0,nuvemBloqueada:0,quem:null}};})();
+function ab883Erro(k,e){try{if(AB883.erros.length<20)AB883.erros.push(k+': '+String(e&&e.message||e));}catch(x){}}
+function ab883T(pt,en,es){try{return typeof text428==='function'?text428(pt,en,es):pt;}catch(e){return pt;}}
+function ab883Edicao(){try{return (typeof WEBMASTER!=='undefined'&&WEBMASTER)?'wm':'normal';}catch(e){return 'normal';}}
+function ab883Aviso(){try{if(document.getElementById('ab883'))return;const st=document.createElement('style');st.id='ab883css';st.textContent=
+    '#ab883{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:rgba(8,5,10,.78)}'+
+    '#ab883 .c{width:min(420px,92vw);padding:22px 22px 18px;border-radius:16px;background:radial-gradient(120% 80% at 50% 0%,#3a2340 0%,#1c1222 55%,#120b16 100%);'+
+    'border:1px solid #c9a24a;box-shadow:0 18px 60px rgba(0,0,0,.65);color:#f3e6c8;font:15px/1.45 Georgia,"Times New Roman",serif;text-align:center}'+
+    '#ab883 h3{margin:0 0 8px;font-size:19px;color:#e8c46a;font-weight:normal}#ab883 p{margin:0 0 16px}'+
+    '#ab883 button{font:inherit;color:#1c1222;background:#e8c46a;border:0;border-radius:10px;padding:9px 18px;cursor:pointer}#ab883 button:focus{outline:2px solid #fff}';
+  document.head.appendChild(st);const el=document.createElement('div');el.id='ab883';el.setAttribute('role','alertdialog');
+  el.innerHTML='<div class="c"><h3></h3><p></p><button type="button"></button></div>';
+  el.querySelector('h3').textContent=ab883T('O Castelo foi aberto em outra aba','The Castle was opened in another tab','El Castillo se abrió en otra pestaña');
+  el.querySelector('p').textContent=ab883T('Continue nela. Esta aba parou de salvar para não apagar o seu progresso.','Keep playing there. This tab stopped saving so it does not erase your progress.','Sigue en ella. Esta pestaña dejó de guardar para no borrar tu progreso.');
+  const b=el.querySelector('button');b.textContent=ab883T('Jogar nesta aba','Play in this tab','Jugar en esta pestaña');
+  b.addEventListener('click',e=>{e.stopPropagation();try{location.reload();}catch(x){}});
+  for(const ev of ['keydown','keyup','pointerdown','mousedown','click','wheel'])el.addEventListener(ev,e=>{if(e.target!==b)e.stopPropagation();},true);
+  document.body.appendChild(el);try{b.focus({preventScroll:true});}catch(x){}
+  // (revisão A3) com a aba travada as teclas não chegam ao jogo (H, M, Y abriam janelas por baixo do aviso); Enter/Espaço no botão continuam
+  for(const ev of ['keydown','keyup','keypress'])addEventListener(ev,e=>{if(!AB883.travada)return;if(e.target===b&&(e.key==='Enter'||e.key===' '||e.key==='Tab'))return;e.stopImmediatePropagation();if(e.key!=='Tab')e.preventDefault();try{b.focus({preventScroll:true});}catch(x){}},true);
+  }catch(e){ab883Erro('aviso',e);}}
+function ab883Travar(motivo){if(AB883.travada)return false;AB883.travada=true;AB883.stats.quem=motivo||'outra aba';
+  try{window.__pause=true;}catch(e){}try{if(document.pointerLockElement&&document.exitPointerLock)document.exitPointerLock();}catch(e){}
+  try{if(window.__mus199&&typeof window.__mus199.volume==='function')window.__mus199.volume(0);}catch(e){}
+  try{if(window.__som198&&typeof window.__som198.volume==='function')window.__som198.volume(0);}catch(e){}   // (revisão A6) o som ambiente também
+  try{for(const d of document.querySelectorAll('dialog[open]'))d.close();}catch(e){}   // (revisão A2) janela modal aberta não fica por cima do aviso
+  ab883Aviso();return true;}
+function ab883Recebe(m){try{if(!m||m.tipo!=='nova'||m.id===AB883.id)return;AB883.stats.recebidos++;
+    if(m.ed!==AB883.ed||window.VISITA){AB883.stats.ignorados++;return;}
+    const mais=(+m.t>AB883.t0)||(+m.t===AB883.t0&&String(m.id)>AB883.id);if(mais)ab883Travar('aba aberta em '+new Date(+m.t).toLocaleTimeString());else AB883.stats.ignorados++;}catch(e){ab883Erro('recebe',e);}}
+function ab883Anunciar(){try{const m={tipo:'nova',ed:AB883.ed,id:AB883.id,t:AB883.t0};AB883.stats.anuncios++;
+    if(AB883.canal)AB883.canal.postMessage(m);
+    else{const S=Storage.prototype.setItem;try{S.call(localStorage,'castelo.abas883',JSON.stringify(m));}catch(e){}}}catch(e){ab883Erro('anunciar',e);}}
+if(AB883.on){
+  // as gravações desta aba viram nada quando ela trava (o embrulho mais de fora: os blocos anteriores também embrulham o protótipo)
+  try{const P=Storage.prototype,s0=P.setItem,r0=P.removeItem,c0=P.clear;let LS=null;try{LS=window.localStorage;}catch(e){}
+    P.setItem=function(k,v){if(AB883.travada&&this===LS){AB883.stats.bloqueadas++;return;}return s0.apply(this,arguments);};
+    P.removeItem=function(k){if(AB883.travada&&this===LS){AB883.stats.bloqueadas++;return;}return r0.apply(this,arguments);};
+    P.clear=function(){if(AB883.travada&&this===LS){AB883.stats.bloqueadas++;return;}return c0.apply(this,arguments);};}catch(e){ab883Erro('armazenamento',e);}
+  try{if(typeof nuvemEnviar==='function'){const ne=nuvemEnviar;nuvemEnviar=function(){if(AB883.travada){AB883.stats.nuvemBloqueada++;return Promise.resolve(false);}return ne.apply(this,arguments);};}}catch(e){ab883Erro('nuvem',e);}
+  // o anúncio: só na página do jogo (não na visita); depois de o resto do script ter definido a edição
+  try{AB883.ed=ab883Edicao();if(!window.VISITA){
+      if(typeof BroadcastChannel==='function'){AB883.canal=new BroadcastChannel('castelo-abas-883');AB883.canal.onmessage=ev=>ab883Recebe(ev&&ev.data);}
+      else addEventListener('storage',ev=>{try{if(ev.key==='castelo.abas883'&&ev.newValue)ab883Recebe(JSON.parse(ev.newValue));}catch(e){}});
+      ab883Anunciar();}}catch(e){ab883Erro('canal',e);}
+}
+window.__abas883={estado:AB883,stats:AB883.stats,erros:AB883.erros,travar:ab883Travar,anunciar:ab883Anunciar};
+
+/* ===================== v883 · LIMITE DE QUADROS POR SEGUNDO ESCOLHIDO PELO JOGADOR: SEM LIMITE, 60 OU 30 (bloco `FQ883`) =====================
+   Decisão (22/11, o Luiz: «faça o que achar melhor» sobre o item 3 de «Para o Luiz decidir» do relatório de 24 h — recomendado para a
+   versão da Steam: notebooks (bateria e calor), monitores de 120/144 Hz, Steam Deck).
+   COMO ERA: o laço principal (`frame`) desenha a cada `requestAnimationFrame`, na frequência do monitor (60, 120, 144 Hz…); só sem foco
+   a v851 segura em 30. Não havia como o jogador escolher.
+   AGORA: em Controles (tecla H), abaixo de «sons (moedas)», a linha «Limite de quadros: Sem limite · 60 por segundo · 30 por segundo»
+   (fica salva neste navegador, `castelo.fps883`; também muda pela cruz do controle, como as outras listas). «Sem limite» é o de sempre
+   e é o padrão: nada muda para quem não escolher. Com 60 ou 30, o laço pula os `requestAnimationFrame` que chegam antes da hora do
+   próximo quadro (a hora anda em passos fixos de 1/60 ou 1/30 s, então num monitor de 144 Hz a média fica em 60 de verdade, não em 48);
+   a lógica do jogo já usa o tempo de verdade entre os quadros, então nada anda mais devagar. Sem foco, a v851 continua valendo (30).
+   REVISÃO (22/11, cópia corrigida — ag870/revisao/v883/REVISAO.md):
+   (1) a hora vem do carimbo do `requestAnimationFrame` (o da vsync), não do `performance.now()` dentro do quadro, e a folga é de meio
+       período da tela (no máximo 1/4 do passo) — antes, com a folga de 1 ms, o atraso do processo principal fazia pular quadros que
+       deviam sair (simulação: 59,94 Hz com «60» dava 58,6 quadros/s com ~80 trancos por minuto; 165 Hz com «60», ~90 por minuto);
+   (2) a tela que já não passa do limite (60 Hz com «60», 30 Hz com «30») não é limitada: nada a pular;
+   (3) o arranque (a montagem das salas atrás do livro, `startup344Frame`, que trabalha 12 ms por quadro) não é limitado — antes, com
+       «30» num monitor de 60 Hz, o carregamento levava o dobro;
+   (4) o que mede a fluidez para decidir sozinho — a resolução dinâmica do Papel (`drs`: mediana acima de 26 ms desce a escala), a troca
+       Papel→Leve e a preparação do Leve (FLOW417: quadro acima de 28 ms zera a medição, acima de 24 ms a preparação não anda) e a
+       limpeza das fusões antigas (QUIET434, abaixo de 24 ms) — recebe o tempo de quadro que o aparelho faria SEM o limite (o maior
+       intervalo entre as chamadas do rAF desde o último quadro desenhado, ou o tempo de processador do quadro anterior, o que for
+       maior). Antes, com «30», todos viam 33 ms: a resolução descia até 0,55 (imagem borrada), o Papel nunca virava Leve, a preparação
+       do Leve escolhida à mão nunca terminava e as fusões antigas não eram desfeitas. Só vale nos quadros em que o limite pulou algum
+       rAF: aparelho lento (sem pulos) e «Sem limite» seguem medindo como antes.
+   Chave: `?quadros883=0` (a linha some e o laço fica como era). Gancho `window.__quadros883` (`estado`, `stats`, `erros`, `define(n)`). */
+const FQ883=(()=>{const q=location.search+location.hash;return {on:!/[?&#]quadros883=0/i.test(q),limite:0,prox:0,tela:0,ultCb:0,gapMax:0,pulouDesde:0,durUlt:0,desenhou:false,
+  erros:[],stats:{pulados:0,desenhados:0,trocas:0,semPulo:0,dtTrocados:0}};})();
+const FQ883_KEY='castelo.fps883';
+function fq883Erro(k,e){try{if(FQ883.erros.length<20)FQ883.erros.push(k+': '+String(e&&e.message||e));}catch(x){}}
+function fq883T(pt,en,es){try{return typeof text428==='function'?text428(pt,en,es):pt;}catch(e){return pt;}}
+function fq883Define(n,grava){n=+n;if(n!==30&&n!==60)n=0;FQ883.limite=n;FQ883.prox=0;FQ883.stats.trocas++;
+  if(grava!==false){try{localStorage.setItem(FQ883_KEY,String(n));}catch(e){}}
+  try{const s=document.getElementById('setFps883');if(s&&s.value!==String(n))s.value=String(n);}catch(e){}return n;}
+function fq883Linha(){try{if(document.getElementById('setFps883'))return true;const box=document.querySelector('#ctrl .ctrlSet');if(!box)return false;
+    const lab=document.createElement('label');lab.className='fq883';const sp=document.createElement('span');sp.textContent=fq883T('Limite de quadros','Frame rate limit','Límite de fotogramas')+' ';
+    const sel=document.createElement('select');sel.id='setFps883';
+    for(const [v,pt,en,es] of [['0','Sem limite','No limit','Sin límite'],['60','60 por segundo','60 per second','60 por segundo'],['30','30 por segundo','30 per second','30 por segundo']]){
+      const o=document.createElement('option');o.value=v;o.textContent=fq883T(pt,en,es);sel.appendChild(o);}
+    sel.value=String(FQ883.limite);sel.addEventListener('change',()=>fq883Define(sel.value));lab.appendChild(sp);lab.appendChild(sel);
+    const som=document.getElementById('setSom'),ref=som&&som.closest('label');if(ref&&ref.parentNode===box)ref.after(lab);else box.appendChild(lab);return true;}catch(e){fq883Erro('linha',e);return false;}}
+// (revisão 4) o tempo de quadro «sem o limite»: só nos quadros em que o limite pulou algum rAF desde o último quadro desenhado
+function fq883Dt(dt){try{const primeiro=!FQ883.desenhou;FQ883.desenhou=true;if(FQ883.pulouDesde>0&&dt>0){const eq=Math.max(FQ883.gapMax,FQ883.durUlt)/1000;if(eq>0&&eq<dt){if(primeiro)FQ883.stats.dtTrocados++;return eq;}}}catch(e){}return dt;}
+if(FQ883.on){
+  try{let v=0;try{v=+(localStorage.getItem(FQ883_KEY)||0);}catch(e){}fq883Define(v,false);}catch(e){fq883Erro('ler',e);}
+  // o laço chama `requestAnimationFrame(frame)` pelo nome: o embrulho vale para todos os quadros (por fora do da v851)
+  try{const fr0=frame;frame=function(ts){let mede=false,t0=0;
+      try{const t=(typeof ts==='number'&&ts>0)?ts:performance.now();
+        // intervalo entre chamadas do rAF: o maior desde o último quadro desenhado (4) e o período da tela (desce depressa, sobe devagar)
+        if(FQ883.ultCb){const d=t-FQ883.ultCb;if(d>0){if(d>FQ883.gapMax)FQ883.gapMax=d;if(d>2&&d<50)FQ883.tela=FQ883.tela?(d<FQ883.tela?FQ883.tela*.7+d*.3:FQ883.tela*.99+d*.01):d;}}
+        FQ883.ultCb=t;
+        const L=FQ883.limite,liberado=(typeof AQ==='undefined')||!!AQ.liberado;   // (3) o arranque não é limitado
+        if(L&&!window.__pause&&liberado){const passo=1000/L,tela=FQ883.tela||passo;
+          if(tela<passo*.95){const tol=Math.min(passo*.25,tela*.5);   // (1) folga de meio período da tela
+            if(FQ883.prox&&t<FQ883.prox-tol){FQ883.pulouDesde++;FQ883.stats.pulados++;requestAnimationFrame(frame);return;}
+            FQ883.prox=(FQ883.prox&&t-FQ883.prox<passo*.5)?FQ883.prox+passo:t+passo;FQ883.stats.desenhados++;}
+          else{FQ883.prox=0;FQ883.stats.semPulo++;}}   // (2) a tela já não passa do limite
+        else FQ883.prox=0;
+        mede=true;FQ883.desenhou=false;t0=performance.now();}catch(e){fq883Erro('quadro',e);}
+      try{return fr0.apply(this,arguments);}
+      finally{if(mede&&FQ883.desenhou){FQ883.durUlt=performance.now()-t0;FQ883.gapMax=0;FQ883.pulouDesde=0;}}};}catch(e){fq883Erro('frame',e);}
+  // (4) chamados pelo nome dentro do `frame` (só nos quadros desenhados): por fora dos embrulhos da v417/v431/v434
+  try{if(typeof startup344Sample==='function'){const s0=startup344Sample;startup344Sample=function(dt){const a=Array.prototype.slice.call(arguments);a[0]=fq883Dt(dt);return s0.apply(this,a);};}}catch(e){fq883Erro('startup344Sample',e);}
+  try{if(typeof drs==='function'){const d0=drs;drs=function(dt){const a=Array.prototype.slice.call(arguments);a[0]=fq883Dt(dt);return d0.apply(this,a);};}}catch(e){fq883Erro('drs',e);}
+  try{if(!fq883Linha()){const t=setInterval(()=>{if(fq883Linha())clearInterval(t);},1000);setTimeout(()=>clearInterval(t),60000);}}catch(e){fq883Erro('linha0',e);}
+}
+window.__quadros883={estado:FQ883,stats:FQ883.stats,erros:FQ883.erros,define:fq883Define};
+
+/* ===================== v883 · «SUBSTITUIR» NA IMPORTAÇÃO TIRA TAMBÉM O QUE O PACOTE NÃO TRAZ (O ITEM 4 DA v877, AGORA LIGADO) (bloco `SB883`) =====================
+   Decisão (22/11, o Luiz: «faça o que achar melhor» sobre o `?substituir877=1`, que a v877 deixou desligado para ele decidir).
+   COMO ERA: importar um pacote de progresso com «Substituir» (v198) gravava o que o pacote traz, mas deixava no navegador as chaves do
+   jogo que o pacote não traz (de uma partida mais nova, de salas visitadas depois, de equipamento que o pacote não conhece): o resultado
+   era uma mistura do progresso importado com o que já estava aqui — «substituir» que não substituía.
+   AGORA: liga o item 4 da v877 (`ar877Removiveis`, pronto e testado em 19/11: «1 removida, 2 cópias, 2 recuperadas»): no «Substituir»,
+   as chaves de progresso do jogo que o pacote não traz também saem, ANTES guardadas numa cópia de segurança, com o botão «↩ Recuperar…»
+   para voltar. Não vale na visita; «Juntar» (se houver) não muda; o Webmaster só mexe nas chaves dele.
+   REVISÃO (revisao/v883/REVISAO.md; sem crítico nem médio): um pacote sem nenhuma chave de progresso (arquivo errado ou vazio) não tira
+   nada daqui (S1).
+   Chave: `?substituir883=0` (volta ao «substituir» de antes; `?substituir877=1` continua ligando). Gancho `window.__substituir883`. */
+const SB883={on:!/[?&#]substituir883=0/i.test(location.search+location.hash),ligou:false,erros:[]};
+try{if(SB883.on&&typeof AR877!=='undefined'&&AR877&&AR877.on&&!AR877.subst){AR877.subst=true;SB883.ligou=true;}}catch(e){SB883.erros.push(String(e&&e.message||e));}
+// (revisão S1) pacote sem NENHUMA chave de progresso (arquivo errado ou vazio — o botão de confirmar diz «0 registros») não tira nada daqui
+try{if(SB883.on&&typeof ar877Removiveis==='function'){const rv0=ar877Removiveis;ar877Removiveis=function(obj,wm){try{const d=obj&&obj.dados;
+      if(d&&typeof d==='object'&&!Object.keys(d).some(k=>AR877_PROGRESSO.test(k))){SB883.vazios=(SB883.vazios||0)+1;return [];}}catch(e){}return rv0.apply(this,arguments);};}}catch(e){SB883.erros.push(String(e&&e.message||e));}
+window.__substituir883={estado:SB883,erros:SB883.erros};
 
 window.__build434={revision:434,family:"web",edition:"en"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
