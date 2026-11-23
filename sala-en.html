@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v883</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v884</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -121054,6 +121054,272 @@ try{if(SB883.on&&typeof AR877!=='undefined'&&AR877&&AR877.on&&!AR877.subst){AR87
 try{if(SB883.on&&typeof ar877Removiveis==='function'){const rv0=ar877Removiveis;ar877Removiveis=function(obj,wm){try{const d=obj&&obj.dados;
       if(d&&typeof d==='object'&&!Object.keys(d).some(k=>AR877_PROGRESSO.test(k))){SB883.vazios=(SB883.vazios||0)+1;return [];}}catch(e){}return rv0.apply(this,arguments);};}}catch(e){SB883.erros.push(String(e&&e.message||e));}
 window.__substituir883={estado:SB883,erros:SB883.erros};
+
+/* ===================== v881 · PEÇAS FLUTUANDO E ENTERRADAS: SÓ A ALTURA — A FOGUEIRA, OS CACTOS, A TORRE D'ÁGUA E A CARROÇA DO FAROESTE (7.º ANDAR) E OS DOIS OBELISCOS DO CAMPO DO EGITO (HISTÓRICA, 1.º ANDAR) (bloco `FL881`) =====================
+   Pedido do Luiz (19/11): varrer todas as salas (as 37, os 7 halls, Minha Sala, Acumulador, prólogo, masmorras, campos e alas extras)
+   atrás de objetos acima ou abaixo do chão — flutuando no ar ou enterrados — e corrigir SÓ a altura.
+   COMO FOI A VARREDURA (em node, com o jogo inteiro da v879, uma cena por processo): cada peça estática (malha pequena inteira; malha
+   grande ou kit fundido quebrado em pedaços conexos; instâncias uma a uma) foi comparada com o apoio de verdade logo abaixo dela — a
+   superfície virada para cima das malhas de chão/terreno da cena (teste exato contra os triângulos; a função de chão da sala como
+   reserva) e as peças que ela toca. Flutuando = grupo de peças que se tocam sem nenhuma com a base no chão nem encostada em parede/forro;
+   enterrada = base mais de 5 cm abaixo do chão mais baixo sob a pegada. Os achados foram conferidos no código de quem montou cada peça.
+   COMO ERA:
+   (1) FAROESTE (`western`). A v437 (`at437Western`, «Atlas vivo») montou a fogueira, a carroça, a torre d'água, a placa e os seis cactos
+       com o pé em y 0, como se o chão fosse plano. Mas a v289 trocou o piso por um terreno irregular (`a289Height`, malha «Faroeste ·
+       terreno irregular»), que fora da rua sobe em morros e desce em valas: os seis cactos ficaram enterrados (o chão sob o pé de cada um
+       sobe 0,2 a 0,64 m), a torre d'água com as pernas enterradas 0,1 a 0,3 m, a carroça com as quatro rodas afundadas 0,06 a 0,33 m e a
+       fogueira (lenha, brasa, tripé e caldeirão) no ar, 0,05 a 0,19 m acima da vala. (A placa «ATLAS CITY» está num trecho plano: certa.)
+   (2) HISTÓRICA (`cat`), campo do Egito (v539, `cp539Egito`). Os dois obeliscos de 12,3 m em (−57; −58,07) e (−25; −58,07) foram postos
+       com a base em y 0, 4,2 m fora da arena, onde o chão é o «terreno contínuo entre Egito, castelo e vila», a −0,31/−0,32 m: os dois
+       ficavam pairando 31 cm acima da areia, com o vão à vista.
+   AGORA: cada peça desce ou sobe até o chão que se vê, sem mudar mais nada (x, z, giro, modelo, cor e material iguais). A altura é medida
+   na hora, na própria cena: base = o vértice visível mais baixo da peça; chão = a malha de chão da sala (terreno do Faroeste; terreno
+   contínuo da Histórica) sob os vértices da base; regra = o pé mais baixo encosta no chão mais baixo sob a base (nada fica no ar; num
+   chão inclinado, o lado de cima fica um pouco enterrado, como um poste fincado). A fogueira leva junto as chamas (a altura-base delas na
+   animação) e as fagulhas; o obelisco leva o brilho da ponta. Só age se a peça estiver onde a varredura a achou (base esperada) e se a
+   correção cair na faixa prevista; senão a peça fica e a lista diz por quê. Os obstáculos do chão são discos 2D (x, z, raio): a altura
+   não muda nada neles.
+   QUANDO: no fim do `finishRoom` (embrulho `fr8Wrap`/`fr8Prev`) a sala entra na fila; a medida e a correção correm em fatias no fatiador
+   (`fat8Go`, urgente com a sala à vista), assim que a sala está pronta e as peças existem (v437 feita; campo do Egito com os dois
+   obeliscos); na entrada da sala (`setActive`, antes do original) o que faltar corre uma fatia de 8 ms e o resto segue urgente (revisão); um vigia
+   de 1 s refaz a peça se outro bloco a tiver mudado de lugar depois (mede de novo no lugar novo). Se alguma malha-alvo estiver fundida
+   pelo Leve (o `visible` dela vira getter), chama `fusaoLimpar(cena)` antes de mexer (no `liga()`/`desliga()` também).
+   REVISÃO (19/11, revisor do PF881/FL881): o trabalho rende mais vezes (uma peça por passo, as matrizes do mundo uma vez só, o percurso das
+   malhas de chão separado do laço dos triângulos, que confere o fim da fatia a cada 512) — no banco, passos de 19–174 ms caíam no Faroeste e
+   41 ms na Histórica —, e na entrada da sala o que faltar corre uma fatia de 8 ms (o resto continua urgente na fila) em vez de terminar tudo
+   dentro do `setActive`; e a malha que o recorte por distância do Leve/Papel (v199) esconde conta como visível na medida (com o leitor a 26 m as
+   pedras da fogueira ficavam de fora da base e saíam 1,7 cm enterradas). Peças e regras iguais.
+   Chaves: `?flutuando881=0` (tudo); por sala `?fl881western=0`, `?fl881cat=0`.
+   Gancho `window.__flutuando881`: `stats`, `erros`, `lista` (por peça: sala, id, nome, origem, y da base antes/depois, apoio, Δy, motivo,
+   estado), `desliga()` / `liga()` (exatos: devolvem os valores guardados), `aplica(sala)`, `mede(sala)` (base, chão e folga de agora),
+   `plano`, `fotos(sala)` (poses de câmera para as fotos de antes/depois). */
+const FL881_Q=location.search+location.hash;
+const FL881={on:!/[?&#]flutuando881=0/i.test(FL881_Q),ativo:true,erros:[],lista:[],salas:{},vigia:null,
+  stats:{pedidos:0,feitas:0,pecas:0,corrigidas:0,jaNoChao:0,doPF881:0,puladas:0,naoAchadas:0,refeitas:0,fusao:0,checagens:0,ms:0}};
+function fl881Erro(k,e){if(FL881.erros.length<40)FL881.erros.push(k+': '+(e&&e.message||e));try{console.warn('v881',k,e);}catch(x){}}
+function fl881Liga(sala){return FL881.on&&!new RegExp('[?&#]fl881'+sala+'=0','i').test(FL881_Q);}
+// ---------- o plano: o que corrigir em cada sala (achados da varredura de 19/11 sobre a v879) ----------
+// tipo 'malhas': malhas da cena cujo nome casa e cujo centro (xz) fica a menos de `raio` de `perto`; 'grupo': o grupo (move a posição dele);
+// 'vertices': os vértices das malhas que casam dentro de `caixa` [x0,y0,z0,x1,y1,z1] (peça de um kit fundido com outras).
+// base0: faixa da base esperada (onde a varredura a achou); faixa: faixa de Δy aceita; regra 'min': o pé mais baixo no chão mais baixo.
+function fl881Plano(sala){
+  if(sala==='western'){let I={};try{I=(typeof AT437!=='undefined'&&AT437.info&&AT437.info.western)||{};}catch(e){}
+    const pc=[];const cactos=[[16,-8],[-16,-2],[17,4],[-17,16],[17,17],[-12,-18]];
+    cactos.forEach((c,i)=>pc.push({id:'cacto-'+(i+1),nome:'cacto florido '+(i+1)+' (v437) em ('+c[0]+'; '+c[1]+')',origem:'v437 at437Western',tipo:'malhas',nomes:/^437 cacto · /,perto:c,raio:1.0,
+      base0:[-.04,.04],faixa:[.04,1.0],doPF881:true,motivo:'a v437 pôs o cacto com o pé em y 0 sobre o morro do terreno da v289: o pé ficava enterrado'}));
+    const f=I.fogueira||[-14,9],t=I.torre||[-15,-16],w=I.carroca||[14,12];
+    pc.push({id:'fogueira',nome:'fogueira com tripé e caldeirão (v437) em ('+f[0]+'; '+f[1]+')',origem:'v437 at437Western',tipo:'malhas',nomes:/^437 fogueira · /,perto:f,raio:1.2,
+      base0:[-.04,.05],faixa:[-.6,-.03],extra:'fogo437',motivo:'a v437 pôs a fogueira em y 0 sobre uma vala do terreno: lenha, brasa e tripé ficavam no ar'});
+    pc.push({id:'torre',nome:'torre d’água (v437) em ('+t[0]+'; '+t[1]+')',origem:'v437 at437Western',tipo:'malhas',nomes:/^437 torre · /,perto:t,raio:2.6,
+      base0:[-.04,.04],faixa:[.02,.8],motivo:'a v437 pôs a torre com as pernas em y 0 numa encosta: as pernas ficavam enterradas'});
+    pc.push({id:'carroca',nome:'carroça coberta (v437) em ('+w[0]+'; '+w[1]+')',origem:'v437 at437Western',tipo:'grupo',nomes:/^Atlas vivo · carroça · bicho$/,perto:w,raio:1.0,
+      base0:[-.09,0],faixa:[.02,.8],motivo:'a v437 pôs a carroça com as rodas em y 0 numa encosta: as quatro rodas ficavam afundadas'});
+    return {sala,nome:'Faroeste',chao:{nomes:/^Faroeste · terreno irregular$/},pecas:pc};}
+  if(sala==='cat'){const pc=[];
+    for(const [i,x] of [[1,-57],[2,-25]]){const z=-58.07;
+      pc.push({id:'obelisco-'+i,nome:'obelisco '+i+' do campo do Egito (v539) em ('+x+'; '+z+')',origem:'v539 cp539Egito',tipo:'vertices',nomes:/^539 egito · /,caixa:[x-1.45,-.06,z-1.45,x+1.45,12.45,z+1.45],
+        perto:[x,z],base0:[-.03,.03],faixa:[-.6,-.08],extra:'sprite',sprite:[x,11.8,z],motivo:'a v539 pôs o obelisco com a base em y 0, fora da arena, onde o terreno contínuo está a −0,31 m: pairava 31 cm acima da areia'});}
+    return {sala,nome:'Histórica (campo do Egito)',chao:{nomes:/^Histórica · terreno contínuo entre Egito, castelo e vila$/},pecas:pc};}
+  return null;}
+const FL881_SALAS=['western','cat'];
+// os seis cactos do Faroeste também estão no plano do PF881 (2.ª varredura de peças esquecidas, outro agente, mesma v881): combinado pela
+// pasta dele — com o PF881 ligado para o Faroeste, os cactos são dele e o FL881 não os toca; sem ele (ausente ou `?pecas881=0` /
+// `?faroeste881=0`), o FL881 corrige os cactos. Em qualquer ordem dos blocos a base esperada (y ≈ 0) impede subir duas vezes.
+function fl881CactosDoPF881(){try{return typeof PF881!=='undefined'&&!!PF881.on&&typeof PF881_SALAS!=='undefined'&&!!(PF881_SALAS.western&&PF881_SALAS.western.liga);}catch(e){return false;}}
+// ---------- prontidão: as peças têm de existir (e os blocos que mexem nelas, terminado) ----------
+function fl881Pronta(sala){const R=typeof ROOMS!=='undefined'&&ROOMS[sala];if(!R||!R.scene||!R.ready)return {ok:false};
+  if(sala==='western'){if(typeof AT437==='undefined')return {ok:false,pula:'sem o bloco AT437 (v437)'};if(!(AT437.feito&&AT437.feito.western))return {ok:false};
+    // a v709 (ampliação, 1,5 s depois do finishRoom) não mexe nestas peças, mas a medida espera por ela até 8 s (a sala fica inteira)
+    try{if(typeof FW709!=='undefined'&&FW709.on&&!FW709.feito)return fl881Espera(sala,R,'v709');}catch(e){}
+    return {ok:true};}
+  if(sala==='cat'){if(typeof CP539==='undefined')return {ok:false,pula:'sem o bloco CP539 (v539)'};let st=null;try{st=CP539.stats&&CP539.stats.cat;}catch(e){}
+    if(!st||!st.obeliscos)return fl881Espera(sala,R,'v539 (obeliscos)',20000);return {ok:true};}
+  return {ok:false};}
+function fl881Espera(sala,R,falta,ms){const E=FL881.espera||(FL881.espera={});const now=performance.now();if(!E[sala]||E[sala].sc!==R.scene)E[sala]={sc:R.scene,t:now};
+  if(now-E[sala].t>(ms||8000))return {ok:true,forcado:falta};return {ok:false,falta};}
+// ---------- utilitários de cena ----------
+// (revisão) o recorte por distância do Leve/Papel (v199, `DES199`) esconde malhas de ≥ 350 triângulos longe da câmera: para medir a base e o chão,
+// a malha escondida só por isso conta como visível (as pedras da fogueira ficavam de fora com o leitor a 26 m e saíam 1,7 cm enterradas)
+const FL881_DES=new WeakMap();
+function fl881DesOculto(o,sc){try{if(typeof DES199==='undefined'||!DES199.cenas)return false;const E=DES199.cenas.get(sc);if(!E||!E.lista)return false;
+  let M=FL881_DES.get(E);if(!M||M.arr!==E.lista||M.n!==E.lista.length){M={arr:E.lista,n:E.lista.length,m:new Map()};for(const it of E.lista)if(it&&it.o)M.m.set(it.o,it);FL881_DES.set(E,M);}const it=M.m.get(o);return !!(it&&it.oculto);}catch(e){return false;}}
+function fl881Vis(o,sc){for(let p=o;p&&p!==sc;p=p.parent){const v=p.__fusaoVis!==undefined?p.__fusaoVis:(p.visible||(p===o&&fl881DesOculto(p,sc)));if(!v)return false;}return true;}
+function fl881Fundida(o){try{const d=Object.getOwnPropertyDescriptor(o,'visible');return !!(d&&d.get);}catch(e){return false;}}
+function fl881Centro(o){const g=o.geometry;if(!g)return null;if(!g.boundingBox)g.computeBoundingBox();if(!g.boundingBox||g.boundingBox.isEmpty())return null;return g.boundingBox.getCenter(new THREE.Vector3()).applyMatrix4(o.matrixWorld);}
+// os alvos de uma peça: {malhas:[...], grupos:[...], vert:[{o,idx}], extras:[...]}
+function fl881Acha(sc,R,pc,semAtualizar){if(!semAtualizar)sc.updateMatrixWorld(true);const A={malhas:[],grupos:[],vert:[],extras:[]};
+  if(pc.tipo==='malhas'){sc.traverse(o=>{if(!o.isMesh||!pc.nomes.test(o.name||''))return;const c=fl881Centro(o);if(!c)return;if(Math.hypot(c.x-pc.perto[0],c.z-pc.perto[1])<=pc.raio)A.malhas.push(o);});}
+  else if(pc.tipo==='grupo'){sc.traverse(o=>{if(!pc.nomes.test(o.name||''))return;const p=new THREE.Vector3();o.getWorldPosition(p);if(Math.hypot(p.x-pc.perto[0],p.z-pc.perto[1])<=pc.raio)A.grupos.push(o);});}
+  else if(pc.tipo==='vertices'){const [x0,y0,z0,x1,y1,z1]=pc.caixa;const v=new THREE.Vector3();
+    sc.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||!pc.nomes.test(o.name||'')||!o.geometry||!o.geometry.attributes.position)return;const pos=o.geometry.attributes.position,e=o.matrixWorld;const idx=[];
+      for(let i=0;i<pos.count;i++){v.fromBufferAttribute(pos,i).applyMatrix4(e);if(v.x>=x0&&v.x<=x1&&v.y>=y0&&v.y<=y1&&v.z>=z0&&v.z<=z1)idx.push(i);}if(idx.length)A.vert.push({o,idx:Uint32Array.from(idx)});});}
+  // efeitos que vão junto
+  if(pc.extra==='fogo437'){try{const F=(typeof NR!=='undefined'&&NR.western&&NR.western.a437Fogo)||null;if(F&&Math.hypot(F.x-pc.perto[0],F.z-pc.perto[1])<1.2){for(const s of F.chamas||[])A.extras.push({tipo:'chama',o:s});if(F.pts)A.extras.push({tipo:'obj',o:F.pts});}}catch(e){fl881Erro('fogo437',e);}}
+  if(pc.extra==='sprite'&&pc.sprite){const [sx,sy,sz]=pc.sprite;sc.traverse(o=>{if(!o.isSprite)return;const p=new THREE.Vector3();o.getWorldPosition(p);if(Math.abs(p.x-sx)<.12&&Math.abs(p.y-sy)<.12&&Math.abs(p.z-sz)<.12)A.extras.push({tipo:'obj',o});});}
+  A.achou=A.malhas.length+A.grupos.length+A.vert.length>0;
+  A.descr=(A.malhas.length?A.malhas.length+' malha(s) ':'')+(A.grupos.length?A.grupos.length+' grupo(s) ':'')+(A.vert.length?A.vert.reduce((s,t)=>s+t.idx.length,0)+' vértices em '+A.vert.length+' malha(s) ':'')+(A.extras.length?'+ '+A.extras.length+' efeito(s)':'');
+  return A;}
+// as malhas visíveis de um alvo (para a base) e todas (para mover)
+function fl881MalhasDe(A,sc,soVisiveis){const L=[];for(const m of A.malhas)if(!soVisiveis||fl881Vis(m,sc))L.push(m);
+  for(const g of A.grupos)g.traverse(o=>{if(o.isMesh&&o.geometry&&o.geometry.attributes&&o.geometry.attributes.position&&(!soVisiveis||fl881Vis(o,sc)))L.push(o);});return L;}
+// base (vértice visível mais baixo) e os pontos (xz) da pegada da base (vértices até 2 cm acima dela; até 48, espalhados)
+function fl881Base(A,sc){const v=new THREE.Vector3();let base=Infinity;const pegar=(o,i)=>{v.fromBufferAttribute(o.geometry.attributes.position,i).applyMatrix4(o.matrixWorld);return v;};
+  const fontes=[];for(const m of fl881MalhasDe(A,sc,true)){const n=m.geometry.attributes.position.count;fontes.push({o:m,n,idx:null});}
+  for(const t of A.vert)if(fl881Vis(t.o,sc))fontes.push({o:t.o,n:t.idx.length,idx:t.idx});
+  for(const f of fontes)for(let k=0;k<f.n;k++){const p=pegar(f.o,f.idx?f.idx[k]:k);if(p.y<base)base=p.y;}
+  if(!Number.isFinite(base))return null;const pts=[];let cx=0,cz=0,n=0;
+  for(const f of fontes)for(let k=0;k<f.n;k++){const p=pegar(f.o,f.idx?f.idx[k]:k);if(p.y<=base+.02){pts.push([p.x,p.z]);cx+=p.x;cz+=p.z;n++;}}
+  let sel=pts;if(pts.length>48){sel=[];for(let k=0;k<48;k++)sel.push(pts[Math.floor(k*(pts.length-1)/47)]);}
+  return {base,pts:sel,centro:[cx/n,cz/n]};}
+// ---------- o chão da sala: índice em grade (1 m) dos triângulos virados para cima das malhas de chão, só perto das peças ----------
+function* fl881IndiceG(sc,spec,regioes){const T=THREE;const I={cel:1,grade:new Map(),tri:[],malhas:[]};const ck=(a,b)=>a*100003+b;
+  sc.updateMatrixWorld(true);const ms=[];sc.traverse(o=>{if(o.isMesh&&!o.isInstancedMesh&&spec.nomes.test(o.name||'')&&o.geometry&&o.geometry.attributes.position&&fl881Vis(o,sc))ms.push(o);});
+  yield 'fl881 índice: malhas'; // (revisão) o percurso da cena e o laço dos triângulos em passos separados
+  const va=new T.Vector3(),vb=new T.Vector3(),vc=new T.Vector3();let passo=0;
+  for(const o of ms){I.malhas.push(o.name);const g=o.geometry,pos=g.attributes.position,ix=g.index,n=ix?ix.count:pos.count,e=o.matrixWorld;
+    for(let t=0;t+2<n;t+=3){va.fromBufferAttribute(pos,ix?ix.getX(t):t).applyMatrix4(e);vb.fromBufferAttribute(pos,ix?ix.getX(t+1):t+1).applyMatrix4(e);vc.fromBufferAttribute(pos,ix?ix.getX(t+2):t+2).applyMatrix4(e);
+      if((++passo&511)===0&&typeof fat8Fim!=='undefined'&&performance.now()>=fat8Fim)yield 'fl881 índice do chão';
+      const x0=Math.min(va.x,vb.x,vc.x),x1=Math.max(va.x,vb.x,vc.x),z0=Math.min(va.z,vb.z,vc.z),z1=Math.max(va.z,vb.z,vc.z);
+      if(!regioes.some(r=>x1>=r[0]&&x0<=r[2]&&z1>=r[1]&&z0<=r[3]))continue;
+      const e1x=vb.x-va.x,e1y=vb.y-va.y,e1z=vb.z-va.z,e2x=vc.x-va.x,e2y=vc.y-va.y,e2z=vc.z-va.z;const ny=e1z*e2x-e1x*e2z,nl=Math.hypot(e1y*e2z-e1z*e2y,ny,e1x*e2y-e1y*e2x);if(nl<1e-12||ny/nl<.25)continue; // só faces viradas para cima
+      const k0=I.tri.length;I.tri.push(va.x,va.y,va.z,vb.x,vb.y,vb.z,vc.x,vc.y,vc.z);const id=k0/9;
+      for(let a=Math.floor(x0);a<=Math.floor(x1);a++)for(let b=Math.floor(z0);b<=Math.floor(z1);b++){const k=ck(a,b);let L=I.grade.get(k);if(!L)I.grade.set(k,L=[]);L.push(id);}}}
+  I.n=I.tri.length/9;return I;}
+// altura do chão em (x,z): a superfície mais alta até ytop (−Infinity se nada)
+function fl881Altura(I,x,z,ytop){if(!I)return -Infinity;const L=I.grade.get(Math.floor(x)*100003+Math.floor(z));let best=-Infinity;if(!L)return best;const t=I.tri;
+  for(const id of L){const j=id*9;const ax=t[j],ay=t[j+1],az=t[j+2],e1x=t[j+3]-ax,e1y=t[j+4]-ay,e1z=t[j+5]-az,e2x=t[j+6]-ax,e2y=t[j+7]-ay,e2z=t[j+8]-az;const den=e1x*e2z-e2x*e1z;if(Math.abs(den)<1e-12)continue;
+    const px=x-ax,pz=z-az;const u=(px*e2z-e2x*pz)/den,w=(e1x*pz-px*e1z)/den;if(u<-1e-6||w<-1e-6||u+w>1+1e-6)continue;const y=ay+u*e1y+w*e2y;if(y<=ytop+.02&&y>best)best=y;}
+  return best;}
+// chão sob os pontos da base: mínimo, máximo e no centro (com a função de chão da sala como reserva)
+function fl881Chao(I,R,B){let mn=Infinity,mx=-Infinity,n=0,sem=0;const yt=B.base+1.5;const fy=(x,z)=>{try{const y=R.floorY?R.floorY(x,z):0;return Number.isFinite(y)?y:null;}catch(e){return null;}};
+  for(const [x,z] of B.pts){let g=fl881Altura(I,x,z,yt);if(!Number.isFinite(g)){sem++;const f=fy(x,z);if(f===null)continue;g=f;}if(g<mn)mn=g;if(g>mx)mx=g;n++;}
+  let c=fl881Altura(I,B.centro[0],B.centro[1],yt);if(!Number.isFinite(c)){const f=fy(B.centro[0],B.centro[1]);c=f===null?NaN:f;}
+  return n?{min:mn,max:mx,centro:c,n,semMalha:sem}:null;}
+// ---------- mover / devolver (exato: os valores de antes ficam guardados) ----------
+function fl881Move(it,dy){const reg=it.reg;reg.malhas.length=0;reg.vert.length=0;reg.extras.length=0;reg.dy=dy;
+  const local=(o,d)=>{const pai=o.parent;if(!pai)return d;pai.updateMatrixWorld(true);const inv=new THREE.Matrix4().copy(pai.matrixWorld).invert();const a=new THREE.Vector3(0,0,0).applyMatrix4(inv),b=new THREE.Vector3(0,d,0).applyMatrix4(inv);return b.sub(a);};
+  for(const o of it.A.malhas.concat(it.A.grupos)){const d=local(o,dy);const r={o,x0:o.position.x,y0:o.position.y,z0:o.position.z,x1:o.position.x+d.x,y1:o.position.y+d.y,z1:o.position.z+d.z};reg.malhas.push(r);o.position.set(r.x1,r.y1,r.z1);o.updateMatrixWorld(true);}
+  for(const t of it.A.vert){const o=t.o,pos=o.geometry.attributes.position,a=pos.array,is=pos.itemSize;o.updateMatrixWorld(true);const inv=new THREE.Matrix4().copy(o.matrixWorld).invert();
+    const d0=new THREE.Vector3(0,0,0).applyMatrix4(inv),d=new THREE.Vector3(0,dy,0).applyMatrix4(inv).sub(d0);const orig=new Float32Array(t.idx.length*3);
+    for(let k=0;k<t.idx.length;k++){const j=t.idx[k]*is;orig[k*3]=a[j];orig[k*3+1]=a[j+1];orig[k*3+2]=a[j+2];}
+    reg.vert.push({o,idx:t.idx,orig,d:[d.x,d.y,d.z]});}
+  fl881VertAplica(reg,true);
+  for(const x of it.A.extras){const o=x.o;const d=local(o,dy);const r={tipo:x.tipo,o,y0:o.position.y,y1:o.position.y+d.y,x0:o.position.x,x1:o.position.x+d.x,z0:o.position.z,z1:o.position.z+d.z};
+    if(x.tipo==='chama'&&o.userData&&typeof o.userData.base==='number'){r.b0=o.userData.base;r.b1=o.userData.base+d.y;o.userData.base=r.b1;}o.position.set(r.x1,r.y1,r.z1);reg.extras.push(r);}}
+function fl881VertAplica(reg,depois){for(const r of reg.vert){const pos=r.o.geometry.attributes.position,a=pos.array,is=pos.itemSize;
+    for(let k=0;k<r.idx.length;k++){const j=r.idx[k]*is;a[j]=depois?r.orig[k*3]+r.d[0]:r.orig[k*3];a[j+1]=depois?r.orig[k*3+1]+r.d[1]:r.orig[k*3+1];a[j+2]=depois?r.orig[k*3+2]+r.d[2]:r.orig[k*3+2];}
+    pos.needsUpdate=true;r.o.geometry.computeBoundingBox();r.o.geometry.computeBoundingSphere();}}
+function fl881Poe(reg,depois){for(const r of reg.malhas){r.o.position.set(depois?r.x1:r.x0,depois?r.y1:r.y0,depois?r.z1:r.z0);r.o.updateMatrixWorld(true);}
+  fl881VertAplica(reg,depois);
+  for(const r of reg.extras){r.o.position.set(depois?r.x1:r.x0,depois?r.y1:r.y0,depois?r.z1:r.z0);if(r.b0!==undefined)r.o.userData.base=depois?r.b1:r.b0;}}
+// alguma malha-alvo fundida pelo Leve?
+function fl881TemFundida(A){for(const m of A.malhas)if(fl881Fundida(m))return true;for(const g of A.grupos){let f=false;g.traverse(o=>{if(!f&&o.isMesh&&fl881Fundida(o))f=true;});if(f)return true;}for(const t of A.vert)if(fl881Fundida(t.o))return true;return false;}
+// onde a peça está (para o vigia perceber se outro bloco a mudou de lugar depois)
+function fl881Marca(it){const out=[];for(const o of it.A.malhas.concat(it.A.grupos))out.push(o.position.x,o.position.z);
+  for(const t of it.A.vert){const p=t.o.geometry.attributes.position;const i=t.idx[0];out.push(p.getX(i),p.getZ(i));}return out;}
+// ---------- a correção de uma sala, em fatias ----------
+function fl881Arred(v,n){return Number.isFinite(v)?+v.toFixed(n===undefined?3:n):null;}
+function* fl881SalaG(sala){const t0=performance.now();const R=ROOMS[sala];const sc=R.scene;const plano=fl881Plano(sala);if(!plano)return;
+  const st=FL881.salas[sala]={sc,feito:false,job:true,plano:plano.nome,pecas:[],indice:null,fusao:false,obst:'os obstáculos são discos 2D (x, z, raio): a altura não muda nada neles'};
+  FL881.lista=FL881.lista.filter(e=>e.sala!==sala);
+  // 1. alvos
+  // (revisão) as matrizes do mundo uma vez só e uma peça por passo (antes: as nove buscas, cada uma com a cena inteira, num passo único)
+  sc.updateMatrixWorld(true);const itens=[];for(const pc of plano.pecas){itens.push({pc,A:fl881Acha(sc,R,pc,true),reg:{malhas:[],vert:[],extras:[],dy:0},e:null});yield 'fl881 alvos';}
+  // 2. índice do chão (só nas regiões das peças, ± 3 m)
+  const reg=[];for(const it of itens){const B=it.A.achou?fl881Base(it.A,sc):null;it.B=B;if(B){let x0=Infinity,z0=Infinity,x1=-Infinity,z1=-Infinity;for(const [x,z] of B.pts){if(x<x0)x0=x;if(x>x1)x1=x;if(z<z0)z0=z;if(z>z1)z1=z;}reg.push([x0-3,z0-3,x1+3,z1+3]);}}
+  let I=null;if(reg.length){I=yield* fl881IndiceG(sc,plano.chao,reg);}st.indice=I?{malhas:I.malhas,triangulos:I.n}:null;yield 'fl881 índice pronto';
+  // 3. fusão do Leve desfeita antes de mexer, se algum alvo estiver fundido
+  try{if(typeof fusaoLimpar==='function'&&itens.some(it=>it.A.achou&&fl881TemFundida(it.A))){fusaoLimpar(sc);st.fusao=true;FL881.stats.fusao++;}}catch(e){fl881Erro('fusão '+sala,e);}
+  // 4. medir e corrigir peça a peça
+  for(const it of itens){const pc=it.pc,A=it.A,B=it.B;FL881.stats.pecas++;
+    const e={sala,id:pc.id,nome:pc.nome,origem:pc.origem,tipo:pc.tipo,alvos:A.descr,estado:'',yAntes:B?fl881Arred(B.base):null,yDepois:null,apoio:null,dy:0,motivo:pc.motivo,amostras:B?B.pts.length:0};it.e=e;
+    if(pc.doPF881&&fl881CactosDoPF881()){e.estado='deixada para o PF881 (o bloco da 2.ª varredura sobe os seis cactos)';FL881.stats.doPF881++;st.pecas.push(it);FL881.lista.push(e);yield 'fl881 peça';continue;}
+    if(!A.achou||!B){e.estado='não achada';FL881.stats.naoAchadas++;st.pecas.push(it);FL881.lista.push(e);yield 'fl881 peça';continue;}
+    const G=fl881Chao(I,R,B);if(!G){e.estado='sem chão medido';FL881.stats.puladas++;st.pecas.push(it);FL881.lista.push(e);yield 'fl881 peça';continue;}
+    e.apoio={min:fl881Arred(G.min),max:fl881Arred(G.max),centro:fl881Arred(G.centro),pontos:G.n,semMalha:G.semMalha,fonte:I&&I.n?'malha de chão':'função de chão'};
+    e.folgaAntes=fl881Arred(B.base-G.min);
+    const dy=G.min-B.base;e.dy=fl881Arred(dy);
+    if(B.base<pc.base0[0]||B.base>pc.base0[1]){e.estado='base fora do esperado (já corrigida ou mexida por outro bloco?)';FL881.stats.puladas++;st.pecas.push(it);FL881.lista.push(e);yield 'fl881 peça';continue;}
+    if(Math.abs(dy)<.02){e.estado='já no chão (o pé mais baixo encosta): nada a mudar';e.enterradoMax=fl881Arred(G.max-B.base);FL881.stats.jaNoChao++;st.pecas.push(it);FL881.lista.push(e);yield 'fl881 peça';continue;}
+    if(dy<pc.faixa[0]||dy>pc.faixa[1]){e.estado='Δy fora da faixa prevista';FL881.stats.puladas++;st.pecas.push(it);FL881.lista.push(e);yield 'fl881 peça';continue;}
+    if(FL881.ativo)fl881Move(it,dy);else{it.dyPendente=dy;}
+    it.dy=dy;e.yDepois=fl881Arred(B.base+dy);e.folgaDepois=fl881Arred(B.base+dy-G.min);e.enterradoMaxDepois=fl881Arred(G.max-(B.base+dy));
+    e.estado=dy<0?'corrigida (desceu)':'corrigida (subiu)';FL881.stats.corrigidas++;it.marca=fl881Marca(it);st.pecas.push(it);FL881.lista.push(e);yield 'fl881 peça';}
+  st.feito=true;FL881.stats.feitas++;FL881.stats.ms+=Math.round(performance.now()-t0);}
+// pede a correção de uma sala (uma vez por cena): na fila do fatiador, urgente com a sala à vista
+function fl881Pede(sala,agora){try{if(!fl881Liga(sala))return;const R=typeof ROOMS!=='undefined'&&ROOMS[sala];if(!R||!R.scene)return;
+    const st=FL881.salas[sala];if(st&&st.sc===R.scene&&(st.feito||st.job||st.pulado))return;
+    const pr=fl881Pronta(sala);if(pr.pula){FL881.salas[sala]={sc:R.scene,pulado:pr.pula,pecas:[]};return;}if(!pr.ok)return;
+    FL881.stats.pedidos++;const it=fl881SalaG(sala);const marca={sc:R.scene,job:true,pecas:[]};FL881.salas[sala]=marca;
+    const fim=()=>{const s=FL881.salas[sala];if(s)s.job=false;if(s&&pr.forcado)s.semEsperar=pr.forcado;};const erro=e=>{const s=FL881.salas[sala];if(s){s.job=false;s.feito=true;s.falhou=true;}fl881Erro('sala '+sala,e);};
+    const vista=()=>{try{return typeof ACTIVE!=='undefined'&&ACTIVE===R.scene;}catch(e){return false;}};
+    if(agora||typeof fat8Go!=='function'){let r;try{do{r=it.next();}while(!r.done);}catch(e){erro(e);return;}fim();return;}
+    fat8Go(it,{nome:'peças flutuando/enterradas 881 · '+sala,urgente:vista,fim,erro});}catch(e){fl881Erro('pede '+sala,e);}}
+// termina agora um trabalho que está na fila do fatiador (ou em andamento nele)
+function fl881Termina(nome){const F=typeof FAT818!=='undefined'?FAT818:null;if(!F||!F.fila)return false;let J=null;
+  if(F.atual&&F.atual.nome===nome){J=F.atual;F.atual=null;}else{const i=F.fila.findIndex(j=>j&&j.nome===nome);if(i>=0)J=F.fila.splice(i,1)[0];}
+  if(!J||!J.it)return false;const f0=fat8Fim;fat8Fim=Infinity;try{let r;do{r=J.it.next();}while(!r.done);if(J.fim)J.fim(r.value);}catch(e){if(J.erro)J.erro(e);else fl881Erro('termina',e);}finally{fat8Fim=f0;}return true;}
+// na entrada da sala (revisão): o que faltar corre UMA fatia já (8 ms) e o resto segue urgente na fila do fatiador — antes terminava tudo de uma
+// vez dentro do `setActive` (o trabalho inteiro: 0,1–0,3 s de CPU parado na porta quando ainda estava na fila); sem trabalho, pede (assíncrono,
+// urgente com a sala à vista). As correções são de 6 a 45 cm na altura: a peça ajustar um instante depois é melhor que o quadro parado.
+function fl881Fatia(nome){const F=typeof FAT818!=='undefined'?FAT818:null;if(!F||!F.fila)return false;let J=null,atual=false;
+  if(F.atual&&F.atual.nome===nome){J=F.atual;atual=true;}else J=F.fila.find(j=>j&&j.nome===nome)||null;if(!J||!J.it)return false;
+  const tira=()=>{if(atual){if(F.atual===J)F.atual=null;}else{const i=F.fila.indexOf(J);if(i>=0)F.fila.splice(i,1);}};
+  const f0=fat8Fim;fat8Fim=performance.now()+8;let r=null;try{do{r=J.it.next();}while(!r.done&&performance.now()<fat8Fim);}
+  catch(e){tira();if(J.erro)J.erro(e);else fl881Erro('fatia',e);return false;}finally{fat8Fim=f0;}
+  if(r&&r.done){tira();if(J.fim){try{J.fim(r.value);}catch(e){fl881Erro('fim',e);}}}return true;}
+function fl881Agora(sala){try{const R=ROOMS[sala];const st=FL881.salas[sala];
+    if(st&&st.sc===R.scene&&st.job){fl881Fatia('peças flutuando/enterradas 881 · '+sala);return;}
+    fl881Pede(sala);}catch(e){fl881Erro('agora '+sala,e);}}
+// vigia (1 s, barato): pede as salas prontas; refaz a peça que outro bloco tenha mudado de lugar depois
+function fl881Vigia(){if(!FL881.on)return;for(const sala of FL881_SALAS){try{if(!fl881Liga(sala))continue;const R=typeof ROOMS!=='undefined'&&ROOMS[sala];if(!R||!R.scene)continue;
+      const st=FL881.salas[sala];if(!st||st.sc!==R.scene){FL881.stats.checagens++;fl881Pede(sala);continue;}
+      if(!st.feito||!FL881.ativo)continue;
+      for(const it of st.pecas){if(!it.marca||!it.reg||!it.reg.dy)continue;const m=fl881Marca(it);const mudou=m.length!==it.marca.length||m.some((v,i)=>Math.abs(v-it.marca[i])>.02);
+        if(mudou){fl881Refaz(sala,it);}}}catch(e){fl881Erro('vigia '+sala,e);}}}
+function fl881Refaz(sala,it){try{const R=ROOMS[sala],sc=R.scene;if(fl881TemFundida(it.A)&&typeof fusaoLimpar==='function')fusaoLimpar(sc);
+    // a peça andou em x/z (outro bloco): volta a altura de antes só nela e mede de novo no lugar novo
+    for(const r of it.reg.malhas){r.o.position.y=r.y0;r.o.updateMatrixWorld(true);}
+    for(const r of it.reg.vert){const pos=r.o.geometry.attributes.position,a=pos.array,is=pos.itemSize;for(let k=0;k<r.idx.length;k++){const j=r.idx[k]*is;a[j+1]-=r.d[1];}pos.needsUpdate=true;r.o.geometry.computeBoundingBox();r.o.geometry.computeBoundingSphere();}
+    for(const r of it.reg.extras){r.o.position.y=r.y0;if(r.b0!==undefined)r.o.userData.base=r.b0;}
+    it.reg={malhas:[],vert:[],extras:[],dy:0};const B=fl881Base(it.A,sc);if(!B){it.marca=null;return;}
+    const reg=[[B.centro[0]-4,B.centro[1]-4,B.centro[0]+4,B.centro[1]+4]];const g=fl881IndiceG(sc,fl881Plano(sala).chao,reg);let r,I=null;do{r=g.next();}while(!r.done);I=r.value;
+    const G=fl881Chao(I,R,B);if(!G){it.marca=null;return;}const dy=G.min-B.base;if(dy<it.pc.faixa[0]||dy>it.pc.faixa[1]){it.marca=null;if(it.e)it.e.estado='mexida por outro bloco: Δy novo fora da faixa, deixada';return;}
+    fl881Move(it,dy);it.dy=dy;it.marca=fl881Marca(it);FL881.stats.refeitas++;if(it.e){it.e.yAntes=fl881Arred(B.base);it.e.yDepois=fl881Arred(B.base+dy);it.e.dy=fl881Arred(dy);it.e.apoio={min:fl881Arred(G.min),max:fl881Arred(G.max),centro:fl881Arred(G.centro),pontos:G.n};it.e.estado+=' · refeita no lugar novo';}}
+  catch(e){fl881Erro('refaz '+sala,e);}}
+// ---------- liga / desliga (o «antes» em tempo de execução, para as fotos) ----------
+function fl881LigaTudo(sim){sim=!!sim;try{if(FL881.ativo===sim)return true;FL881.ativo=sim;
+    for(const sala in FL881.salas){const st=FL881.salas[sala];if(!st||!st.pecas)continue;const R=ROOMS[sala];if(!R||R.scene!==st.sc)continue;
+      try{if(typeof fusaoLimpar==='function'&&st.pecas.some(it=>it.A&&fl881TemFundida(it.A)))fusaoLimpar(st.sc);}catch(e){fl881Erro('fusão liga',e);}
+      for(const it of st.pecas){if(!it.e||!/^corrigida/.test(it.e.estado))continue;if(sim&&it.dyPendente!==undefined&&!it.reg.dy){fl881Move(it,it.dyPendente);delete it.dyPendente;it.marca=fl881Marca(it);continue;}if(it.reg.dy)fl881Poe(it.reg,sim);}}
+    return true;}catch(e){fl881Erro('liga',e);return false;}}
+// ---------- medir agora (para o teste e as fotos) ----------
+function fl881Mede(sala){const out=[];try{const R=ROOMS[sala];if(!R||!R.scene)return out;const sc=R.scene;const plano=fl881Plano(sala);if(!plano)return out;
+    const st=FL881.salas[sala];const itens=(st&&st.sc===sc&&st.pecas&&st.pecas.length)?st.pecas:plano.pecas.map(pc=>({pc,A:fl881Acha(sc,R,pc)}));
+    const reg=[];const Bs=itens.map(it=>{const B=it.A&&it.A.achou?fl881Base(it.A,sc):null;if(B)reg.push([B.centro[0]-4,B.centro[1]-4,B.centro[0]+4,B.centro[1]+4]);return B;});
+    let I=null;if(reg.length){const g=fl881IndiceG(sc,plano.chao,reg);let r;do{r=g.next();}while(!r.done);I=r.value;}
+    itens.forEach((it,i)=>{const B=Bs[i];if(!B){out.push({id:it.pc.id,achou:false});return;}const G=fl881Chao(I,R,B);
+      out.push({id:it.pc.id,nome:it.pc.nome,achou:true,base:fl881Arred(B.base),chaoMin:G?fl881Arred(G.min):null,chaoMax:G?fl881Arred(G.max):null,chaoCentro:G?fl881Arred(G.centro):null,
+        folga:G?fl881Arred(B.base-G.min):null,enterradoMax:G?fl881Arred(G.max-B.base):null,centro:B.centro.map(v=>+v.toFixed(2)),pontos:B.pts.length});});}
+  catch(e){fl881Erro('mede '+sala,e);}return out;}
+// ---------- poses de câmera para as fotos: olho a 1,6 m do chão, a alguns metros, olhando a base da peça ----------
+function fl881Fotos(sala){const F=[];try{const R=ROOMS[sala];if(!R)return F;const fov=(typeof camera!=='undefined'&&camera&&camera.fov)||60;
+    for(const m of fl881Mede(sala)){if(!m.achou)continue;const [cx,cz]=m.centro;const alto=/obelisco/.test(m.id),dist=alto?9:(/torre|carroca/.test(m.id)?6:4);
+      let dx=-cx,dz=-cz;const L=Math.hypot(dx,dz)||1;dx/=L;dz/=L; // do lado do meio da sala (sem parede no meio da vista)
+      const x=cx+dx*dist,z=cz+dz*dist;let fy=0;try{fy=R.floorY?R.floorY(x,z):0;}catch(e){}if(!Number.isFinite(fy))fy=0;
+      const alvoY=(m.base||0)+(alto?1.2:.45);F.push({id:sala+'-'+m.id,sala,peca:m.id,pos:[+x.toFixed(2),+(fy+1.6).toFixed(2),+z.toFixed(2)],alvo:[+cx.toFixed(2),+alvoY.toFixed(2),+cz.toFixed(2)],fov,
+        nota:'base '+m.base+' · chão sob a base '+m.chaoMin+'…'+m.chaoMax+' (folga '+m.folga+')'});}}catch(e){fl881Erro('fotos',e);}return F;}
+// ---------- instalação ----------
+if(FL881.on){
+  try{const fr0=finishRoom;finishRoom=fr8Wrap(function*(key){const r=(yield* fr8Prev(fr0,this,arguments,"FL881"));if(FL881_SALAS.indexOf(key)>=0){try{fl881Pede(key);}catch(e){fl881Erro('finishRoom '+key,e);}}return r;});}catch(e){fl881Erro('finishRoom',e);}
+  try{const sa0=setActive;setActive=function(sc){try{if(sc&&typeof ROOMS!=='undefined'){for(const k of FL881_SALAS){const R=ROOMS[k];if(R&&R.scene===sc&&R.ready&&fl881Liga(k))fl881Agora(k);}}}catch(e){fl881Erro('setActive',e);}return sa0.apply(this,arguments);};}catch(e){fl881Erro('setActive0',e);}
+  try{FL881.vigia=setInterval(fl881Vigia,1000);}catch(e){fl881Erro('vigia',e);}
+}
+window.__flutuando881={estado:FL881,stats:FL881.stats,erros:FL881.erros,get lista(){return FL881.lista;},liga:()=>fl881LigaTudo(true),desliga:()=>fl881LigaTudo(false),
+  aplica:(s)=>{const ks=s?[s]:FL881_SALAS;for(const k of ks){try{const st=FL881.salas[k];if(st&&st.job)fl881Termina('peças flutuando/enterradas 881 · '+k);const s2=FL881.salas[k];
+        if(s2&&s2.pecas){for(const it of s2.pecas)if(it.reg&&it.reg.dy)fl881Poe(it.reg,false);delete FL881.salas[k];} // devolve a altura de antes e mede de novo
+        fl881Pede(k,true);}catch(e){fl881Erro('aplica '+k,e);}}return ks.map(k=>!!(FL881.salas[k]&&FL881.salas[k].feito));},
+  mede:fl881Mede,fotos:fl881Fotos,plano:fl881Plano,salas:FL881_SALAS};
 
 window.__build434={revision:434,family:"web",edition:"en"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
