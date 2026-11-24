@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v890</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v891</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -124454,6 +124454,355 @@ if(AF880.on){
 window.__arvoresfant880={estado:AF880,stats:AF880.stats,erros:AF880.erros,P:AF880_P,
   aplica(){AF880.pausa=false;if(!AF880.on)return false;af880Monta(true);const r=af880Aplica();return r;},desfaz(){return af880Desfaz();},
   poses:af880Poses,sinc(){return af880Sinc(true);},assenta(){return af880Assenta();},arvores(){return AF880.arvores.map(a=>{let b=null;try{b=af880BaseAntiga(a);}catch(e){}return {tipo:a.tipo,variante:a.v,x:a.pos[0],y:a.pos[1],z:a.pos[2],escala:a.esc,giro:a.ry,velha:b?{x:b[0],y:b[1],z:b[2]}:null};});}};
+
+/* ===================== v880 · FANTASIA: A LINHA RETA ENTRE A CLAREIRA E O PRADO VIRA UM DEGRADÊ LARGO E IRREGULAR, E O GRAMADO ENTRE OS SALTOS GANHA OUTEIROS (bloco `EM880`) =====================
+   Pedido do Luiz (19/11, 20:34, com dois prints tirados no prado, olhando para a vila): «Tem uma clara linha divisória aqui que esteticamente
+   não faz sentido, na transição das duas áreas de fantasia» · «Ajuste».
+   COMO ERA: o chão da Fantasia são DUAS malhas que se encontram numa aresta reta em z = −72 (de x −72 a 72):
+     · SUL — `FANT.ground` (a clareira da Grande Árvore e a vila: plano de 144 × 144 m, 193 × 193 vértices), com o material da Oficina da
+       Floresta (`finishTerrain`: textura de 1024 px lida como LINEAR, repetição 24 = azulejo de 6 m) — relva clara, lavada, azulada;
+     · NORTE — «Mansão · prado contínuo integrado ao bosque» (`COZY355.ground367.mesh`, v367: leque em volta de (0, −137), de z −72 para trás),
+       que desde a v506 usa um CLONE desse material com outra textura (`pr506TexRelva`: 512 px em sRGB, repetição 36 sobre o mapeamento da v422 = azulejo de
+       5,9 × 4,75 m, aspereza 0,95) — relva escura e saturada.
+   Mesma cor de base (#aab8cc), mesmas cores por vértice na aresta (a v367 copia as da clareira), mesma altura (y = 0 ao longo de z = −72), mesma
+   luz, mesma névoa: a linha é só a troca de TEXTURA (e da leitura linear × sRGB) de um lado para o outro — vermelho ×1,45 e azul ×3 do lado
+   sul, exatamente o que se mede nos prints. Fica a 2,85 m da borda andável do prado (z −74,85), no vão do salto, antes do capim alto da vila.
+   AGORA: as duas áreas continuam com a relva que tinham; por cima do chão da clareira, junto à aresta, entra UMA malha que continua a relva do
+   prado para dentro da clareira e some aos poucos: a mesma grade do chão sul (os mesmos vértices e triângulos, 1 cm acima — acompanha o
+   relevo; encostada nele na própria aresta), o MESMO material do prado (clone transparente, sem escrever profundidade; o mapeamento da
+   textura é o do prado — afim desde a v422, medido na malha —, e na aresta as cores e normais são as dos vértices do prado, por isso ali
+   fica idêntica a ele: nenhuma aresta), e a opacidade POR VÉRTICE (cor de 4 componentes do three r128): 1 em z = −72 e 0 entre
+   ~5 e ~12 m adiante, com a largura a variar devagar ao longo da emenda e manchas de ruído de 2–3,5 m (`em880Alfa`) — um degradê largo e
+   irregular, sem reta. Nada muda no prado andável nem na clareira além dessa faixa (z −72…−60, quase toda no vão que não se pisa).
+   CUSTO: uma chamada de desenho a mais, ~4 mil triângulos, sem luz, sem textura nova (usa as do prado), sem sombra projetada; recebe sombra
+   como o chão sul. Montagem ~3 ms, uma vez, no `setActive` da Fantasia (antes da fusão do Leve; a malha é transparente e tem `renderOrder`,
+   logo a fusão não a toca). `renderOrder` −6: depois da floresta distante (≤ −30) e ANTES das fitas de névoa do horizonte (−4) e de todo o
+   resto transparente (que continuam a desenhar-se por cima, como sobre o chão).
+   PAPEL / LEVE / CLÁSSICO / ALTO: o material da faixa é sempre um clone do material que o prado estiver usando NA HORA (padrão ou o gêmeo
+   «toon» do Papel) — `em880Sinc`, a cada 12 quadros do tique da sala, refaz o clone se o material do prado trocou (mudança de estilo) e copia
+   cor, mapas e aspereza; o clone tem `papelKeep` e não leva `papelDeUuid` (o Papel não mexe nele: quem o troca é este bloco). `papelKeepGeo`,
+   `noCam`, sem `raycast`. Se os dois chãos estiverem com o mesmo material (ex.: `?prado506=0`), a faixa fica invisível.
+   OS OUTEIROS (pedido de 19/11, 21:02, print tirado do alto durante o salto: «faça essa área de transição entre os pulos bem ondulada com relevos de
+   outeiros etc»). COMO ERA: o gramado entre os dois círculos de salto (z −73…−106, do matagal ao arco do jardim da Casa da Clareira) era quase plano
+   — só as lombas de ±0,8 m da v506. AGORA: quinze outeiros de 1,2 a 3,2 m de altura e 9 a 21 m de largura (perfil (1 − r²)², que somados formam selas
+   e espigões suaves; o do meio fica debaixo do Grande Rubi), ruído de 9 m e de 4 m, baixadas ~0,4 m abaixo do nível antigo; a altura volta a ZERO em
+   rampas de 6,5–6,8 m antes de z −73,7 (a borda do terreno contínuo, em z −72, e a fileira de vértices dela não mudam), antes de z −106,2 (arco,
+   jardins, caminho e casa), além de |x| 52 e a menos de 5,6 m do círculo «Voltar ao bosque» (os dois círculos, os prados e os pousos ficam como eram).
+   · CHÃO: a malha do prado (v367, leque de 7 741 vértices) ganha uma geometria nova com os triângulos da zona repartidos em 16 (lado de 0,3–0,9 m;
+     costura em leque, sem «T») e a altura somada; cor por vértice: topos mais claros e quentes, baixadas mais escuras, encostas um nada fechadas, e
+     uma trilha de terra que sai do arco do jardim, sobe ao outeiro do rubi e desce até o matagal. `desfaz()` devolve a geometria antiga.
+   · `R.floorY` é embrulhado por composição e soma a altura do relevo NA MALHA (acha o triângulo pequeno e interpola como a placa de vídeo: o leitor,
+     a câmera, os coelhos e o cervo pisam exatamente o que se vê); durante o voo do salto vale a altura do voo. Não toca no `terrainV58`.
+   · O QUE ESTÁ POUSADO sobe/desce junto, nada em x/z: grupos, malhas, luzes e sprites com posição própria → posição y; instâncias → o y da instância;
+     peças fundidas em coordenadas de mundo (kits da v433/v456/v506, árvores do bosque da Clareira…) → o y de cada vértice (como a v506 fez); moedas,
+     pratas, rubis e o Grande Rubi → a altura guardada. Tudo fica num diário e `desfaz()` devolve os valores exatos. O que nascer depois lê o
+     `floorY` já com o relevo. Céu, floresta distante, o leitor e o que tem `renderOrder` negativo ficam de fora.
+   · Pedras com musgo (as `forest433Rock` do prado) no alto de quatro outeiros, com obstáculo (`COZY355.obstacles` + lista viva).
+   CUSTO: uma vez, no `setActive` da Fantasia (depois dos blocos antigos, antes da fusão do Leve): ~25 mil triângulos a mais no chão, uma malha de
+   pedras, nenhuma luz, nenhuma textura. Chaves: `?emenda880=0` (tudo) e `?outeiros880=0` (só o relevo). Gancho `window.__emenda880`: `aplica()`,
+   `desfaz()` (linha e relevo, exatos; ficam desfeitos até `aplica()`), `poses()`, `sinc()`, `alfa(x,z)`, `relevo(x,z)` (na malha), `campo(x,z)`,
+   `mascara(x,z)`, `estado`, `outeiros`, `stats`, `erros`, `P`, `O`.
+   REVISÃO (23/11, revisao/em880): R1 o relevo volta a tentar no tique da sala (antes só no `setActive`); R2 todas as instâncias de um lote sobem (o
+   Papel esconde 45 % da vegetação instanciada); R3 o embrulho do `floorY` é por sala e conferido por medida (outro bloco embrulhando por cima fazia o
+   `aplica()` seguinte somar o relevo duas vezes); R4 o chão do Decorar soma o relevo; R5 a lista de bloqueio da câmera é avisada de verdade. */
+const EM880={on:!/[?&#]emenda880=0/i.test(location.search+location.hash),pausa:false,erros:[],stats:{setActive:0,sinc:0,trocasMat:0,montagens:0},malha:null,mat:null,fonte:null,sul:null,norte:null,q:0};
+const EM880_P={z0:-72,eps:.01,ini:.6,largMin:5.2,largMax:8.6,ruido:.38,fim:12,ordem:-6};
+function em880Erro(k,e){try{if(EM880.erros.length<20)EM880.erros.push(k+': '+(e&&e.message||e));}catch(x){}}
+/* ---------- ruído de valor (determinístico) e a opacidade da faixa ---------- */
+function em880H(i,j){let h=(Math.imul(i,374761393)+Math.imul(j,668265263)+880880)>>>0;h=Math.imul(h^(h>>>13),1274126177)>>>0;return ((h^(h>>>16))>>>0)/4294967296;}
+function em880R(x,z){const i=Math.floor(x),j=Math.floor(z),fx=x-i,fz=z-j,u=fx*fx*(3-2*fx),v=fz*fz*(3-2*fz),a=em880H(i,j),b=em880H(i+1,j),c=em880H(i,j+1),d=em880H(i+1,j+1);return a+(b-a)*u+(c-a)*v+(a-b-c+d)*u*v;}
+// 1 na aresta (z = z0) → 0 para dentro da clareira; d = distância à aresta
+function em880Alfa(x,z){const P=EM880_P,d=z-P.z0;if(d<=0)return 1;if(d>=P.fim)return 0;
+  const L=P.largMin+(P.largMax-P.largMin)*em880R(x/11+3.1,7.7);                 // largura do degradê: varia devagar ao longo da emenda
+  const n=.62*em880R(x/3.4+1.3,z/3.4+5.2)+.38*em880R(x/2.1+8.8,z/2.1+2.6);       // manchas de 2–3,5 m
+  const m=Math.min(1,d/2.2);                                                     // o ruído entra aos poucos: na aresta a relva do prado está inteira
+  let t=(d-P.ini)/L+(n-.5)*2*P.ruido*m;t=Math.max(0,Math.min(1,t));let a=1-t*t*(3-2*t);
+  const f=Math.max(0,Math.min(1,(P.fim-d)/2));return a*f*f*(3-2*f);}             // fecha em zero antes do fim da malha
+/* ---------- as duas malhas de chão ---------- */
+function em880Par(){try{const F=window.__FANT,S=(typeof COZY355!=='undefined')?COZY355:null,sul=F&&F.ground,norte=S&&S.ground367&&S.ground367.mesh;
+    if(!sul||!norte||!sul.isMesh||!norte.isMesh||!sul.geometry||!norte.geometry)return null;return {sul,norte};}catch(e){return null;}}
+function em880MatDe(o){const m=o&&o.material;return Array.isArray(m)?m[0]:m;}
+function em880Hex(c){try{return c&&c.isColor?c.getHex():-1;}catch(e){return -1;}}
+// os dois chãos têm aspecto diferente? (mapa, repetição, cor ou tipo de material)
+function em880Difere(a,b){if(!a||!b||a===b)return false;if(a.type!==b.type)return true;if(a.map!==b.map)return true;if(em880Hex(a.color)!==em880Hex(b.color))return true;
+  if(a.map&&b.map&&(a.map.repeat.x!==b.map.repeat.x||a.map.repeat.y!==b.map.repeat.y))return true;return (a.roughness!==b.roughness)||(!!a.vertexColors!==!!b.vertexColors);}
+/* ---------- o que o prado desenha ao longo da aresta: o mapeamento da textura (afim, v422) e as cores/normais dos vértices da borda ---------- */
+// u = a·x + b·z + c (idem v), ajustado por mínimos quadrados nos vértices do prado; se não for afim, vale o da v422: ((x+106)/212, (−72−z)/171)
+function em880UV(norte){const padrao={u:[1/212,0,106/212],v:[0,-1/171,-72/171],ajuste:false};try{const g=norte.geometry,P=g.attributes.position,U=g.attributes.uv;if(!P||!U||P.count<8)return padrao;
+    norte.updateMatrixWorld(true);const mw=norte.matrixWorld,p=new THREE.Vector3(),st=Math.max(1,Math.floor(P.count/500));let sxx=0,sxz=0,sx=0,szz=0,sz=0,n=0,xu=0,zu=0,su=0,xv=0,zv=0,sv=0;const am=[];
+    for(let k=0;k<P.count;k+=st){p.fromBufferAttribute(P,k).applyMatrix4(mw);const x=p.x,z=p.z+137,u=U.getX(k),w=U.getY(k);am.push(x,z,u,w);sxx+=x*x;sxz+=x*z;sx+=x;szz+=z*z;sz+=z;n++;xu+=x*u;zu+=z*u;su+=u;xv+=x*w;zv+=z*w;sv+=w;}
+    const det=sxx*(szz*n-sz*sz)-sxz*(sxz*n-sz*sx)+sx*(sxz*sz-szz*sx);if(!(Math.abs(det)>1e-6))return padrao;
+    const res=(r0,r1,r2)=>[(r0*(szz*n-sz*sz)-sxz*(r1*n-sz*r2)+sx*(r1*sz-szz*r2))/det,(sxx*(r1*n-sz*r2)-r0*(sxz*n-sz*sx)+sx*(sxz*r2-r1*sx))/det,(sxx*(szz*r2-r1*sz)-sxz*(sxz*r2-r1*sx)+r0*(sxz*sz-szz*sx))/det];
+    const a=res(xu,zu,su),b=res(xv,zv,sv);let erro=0;for(let i=0;i<am.length;i+=4){erro=Math.max(erro,Math.abs(a[0]*am[i]+a[1]*am[i+1]+a[2]-am[i+2]),Math.abs(b[0]*am[i]+b[1]*am[i+1]+b[2]-am[i+3]));}
+    if(!(erro<2e-3))return padrao;return {u:[a[0],a[1],a[2]-a[1]*137],v:[b[0],b[1],b[2]-b[1]*137],ajuste:true,erro};}catch(e){return padrao;}}   // (o ajuste é feito com z+137, para condicionar; aqui volta para z)
+function em880Borda(norte){try{const T=THREE,P=EM880_P,g=norte.geometry,A=g.attributes.position,C=g.attributes.color,N=g.attributes.normal;if(!A)return null;norte.updateMatrixWorld(true);
+    const mw=norte.matrixWorld,nm=new T.Matrix3().getNormalMatrix(mw),v=new T.Vector3(),L=[];
+    for(let k=0;k<A.count;k++){v.fromBufferAttribute(A,k).applyMatrix4(mw);if(Math.abs(v.z-P.z0)>.004)continue;const o={x:v.x,y:v.y,c:C?[C.getX(k),C.getY(k),C.getZ(k)]:[1,1,1],n:[0,1,0]};if(N){v.fromBufferAttribute(N,k).applyMatrix3(nm).normalize();o.n=[v.x,v.y,v.z];}L.push(o);}
+    if(L.length<2)return null;L.sort((a,b)=>a.x-b.x);return L;}catch(e){return null;}}
+/* ---------- a geometria: a grade do chão sul junto à aresta (encostada nele na aresta, 1 cm acima a partir da 2.ª fileira), com o mapeamento
+   do prado, as cores/normais do prado na aresta (passando às da clareira em ~2 m) e a opacidade por vértice ---------- */
+function em880Geo(sul,norte){const T=THREE,P=EM880_P;let g0=sul.geometry;try{if(typeof PAPEL_GEO!=='undefined'){const q=PAPEL_GEO.get(sul);if(q&&q.g)g0=q.g;}}catch(e){}
+  const pr=g0.parameters,A=g0.attributes.position,C=g0.attributes.color,N=g0.attributes.normal;if(!pr||!A)return null;const nx=(pr.widthSegments|0)+1,nz=(pr.heightSegments|0)+1;if(nx<3||nz<3||A.count!==nx*nz)return null;
+  sul.updateMatrixWorld(true);const mw=sul.matrixWorld,nm=new T.Matrix3().getNormalMatrix(mw),v=new T.Vector3();
+  // a 1.ª fileira da grade tem de ser a da aresta (z = −72), a correr em x; a 2.ª, 0,75 m para dentro da clareira
+  v.fromBufferAttribute(A,0).applyMatrix4(mw);const xa=v.x,za=v.z;v.fromBufferAttribute(A,nx-1).applyMatrix4(mw);const xb=v.x,zb=v.z;v.fromBufferAttribute(A,nx).applyMatrix4(mw);const zc=v.z;
+  if(Math.abs(za-P.z0)>.02||Math.abs(zb-P.z0)>.02||!(zc>za+.05)||!(xb>xa+1))return null;
+  const passo=zc-za,NR=Math.min(nz-1,Math.ceil(P.fim/passo)),nv=nx*(NR+1),UV=em880UV(norte),B=em880Borda(norte);
+  const pos=new Float32Array(nv*3),nor=new Float32Array(nv*3),uv=new Float32Array(nv*2),cor=new Float32Array(nv*4),alfa=new Float32Array(nv);let degrau=0;
+  for(let j=0;j<=NR;j++){let q=0;for(let i=0;i<nx;i++){const k=j*nx+i;v.fromBufferAttribute(A,k).applyMatrix4(mw);const x=v.x,y=v.y,z=v.z,d=Math.max(0,z-P.z0);
+      pos[k*3]=x;pos[k*3+1]=y+P.eps*Math.min(1,d/passo);pos[k*3+2]=z;uv[k*2]=UV.u[0]*x+UV.u[1]*z+UV.u[2];uv[k*2+1]=UV.v[0]*x+UV.v[1]*z+UV.v[2];
+      let cr=C?C.getX(k):1,cg=C?C.getY(k):1,cb=C?C.getZ(k):1,nX=0,nY=1,nZ=0;if(N){v.fromBufferAttribute(N,k).applyMatrix3(nm).normalize();nX=v.x;nY=v.y;nZ=v.z;}
+      if(B&&d<2.3){while(q<B.length-2&&B[q+1].x<x)q++;const e0=B[q],e1=B[q+1],f=Math.max(0,Math.min(1,(x-e0.x)/((e1.x-e0.x)||1))),w0=Math.min(1,d/2.25),w=w0*w0*(3-2*w0);
+        if(j===0)degrau=Math.max(degrau,Math.abs(y-(e0.y+(e1.y-e0.y)*f)));
+        cr=(e0.c[0]+(e1.c[0]-e0.c[0])*f)*(1-w)+cr*w;cg=(e0.c[1]+(e1.c[1]-e0.c[1])*f)*(1-w)+cg*w;cb=(e0.c[2]+(e1.c[2]-e0.c[2])*f)*(1-w)+cb*w;
+        nX=(e0.n[0]+(e1.n[0]-e0.n[0])*f)*(1-w)+nX*w;nY=(e0.n[1]+(e1.n[1]-e0.n[1])*f)*(1-w)+nY*w;nZ=(e0.n[2]+(e1.n[2]-e0.n[2])*f)*(1-w)+nZ*w;const nl=Math.hypot(nX,nY,nZ)||1;nX/=nl;nY/=nl;nZ/=nl;}
+      nor[k*3]=nX;nor[k*3+1]=nY;nor[k*3+2]=nZ;const a=(j===NR)?0:em880Alfa(x,z);alfa[k]=a;cor[k*4]=cr;cor[k*4+1]=cg;cor[k*4+2]=cb;cor[k*4+3]=a;}}
+  // só as células onde a faixa aparece; vértices compactados
+  const mapa=new Int32Array(nv).fill(-1),ind=[];let n=0;const usa=k=>{if(mapa[k]<0)mapa[k]=n++;return mapa[k];};let fundo=0;
+  for(let j=0;j<NR;j++)for(let i=0;i<nx-1;i++){const a=i+nx*j,b=i+nx*(j+1),c=(i+1)+nx*(j+1),d=(i+1)+nx*j;if(Math.max(alfa[a],alfa[b],alfa[c],alfa[d])<.004)continue;
+      ind.push(usa(a),usa(b),usa(d),usa(b),usa(c),usa(d));if(pos[b*3+2]-P.z0>fundo)fundo=pos[b*3+2]-P.z0;}
+  if(!n)return null;const p2=new Float32Array(n*3),n2=new Float32Array(n*3),u2=new Float32Array(n*2),c2=new Float32Array(n*4);
+  for(let k=0;k<nv;k++){const q=mapa[k];if(q<0)continue;p2.set(pos.subarray(k*3,k*3+3),q*3);n2.set(nor.subarray(k*3,k*3+3),q*3);u2.set(uv.subarray(k*2,k*2+2),q*2);c2.set(cor.subarray(k*4,k*4+4),q*4);}
+  const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(p2,3));g.setAttribute('normal',new T.BufferAttribute(n2,3));g.setAttribute('uv',new T.BufferAttribute(u2,2));g.setAttribute('color',new T.BufferAttribute(c2,4));
+  g.setIndex(new T.BufferAttribute(n>65535?new Uint32Array(ind):new Uint16Array(ind),1));g.computeBoundingBox();g.computeBoundingSphere();
+  let a0=1,a1=0;for(let i=0;i<nx;i++){if(alfa[i]<a0)a0=alfa[i];if(alfa[NR*nx+i]>a1)a1=alfa[NR*nx+i];}
+  return {g,stats:{vertices:n,triangulos:ind.length/3,fileiras:NR,passo:+passo.toFixed(3),alcance:+fundo.toFixed(2),alfaNaAresta:a0,alfaNoFim:a1,x:[+xa.toFixed(2),+xb.toFixed(2)],uvAjustada:!!UV.ajuste,uvErro:UV.erro===undefined?null:+UV.erro.toExponential(2),uv:{u:UV.u.map(q=>+q.toFixed(6)),v:UV.v.map(q=>+q.toFixed(6))},verticesDaBorda:B?B.length:0,degrauNaAresta:+degrau.toFixed(4)}};}
+/* ---------- o material: clone do que o prado estiver usando, transparente, com a opacidade do vértice ---------- */
+function em880Material(base){const T=THREE,m=base.clone();m.name='880 emenda · relva do prado sobre a clareira';m.transparent=true;m.opacity=1;m.depthWrite=false;m.vertexColors=true;m.side=T.FrontSide;m.alphaTest=0;
+  m.polygonOffset=true;m.polygonOffsetFactor=-1;m.polygonOffsetUnits=-1;m.userData={papelKeep:true,em880:true};
+  try{if(base.onBeforeCompile&&base.onBeforeCompile!==T.Material.prototype.onBeforeCompile&&m.onBeforeCompile!==base.onBeforeCompile){m.onBeforeCompile=base.onBeforeCompile;if(base.customProgramCacheKey!==T.Material.prototype.customProgramCacheKey)m.customProgramCacheKey=base.customProgramCacheKey.bind(base);}}catch(e){}
+  m.needsUpdate=true;return m;}
+/* ---------- montar / sincronizar ---------- */
+function em880Tira(){try{const o=EM880.malha;if(o){if(o.parent)o.parent.remove(o);try{o.geometry.dispose();}catch(e){}}if(EM880.mat)try{EM880.mat.dispose();}catch(e){}}catch(e){}EM880.malha=null;EM880.mat=null;EM880.fonte=null;EM880.sul=null;EM880.norte=null;}
+function em880Monta(R){const T=THREE,par=em880Par();if(!par||!R||!R.scene)return false;const t0=performance.now();const G=em880Geo(par.sul,par.norte);if(!G){if(!EM880.stats.semGrade){EM880.stats.semGrade=1;em880Erro('grade','o chão sul não tem a grade esperada (1.ª fileira em z = −72)');}return false;}
+  const fonte=em880MatDe(par.norte);if(!fonte||!fonte.isMaterial)return false;const mat=em880Material(fonte),o=new T.Mesh(G.g,mat);o.name='880 emenda · relva do prado sobre a clareira';
+  o.renderOrder=EM880_P.ordem;o.castShadow=false;o.receiveShadow=!!par.sul.receiveShadow;o.frustumCulled=true;o.layers.mask=par.sul.layers.mask;o.raycast=function(){};
+  o.userData.em880=true;o.userData.noCam=true;o.userData.papelKeepGeo=true;o.matrixAutoUpdate=false;o.updateMatrix();R.scene.add(o);o.updateMatrixWorld(true);
+  EM880.malha=o;EM880.mat=mat;EM880.fonte=fonte;EM880.sul=par.sul;EM880.norte=par.norte;EM880.cena=R.scene;EM880.stats.montagens++;EM880.stats.malha=G.stats;EM880.stats.ms=+(performance.now()-t0).toFixed(1);return true;}
+function em880Sinc(){const o=EM880.malha;if(!o)return false;const par=em880Par(),R=(typeof ROOMS!=='undefined')?ROOMS.fant:null;
+  if(!par||!R||o.parent!==R.scene||par.sul!==EM880.sul||par.norte!==EM880.norte){em880Tira();return false;}   // a sala foi refeita: monta de novo no próximo passo
+  EM880.stats.sinc++;const fonte=em880MatDe(par.norte),sulM=em880MatDe(par.sul);if(!fonte||!fonte.isMaterial)return false;let m=EM880.mat;
+  if(fonte!==EM880.fonte||fonte.type!==m.type){try{m.dispose();}catch(e){}m=em880Material(fonte);o.material=m;EM880.mat=m;EM880.fonte=fonte;EM880.stats.trocasMat++;}
+  else{let muda=false;if(m.color&&fonte.color&&!m.color.equals(fonte.color))m.color.copy(fonte.color);if(m.emissive&&fonte.emissive&&!m.emissive.equals(fonte.emissive))m.emissive.copy(fonte.emissive);
+    for(const k of ['map','bumpMap','normalMap','gradientMap'])if(k in m&&m[k]!==fonte[k]){if((!!m[k])!==(!!fonte[k]))muda=true;m[k]=fonte[k]||null;}
+    for(const k of ['roughness','metalness','bumpScale','emissiveIntensity','fog'])if(fonte[k]!==undefined&&m[k]!==fonte[k]){if(k==='fog')muda=true;m[k]=fonte[k];}
+    if(fonte.normalScale&&m.normalScale&&!m.normalScale.equals(fonte.normalScale))m.normalScale.copy(fonte.normalScale);
+    if(m.clippingPlanes!==fonte.clippingPlanes){m.clippingPlanes=fonte.clippingPlanes;m.clipIntersection=fonte.clipIntersection;muda=true;}if(muda)m.needsUpdate=true;}
+  if(o.receiveShadow!==!!par.sul.receiveShadow){o.receiveShadow=!!par.sul.receiveShadow;m.needsUpdate=true;}
+  if(o.layers.mask!==par.sul.layers.mask)o.layers.mask=par.sul.layers.mask;
+  let vis=EM880.on&&!EM880.pausa&&em880Difere(fonte,sulM);if(vis)for(let p=par.norte.parent;p&&p!==R.scene;p=p.parent)if(p.visible===false){vis=false;break;}
+  EM880.stats.igual=!em880Difere(fonte,sulM);if(o.visible!==vis)o.visible=vis;return true;}
+function em880Tenta(){if(!EM880.on)return false;try{const R=(typeof ROOMS!=='undefined')?ROOMS.fant:null;if(!R||!R.scene)return false;em880LigaTick(R);if(EM880.malha)em880Sinc();   // o Sinc tira a malha se a sala foi refeita
+    if(!EM880.malha){if(EM880.pausa)return false;if(!em880Monta(R))return false;em880Sinc();}return true;}catch(e){em880Erro('tenta',e);return false;}}
+function em880LigaTick(R){try{if(!R||R.__em880tick)return;R.__em880tick=true;const tk=R.tick;R.tick=function(dt){const r=tk?tk.apply(this,arguments):undefined;
+      try{if(EM880.on&&++EM880.q>=12){EM880.q=0;if(EM880.malha)em880Sinc();if(!EM880.malha&&!EM880.pausa)em880Tenta();em880RelTarde();}}catch(e){if(!EM880.erroTick){EM880.erroTick=1;em880Erro('tique',e);}}return r;};}catch(e){em880Erro('ligaTick',e);}}
+/* (revisão R1) O relevo só era tentado no `setActive` da Fantasia: se ali a sala ainda não estivesse madura (`PR506`/`CL504`/`P456` por fazer — o
+   caminho síncrono `jump('room',…)`, um temporizador do acabamento atrasado), a visita inteira ficava sem outeiros. Agora o tique da sala (a cada 12
+   quadros, com o leitor lá dentro) volta a tentar: adianta o preparo em fatias e aplica entre ~2,6 e ~5 s depois (dá tempo de os vigias do `AF880`
+   e do `CG880` assentarem o que a v506 mexeu). Uma malha de chão inesperada desiste de vez. */
+function em880RelTarde(){const V=EM880R;if(!V.on||V.ativo||V.pausa||V.falhou)return false;const R=em880RelPronto();if(!R)return false;try{if(typeof ACTIVE!=='undefined'&&ACTIVE!==R.scene)return false;}catch(e){}
+  const Pp=V.prep,pronto=!!(Pp&&Pp.fim);V.espera=(V.espera||0)+1;if(V.espera<13||(!pronto&&V.espera<=25)){if(!pronto)em880Prep();return false;}   // (≥ 13 voltas ≈ 2,6 s: os vigias dos vizinhos — 1,5 a 2 s — passam antes)
+  const ok=em880RelTenta();if(ok)V.stats.tarde=(V.stats.tarde||0)+1;else if((V.falhas=(V.falhas||0)+1)>=3)V.falhou=true;return ok;}
+/* ===================== OS OUTEIROS: RELEVO DO GRAMADO ENTRE OS DOIS SALTOS (sub-chave `?outeiros880=0`) ===================== */
+const EM880R={on:EM880.on&&!/[?&#]outeiros880=0/i.test(location.search+location.hash),ativo:false,pausa:false,feito:false,cache:null,chao:null,J:null,pedras:null,obst:[],marcos:null,erros:EM880.erros,
+  stats:{aplicacoes:0,desfeitas:0,setActive:0}};
+// a zona (metros): relevo só em |x| < x1 e zN < z < zS, com rampas largas; `K` = os outeiros [x, z, raio a, raio b, giro, altura]
+const EM880_O={x1:52,xm:42,zS:-73.7,rs:6.8,zN:-106.2,rn:6.5,mr0:6.3,mr1:6.5,piso:-.42,passo:.5,n:4,
+  K:[[0,-90,11,10.2,.25,3.8],[-17,-83.8,8.6,7.2,-.5,2.5],[-26.5,-92.4,10.6,9.4,.4,3.7],[15.6,-82.4,7.8,7,.7,2.3],[25.4,-93,11,10,-.3,3.9],[36.5,-84,8.2,7.6,.2,2.6],[-38.5,-82.6,8.2,7.4,.9,2.4],[-40,-94.2,8.6,7.8,-.6,2.6],
+     [9.8,-98.4,6,5.4,.1,1.9],[-10.4,-99.2,6.4,5.6,.5,2.0],[44.5,-95.4,7.6,7,0,2.1],[-6.2,-79.8,5.4,4.8,-.2,1.6],[6.8,-78.8,5,4.6,.6,1.5],[-47,-88.5,6.5,6,0,1.7],[47.5,-80.5,6,5.6,.3,1.5]],
+  trilha:[[.2,-106.4],[1.4,-102.6],[4.6,-98.6],[6.2,-94.4],[3.6,-90.9],[-.6,-88.4],[-4.6,-85.2],[-7.4,-81],[-6,-77.2],[-3.4,-74.6]],
+  pedras:[[-26.9,-92.9,.74,3],[-25.3,-91.3,.46,11],[-27.9,-91.2,.34,5],[25.9,-93.6,.68,8],[24.2,-92.3,.4,2],[-38.9,-82.2,.6,6],[-37.6,-83.4,.36,9],[36.9,-84.4,.56,4],[35.7,-83.3,.33,12]]};
+for(const k of EM880_O.K){k[6]=Math.cos(k[4]);k[7]=Math.sin(k[4]);}
+function em880S(u){return u<=0?0:u>=1?1:u*u*(3-2*u);}
+// os círculos de salto do lado da casa (lidos na hora da 1.ª aplicação): o relevo é zero até 5,6 m deles e volta em 6,6 m
+function em880Marcos(){if(EM880R.marcos)return EM880R.marcos;const L=[];try{const S=(typeof COZY355!=='undefined')?COZY355:null;if(S&&S.markers)for(const a of S.markers)if(a&&a.z<-72)L.push([a.x,a.z]);}catch(e){}if(!L.length)L.push([5.5,-106.5]);return L;}
+function em880Masc(x,z){const O=EM880_O;if(z>=O.zS||z<=O.zN)return 0;const ax=Math.abs(x);if(ax>=O.x1)return 0;
+  let m=em880S((O.zS-z)/O.rs)*em880S((z-O.zN)/O.rn)*(1-em880S((ax-O.xm)/(O.x1-O.xm)));
+  for(const a of em880Marcos()){const d=Math.hypot(x-a[0],z-a[1]);if(d<=O.mr0)return 0;m*=em880S((d-O.mr0)/O.mr1);}return m;}
+// o campo de alturas «ideal»: outeiros de perfil (1 − r²)² somados (formam selas e espigões suaves) + ruído de 9 m e de 4 m, tudo vezes a máscara
+function em880Rel(x,z){const m=em880Masc(x,z);if(m<=0)return 0;const O=EM880_O;let h=O.piso;
+  for(const k of O.K){const dx=x-k[0],dz=z-k[1],u=(dx*k[6]+dz*k[7])/k[2],v=(dz*k[6]-dx*k[7])/k[3],t=u*u+v*v;if(t<1){const q=1-t;h+=k[5]*q*q;}}
+  h+=(em880R(x/9+2.7,z/9+6.1)-.5)*.8+(em880R(x/4.1+7.3,z/4.1+1.9)-.5)*.26;return h*m;}
+// a grade de 0,5 m do campo (uma vez, ~14 mil amostras) e a leitura bilinear dela: é ESTA a altura que vai para os vértices do chão e para o `floorY`
+function* em880CacheG(){if(EM880R.cache)return EM880R.cache;EM880R.marcos=em880Marcos();const O=EM880_O,p=O.passo,x0=-O.x1,z0=Math.floor(O.zN/p)*p-p,z1=Math.ceil(O.zS/p)*p,nx=Math.round(2*O.x1/p)+1,nz=Math.round((z1-z0)/p)+1,A=new Float32Array(nx*nz);let mn=0,mx=0;
+  for(let j=0;j<nz;j++){for(let i=0;i<nx;i++){const h=em880Rel(x0+i*p,z0+j*p);A[j*nx+i]=h;if(h<mn)mn=h;if(h>mx)mx=h;}if(j%8===7)yield 0;}
+  if(!EM880R.cache)EM880R.cache={A,nx,nz,x0,z0,x1:x0+(nx-1)*p,z1:z0+(nz-1)*p,ip:1/p,min:mn,max:mx};return EM880R.cache;}
+function em880Cache(){if(EM880R.cache)return EM880R.cache;const it=em880CacheG();let r;do{r=it.next();}while(!r.done);return r.value;}
+function em880Fast(x,z){const C=EM880R.cache;if(!C||x<=C.x0||x>=C.x1||z<=C.z0||z>=C.z1)return 0;const fx=(x-C.x0)*C.ip,fz=(z-C.z0)*C.ip,i=fx|0,j=fz|0,u=fx-i,v=fz-j,A=C.A,k=j*C.nx+i,a=A[k],b=A[k+1],c=A[k+C.nx],d=A[k+C.nx+1];return a+(b-a)*u+(c-a)*v+(a-b-c+d)*u*v;}
+/* ---------- a altura do relevo NA MALHA (exata): o chão do prado é um leque em volta de (0, −137) — 128 setores × 60 anéis, a borda cortada em z = −72 —
+   e cada triângulo dele é repartido em n² triângulos; aqui acha-se o triângulo pequeno que contém (x, z) e interpola-se como a placa de vídeo ---------- */
+function em880Raio(i){const a=i*Math.PI*2/128,s=Math.sin(a),o=s>0?Math.min(106,65/s):106;return [Math.cos(a)*o,s*o];}
+function em880Bar(px,pz,ax,az,bx,bz,cx,cz){const d=(bx-ax)*(cz-az)-(cx-ax)*(bz-az);if(Math.abs(d)<1e-12)return null;const b1=((px-ax)*(cz-az)-(cx-ax)*(pz-az))/d,b2=((bx-ax)*(pz-az)-(px-ax)*(bz-az))/d;return [b1,b2];}
+function em880Tri(b,ax,az,bx,bz,cx,cz){const n=EM880_O.n;let b1=Math.max(0,b[0]),b2=Math.max(0,b[1]);const s=b1+b2;if(s>1){b1/=s;b2/=s;}
+  const u=b1*n,v=b2*n;let p=Math.min(n-1,Math.floor(u)),q=Math.min(n-1-p,Math.floor(v));if(q<0)q=0;const fu=u-p,fv=v-q;
+  const L=(pp,qq)=>em880Fast(ax+(bx-ax)*pp/n+(cx-ax)*qq/n,az+(bz-az)*pp/n+(cz-az)*qq/n);
+  if(fu+fv<=1)return L(p,q)*(1-fu-fv)+L(p+1,q)*fu+L(p,q+1)*fv;return L(p+1,q+1)*(fu+fv-1)+L(p,q+1)*(1-fu)+L(p+1,q)*(1-fv);}
+function em880Chao(x,z){const C=EM880R.cache;if(!C||x<=C.x0-1.3||x>=C.x1+1.3||z<=C.z0-1.3||z>=C.z1+1.3)return 0;
+  const dx=x,dz=z+137,da=Math.PI*2/128;let a=Math.atan2(dz,dx);if(a<0)a+=Math.PI*2;let i=Math.floor(a/da);if(i>127)i=127;
+  for(let t=0;t<3;t++){const A=em880Raio(i),B=em880Raio(i+1),ex=B[0]-A[0],ez=B[1]-A[1],den=A[0]*ez-A[1]*ex;if(Math.abs(den)<1e-9)return 0;
+    const lam=(dx*ez-dz*ex)/den,mu=(A[0]*dz-A[1]*dx)/den;if(mu<-1e-9&&t<2){i=(i+127)%128;continue;}if(mu>lam+1e-9&&t<2){i=(i+1)%128;continue;}   // (arredondamento na borda do setor)
+    const jf=lam*60;let j=Math.floor(jf);if(j>=60)j=59;if(j<1)return em880Fast(x,z);const r0=j/60,r1=(j+1)/60;
+    const x00=A[0]*r0,z00=A[1]*r0-137,x01=B[0]*r0,z01=B[1]*r0-137,x10=A[0]*r1,z10=A[1]*r1-137,x11=B[0]*r1,z11=B[1]*r1-137;
+    let b=em880Bar(x,z,x00,z00,x11,z11,x10,z10);if(b&&b[0]>=-1e-7&&b[1]>=-1e-7&&b[0]+b[1]<=1+1e-7)return em880Tri(b,x00,z00,x11,z11,x10,z10);
+    b=em880Bar(x,z,x00,z00,x01,z01,x11,z11);if(b)return em880Tri(b,x00,z00,x01,z01,x11,z11);return 0;}return 0;}
+/* ---------- a cor do chão no relevo: topos mais claros e quentes, baixadas mais escuras e frias, encostas um nada mais fechadas; e a trilha de terra ---------- */
+function em880DistTrilha(x,z){const P=EM880_O.trilha;let best=1e9,along=0,acc=0,tot=0;for(let k=0;k<P.length-1;k++)tot+=Math.hypot(P[k+1][0]-P[k][0],P[k+1][1]-P[k][1]);
+  for(let k=0;k<P.length-1;k++){const ax=P[k][0],az=P[k][1],bx=P[k+1][0],bz=P[k+1][1],ex=bx-ax,ez=bz-az,l2=ex*ex+ez*ez,t=Math.max(0,Math.min(1,((x-ax)*ex+(z-az)*ez)/l2)),d=Math.hypot(x-ax-ex*t,z-az-ez*t),L=Math.sqrt(l2);if(d<best){best=d;along=(acc+L*t)/tot;}acc+=L;}return [best,along];}
+function em880Cor(x,z,D,c){const tt=em880S(D/2.3),td=em880S(-D/.55),e=.6,gx=(em880Fast(x+e,z)-em880Fast(x-e,z))/(2*e),gz=(em880Fast(x,z+e)-em880Fast(x,z-e))/(2*e),inc=em880S(Math.hypot(gx,gz)/.62);
+  let r=1+.25*tt-.22*td-.12*inc,g=1+.19*tt-.15*td-.10*inc,b=1-.10*tt-.11*td-.05*inc;
+  if(Math.abs(x)<12&&z>-107&&z<-73.5){const q=em880DistTrilha(x,z),w=.62+.3*em880R(x/1.7+3.3,z/1.7+9.1),s=(1-em880S((q[0]-w)/1.05))*em880S(q[1]/.07)*em880S((1-q[1])/.09)*(.72+.28*em880R(x/.9+1.1,z/.9+4.7));
+    if(s>0){r+=(1.75-r)*s*.85;g+=(.84-g)*s*.85;b+=(.6-b)*s*.85;}}
+  c[0]*=r;c[1]*=g;c[2]*=b;}
+/* ---------- a malha nova do chão: a mesma do prado, com os triângulos da zona repartidos em n² (vértices das arestas compartilhados; os vizinhos de
+   fora recebem um leque para a costura ficar sem «T») e a altura do relevo somada; as normais são refeitas (as da fileira z = −72 ficam como eram) ---------- */
+function* em880RefinaG(g0){const T=THREE,O=EM880_O,n=O.n,P0=g0.attributes.position,U0=g0.attributes.uv,C0=g0.attributes.color,N0=g0.attributes.normal,I0=g0.index;
+  if(!P0||!I0||P0.count!==7741||!C0||C0.itemSize!==3)return null;
+  {const k=1+39*129+30,A=em880Raio(30),r=40/60;if(Math.abs(P0.getX(k)-A[0]*r)>.002||Math.abs(P0.getZ(k)-(A[1]*r-137))>.002)return null;}   // a malha é o leque esperado?
+  const C=yield* em880CacheG();const nT=I0.count/3,ia=I0.array,pa=P0.array,ua=U0?U0.array:null,ca=C0.array,ref=new Uint8Array(nT);let nRef=0;
+  for(let t=0;t<nT;t++){const a=ia[t*3],b=ia[t*3+1],c=ia[t*3+2],xa=pa[a*3],xb=pa[b*3],xc=pa[c*3],za=pa[a*3+2],zb=pa[b*3+2],zc=pa[c*3+2];
+    if(Math.max(xa,xb,xc)>C.x0&&Math.min(xa,xb,xc)<C.x1&&Math.max(za,zb,zc)>C.z0&&Math.min(za,zb,zc)<C.z1){ref[t]=1;nRef++;}}
+  if(!nRef)return null;const NV=P0.count,chave=(a,b)=>a<b?a*NV+b:b*NV+a;let arestas=new Set();
+  for(let volta=0;volta<8;volta++){arestas=new Set();for(let t=0;t<nT;t++)if(ref[t]){const a=ia[t*3],b=ia[t*3+1],c=ia[t*3+2];arestas.add(chave(a,b));arestas.add(chave(b,c));arestas.add(chave(c,a));}
+    let mud=0;for(let t=0;t<nT;t++)if(!ref[t]){const a=ia[t*3],b=ia[t*3+1],c=ia[t*3+2];if((arestas.has(chave(a,b))?1:0)+(arestas.has(chave(b,c))?1:0)+(arestas.has(chave(c,a))?1:0)>=2){ref[t]=1;nRef++;mud++;}}if(!mud)break;}
+  yield 0;
+  const vMax=NV+nRef*((n+1)*(n+2)/2),pos=new Float32Array(vMax*3),uv=ua?new Float32Array(vMax*2):null,cor=new Float32Array(vMax*3),ind=new Uint32Array((nRef*n*n+(nT-nRef)*n)*3),cacheA=new Map();let nv=NV,ni=0;
+  pos.set(pa.subarray(0,NV*3));if(uv)uv.set(ua.subarray(0,NV*2));cor.set(ca.subarray(0,NV*3));
+  const novo=(a,b,c,w0,w1,w2)=>{const k=nv*3;pos[k]=pa[a*3]*w0+pa[b*3]*w1+pa[c*3]*w2;pos[k+1]=pa[a*3+1]*w0+pa[b*3+1]*w1+pa[c*3+1]*w2;pos[k+2]=pa[a*3+2]*w0+pa[b*3+2]*w1+pa[c*3+2]*w2;
+    if(uv){uv[nv*2]=ua[a*2]*w0+ua[b*2]*w1+ua[c*2]*w2;uv[nv*2+1]=ua[a*2+1]*w0+ua[b*2+1]*w1+ua[c*2+1]*w2;}cor[k]=ca[a*3]*w0+ca[b*3]*w1+ca[c*3]*w2;cor[k+1]=ca[a*3+1]*w0+ca[b*3+1]*w1+ca[c*3+1]*w2;cor[k+2]=ca[a*3+2]*w0+ca[b*3+2]*w1+ca[c*3+2]*w2;return nv++;};
+  // o k-ésimo ponto (1…n−1) da aresta a→b, compartilhado entre os dois triângulos que a tocam
+  const naAresta=(a,b,k)=>{const lo=a<b?a:b,hi=a<b?b:a,key=lo*NV+hi;let base=cacheA.get(key);if(base===undefined){base=nv;cacheA.set(key,base);for(let q=1;q<n;q++)novo(lo,hi,lo,1-q/n,q/n,0);}return base+((a===lo)?k:n-k)-1;};
+  const loc=new Int32Array((n+1)*(n+1));let nFan=0;
+  for(let t=0;t<nT;t++){const a=ia[t*3],b=ia[t*3+1],c=ia[t*3+2];if((t&511)===511)yield 0;
+    if(ref[t]){for(let q=0;q<=n;q++)for(let p=0;p+q<=n;p++){let v;if(p===0&&q===0)v=a;else if(p===n)v=b;else if(q===n)v=c;else if(q===0)v=naAresta(a,b,p);else if(p===0)v=naAresta(a,c,q);else if(p+q===n)v=naAresta(b,c,q);else v=novo(a,b,c,1-(p+q)/n,p/n,q/n);loc[q*(n+1)+p]=v;}
+      for(let q=0;q<n;q++)for(let p=0;p+q<n;p++){ind[ni++]=loc[q*(n+1)+p];ind[ni++]=loc[q*(n+1)+p+1];ind[ni++]=loc[(q+1)*(n+1)+p];if(p+q<n-1){ind[ni++]=loc[q*(n+1)+p+1];ind[ni++]=loc[(q+1)*(n+1)+p+1];ind[ni++]=loc[(q+1)*(n+1)+p];}}continue;}
+    let feito=false;const E=[a,b,c,a,b];for(let q=0;q<3&&!feito;q++){const e0=E[q],e1=E[q+1],op=E[q+2];if(!arestas.has(chave(e0,e1)))continue;let ant=e0;for(let k=1;k<=n;k++){const prox=k===n?e1:naAresta(e0,e1,k);ind[ni++]=ant;ind[ni++]=prox;ind[ni++]=op;ant=prox;}feito=true;nFan++;}
+    if(!feito){ind[ni++]=a;ind[ni++]=b;ind[ni++]=c;}}
+  yield 0;
+  // alturas e cores
+  const c3=[0,0,0];let dmin=0,dmax=0,mex=0;for(let k=0;k<nv;k++){if((k&1023)===1023)yield 0;const x=pos[k*3],z=pos[k*3+2],D=em880Fast(x,z);if(D!==0){pos[k*3+1]+=D;mex++;if(D<dmin)dmin=D;if(D>dmax)dmax=D;}
+    if(k>=NV||D!==0||(Math.abs(x)<12&&z>-107&&z<-73.5)){c3[0]=cor[k*3];c3[1]=cor[k*3+1];c3[2]=cor[k*3+2];em880Cor(x,z,D,c3);cor[k*3]=c3[0];cor[k*3+1]=c3[1];cor[k*3+2]=c3[2];}}
+  yield 0;
+  const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(pos.slice(0,nv*3),3));if(uv)g.setAttribute('uv',new T.BufferAttribute(uv.slice(0,nv*2),2));g.setAttribute('color',new T.BufferAttribute(cor.slice(0,nv*3),3));
+  g.setIndex(new T.BufferAttribute(nv>65535?ind.slice(0,ni):Uint16Array.from(ind.subarray(0,ni)),1));yield 0;g.computeVertexNormals();
+  if(N0){const N=g.attributes.normal;for(let k=0;k<NV;k++)if(pa[k*3+2]>-72.02)N.setXYZ(k,N0.getX(k),N0.getY(k),N0.getZ(k));}
+  g.computeBoundingBox();g.computeBoundingSphere();g.userData={em880:true};
+  return {g,g0,vp:P0.version,vc:C0.version,stats:{triangulosAntes:nT,triangulosAgora:ni/3,verticesAntes:NV,verticesAgora:nv,repartidos:nRef,leques:nFan,comRelevo:mex,min:+dmin.toFixed(3),max:+dmax.toFixed(3)}};}
+function em880Refina(g0){const it=em880RefinaG(g0);let r;do{r=it.next();}while(!r.done);return r.value;}
+// a preparação (grade + malha nova) em fatias de ~5 ms, em segundo plano, assim que a sala fica pronta; no `setActive` sobra só trocar e mover
+function* em880PlanoG(R){const L=[],st={malhas:0,vertices:0,inclinadas:0,papel:0};em880Varre(R,1,L);yield 0;for(const o of L){if(EM880R.ativo||EM880R.feito)break;em880Cisalha(o,1,st,true);yield 0;}return st;}
+function em880Prep(){if(!EM880R.on||EM880R.ativo||EM880R.feito)return true;try{const R=em880RelPronto();if(!R)return false;const g0=COZY355.ground367.mesh.geometry;let Pp=EM880R.prep;if(!Pp||Pp.g0!==g0)Pp=EM880R.prep={g0,it:em880RefinaG(g0),G:null,it2:null,fim:false,fatias:0,ms:0,maior:0};
+    if(Pp.fim)return true;const t0=performance.now();
+    if(Pp.G===null){let r;do{r=Pp.it.next();}while(!r.done&&performance.now()-t0<4);if(r.done){Pp.G=r.value||false;if(!Pp.G)Pp.fim=true;}}
+    else if(!Pp.it2){Pp.it2=em880PlanoG(R);}
+    else if(!Pp.plano){let r;do{r=Pp.it2.next();}while(!r.done&&performance.now()-t0<4);if(r.done)Pp.plano=r.value||{};}
+    else{if(!EM880R.pedras)em880Pedras(R);Pp.fim=true;}
+    const d=performance.now()-t0;Pp.fatias++;Pp.ms+=d;if(d>Pp.maior)Pp.maior=d;EM880R.stats.preparo={fatias:Pp.fatias,ms:+Pp.ms.toFixed(1),maiorFatia:+Pp.maior.toFixed(1),malha:!!Pp.G,plano:Pp.plano?Pp.plano.malhas:null,fim:Pp.fim};return Pp.fim;}catch(e){em880Erro('preparo',e);return true;}}
+function em880PrepLaco(){try{if(!EM880R.on||EM880R.feito||EM880R.ativo)return;const fim=em880Prep();if(fim===true)return;setTimeout(em880PrepLaco,EM880R.prep?24:900);}catch(e){}}
+/* ---------- o que está pousado na zona sobe/desce junto. Regra: quem tem posição própria (grupo, malha, luz, sprite, instância) muda SÓ a posição y;
+   as peças fundidas com coordenadas de mundo (os kits da v456/v506/v433…) mudam o y de cada vértice (como a v506); as listas com altura guardada
+   (moedas, pratas, rubis, o Grande Rubi) mudam a altura guardada. Tudo fica no diário `J` — `desfaz()` devolve os valores exatos ---------- */
+function em880Id(m){const e=m.elements;return e[12]===0&&e[13]===0&&e[14]===0&&e[0]===1&&e[5]===1&&e[10]===1&&e[1]===0&&e[2]===0&&e[4]===0&&e[6]===0&&e[8]===0&&e[9]===0;}
+function em880Exclui(o,R){const u=o.userData||{};if(u.em880||u.forest409||u.sky409||u.fx||u.fusao||o.renderOrder<0)return true;if(o===EM880R.chaoMalha)return true;try{if(typeof READER!=='undefined'&&o===READER.g)return true;}catch(e){}
+  if(o.isMesh){const m=Array.isArray(o.material)?o.material[0]:o.material;if(m&&(m.isShaderMaterial||m.fog===false))return true;}return false;}
+function em880GeoReal(o){try{if(typeof PAPEL_GEO!=='undefined'){const q=PAPEL_GEO.get(o);if(q&&q.g)return q.g;}}catch(e){}return o.geometry;}
+function em880Cisalha(o,dir,st,plano){const g=em880GeoReal(o),P=g&&g.attributes&&g.attributes.position;if(!P||P.isInterleavedBufferAttribute||P.itemSize!==3)return;const J=EM880R.J,C=EM880R.cache;let E=J.geo.get(g);
+  if(E&&(E.P!==P||E.n!==P.count||(!E.escrito&&E.v!==P.version))){J.geo.delete(g);E=null;}const A=P.array;   // (o plano feito em segundo plano só vale se ninguém mexeu na peça depois)
+  if(!E){if(!g.boundingBox)g.computeBoundingBox();if(!g.boundingSphere)g.computeBoundingSphere();const bb=EM880R.bb.copy(g.boundingBox).applyMatrix4(o.matrixWorld);if(bb.max.x<=C.x0||bb.min.x>=C.x1||bb.max.z<=C.z0||bb.min.z>=C.z1)return;
+    const e=o.matrixWorld.elements,id=em880Id(o.matrixWorld);if(!id&&(Math.abs(e[1])+Math.abs(e[9])>1e-6||Math.abs(e[5])<1e-6)){st.inclinadas++;return;}
+    const n=P.count;let tmp=EM880R.tmp;if(!tmp||tmp.length<n)tmp=EM880R.tmp=new Float32Array(Math.max(n,65536));let m=0,dmin=0,dmax=0;
+    for(let i=0;i<n;i++){const x=A[i*3],z=A[i*3+2];const D=id?em880Fast(x,z):em880Fast(e[0]*x+e[4]*A[i*3+1]+e[8]*z+e[12],e[2]*x+e[6]*A[i*3+1]+e[10]*z+e[14])/e[5];if(D>-1e-4&&D<1e-4){tmp[i]=0;continue;}tmp[i]=D;m++;if(D<dmin)dmin=D;if(D>dmax)dmax=D;}
+    if(!m)return;const idx=new Int32Array(m),y0=new Float32Array(m),y1=new Float32Array(m);let k=0;for(let i=0;i<n;i++){const D=tmp[i];if(D===0)continue;const y=A[i*3+1];idx[k]=i;if(dir>0){y0[k]=y;y1[k]=y+D;}else{y1[k]=y;y0[k]=y-D;}k++;}
+    // as caixas: a do estado em que a peça foi achada fica como está; a do outro estado cresce o que o relevo pede (sem percorrer os vértices de novo)
+    const ca=g.boundingBox.clone(),ea=g.boundingSphere.clone(),cb=ca.clone(),eb=ea.clone(),s=dir>0?1:-1;cb.min.y+=Math.min(0,s*dmin,s*dmax);cb.max.y+=Math.max(0,s*dmin,s*dmax);eb.radius+=Math.max(-dmin,dmax);
+    E={P,n,o,idx,y0,y1,c0:dir>0?ca:cb,e0:dir>0?ea:eb,c1:dir>0?cb:ca,e1:dir>0?eb:ea,v:P.version,escrito:false};J.geo.set(g,E);st.malhas++;st.vertices+=m;}
+  if(plano)return;E.escrito=true;
+  const src=dir>0?E.y1:E.y0,ix=E.idx;for(let k=0;k<ix.length;k++)A[ix[k]*3+1]=src[k];P.needsUpdate=true;g.boundingBox.copy(dir>0?E.c1:E.c0);g.boundingSphere.copy(dir>0?E.e1:E.e0);
+  try{if(typeof PAPEL_GEO_LOD!=='undefined')PAPEL_GEO_LOD.delete(g);if(g!==o.geometry&&typeof PAPEL_GEO!=='undefined'){o.geometry=g;PAPEL_GEO.delete(o);st.papel++;}}catch(e){}}
+function em880Unidade(o,x,z,dir,st){const J=EM880R.J;let E=J.obj.get(o);if(E){const de=dir>0?E.y0:E.y1,para=dir>0?E.y1:E.y0;if(Math.abs(o.position.y-de)<1e-5||Math.abs(o.position.y-para)<1e-5){o.position.y=para;if(!o.matrixAutoUpdate)o.updateMatrix();}else st.vivos++;return;}
+  const D=em880Chao(x,z);if(D>-1e-4&&D<1e-4)return;let sy=1;if(o.parent){const e=o.parent.matrixWorld.elements;sy=Math.hypot(e[4],e[5],e[6]);if(!(sy>1e-6)||Math.abs(e[5])<sy*.985){st.inclinadas++;return;}}
+  const y=o.position.y,d=D/sy;E=dir>0?{y0:y,y1:y+d}:{y1:y,y0:y-d};J.obj.set(o,E);o.position.y=dir>0?E.y1:E.y0;if(!o.matrixAutoUpdate)o.updateMatrix();st.unidades++;}
+function em880Inst(o,dir,st){if(o.instanceMatrix.usage===35048)return;const J=EM880R.J,C=EM880R.cache,A=o.instanceMatrix.array;let E=J.inst.get(o);if(E&&E.A!==A){J.inst.delete(o);E=null;}
+  if(!E){const e=o.matrixWorld.elements,sy=Math.hypot(e[4],e[5],e[6]);if(!(sy>1e-6)||Math.abs(e[5])<sy*.985)return;const idx=[],y0=[],y1=[];
+    let nI=o.count;try{if(typeof PAPEL_MATO!=='undefined'){const q=PAPEL_MATO.get(o);if(q>nI)nI=q;}}catch(e){}nI=Math.min(nI,o.instanceMatrix.count);   // (revisão R2) o Papel desenha só 55 % da vegetação instanciada: as escondidas sobem também
+    for(let i=0;i<nI;i++){const b=i*16;if(A[b]===0&&A[b+5]===0&&A[b+10]===0)continue;const x=A[b+12],y=A[b+13],z=A[b+14],wx=e[0]*x+e[4]*y+e[8]*z+e[12],wz=e[2]*x+e[6]*y+e[10]*z+e[14];if(wx<=C.x0||wx>=C.x1||wz<=C.z0||wz>=C.z1)continue;
+      const D=em880Chao(wx,wz)/sy;if(D>-1e-4&&D<1e-4)continue;idx.push(i);if(dir>0){y0.push(y);y1.push(y+D);}else{y1.push(y);y0.push(y-D);}}
+    if(!idx.length)return;E={A,idx,y0,y1};J.inst.set(o,E);st.instancias+=idx.length;}
+  const src=dir>0?E.y1:E.y0;for(let k=0;k<E.idx.length;k++)A[E.idx[k]*16+13]=src[k];o.instanceMatrix.needsUpdate=true;}
+function em880Itens(dir,st){const J=EM880R.J,L=[];try{const s=COINS.sets&&COINS.sets.fant;if(s&&s.coins)for(const c of s.coins)L.push([c,'y0']);}catch(e){}try{const s=PRATA346.sets&&PRATA346.sets.fant;if(s&&s.coins)for(const c of s.coins)L.push([c,'y0']);}catch(e){}
+  try{const s=RUBY422.sets&&RUBY422.sets.fant;if(s&&s.coins)for(const c of s.coins)L.push([c,'y']);}catch(e){}try{if(typeof CL504!=='undefined'&&CL504.rubi&&!CL504.rubi.pego)L.push([CL504.rubi,'y0']);}catch(e){}
+  for(const [c,k] of L){if(!c||typeof c[k]!=='number')continue;let E=J.it.get(c);if(!E){const D=em880Chao(c.x,c.z);if(D>-1e-4&&D<1e-4)continue;E=dir>0?{v0:c[k],v1:c[k]+D}:{v1:c[k],v0:c[k]-D};J.it.set(c,E);st.itens++;}c[k]=dir>0?E.v1:E.v0;}}
+function em880Varre(R,dir,plano){const T=THREE,sc=R.scene,C=EM880R.cache;try{EM880R.chaoMalha=COZY355.ground367.mesh;}catch(e){}const st={malhas:0,vertices:0,unidades:0,instancias:0,itens:0,inclinadas:0,vivos:0,papel:0};if(!EM880R.J)EM880R.J={geo:new Map(),obj:new Map(),inst:new Map(),it:new Map()};EM880R.bb=EM880R.bb||new T.Box3();
+  sc.updateMatrixWorld(true);const usos=new Map();sc.traverse(o=>{if(o.geometry)usos.set(o.geometry,(usos.get(o.geometry)||0)+1);});const bb=new T.Box3(),M=12;
+  const visita=o=>{if(em880Exclui(o,R))return;if(o.isInstancedMesh){if(!plano)em880Inst(o,dir,st);return;}if(o.isSkinnedMesh||o.isLine||o.isPoints)return;   // (nuvens de pontos animadas: os vaga-lumes da v619 ficam do arco para trás)
+    const e=o.matrixWorld.elements,wx=e[12],wz=e[14],propria=!em880Id(o.matrix),idW=em880Id(o.matrixWorld);
+    if(!plano&&EM880R.J.obj.has(o)){em880Unidade(o,wx,wz,dir,st);return;}
+    const perto=idW||(wx>C.x0-10&&wx<C.x1+10&&wz>C.z0-10&&wz<C.z1+10);
+    if(propria&&perto&&!plano){const dentro=wx>C.x0-1&&wx<C.x1+1&&wz>C.z0-1&&wz<C.z1+1,folha=!o.children.length&&(o.isMesh||o.isSprite||o.isLight);
+      if(dentro||folha){bb.setFromObject(o);const vazio=bb.isEmpty(),sx=vazio?0:bb.max.x-bb.min.x,sz=vazio?0:bb.max.z-bb.min.z;
+        if(sx<=7.5&&sz<=7.5){let ax=wx,az=wz;if(!vazio&&(wx<bb.min.x-.6||wx>bb.max.x+.6||wz<bb.min.z-.6||wz>bb.max.z+.6)){ax=(bb.min.x+bb.max.x)/2;az=(bb.min.z+bb.max.z)/2;}em880Unidade(o,ax,az,dir,st);return;}}}
+    if(o.isMesh&&o.geometry&&perto&&!(propria&&(usos.get(o.geometry)||0)>1)&&(!plano||idW)){if(plano)plano.push(o);else em880Cisalha(o,dir,st);}
+    for(const c of o.children)visita(c);};
+  for(const c of sc.children)visita(c);
+  if(!plano)em880Itens(dir,st);return st;}
+/* ---------- pedras com musgo no alto de quatro outeiros (as mesmas `forest433Rock` do prado), com obstáculo ---------- */
+function em880Pedras(R){if(EM880R.pedras||typeof t160Kit!=='function'||typeof forest433Rock!=='function')return;const T=THREE,root=new T.Group();root.name='880 outeiros · pedras dos topos';root.userData.em880=true;R.scene.add(root);const K=t160Kit('880 outeiros · pedras');let n=0;
+  const W=R.world,livre=(x,z,m)=>{try{for(const o of (W.obst||[]))if(Math.hypot(x-o[0],z-o[1])<o[2]+m)return false;}catch(e){}return true;};
+  for(const [x,z,s,seed] of EM880_O.pedras){if(!(em880Chao(x,z)>.5)||!livre(x,z,s*.9+.25))continue;const y=R.floorY(x,z)+(EM880R.ativo?0:em880Chao(x,z));forest433Rock(K,x,y-s*.12,z,s,seed);if(s>=.45){const ob=[x,z,+(s*.92).toFixed(2)];ob.em880=true;EM880R.obst.push(ob);}n++;}
+  const ms=K.fim(root,{sombra:true});root.visible=!!EM880R.ativo;root.traverse(o=>{o.userData.em880=true;o.userData.noCam=true;o.userData.papelKeepGeo=true;o.userData.papelKeep=true;if(o.material&&o.material.userData)o.material.userData.papelKeep=true;o.__fusaoMoveu=9;});EM880R.pedras=root;EM880R.stats.pedras={pedras:n,malhas:ms.length,obstaculos:EM880R.obst.length};}
+function em880Obst(R,liga){try{const S=(typeof COZY355!=='undefined')?COZY355:null,W=R.world,cur=W.obst;for(const L of [S&&S.obstacles,Array.isArray(cur)?cur:null]){if(!L)continue;for(const o of EM880R.obst){const k=L.indexOf(o);if(liga&&k<0)L.push(o);else if(!liga&&k>=0)L.splice(k,1);}}W.__nav=null;W.__cl=null;}catch(e){em880Erro('obstáculos',e);}}
+/* ---------- aplicar / desfazer ---------- */
+function em880RelPronto(){try{const R=(typeof ROOMS!=='undefined')?ROOMS.fant:null,S=(typeof COZY355!=='undefined')?COZY355:null;if(!R||!R.scene||!R.world||typeof R.floorY!=='function'||!S||!S.ready||!S.ground367||!S.ground367.mesh)return null;
+    if(typeof PR506!=='undefined'&&PR506.on&&!PR506.feito)return null;if(typeof P456!=='undefined'&&P456.on&&!P456.feito)return null;if(typeof CL504!=='undefined'&&CL504.on&&!CL504.feito)return null;return R;}catch(e){return null;}}
+/* (revisão R3) o embrulho do `floorY` é marcado na SALA e conferido por medida (no alto do outeiro do meio, relevo ligado × desligado): a marca na
+   função sumia quando outro bloco embrulhava o `floorY` por cima (o `CH880` faz isso) e o `aplica()` seguinte somava o relevo DUAS vezes. */
+function em880FyTem(R){if(!R.__em880fy)return false;try{if(typeof ASA246!=='undefined'&&ASA246.voo)return true;const k=EM880_O.K[0],d=em880Chao(k[0],k[1]);if(!(Math.abs(d)>.3))return true;const a=EM880R.ativo;let on=0,off=0;
+    try{EM880R.ativo=true;on=R.floorY(k[0],k[1]);EM880R.ativo=false;off=R.floorY(k[0],k[1]);}finally{EM880R.ativo=a;}if(Math.abs(on-off)>Math.abs(d)*.5)return true;EM880R.stats.reembrulhos=(EM880R.stats.reembrulhos||0)+1;return false;}catch(e){return true;}}
+/* (revisão R4) o chão do DECORAR (nível 0 do `keyFloors`: `FANT.terrainH`, plano no prado) soma o mesmo relevo: uma peça posta pelo jogador num
+   outeiro nascia em y = 0, dentro do morro (até 3,6 m) ou no ar sobre uma baixada. As peças que já estavam lá sobem como unidades (diário). */
+function em880Decorar(R){try{const kf=(typeof R.keyFloors==='function')?R.keyFloors():null;if(!Array.isArray(kf))return;for(const f of kf){if(!f||f.lvl!==0||typeof f.floorY!=='function'||f.__em880)continue;const f0=f.floorY;
+      f.floorY=function(x,z){const y=f0.apply(this,arguments);return EM880R.ativo?y+em880Chao(x,z):y;};f.__em880=true;}}catch(e){em880Erro('decorar',e);}}
+function em880RelPoe(R,liga){const S=COZY355,mesh=S.ground367.mesh,sc=R.scene,t0=performance.now();
+  try{if(typeof fusaoLimpar==='function')fusaoLimpar(sc);}catch(e){}
+  if(liga){em880Cache();
+    if(!em880FyTem(R)){const f0=R.floorY;R.floorY=function(x,z){const y=f0.apply(this,arguments);if(!EM880R.ativo)return y;try{const v=(typeof ASA246!=='undefined')?ASA246.voo:null;if(v&&v.cozy355&&Math.hypot(x-v.x,z-v.z)<1)return y;}catch(e){}return y+em880Chao(x,z);};R.floorY.em880=true;R.__em880fy=true;}
+    em880Decorar(R);
+    let Ch=EM880R.chao;if(!Ch||Ch.mesh!==mesh||(mesh.geometry!==Ch.g0&&mesh.geometry!==Ch.g1)){const g0=mesh.geometry,Pp=EM880R.prep;let G=(Pp&&Pp.G&&Pp.g0===g0&&Pp.G.vp===g0.attributes.position.version&&Pp.G.vc===g0.attributes.color.version)?Pp.G:null;EM880R.stats.preparado=!!G;if(!G)G=em880Refina(g0);if(Pp)Pp.fim=true;if(!G){if(!EM880R.stats.semMalha){EM880R.stats.semMalha=1;em880Erro('outeiros','o chão do prado não é o leque de 7741 vértices esperado: relevo não aplicado');}EM880R.falhou=true;return false;}
+      Ch=EM880R.chao={mesh,g0:mesh.geometry,g1:G.g};EM880R.stats.chao=G.stats;}
+    const t1=performance.now();mesh.geometry=Ch.g1;EM880R.ativo=true;const st=em880Varre(R,1);EM880R.stats.pousados=st;const t2=performance.now();
+    try{em880Pedras(R);if(EM880R.pedras)EM880R.pedras.visible=true;em880Obst(R,true);}catch(e){em880Erro('pedras',e);}EM880R.stats.aplicacoes++;if(!EM880R.stats.primeira)EM880R.stats.primeira={ms:+(performance.now()-t0).toFixed(1),preparado:!!EM880R.stats.preparado};EM880R.stats.tempos={chao:+(t1-t0).toFixed(1),pousados:+(t2-t1).toFixed(1),pedras:+(performance.now()-t2).toFixed(1)};}
+  else{const Ch=EM880R.chao;if(Ch&&Ch.mesh.geometry===Ch.g1)Ch.mesh.geometry=Ch.g0;if(EM880R.pedras)EM880R.pedras.visible=false;em880Obst(R,false);const st=em880Varre(R,-1);EM880R.ativo=false;EM880R.stats.desfeitos=st;EM880R.stats.desfeitas++;}
+  try{if(typeof DES199!=='undefined'&&DES199.cenas){if(typeof des199Mostrar==='function')des199Mostrar(sc);DES199.cenas.delete(sc);}}catch(e){}
+  try{if(typeof camBlockScene!=='undefined'&&camBlockScene===sc&&typeof camBlockT190!=='undefined')camBlockT190=-1e9;}catch(e){}   // (revisão R5) `camBlockReset190` não existe: é assim que a lista da câmera se refaz (como no PF881)
+  EM880R.stats.ms=+(performance.now()-t0).toFixed(1);const C=EM880R.cache;if(C)EM880R.stats.campo={min:+C.min.toFixed(2),max:+C.max.toFixed(2)};return true;}
+function em880RelTenta(){if(!EM880R.on||EM880R.pausa||EM880R.ativo)return false;try{const R=em880RelPronto();if(!R)return false;const ok=em880RelPoe(R,true);EM880R.feito=EM880R.feito||ok;return ok;}catch(e){em880Erro('outeiros',e);return false;}}
+function em880RelDesfaz(){EM880R.pausa=true;if(!EM880R.ativo)return false;try{const R=ROOMS.fant;return em880RelPoe(R,false);}catch(e){em880Erro('outeiros desfaz',e);return false;}}
+/* ---------- gancho ---------- */
+function em880Aplica(){EM880.pausa=false;EM880R.pausa=false;const ok=em880Tenta();const rel=em880RelTenta();if(EM880.malha)em880Sinc();return {ok:!!ok,visivel:!!(EM880.malha&&EM880.malha.visible),relevo:!!EM880R.ativo,aplicouRelevo:!!rel,stats:EM880.stats,outeiros:EM880R.stats,erros:EM880.erros.slice()};}
+function em880Desfaz(){EM880.pausa=true;if(EM880.malha)EM880.malha.visible=false;const rel=em880RelDesfaz();return {ok:true,visivel:false,relevo:!!EM880R.ativo,desfezRelevo:!!rel};}
+function em880Poses(){let h=()=>0;try{const R=ROOMS.fant;if(R&&typeof R.floorY==='function')h=(x,z)=>R.floorY(x,z)||0;else if(window.__FANT&&window.__FANT.terrainH)h=(x,z)=>(z>-72?window.__FANT.terrainH(x,z):0)||0;}catch(e){}
+  const p=(x,y,z)=>[x,+(h(x,z)+y).toFixed(3),z];
+  return [{id:'como_no_print_de_frente',pos:p(1,3.3,-81.2),alvo:p(1,.6,-71),fov:70,nota:'do prado olhando para a vila; a aresta é z = −72'},
+    {id:'como_no_print_em_diagonal',pos:p(-5.5,5.2,-81.5),alvo:p(1.5,.4,-74),fov:70,nota:'a aresta atravessa a tela em diagonal'},
+    {id:'ao_longo_da_emenda',pos:p(-22,2.4,-74.6),alvo:p(6,.2,-70.5),fov:70,nota:'rasante, ao longo de z = −72'},
+    {id:'do_lado_da_vila',pos:p(0,3.6,-60.5),alvo:p(0,.3,-71.5),fov:70,nota:'da borda andável da vila (z −63,65) olhando para o prado'},
+    {id:'leste_x25',pos:p(25,3.3,-81),alvo:p(24,.5,-71),fov:70,nota:'outro trecho da emenda (x ≈ 25)'},
+    {id:'oeste_x-30',pos:p(-30,3.3,-81),alvo:p(-29,.5,-71),fov:70,nota:'outro trecho da emenda (x ≈ −30)'},
+    {id:'de_cima',pos:[0,46,-67.99],alvo:[0,0,-68],fov:70,nota:'planta: z −91…−45; a aresta é a horizontal do meio'},
+    {id:'outeiros_do_alto_do_salto',pos:[7,15.5,-70],alvo:[-3,0,-95],fov:70,nota:'como no print do relevo: do alto, no meio do voo, olhando para a casa'},
+    {id:'outeiros_do_alto_voltando',pos:[2,16,-108],alvo:[4,0,-84],fov:70,nota:'no voo de volta, olhando para a vila'},
+    {id:'outeiros_rasante_do_arco',pos:p(.5,1.7,-105.2),alvo:p(-1.5,1.6,-90),fov:70,nota:'ao nível do leitor, saindo do arco do jardim: a trilha sobe ao outeiro do rubi'},
+    {id:'outeiros_rasante_oeste',pos:p(-10.2,1.7,-77.2),alvo:p(-27,1.2,-92),fov:70,nota:'ao nível do leitor, no vale entre os outeiros do oeste'},
+    {id:'outeiros_do_topo_do_rubi',pos:p(1.5,1.8,-88.6),alvo:p(24,-.6,-93),fov:75,nota:'do alto do outeiro do meio, olhando para o leste'},
+    {id:'outeiros_planta',pos:[0,64,-89.49],alvo:[0,0,-89.5],fov:60,nota:'planta da zona (z −126…−53)'}];}
+if(EM880.on){
+  try{em880Tenta();}catch(e){em880Erro('carga',e);}
+  try{const sa880=setActive;setActive=function(sc){let ehFant=false;try{ehFant=!!(EM880.on&&sc&&typeof ROOMS!=='undefined'&&ROOMS.fant&&sc===ROOMS.fant.scene);if(ehFant){EM880.stats.setActive++;em880Tenta();}}catch(e){em880Erro('setActive',e);}
+      const r=sa880.apply(this,arguments);
+      // o relevo entra DEPOIS dos blocos antigos que agem no `setActive` (o que eles puseram está no plano) e antes da fusão do Leve
+      try{if(ehFant&&EM880R.on){EM880R.stats.setActive++;em880RelTenta();}}catch(e){em880Erro('setActive · outeiros',e);}return r;};}catch(e){em880Erro('embrulho do setActive',e);}
+  try{if(EM880R.on)setTimeout(em880PrepLaco,3000);}catch(e){}
+}
+window.__emenda880={estado:EM880,outeiros:EM880R,stats:EM880.stats,erros:EM880.erros,P:EM880_P,O:EM880_O,aplica:em880Aplica,desfaz:em880Desfaz,poses:em880Poses,sinc:em880Sinc,alfa:em880Alfa,relevo:em880Chao,campo:em880Rel,mascara:em880Masc};
 
 window.__build434={revision:434,family:"web",edition:"en"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
