@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v899</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v900</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -128081,6 +128081,47 @@ window.__alturas882={estado:AL882,stats:AL882.stats,erros:AL882.erros,get lista(
     }
   }catch(x){R.erros++;}
 }catch(e){try{console.error('v899',e);}catch(x){}}})();
+
+/* ===================== v900 · FANTASIA: A PEÇA DA GALERIA, O BAÚ DE PRATA E O BAÚ MONSTRO BARRAM O LEITOR DESDE O COMEÇO (bloco `OB900`) =====================
+   Defeito antigo da v232/v146 com o recanto da v355, achado pela revisão da v896 (24/11) e anotado nos achados; o Luiz mandou seguir com os
+   consertos dos achados (24/11, «ok, siga»). Sem arte: nenhuma malha, material, luz ou textura.
+   COMO ERA: três sistemas põem o disco do obstáculo deles na lista-BASE do chão da sala (`DEC128.rooms[sala].floors[0].baseObs`) e chamam o
+   `decorInvalidate128`: a peça da galeria do TRELLIS (v232, `g232Uma` e `g232UmaG`, quando os dados chegam), o baú de prata (`registerChest2`)
+   e o Baú Monstro (v232, `m232Registrar`). Nas outras salas isso basta: sem peça do Decorar a lista viva É a base, e com peça o Decorar refaz a
+   cópia dele. Na Fantasia a lista viva é a cópia que o recanto da v355 junta (base + `COZY355.obstacles`), refeita só quando a lista de baixo
+   muda; sem peça do Decorar no chão ela não muda, e o disco ficava fora da lista viva até a primeira troca de nível da escada da Grande
+   Árvore (ou uma mudança no Decorar): até lá o leitor, os bichos e o clique atravessavam a peça da galeria, o baú de prata e o Baú Monstro.
+   AGORA: o `decorInvalidate128` ganha um embrulho; quando a chamada é da Fantasia e o leitor está no chão (nível 0), o que entrou na lista-base
+   desde a chamada anterior (na primeira, só o último da lista: quem chama acabou de empurrar) e não está na lista viva do chão é posto nela,
+   o mesmo objeto (a mesma entrada da base: a v896 reconhece e não duplica na próxima recópia; quem tira da base e da viva tira as duas), e a
+   malha de navegação é zerada (`__nav`/`__cl`). Fora do chão (escada, deque) não mexe: a volta ao chão traz a base na recópia. Com peça do
+   Decorar no chão, a leitura da lista viva já sai refeita com o disco e nada é posto. Nada é tirado de lista nenhuma.
+   Chave `?obstbase900=0` (como era). Gancho `window.__obstbase900`: `stats` (chamadas, da Fantasia, postos, fora do chão, a última), `postos`
+   (x, z, raio de cada disco posto), `erros`. */
+;(function(){try{
+  const Q=location.search+location.hash;
+  const OB={on:!/[?&#]obstbase900=0/i.test(Q),vistos:null,erros:[],postos:[],stats:{chamadas:0,fantasia:0,postos:0,foraDoChao:0,ultima:null}};
+  window.__obstbase900={stats:OB.stats,postos:OB.postos,erros:OB.erros,estado:OB};
+  if(!OB.on||typeof decorInvalidate128!=='function')return;
+  function erro(k,e){try{if(OB.erros.length<30)OB.erros.push(k+': '+String(e&&e.message||e));console.warn('v900',k,e);}catch(x){}}
+  function trata(D){
+    const R=(typeof ROOMS!=='undefined')?ROOMS.fant:null;if(!R||!R.world)return;
+    const base=D&&D.floors&&D.floors[0]&&D.floors[0].baseObs;if(!Array.isArray(base))return;
+    const cand=OB.vistos?base.filter(q=>q&&!OB.vistos.has(q)):(base.length?[base[base.length-1]]:[]);
+    OB.vistos=new Set(base);
+    if(!cand.length)return;
+    const F=window.__FANT;if(F&&F.lvl){OB.stats.foraDoChao+=cand.length;return;}
+    const viva=R.world.obst;if(!Array.isArray(viva)||viva===base)return;
+    const S=new Set(viva);let n=0;
+    for(const q of cand){if(!S.has(q)){Array.prototype.push.call(viva,q);S.add(q);n++;if(OB.postos.length<60)OB.postos.push([+(+q[0]).toFixed(2),+(+q[1]).toFixed(2),+(+q[2]).toFixed(2)]);}}
+    if(n){try{R.world.__nav=null;R.world.__cl=null;}catch(x){}OB.stats.postos+=n;OB.stats.ultima={postos:n,viva:viva.length,t:Math.round(performance.now())};}
+  }
+  const d0=decorInvalidate128;
+  decorInvalidate128=function(D){
+    const r=d0.apply(this,arguments);
+    try{OB.stats.chamadas++;const DF=(typeof DEC128!=='undefined')&&DEC128.rooms&&DEC128.rooms.fant;if(D&&DF&&D===DF){OB.stats.fantasia++;trata(D);}}catch(e){erro('embrulho',e);}
+    return r;};
+}catch(e){try{console.error('v900',e);}catch(x){}}})();
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
