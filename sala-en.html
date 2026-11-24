@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v896</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v897</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -126886,6 +126886,738 @@ if(OV896.on){
   try{OV896.iv=setInterval(ov896Vigia,2000);}catch(e){ov896Erro('vigia 0',e);}
 }
 window.__obstaculos896={estado:OV896,stats:OV896.stats,erros:OV896.erros,lista:ov896Lista,confere:ov896Confere};
+
+/* ===================== v897 · PEÇAS TORTAS QUE SOBRARAM: ARANDELAS E TOCHAS ENCOSTADAS NA PAREDE, EIXOS DO CARRINHO DO CORREIO NAS RODAS, LUNETA DAS VIAGENS NO TRIPÉ, PÉ DO CARRINHO DO CARTEIRO, BANZOS DA ESCADA DO STEAMPUNK, RETRATOS DO HALLOWEEN, PEDRAS DO FORTE DA ILHA DO DUELO, PLACA «PADARIA» E PENTEADEIRAS DA OFICINA DOS PALHAÇOS (bloco `PT882`) =====================
+   Pedido do Luiz (19/11, ~20:05, «Peças tortas que sobraram»): varrer as salas atrás de peças TORTAS — giradas errado, soltas da parede ou do
+   apoio, partes de um objeto montadas no lugar errado — que as passadas anteriores deixaram. Começado em 19/11 (rascunho na v879 + PE880,
+   ZF880, PF881, FL881), retomado e terminado em 24/11 na BASE DE HOJE (v896 publicada: HF879, PE880, PF881, ZF880, FL881, LE880, EG880, CS880,
+   TR880, PL880, a arte da Fantasia e da Aventura, DP880, OV896…), conferido no jogo montado em node, uma sala por processo, nas 35 salas de
+   gênero, em português e em inglês. Só posição/rotação de peça existente (e os discos de obstáculo que vão junto): modelos, cores,
+   materiais e texturas iguais; nada de arte nova.
+   COMO ERA → AGORA:
+   · ARANDELAS da v407 (`lantern407Room`, as duas «Arandela interior» que ladeiam a porta nas salas de gênero): a placa de ferro do suporte
+     ficava a 0,47 m da parede da porta (o `clamp(…, .35)` do caminho andável, mais 0,18 m; 0,29–0,57 conforme a sala) — a arandela
+     flutuava. → Anda para trás até a placa encostar (4 mm), a peça inteira (suporte, braço, lanterna); folga medida com 5 raios das costas da
+     placa contra a parede de verdade; destino conferido com a forma em fatias de 10 cm. Ficam onde estão quando há decoração na parede no
+     lugar (quadro, sebe, pórtico, estante, faixa) ou não há parede atrás (Fantasia, Faroeste). A Sala do Acumulador fica com o PF881.
+   · TOCHAS da v537/v693 (`rv537Tochas`: muralhas dos Campos dos Rivais, 2.º ao 5.º andar, e paredes do Salão dos Espectros do Terror): a placa
+     nascia a `esp/2 + 0,3` do eixo da parede — 0,30 m da face nos campos, 0,29–0,45 m no Salão. → Encostam (placa, braço, copo, chama e os
+     dois brilhos), achadas pela assinatura dos vértices no kit fundido «521 <sala>». As que ficam junto das torres redondas dos cantos (a
+     chama entraria na torre) e diante de colunas ficam onde estão.
+   · CARRINHO DO CORREIO da v668 (Epistolar): as rodas estão de pé; os DOIS EIXOS foram escritos iguais, no meio, atravessados, sem tocar roda
+     (pontas a 0,43 m dos cubos). → Cada eixo vai para o seu par de rodas, ao longo da largura (pontas a 2 cm dos cubos).
+   · LUNETA da v349 (Viagens): a inclinação de 0,65 rad foi para o eixo errado — tubo deitado 0,42 m acima da ponta do tripé, anel e lente
+     soltos no ar. → O tubo inclina 37° e assenta na ponta do tripé; anel e lente na boca de cima.
+   · CARRINHO DO CARTEIRO da v437 (Epistolar): o laço dos pés variou x em vez de z — um pé atravessava a roda de trás e o canto da alça ficava
+     sem pé. → Esse pé vai para o canto sem pé (Δ local −1,4 em x, +0,8 em z).
+   · BANZOS da escada da passarela do Steampunk (v224 `a6xSteampunk`, `rx −0,78`): subiam para +z enquanto os degraus descem — os dois banzos
+     cruzavam a escada em X. → Giram 1,56 rad em x pelo centro (passam pelas pontas dos degraus).
+   · RETRATOS da sala de Halloween (v551 `hw551Aplica`, biblioteca de Terror, parede da frente): moldura e pintura a 0,165 m da parede. → Encostam.
+   · PEDRAS DE CIMA da muralha do forte da Ilha do Duelo (v539 `cp539Ilha`, Aventura): 0,15 m acima do topo do muro, no ar (8). → Assentam (2 mm).
+   · PLACA «PADARIA» do Realismo (v221): o plano ficava 0,30 m à frente da fachada. → Encosta na viga horizontal que cruza a fachada atrás
+     dela (4 mm; 5,4 cm da parede acima e abaixo da viga).
+   · PENTEADEIRAS da Oficina dos Palhaços (v522, anexo do Humor, três): gaveteiro sem pés a 0,16 m da parede e o espelho (moldura, espelho e dez
+     lâmpadas) solto a 0,38 m. → Penteadeira (tampo, gaveteiro, narizes e o disco dela — só a 1.ª tem disco no jogo) e espelho encostam.
+   · PASSARELA DE FERRO do Steampunk (v224): desenhada encostada na parede direita da oficina de 20 m; a oficina passou a 28,3 m e a passarela
+     ficou a 4,23 m da parede. DECISÃO: fica onde está (`padrao:false`). Medido na v896 parte a parte em 17 deslizes ao longo da parede de
+     hoje (Δz −3…+5): nenhum livre — o 1.º pilar bate na bobina e nas garrafas de Leiden da v807 (Δz ≤ 1,5, com o disco dela), o banzo de
+     fora da escada e depois o piso e as vigas batem nos caixilhos das janelas da parede («Oficina · janelas», Δz ≥ 0,5) e para trás entram
+     nos miúdos e nas estantes; levar a passarela exigiria mexer em outras peças (fora do pedido). Ela se sustenta nos próprios pilares (não
+     está solta). `?passarela882=1` tenta (e, na v896, fica bloqueada com o motivo).
+   QUANDO: com a sala pronta e assentada (3 s, cena sem mudar há 2 s, as decorações tardias — SG801, v668, campos dos rivais — feitas, e sem a
+   cadeia do c465 correndo na cena; 15 s depois de pronta, vai assim mesmo), na fila do fatiador (`fat8Go`, urgente com a sala à vista), em
+   fatias: achar as peças, índice dos triângulos perto delas (grade de 1 m), raios até a parede, conferência do destino (triângulos de outras
+   malhas no volume de chegada) e o mover. No `setActive` da sala corre uma fatia já. Malha-alvo fundida pelo Leve → `fusaoLimpar(cena)`
+   antes (numa fatia nova); LOD do Papel → volta a original (o Papel refaz a leve dela); esfera do recorte por distância (DES199) das malhas
+   mexidas refeita; discos de obstáculo: o mesmo objeto da lista viva e das listas-base (o `desliga()` devolve cada um ao lugar de origem),
+   `__nav`/`__cl` zerados e `camBlockT190=-1e9`. Destino ocupado → fica, `bloqueada`, com o motivo. Sala remontada → refaz.
+   REACERTO (a cadeia do c465): o ZF880 (A) afasta 4 mm a face menor de pares coplanares da mesma malha fundida — nas muralhas 521/532 dos
+   campos, a face atrás de parte das tochas sai 4–8 mm. Essa cadeia só roda na cena ATIVA e depois de a construção sossegar; o PT882 já
+   trabalha nas salas montadas ao fundo. Quando uma passada do c465 termina depois do começo do PT882 (assinatura `userData.c465.feito` + vez
+   do ZF880), as peças de parede são medidas de novo a partir do lugar de origem e, se a folga mudou mais de 0,5 mm, vão do lugar velho ao
+   novo no MESMO passo (sem quadro no lugar de origem). Sem isso, 11 a 20 tochas por campo ficavam 4 mm DENTRO da muralha (ou rentes a ela).
+   Ordem com os vizinhos: PF881 (Acumulador) e FL881 (alturas) mexem em outras peças; LE880 (placas) e os demais, idem — conferido no banco,
+   objeto por objeto (liga/desliga de cada um sem nada em comum com o PT882).
+   Chaves: `?tortas882=0` (tudo) e uma por item: `?arandelas882=0`, `?tochas882=0`, `?carrinho882=0`, `?luneta882=0`, `?carroca882=0`,
+   `?escada882=0`, `?retratos882=0`, `?pedras882=0`, `?placa882=0`, `?penteadeiras882=0`; `?passarela882=1` liga a tentativa da passarela.
+   Gancho `window.__tortas882`: `stats`, `erros`, `lista` (por peça: sala, item, estado, antes/depois, folga, Δ, motivo, conferência,
+   reacerto), `desliga()` / `liga()` (exatos), `aplica(sala)`, `reacerta(sala)`, `c465(sala)`, `pecas(sala)`, `mede(sala)` (antes/depois de
+   cada peça), `fotos(sala)` (poses {id, pos, alvo, fov} de pontos andáveis), `pose(id)` / `poseSai()`, `itens`.
+   REVISÃO (24/11, revisor, conferido no jogo montado em node, v896 + bloco, PT e EN): a placa «PADARIA» entrava 4,6 cm na viga horizontal da
+   fachada (y 2,852–2,972, 5 cm à frente da parede): os 5 raios passavam por cima e por baixo da viga, e a conferência do destino das peças
+   de parede em vértices (`paredeV`) encolhia a caixa com `expandByScalar(-.01)` — na placa (13 mm de espessura) a caixa virava do avesso e a
+   conferência não via nada. Agora: grade de 5 × 5 raios na placa (encosta na viga), caixa da placa ±1,5 mm em volta do plano e `pt882Encolhe`
+   no `paredeV` (retratos e penteadeiras: mesma caixa de antes). */
+const PT882_Q=location.search+location.hash;
+const PT882={on:!/[?&#]tortas882=0/i.test(PT882_Q),ativo:true,erros:[],lista:[],salas:{},jobs:{},espera:{},falhas:{},vigia:null,pose0:null,
+  EPS:0.004,stats:{aplicado:0,movidas:0,bloqueadas:0,noLugar:0,naoAchadas:0,checagens:0,fatias:0,ms:0,fusao:0,discos:0,papel:0,triangulos:0,raios:0,forcadas:0,recorte:0,reacertoPassadas:0,reacertos:0}};
+const PT882_ITENS={
+  arandelas:{chave:'arandelas882',nome:'arandelas da v407 encostadas na parede da porta'},
+  tochas:{chave:'tochas882',nome:'tochas da v537/v693 encostadas na parede'},
+  carrinho:{chave:'carrinho882',nome:'eixos do carrinho do correio da v668 nas rodas'},
+  luneta:{chave:'luneta882',nome:'luneta das Viagens (v349) inclinada e assentada no tripé'},
+  passarela:{chave:'passarela882',nome:'passarela de ferro do Steampunk (v224) na parede direita de hoje',padrao:false},
+  escada:{chave:'escada882',nome:'banzos da escada da passarela do Steampunk (v224) no sentido dos degraus'},
+  carroca:{chave:'carroca882',nome:'pé do carrinho do carteiro (v437) no canto sem pé'},
+  retratos:{chave:'retratos882',nome:'os dois retratos da sala de Halloween (v551) encostados na parede da frente'},
+  pedras:{chave:'pedras882',nome:'pedras de cima da muralha do forte da Ilha do Duelo (v539) assentadas'},
+  placa:{chave:'placa882',nome:'placa «PADARIA» da padaria do Realismo (v221) encostada na fachada'},
+  penteadeiras:{chave:'penteadeiras882',nome:'penteadeiras e espelhos da Oficina dos Palhaços (v522) encostados na parede'}};
+// `padrao:false`: só com `?<chave>=1` (a passarela muda a composição da oficina e o lugar livre é apertado — ver o comentário dela)
+for(const k in PT882_ITENS){const I=PT882_ITENS[k];I.liga=PT882.on&&(I.padrao===false?new RegExp('[?&#]'+I.chave+'=1','i').test(PT882_Q):!new RegExp('[?&#]'+I.chave+'=0','i').test(PT882_Q));}
+const PT882_FORA=new Set(['minha','pessoal']); // Sala do Acumulador: o PF881 trata as arandelas dela; a sala pessoal não tem
+function pt882Erro(k,e){if(PT882.erros.length<80)PT882.erros.push(k+': '+(e&&e.message||e));try{console.warn('v882',k,e);}catch(x){}}
+// ---------- utilitários ----------
+function pt882Corte(){return typeof fat8Fim!=='undefined'&&performance.now()>=fat8Fim;}
+function pt882R(v){return +(+v).toFixed(3);}
+function pt882V(v){return v?[pt882R(v.x),pt882R(v.y),pt882R(v.z)]:null;}
+function pt882Cx(B){return B&&!B.isEmpty()?{min:pt882V(B.min),max:pt882V(B.max)}:null;}
+// o recorte por distância do Leve/Papel (v199, `DES199`) esconde malhas longe da câmera: escondida só por isso conta como presente
+const PT882_DES=new WeakMap();
+function pt882DesOculto(o,sc){try{if(typeof DES199==='undefined'||!DES199.cenas)return false;const E=DES199.cenas.get(sc);if(!E||!E.lista)return false;
+  let M=PT882_DES.get(E);if(!M||M.arr!==E.lista||M.n!==E.lista.length){M={arr:E.lista,n:E.lista.length,m:new Map()};for(const it of E.lista)if(it&&it.o)M.m.set(it.o,it);PT882_DES.set(E,M);}const it=M.m.get(o);return !!(it&&it.oculto);}catch(e){return false;}}
+function pt882Vis(o,sc){for(let p=o;p&&p!==sc;p=p.parent){const v=p.__fusaoVis!==undefined?p.__fusaoVis:(p.visible||(p===o&&pt882DesOculto(p,sc)));if(!v)return false;}return true;}
+// a geometria ORIGINAL do objeto: no modo Papel o LOD (`PAPEL_GEO`) pode ter trocado a geometria do objeto pela leve; as peças são
+// procuradas e mexidas na original (a passada do Papel refaz a leve dela, já com os vértices novos)
+function pt882Geo(o){try{if(typeof PAPEL_GEO!=='undefined'&&PAPEL_GEO.has(o)){const r=PAPEL_GEO.get(o);if(r&&r.g&&r.g.attributes&&r.g.attributes.position)return r.g;}}catch(e){}return o.geometry;}
+function pt882Fundida(o){try{const d=Object.getOwnPropertyDescriptor(o,'visible');return !!(d&&d.get);}catch(e){return false;}}
+function pt882Movel(o){for(let p=o;p;p=p.parent){const u=p.userData||{};if(u.npc||u.aiCharacter||u.talkName127||u.fx||u.coin||u.colecionavel)return true;if(p.name&&typeof FUSAO_PAI!=='undefined'&&FUSAO_PAI.test(p.name)&&!(typeof FUSAO_PAI_OK230!=='undefined'&&FUSAO_PAI_OK230.test(p.name)))return true;}return false;}
+function pt882Solida(o,sc){if(!(o.isMesh||o.isInstancedMesh)||o.isSkinnedMesh||!o.geometry||!o.geometry.attributes||!o.geometry.attributes.position)return false;
+  const u=o.userData||{};if(u.fusao||u.fx||u.portal)return false;const m=o.material;if(!m)return false;
+  if(!Array.isArray(m)&&(m.visible===false||m.blending===THREE.AdditiveBlending||(m.transparent&&m.opacity<.35)))return false;
+  return pt882Vis(o,sc)&&!pt882Movel(o);}
+// percorre a cena com pilha própria; f(o) devolve true para não descer nos filhos
+function* pt882Percorre(sc,f){const pilha=[sc];let n=0;while(pilha.length){const o=pilha.pop();if(f(o)===true)continue;const ch=o.children;for(let i=ch.length-1;i>=0;i--)pilha.push(ch[i]);if(++n%32===0&&pt882Corte())yield 'pt882 percurso';}}
+// as matrizes do mundo da cena inteira, em fatias (o mesmo que `updateMatrixWorld(true)`, mas rendendo a cada 256 objetos)
+function* pt882Matrizes(sc){const pilha=[sc];let n=0;while(pilha.length){const o=pilha.pop();if(o.matrixAutoUpdate)o.updateMatrix();if(o.parent)o.matrixWorld.multiplyMatrices(o.parent.matrixWorld,o.matrix);else o.matrixWorld.copy(o.matrix);o.matrixWorldNeedsUpdate=false;
+    const ch=o.children;for(let i=ch.length-1;i>=0;i--)pilha.push(ch[i]);if(++n%128===0&&pt882Corte())yield 'pt882 matrizes';}}
+function pt882Ident(e){const E=e.elements;return E[0]===1&&E[1]===0&&E[2]===0&&E[3]===0&&E[4]===0&&E[5]===1&&E[6]===0&&E[7]===0&&E[8]===0&&E[9]===0&&E[10]===1&&E[11]===0&&E[12]===0&&E[13]===0&&E[14]===0&&E[15]===1;}
+// caixa orientada: matriz do mundo → local a partir de uma origem e três eixos (ortonormais) do mundo
+function pt882OBB(org,ex,ey,ez){const M=new THREE.Matrix4().makeBasis(ex,ey,ez).setPosition(org);return {M,Mi:new THREE.Matrix4().copy(M).invert()};}
+function pt882CaixaMundo(M,lb){const B=new THREE.Box3(),v=new THREE.Vector3();for(let i=0;i<8;i++){v.set(i&1?lb.max.x:lb.min.x,i&2?lb.max.y:lb.min.y,i&4?lb.max.z:lb.min.z).applyMatrix4(M);B.expandByPoint(v);}return B;}
+// ---------- salas ----------
+function pt882Cena(k){try{if(PT882_FORA.has(k))return null;const R=typeof ROOMS!=='undefined'&&ROOMS[k];return R&&R.scene&&R.world?{sc:R.scene,R}:null;}catch(e){return null;}}
+function pt882Obst(k){try{const c=pt882Cena(k);if(!c)return null;const o=c.R.world.obst;return Array.isArray(o)?o:null;}catch(e){return null;}}
+function pt882Nav(k){try{const c=pt882Cena(k);if(!c)return;const R=c.R;try{R.world.__nav=null;R.world.__cl=null;}catch(e){}
+    const D=typeof DEC128!=='undefined'&&DEC128.rooms&&DEC128.rooms[k];if(D&&D.floors)for(const f of D.floors){try{delete f.world.__nav;delete f.world.__cl;}catch(e){}}}catch(e){pt882Erro('nav '+k,e);}}
+function pt882Dim(k){let W=0,D=0;try{const N=typeof NR!=='undefined'&&NR[k];if(N&&N.W>0){W=N.W;D=N.D;}}catch(e){}
+  try{const A=typeof AREA350!=='undefined'&&AREA350.rooms&&AREA350.rooms[k];if(A&&A.width>0){W=Math.max(W,A.width);D=Math.max(D,A.depth);}}catch(e){}
+  try{const R=ROOMS[k];if(R&&R.W>0&&R.D>0){W=Math.max(W,R.W);D=Math.max(D,R.D);}}catch(e){}return {W,D};}
+function pt882Cam(sc){try{if(typeof camBlockScene!=='undefined'&&camBlockScene===sc&&typeof camBlockT190!=='undefined')camBlockT190=-1e9;}catch(e){}}
+// ---------- índice dos triângulos da sala perto das peças (grade de 1 m em x/z; em fatias) ----------
+// Só as malhas sólidas (como o PF881: sem fusão, brilho, portal, transparente fraco; personagens e colecionáveis fora) que tocam as regiões; as
+// instâncias pequenas entram triângulo a triângulo, as grandes só pela caixa de cada instância (conta como ocupado). `excl`: objetos fora.
+function* pt882Indice(sc,excl,regs){const T=THREE,G=1;const U=new T.Box3();for(const r of regs)U.union(r);
+  const I={G,U,ix0:0,iz0:0,nx:0,nz:0,marca:null,cel:new Map(),tri:[],tm:[],ta:[],tb:[],tc:[],malhas:[],lados:[],quadro:[],caixas:[],selo:null,vez:0};
+  if(U.isEmpty())return I;I.ix0=Math.floor(U.min.x/G);I.iz0=Math.floor(U.min.z/G);I.nx=Math.floor(U.max.x/G)-I.ix0+1;I.nz=Math.floor(U.max.z/G)-I.iz0+1;
+  I.marca=new Uint8Array(I.nx*I.nz);for(const r of regs){const a0=Math.floor(r.min.x/G)-I.ix0,a1=Math.floor(r.max.x/G)-I.ix0,b0=Math.floor(r.min.z/G)-I.iz0,b1=Math.floor(r.max.z/G)-I.iz0;for(let i=a0;i<=a1;i++)for(let j=b0;j<=b1;j++)I.marca[i*I.nz+j]=1;}
+  // duas passadas: as candidatas (barato) e, uma a uma, a caixa de cada geometria (a 1.ª `computeBoundingBox` de uma malha fundida grande custa
+  // milissegundos: um corte antes de cada uma)
+  const cands=[],malhas=[];yield* pt882Percorre(sc,o=>{if(excl&&excl.has(o))return true;if(pt882Solida(o,sc))cands.push(o);});
+  for(const o of cands){const g=o.geometry;if(!g.boundingBox){if(pt882Corte())yield 'pt882 caixas';g.computeBoundingBox();}if(!g.boundingBox||g.boundingBox.isEmpty())continue;
+    if(o.isInstancedMesh){malhas.push(o);continue;}const bb=g.boundingBox.clone().applyMatrix4(o.matrixWorld);if(!bb.intersectsBox(U))continue;for(const r of regs)if(r.intersectsBox(bb)){malhas.push(o);break;}}
+  const va=new T.Vector3(),vb=new T.Vector3(),vc=new T.Vector3(),Mi=new T.Matrix4();let passos=0;
+  const poe=(mi,a,b,c)=>{const x0=Math.min(va.x,vb.x,vc.x),x1=Math.max(va.x,vb.x,vc.x),y0=Math.min(va.y,vb.y,vc.y),y1=Math.max(va.y,vb.y,vc.y),z0=Math.min(va.z,vb.z,vc.z),z1=Math.max(va.z,vb.z,vc.z);
+    if(x1<U.min.x||x0>U.max.x||y1<U.min.y||y0>U.max.y||z1<U.min.z||z0>U.max.z)return;
+    const a0=Math.max(0,Math.floor(x0/G)-I.ix0),a1=Math.min(I.nx-1,Math.floor(x1/G)-I.ix0),b0=Math.max(0,Math.floor(z0/G)-I.iz0),b1=Math.min(I.nz-1,Math.floor(z1/G)-I.iz0);let id=-1;
+    for(let i=a0;i<=a1;i++)for(let j=b0;j<=b1;j++){const q=i*I.nz+j;if(!I.marca[q])continue;if(id<0){id=I.tm.length;I.tri.push(va.x,va.y,va.z,vb.x,vb.y,vb.z,vc.x,vc.y,vc.z);I.tm.push(mi);I.ta.push(a);I.tb.push(b);I.tc.push(c);}let L=I.cel.get(q);if(!L){L=[];I.cel.set(q,L);}L.push(id);}};
+  for(const o of malhas){const g=o.geometry,pos=g.attributes.position,ix=g.index,nt=ix?ix.count:pos.count,m=Array.isArray(o.material)?null:o.material;
+    const mi=I.malhas.length;I.malhas.push(o);I.lados.push(m?m.side:T.DoubleSide);I.quadro.push(pt882EhQuadro(o));
+    if(o.isInstancedMesh){const n=o.count||0;const peq=n<=64&&nt<=3000;for(let k=0;k<n;k++){o.getMatrixAt(k,Mi);Mi.premultiply(o.matrixWorld);const bb=g.boundingBox.clone().applyMatrix4(Mi);if(++passos%256===0&&pt882Corte())yield 'pt882 instâncias';
+        if(!bb.intersectsBox(U)||!regs.some(r=>r.intersectsBox(bb)))continue;
+        if(!peq){I.caixas.push({b:bb,nome:(o.name||'instância')+' ['+k+']'});continue;}
+        for(let t=0;t+2<nt;t+=3){if(++passos%512===0&&pt882Corte())yield 'pt882 índice';const a=ix?ix.getX(t):t,b=ix?ix.getX(t+1):t+1,c=ix?ix.getX(t+2):t+2;va.fromBufferAttribute(pos,a).applyMatrix4(Mi);vb.fromBufferAttribute(pos,b).applyMatrix4(Mi);vc.fromBufferAttribute(pos,c).applyMatrix4(Mi);poe(mi,a,b,c);}}continue;}
+    const e=o.matrixWorld,id=pt882Ident(e),P=pos.array,it=pos.itemSize;
+    for(let t=0;t+2<nt;t+=3){if(++passos%512===0&&pt882Corte())yield 'pt882 índice';const a=ix?ix.getX(t):t,b=ix?ix.getX(t+1):t+1,c=ix?ix.getX(t+2):t+2;
+      if(id&&it===3&&!pos.isInterleavedBufferAttribute){va.set(P[a*3],P[a*3+1],P[a*3+2]);vb.set(P[b*3],P[b*3+1],P[b*3+2]);vc.set(P[c*3],P[c*3+1],P[c*3+2]);}
+      else{va.fromBufferAttribute(pos,a).applyMatrix4(e);vb.fromBufferAttribute(pos,b).applyMatrix4(e);vc.fromBufferAttribute(pos,c).applyMatrix4(e);}poe(mi,a,b,c);}}
+  I.selo=new Uint32Array(I.tm.length);PT882.stats.triangulos+=I.tm.length;return I;}
+// um QUADRO (plano com imagem: pôster, mural, pintura, placa) — a placa de uma arandela não se encosta em cima dele
+function pt882EhQuadro(o){try{if(o.isInstancedMesh||!o.geometry)return false;if(!/^(PlaneGeometry|PlaneBufferGeometry|CircleGeometry|CircleBufferGeometry)$/.test(o.geometry.type||''))return false;
+  const ms=Array.isArray(o.material)?o.material:[o.material];return ms.some(m=>m&&m.map&&m.visible!==false&&m.blending!==THREE.AdditiveBlending&&!(m.transparent&&m.opacity<.5));}catch(e){return false;}}
+// (gerador: uma célula de 1 m junto de uma estante fundida tem milhares de triângulos)
+function* pt882Cands(I,B){const out=[];if(!I.marca||!B.intersectsBox(I.U))return out;I.vez++;if(I.vez>4e9){I.selo.fill(0);I.vez=1;}const G=I.G,vez=I.vez;let n=0;
+  const a0=Math.max(0,Math.floor(B.min.x/G)-I.ix0),a1=Math.min(I.nx-1,Math.floor(B.max.x/G)-I.ix0),b0=Math.max(0,Math.floor(B.min.z/G)-I.iz0),b1=Math.min(I.nz-1,Math.floor(B.max.z/G)-I.iz0);
+  for(let i=a0;i<=a1;i++)for(let j=b0;j<=b1;j++){const L=I.cel.get(i*I.nz+j);if(!L)continue;for(const id of L){if(++n%4096===0&&pt882Corte())yield 'pt882 candidatos';if(I.selo[id]===vez)continue;I.selo[id]=vez;out.push(id);}}return out;}
+// triângulos de outras malhas dentro de uma caixa orientada (teste exato triângulo × caixa no espaço dela); `ign(malha,a,b,c)` tira os da peça
+function* pt882Invasores(I,obb,lb,ign){const T=THREE,va=new T.Vector3(),vb=new T.Vector3(),vc=new T.Vector3(),tri=new T.Triangle(va,vb,vc),tb=new T.Box3();
+  const BW=pt882CaixaMundo(obb.M,lb);const L=yield* pt882Cands(I,BW);let n=0,k=0;const quem={};
+  for(const id of L){if(++k%64===0&&pt882Corte())yield 'pt882 invasores';const o=I.malhas[I.tm[id]];if(ign&&ign(o,I.ta[id],I.tb[id],I.tc[id]))continue;const q=id*9,t=I.tri;
+    va.set(t[q],t[q+1],t[q+2]).applyMatrix4(obb.Mi);vb.set(t[q+3],t[q+4],t[q+5]).applyMatrix4(obb.Mi);vc.set(t[q+6],t[q+7],t[q+8]).applyMatrix4(obb.Mi);
+    tb.makeEmpty();tb.expandByPoint(va);tb.expandByPoint(vb);tb.expandByPoint(vc);if(!tb.intersectsBox(lb)||!lb.intersectsTriangle(tri))continue;n++;const nm=o.name||o.type;quem[nm]=(quem[nm]||0)+1;}
+  for(const c of I.caixas)if(c.b.intersectsBox(BW)){n++;quem[c.nome]=(quem[c.nome]||0)+1;}
+  return {n,quem:Object.entries(quem).sort((a,b)=>b[1]-a[1]).slice(0,6).map(e=>e[0]+' ('+e[1]+')')};}
+// raio contra os triângulos do índice (lado da face pelo material, como o Mesh.raycast; malhas de kit, que não respondem a raios, entram)
+function* pt882Raio(I,o,d,far,ign){const T=THREE;const R=new T.Ray(o,d),hp=new T.Vector3(),va=new T.Vector3(),vb=new T.Vector3(),vc=new T.Vector3();
+  const B=new T.Box3().setFromPoints([o,o.clone().addScaledVector(d,far)]).expandByScalar(.02);const L=yield* pt882Cands(I,B);let best=null,k=0;
+  for(const id of L){if(++k%128===0&&pt882Corte())yield 'pt882 raio';const m=I.malhas[I.tm[id]];if(ign&&ign(m,I.ta[id],I.tb[id],I.tc[id]))continue;const q=id*9,t=I.tri;va.set(t[q],t[q+1],t[q+2]);vb.set(t[q+3],t[q+4],t[q+5]);vc.set(t[q+6],t[q+7],t[q+8]);
+    const lf=I.lados[I.tm[id]];const h=lf===T.BackSide?R.intersectTriangle(vc,vb,va,true,hp):R.intersectTriangle(va,vb,vc,lf!==T.DoubleSide,hp);if(!h)continue;const dd=o.distanceTo(hp);
+    if(dd<=far&&(!best||dd<best.d))best={d:dd,quem:m.name||m.type,quadro:I.quadro[I.tm[id]]};}
+  PT882.stats.raios++;return best;}
+// ---------- blocos de vértices (malhas fundidas pelo kit): registro exato, transformação do mundo ----------
+function pt882Bloco(o,s,n){const g=pt882Geo(o),P=g.attributes.position,N=g.attributes.normal;return {o,g,s,n,pos0:P.array.slice(s*3,(s+n)*3),nor0:N&&N.itemSize===3?N.array.slice(s*3,(s+n)*3):null,pos1:null,nor1:null,W:null,feito:false};}
+// X: transformação do mundo (Matrix4) → no espaço da malha: M⁻¹·X·M (posição) e a matriz normal dela (normal)
+function pt882BlocoCalc(b,X){const T=THREE;const M=b.o.matrixWorld,Mi=new T.Matrix4().copy(M).invert(),W=new T.Matrix4().multiplyMatrices(Mi,X).multiply(M),Nm=new T.Matrix3().getNormalMatrix(W),v=new T.Vector3();
+  b.W=W;b.pos1=new Float32Array(b.n*3);for(let i=0;i<b.n;i++){v.fromArray(b.pos0,i*3).applyMatrix4(W);b.pos1[i*3]=v.x;b.pos1[i*3+1]=v.y;b.pos1[i*3+2]=v.z;}
+  if(b.nor0){b.nor1=new Float32Array(b.n*3);for(let i=0;i<b.n;i++){v.fromArray(b.nor0,i*3).applyMatrix3(Nm).normalize();b.nor1[i*3]=v.x;b.nor1[i*3+1]=v.y;b.nor1[i*3+2]=v.z;}}}
+function pt882CaixaBloco(b,novo){const B=new THREE.Box3(),v=new THREE.Vector3(),A=novo?b.pos1:b.pos0;for(let i=0;i<b.n;i++){v.fromArray(A,i*3).applyMatrix4(b.o.matrixWorld);B.expandByPoint(v);}return B;}
+// a malha trocada pelo LOD do Papel volta à original (o LOD dela é refeito pela passada do Papel, já com os vértices novos)
+function pt882PapelOriginal(o){try{if(typeof PAPEL_GEO!=='undefined'&&PAPEL_GEO.has(o)){const r=PAPEL_GEO.get(o);if(r&&r.g){o.geometry=r.g;PAPEL_GEO.delete(o);PT882.stats.papel++;}}}catch(e){pt882Erro('papel',e);}}
+function pt882BlocoPoe(b,novo){let g=b.o.geometry;if(g!==b.g){pt882PapelOriginal(b.o);g=b.o.geometry;if(g!==b.g){pt882Erro('bloco','geometria trocada em «'+(b.o.name||'?')+'»');return false;}}
+  const P=g.attributes.position,N=g.attributes.normal,a=P.array,o=b.s*3,alvo=novo?b.pos1:b.pos0,de=novo?b.pos0:b.pos1;let igual=true;
+  for(let i=0;i<b.n*3;i++)if(a[o+i]!==de[i]){igual=false;break;}
+  if(igual){a.set(alvo,o);if(N&&b.nor0)N.array.set(novo?b.nor1:b.nor0,o);}
+  else{ // alguém mexeu nesses vértices depois (outro bloco): o mesmo movimento, relativo
+    const W=novo?b.W:new THREE.Matrix4().copy(b.W).invert(),Nm=new THREE.Matrix3().getNormalMatrix(W),v=new THREE.Vector3();
+    for(let i=0;i<b.n;i++){v.fromArray(a,o+i*3).applyMatrix4(W);a[o+i*3]=v.x;a[o+i*3+1]=v.y;a[o+i*3+2]=v.z;}
+    if(N&&b.nor0)for(let i=0;i<b.n;i++){v.fromArray(N.array,o+i*3).applyMatrix3(Nm).normalize();N.array[o+i*3]=v.x;N.array[o+i*3+1]=v.y;N.array[o+i*3+2]=v.z;}}
+  P.needsUpdate=true;if(N)N.needsUpdate=true;
+  // caixa e esfera só crescem (a malha fundida é grande; recalcular tudo custa)
+  try{const v=new THREE.Vector3();if(!g.boundingBox)g.computeBoundingBox();if(!g.boundingSphere)g.computeBoundingSphere();const S=g.boundingSphere;
+    for(let i=0;i<b.n;i++){v.fromArray(a,o+i*3);g.boundingBox.expandByPoint(v);const d=v.distanceTo(S.center);if(d>S.radius)S.radius=d;}}catch(e){}
+  try{if(typeof PAPEL_GEO_LOD!=='undefined')PAPEL_GEO_LOD.delete(g);}catch(e){}
+  b.feito=novo;return true;}
+// objetos (grupo da arandela, brilhos da tocha): posição de antes e de depois
+function pt882Obj(o){return {o,p0:o.position.clone(),p1:null,feito:false};}
+function pt882ObjCalc(r,dW){const o=r.o,p=o.parent;let dl=dW.clone();if(p){p.updateMatrixWorld(true);const inv=new THREE.Matrix4().copy(p.matrixWorld).invert();const a=new THREE.Vector3().applyMatrix4(inv),b=dW.clone().applyMatrix4(inv);dl=b.sub(a);}r.p1=r.p0.clone().add(dl);}
+function pt882ObjPoe(r,novo){const o=r.o,de=novo?r.p0:r.p1,alvo=novo?r.p1:r.p0;if(o.position.equals(de))o.position.copy(alvo);else o.position.add(alvo.clone().sub(de));o.updateMatrixWorld(true);r.feito=novo;}
+// discos de obstáculo (o mesmo objeto da lista-base do DEC128)
+function pt882Disco(o){return {o,x0:o[0],z0:o[1],x1:null,z1:null};}
+function pt882DiscoPoe(r,novo){r.o[0]=novo?r.x1:r.x0;r.o[1]=novo?r.z1:r.z0;if(novo)r.o.pt882=true;else delete r.o.pt882;}
+// o recorte por distância do Leve/Papel (v199) guarda, por malha pequena (≥ 350 triângulos, raio ≤ 1,6 m), o centro e o raio da esfera do
+// mundo: a malha cujos vértices andaram ganha o centro e o raio novos (a malha cujo objeto andou sai sozinha da lista: `des199Moveu`)
+function pt882Des(p){try{if(typeof DES199==='undefined'||!DES199.cenas||!p.blocos.length)return;const st=PT882.salas[p.sala];const sc=st&&st.sc;const E=sc&&DES199.cenas.get(sc);if(!E||!E.lista)return;
+    const S=new Set(p.blocos.map(b=>b.o)),V=new THREE.Vector3(),W=new THREE.Vector3();for(const it of E.lista){if(!it||!S.has(it.o))continue;const g=it.o.geometry;if(!g)continue;g.computeBoundingSphere();it.o.getWorldScale(W);
+      V.copy(g.boundingSphere.center).applyMatrix4(it.o.matrixWorld);it.x=V.x;it.y=V.y;it.z=V.z;it.r=g.boundingSphere.radius*Math.max(Math.abs(W.x),Math.abs(W.y),Math.abs(W.z));PT882.stats.recorte++;}}catch(e){pt882Erro('recorte',e);}}
+// mover / devolver uma peça inteira (blocos, objetos, discos)
+function pt882Poe(p,novo){for(const b of p.blocos)pt882BlocoPoe(b,novo);for(const r of p.objs)pt882ObjPoe(r,novo);for(const r of (p.discos||[]))pt882DiscoPoe(r,novo);p.aplicada=novo;pt882Des(p);}
+function pt882Fundidas(p){for(const b of p.blocos)if(pt882Fundida(b.o))return true;for(const r of p.objs){let f=false;r.o.traverse(q=>{if(!f&&pt882Fundida(q))f=true;});if(f)return true;}return false;}
+function pt882Caixa(p,novo){const B=new THREE.Box3();for(const b of p.blocos)B.union(pt882CaixaBloco(b,novo));for(const r of p.objs){if(r.o.isSprite)continue;const o=r.o;const pos=o.position.clone();if(novo&&!r.feito&&r.p1)o.position.copy(r.p1);else if(!novo&&r.feito)o.position.copy(r.p0);o.updateMatrixWorld(true);B.union(new THREE.Box3().setFromObject(o));o.position.copy(pos);o.updateMatrixWorld(true);}return B.isEmpty()?null:B;}
+// procura um bloco de n vértices inteiro numa caixa esperada do mundo (± tol), nas malhas cujo nome casa com `re`
+function* pt882AchaBloco(sc,re,n,cx,tol){const T=THREE,out=[],v=new T.Vector3(),C=cx.clone().expandByScalar(tol);const malhas=[];
+  yield* pt882Percorre(sc,o=>{if(o.isMesh&&!o.isInstancedMesh&&o.geometry&&o.geometry.attributes&&o.geometry.attributes.position&&re.test(o.name||''))malhas.push(o);});let kk=0;
+  for(const o of malhas){const g=pt882Geo(o);if(!g.boundingBox)g.computeBoundingBox();if(!g.boundingBox.clone().applyMatrix4(o.matrixWorld).intersectsBox(C))continue;const pos=g.attributes.position,N=pos.count,e=o.matrixWorld;let ini=-1;
+    for(let i=0;i<=N;i++){if(i%4096===4095&&pt882Corte())yield 'pt882 bloco';let den=false;if(i<N){v.fromBufferAttribute(pos,i).applyMatrix4(e);den=C.containsPoint(v);}
+      if(den){if(ini<0)ini=i;continue;}
+      if(ini>=0){const L=i-ini;if(L>=n){for(let s=ini;s+n<=i;s++){if(++kk%48===0&&pt882Corte())yield 'pt882 bloco';const B=new T.Box3();for(let j=s;j<s+n;j++){v.fromBufferAttribute(pos,j).applyMatrix4(e);B.expandByPoint(v);}
+            if(Math.abs(B.min.x-cx.min.x)<=tol&&Math.abs(B.max.x-cx.max.x)<=tol&&Math.abs(B.min.y-cx.min.y)<=tol&&Math.abs(B.max.y-cx.max.y)<=tol&&Math.abs(B.min.z-cx.min.z)<=tol&&Math.abs(B.max.z-cx.max.z)<=tol){out.push({o,s,n});s+=n-1;}}}ini=-1;}}}
+  return out;}
+// caixa do mundo de uma caixa local num referencial (origem, giro y)
+function pt882CaixaRef(F,ry,lmin,lmax){const M=new THREE.Matrix4().makeRotationY(ry).setPosition(F[0],F[1]||0,F[2]);return pt882CaixaMundo(M,new THREE.Box3(new THREE.Vector3(...lmin),new THREE.Vector3(...lmax)));}
+// ---------- 1) ARANDELAS da v407 ----------
+// Cada «Arandela interior» é um grupo próprio (filho de «Lanternas interiores», na origem): o suporte (placa 0,18 × 0,50 × 0,06 em z local
+// −0,13; braço em arco) e a lanterna (z local 0,23). Olha para dentro da sala (z local); a parede da porta fica atrás (−z local).
+const PT882_PLACA=[[0,.82],[-.07,.62],[.07,.62],[-.07,1.02],[.07,1.02]];
+function pt882Arandelas(k,sc){const L=[];try{const E=typeof LANTERN407!=='undefined'&&LANTERN407.rooms&&LANTERN407.rooms.get(sc);const fx=[];
+    const pega=o=>{if(/^Arandela interior/.test(o.name||'')&&o.parent&&/^Lanternas interiores/.test(o.parent.name||''))fx.push(o);};
+    if(E&&E.root&&E.root.parent===sc)E.root.traverse(pega);else sc.traverse(pega);
+    fx.forEach((f,i)=>{f.updateMatrixWorld(true);const Mi=new THREE.Matrix4().copy(f.matrixWorld).invert();const lb=new THREE.Box3();
+      f.traverse(q=>{if(!q.isMesh||!q.geometry)return;const g=q.geometry;if(!g.boundingBox)g.computeBoundingBox();if(!g.boundingBox||g.boundingBox.isEmpty())return;lb.union(g.boundingBox.clone().applyMatrix4(new THREE.Matrix4().multiplyMatrices(Mi,q.matrixWorld)));});
+      if(lb.isEmpty())return;const dir=new THREE.Vector3(0,0,-1).transformDirection(f.matrixWorld);dir.y=0;if(dir.lengthSq()<1e-6)return;dir.normalize();
+      const p=f.getWorldPosition(new THREE.Vector3()),R=ROOMS[k],df=R&&R.doorFront;const lado=df?((p.x-df[0])*dir.z-(p.z-df[1])*dir.x>0?'esquerda':'direita'):String(i+1);
+      L.push({item:'arandelas',sala:k,id:k+'-arandela-'+(i+1),nome:'arandela «'+String(f.name).replace(/^Arandela interior · /,'')+'» da '+lado+' da porta',origem:'v407 lantern407Room («lanternas interiores»)',
+        tipo:'parede',f,M0:f.matrixWorld.clone(),lb,dir,blocos:[],objs:[pt882Obj(f)],
+        motivo:'a placa do suporte ficava afastada da parede da porta (o caminho andável da v407, `clamp(…, .35)`, e mais 0,18 m para dentro) — a arandela flutuava diante da parede; anda para trás até a placa encostar nela'});});}
+  catch(e){pt882Erro('arandelas '+k,e);}return L;}
+// a forma da arandela em fatias de 10 cm de altura (caixas locais por faixa de y, dos triângulos dela): a caixa única de uma peça em L
+// (placa atrás e embaixo, braço que sobe e avança, lanterna na frente) pegava o vazio dos cantos — um friso rente à parede, acima da placa,
+// passava por «malha no destino»
+// (gerador: a lanterna de algumas salas tem milhares de triângulos — em fatias; `pt882Fatias` é a versão de uma vez, para o roteiro)
+function pt882Fatias(f,h){const it=pt882FatiasG(f,h);let r;do{r=it.next();}while(!r.done);return r.value;}
+function* pt882FatiasG(f,h){const T=THREE,Mi=new T.Matrix4().copy(f.matrixWorld).invert(),M=new T.Matrix4(),v=new T.Vector3(),L=[];let y0=1e9,y1=-1e9,nn=0;
+  const ms=[];f.traverse(q=>{if(q.isMesh&&q.geometry&&q.geometry.attributes&&q.geometry.attributes.position)ms.push(q);});
+  for(const q of ms){const g=q.geometry,pos=g.attributes.position,ix=g.index,nt=ix?ix.count:pos.count;M.multiplyMatrices(Mi,q.matrixWorld);
+    for(let t=0;t+2<nt;t+=3){if(++nn%1024===0&&pt882Corte()){yield 'pt882 fatias';M.multiplyMatrices(Mi,q.matrixWorld);}let a0=1e9,a1=-1e9,b0=1e9,b1=-1e9,c0=1e9,c1=-1e9;for(let k=0;k<3;k++){v.fromBufferAttribute(pos,ix?ix.getX(t+k):t+k).applyMatrix4(M);if(v.x<a0)a0=v.x;if(v.x>a1)a1=v.x;if(v.y<b0)b0=v.y;if(v.y>b1)b1=v.y;if(v.z<c0)c0=v.z;if(v.z>c1)c1=v.z;}
+      L.push(a0,a1,b0,b1,c0,c1);if(b0<y0)y0=b0;if(b1>y1)y1=b1;}}
+  if(!L.length)return [];const n=Math.max(1,Math.ceil((y1-y0)/h)),F=[];for(let i=0;i<n;i++)F.push(new T.Box3());
+  for(let j=0;j<L.length;j+=6){const i0=Math.max(0,Math.min(n-1,Math.floor((L[j+2]-y0)/h))),i1=Math.max(0,Math.min(n-1,Math.floor((L[j+3]-y0-1e-9)/h)));
+    for(let i=i0;i<=i1;i++){F[i].expandByPoint(v.set(L[j],Math.max(L[j+2],y0+i*h),L[j+4]));F[i].expandByPoint(v.set(L[j+1],Math.min(L[j+3],y0+(i+1)*h),L[j+5]));}}
+  return F.filter(B=>!B.isEmpty());}
+function pt882Encolhe(B,e){const C=B.clone().expandByScalar(-e);for(const a of ['x','y','z'])if(C.min[a]>C.max[a]){const m=(B.min[a]+B.max[a])/2;C.min[a]=m-.001;C.max[a]=m+.001;}return C;}
+// os raios saem das costas da placa NO LUGAR DE ORIGEM (`M0`, a matriz do mundo de quando a arandela foi achada): o reacerto mede de novo com
+// a arandela já encostada
+function pt882ArandelaRaios(p){const f=p.f;f.updateMatrixWorld(true);const M=p.M0||f.matrixWorld;return PT882_PLACA.map(([x,y])=>new THREE.Vector3(x,y,-.158).applyMatrix4(M));}
+// ---------- 2) TOCHAS da v537/v693 (vértices no kit «521 <sala>») ----------
+// placa (caixa 0,16 × 0,34 × 0,12, 24 vértices) + braço (cilindro 6 lados, 0,55 de altura, 40) + copo (8 lados, 0,14, 52), seguidos na malha de
+// ferro; a chama (esfera 7 × 5, 48 vértices) na malha «brilho vc» do mesmo kit; dois brilhos (Sprite) na cena.
+function* pt882Tochas(k,sc){const T=THREE,L=[],malhas=[],brilhos=[],sprites=[];
+  yield* pt882Percorre(sc,o=>{if(o.isSprite){sprites.push(o);return;}if(!o.isMesh||o.isInstancedMesh||!o.geometry||!o.geometry.attributes||!o.geometry.attributes.position)return;const nm=o.name||'';if(!/^521 /.test(nm))return;if(/brilho/.test(nm))brilhos.push(o);else if(/vc r/.test(nm))malhas.push(o);});
+  if(!malhas.length)return L;const near=(a,b,t)=>Math.abs(a-b)<=t,t=.006;let passos=0;
+  for(const o of malhas){const pos=pt882Geo(o).attributes.position;if(pos.isInterleavedBufferAttribute||pos.itemSize!==3)continue;const A=pos.array,N=pos.count,e=o.matrixWorld,id=pt882Ident(e),v=new T.Vector3();
+    const P=i=>{if(id)return v.set(A[i*3],A[i*3+1],A[i*3+2]);return v.set(A[i*3],A[i*3+1],A[i*3+2]).applyMatrix4(e);};
+    const cx=(s,n,lim)=>{let x0=1e9,y0=1e9,z0=1e9,x1=-1e9,y1=-1e9,z1=-1e9;for(let i=s;i<s+n;i++){P(i);if(v.x<x0)x0=v.x;if(v.x>x1)x1=v.x;if(v.y<y0)y0=v.y;if(v.y>y1)y1=v.y;if(v.z<z0)z0=v.z;if(v.z>z1)z1=v.z;if(lim&&(x1-x0>lim||y1-y0>lim||z1-z0>lim))return null;}return {cx:(x0+x1)/2,cy:(y0+y1)/2,cz:(z0+z1)/2,dx:x1-x0,dy:y1-y0,dz:z1-z0};};
+    for(let s=0;s+116<=N;s++){if(++passos%2048===0&&pt882Corte())yield 'pt882 tochas';const b=cx(s,24,.36);if(!b||!near(b.dy,.34,t))continue;if(!((near(b.dx,.16,t)&&near(b.dz,.12,t))||(near(b.dx,.12,t)&&near(b.dz,.16,t))))continue;
+      const br=cx(s+24,40,.6);if(!br||!near(br.dy,.55,t)||br.dx>.1||br.dz>.1||!near(br.cy-b.cy,.27,.012))continue;
+      const cp=cx(s+64,52,.3);if(!cp||!near(cp.dy,.14,t)||!near(cp.cy-b.cy,.57,.012)||Math.hypot(cp.cx-br.cx,cp.cz-br.cz)>.012)continue;
+      const hx=br.cx-b.cx,hz=br.cz-b.cz,hl=Math.hypot(hx,hz);if(!near(hl,.16,.015))continue;const n=new T.Vector3(hx/hl,0,hz/hl);
+      const O=new T.Vector3(b.cx,b.cy-2.45,b.cz).addScaledVector(n,-.06);L.push({o,s,n,O});s+=115;}}
+  // os brilhos (Sprite) por célula de 0,5 m (posição do mundo já atualizada no começo do trabalho; `getWorldPosition` recalcula a cadeia toda)
+  const cel=new Map(),ck=(x,z)=>Math.floor(x*2)+','+Math.floor(z*2),w=new T.Vector3();let ns=0;
+  if(L.length)for(const sp of sprites){w.setFromMatrixPosition(sp.matrixWorld);const key=ck(w.x,w.z);let a=cel.get(key);if(!a){a=[];cel.set(key,a);}a.push([sp,w.x,w.y,w.z]);if(++ns%512===0&&pt882Corte())yield 'pt882 brilhos';}
+  const perto=(p,lista)=>{for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const c=cel.get((Math.floor(p.x*2)+a)+','+(Math.floor(p.z*2)+b));if(!c)continue;for(const e of c)if(Math.hypot(e[1]-p.x,e[2]-p.y,e[3]-p.z)<.03&&lista.indexOf(e[0])<0)lista.push(e[0]);}};
+  const out=[];let i=0,nv=0;
+  for(const q of L){i++;const {n,O}=q,blocos=[pt882Bloco(q.o,q.s,116)],objs=[];
+    const ch=new T.Vector3(O.x+n.x*.22,O.y+3.16,O.z+n.z*.22);let chama=null;
+    for(const o of brilhos){const pos=pt882Geo(o).attributes.position,A=pos.array,N=pos.count;if(pos.itemSize!==3||!pt882Ident(o.matrixWorld))continue;let run=0,ini=-1;
+      for(let j=0;j<=N;j++){const ok=j<N&&Math.abs(A[j*3]-ch.x)<.17&&Math.abs(A[j*3+1]-ch.y)<.26&&Math.abs(A[j*3+2]-ch.z)<.17;if(ok){if(!run)ini=j;run++;}else{if(run===48&&!chama)chama={o,s:ini};run=0;}if(++nv%4096===0&&pt882Corte())yield 'pt882 chama';}if(chama)break;}
+    if(chama)blocos.push(pt882Bloco(chama.o,chama.s,48));
+    const s1=new T.Vector3(O.x+n.x*.22,O.y+3.22,O.z+n.z*.22),s2=new T.Vector3(O.x+n.x*.3,O.y+2.9,O.z+n.z*.3),acha=[];perto(s1,acha);perto(s2,acha);
+    for(const sp of acha)objs.push(pt882Obj(sp));
+    const ex=new T.Vector3(n.z,0,-n.x); // eixo lateral (y para cima, z = para dentro da sala)
+    out.push({item:'tochas',sala:k,id:k+'-tocha-'+i,nome:'tocha de parede '+i+' (placa em '+pt882V(new T.Vector3(O.x,O.y+2.45,O.z)).join('; ')+')',origem:'v537/v693 rv537Tochas (tochas da muralha / do Salão dos Espectros)',
+      tipo:'tocha',n,O,ex,blocos,objs,chama:!!chama,brilhos:objs.length,
+      motivo:'a tocha nascia a esp/2 + 0,3 do eixo da muralha/parede: a placa ficava afastada da face (o Luiz pediu «tochas e braseiros colados nas paredes»); anda até a placa encostar'});}
+  return out;}
+// ---------- 3) CARRINHO DO CORREIO da v668 (Epistolar): os dois eixos ----------
+// `K.push(9.5, 0, 15.5, −0,5)`; rodas (r 0,22, 14 lados) em (±0,5; 0,22; ±0,45) com o eixo da roda ao longo de z local (de pé); os dois eixos
+// (cilindro r 0,02 × 0,9, 6 lados, 40 vértices cada, um logo depois do outro) foram escritos iguais, em (0; 0,22; 0), ao longo de x local.
+const PT882_CARRO={F:[9.5,0,15.5],ry:-.5};
+function* pt882Carrinho(sc){const T=THREE,C=PT882_CARRO,L=[];
+  const cx=pt882CaixaRef(C.F,C.ry,[-.45,.2,-.02],[.45,.24,.02]);const ach=yield* pt882AchaBloco(sc,/^668 correio/,40,cx,.006);
+  // as rodas, para conferir que estão de pé (altura da caixa = diâmetro) e no lugar: (±0,5; ±0,45)
+  const rodas=[];for(const [x,z] of [[-.5,.45],[-.5,-.45],[.5,.45],[.5,-.45]]){const r=yield* pt882AchaBloco(sc,/^668 correio/,88,pt882CaixaRef(C.F,C.ry,[x-.22,0,z-.025],[x+.22,.44,z+.025]),.01);rodas.push(r.length?1:0);}
+  if(ach.length<2)return {pecas:L,rodas,eixos:ach.length};
+  const Rf=new T.Matrix4().makeRotationY(C.ry),c0=new T.Vector3(0,.22,0).applyMatrix4(Rf).add(new T.Vector3(C.F[0],0,C.F[2]));
+  ach.slice(0,2).forEach((q,j)=>{const x=j?.5:-.5;const c1=new T.Vector3(x,.22,0).applyMatrix4(Rf).add(new T.Vector3(C.F[0],0,C.F[2]));
+    const X=new T.Matrix4().makeTranslation(c1.x,c1.y,c1.z).multiply(new T.Matrix4().makeRotationY(Math.PI/2)).multiply(new T.Matrix4().makeTranslation(-c0.x,-c0.y,-c0.z));
+    const b=pt882Bloco(q.o,q.s,40);pt882BlocoCalc(b,X);
+    const ex=new T.Vector3(1,0,0).applyMatrix4(Rf),ez=new T.Vector3(0,0,1).applyMatrix4(Rf);
+    L.push({item:'carrinho',sala:'epistolar',id:'epistolar-carrinho-eixo-'+(j?'direita':'esquerda'),nome:'eixo '+(j?'da direita':'da esquerda')+' do carrinho do correio (x local '+x+')',origem:'v668 ep668Aplica («o carrinho do correio»)',
+      tipo:'transforma',grupo:'eixos do carrinho',blocos:[b],objs:[],X,obb:pt882OBB(c1,ex,new T.Vector3(0,1,0),ez),lb:new T.Box3(new T.Vector3(-.015,-.015,-.44),new T.Vector3(.015,.015,.44)),fora:/^668 correio/,
+      motivo:'os dois eixos foram escritos iguais, no meio do carrinho e atravessados (ao longo do comprimento): nenhum toca roda e os dois ficam soltos debaixo da caixa; cada um vai para o seu par de rodas, ao longo da largura, com as pontas nos cubos'});});
+  return {pecas:L,rodas,eixos:ach.length};}
+// ---------- 4) LUNETA da v349 (Viagens) ----------
+// `K.push(−13, 0, −6, 0,45)`; tubo (r 0,25 × 2,8, 28 lados, 172 vértices) em (0; 1,9; 0) e anel (r 0,34 × 0,16, 172) em (−1,22; 2,73; 0), os dois
+// com `ry 0, rx 0,65, rz π/2` (eixo ao longo de x local: deitados); lente (esfera r 0,24 achatada 0,7 em y, 425) em (−1,28; 2,78; 0); tripé:
+// três tubos de (0; 1,2; 0) aos pés. A inclinação de 0,65 rad para −x local que a v349 queria (anel e lente na boca de cima) e o tubo apoiado
+// na ponta do tripé.
+const PT882_LUN={F:[-13,0,-6],ry:.45,th:.65,r:.25,meio:1.4,anel:1.48,lente:1.56};
+function* pt882Luneta(sc){const T=THREE,C=PT882_LUN,L=[];const re=/^Atlas · viagens/;
+  const tubo=yield* pt882AchaBloco(sc,re,172,pt882CaixaRef(C.F,C.ry,[-1.4,1.65,-.25],[1.4,2.15,.25]),.012);
+  const anel=yield* pt882AchaBloco(sc,re,172,pt882CaixaRef(C.F,C.ry,[-1.30,2.39,-.34],[-1.14,3.07,.34]),.012);
+  // a esfera da lente gira com o referencial sem mudar a caixa em x/z: caixa do mundo direto pelo centro
+  const Wl=(l)=>new T.Vector3(l[0],l[1],l[2]).applyMatrix4(new T.Matrix4().makeRotationY(C.ry)).add(new T.Vector3(C.F[0],0,C.F[2]));const cl=Wl([-1.28,2.78,0]);
+  const lente=yield* pt882AchaBloco(sc,re,425,new T.Box3(new T.Vector3(cl.x-.24,cl.y-.168,cl.z-.24),new T.Vector3(cl.x+.24,cl.y+.168,cl.z+.24)),.012);
+  // as três pernas do tripé (tubos r 0,045 da ponta aos pés): a altura da ponta, para o tubo assentar nela
+  let topo=1.2+.045;const pernas=[];const pes=[[.85,.05,.6],[-.85,.05,.6],[0,.05,-.9]],ap=Wl([0,1.2,0]);
+  for(const f of pes){const pf=Wl(f);const cxp=new T.Box3().setFromPoints([ap,pf]).expandByScalar(.045);const r=yield* pt882AchaBloco(sc,re,45,cxp,.03);
+    for(const q of r){const B=pt882CaixaBloco(pt882Bloco(q.o,q.s,45),false);if(B.max.y>1.1&&B.max.y<1.3){pernas.push(q);topo=pernas.length===1?B.max.y:Math.max(topo,B.max.y);break;}}}
+  const info={tubo:tubo.length,anel:anel.length,lente:lente.length,pernas:pernas.length,topo:pt882R(topo)};
+  if(tubo.length!==1||anel.length!==1||lente.length!==1)return {pecas:L,info};
+  const Rf=new T.Matrix4().makeRotationY(C.ry),F=new T.Vector3(C.F[0],0,C.F[2]),W=l=>new T.Vector3(l[0],l[1],l[2]).applyMatrix4(Rf).add(F);
+  const Lz=new T.Vector3(0,0,1).applyMatrix4(Rf).normalize(),eixo=new T.Vector3(-Math.cos(C.th),Math.sin(C.th),0);
+  // altura do centro do tubo: o tubo inclinado desce até encostar no vértice do tripé que mais sobe contra ele (a ponta e o anel de cima das
+  // pernas, do lado em que o tubo desce); distância de cada vértice ao eixo, no referencial da luneta, ≥ r + 2 mm
+  const Ri=new T.Matrix4().copy(Rf).invert(),sn=Math.sin(C.th),cs=Math.cos(C.th);let yc=topo+C.r/cs+.002;
+  for(const q of pernas){const b=pt882Bloco(q.o,q.s,45),v=new T.Vector3();for(let i=0;i<b.n;i++){v.fromArray(b.pos0,i*3).applyMatrix4(q.o.matrixWorld).sub(F).applyMatrix4(Ri);
+      if(Math.abs(v.z)>=C.r||Math.abs(v.x)>C.meio)continue;const rz=Math.sqrt(C.r*C.r-v.z*v.z);const y=v.y+(rz+.002+v.x*sn)/cs;if(y>yc)yc=y;}}
+  info.yc=pt882R(yc);
+  const ctr=[0,yc,0],ponto=s=>[ctr[0]+eixo.x*s,ctr[1]+eixo.y*s,0];const ax=eixo.clone().applyMatrix4(Rf).normalize(),az=Lz.clone(),ay=new T.Vector3().crossVectors(az,ax).normalize();
+  const peca=(id,nome,q,n,de,para,ang,meio)=>{const c0=W(de),c1=W(para);const X=new T.Matrix4().makeTranslation(c1.x,c1.y,c1.z).multiply(new T.Matrix4().makeRotationAxis(Lz,ang)).multiply(new T.Matrix4().makeTranslation(-c0.x,-c0.y,-c0.z));
+    const b=pt882Bloco(q.o,q.s,n);pt882BlocoCalc(b,X);L.push({item:'luneta',sala:'viagens',id,nome,origem:'v349 atlas349Details (Viagens: «observatory desk»)',tipo:'transforma',blocos:[b],objs:[],X,
+      obb:pt882OBB(c1,ax,ay,az),lb:new T.Box3(new T.Vector3(-meio[0],-meio[1],-meio[1]),new T.Vector3(meio[0],meio[1],meio[1])),fora:null,
+      motivo:'o tubo da luneta devia estar inclinado 0,65 rad (o anel e a lente na boca de cima): a inclinação foi para o eixo errado e o tubo ficou deitado 0,45 m acima da ponta do tripé, com o anel e a lente soltos no ar; o tubo inclina e desce até a ponta do tripé, o anel e a lente vão para a boca de cima'});};
+  peca('viagens-luneta-tubo','tubo de latão da luneta (2,8 m)',tubo[0],172,[0,1.9,0],ctr,-C.th,[C.meio-.01,C.r-.01]);
+  peca('viagens-luneta-anel','anel da boca da luneta',anel[0],172,[-1.22,2.73,0],ponto(C.anel),-C.th,[.07,.33]);
+  peca('viagens-luneta-lente','lente escura da luneta',lente[0],425,[-1.28,2.78,0],ponto(C.lente),Math.PI/2-C.th,[.158,.23]);
+  // as três peças da luneta não contam umas para as outras nem o tripé (que encosta de propósito no tubo: a altura já vem dele); andam juntas
+  const blocosLun=L.map(p=>p.blocos[0]).concat(pernas.map(q=>({o:q.o,s:q.s,n:45})));const ignLun=(o,a,b,c)=>blocosLun.some(B=>B.o===o&&a>=B.s&&a<B.s+B.n);for(const p of L){p.ign=ignLun;p.grupo='luneta';}L[0].pernas=pernas.map(q=>({o:q.o,s:q.s,n:45}));
+  return {pecas:L,info};}
+// ---------- 5) PASSARELA do Steampunk (v224 a6xSteampunk, kit «Oficina · passarela») ----------
+// X0 8,1 · X1 9,9 · Z0 −9,6 · Z1 2,0 · Y 3,8 (a oficina de 20 m tinha a parede direita em x 10). Partes para conferir o destino, do código:
+const PT882_PAS={X0:8.1,X1:9.9,Z0:-9.6,Z1:2.0,Y:3.8,partes:(()=>{const P=[];P.push(['piso de grade',[8.1,3.75,-9.6],[9.9,3.85,2.0]]);P.push(['vigas',[8.1,3.67,-9.6],[9.9,3.75,2.0]]);
+    for(const z of [-9.0,-5.6,-1.8,1.4])P.push(['pilar z '+z,[8.18,0,z-.12],[8.42,3.8,z+.12]]);P.push(['guarda-corpo',[8.07,3.8,-9.63],[8.13,4.83,2.03]]);
+    for(let i=0;i<13;i++){const y=3.8-.28*(i+1),z=2.0+.28*(i+1);P.push(['degrau '+(i+1),[8.25,y-.025,z-.15],[9.75,y+.025,z+.15]]);}
+    P.push(['banzo da escada (dentro)',[8.22,.52,2.45],[8.28,3.38,5.35]]);P.push(['banzo da escada (fora)',[9.72,.52,2.45],[9.78,3.38,5.35]]);P.push(['corrimão da escada',[8.08,.5,2.2],[8.12,4.5,5.75]]);
+    P.push(['caixote grande',[8.75,3.85,-8.35],[9.45,4.45,-7.65]]);P.push(['caixote pequeno',[8.8,3.85,-7.1],[9.4,4.35,-6.5]]);P.push(['bobina de cobre',[8.78,3.85,-2.72],[9.22,4.35,-2.28]]);
+    P.push(['luneta de latão',[8.2,4.1,1.05],[9.05,5.35,1.35]]);P.push(['lâmpadas e cabo',[7.84,4.4,-9.65],[7.96,4.97,2.05]]);return P;})(),
+  discos:[[8.3,-9,.35],[8.3,-5.6,.35],[8.3,-1.8,.35],[8.3,1.4,.35],[9,4.2,1]],deslizes:[0,.5,-.5,1,-1,1.5,-1.5,2,-2,2.5,-2.5,3]};
+function* pt882Passarela(sc,k){const T=THREE,P=PT882_PAS,L=[],info={};const dm=pt882Dim(k);info.W=pt882R(dm.W);if(!(dm.W>20.5))return {pecas:L,info:Object.assign(info,{pula:'oficina sem ampliação'})};
+  // o piso de grade (24 vértices) no lugar do desenho: confirma que a passarela é a da v224 e que ninguém a moveu
+  const piso=yield* pt882AchaBloco(sc,/^Oficina · passarela/,24,new T.Box3(new T.Vector3(P.X0,P.Y-.05,P.Z0),new T.Vector3(P.X1,P.Y+.05,P.Z1)),.01);info.piso=piso.length;if(piso.length!==1)return {pecas:L,info};
+  const malhas=[];yield* pt882Percorre(sc,o=>{if(o.isMesh&&!o.isInstancedMesh&&/^Oficina · passarela/.test(o.name||'')&&o.geometry&&o.geometry.attributes&&o.geometry.attributes.position)malhas.push(o);});
+  const blocos=malhas.map(o=>pt882Bloco(o,0,pt882Geo(o).attributes.position.count));
+  // a poça de luz do chão debaixo das lâmpadas (`LZ.chao(X0 − 1,5; −2; 3,5)`: quadrado 7 × 7 a 1,6 cm do chão)
+  const poca=yield* pt882AchaBloco(sc,/poças de luz$/,4,new T.Box3(new T.Vector3(P.X0-1.5-3.5,.016,-2-3.5),new T.Vector3(P.X0-1.5+3.5,.016,-2+3.5)),.01);info.poca=poca.length;
+  const ob=pt882Obst(k)||[];const discos=[];for(const [x,z,r] of P.discos){const o=ob.find(d=>d&&Math.abs(d[0]-x)<.05&&Math.abs(d[1]-z)<.05&&Math.abs(d[2]-r)<.03);if(o)discos.push(pt882Disco(o));}info.discos=discos.length;
+  const dx=dm.W/2-10;info.dx=pt882R(dx);
+  L.push({item:'passarela',sala:k,id:'steampunk-passarela',nome:'passarela de ferro da oficina (piso de grade 1,8 × 11,6 m a 3,8 m, pilares, escada, guarda-corpo, caixotes, lâmpadas)',origem:'v224 a6xSteampunk («passarela de ferro ao longo da parede direita»)',
+    tipo:'passarela',dx,blocos,poca:poca.length?pt882Bloco(poca[0].o,poca[0].s,4):null,objs:[],discos,
+    motivo:'desenhada encostada na parede direita da oficina de 20 m (x 10); a oficina passou a '+pt882R(dm.W)+' m e a passarela ficou a '+pt882R(dx)+' m da parede, com o lado de fora sem guarda-corpo; vai para a parede de hoje e desliza ao longo dela até o primeiro lugar livre'});
+  return {pecas:L,info};}
+// ---------- 6) CARRINHO DO CARTEIRO da v437 (Epistolar): o pé do canto sem pé ----------
+// `at437Lugar(R, [[16.5,−9],[−16.5,−9],[16.5,13],[−16.5,13],[16.3,−2]], 1,1)`; tampo 1,5 × 0,95 a 0,52; pés (0,07 × 0,5) em (x ± 0,7; z − 0,4) — o
+// laço variou x com z fixo —; rodas em (x + 0,55; z ± 0,42); alça (montantes de 0,425 a 1,375) em (x − 0,72; z ± 0,42).
+function* pt882Carroca(sc){const T=THREE,L=[];let pos=null;try{const I=typeof AT437!=='undefined'&&AT437.info;for(const kk of ['epistolar']){const c=I&&I[kk]&&I[kk].carrinho;if(Array.isArray(c))pos=c;}}catch(e){}
+  const cands=pos?[pos]:[[16.5,-9],[-16.5,-9],[16.5,13],[-16.5,13],[16.3,-2]];
+  for(const [x,z] of cands){const pe=yield* pt882AchaBloco(sc,/^437 carrinho/,24,new T.Box3(new T.Vector3(x+.665,.05,z-.435),new T.Vector3(x+.735,.55,z-.365)),.006);if(pe.length!==1)continue;
+    const outro=yield* pt882AchaBloco(sc,/^437 carrinho/,24,new T.Box3(new T.Vector3(x-.735,.05,z-.435),new T.Vector3(x-.665,.55,z-.365)),.006);
+    const tampo=yield* pt882AchaBloco(sc,/^437 carrinho/,24,new T.Box3(new T.Vector3(x-.75,.475,z-.475),new T.Vector3(x+.75,.565,z+.475)),.006);
+    if(outro.length!==1||tampo.length!==1)continue;
+    const b=pt882Bloco(pe[0].o,pe[0].s,24);const X=new T.Matrix4().makeTranslation(-1.4,0,.8);pt882BlocoCalc(b,X);const c1=new T.Vector3(x-.7,.3,z+.4);
+    L.push({item:'carroca',sala:'epistolar',id:'epistolar-carrinho437-pe',nome:'pé do carrinho do carteiro (canto da alça, frente)',origem:'v437 at437Epistolar («carrinho do carteiro com sacos de cartas»)',
+      tipo:'transforma',blocos:[b],objs:[],X,obb:pt882OBB(c1,new T.Vector3(1,0,0),new T.Vector3(0,1,0),new T.Vector3(0,0,1)),lb:new T.Box3(new T.Vector3(-.03,-.245,-.03),new T.Vector3(.03,.245,.03)),fora:/^437 carrinho/,
+      motivo:'o laço dos pés variou x com z fixo: um pé ficou do lado das rodas (atravessando a roda de trás) e o canto da frente do lado da alça ficou sem pé (o montante da alça acaba 0,43 m acima do chão); o pé vai para o canto sem pé'});break;}
+  return L;}
+// ---------- 7) BANZOS da escada da passarela do Steampunk (v224) ----------
+// `K.box(.06, .06, 4,0, FER, 9 ± 0,75, Y − 1,85, Z1 + 1,9, 0, −0,78)`: com rx −0,78 o banzo SOBE para +z — os degraus descem para +z (de 3,52 m
+// em z 2,28 a 0,16 m em z 5,64): os dois banzos cruzavam a escada em X. Giram 1,56 rad em x pelo centro (rx +0,78): passam pelas pontas dos degraus.
+function* pt882Banzos(sc){const T=THREE,L=[],P=PT882_PAS;const xs=[(P.X0+P.X1)/2-.75,(P.X0+P.X1)/2+.75];
+  for(const x of xs){const r=yield* pt882AchaBloco(sc,/^Oficina · passarela/,24,new T.Box3(new T.Vector3(x-.03,.522,2.457),new T.Vector3(x+.03,3.378,5.343)),.01);if(r.length!==1)continue;
+    const b=pt882Bloco(r[0].o,r[0].s,24),v=new T.Vector3();let z0=1e9,z1=-1e9;const pts=[];for(let i=0;i<24;i++){v.fromArray(b.pos0,i*3).applyMatrix4(b.o.matrixWorld);pts.push(v.clone());if(v.z<z0)z0=v.z;if(v.z>z1)z1=v.z;}
+    let yA=0,nA=0,yB=0,nB=0;for(const q of pts){if(q.z<z0+.05){yA+=q.y;nA++;}if(q.z>z1-.05){yB+=q.y;nB++;}}yA/=nA||1;yB/=nB||1;
+    if(!(yB>yA+1))continue; // já desce para +z (ou não é o desenho)
+    const c=pt882CaixaBloco(b,false).getCenter(new T.Vector3());const X=new T.Matrix4().makeTranslation(c.x,c.y,c.z).multiply(new T.Matrix4().makeRotationX(1.56)).multiply(new T.Matrix4().makeTranslation(-c.x,-c.y,-c.z));pt882BlocoCalc(b,X);
+    const u=new T.Vector3(0,-Math.sin(.78),Math.cos(.78)),ex=new T.Vector3(1,0,0),ey=new T.Vector3().crossVectors(u,ex).normalize();
+    L.push({item:'escada',sala:'steampunk',id:'steampunk-escada-banzo-'+(x<9?'dentro':'fora'),nome:'banzo '+(x<9?'de dentro':'de fora')+' da escada da passarela (x '+pt882R(x)+')',origem:'v224 a6xSteampunk («escada de ferro descendo para +z»)',
+      foto:{id:'steampunk-escada',olho:[5.6,3.2],alvo:[9,1.9,3.9],nota:'a escada da passarela de lado: antes, os banzos cruzando os degraus em X; depois, no sentido dos degraus'},
+      tipo:'transforma',grupo:'banzos da escada',blocos:[b],objs:[],X,obb:pt882OBB(c,ex,ey,u),lb:new T.Box3(new T.Vector3(-.02,-.02,-1.97),new T.Vector3(.02,.02,1.97)),fora:/^Oficina · passarela/,
+      motivo:'o banzo subia para +z (rx −0,78) enquanto os degraus descem para +z: os dois banzos cruzavam a escada em X; giram para o sentido dos degraus (rx +0,78), passando pelas pontas deles'});}
+  return L;}
+// ---------- 8) RETRATOS da sala de Halloween (v551 `hw551Aplica`, parede da frente, kit «551 decoração») ----------
+// `Kd.push(x, 2,9, S.z1 − 0,2, π)`: moldura 1,3 × 1,66 × 0,07 e a pintura (plano 1,08 × 1,42, material próprio) 4,5 cm à frente; as costas da moldura
+// ficavam a 0,165 m da parede (S.z1). Encostam (moldura e pintura juntas).
+function* pt882Retratos(sc){const T=THREE,L=[];let S=null;try{S=typeof TR507!=='undefined'&&TR507.S;}catch(e){}if(!S||!(S.z1>S.z0))return L;let i=0;
+  for(const x of [S.x0+6.2,S.x1-6.2]){i++;const zc=S.z1-.2;
+    const mol=yield* pt882AchaBloco(sc,/^551 decoração/,24,new T.Box3(new T.Vector3(x-.65,2.07,zc-.035),new T.Vector3(x+.65,3.73,zc+.035)),.008);
+    const pin=yield* pt882AchaBloco(sc,/^551 decoração/,4,new T.Box3(new T.Vector3(x-.54,2.19,zc-.045),new T.Vector3(x+.54,3.61,zc-.045)),.008);if(mol.length!==1||pin.length!==1)continue;
+    const dir=new T.Vector3(0,0,1),raios=[[0,0],[-.5,-.6],[.5,-.6],[-.5,.6],[.5,.6]].map(([u,w])=>new T.Vector3(x+u,2.9+w,zc+.035-.002));
+    L.push({item:'retratos',sala:'lib',id:'lib-retrato-'+i,nome:'retrato '+i+' da parede da frente da sala de Halloween',origem:'v551 hw551Aplica («retratos na parede da frente»)',
+      foto:{id:'lib-retrato-'+i,olho:[x+(i===1?2.2:-2.2),zc-3.6],alvo:[x,2.9,zc+.1],nota:'o retrato '+i+' na parede da frente do Halloween, de viés: antes, a 0,17 m da parede; depois, encostado'},
+      tipo:'paredeV',blocos:[pt882Bloco(mol[0].o,mol[0].s,24),pt882Bloco(pin[0].o,pin[0].s,4)],objs:[],dir,raios,recuo:.002,semQuadro:true,
+      obb:pt882OBB(new T.Vector3(x,2.9,zc+.035),new T.Vector3(-1,0,0),new T.Vector3(0,1,0),new T.Vector3(0,0,-1)),lb:new T.Box3(new T.Vector3(-.65,-.83,0),new T.Vector3(.65,.83,.081)),
+      motivo:'a moldura ficava a 0,165 m da parede da frente (`S.z1 − 0,2`): o retrato flutuava diante da parede; encosta'});}
+  return L;}
+// ---------- 9) PEDRAS DE CIMA da muralha do forte em ruínas da Ilha do Duelo (v539 `cp539Ilha`, kit «539 ilha», pedra escura) ----------
+// cada trecho: `K.box(3,4, alt, 1,1)` de −0,3 a alt − 0,3 e, em 60 %, `K.box(1,2, 0,5, 1,1)` centrado em alt + 0,1 (de alt − 0,15 a alt + 0,35): a pedra de
+// cima ficava 0,15 m acima do topo do muro, no ar. Desce até assentar (2 mm de folga). Assinatura: duas caixas seguidas na malha (24 + 24 vértices).
+function* pt882Pedras(sc){const T=THREE,L=[],malhas=[];yield* pt882Percorre(sc,o=>{if(o.isMesh&&!o.isInstancedMesh&&/^539 ilha/.test(o.name||'')&&/pedra escura/.test(o.name||'')&&o.geometry&&o.geometry.attributes&&o.geometry.attributes.position)malhas.push(o);});
+  let passos=0,i=0;for(const o of malhas){const pos=pt882Geo(o).attributes.position,N=pos.count,e=o.matrixWorld,v=new T.Vector3();
+    const cx=(s,n,lh,lv)=>{let x0=1e9,y0=1e9,z0=1e9,x1=-1e9,y1=-1e9,z1=-1e9;for(let j=s;j<s+n;j++){v.fromBufferAttribute(pos,j).applyMatrix4(e);if(v.x<x0)x0=v.x;if(v.x>x1)x1=v.x;if(v.y<y0)y0=v.y;if(v.y>y1)y1=v.y;if(v.z<z0)z0=v.z;if(v.z>z1)z1=v.z;if(x1-x0>lh||z1-z0>lh||y1-y0>lv)return null;}return {x0,y0,z0,x1,y1,z1};};
+    for(let s=0;s+48<=N;s++){if(++passos%2048===0&&pt882Corte())yield 'pt882 pedras';const A=cx(s,24,3.7,3.9);if(!A)continue;const ha=A.y1-A.y0;if(ha<1.15||ha>3.85||Math.max(A.x1-A.x0,A.z1-A.z0)<3.0)continue;
+      const B=cx(s+24,24,1.7,.6);if(!B||Math.abs((B.y1-B.y0)-.5)>.006)continue;const gap=B.y0-A.y1;if(gap<.13||gap>.17)continue;
+      if(Math.hypot((B.x0+B.x1)/2-(A.x0+A.x1)/2,(B.z0+B.z1)/2-(A.z0+A.z1)/2)>1.35)continue;i++;
+      L.push({item:'pedras',sala:'adv',id:'adv-pedra-forte-'+i,nome:'pedra de cima do trecho '+i+' da muralha do forte (topo do muro a '+pt882R(A.y1)+' m)',origem:'v539 cp539Ilha («a muralha do forte em ruínas»)',
+        foto:i===1?{id:'adv-pedras-forte',olho:[(A.x0+A.x1)/2+((A.x0+A.x1)/2>(typeof CP539_ILHA!=='undefined'?CP539_ILHA.ax:0)?-4.5:4.5),(A.z0+A.z1)/2-3],alvo:[(B.x0+B.x1)/2,A.y1,(B.z0+B.z1)/2],nota:'a muralha do forte em ruínas: antes, a pedra de cima 15 cm acima do muro; depois, assentada'}:null,
+        tipo:'cair',blocos:[pt882Bloco(o,s+24,24)],objs:[],dy:gap-.002,folga:pt882R(gap),
+        motivo:'a pedra de cima ficava 0,15 m acima do topo do muro (centro em alt + 0,1 com 0,5 de altura; o muro acaba em alt − 0,3): solta no ar; desce até assentar'});s+=47;}}
+  return L;}
+// ---------- 10) PLACA «PADARIA» do Realismo (v221, kit «Vila mágica · padaria») ----------
+// `K.plane(2,2, 0,5, …, 5,5, 3,0, −12,2)` diante da casa de (5,5; −12,75): a placa (só o plano) ficava 0,30 m à frente da fachada (medido). Encosta.
+// (revisão) a fachada tem uma VIGA horizontal (y 2,852–2,972, 5 cm à frente da parede, a casa inteira) atrás da faixa de baixo da placa: os
+// 5 raios de antes (y 2,82 / 3,0 / 3,18) passavam por baixo e por cima dela e a placa entrava 4,6 cm na viga (a viga cortava o «PADARIA»).
+// Grade 5 × 5 (uma linha em y 2,89): a placa encosta na viga (4 mm), a 5,4 cm da parede acima e abaixo dela.
+function* pt882Placa(sc){const T=THREE,L=[];const r=yield* pt882AchaBloco(sc,/v221 placa padaria$/,4,new T.Box3(new T.Vector3(4.4,2.75,-12.2),new T.Vector3(6.6,3.25,-12.2)),.01);if(r.length!==1)return L;
+  const raios=[];for(const u of [-1.0,-.5,0,.5,1.0])for(const w of [-.22,-.11,0,.11,.22])raios.push(new T.Vector3(5.5+u,3.0+w,-12.2));const dir=new T.Vector3(0,0,-1);
+  L.push({item:'placa',sala:'realismo',id:'realismo-placa-padaria',nome:'placa «PADARIA» da padaria da vila (2,2 × 0,5 m)',origem:'v221 (Realismo, «a padaria: balcão na janela…»)',
+    foto:{id:'realismo-placa-padaria',olho:[8.3,-8.2],alvo:[5.5,3.0,-12.3],nota:'a fachada da padaria de viés: antes, a placa a 0,25 m da fachada; depois, encostada'},
+    tipo:'paredeV',blocos:[pt882Bloco(r[0].o,r[0].s,4)],objs:[],dir,raios,recuo:0,
+    obb:pt882OBB(new T.Vector3(5.5,3.0,-12.2),new T.Vector3(1,0,0),new T.Vector3(0,1,0),new T.Vector3(0,0,1)),lb:new T.Box3(new T.Vector3(-1.1,-.25,-.0015),new T.Vector3(1.1,.25,.0015)),
+    motivo:'a placa (um plano, sem suporte) ficava 0,30 m à frente da fachada da padaria (0,25 m da viga que cruza a fachada atrás dela), no ar; encosta na viga'});return L;}
+// ---------- 11) PENTEADEIRAS da Oficina dos Palhaços (v522, anexo da sala do Humor, kit «521 fazenda») ----------
+// por penteadeira (três, em q.x0 + 1,2, z = q.z0 + 2,5 + 5i): tampo 2 × 0,06 × 0,7 a 0,76, gaveteiro 1,9 × 0,3 × 0,6 (de 0,45 a 0,75 — sem pés) com
+// as costas a 0,2 m da parede (q.x0); espelho (moldura 1,5 × 1,3 × 0,06, o plano e dez lâmpadas) com as costas a 0,42 m da parede, no ar; quatro
+// narizes no tampo. A penteadeira (tampo, gaveteiro, narizes, disco) encosta na parede, presa nela; o espelho encosta acima dela. As duas partes juntas.
+function* pt882Penteadeiras(sc){const T=THREE,L=[],malhas=[];yield* pt882Percorre(sc,o=>{if(o.isMesh&&!o.isInstancedMesh&&/^521 fazenda/.test(o.name||'')&&o.geometry&&o.geometry.attributes&&o.geometry.attributes.position)malhas.push(o);});
+  const gav=[];let passos=0;for(const o of malhas){const pos=pt882Geo(o).attributes.position,N=pos.count,e=o.matrixWorld,v=new T.Vector3();
+    for(let s=0;s+24<=N;s++){if(++passos%2048===0&&pt882Corte())yield 'pt882 penteadeiras';let x0=1e9,y0=1e9,z0=1e9,x1=-1e9,y1=-1e9,z1=-1e9,ok=true;
+      for(let j=s;j<s+24;j++){v.fromBufferAttribute(pos,j).applyMatrix4(e);if(v.x<x0)x0=v.x;if(v.x>x1)x1=v.x;if(v.y<y0)y0=v.y;if(v.y>y1)y1=v.y;if(v.z<z0)z0=v.z;if(v.z>z1)z1=v.z;if(x1-x0>1.91||y1-y0>.31||z1-z0>.61){ok=false;break;}}
+      if(!ok||Math.abs(x1-x0-1.9)>.005||Math.abs(y1-y0-.3)>.005||Math.abs(z1-z0-.6)>.005||Math.abs(y0-.45)>.01)continue;gav.push({o,s,cx:(x0+x1)/2,cz:(z0+z1)/2});s+=23;}}
+  const ob=pt882Obst('fazenda')||[];let i=0;
+  for(const g of gav){i++;const {cx,cz}=g,B=(a,b)=>new T.Box3(new T.Vector3(...a),new T.Vector3(...b));
+    const tam=yield* pt882AchaBloco(sc,/^521 fazenda/,24,B([cx-1.0,.73,cz-.35],[cx+1.0,.79,cz+.35]),.006);
+    const mol=yield* pt882AchaBloco(sc,/^521 fazenda/,24,B([cx-.78,1.1,cz-.75],[cx-.72,2.4,cz+.75]),.006);
+    const esp=yield* pt882AchaBloco(sc,/^521 fazenda/,4,B([cx-.71,1.2,cz-.65],[cx-.71,2.3,cz+.65]),.006);
+    if(tam.length!==1||mol.length!==1||esp.length!==1)continue;
+    const lamp=[],nar=[];for(let k=0;k<10;k++){const a=k/10*6.283,y=1.75+Math.sin(a)*.6,z=cz+Math.cos(a)*.78;const r=yield* pt882AchaBloco(sc,/^521 fazenda/,48,B([cx-.72,y-.04,z-.04],[cx-.64,y+.04,z+.04]),.006);if(r.length===1)lamp.push(r[0]);}
+    for(let k=0;k<4;k++){const x=cx-.4+k*.3;const r=yield* pt882AchaBloco(sc,/^521 fazenda/,63,B([x-.05,.79,cz-.25],[x+.05,.89,cz-.15]),.006);if(r.length===1)nar.push(r[0]);}
+    const dir=new T.Vector3(-1,0,0),ex=new T.Vector3(0,0,-1),ey=new T.Vector3(0,1,0),ez=new T.Vector3(1,0,0);const disco=ob.find(d=>d&&Math.abs(d[0]-cx)<.05&&Math.abs(d[1]-cz)<.05&&Math.abs(d[2]-1.2)<.03);
+    const grupo='penteadeira '+i;
+    L.push({item:'penteadeiras',sala:'fazenda',id:'fazenda-penteadeira-'+i,nome:'penteadeira '+i+' da Oficina dos Palhaços (tampo, gaveteiro e '+nar.length+' narizes)',origem:'v522 (Oficina dos Palhaços, anexo do Humor)',grupo,
+      foto:i===1?{id:'fazenda-penteadeiras',olho:[cx+2.4,cz+3.2],alvo:[cx-.8,1.2,cz],nota:'as penteadeiras da Oficina dos Palhaços de viés: antes, sem pés a 0,2 m da parede e o espelho solto a 0,42 m; depois, encostados na parede'}:null,
+      tipo:'paredeV',blocos:[pt882Bloco(tam[0].o,tam[0].s,24),pt882Bloco(g.o,g.s,24)].concat(nar.map(q=>pt882Bloco(q.o,q.s,63))),objs:[],discos:disco?[pt882Disco(disco)]:[],dir,
+      raios:[[-.3,.76],[.3,.76],[-.25,.6],[.25,.6],[0,.68]].map(([u,y])=>new T.Vector3(cx-1.0+.002,y,cz+u)),recuo:.002,
+      obb:pt882OBB(new T.Vector3(cx-1.0,.6,cz),ex,ey,ez),lb:new T.Box3(new T.Vector3(-.35,-.15,0),new T.Vector3(.35,.3,2.0)),
+      motivo:'a penteadeira não tem pés (gaveteiro de 0,45 a 0,75 m) e as costas ficavam a 0,16 m da parede: flutuava; encosta na parede, presa nela'});
+    L.push({item:'penteadeiras',sala:'fazenda',id:'fazenda-espelho-'+i,nome:'espelho da penteadeira '+i+' (moldura, espelho e '+lamp.length+' lâmpadas)',origem:'v522 (Oficina dos Palhaços, anexo do Humor)',grupo,
+      tipo:'paredeV',blocos:[pt882Bloco(mol[0].o,mol[0].s,24),pt882Bloco(esp[0].o,esp[0].s,4)].concat(lamp.map(q=>pt882Bloco(q.o,q.s,48))),objs:[],dir,
+      raios:[[0,0],[-.6,-.5],[.6,-.5],[-.6,.5],[.6,.5]].map(([u,w])=>new T.Vector3(cx-.78+.002,1.75+w,cz+u)),recuo:.002,
+      obb:pt882OBB(new T.Vector3(cx-.78,1.75,cz),ex,ey,ez),lb:new T.Box3(new T.Vector3(-.83,-.66,0),new T.Vector3(.83,.66,.145)),
+      motivo:'a moldura do espelho ficava a 0,38 m da parede, solta no ar acima da penteadeira; encosta na parede'});}
+  return L;}
+// ---------- a cadeia do c465 (tremeliques: v465/v471, ZF879 e ZF880, `c465Varre`) ----------
+// Roda só na cena ATIVA, quando a construção sossega (`c465Tick`, 3 ms por quadro), e termina gravando `userData.c465.feito`; o ZF880 (A)
+// afasta 4 mm a face menor de pares coplanares da MESMA malha fundida — nas muralhas 521/532 dos campos, a face onde a tocha encosta chega a
+// sair 8 mm. A assinatura muda a cada passada terminada (a contagem de malhas da passada e a vez do ZF880 na cena).
+function pt882C465Corre(sc){try{return typeof C465!=='undefined'&&C465.on&&!!C465.job&&C465.job.sc===sc;}catch(e){return false;}}
+function pt882Sig465(sc){try{if(typeof C465==='undefined'||!C465.on)return 'sem c465';const u=sc&&sc.userData&&sc.userData.c465;let z='';
+    try{if(typeof ZF880!=='undefined'&&ZF880.cenas&&typeof zf880NomeCena==='function'){const s=ZF880.cenas[zf880NomeCena(sc)];z=s?String(s.vez):'';}}catch(e){}
+    return (u&&u.feito>=0?u.feito:'-')+'|'+z;}catch(e){return '?';}}
+// ---------- pronto para aplicar? ----------
+// sala pronta há 3 s, cena sem filhos novos há 2 s e as decorações tardias da sala feitas (SG801 — 2.º, 6.º e 7.º andares —, v668, campo dos
+// rivais); 15 s depois de pronta, vai assim mesmo
+function pt882Pronta(k){const c=pt882Cena(k);if(!c||!c.R.ready)return {ok:false};const now=performance.now();let E=PT882.espera[k];
+  if(!E||E.sc!==c.sc)E=PT882.espera[k]={sc:c.sc,t:now,n:c.sc.children.length,tn:now};if(c.sc.children.length!==E.n){E.n=c.sc.children.length;E.tn=now;}
+  const falta=[];if(now-E.t<3000)falta.push('assentar (3 s)');if(now-E.tn<2000)falta.push('cena mudando');
+  try{if(typeof SG801!=='undefined'&&SG801.on&&SG801.salas&&SG801.salas[k]&&!SG801.salas[k].feito)falta.push('SG801');}catch(e){}
+  try{if(k==='epistolar'&&typeof EP668!=='undefined'&&EP668.on&&!EP668.feito)falta.push('v668');}catch(e){}
+  // a cadeia do c465 (v465/v471 + ZF879 + ZF880) andando nesta cena: ela ainda afasta faces da parede (a muralha dos campos sai 4–8 mm);
+  // medir no meio dela daria a parede de antes (o que sobrar é acertado pelo reacerto, quando ela termina)
+  if(pt882C465Corre(c.sc))falta.push('c465 em curso');
+  try{if(typeof RV530!=='undefined'&&RV530.on&&typeof rv530Def==='function'){const d=rv530Def(k);if(d&&!d.portal&&!d.adiado&&!RV530.campos[k]&&!(d.ala&&typeof AL521!=='undefined'&&AL521.feitas&&AL521.feitas[k]))falta.push('campo dos rivais');}}catch(e){}
+  if(!falta.length)return {ok:true};if(now-E.t>15000)return {ok:true,forcado:falta.join(', ')};return {ok:false,falta:falta.join(', ')};}
+// a região do índice de uma peça: a peça NO LUGAR DE ORIGEM e o caminho até o destino, com folga (vale com a peça já aplicada: reacerto)
+function pt882Regiao(p){const T=THREE;let B=null;
+  if(p.tipo==='parede'){B=pt882Caixa(p,false);if(B)B.expandByScalar(1.3);}else if(p.tipo==='tocha'){B=pt882Caixa(p,false);if(B)B.expandByScalar(.7);}
+  else if(p.tipo==='paredeV'){B=pt882Caixa(p,false);if(B)B.expandByPoint(B.getCenter(new T.Vector3()).addScaledVector(p.dir,1.3)).expandByScalar(.3);}
+  else if(p.tipo==='cair'){B=pt882Caixa(p,false);if(B)B.expandByPoint(B.getCenter(new T.Vector3()).add(new T.Vector3(0,-p.dy-.3,0))).expandByScalar(.3);}
+  else if(p.tipo==='passarela'){B=new T.Box3(new T.Vector3(PT882_PAS.X0-.4,0,PT882_PAS.Z0-4),new T.Vector3(PT882_PAS.X1+p.dx+.4,5.6,PT882_PAS.Z1+4.5+4));}
+  else{B=pt882Caixa(p,false);if(B){B.union(pt882Caixa(p,true));B.expandByScalar(.3);}}return B;}
+// ---------- aplicar numa sala (gerador: corre em fatias na fila do fatiador) ----------
+function* pt882AplicaG(k){const t0=performance.now(),T=THREE;const c=pt882Cena(k);if(!c)return false;const sc=c.sc,R=c.R;let st=PT882.salas[k];
+  // aplicar de novo na mesma cena (gancho `aplica`): primeiro devolve o que já andou
+  if(st&&st.sc===sc){try{if(typeof fusaoLimpar==='function'&&st.pecas.some(p=>p.aplicada&&pt882Fundidas(p)))fusaoLimpar(sc);}catch(e){}for(const p of st.pecas.slice().reverse())if(p.aplicada)pt882Poe(p,false);if(st.discos)pt882Nav(k);}
+  st=PT882.salas[k]={sc,feito:false,pecas:[],semEsperar:null,fusao:false,info:{},discos:false,sig465:pt882Sig465(sc),reacerto:null};PT882.lista=PT882.lista.filter(e=>e.sala!==k);
+  yield* pt882Matrizes(sc);const I0=PT882_ITENS;let pecas=[];
+  if(pt882Corte())yield 'pt882 matrizes';
+  try{if(I0.arandelas.liga)pecas.push(...pt882Arandelas(k,sc));}catch(e){pt882Erro('arandelas '+k,e);}
+  if(pt882Corte())yield 'pt882 arandelas';
+  try{if(I0.tochas.liga)pecas.push(...(yield* pt882Tochas(k,sc)));}catch(e){pt882Erro('tochas '+k,e);}
+  if(k==='epistolar'){try{if(I0.carrinho.liga){const r=yield* pt882Carrinho(sc);st.info.carrinho={rodasDePe:r.rodas,eixos:r.eixos};pecas.push(...r.pecas);if(r.eixos<2)pt882Registra(st,{item:'carrinho',sala:k,id:'epistolar-carrinho-eixos',nome:'eixos do carrinho do correio',origem:'v668',blocos:[],objs:[]},'não achada',{motivo:'eixos não achados no lugar do desenho ('+r.eixos+')'});}}catch(e){pt882Erro('carrinho',e);}
+    try{if(I0.carroca.liga){const L=yield* pt882Carroca(sc);if(!L.length)pt882Registra(st,{item:'carroca',sala:k,id:'epistolar-carrinho437-pe',nome:'pé do carrinho do carteiro',origem:'v437',blocos:[],objs:[]},'não achada',{motivo:'o carrinho da v437 não está no desenho (pé, outro pé e tampo)'});pecas.push(...L);}}catch(e){pt882Erro('carroça',e);}}
+  if(k==='viagens'){try{if(I0.luneta.liga){const r=yield* pt882Luneta(sc);st.info.luneta=r.info;if(!r.pecas.length)pt882Registra(st,{item:'luneta',sala:k,id:'viagens-luneta',nome:'luneta',origem:'v349',blocos:[],objs:[]},'não achada',{motivo:'tubo/anel/lente não achados no desenho',info:r.info});pecas.push(...r.pecas);}}catch(e){pt882Erro('luneta',e);}}
+  if(k==='steampunk'){try{if(I0.escada.liga)pecas.push(...(yield* pt882Banzos(sc)));}catch(e){pt882Erro('banzos',e);}}
+  if(k==='lib'){try{if(I0.retratos.liga)pecas.push(...(yield* pt882Retratos(sc)));}catch(e){pt882Erro('retratos',e);}}
+  if(k==='adv'){try{if(I0.pedras.liga)pecas.push(...(yield* pt882Pedras(sc)));}catch(e){pt882Erro('pedras',e);}}
+  if(k==='realismo'){try{if(I0.placa.liga)pecas.push(...(yield* pt882Placa(sc)));}catch(e){pt882Erro('placa',e);}}
+  if(k==='fazenda'){try{if(I0.penteadeiras.liga)pecas.push(...(yield* pt882Penteadeiras(sc)));}catch(e){pt882Erro('penteadeiras',e);}}
+  if(k==='steampunk'){try{if(I0.passarela.liga){const r=yield* pt882Passarela(sc,k);st.info.passarela=r.info;if(!r.pecas.length)pt882Registra(st,{item:'passarela',sala:k,id:'steampunk-passarela',nome:'passarela',origem:'v224',blocos:[],objs:[]},r.info&&r.info.pula?'pulada':'não achada',{motivo:r.info&&r.info.pula||'passarela não achada no desenho',info:r.info});pecas.push(...r.pecas);}}catch(e){pt882Erro('passarela',e);}}
+  if(!pecas.length){st.feito=true;PT882.stats.aplicado++;PT882.stats.ms+=Math.round(performance.now()-t0);return true;}
+  // malha-alvo fundida pelo Leve? desfaz a fusão da cena antes de mexer (ela volta sozinha com as peças no lugar novo)
+  // (numa fatia nova: o `fusaoLimpar` da cena inteira é indivisível)
+  if(typeof fusaoLimpar==='function'&&pecas.some(pt882Fundidas)){yield 'pt882 antes da fusão';if(PT882.salas[k]!==st)return false;
+    try{const tf=performance.now();fusaoLimpar(sc);st.fusao=true;st.info.fusaoMs=pt882R(performance.now()-tf);PT882.stats.fusao++;}catch(e){pt882Erro('fusão',e);}}
+  for(const p of pecas)for(const b of p.blocos)pt882PapelOriginal(b.o);
+  // caixa e esfera das geometrias que vão ser mexidas, já agora (o mover só as alarga; a 1.ª conta numa malha fundida grande custa milissegundos)
+  {const gs=new Set();for(const p of pecas)for(const b of p.blocos)gs.add(b.g);for(const g of gs){if(g.boundingBox&&g.boundingSphere)continue;if(pt882Corte())yield 'pt882 limites';if(!g.boundingBox)g.computeBoundingBox();if(!g.boundingSphere)g.computeBoundingSphere();}}
+  // índice dos triângulos perto das peças (as regiões: a peça e o caminho até o destino, com folga)
+  const excl=new Set();for(const p of pecas)for(const r of p.objs)r.o.traverse(q=>excl.add(q));
+  const regs=[];for(const p of pecas){try{const B=pt882Regiao(p);if(B)regs.push(B);}catch(e){pt882Erro('região '+p.id,e);}}
+  let I;try{I=yield* pt882Indice(sc,excl,regs);}catch(e){pt882Erro('índice '+k,e);I=null;}
+  if(!I){st.feito=true;return false;}
+  const dm=pt882Dim(k);const feitos=new Set();
+  for(const p of pecas){if(feitos.has(p))continue;
+    // peças de um grupo (as três da luneta, os dois eixos) andam juntas: todas conferidas antes; uma bloqueada segura as outras
+    const grupo=p.grupo?pecas.filter(q=>q.grupo===p.grupo):[p];const rs=[];
+    for(const q of grupo){feitos.add(q);let r;try{r=yield* pt882Planeja(k,R,q,I,dm);}catch(e){pt882Erro('peça '+q.id,e);r={ok:false,estado:'bloqueada',motivo:'erro: '+(e&&e.message||e)};}rs.push(r);if(pt882Corte())yield 'pt882 peça';}
+    const todos=rs.every(r=>r.ok),ruim=rs.find(r=>!r.ok);
+    grupo.forEach((q,j)=>{try{let r=rs[j];if(!todos&&r.ok)r={ok:false,estado:'bloqueada',motivo:'o grupo «'+q.grupo+'» anda junto: '+(ruim&&ruim.motivo),confere:r.confere};
+        if(r.ok&&PT882.ativo){pt882Poe(q,true);if(q.discos&&q.discos.length)st.discos=true;}
+        pt882Registra(st,q,r.ok?(r.estado||'movida'):r.estado||'bloqueada',r);}catch(e){pt882Erro('registra '+q.id,e);}});}
+  if(st.discos)pt882Nav(k);pt882Cam(sc);
+  st.feito=true;PT882.stats.aplicado++;PT882.stats.ms+=Math.round(performance.now()-t0);return true;}
+function pt882Registra(st,p,estado,r){r=r||{};const e={sala:p.sala,item:p.item,id:p.id,nome:p.nome,origem:p.origem,estado,motivo:r.motivo||p.motivo,folga:r.folga!==undefined?r.folga:null,d:r.d||null,confere:r.confere||null,info:r.info||null};
+  try{e.antes={caixa:pt882Cx(pt882Caixa(p,false))};if(/movida/.test(estado))e.depois={caixa:pt882Cx(pt882Caixa(p,true))};}catch(x){}
+  p.e=e;st.pecas.push(p);PT882.lista.push(e);
+  if(/movida/.test(estado))PT882.stats.movidas++;else if(estado==='no lugar')PT882.stats.noLugar++;else if(estado==='não achada')PT882.stats.naoAchadas++;else if(/bloqueada/.test(estado))PT882.stats.bloqueadas++;}
+// ---------- planejar uma peça: medir, calcular o destino e conferir ----------
+function* pt882Planeja(k,R,p,I,dm){const T=THREE,EPS=PT882.EPS;if(pt882Corte())yield 'pt882 planeja';
+  if(p.tipo==='parede'){ // arandela: raios das costas da placa até a parede, a peça inteira anda para trás
+    const O=pt882ArandelaRaios(p);let hs=[],quadro=false;for(const o of O){const h=yield* pt882Raio(I,o,p.dir,1.2,null);hs.push(h?pt882R(h.d-.002):null);if(h&&h.quadro&&h.d<1.0)quadro=true;}
+    const ok=hs.filter(d=>d!==null&&d<=1.0);if(ok.length<3)return {ok:false,estado:'bloqueada',motivo:'sem parede atrás ('+ok.length+'/5 raios)',folga:hs};
+    const g=Math.min(...ok);if(g<.02)return {ok:false,estado:'no lugar',folga:pt882R(g)};
+    if(quadro)return {ok:false,estado:'bloqueada',motivo:'cobriria um quadro na parede',folga:pt882R(g)};
+    const mv=g-EPS,dW=p.dir.clone().multiplyScalar(mv);pt882ObjCalc(p.objs[0],dW);
+    const M0=p.M0||p.f.matrixWorld,obb={M:M0.clone(),Mi:new T.Matrix4().copy(M0).invert()};if(!p.fatias)p.fatias=yield* pt882FatiasG(p.f,.1);const partes=p.fatias.length?p.fatias:[p.lb];
+    for(const fa of partes){const lb=pt882Encolhe(fa.clone().translate(new T.Vector3(0,0,-mv)),.01);const inv=yield* pt882Invasores(I,obb,lb,null);
+      if(inv.n)return {ok:false,estado:'bloqueada',motivo:'malha no destino, à altura de '+pt882R(fa.min.y)+'–'+pt882R(fa.max.y)+' m da base da arandela ('+inv.quem.join('; ')+')',folga:pt882R(g),confere:inv};}
+    return {ok:true,folga:pt882R(g),d:pt882V(dW),confere:{invasores:0,raios:hs,depois:pt882R(EPS)}};}
+  if(p.tipo==='tocha'){ // tocha: três raios das costas da placa; os vértices dela (e a chama) e os dois brilhos andam para trás
+    const n=p.n,O=p.O,dir=n.clone().negate();const ign=(o,a)=>p.blocos.some(B=>B.o===o&&a>=B.s&&a<B.s+B.n);let hs=[];
+    for(const [u,w] of [[0,0],[-.06,-.12],[.06,.12]]){const o=new T.Vector3(O.x+p.ex.x*u,O.y+2.45+w,O.z+p.ex.z*u).addScaledVector(n,.002);const h=yield* pt882Raio(I,o,dir,1.0,ign);hs.push(h?pt882R(h.d-.002):null);}
+    const ok=hs.filter(d=>d!==null&&d<=.9);if(ok.length<2)return {ok:false,estado:'bloqueada',motivo:'sem parede atrás ('+ok.length+'/3 raios)',folga:hs};
+    const g=Math.min(...ok);if(g<.02)return {ok:false,estado:'no lugar',folga:pt882R(g)};const mv=g-EPS;
+    // a forma da tocha: placa, braço, copo e chama, cada um com a sua caixa (no referencial dela; a caixa única pegava o vazio acima da placa)
+    const obb=pt882OBB(O,p.ex,new T.Vector3(0,1,0),n);const b0=p.blocos[0],partes=[[b0,0,24,'placa'],[b0,24,40,'braço'],[b0,64,52,'copo']];if(p.blocos[1])partes.push([p.blocos[1],0,48,'chama']);const v=new T.Vector3();
+    for(const [b,a,q,nm] of partes){const lb=new T.Box3();for(let j=a;j<a+q;j++){v.fromArray(b.pos0,j*3).applyMatrix4(b.o.matrixWorld).applyMatrix4(obb.Mi);lb.expandByPoint(v);}
+      const inv=yield* pt882Invasores(I,obb,pt882Encolhe(lb.translate(new T.Vector3(0,0,-mv)),.01),ign);if(inv.n)return {ok:false,estado:'bloqueada',motivo:'malha no destino ('+nm+': '+inv.quem.join('; ')+')',folga:pt882R(g),confere:inv};}
+    const dW=dir.clone().multiplyScalar(mv),X=new T.Matrix4().makeTranslation(dW.x,dW.y,dW.z);for(const b of p.blocos)pt882BlocoCalc(b,X);for(const r of p.objs)pt882ObjCalc(r,dW);
+    return {ok:true,folga:pt882R(g),d:pt882V(dW),confere:{invasores:0,raios:hs,chama:p.chama,brilhos:p.brilhos}};}
+  if(p.tipo==='paredeV'){ // peça de parede em vértices (retratos, placa, penteadeiras): raios das costas até a parede; os blocos andam juntos
+    const ign=(o,a)=>p.blocos.some(B=>B.o===o&&a>=B.s&&a<B.s+B.n);const hs=[];let quadro=false;
+    for(const o of p.raios){const h=yield* pt882Raio(I,o,p.dir,1.2,ign);hs.push(h?pt882R(h.d-(p.recuo||0)):null);if(h&&h.quadro&&p.semQuadro&&h.d<1)quadro=true;}
+    const ok=hs.filter(d=>d!==null&&d<=1.0);if(ok.length<Math.ceil(p.raios.length*.6))return {ok:false,estado:'bloqueada',motivo:'sem parede atrás ('+ok.length+'/'+p.raios.length+' raios)',folga:hs};
+    const g=Math.min(...ok);if(g<.02)return {ok:false,estado:'no lugar',folga:pt882R(g)};if(quadro)return {ok:false,estado:'bloqueada',motivo:'cobriria um quadro na parede',folga:pt882R(g)};
+    // (revisão) `pt882Encolhe`, não `expandByScalar(-.01)`: a caixa da placa (13 mm de espessura) virava do avesso — vazia — e a conferência
+    // do destino não rodava; a espessura fina fica ±1 mm em volta do meio
+    const mv=g-EPS,lb=pt882Encolhe(p.lb.clone().translate(new T.Vector3(0,0,-mv)),.01);
+    const inv=yield* pt882Invasores(I,p.obb,lb,ign);if(inv.n)return {ok:false,estado:'bloqueada',motivo:'malha no caminho/destino ('+inv.quem.join('; ')+')',folga:pt882R(g),confere:inv};
+    const dW=p.dir.clone().multiplyScalar(mv),X=new T.Matrix4().makeTranslation(dW.x,dW.y,dW.z);for(const b of p.blocos)pt882BlocoCalc(b,X);for(const r of p.objs)pt882ObjCalc(r,dW);
+    for(const r of (p.discos||[])){r.x1=+(r.x0+dW.x).toFixed(3);r.z1=+(r.z0+dW.z).toFixed(3);}
+    return {ok:true,folga:pt882R(g),d:pt882V(dW),confere:{invasores:0,raios:hs}};}
+  if(p.tipo==='cair'){ // pedra solta em cima de outra: desce até assentar
+    const ign=(o,a)=>p.blocos.some(B=>B.o===o&&a>=B.s&&a<B.s+B.n);const B1=pt882CaixaBloco(p.blocos[0],false).translate(new T.Vector3(0,-p.dy,0)).expandByScalar(-.01);
+    const inv=yield* pt882Invasores(I,{M:new T.Matrix4(),Mi:new T.Matrix4()},B1,ign);if(inv.n)return {ok:false,estado:'bloqueada',motivo:'malha no destino ('+inv.quem.join('; ')+')',folga:p.folga,confere:inv};
+    pt882BlocoCalc(p.blocos[0],new T.Matrix4().makeTranslation(0,-p.dy,0));return {ok:true,folga:p.folga,d:[0,-pt882R(p.dy),0],confere:{invasores:0}};}
+  if(p.tipo==='transforma'){ // eixos do carrinho, luneta, pé da carroça: a transformação já calculada; destino sem malha de fora
+    const ign=p.ign||((o,a,b,c)=>(p.fora&&p.fora.test(o.name||''))||p.blocos.some(B=>B.o===o&&a>=B.s&&a<B.s+B.n));
+    const inv=yield* pt882Invasores(I,p.obb,p.lb,ign);if(inv.n)return {ok:false,estado:'bloqueada',motivo:'malha no destino ('+inv.quem.join('; ')+')',confere:inv};
+    const B0=pt882CaixaBloco(p.blocos[0],false),B1=pt882CaixaBloco(p.blocos[0],true);const c0=B0.getCenter(new T.Vector3()),c1=B1.getCenter(new T.Vector3());
+    const conf={invasores:0,centro:[pt882V(c0),pt882V(c1)]};
+    if(p.item==='luneta'&&p.id==='viagens-luneta-tubo'){conf.apoio='tubo assentado na ponta do tripé (centro do tubo na vertical da ponta)';}
+    return {ok:true,d:pt882V(c1.clone().sub(c0)),confere:conf};}
+  if(p.tipo==='passarela'){ // a passarela inteira: Δx até a parede de hoje e deslizes em z; confere parte a parte, discos e sala
+    // o «antes» dos vértices é tirado agora (os banzos da escada, se corrigidos, já giraram: o desliga devolve na ordem inversa)
+    for(const b of p.blocos){const G0=pt882Geo(b.o),P0=G0.attributes.position,N0=G0.attributes.normal;b.g=G0;b.pos0=P0.array.slice(b.s*3,(b.s+b.n)*3);b.nor0=N0&&N0.itemSize===3?N0.array.slice(b.s*3,(b.s+b.n)*3):null;}
+    const P=PT882_PAS,ign=(o)=>/^Oficina · passarela/.test(o.name||'')||/poças de luz$/.test(o.name||'');let ult=null;const ob=pt882Obst(k)||[];const meus=new Set(p.discos.map(r=>r.o));
+    for(const s of P.deslizes){const d=new T.Vector3(p.dx,0,s);let ruim=null;
+      if(P.Z0+s<-dm.D/2+.5||P.Z1+4.5+s>dm.D/2-.5||P.X1+d.x>dm.W/2-.05){ult={s,motivo:'fora da sala'};continue;}
+      for(const [nm,a,b] of P.partes){const lb=new T.Box3(new T.Vector3(a[0]+d.x,a[1],a[2]+d.z),new T.Vector3(b[0]+d.x,b[1],b[2]+d.z)).expandByScalar(-.01);
+        const inv=yield* pt882Invasores(I,{M:new T.Matrix4(),Mi:new T.Matrix4()},lb,ign);if(inv.n){ruim={parte:nm,quem:inv.quem};break;}}
+      if(ruim){ult={s,motivo:'malha em «'+ruim.parte+'» ('+ruim.quem.join('; ')+')'};continue;}
+      // discos: sem encostar em outro disco (folga ≥ 5 cm), longe do nascer e do corredor da porta
+      let pior=null,disco=null;for(const r of p.discos){const nx=r.x0+d.x,nz=r.z0+d.z;for(const o of ob){if(!o||meus.has(o)||!(o[2]>0))continue;const gp=Math.hypot(o[0]-nx,o[1]-nz)-o[2]-r.o[2];if(pior===null||gp<pior){pior=gp;disco=[o[0],o[1],o[2]];}}
+        try{if(R.spawn&&Math.hypot(R.spawn.x-nx,R.spawn.z-nz)<r.o[2]+1.2)pior=-1;if(R.doorFront&&Math.abs(nx-R.doorFront[0])<1.2+r.o[2]&&Math.abs(nz-R.doorFront[1])<3)pior=-1;}catch(e){}}
+      if(pior!==null&&pior<.05){ult={s,motivo:'disco encostado ('+pt882R(pior)+' m; disco '+JSON.stringify(disco)+')'};continue;}
+      const X=new T.Matrix4().makeTranslation(d.x,0,d.z);for(const b of p.blocos)pt882BlocoCalc(b,X);
+      if(p.poca){const dxp=Math.min(d.x,dm.W/2-.05-(P.X0-1.5+3.5));pt882BlocoCalc(p.poca,new T.Matrix4().makeTranslation(dxp,0,d.z));p.blocos.push(p.poca);p.poca=null;}
+      for(const r of p.discos){r.x1=+(r.x0+d.x).toFixed(3);r.z1=+(r.z0+d.z).toFixed(3);}
+      return {ok:true,estado:s?'movida (deslizada '+s+' m em z)':'movida',d:pt882V(d),confere:{invasores:0,deslize:s,folgaDisco:pior===null?null:pt882R(pior),parede:pt882R(dm.W/2-(P.X1+d.x))}};}
+    return {ok:false,estado:'bloqueada',motivo:'sem lugar junto da parede de hoje (último: Δz '+(ult&&ult.s)+' — '+(ult&&ult.motivo)+')'};}
+  return {ok:false,estado:'bloqueada',motivo:'tipo desconhecido'};}
+// ---------- reacerto: depois de uma passada do c465 terminada nesta cena ----------
+// As peças de parede já encostadas (arandelas, tochas, retratos, placa, penteadeiras) são medidas de novo A PARTIR DO LUGAR DE ORIGEM (os
+// mesmos raios do planejamento; a peça e os objetos dela fora da conta) e conferidas no destino novo. Se o deslocamento mudou mais de 0,5 mm
+// (a face da parede andou depois do PT882), a peça vai do lugar velho ao novo no MESMO passo (devolve com os dados velhos e põe com os
+// novos: nenhum quadro a vê no lugar de origem). Sem medida ou destino novo ocupado: fica onde está, com o motivo (`reacerto.lista`).
+function pt882Guarda(p){return {b:p.blocos.map(b=>[b.pos1,b.nor1,b.W]),o:p.objs.map(r=>r.p1),d:(p.discos||[]).map(r=>[r.x1,r.z1])};}
+function pt882Restaura(p,G){p.blocos.forEach((b,i)=>{const g=G.b[i];if(g){b.pos1=g[0];b.nor1=g[1];b.W=g[2];}});p.objs.forEach((r,i)=>{if(i<G.o.length)r.p1=G.o[i];});(p.discos||[]).forEach((r,i)=>{const g=G.d[i];if(g){r.x1=g[0];r.z1=g[1];}});}
+function pt882DeParede(p){return p.tipo==='parede'||p.tipo==='tocha'||p.tipo==='paredeV';}
+function* pt882ReacertaG(k){const c=pt882Cena(k);const st=PT882.salas[k];if(!c||!st||st.sc!==c.sc||!st.feito)return 0;const sc=c.sc,R=c.R;
+  const RA=st.reacerto||(st.reacerto={vezes:0,conferidas:0,mexidas:0,mantidas:0,lista:[],sig:null});RA.vezes++;RA.sig=pt882Sig465(sc);
+  if(!PT882.ativo)return 0;const L=st.pecas.filter(p=>p.aplicada&&p.e&&/movida/.test(p.e.estado)&&pt882DeParede(p));if(!L.length)return 0;
+  yield* pt882Matrizes(sc);
+  const excl=new Set();for(const p of st.pecas)for(const r of p.objs)r.o.traverse(q=>excl.add(q));
+  const regs=[];for(const p of L){try{const B=pt882Regiao(p);if(B)regs.push(B);}catch(e){pt882Erro('região '+p.id,e);}}
+  const I=yield* pt882Indice(sc,excl,regs);const dm=pt882Dim(k);let disco=false,limpou=false,n=0;
+  for(const p of L){if(!p.aplicada)continue;RA.conferidas++;const velho=pt882Guarda(p),d0=(p.e&&p.e.d)||[0,0,0];let r;
+    try{r=yield* pt882Planeja(k,R,p,I,dm);}catch(e){r={ok:false,motivo:'erro: '+(e&&e.message||e)};}
+    const novo=pt882Guarda(p);pt882Restaura(p,velho);
+    if(!p.aplicada||!PT882.ativo||st!==PT882.salas[k])continue; // desligado (ou sala refeita) no meio do caminho: fica como está
+    if(!r.ok||!r.d){RA.mantidas++;if(RA.lista.length<60)RA.lista.push({id:p.id,estado:'mantida',motivo:r.motivo||r.estado||'?',folga:r.folga===undefined?null:r.folga});continue;}
+    const dd=Math.hypot(r.d[0]-d0[0],r.d[1]-d0[1],r.d[2]-d0[2]);if(dd<=.0005)continue;
+    try{if(!limpou&&typeof fusaoLimpar==='function'&&pt882Fundidas(p)){fusaoLimpar(sc);limpou=true;PT882.stats.fusao++;}}catch(e){pt882Erro('fusão reacerto',e);}
+    pt882Poe(p,false);pt882Restaura(p,novo);pt882Poe(p,true);n++;
+    const e=p.e;e.reacerto={de:d0,para:r.d,folgaAntes:e.folga,folgaNova:r.folga,c465:RA.sig};e.d=r.d;e.folga=r.folga;if(r.confere)e.confere=r.confere;try{e.depois={caixa:pt882Cx(pt882Caixa(p,true))};}catch(x){}
+    RA.mexidas++;PT882.stats.reacertos++;if(RA.lista.length<60)RA.lista.push({id:p.id,estado:'reacertada',de:d0,para:r.d,folga:r.folga});if(p.discos&&p.discos.length)disco=true;
+    if(pt882Corte())yield 'pt882 reacerto';}
+  if(disco)pt882Nav(k);if(n)pt882Cam(sc);return n;}
+// de uma vez (gancho e banco); um trabalho desta sala que esteja na fila termina antes
+function pt882Reacerta(k){try{let g=0;while(PT882.jobs[k]&&!PT882.jobs[k].feito&&g++<20000)pt882Fatia(k);const st=PT882.salas[k];const c=pt882Cena(k);if(st&&c)st.sig465=pt882Sig465(c.sc);
+    const it=pt882ReacertaG(k);let r;const f0=typeof fat8Fim!=='undefined'?fat8Fim:undefined;try{fat8Fim=Infinity;do{r=it.next();}while(!r.done);}finally{if(f0!==undefined)fat8Fim=f0;}return r.value;}catch(e){pt882Erro('reacerta '+k,e);return false;}}
+function pt882Aplica(k){try{let g=0;while(PT882.jobs[k]&&!PT882.jobs[k].feito&&g++<20000)pt882Fatia(k);
+    const it=pt882AplicaG(k);let r;const f0=typeof fat8Fim!=='undefined'?fat8Fim:undefined;try{fat8Fim=Infinity;do{r=it.next();}while(!r.done);}finally{if(f0!==undefined)fat8Fim=f0;}return r.value;}catch(e){pt882Erro('aplica '+k,e);return false;}}
+// ---------- a fila do fatiador ----------
+function pt882Vista(k){try{const c=pt882Cena(k);return !!(c&&typeof ACTIVE!=='undefined'&&ACTIVE===c.sc);}catch(e){return false;}}
+function pt882Pede(k){if(!PT882.on||PT882_FORA.has(k))return;const c=pt882Cena(k);if(!c)return;const st=PT882.salas[k];if(st&&st.sc===c.sc&&st.feito)return;
+  const J=PT882.jobs[k];if(J&&J.sc===c.sc)return;const F=PT882.falhas[k];if(F&&F.sc===c.sc&&F.n>=3)return;
+  const pr=pt882Pronta(k);if(!pr.ok)return;PT882.stats.checagens++;if(pr.forcado)PT882.stats.forcadas++;
+  pt882Job(k,c.sc,pt882AplicaG(k),'aplica',job=>{const s2=PT882.salas[k];if(s2&&s2.sc===c.sc){if(pr.forcado)s2.semEsperar=pr.forcado;s2.cpu=pt882R(job.cpu);s2.maiorPasso=pt882R(job.max);s2.excesso=pt882R(job.exc);
+      s2.passos=job.passos;s2.rotMax=job.rotMax;s2.rotExc=job.rotExc;s2.tExc=job.tExc||null;s2.top=job.top;}},
+    ()=>{const F2=PT882.falhas[k];if(!F2||F2.sc!==c.sc)PT882.falhas[k]={sc:c.sc,n:1};else F2.n++;});}
+// um trabalho na fila do fatiador (aplicar ou reacertar): mede o tempo de cada passo e o EXCESSO sobre o orçamento que o fatiador deu
+// (`fat8Fim`): o passo mais longo de um trabalho em fatias é o orçamento da fatia (4–12 ms no navegador; no banco, com quadros lentos, até
+// 40 ms); o excesso é o que um trecho indivisível passou dele
+function pt882Job(k,sc,g0,nome,onFim,onErro){const job={sc,it:null,feito:false,acabou:false,cpu:0,max:0,exc:0,passos:0,top:[],rot:null,rotMax:null,rotExc:null,nome};
+  job.it={next:()=>{const t=performance.now();const orc=(typeof fat8Fim!=='undefined'&&Number.isFinite(fat8Fim))?fat8Fim-t:null;const r=g0.next();const dt=performance.now()-t;job.cpu+=dt;job.passos++;
+    const nm=(job.rot||'início')+' → '+(r.done?'fim':r.value);if(dt>job.max){job.max=dt;job.rotMax=nm;}if(orc!==null){const ex=dt-Math.max(0,orc);if(ex>job.exc){job.exc=ex;job.rotExc=nm;job.tExc=[pt882R(t),pt882R(dt)];}}
+    if(dt>4){job.top.push([pt882R(dt),orc===null?null:pt882R(orc),nm]);job.top.sort((a,b)=>b[0]-a[0]);if(job.top.length>4)job.top.length=4;}job.rot=r.done?'fim':r.value;return r;}};
+  job.fim=()=>{if(job.acabou)return;job.acabou=true;job.feito=true;if(PT882.jobs[k]===job)delete PT882.jobs[k];try{if(onFim)onFim(job);}catch(e){pt882Erro('fim '+nome+' '+k,e);}};
+  job.erro=e=>{if(job.acabou)return;job.acabou=true;job.feito=true;if(PT882.jobs[k]===job)delete PT882.jobs[k];pt882Erro('fila '+nome+' '+k,e);try{if(onErro)onErro(e);}catch(x){}};
+  PT882.jobs[k]=job;
+  if(typeof fat8Go==='function')job.J=fat8Go({next:()=>{PT882.stats.fatias++;return job.it.next();}},{nome:'peças tortas 882 · '+nome+' · '+k,urgente:()=>pt882Vista(k),fim:()=>job.fim(),erro:e=>job.erro(e)});
+  else{try{let r;do{r=job.it.next();}while(!r.done);job.fim();}catch(e){job.erro(e);}}
+  return job;}
+// na entrada da sala: se o trabalho ainda está na fila, corre uma fatia já (8 ms; o resto continua urgente)
+function pt882Fatia(k){const job=PT882.jobs[k];if(!job||job.feito)return;const f0=typeof fat8Fim!=='undefined'?fat8Fim:undefined;try{fat8Fim=performance.now()+8;let r;do{r=job.it.next();PT882.stats.fatias++;}while(!r.done&&performance.now()<fat8Fim);
+    if(r.done){job.fim();try{const FQ=typeof FAT818!=='undefined'&&FAT818;if(FQ&&job.J){const i=FQ.fila.indexOf(job.J);if(i>=0)FQ.fila.splice(i,1);if(FQ.atual===job.J)FQ.atual=null;}}catch(e){}}}
+  catch(e){job.erro(e);}finally{if(f0!==undefined)fat8Fim=f0;}}
+// reacerto: quando uma passada do c465 terminou nesta cena depois do começo do PT882 (assinatura diferente da gravada), as peças de parede são
+// medidas de novo (`pt882ReacertaG`); nada a fazer se a assinatura é a mesma, se o c465 ainda corre ou se há trabalho do PT882 na fila
+function pt882PedeReacerto(k){try{const st=PT882.salas[k];if(!st||!st.feito||!PT882.on||!PT882.ativo)return;const c=pt882Cena(k);if(!c||c.sc!==st.sc)return;
+    if(PT882.jobs[k]||pt882C465Corre(c.sc))return;const sig=pt882Sig465(c.sc);if(st.sig465===undefined||sig===st.sig465)return;st.sig465=sig;
+    if(!st.pecas.some(p=>p.aplicada&&pt882DeParede(p)))return;PT882.stats.reacertoPassadas++;
+    pt882Job(k,c.sc,pt882ReacertaG(k),'reacerto',job=>{const RA=st.reacerto;if(RA){RA.cpu=pt882R((RA.cpu||0)+job.cpu);RA.maiorPasso=pt882R(Math.max(RA.maiorPasso||0,job.max));if(job.exc>(RA.excesso||0)){RA.excesso=pt882R(job.exc);RA.rotExc=job.rotExc;}RA.passos=(RA.passos||0)+job.passos;}});}
+  catch(e){pt882Erro('reacerto '+k,e);}}
+function pt882Vigia(){if(!PT882.on)return;try{for(const k in ROOMS){if(PT882_FORA.has(k))continue;try{pt882Pede(k);pt882PedeReacerto(k);}catch(e){pt882Erro('vigia '+k,e);}}}catch(e){}}
+// ---------- liga / desliga (o «antes» em tempo de execução, exato) ----------
+function pt882Liga(sim){sim=!!sim;try{if(PT882.ativo===sim)return true;PT882.ativo=sim;
+    for(const k in PT882.salas){const st=PT882.salas[k];if(!st||!st.feito)continue;const c=pt882Cena(k);if(!c||c.sc!==st.sc)continue;
+      const L=st.pecas.filter(p=>p.e&&/movida/.test(p.e.estado));if(!L.length)continue;
+      try{if(typeof fusaoLimpar==='function'&&L.some(pt882Fundidas)){fusaoLimpar(st.sc);PT882.stats.fusao++;}}catch(e){pt882Erro('fusão liga',e);}
+      let disco=false;for(const p of (sim?L:L.slice().reverse())){if(p.aplicada===sim)continue;pt882Poe(p,sim);if(p.discos&&p.discos.length)disco=true;}
+      if(disco)pt882Nav(k);pt882Cam(st.sc);}
+    return true;}catch(e){pt882Erro('liga',e);return false;}}
+// ---------- onde está cada peça agora ----------
+function pt882Pecas(k){const out=[];try{for(const s in PT882.salas){if(k&&s!==k)continue;const st=PT882.salas[s];if(!st)continue;
+    for(const p of st.pecas){const B=pt882Caixa(p,!!p.aplicada);out.push({sala:s,id:p.id,item:p.item,estado:p.e&&p.e.estado,aplicada:!!p.aplicada,caixa:pt882Cx(B),centro:B?pt882V(B.getCenter(new THREE.Vector3())):null,
+      discos:(p.discos||[]).map(r=>[r.o[0],r.o[1],r.o[2]])});}}}catch(e){pt882Erro('peças',e);}return out;}
+// ---------- medida de antes/depois de cada peça (gancho `mede(sala)`) ----------
+// Para cada peça da sala: o estado, a caixa e o centro de ANTES (o lugar de origem) e de DEPOIS (o lugar novo), o deslocamento, a folga até a
+// parede/apoio que o planejamento mediu antes de mexer (raios das costas da peça) e a folga que fica depois (4 mm nas peças de parede; a pedra
+// assenta com 2 mm), se a peça está aplicada agora e os discos de obstáculo que andam com ela (o mesmo objeto da lista viva e da lista-base).
+function pt882Mede(k){const out=[];try{for(const s in PT882.salas){if(k&&s!==k)continue;const st=PT882.salas[s];if(!st)continue;
+    for(const p of st.pecas){const e=p.e||{};const mov=/movida/.test(e.estado||'');const B0=pt882Caixa(p,false),B1=mov?pt882Caixa(p,true):null;
+      let fd=null;if(mov){if(p.tipo==='parede'||p.tipo==='tocha'||p.tipo==='paredeV')fd=PT882.EPS;else if(p.tipo==='cair')fd=.002;}
+      out.push({sala:s,id:p.id,item:p.item,nome:p.nome,estado:e.estado||null,aplicada:!!p.aplicada,motivo:e.motivo||null,d:e.d||null,
+        antes:{caixa:pt882Cx(B0),centro:B0?pt882V(B0.getCenter(new THREE.Vector3())):null,folga:e.folga!==undefined?e.folga:null},
+        depois:mov?{caixa:pt882Cx(B1),centro:B1?pt882V(B1.getCenter(new THREE.Vector3())):null,folga:fd}:null,
+        confere:e.confere||null,reacerto:e.reacerto||null,discos:(p.discos||[]).map(r=>({agora:[r.o[0],r.o[1],r.o[2]],antes:[r.x0,r.z0],depois:r.x1===null?null:[r.x1,r.z1]}))});}}}
+  catch(e){pt882Erro('mede',e);}return out;}
+// ---------- poses de câmera para as fotos (1.ª pessoa: olho a EYE + chão; yaw/pitch para olhar o alvo) ----------
+// `fotos(sala)`: as poses daquela sala; `fotos()`: as das salas montadas; `fotos(true)`: todas. Cada pose: {id, sala, peca, pos, alvo, fov, nota,
+// quando, andavel} — `pos` é um ponto ANDÁVEL (dentro do `clamp` do mundo da sala, fora dos discos de obstáculo, com folga de 0,35 m).
+function pt882Andavel(R,x,z){let ok=true;try{const W=R&&R.world;if(!W)return [x,z,false];const ob=Array.isArray(W.obst)?W.obst:[];
+    for(let it=0;it<6;it++){if(typeof W.clamp==='function'){const c=W.clamp(x,z,.4);if(c&&Number.isFinite(c[0])&&Number.isFinite(c[1])){x=c[0];z=c[1];}}let mexeu=false;
+      for(const o of ob){if(!o||!(o[2]>0))continue;const dx=x-o[0],dz=z-o[1],d=Math.hypot(dx,dz),m=o[2]+.35;if(d<m){const f=d>1e-6?(m-d+.01)/d:0;x+=d>1e-6?dx*f:m;z+=d>1e-6?dz*f:0;mexeu=true;}}
+      if(!mexeu)break;}
+    for(const o of ob){if(o&&o[2]>0&&Math.hypot(x-o[0],z-o[1])<o[2]+.3)ok=false;}if(typeof W.clamp==='function'){const c=W.clamp(x,z,.4);if(c&&(Math.abs(c[0]-x)>.01||Math.abs(c[1]-z)>.01))ok=false;}}
+  catch(e){ok=false;}return [x,z,ok];}
+function pt882Fotos(sala){const F=[];try{pt882FotosEm(F,sala);}catch(e){pt882Erro('fotos',e);}return F;}
+function pt882FotosEm(F,sala){const eye=(typeof EYE==='number'?EYE:1.134);const fov=(typeof camera!=='undefined'&&camera&&camera.fov)||70;const todas=sala===true,uma=typeof sala==='string'?sala:null;
+  const add=(id,k,peca,quando,x0,z0,tx,ty,tz,nota)=>{const R=ROOMS[k];const [x,z,ok]=pt882Andavel(R,x0,z0);let fy=0;try{fy=R&&R.world&&typeof R.world.floorY==='function'?R.world.floorY(x,z):0;}catch(e){}if(!Number.isFinite(fy))fy=0;
+    const yaw=Math.atan2(-(tx-x),-(tz-z)),dist=Math.hypot(tx-x,tz-z),pitch=Math.atan2(ty-(eye+fy),dist);
+    F.push({id,sala:k,peca,quando,pos:[+x.toFixed(2),+(eye+fy).toFixed(3),+z.toFixed(2)],alvo:[+tx.toFixed(2),+ty.toFixed(2),+tz.toFixed(2)],fov,nota,andavel:ok,x:+x.toFixed(2),z:+z.toFixed(2),yaw:+yaw.toFixed(3),pitch:+pitch.toFixed(3)});};
+  for(const k in PT882.salas){if(uma&&k!==uma)continue;const st=PT882.salas[k];if(!st||!st.feito||(!todas&&!uma&&!pt882Cena(k)))continue;
+    const mov=st.pecas.filter(p=>p.e&&/movida/.test(p.e.estado));
+    const ar=mov.filter(p=>p.item==='arandelas');if(ar.length){const p=ar[0],B=pt882Caixa(p,false),c=B.getCenter(new THREE.Vector3()),d=p.dir;const cx=ar.length>1?(pt882Caixa(ar[0],false).getCenter(new THREE.Vector3()).x+pt882Caixa(ar[1],false).getCenter(new THREE.Vector3()).x)/2:c.x,cz=ar.length>1?(pt882Caixa(ar[0],false).getCenter(new THREE.Vector3()).z+pt882Caixa(ar[1],false).getCenter(new THREE.Vector3()).z)/2:c.z;
+      add(k+'-arandelas',k,'arandelas','antes e depois',cx-d.x*5,cz-d.z*5,cx,c.y,cz,'de frente para a parede da porta: antes, as duas arandelas a meio metro da parede; depois, encostadas');
+      const lx=d.z,lz=-d.x;add(k+'-arandela-lado',k,p.id,'antes e depois',c.x-d.x*1.6+lx*2.2,c.z-d.z*1.6+lz*2.2,c.x+d.x*.2,c.y,c.z+d.z*.2,'de lado: a folga entre a placa do suporte e a parede (antes) e a placa encostada (depois)');}
+    const tc=mov.filter(p=>p.item==='tochas');if(tc.length){const p=tc[Math.floor(tc.length/2)],O=p.O,n=p.n;add(k+'-tocha',k,p.id,'antes e depois',O.x+n.x*3.2+p.ex.x*2.2,O.z+n.z*3.2+p.ex.z*2.2,O.x,O.y+2.8,O.z,'uma tocha de lado: antes, a 0,3–0,45 m da parede; depois, a placa encostada');}
+    if(mov.some(p=>p.item==='carrinho')){const C=PT882_CARRO;add('epistolar-carrinho',k,'epistolar-carrinho-eixo-esquerda','antes e depois',C.F[0]-1.6,C.F[2]+2.6,C.F[0],.25,C.F[2],'o carrinho do correio de perto, baixo: os eixos (antes no meio, soltos; depois nas rodas)');}
+    if(mov.some(p=>p.item==='carroca')){let c=null;try{c=AT437.info.epistolar.carrinho;}catch(e){}if(c)add('epistolar-carrinho437',k,'epistolar-carrinho437-pe','antes e depois',c[0]+(c[0]>0?-2.6:2.6),c[1]+2.2,c[0],.5,c[1],'o carrinho do carteiro: o canto da alça com o pé (depois) e sem pé (antes)');}
+    if(mov.some(p=>p.item==='luneta')){const C=PT882_LUN;add('viagens-luneta',k,'viagens-luneta-tubo','antes e depois',C.F[0]+2.4,C.F[2]+3.6,C.F[0]-.4,1.9,C.F[2],'a luneta e o tripé de lado: antes, o tubo deitado no ar e o anel solto; depois, inclinada e apoiada na ponta do tripé');}
+    const vistas=new Set();for(const p of mov){const f=p.foto;if(!f||vistas.has(f.id))continue;vistas.add(f.id);add(f.id,k,p.id,f.quando||'antes e depois',f.olho[0],f.olho[1],f.alvo[0],f.alvo[1],f.alvo[2],f.nota);}
+    const ps=mov.find(p=>p.item==='passarela');if(ps){const d=ps.e&&ps.e.d||[0,0,0];add('steampunk-passarela',k,ps.id,'antes e depois',3.5,-3+d[2]-6,11,3.8,-3+d[2],'a passarela de lado, do meio da oficina: antes, no meio do caminho a 4 m da parede; depois, encostada na parede direita');
+      add('steampunk-passarela-escada',k,ps.id,'depois',6.5,8+d[2],12.6,1.8,4+d[2],'a escada da passarela, de frente, junto da parede');}}}
+function pt882Pose(id){try{const F=pt882Fotos(true).find(f=>f.id===id);if(!F)return false;const c=pt882Cena(F.sala);if(!c||typeof ACTIVE==='undefined'||ACTIVE!==c.sc)return false;
+    if(!PT882.pose0)PT882.pose0={MODE,CH:{x:CH.x,z:CH.z,px:CH.px,pz:CH.pz,dir:CH.dir},P:{x:P.x,z:P.z,yaw:P.yaw,pitch:P.pitch},camYaw:CAM.yaw};
+    let ls=null;try{ls=localStorage.getItem('bibmode2');}catch(e){}if(MODE!=='fp'){if(typeof setMode==='function')setMode('fp');else MODE='fp';}try{if(ls!==null)localStorage.setItem('bibmode2',ls);}catch(e){}
+    CH.x=F.x;CH.z=F.z;CH.px=F.x;CH.pz=F.z;P.x=F.x;P.z=F.z;P.yaw=F.yaw;P.pitch=F.pitch;try{vx=0;vz=0;}catch(e){}return true;}catch(e){pt882Erro('pose',e);return false;}}
+function pt882PoseSai(){try{const S=PT882.pose0;PT882.pose0=null;if(!S)return false;let ls=null;try{ls=localStorage.getItem('bibmode2');}catch(e){}
+    if(MODE!==S.MODE){if(typeof setMode==='function')setMode(S.MODE);else MODE=S.MODE;}try{if(ls!==null)localStorage.setItem('bibmode2',ls);}catch(e){}
+    Object.assign(P,S.P);Object.assign(CH,S.CH);CAM.yaw=S.camYaw;try{vx=0;vz=0;CH.vx=CH.vz=0;CH.target=null;}catch(e){}return true;}catch(e){pt882Erro('pose sai',e);return false;}}
+// ---------- instalação ----------
+if(PT882.on){
+  try{const fr0=finishRoom;finishRoom=fr8Wrap(function*(key){const r=(yield* fr8Prev(fr0,this,arguments,"PT882"));try{if(!PT882_FORA.has(key))pt882Pede(key);}catch(e){pt882Erro('finishRoom '+key,e);}return r;});}catch(e){pt882Erro('finishRoom',e);}
+  try{const sa0=setActive;setActive=function(sc){try{if(sc&&typeof ROOMS!=='undefined'){for(const k in ROOMS){if(PT882_FORA.has(k))continue;const R=ROOMS[k];if(R&&R.scene===sc){pt882Pede(k);pt882Fatia(k);break;}}}}catch(e){pt882Erro('setActive',e);}return sa0.apply(this,arguments);};}catch(e){pt882Erro('setActive0',e);}
+  try{PT882.vigia=setInterval(pt882Vigia,1000);}catch(e){pt882Erro('vigia',e);}
+}
+window.__tortas882={estado:PT882,stats:PT882.stats,erros:PT882.erros,get lista(){return PT882.lista;},liga:()=>pt882Liga(true),desliga:()=>pt882Liga(false),
+  aplica:(k)=>{const ks=k?[k]:Object.keys(ROOMS).filter(x=>pt882Cena(x));return ks.map(x=>pt882Aplica(x));},
+  reacerta:(k)=>pt882Reacerta(k||Object.keys(ROOMS).find(x=>{const c=pt882Cena(x);return c&&typeof ACTIVE!=='undefined'&&c.sc===ACTIVE;})),
+  c465:(k)=>{const c=pt882Cena(k);const st=PT882.salas[k];return c?{corre:pt882C465Corre(c.sc),sig:pt882Sig465(c.sc),gravada:st?st.sig465:null,reacerto:st?st.reacerto:null}:null;},
+  pecas:pt882Pecas,mede:pt882Mede,fotos:pt882Fotos,pose:pt882Pose,poseSai:pt882PoseSai,itens:PT882_ITENS,passarela:PT882_PAS};
 
 window.__build434={revision:434,family:"web",edition:"en"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
