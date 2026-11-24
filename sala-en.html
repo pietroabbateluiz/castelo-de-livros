@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v888</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v889</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -123466,6 +123466,503 @@ if(CG880.on){
 window.__cogumelos880={estado:CG880,stats:CG880.stats,erros:CG880.erros,especies:CG880_ESP,aplica:cg880AplicaManual,desfaz:cg880Desfaz,monta:()=>{const R=cg880Pronta();if(R)cg880Monta(R,true);return !!CG880.tex;},poses:cg880Poses,vigia:cg880Vigia,assenta:()=>cg880Assenta(),
   lista:()=>({giga:CG880.stats.giga&&CG880.stats.giga.lista,lume:CG880.pronto.lume&&CG880.pronto.lume.A?CG880.pronto.lume.A.L.length:null,cha:CG880.pronto.cha&&CG880.pronto.cha.A?CG880.pronto.cha.A.bancos.length:null,
     miudos:CG880.pronto.miudos&&CG880.pronto.miudos.A?CG880.pronto.miudos.A.L.map(q=>[+q.x.toFixed(2),+q.z.toFixed(2),+q.h.toFixed(2),+q.rc.toFixed(3)]):null})};
+
+/* ===================== v880 · AVENTURA — TODAS AS ÁRVORES DAS ILHAS REFEITAS: COQUEIROS, AMENDOEIRAS-DA-PRAIA E FIGUEIRAS DE SELVA (bloco `AV880`) =====================
+   Pedido do Luiz (19/11, 20:35): «E depois melhore todas as árvores da sala Aventura» (as peças «precisam ficar esteticamente lindas»; nada de
+   esfera achatada + cilindro).
+   COMO ERA (v620, sobre a v503): as árvores da Aventura estão todas nas três ilhas — a escondida (`NAV252.ilha`), a das Moedas (`ILHA294`) e a do
+   Duelo (v539); o galeão e a chalupa não têm nenhuma. São 65 palmeiras (`i503Palmeira` → `il620Palmeira`: tubo de 22 × 10 com cor por vértice,
+   cones na base e no topo, 5–8 cocos de esfera 10 × 7 e 13–16 frondes em TIRA dobrada em V com a foto de uma folha inteira recortada por alfa —
+   de perto são fitas planas, de longe os folíolos somem no mip e sobra um arame; ~2 400 triângulos cada), 18 amendoeiras-da-praia
+   (`il620Amendoeira`: tubo + 3 andares de galhos e, em cada ponta, uma ESFERA escura de 192 triângulos com cartões de folhas em volta — de
+   qualquer distância leem-se as bolas; ~4 000 triângulos cada, 2 700 só de bolas) e 34 frondes secas no chão. Tudo fundido pelo kit da ilha
+   (seis malhas por ilha, 227 378 triângulos nas três), com vento só nas folhas.
+   AGORA (nos mesmos lugares, com a mesma altura, a mesma inclinação e os mesmos obstáculos — o sorteio da ilha não muda):
+   · COQUEIRO (65): tronco único por indivíduo, curvo (em «J», em arco ou quase a prumo, com uma leve ondulação), a base em bojo com a saia de
+     raízes, casca de ANÉIS de verdade (cicatrizes das folhas, fendas, líquenes: mapa de cor + relevo), mais escura no pé; coroa
+     com 17–21 frondes em espiral (as novas a pino no meio, as adultas abertas em arco, as velhas caídas e amareladas com a ponta seca), cada
+     fronde com a ráquis arqueada e 26 GRUPOS DE FOLÍOLOS soltos (cada grupo é uma peça própria presa à ráquis, virada para a frente e caída
+     pelo peso, com 5 folíolos pontiagudos de duas águas e nervura — a silhueta é serrilhada e deixa ver o céu), 2–4 frondes secas penduradas em
+     saia, o coração de estopa, as bainhas velhas, a tela de fibra, a inflorescência e 2–3 cachos de cocos (verdes, amarelos e castanhos).
+     1 670–2 100 triângulos (eram ~2 400).
+   · AMENDOEIRA-DA-PRAIA (12): tronco com casca de sulcos e sapopemas pequenas, 3–4 andares de galhos horizontais (a «pagode» da espécie, uns
+     a subir e outros a pender) e, ao longo de cada galho, rosetas de folhas largas em TAÇA (um prato de folhas visto de cima + três leques
+     cruzados vistos de lado + um leque caído por baixo, do lado de fora), em alturas desencontradas, com folhas vermelhas e alaranjadas em
+     parte das árvores; nenhuma esfera. ~1 100 triângulos (eram ~4 000).
+   · FIGUEIRA DE SELVA (6 — uma em cada três «amendoeiras»: 1 na ilha escondida, 2 na das Moedas, 3 na do Duelo): tronco grosso com RAÍZES
+     TABULARES (5–6 lâminas em cunha), pernadas abertas, copa em guarda-chuva de tufos irregulares de folhagem miúda (cartões cruzados com
+     luz de volume), CIPÓS pendurados que balançam e samambaias nas forquilhas. 640–820 triângulos. O obstáculo destas seis passa de
+     0,42 para 0,70 m de raio quando o leitor entra na sala (não atravessa as raízes; o mesmo vetor das listas vivas, depois de a ilha
+     estar toda sorteada); os outros 77 obstáculos são os de sempre.
+   · FRONDES SECAS no chão (34): a fronde nova, seca, deitada.
+   · FICAM COMO ESTÃO: as moitas de hibisco e flores brancas da v620 (não são árvores, e os cartões floridos funcionam), o capim, as
+     samambaias e as plantas rasteiras da orla; as seis palmeiras antigas da v253, escondidas desde a v468, continuam escondidas.
+   Uma textura de 512 × 256 para a madeira (casca de coqueiro, casca de árvore, estopa, coco verde, coco castanho; cor + relevo) e um atlas de
+   1024 × 1024 para as folhas; DUAS malhas por ilha (madeira e folhas) no lugar de seis: 140 mil triângulos nas três ilhas (eram 227 mil).
+   Vento no shader dos vértices (tempo do jogo): o coqueiro inteiro balança devagar pelo tronco (peso pela altura) e as folhas tremem (peso da
+   base à ponta); nada por vértice no processador. As folhas são iluminadas dos dois lados com a mesma normal (a face de baixo um pouco mais
+   escura) e, de longe, o recorte por alfa engrossa para os folíolos não sumirem. Sem luz nova. Papel/Leve/Clássico/Alto: materiais com
+   `papelKeep`, malhas com `papelKeepGeo` e `noCam` (como o kit da ilha), fora da fusão do Leve (têm `onBeforeCompile`; já são uma malha só por
+   material e por ilha) e do recorte por distância (malha de ilha inteira); sombra recortada pelas folhas.
+   COMO ENTRA: `i503Palmeira`, `i503Amendoeira` e `i503FolhaCaida` (já trocadas pela v620) são embrulhadas. O embrulho corre a função de hoje «a
+   seco» (um kit que não guarda nada: o sorteio da ilha é consumido igual e o obstáculo entra igual), anota o pedido e adianta um passo do
+   preparo (texturas e moldes — 5 coroas, 3 amendoeiras, 3 figueiras, 1 fronde seca —, 35 passos de menos de 10 ms). Quando o kit da ilha
+   fecha (`K.fim`), a montagem vai para a fila das fatias (`fat8Go`, cedo e com prioridade se o leitor estiver na sala): o preparo que faltar e
+   depois uma árvore de cada vez (molde copiado com a matriz do indivíduo), cedendo no fim da fatia; sem a fila (`?fatias818=0`), entra já.
+   Quem entra na Aventura antes disso (`setActive`) escoa o resto de uma vez — a sala nunca aparece sem árvores. Se a montagem falhar, as
+   árvores de hoje entram no lugar. `desfaz()` remonta as de hoje exatamente (mesmas funções, mesmo sorteio regravado) para a foto do antes;
+   `aplica()` volta às novas.
+   REVISÃO (23/11; R1–R3, sem arte nova): R1 — se o kit de uma ilha fecha com o leitor JÁ dentro da Aventura (a ilha montada com ele lá: entrada
+   «cedo», `jump`, ou o campo do Duelo, que vem 300 ms depois do acabamento), as árvores são montadas ali mesmo, junto com a ilha — pela fila elas
+   chegavam 3–6 quadros depois e a ilha aparecia pelada. R2 — dentro de um passo do acabamento escondido da sala (`FR819.rodando`) o
+   `requestIdleCallback` está guardado: pôr o trabalho na fila ali deixava `FAT818.agendado` preso e a corrente do tempo livre (a fila inteira do
+   fatiador e a obra da própria sala) parava até a sala aparecer; agora o kit fica à espera e só vai para a fila quando a sala aparece (`fr8Pos`);
+   quem entra antes continua a escoar tudo no `setActive`. R3 — `pend` deixa de ficar ligado depois de a fila acabar.
+   Chaves: `?arvores880=0` (tudo: as funções nem são embrulhadas), `?vento880=0` (árvores paradas), `?raizes880=0` (o obstáculo das
+   figueiras volta a 0,42 m). Gancho `window.__arvores880`:
+   `estado`, `stats`, `erros`, `desfaz()`, `aplica()`, `termina()`, `raizes()`, `poses()`, `resumo()`, `texturas()`, `moldes()`, `vitrine(cena)`. */
+const AV880={on:!/[?&#]arvores880=0/i.test(location.search+location.hash),vento:!/[?&#]vento880=0/i.test(location.search+location.hash),raioFig:/[?&#]raizes880=0/i.test(location.search+location.hash)?.42:.7,erros:[],
+  stats:{coqueiros:0,amendoeiras:0,figueiras:0,secas:0,triangulos:0,montaMs:0,passos:0,maiorPassoMs:0,ilhas:0},orig:{},kits:[],U:{value:0},tex:null,mats:null,moldes:null,fila:null,desfeito:false,tick:false,tickR:null,pend:false,nulo:null,pausa:false};
+function av880Erro(k,e){if(AV880.erros.length<30)AV880.erros.push(k+': '+(e&&e.message||e));try{console.warn('v880 árvores',k,e);}catch(x){}}
+function av880Rnd(s){s=(s>>>0)||1;return function(){s=(s+0x6D2B79F5)>>>0;let t=s;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296;};}
+function av880N3(a){const l=Math.hypot(a[0],a[1],a[2])||1;return [a[0]/l,a[1]/l,a[2]/l];}
+function av880X3(a,b){return [a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];}
+function av880Sm(x){x=x<0?0:x>1?1:x;return x*x*(3-2*x);}
+function av880Can(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return c;}
+/* ---------- texturas ---------- */
+// atlas da madeira, 512 × 256, repete em v: casca de coqueiro (x 4…156), casca de árvore (164…316), estopa (322…382), coco verde (386…446), coco castanho (450…510)
+const AV880_M={palma:[4/512,156/512],casca:[164/512,316/512],fibra:[324/512,380/512],cocoV:[388/512,444/512],cocoC:[452/512,508/512]};
+// azulejo que repete nos dois sentidos: cada pincelada {f, x0,x1,y0,y1} é desenhada no lugar e, se cruza uma borda, também do outro lado
+function av880Azulejo(w,h,fundo,ops){const c=av880Can(w,h),x=c.getContext('2d');x.fillStyle=fundo;x.fillRect(0,0,w,h);
+  for(const o of ops){o.f(x);if(o.x0===undefined)continue;const dxs=[0],dys=[0];if(o.x0<0)dxs.push(w);if(o.x1>w)dxs.push(-w);if(o.y0<0)dys.push(h);if(o.y1>h)dys.push(-h);
+    for(const dx of dxs)for(const dy of dys){if(!dx&&!dy)continue;x.save();x.translate(dx,dy);o.f(x);x.restore();}}return c;}
+// a madeira em quatro passos: 0 casca de coqueiro, 1 casca de árvore, 2 estopa e cocos, 3 texturas (cor + relevo)
+function av880TexMadeira(parte,E){const W=512,H=256;if(!E){const A=av880Can(W,H),Hc=av880Can(W,H);E={A,a:A.getContext('2d'),Hc,h:Hc.getContext('2d'),r:av880Rnd(88001)};E.a.fillStyle='#8a7862';E.a.fillRect(0,0,W,H);E.h.fillStyle='#808080';E.h.fillRect(0,0,W,H);}
+  const a=E.a,h=E.h,r=E.r,PI2=Math.PI*2;const poe=(cv,ct,x0,w)=>{ct.drawImage(cv,x0,0);ct.drawImage(cv,w-4,0,4,H,x0-4,0,4,H);ct.drawImage(cv,0,0,4,H,x0+w,0,4,H);};
+  if(parte===0){// casca de coqueiro: anéis (cicatrizes das folhas), fendas finas, líquenes
+    const w=152,oc=[],oh=[];const linha=(x,an,dy)=>{x.beginPath();for(let q=0;q<=w;q+=4){const yy=an.y+dy+an.a1*Math.sin(q/w*PI2+an.f1)+an.a2*Math.sin(q/w*PI2*3+an.f2);if(q)x.lineTo(q,yy);else x.moveTo(q,yy);}x.stroke();};
+    for(let k=0;k<22;k++){const x0=r()*w,lw=3+r()*9,c=r()<.5?'rgba(110,90,66,.13)':'rgba(240,228,200,.14)';oc.push({f:x=>{x.fillStyle=c;x.fillRect(x0,0,lw,H);},x0,x1:x0+lw,y0:0,y1:H});}
+    for(let k=0;k<5;k++){const an={y:(k+.5)*H/5+(r()-.5)*9,f1:r()*PI2,f2:r()*PI2,a1:2.5+r()*2.5,a2:1+r()*1.5,e:2+r()*1.3,des:r()*20};
+      oc.push({f:x=>{const g=x.createLinearGradient(0,an.y-15,0,an.y+2);g.addColorStop(0,'rgba(70,52,34,0)');g.addColorStop(1,'rgba(70,52,34,.34)');x.fillStyle=g;x.fillRect(0,an.y-15,w,17);
+          const g2=x.createLinearGradient(0,an.y+3,0,an.y+17);g2.addColorStop(0,'rgba(250,240,214,.4)');g2.addColorStop(1,'rgba(250,240,214,0)');x.fillStyle=g2;x.fillRect(0,an.y+3,w,14);
+          x.strokeStyle='rgba(56,40,26,.9)';x.lineWidth=an.e+1;linha(x,an,0);x.strokeStyle='rgba(244,232,204,.6)';x.lineWidth=1.3;linha(x,an,an.e+1.6);
+          x.fillStyle='rgba(50,36,24,.5)';for(let q=0;q<4;q++){x.beginPath();x.ellipse((q+.5)*w/4+an.des-10,an.y-1,7,2.6,0,0,7);x.fill();}}});
+      oh.push({f:x=>{const g2=x.createLinearGradient(0,an.y+2,0,an.y+20);g2.addColorStop(0,'rgba(235,235,235,.85)');g2.addColorStop(1,'rgba(128,128,128,0)');x.fillStyle=g2;x.fillRect(0,an.y+2,w,18);x.strokeStyle='rgba(18,18,18,.95)';x.lineWidth=an.e+2;linha(x,an,0);}});}
+    for(let k=0;k<110;k++){const f={x:r()*w,y:r()*H,l:7+r()*26,d:(r()-.5)*4,a:.14+r()*.28,e:.7+r()*.8};const bb={x0:f.x-3,x1:f.x+3,y0:f.y,y1:f.y+f.l};
+      oc.push(Object.assign({f:x=>{x.strokeStyle='rgba(50,36,24,'+f.a+')';x.lineWidth=f.e;x.beginPath();x.moveTo(f.x,f.y);x.lineTo(f.x+f.d,f.y+f.l);x.stroke();}},bb));
+      oh.push(Object.assign({f:x=>{x.strokeStyle='rgba(40,40,40,'+(f.a+.25)+')';x.lineWidth=f.e+.4;x.beginPath();x.moveTo(f.x,f.y);x.lineTo(f.x+f.d,f.y+f.l);x.stroke();}},bb));}
+    for(let k=0;k<14;k++){const m={x:r()*w,y:r()*H,rx:5+r()*13,ry:4+r()*10,c:k%3===0?'rgba(206,154,80,.2)':k%3===1?'rgba(222,228,202,.26)':'rgba(128,146,104,.2)'};oc.push({f:x=>{x.fillStyle=m.c;x.beginPath();x.ellipse(m.x,m.y,m.rx,m.ry,0,0,7);x.fill();},x0:m.x-m.rx,x1:m.x+m.rx,y0:m.y-m.ry,y1:m.y+m.ry});}
+    oc.push({f:x=>{for(let k=0;k<700;k++){x.fillStyle=r()<.5?'rgba(70,52,34,.15)':'rgba(250,240,214,.15)';x.fillRect(r()*(w-2),r()*(H-2),1+((r()*2)|0),1+((r()*2)|0));}}});
+    poe(av880Azulejo(w,H,'#cbb999',oc),a,4,w);poe(av880Azulejo(w,H,'#808080',oh),h,4,w);}
+  else if(parte===1){// casca de árvore: sulcos verticais, placas, musgo
+    const w=152,oc=[],oh=[];const traco=(x,s)=>{x.beginPath();x.moveTo(s.x,s.y);x.bezierCurveTo(s.x+s.b[0],s.y+s.l*.33,s.x+s.b[1],s.y+s.l*.66,s.x+s.b[2],s.y+s.l);x.stroke();};
+    for(let k=0;k<34;k++){const p={x:r()*w,y:r()*H,l:24+r()*70,e:2+r()*5,b:(r()-.5)*8};const bb={x0:p.x-8,x1:p.x+8,y0:p.y-4,y1:p.y+p.l+4};const pl=(x)=>{x.lineWidth=p.e;x.lineCap='round';x.beginPath();x.moveTo(p.x,p.y);x.quadraticCurveTo(p.x+p.b,p.y+p.l*.5,p.x,p.y+p.l);x.stroke();};
+      oc.push(Object.assign({f:x=>{x.strokeStyle='rgba(214,198,170,.3)';pl(x);}},bb));oh.push(Object.assign({f:x=>{x.strokeStyle='rgba(200,200,200,.5)';pl(x);}},bb));}
+    for(let k=0;k<30;k++){const q={x:r()*w,y:r()*H,l:50+r()*150,e:1.6+r()*3.4,b:[(r()-.5)*12,(r()-.5)*12,(r()-.5)*9]};const bb={x0:q.x-10,x1:q.x+10,y0:q.y-4,y1:q.y+q.l+4};
+      oc.push(Object.assign({f:x=>{x.lineCap='round';x.strokeStyle='rgba(56,43,32,.78)';x.lineWidth=q.e;traco(x,q);x.strokeStyle='rgba(226,210,182,.3)';x.lineWidth=1;x.save();x.translate(q.e*.7+.6,0);traco(x,q);x.restore();}},bb));
+      oh.push(Object.assign({f:x=>{x.lineCap='round';x.strokeStyle='rgba(14,14,14,.95)';x.lineWidth=q.e+1;traco(x,q);}},bb));}
+    for(let k=0;k<10;k++){const m={x:r()*w,y:r()*H,rx:6+r()*14,ry:9+r()*22,c:k%2?'rgba(116,140,82,.26)':'rgba(190,196,170,.2)'};oc.push({f:x=>{x.fillStyle=m.c;x.beginPath();x.ellipse(m.x,m.y,m.rx,m.ry,0,0,7);x.fill();},x0:m.x-m.rx,x1:m.x+m.rx,y0:m.y-m.ry,y1:m.y+m.ry});}
+    oc.push({f:x=>{for(let k=0;k<650;k++){x.fillStyle=r()<.5?'rgba(40,30,22,.2)':'rgba(234,218,192,.15)';x.fillRect(r()*(w-2),r()*(H-2),2,2);}}});
+    poe(av880Azulejo(w,H,'#b6a188',oc),a,164,w);poe(av880Azulejo(w,H,'#909090',oh),h,164,w);}
+  else if(parte===2){// estopa (fibra trançada do coração do coqueiro) e cocos: verde (do pedúnculo ao fundo amarelado) e castanho
+    {const x0=320,w=64;a.save();a.beginPath();a.rect(x0,0,w,H);a.clip();a.fillStyle='#a07a4c';a.fillRect(x0,0,w,H);
+      for(let k=-H;k<w+H;k+=5){a.strokeStyle=k%10?'rgba(60,40,20,.5)':'rgba(226,188,132,.4)';a.lineWidth=1.3;a.beginPath();a.moveTo(x0+k,0);a.lineTo(x0+k+H*.8,H);a.stroke();a.strokeStyle=k%10?'rgba(226,188,132,.32)':'rgba(60,40,20,.42)';a.beginPath();a.moveTo(x0+k+H*.8,0);a.lineTo(x0+k,H);a.stroke();}a.restore();
+      h.save();h.beginPath();h.rect(x0,0,w,H);h.clip();for(let k=-H;k<w+H;k+=5){h.strokeStyle=k%10?'rgba(30,30,30,.6)':'rgba(220,220,220,.5)';h.lineWidth=1.3;h.beginPath();h.moveTo(x0+k,0);h.lineTo(x0+k+H*.8,H);h.stroke();}h.restore();}
+    for(const [x0,c0,c1,c2] of [[384,'#76a038','#aec242','#dcc456'],[448,'#a87438','#925e2c','#70481e']]){const w=64;a.save();a.beginPath();a.rect(x0,0,w,H);a.clip();const g=a.createLinearGradient(0,0,0,H);g.addColorStop(0,c0);g.addColorStop(.55,c1);g.addColorStop(1,c2);a.fillStyle=g;a.fillRect(x0,0,w,H);
+      for(let k=0;k<3;k++){a.strokeStyle='rgba(40,40,10,.15)';a.lineWidth=5;a.beginPath();a.moveTo(x0+10+k*22,0);a.lineTo(x0+10+k*22,H);a.stroke();}
+      for(let k=0;k<110;k++){a.fillStyle=r()<.6?'rgba(70,46,18,.26)':'rgba(240,236,190,.2)';a.fillRect(x0+r()*w,r()*H,1+r()*2,1.5+r()*4);}
+      a.fillStyle='rgba(70,50,24,.62)';a.fillRect(x0,0,w,12);a.restore();}}
+  else{const T=THREE,mk=(cv)=>{const t=new T.CanvasTexture(cv);t.wrapS=T.ClampToEdgeWrapping;t.wrapT=T.RepeatWrapping;t.anisotropy=8;return t;};
+    E.map=mk(E.A);E.map.encoding=T.sRGBEncoding;E.map.name='av880 madeira';E.nrm=null;try{if(typeof normalFrom==='function'){E.nrm=mk(normalFrom(E.Hc,2.4));E.nrm.name='av880 madeira relevo';}}catch(e){av880Erro('relevo',e);}}
+  return E;}
+// atlas das folhas, 1024 × 1024 (alfa recortada): células em pixels → [u0,v0,u1,v1]
+function av880Cel(x,y,w,h){const S=1024,e=1.5;return [(x+e)/S,1-(y+h-e)/S,(x+w-e)/S,1-(y+e)/S];}
+const AV880_F={fol:[0,1,2,3].map(k=>av880Cel(k*128,0,128,256)),jovem:av880Cel(512,0,128,256),seca:[av880Cel(640,0,128,256),av880Cel(768,0,128,256)],bainha:av880Cel(896,0,128,128),estopa:av880Cel(896,128,128,128),
+  rosV:av880Cel(0,256,384,384),rosO:av880Cel(384,256,384,384),leqV:av880Cel(768,256,256,192),leqO:av880Cel(768,448,256,192),
+  selA:av880Cel(0,640,384,384),selB:av880Cel(384,640,384,384),cipo:av880Cel(768,640,128,384),infl:av880Cel(896,640,128,192),feto:av880Cel(896,832,128,192)};
+// uma folha larga (obovada ou em ponta) com nervuras; (x,y) = pé, ang = direção, m = onde é mais larga
+function av880Folha(c,x,y,ang,len,wid,c0,c1,nerv,m){c.save();c.translate(x,y);c.rotate(ang);const g=c.createLinearGradient(0,0,len,0);g.addColorStop(0,c0);g.addColorStop(.62,c1);g.addColorStop(1,c0);c.fillStyle=g;
+  c.beginPath();c.moveTo(0,0);c.bezierCurveTo(len*.18,-wid*.16,len*(m-.24),-wid*.54,len*m,-wid*.5);c.bezierCurveTo(len*(m+.2),-wid*.46,len*.96,-wid*.2,len,0);
+  c.bezierCurveTo(len*.96,wid*.2,len*(m+.2),wid*.46,len*m,wid*.5);c.bezierCurveTo(len*(m-.24),wid*.54,len*.18,wid*.16,0,0);c.closePath();c.fill();c.strokeStyle='rgba(10,28,8,.5)';c.lineWidth=1.1;c.stroke();
+  c.fillStyle='rgba(0,22,0,.17)';c.beginPath();c.moveTo(0,0);c.lineTo(len,0);c.bezierCurveTo(len*.96,wid*.2,len*(m+.2),wid*.46,len*m,wid*.5);c.bezierCurveTo(len*(m-.24),wid*.54,len*.18,wid*.16,0,0);c.closePath();c.fill();
+  if(nerv){c.strokeStyle=nerv;c.lineWidth=Math.max(1,wid*.035);c.beginPath();c.moveTo(len*.04,0);c.lineTo(len*.92,0);c.stroke();c.lineWidth=Math.max(.6,wid*.016);c.beginPath();
+    for(let k=1;k<6;k++){const t=.1+k*.13,t2=t+.09,lar=wid*.36*(t2<m?Math.pow(t2/m,.8):Math.max(0,1-Math.pow((t2-m)/(1-m),1.6)));c.moveTo(len*t,0);c.lineTo(len*t2,-lar);c.moveTo(len*t,0);c.lineTo(len*t2,lar);}c.stroke();}
+  c.restore();}
+// folha miúda (tufos da figueira): duas curvas, uma metade mais clara, nervura
+function av880FolhaM(c,x,y,ang,len,wid,cor,luz,nerv){const ca=Math.cos(ang),sa=Math.sin(ang),tx=x+ca*len,ty=y+sa*len,nx=-sa*wid*.75,ny=ca*wid*.75,mx=x+ca*len*.45,my=y+sa*len*.45;
+  c.fillStyle=cor;c.beginPath();c.moveTo(x,y);c.quadraticCurveTo(mx+nx,my+ny,tx,ty);c.quadraticCurveTo(mx-nx,my-ny,x,y);c.fill();
+  c.fillStyle=luz;c.beginPath();c.moveTo(x,y);c.quadraticCurveTo(mx+nx,my+ny,tx,ty);c.closePath();c.fill();if(nerv){c.strokeStyle=nerv;c.lineWidth=1;c.beginPath();c.moveTo(x,y);c.lineTo(tx,ty);c.stroke();}}
+// um grupo de folíolos de coqueiro numa célula: ráquis embaixo, pontas para cima
+function av880Foliolos(c,x0,y0,w,h,r,tipo){const n=5,pas=w/n;const pal=tipo==='seca'?[['#6e4c28','#9a7442','#c4a064'],['#7a5830','#a8824c','#d2b276']]:tipo==='jovem'?[['#4c8a30','#86bc46','#cfe07c'],['#58963a','#96c84e','#dcea8c']]:[['#215c26','#3c8c34','#86bc50'],['#2a6a2c','#4a9c3c','#9cca5a'],['#1c5224','#34802f','#74ae48']];
+  c.save();c.beginPath();c.rect(x0,y0,w,h);c.clip();
+  const ordem=[0,2,4,1,3];for(const k of ordem){if(tipo==='rasgada'&&k===2)continue;if(tipo==='seca'&&r()<.16)continue;
+    const cx=x0+(k+.5)*pas+(r()-.5)*5;let comp=h*(.8+r()*.17);if(tipo==='rasgada'&&k===3)comp*=.55;if(tipo==='seca'&&r()<.3)comp*=.5+r()*.3;const bw=pas*(tipo==='seca'?.62:.98)*(.9+r()*.2);const tx=cx+(r()-.5)*16,ty=y0+h-comp;const yb=y0+h-4;const p=pal[(r()*pal.length)|0];
+    const g=c.createLinearGradient(0,yb,0,ty);g.addColorStop(0,p[0]);g.addColorStop(.45,p[1]);g.addColorStop(1,p[2]);
+    const ym=yb-comp*.42,xm=cx+(tx-cx)*.3;
+    // meia folha da esquerda (mais escura) e da direita (mais clara): as duas águas do folíolo
+    for(const s of [-1,1]){c.beginPath();c.moveTo(cx,yb);c.bezierCurveTo(cx+s*bw,yb-comp*.08,xm+s*bw*.95,ym,tx,ty);c.quadraticCurveTo(xm,ym,cx,yb);c.closePath();c.fillStyle=g;c.fill();if(s<0){c.fillStyle='rgba(0,24,4,.24)';c.fill();}else{c.fillStyle='rgba(255,255,200,.07)';c.fill();}}
+    c.strokeStyle=tipo==='seca'?'rgba(60,40,18,.5)':'rgba(8,36,10,.5)';c.lineWidth=1;c.beginPath();c.moveTo(cx-bw*.2,yb);c.bezierCurveTo(cx-bw,yb-comp*.08,xm-bw*.95,ym,tx,ty);c.bezierCurveTo(xm+bw*.95,ym,cx+bw,yb-comp*.08,cx+bw*.2,yb);c.stroke();
+    c.strokeStyle=tipo==='seca'?'rgba(226,200,150,.55)':'rgba(214,236,150,.62)';c.lineWidth=1.3;c.beginPath();c.moveTo(cx,yb);c.quadraticCurveTo(xm,ym,tx,ty);c.stroke();
+    if(tipo!=='seca'&&tipo!=='jovem'&&r()<.3){c.fillStyle='rgba(186,150,84,.85)';c.beginPath();c.moveTo(tx,ty);c.lineTo(tx-3.5,ty+comp*.1);c.lineTo(tx+3.5,ty+comp*.1);c.closePath();c.fill();}}
+  // a ráquis (a faixa de baixo da célula: os grupos vizinhos emendam uns nos outros)
+  const gr=c.createLinearGradient(0,y0+h-13,0,y0+h);if(tipo==='seca'){gr.addColorStop(0,'#8a6638');gr.addColorStop(.5,'#b48e56');gr.addColorStop(1,'#7c5a30');}else{gr.addColorStop(0,'#7c9440');gr.addColorStop(.5,'#c0c470');gr.addColorStop(1,'#8a9a48');}
+  c.fillStyle=gr;c.fillRect(x0,y0+h-13,w,13);c.restore();}
+// roseta de folhas largas vista de cima (amendoeira): três camadas, as de dentro mais claras
+function av880Roseta(c,cx,cy,R,r,outono){const verdes=[['#23561f','#458a33'],['#2a6426','#539a39'],['#327230','#63a83f'],['#1f4e22','#3d7c2e']],claros=[['#43862f','#7db648'],['#4e9434','#8ec450'],['#5a9e3c','#a2d05c']],fogo=[['#7c1c12','#cc4426'],['#8c4410','#e08628'],['#84700e','#d6ba30'],['#6a1414','#b02a22']];
+  const cam=[{n:13,l0:.78,l1:.98,w:.35,tons:verdes,f:outono?.3:0},{n:10,l0:.54,l1:.72,w:.31,tons:verdes,f:outono?.36:0},{n:7,l0:.3,l1:.46,w:.24,tons:claros,f:outono?.14:0}];
+  cam.forEach((C,ci)=>{if(ci){c.save();c.globalCompositeOperation='source-atop';const g=c.createRadialGradient(cx,cy,R*.05,cx,cy,R*(ci===1?.86:.6));g.addColorStop(0,'rgba(0,26,6,.5)');g.addColorStop(1,'rgba(0,26,6,0)');c.fillStyle=g;c.fillRect(cx-R,cy-R,2*R,2*R);c.restore();}
+    for(let k=0;k<C.n;k++){const a=k/C.n*Math.PI*2+ci*.37+(r()-.5)*.36,len=R*(C.l0+r()*(C.l1-C.l0)),wid=R*C.w*(.86+r()*.3);const t=(r()<C.f)?fogo[(r()*fogo.length)|0]:C.tons[(r()*C.tons.length)|0];
+      av880Folha(c,cx+Math.cos(a)*R*.04,cy+Math.sin(a)*R*.04,a,len,wid,t[0],t[1],'rgba(232,244,188,.42)',.66);}});
+  c.fillStyle='#5a4226';c.beginPath();c.arc(cx,cy,R*.04,0,7);c.fill();}
+// a mesma roseta vista de lado: um leque de folhas a sair da ponta do raminho (em baixo, ao meio)
+function av880Leque(c,x0,y0,w,h,r,outono){const verdes=[['#23561f','#458a33'],['#2a6426','#539a39'],['#327230','#63a83f']],claros=[['#43862f','#7db648'],['#4e9434','#8ec450']],fogo=[['#7c1c12','#cc4426'],['#8c4410','#e08628'],['#84700e','#d6ba30']];
+  c.save();c.beginPath();c.rect(x0,y0,w,h);c.clip();const bx=x0+w/2,by=y0+h-10;
+  c.strokeStyle='#5a4228';c.lineWidth=6;c.beginPath();c.moveTo(bx,y0+h);c.lineTo(bx,by-6);c.stroke();
+  for(const [n,l0,l1,tons,f] of [[10,.74,.94,verdes,outono?.3:0],[7,.5,.72,claros,outono?.2:0]]){for(let k=0;k<n;k++){const a=-Math.PI*(.04+.92*(k+.5)/n)+(r()-.5)*.2,len=(w/2-6)*(l0+r()*(l1-l0))*(.72+.28*Math.abs(Math.cos(a))+.2*Math.abs(Math.sin(a)));const t=(r()<f)?fogo[(r()*fogo.length)|0]:tons[(r()*tons.length)|0];
+      av880Folha(c,bx+Math.cos(a)*4,by+Math.sin(a)*4,a,Math.min(len,(h-16)/Math.max(.25,Math.abs(Math.sin(a)))),len*.36,t[0],t[1],'rgba(232,244,188,.4)',.66);}}
+  c.restore();}
+// tufo de folhagem miúda (copa da figueira): bolo denso de folhas em três profundidades, as de cima mais claras
+function av880Tufo(c,cx,cy,R,r){const fundo=[['#17401c','#1e4c22'],['#1a451e','#235626']],meio=[['#225a28','#2f7030'],['#27662c','#37802f'],['#1e5225','#2b692d']],luz=[['#3f8c31','#5aa63c'],['#499a33','#6cb644'],['#5aa83c','#8cc650']];
+  c.fillStyle='#133819';for(let k=0;k<22;k++){const a=r()*6.283,d=R*.5*Math.sqrt(r());c.beginPath();c.arc(cx+Math.cos(a)*d,cy+Math.sin(a)*d,R*(.17+r()*.14),0,7);c.fill();}
+  const cam=[[115,.9,fundo],[105,.8,meio],[75,.66,luz]];
+  cam.forEach(([n,rr,tons],ci)=>{for(let k=0;k<n;k++){const a=r()*6.283,d=R*rr*Math.sqrt(r()),px=cx+Math.cos(a)*d,py=cy+Math.sin(a)*d-(ci===2?R*.05:0),len=R*(.2+r()*.09),dir=a+(r()-.5)*1.7;const t=(ci===2&&r()<.1)?['#96a430','#c8cc48']:tons[(r()*tons.length)|0];
+      if(Math.hypot(px+Math.cos(dir)*len-cx,py+Math.sin(dir)*len-cy)>R*.985)continue;av880FolhaM(c,px,py,dir,len,len*.44,t[0],t[1],ci?'rgba(226,242,180,.32)':null);}});}
+function av880TexFolhas(parte,estado){const S=1024;if(!estado){const cv=av880Can(S,S);estado={cv,c:cv.getContext('2d'),r:av880Rnd(88011)};estado.c.clearRect(0,0,S,S);}const c=estado.c,r=estado.r;
+  if(parte===0){av880Foliolos(c,0,0,128,256,r,'verde');av880Foliolos(c,128,0,128,256,r,'verde');av880Foliolos(c,256,0,128,256,r,'verde');av880Foliolos(c,384,0,128,256,r,'rasgada');}
+  else if(parte===1){av880Foliolos(c,512,0,128,256,r,'jovem');av880Foliolos(c,640,0,128,256,r,'seca');av880Foliolos(c,768,0,128,256,r,'seca');
+    // bainha velha (o pé de uma folha que caiu): larga em baixo, quebrada em cima, com fiapos
+    {const x0=896,y0=0;c.save();c.beginPath();c.rect(x0,y0,128,128);c.clip();const g=c.createLinearGradient(0,y0+128,0,y0);g.addColorStop(0,'#86663c');g.addColorStop(.6,'#b4945e');g.addColorStop(1,'#cfb47e');c.fillStyle=g;
+      c.beginPath();c.moveTo(x0+24,y0+128);c.quadraticCurveTo(x0+44,y0+70,x0+50,y0+10);c.lineTo(x0+56,y0+18);c.lineTo(x0+62,y0+6);c.lineTo(x0+68,y0+20);c.lineTo(x0+74,y0+8);c.lineTo(x0+78,y0+14);c.quadraticCurveTo(x0+84,y0+70,x0+104,y0+128);c.closePath();c.fill();
+      for(let k=0;k<20;k++){const fx=x0+30+r()*68;c.strokeStyle=r()<.6?'rgba(66,44,20,.42)':'rgba(232,208,160,.4)';c.lineWidth=1;c.beginPath();c.moveTo(fx,y0+128);c.quadraticCurveTo(x0+64+(fx-x0-64)*.6,y0+70,x0+64+(fx-x0-64)*.38,y0+14);c.stroke();}
+      for(let k=0;k<14;k++){const s=k%2?1:-1,yy=y0+30+r()*90,xe=x0+64+s*(20+(yy-y0)*.2);c.strokeStyle='rgba(176,146,96,.8)';c.lineWidth=1;c.beginPath();c.moveTo(xe,yy);c.quadraticCurveTo(xe+s*10,yy-8,xe+s*(14+r()*12),yy-14-r()*12);c.stroke();}c.restore();}
+    // tela de estopa: retalho de fibra cruzada com buracos e fiapos
+    {const x0=896,y0=128;c.save();c.beginPath();c.rect(x0,y0,128,128);c.clip();c.beginPath();c.moveTo(x0+14,y0+8);for(let k=1;k<=8;k++)c.lineTo(x0+14+k*12.5,y0+6+r()*8);for(let k=1;k<=8;k++)c.lineTo(x0+112+r()*8,y0+8+k*11);for(let k=1;k<=8;k++)c.lineTo(x0+114-k*12.5,y0+96+r()*14);for(let k=1;k<=8;k++)c.lineTo(x0+8+r()*8,y0+98-k*11);c.closePath();c.fillStyle='#7c5a34';c.fill();c.save();c.clip();
+      for(let k=-128;k<256;k+=5){c.strokeStyle=k%10?'rgba(44,28,12,.55)':'rgba(206,166,108,.45)';c.lineWidth=1.2;c.beginPath();c.moveTo(x0+k,y0);c.lineTo(x0+k+92,y0+128);c.stroke();c.strokeStyle=k%10?'rgba(206,166,108,.34)':'rgba(44,28,12,.45)';c.beginPath();c.moveTo(x0+k+92,y0);c.lineTo(x0+k,y0+128);c.stroke();}c.restore();
+      c.globalCompositeOperation='destination-out';for(let k=0;k<12;k++){c.beginPath();c.ellipse(x0+20+r()*88,y0+18+r()*80,2+r()*5,3+r()*7,r()*3,0,7);c.fill();}c.globalCompositeOperation='source-over';
+      for(let k=0;k<14;k++){const fx=x0+16+r()*96;c.strokeStyle='rgba(150,112,64,.85)';c.lineWidth=1;c.beginPath();c.moveTo(fx,y0+98);c.quadraticCurveTo(fx+(r()-.5)*10,y0+112,fx+(r()-.5)*14,y0+110+r()*16);c.stroke();}c.restore();}}
+  else if(parte===2){c.save();c.beginPath();c.rect(0,256,384,384);c.clip();av880Roseta(c,192,448,186,r,false);c.restore();}
+  else if(parte===3){c.save();c.beginPath();c.rect(384,256,384,384);c.clip();av880Roseta(c,576,448,186,r,true);c.restore();}
+  else if(parte===4){av880Leque(c,768,256,256,192,r,false);av880Leque(c,768,448,256,192,r,true);}
+  else if(parte===5){c.save();c.beginPath();c.rect(0,640,384,384);c.clip();av880Tufo(c,192,832,186,r);c.restore();}
+  else if(parte===6){c.save();c.beginPath();c.rect(384,640,384,384);c.clip();av880Tufo(c,576,832,186,r);c.restore();}
+  else{
+    // cipó: dois ramos torcidos com folhas em coração
+    {const x0=768,y0=640,h=384;c.save();c.beginPath();c.rect(x0,y0,128,h);c.clip();for(const s of [1,-1]){for(const [cor,lw,dx] of [['#3e2e1c',7,0],['#7c6444',2.2,-1.6]]){c.strokeStyle=cor;c.lineWidth=lw;c.lineCap='round';c.beginPath();for(let q=0;q<=h;q+=6){const xx=x0+64+dx+s*13*Math.sin(q/h*Math.PI*2*3.5+(s>0?0:.6));if(q)c.lineTo(xx,y0+q);else c.moveTo(xx,y0+q);}c.stroke();}}
+      for(let k=0;k<11;k++){const s=k%2?1:-1,yy=y0+16+k*33+r()*10,xx=x0+64+s*10;const a=Math.PI/2-s*(.55+r()*.5);const t=[['#245c26','#4a9236'],['#2c6a2a','#5ca43e'],['#3a7a2e','#7cb84a']][(r()*3)|0];c.strokeStyle='#4a3a22';c.lineWidth=1.6;c.beginPath();c.moveTo(xx,yy);c.lineTo(xx+Math.cos(a)*9,yy+Math.sin(a)*9);c.stroke();av880Folha(c,xx+Math.cos(a)*8,yy+Math.sin(a)*8,a,34+r()*12,24+r()*8,t[0],t[1],'rgba(226,242,180,.4)',.36);}c.restore();}
+    // inflorescência do coqueiro: espata e fios com botões
+    {const x0=896,y0=640;c.save();c.beginPath();c.rect(x0,y0,128,192);c.clip();c.fillStyle='#8c6c3c';c.beginPath();c.moveTo(x0+58,y0+2);c.quadraticCurveTo(x0+20,y0+70,x0+34,y0+150);c.quadraticCurveTo(x0+52,y0+80,x0+70,y0+2);c.closePath();c.fill();c.strokeStyle='rgba(50,34,14,.5)';c.lineWidth=1;c.stroke();
+      for(let k=0;k<17;k++){const ex=x0+12+k*6.4+(r()-.5)*5,ey=y0+110+r()*76;const mx=x0+64+(ex-x0-64)*.7,my=y0+50;c.strokeStyle=k%3?'#d6c676':'#b8a650';c.lineWidth=1.7;c.beginPath();c.moveTo(x0+64,y0+4);c.quadraticCurveTo(mx,my,ex,ey);c.stroke();
+        for(let q=0;q<5;q++){const t=.35+q*.14,bx=(1-t)*(1-t)*(x0+64)+2*(1-t)*t*mx+t*t*ex,by=(1-t)*(1-t)*(y0+4)+2*(1-t)*t*my+t*t*ey;c.fillStyle=q<2&&k%4===0?'#7c9a34':'#e6d88c';c.beginPath();c.arc(bx,by,q<2&&k%4===0?3.4:1.9,0,7);c.fill();}}c.restore();}
+    // samambaia (epífita): frondes em fonte
+    {const x0=896,y0=832;c.save();c.beginPath();c.rect(x0,y0,128,192);c.clip();const bx=x0+64,by=y0+186;for(let k=0;k<11;k++){const a=-Math.PI*(.06+.88*(k+.5)/11),L=88+r()*40;const ex=bx+Math.cos(a)*L*.62,ey=by+Math.sin(a)*L*.9+Math.abs(Math.cos(a))*36;const mx=bx+Math.cos(a)*L*.34,my=by+Math.sin(a)*L*1.02;const t=['#2c6e2a','#3a842e','#4c9a36','#62ac40'][(r()*4)|0];
+        for(let q=1;q<=15;q++){const u=q/15,px=(1-u)*(1-u)*bx+2*(1-u)*u*mx+u*u*ex,py=(1-u)*(1-u)*by+2*(1-u)*u*my+u*u*ey;const tx=2*(1-u)*(mx-bx)+2*u*(ex-mx),ty=2*(1-u)*(my-by)+2*u*(ey-my),tl=Math.hypot(tx,ty)||1;const nx=-ty/tl,ny=tx/tl,pl=11*Math.sin(Math.PI*Math.min(1,u*1.1))+2;c.strokeStyle=t;c.lineWidth=3.4;c.lineCap='round';c.beginPath();c.moveTo(px-nx*pl,py-ny*pl);c.lineTo(px+nx*pl,py+ny*pl);c.stroke();}
+        c.strokeStyle='rgba(190,214,130,.7)';c.lineWidth=1.2;c.beginPath();c.moveTo(bx,by);c.quadraticCurveTo(mx,my,ex,ey);c.stroke();}c.restore();}
+    const T=THREE,t=new T.CanvasTexture(estado.cv);t.wrapS=t.wrapT=T.ClampToEdgeWrapping;t.anisotropy=8;t.encoding=T.sRGBEncoding;t.name='av880 folhas';estado.tex=t;}
+  return estado;}
+/* ---------- materiais (dois: madeira e folhas), com o vento no shader dos vértices ---------- */
+function av880Mats(){if(AV880.mats)return AV880.mats;const T=THREE,X=AV880.tex;
+  const vento=(m,folha)=>{m.onBeforeCompile=(sh)=>{sh.uniforms.uT880=AV880.U;
+      sh.vertexShader='uniform float uT880;\nattribute vec4 av880w;\n'+(folha?'varying float vU880;\n':'')+sh.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\n\tfloat f880=uT880+av880w.z;\n'+(folha?'\tvU880=av880w.w;\n':'')+
+        '\ttransformed.x+=(sin(f880*.83)+.45*sin(f880*2.1+1.3))*.11*av880w.y;\n\ttransformed.z+=(cos(f880*.67)+.45*sin(f880*1.7+.6))*.09*av880w.y;\n'+
+        (folha?'\tfloat g880=f880*2.3+position.x*.9+position.z*.7;\n\ttransformed.x+=sin(g880)*av880w.x*.7;\n\ttransformed.y+=sin(g880*1.31+1.0)*av880w.x;\n\ttransformed.z+=cos(g880*.87)*av880w.x*.7;\n':''));
+      if(folha)sh.fragmentShader='varying float vU880;\n'+sh.fragmentShader
+        .replace('#include <alphatest_fragment>','\tdiffuseColor.a*=1.0+clamp((length(vViewPosition)-14.0)/42.0,0.0,1.0)*1.6;\n#include <alphatest_fragment>')
+        .replace('#include <normal_fragment_begin>','#include <normal_fragment_begin>\n#ifdef DOUBLE_SIDED\n\tnormal=normal*faceDirection;\n\tgeometryNormal=normal;\n\tif(faceDirection<0.0)diffuseColor.rgb*=vU880;\n#endif');};
+    m.customProgramCacheKey=()=>'av880'+(folha?'f':'m');};
+  const madeira=new T.MeshStandardMaterial({color:0xffffff,map:X.madeira.map,roughness:.9,metalness:0,vertexColors:true});if(X.madeira.nrm){madeira.normalMap=X.madeira.nrm;madeira.normalScale=new T.Vector2(.9,.9);}
+  madeira.name='AV880 madeira';madeira.userData.papelKeep=true;madeira.userData.av880={tipo:'madeira'};vento(madeira,false);
+  const folhas=new T.MeshStandardMaterial({color:0xffffff,map:X.folhas,alphaTest:.4,side:T.DoubleSide,roughness:.64,metalness:0,vertexColors:true});
+  folhas.name='AV880 folhas';folhas.userData.papelKeep=true;folhas.userData.av880={tipo:'folhas',alfaLonge:14,semVirar:1};vento(folhas,true);
+  const prof=new T.MeshDepthMaterial({depthPacking:T.RGBADepthPacking,map:X.folhas,alphaTest:.4});prof.side=T.DoubleSide;
+  AV880.mats={madeira,folhas,prof};return AV880.mats;}
+/* ---------- moldes: listas de vértices (posição, normal, uv, cor, vento[tremor, peso do tronco, fase, face de baixo]) e índices ---------- */
+function av880Molde(){return {p:[],n:[],u:[],c:[],w:[],i:[]};}
+// quadrilátero de folhagem: a,b = lado de dentro; c (do lado de b), d (do lado de a) = lado de fora; a face da frente fica virada para nh
+function av880Q(G,a,b,c,d,uv,nh,mix,ca,cb,wa,wb,wy,und,inv,ns){const e1=[b[0]-a[0],b[1]-a[1],b[2]-a[2]],e2=[d[0]-a[0],d[1]-a[1],d[2]-a[2]];let g=av880N3(av880X3(e1,e2));const vira=(g[0]*nh[0]+g[1]*nh[1]+g[2]*nh[2])<0;if(vira)g=[-g[0],-g[1],-g[2]];
+  const n=av880N3([g[0]*(1-mix)+nh[0]*mix,g[1]*(1-mix)+nh[1]*mix,g[2]*(1-mix)+nh[2]*mix]);const k=G.p.length/3,u0=inv?uv[2]:uv[0],u1=inv?uv[0]:uv[2];
+  G.p.push(a[0],a[1],a[2],b[0],b[1],b[2],c[0],c[1],c[2],d[0],d[1],d[2]);if(ns){for(let q=0;q<4;q++)G.n.push(ns[q][0],ns[q][1],ns[q][2]);}else for(let q=0;q<4;q++)G.n.push(n[0],n[1],n[2]);
+  G.u.push(u0,uv[1],u1,uv[1],u1,uv[3],u0,uv[3]);G.c.push(ca[0],ca[1],ca[2],ca[0],ca[1],ca[2],cb[0],cb[1],cb[2],cb[0],cb[1],cb[2]);
+  G.w.push(wa,wy,0,und,wa,wy,0,und,wb,wy,0,und,wb,wy,0,und);if(vira)G.i.push(k,k+2,k+1,k,k+3,k+2);else G.i.push(k,k+1,k+2,k,k+2,k+3);}
+// cartão: quadrilátero de centro o, eixos ex (meia largura) e ey (meia altura)
+function av880Cartao(G,o,ex,ey,uv,nh,mix,cor,wa,wy,und,ns,cb){const a=[o[0]-ex[0]-ey[0],o[1]-ex[1]-ey[1],o[2]-ex[2]-ey[2]],b=[o[0]+ex[0]-ey[0],o[1]+ex[1]-ey[1],o[2]+ex[2]-ey[2]],c=[o[0]+ex[0]+ey[0],o[1]+ex[1]+ey[1],o[2]+ex[2]+ey[2]],d=[o[0]-ex[0]+ey[0],o[1]-ex[1]+ey[1],o[2]-ex[2]+ey[2]];
+  av880Q(G,a,b,c,d,uv,nh,mix,cor,cb||cor,wa,wa,wy,und,false,ns?[ns(a),ns(b),ns(c),ns(d)]:null);}
+// tubo ao longo de pts com os raios rs; S lados; u de ua a ub em volta; v = comprimento × ve
+function av880Tubo(G,pts,rs,S,ua,ub,ve,cor,wy,v0){const n=pts.length,k0=G.p.length/3;let A=null,len=0;
+  for(let i=0;i<n;i++){const p=pts[i],q0=pts[Math.max(0,i-1)],q1=pts[Math.min(n-1,i+1)];const Tg=av880N3([q1[0]-q0[0],q1[1]-q0[1],q1[2]-q0[2]]);if(!A)A=Math.abs(Tg[1])>.9?[1,0,0]:[0,1,0];
+    const d=A[0]*Tg[0]+A[1]*Tg[1]+A[2]*Tg[2];A=av880N3([A[0]-Tg[0]*d,A[1]-Tg[1]*d,A[2]-Tg[2]*d]);const B=av880X3(Tg,A);if(i)len+=Math.hypot(p[0]-pts[i-1][0],p[1]-pts[i-1][1],p[2]-pts[i-1][2]);const wv=wy(i);
+    for(let j=0;j<=S;j++){const a=j/S*6.2831853,cs=Math.cos(a),sn=Math.sin(a),dx=A[0]*cs+B[0]*sn,dy=A[1]*cs+B[1]*sn,dz=A[2]*cs+B[2]*sn,col=cor(i,j,dx,dy,dz);
+      G.p.push(p[0]+dx*rs[i],p[1]+dy*rs[i],p[2]+dz*rs[i]);G.n.push(dx,dy,dz);G.u.push(ua+(ub-ua)*j/S,(v0||0)+len*ve);G.c.push(col[0],col[1],col[2]);G.w.push(0,wv,0,1);}}
+  for(let i=0;i<n-1;i++)for(let j=0;j<S;j++){const a=k0+i*(S+1)+j,b=a+1,c=a+S+1,d=c+1;G.i.push(a,b,c,b,d,c);}return len;}
+// elipsoide baixo (coco): 6 gomos × 4 andares, a textura espelhada em volta (sem emenda)
+function av880Coco(G,o,rx,ry,ua,ub,tom,wy){const S=6,K=4,k0=G.p.length/3;for(let k=0;k<=K;k++){const ph=k/K*Math.PI,sp=Math.sin(ph),cp=Math.cos(ph);for(let j=0;j<=S;j++){const th=j/S*6.2831853,nx=sp*Math.cos(th),nz=sp*Math.sin(th);const s=tom*(.74+.26*(cp*.5+.5));
+      G.p.push(o[0]+nx*rx,o[1]+cp*ry,o[2]+nz*rx);G.n.push(nx,cp,nz);G.u.push(ua+(ub-ua)*Math.abs(2*j/S-1),.06+.88*k/K);G.c.push(s,s,s);G.w.push(0,wy,0,1);}}
+  for(let k=0;k<K;k++)for(let j=0;j<S;j++){const a=k0+k*(S+1)+j,b=a+1,c=a+S+1,d=c+1;if(k>0)G.i.push(a,b,c);if(k<K-1)G.i.push(b,d,c);}}
+/* ---------- o coqueiro ---------- */
+// uma fronde no molde F: a ráquis arqueia no plano do azimute e os grupos de folíolos pendem dos dois lados
+function av880Fronde(F,o){const r=o.r,N=o.seg||13,nT=N+2,L=o.L,seca=!!o.seca,id=o.idade;const P=[],Tn=[],Sd=[],Up=[];let p=[Math.cos(o.az)*o.r0+(o.ox||0),o.y0,Math.sin(o.az)*o.r0+(o.oz||0)];
+  for(let i=0;i<=nT;i++){const s=i/nT,th=o.el-o.queda*Math.pow(s,1.55),az=o.az+o.tor*s*s;const Tg=[Math.cos(th)*Math.cos(az),Math.sin(th),Math.cos(th)*Math.sin(az)],S=[-Math.sin(az),0,Math.cos(az)];
+    if(i){const tm=av880N3([Tg[0]+Tn[i-1][0],Tg[1]+Tn[i-1][1],Tg[2]+Tn[i-1][2]]);p=[p[0]+tm[0]*L/nT,p[1]+tm[1]*L/nT,p[2]+tm[2]*L/nT];}P.push(p);Tn.push(Tg);Sd.push(S);Up.push(av880X3(S,Tg));}
+  const tin=o.tinta||[1,1,1],lm=(o.lf||.25)*L,pesoG=o.peso!==undefined?o.peso:seca?.85:.22+.6*id,ergue=o.peso!==undefined?.04:seca?-.1:id<.3?.32:.06;
+  const dirF=(i,sg,gi)=>{const u=Math.max(0,(i-2)/N),ga=.34+.8*u,S=Sd[i],Tg=Tn[i],U=Up[i];const cg=Math.cos(ga)*sg,sn=Math.sin(ga);const g=pesoG+.12*u+gi;return av880N3([cg*S[0]+sn*Tg[0]+U[0]*ergue,cg*S[1]+sn*Tg[1]+U[1]*ergue-g,cg*S[2]+sn*Tg[2]+U[2]*ergue]);};
+  const perf=(u)=>(.5+.5*av880Sm(u/.3))*(1-.74*av880Sm((u-.5)/.5));
+  // o pecíolo: fita curta sem folíolos
+  {const wd=.05*L/3.6,cel=seca?AV880_F.seca[0]:AV880_F.fol[0],uv=[cel[0],cel[1],cel[2],cel[1]+.04*(cel[3]-cel[1])];for(let i=0;i<2;i++){const a=P[i],b=P[i+1],S0=Sd[i],S1=Sd[i+1],k0=1.25-i*.25,k1=1-i*.25+(i?0:0);
+      const cz=seca?[.8,.74,.62]:[.6*tin[0],.62*tin[1],.5*tin[2]];av880Q(F,[a[0]-S0[0]*wd*k0,a[1],a[2]-S0[2]*wd*k0],[b[0]-S1[0]*wd*k1,b[1],b[2]-S1[2]*wd*k1],[b[0]+S1[0]*wd*k1,b[1],b[2]+S1[2]*wd*k1],[a[0]+S0[0]*wd*k0,a[1],a[2]+S0[2]*wd*k0],uv,Up[i],.2,cz,cz,0,0,1,.8,false,null);}}
+  for(let i=2;i<nT;i++){const u0=(i-2)/N,u1=(i-1)/N,s=i/nT,ao=.46+.54*av880Sm(s/.4);for(const sg of [-1,1]){const j=.86+r()*.26,gi=(r()-.5)*.2;const d0=dirF(i,sg,gi),d1=dirF(i+1,sg,gi);const l0=lm*perf(u0)*j,l1=lm*perf(u1)*j;const a=P[i],b=P[i+1];
+      const c=[b[0]+d1[0]*l1,b[1]+d1[1]*l1,b[2]+d1[2]*l1],d=[a[0]+d0[0]*l0,a[1]+d0[1]*l0,a[2]+d0[2]*l0];
+      let cel;if(seca)cel=AV880_F.seca[(r()*2)|0];else if(id<.14)cel=AV880_F.jovem;else if(id>.78&&u0>.55&&r()<.6)cel=AV880_F.seca[(r()*2)|0];else cel=AV880_F.fol[(r()*4)|0];
+      const v=.92+r()*.16,ca=[tin[0]*ao*.8*v,tin[1]*ao*.8*v,tin[2]*ao*.8*v],cb=[tin[0]*(ao*.3+.74)*v,tin[1]*(ao*.3+.74)*v,tin[2]*(ao*.3+.74)*v];
+      const wf=(seca?.02:.05)*s*s*L/3.6;av880Q(F,a,b,c,d,cel,Up[i],.42,ca,cb,wf,wf+.045*(l0/lm),1,.72,r()<.5,null);}}
+  return P[nT];}
+// molde da coroa (frondes, saia seca, coração, bainhas, estopa, inflorescência, cachos): fronde de referência com 3,6 m
+function av880Coroa(seed,E){if(!E){E={M:av880Molde(),F:av880Molde(),r:av880Rnd(seed),k:0,pronto:false};E.nF=17+((E.r()*5)|0);}const M=E.M,F=E.F,r=E.r,nF=E.nF,GA=2.39996;
+  for(const ate=Math.min(nF,E.k+6);E.k<ate;E.k++){const k=E.k,id=k/(nF-1);const el=1.36-1.74*Math.pow(id,.85)+(r()-.5)*.16;const L=3.6*(id<.12?.5+id*2.6:.84+r()*.24);
+    const tinta=id<.14?[1.12,1.14,1.0]:id>.78?[1.18,1.08,.84]:[1.0+r()*.14,1.02+r()*.12,.92+r()*.18];
+    av880Fronde(F,{r,az:k*GA+r()*.3,el,L,queda:.5+1.06*id+r()*.3,idade:id,tor:(r()-.5)*.55,y0:.16-.3*id,r0:.06+.1*id,tinta});}
+  if(E.k<nF)return E;
+  const nS=2+((r()*3)|0);for(let k=0;k<nS;k++)av880Fronde(F,{r,seg:9,seca:true,az:r()*6.283,el:-.95-r()*.4,L:3.6*(.62+r()*.2),queda:.22+r()*.2,idade:1,tor:(r()-.5)*.4,y0:-.28,r0:.17,lf:.17,tinta:[.96,.92,.84]});
+  // o coração: bojo de estopa que afina para o palmito verde
+  {const pf=[[-.66,.135],[-.44,.19],[-.2,.24],[.02,.2],[.24,.115],[.44,.035]];const fb=AV880_M.fibra;av880Tubo(M,pf.map(q=>[0,q[0],0]),pf.map(q=>q[1]),8,fb[0],fb[1],.9,(i)=>i>=4?[.62,.82,.42]:i===3?[.78,.78,.5]:[.66+.1*i,.62+.1*i,.56+.08*i],()=>1);}
+  // bainhas velhas em volta, a tela de estopa, a inflorescência
+  const nB=7+((r()*3)|0);for(let k=0;k<nB;k++){const a=k/nB*6.283+r()*.5,ca=Math.cos(a),sa=Math.sin(a),y=-.52+r()*.3,inc=.5+r()*.35,Lb=.46+r()*.2,w=.11+r()*.03;const o=[ca*(.19+Lb*.5*Math.sin(inc)),y+Lb*.5*Math.cos(inc),sa*(.19+Lb*.5*Math.sin(inc))];
+    const t=.74+r()*.26;av880Cartao(F,o,[-sa*w,0,ca*w],[ca*Math.sin(inc)*Lb*.5,Math.cos(inc)*Lb*.5,sa*Math.sin(inc)*Lb*.5],AV880_F.bainha,[ca,.3,sa],.5,[t,t,t],.004,1,.8);}
+  for(let k=0;k<4;k++){const a=r()*6.283,ca=Math.cos(a),sa=Math.sin(a),w=.17+r()*.05,hh=.2+r()*.06;const t=.7+r()*.25;av880Cartao(F,[ca*.245,-.36-r()*.14,sa*.245],[-sa*w,0,ca*w],[ca*.03,hh,sa*.03],AV880_F.estopa,[ca,.2,sa],.6,[t,t,t],.006,1,.85);}
+  const nI=1+((r()*2)|0);for(let k=0;k<nI;k++){const a=r()*6.283,ca=Math.cos(a),sa=Math.sin(a);const o=[ca*.42,-.5,sa*.42];const t=[1,1,1];
+    av880Cartao(F,o,[-sa*.22,0,ca*.22],[-ca*.12,.3,-sa*.12],AV880_F.infl,[ca,.5,sa],.6,t,.02,1,.9);av880Cartao(F,o,[ca*.2-sa*.06,0,sa*.2+ca*.06],[-ca*.1,.3,-sa*.1],AV880_F.infl,[-sa,.5,ca],.6,t,.02,1,.9);}
+  // cachos de cocos
+  const nC=2+((r()*2)|0),a0=r()*6.283;for(let q=0;q<nC;q++){const a=a0+q*6.283/nC+(r()-.5)*.7,castanho=r()<.22,col=castanho?AV880_M.cocoC:AV880_M.cocoV,nn=3+((r()*3)|0);const cx=Math.cos(a)*.33,cz=Math.sin(a)*.33,cy=-.5-r()*.12;
+    for(let k=0;k<nn;k++){const b=k/nn*6.283+r(),d=k===0?0:.13+r()*.03,rr=.108+r()*.028;av880Coco(M,[cx+Math.cos(b)*d,cy-(k===0?.1:0)-r()*.07,cz+Math.sin(b)*d],rr,rr*1.2,col[0],col[1],.82+r()*.3,1);}
+    const fb=AV880_M.fibra;av880Tubo(M,[[Math.cos(a)*.14,-.22,Math.sin(a)*.14],[Math.cos(a)*.26,-.3,Math.sin(a)*.26],[cx,cy+.06,cz]],[.028,.024,.02],3,fb[0],fb[1],.8,()=>[.7,.8,.42],()=>1);}
+  E.pronto=true;return E;}
+// o tronco de um coqueiro, direto no lugar (cada indivíduo tem a sua curva); devolve o topo e a tangente no topo
+function av880TroncoCoqueiro(G,x,y,z,h,dx,dz,r){const N=14,S=8,pts=[],rs=[],ts=[];const tipo=r(),pw=1.2+r()*1.0,qw=1.35+r()*.7;const f=(t)=>tipo<.45?Math.pow(t,pw):tipo<.85?1-Math.pow(1-t,qw):t;
+  const od=Math.hypot(dx,dz);let wx,wz;if(od>.05){wx=-dz/od;wz=dx/od;}else{const a=r()*6.283;wx=Math.cos(a);wz=Math.sin(a);}const wig=(r()-.5)*.075*h,wig2=(r()-.5)*.03*h;
+  const R0=(.158+.011*(h-4.5))*(.92+r()*.16);
+  for(let i=0;i<=N;i++){const t=Math.pow(i/N,1.18),yy=y-.45+(h+.45)*t,o=f(t),s=Math.sin(t*Math.PI)*wig+Math.sin(t*Math.PI*2)*wig2;pts.push([x+dx*o+wx*s,yy,z+dz*o+wz*s]);ts.push(Math.max(0,(yy-y)/h));
+    rs.push(R0*(1-.36*t)*(1+.78*Math.exp(-Math.max(0,yy-y+.08)/.3))*(1+.1*av880Sm((t-.9)/.1)));}
+  const tom=1.02+r()*.22,quente=.95+r()*.1,pm=AV880_M.palma;
+  av880Tubo(G,pts,rs,S,pm[0],pm[1],1/.62,(i,j)=>{const t=ts[i],pe=.56+.44*av880Sm(t*h/1.5),alto=1-.24*av880Sm((t-.84)/.16),v=tom*pe*alto*(.95+.1*(((i*7+j*13)%5)/4));return [v*quente*(1.07-.03*pe),v*(.95+.03*pe),v*(.8+.08*pe)/quente];},(i)=>Math.pow(ts[i],1.8),r()*3);
+  // a saia de raízes ao pé
+  {const rb=rs[1],k0=G.p.length/3,lob=[];for(let j=0;j<S;j++)lob.push(r());
+    // o eixo do tronco junto ao chão (o tronco já vem inclinado: a saia acompanha)
+    const eixo=(yy)=>{let i=0;while(i<N-1&&pts[i+1][1]<yy)i++;const a=pts[i],b=pts[i+1],f=Math.max(0,Math.min(1,(yy-a[1])/((b[1]-a[1])||1)));return [a[0]+(b[0]-a[0])*f,yy,a[2]+(b[2]-a[2])*f];};
+    const cs=[eixo(y+.27),eixo(y+.07),eixo(y-.16)];av880Tubo(G,cs,[rb*.76,rb*.98,rb*1.2],S,pm[0],pm[1],2.2,(i)=>i===0?[.7,.62,.5]:i===1?[.6,.52,.42]:[.48,.41,.33],()=>0,r());
+    // raízes: a barra da saia ondula (gomos desiguais), para não ficar um pedestal redondo
+    for(let i=1;i<3;i++)for(let j=0;j<=S;j++){const k=(k0+i*(S+1)+j)*3,f=1+(i===2?.24:.06)*(lob[j%S]-.35);G.p[k]=cs[i][0]+(G.p[k]-cs[i][0])*f;G.p[k+2]=cs[i][2]+(G.p[k+2]-cs[i][2])*f;}}
+  const a=pts[N],b=pts[N-1];return {topo:a,tan:av880N3([a[0]-b[0],a[1]-b[1],a[2]-b[2]])};}
+/* ---------- a amendoeira-da-praia (molde com tronco de 5 m) ---------- */
+function av880RosetaEm(F,o,s,dir,outono,r,ao,wy){const R=AV880_F,inc=.16+r()*.36,ca=Math.cos(dir),sa=Math.sin(dir);o=[o[0],o[1]+(r()-.35)*.6*s,o[2]];const nh=av880N3([ca*Math.sin(inc),Math.cos(inc),sa*Math.sin(inc)]);const ro=r()*6.283,cr=Math.cos(ro),sr=Math.sin(ro);
+  // o prato (a roseta vista de cima), num plano um pouco inclinado para fora
+  const e1=av880N3(av880X3(nh,[sa,0,-ca])),e2=av880X3(nh,e1);const ex=[(e1[0]*cr+e2[0]*sr)*s,(e1[1]*cr+e2[1]*sr)*s,(e1[2]*cr+e2[2]*sr)*s],ey=[(-e1[0]*sr+e2[0]*cr)*s,(-e1[1]*sr+e2[1]*cr)*s,(-e1[2]*sr+e2[2]*cr)*s];
+  const t=ao*(.92+r()*.2),red=outono&&r()<.5;av880Cartao(F,o,ex,ey,red?R.rosO:R.rosV,nh,.7,[t,t,t],.03*s,wy,.62);
+  // três leques cruzados (a mesma roseta vista de lado): dão corpo ao andar quando se olha de longe
+  const b0=r()*3.14;for(let k=0;k<3;k++){const b=b0+k*1.047+(r()-.5)*.3,cb=Math.cos(b),sb=Math.sin(b),w=s*(.9+r()*.14),hh=s*(.54+r()*.12);const t2=ao*(.86+r()*.2);
+    av880Cartao(F,[o[0]+nh[0]*hh*.2,o[1]+hh*.62,o[2]+nh[2]*hh*.2],[cb*w,0,sb*w],[nh[0]*hh*.35,hh,nh[2]*hh*.35],red?R.leqO:R.leqV,[-sb*.45,.88,cb*.45],.8,[t2*.74,t2*.74,t2*.74],.03*s,wy,.8,null,[t2*1.1,t2*1.1,t2*1.1]);}
+  // um leque caído por baixo, do lado de fora (as folhas velhas pendem): o andar deixa de ter o fundo reto
+  if(r()<.75){const b=b0+.5+r()*2.1,cb=Math.cos(b),sb=Math.sin(b),w=s*(.6+r()*.22),hh=s*(.27+r()*.15),t3=ao*(.72+r()*.16);
+    av880Cartao(F,[o[0]+nh[0]*s*.3,o[1]-hh*.8,o[2]+nh[2]*s*.3],[cb*w,0,sb*w],[nh[0]*hh*.3,-hh,nh[2]*hh*.3],red?R.leqO:R.leqV,[-sb*.45,.88,cb*.45],.8,[t3,t3,t3],.04*s,wy,.8,null,[t3*.72,t3*.72,t3*.72]);}}
+function av880Galho(M,pts,r0,r1,S,cor,wy0,wy1){const n=pts.length,cs=AV880_M.casca;av880Tubo(M,pts,pts.map((q,i)=>r0+(r1-r0)*i/(n-1)),S,cs[0],cs[1],1/1.1,()=>cor,(i)=>wy0+(wy1-wy0)*i/(n-1));}
+function av880Amendoeira(seed){const M=av880Molde(),F=av880Molde(),r=av880Rnd(seed),H=5,cs=AV880_M.casca;const outono=r()<.5;const la=r()*6.283,lm=.12+r()*.3;
+  const eixo=(t)=>[Math.cos(la)*lm*t*t+Math.sin(t*Math.PI)*.1*Math.cos(la+2),-.35+(H+.35)*t,Math.sin(la)*lm*t*t+Math.sin(t*Math.PI)*.1*Math.sin(la+2)];
+  const NT=8,pts=[],rs=[];for(let i=0;i<=NT;i++){const t=i/NT,p=eixo(t);pts.push(p);rs.push((.2*(1-.66*Math.pow(t,.9))+.022)*(1+.6*Math.exp(-Math.max(0,p[1]+.05)/.28)));}
+  const tom=1.0+r()*.2;av880Tubo(M,pts,rs,10,cs[0],cs[1],1/1.1,(i,j)=>{const t=i/NT,v=tom*(.6+.4*av880Sm(t*H/1.2))*(.94+.12*(((i*5+j*11)%4)/3));return [v,v*.99,v*.96];},(i)=>Math.pow(i/NT,2));
+  // sapopemas pequenas (cunhas ao pé)
+  const nSp=4+((r()*2)|0);for(let k=0;k<nSp;k++){const a=k/nSp*6.283+r()*.6,ca=Math.cos(a),sa=Math.sin(a),hb=.6+r()*.35,rb=.36+r()*.12,e=.045;const A=[ca*.12,hb,sa*.12],B=[ca*.1,-.3,sa*.1],C=[ca*rb,-.3,sa*rb],Cm=[ca*rb*.5,hb*.22,sa*rb*.5];
+    for(const sg of [-1,1]){const ox=-sa*e*sg,oz=ca*e*sg,k0=M.p.length/3;const V=[[A[0]+ox*.5,A[1],A[2]+oz*.5],[B[0]+ox*2.2,B[1],B[2]+oz*2.2],[Cm[0],Cm[1],Cm[2]],[C[0],C[1],C[2]]];const nn=av880N3([-sa*sg+ca*.25,.2,ca*sg+sa*.25]);
+      for(let q=0;q<4;q++){M.p.push(V[q][0],V[q][1],V[q][2]);M.n.push(nn[0],nn[1],nn[2]);M.u.push(cs[0]+(cs[1]-cs[0])*(q===0||q===1?.1:q===2?.3:.5),(V[q][1]+.3)/1.1);const v=tom*(q<2?.5:.66);M.c.push(v,v,v*.96);M.w.push(0,0,0,1);}
+      if(sg>0)M.i.push(k0,k0+1,k0+2,k0+1,k0+3,k0+2);else M.i.push(k0,k0+2,k0+1,k0+1,k0+2,k0+3);}}
+  // os andares de galhos e as rosetas
+  const andares=3+((r()*2)|0);for(let an=0;an<andares;an++){const t=andares===3?[.5,.68,.86][an]:[.44,.59,.74,.88][an];const C=eixo(t);const nG=an===andares-1?4:5+((r()*2)|0);const Lb=(2.05-an*(andares===3?.44:.36))*(.9+r()*.16);const a0=r()*6.283,ao=.8+.3*an/(andares-1),wy=t*t;
+    for(let g=0;g<nG;g++){const a=a0+g/nG*6.283+(r()-.5)*.5,ca=Math.cos(a),sa=Math.sin(a),L=Lb*(.82+r()*.34),sobe=-.05+r()*.27;
+      const pB=[[C[0]+ca*.06,C[1],C[2]+sa*.06],[C[0]+ca*L*.4,C[1]+L*.03,C[2]+sa*L*.4],[C[0]+ca*L*.76,C[1]+L*sobe*.45,C[2]+sa*L*.76],[C[0]+ca*L,C[1]+L*sobe+.1,C[2]+sa*L]];
+      av880Galho(M,pB,.07-an*.008,.018,4,[tom*.86,tom*.84,tom*.8],wy,wy);
+      const lado=r()<.5?1:-1;const pos=[[1,0,1.3],[.7,lado*.4,1.12],[.42,-lado*.36,.98]];if(r()<.7)pos.push([.86,-lado*.44,.96]);
+      for(const [u,off,sz] of pos){const k=Math.min(2,Math.floor(u*3)),f=u*3-k,p0=pB[k],p1=pB[Math.min(3,k+1)];const o=[p0[0]+(p1[0]-p0[0])*f-sa*off*L*.5,p0[1]+(p1[1]-p0[1])*f+.08+Math.abs(off)*.1,p0[2]+(p1[2]-p0[2])*f+ca*off*L*.5];
+        av880RosetaEm(F,o,sz*(.62+.08*r())*(1-.06*an),a+off,outono,r,ao*(u<.5?.86:1),wy);}}}
+  // o topo
+  {const C=eixo(1);for(let k=0;k<5;k++){const a=k*1.257+r(),d=k?.5:0;av880RosetaEm(F,[C[0]+Math.cos(a)*d,C[1]+.14+(k?0:.26),C[2]+Math.sin(a)*d],.7+r()*.1,a,outono,r,1.08,1);}}
+  return {M,F};}
+/* ---------- a figueira de selva (molde com 6 m até o alto da copa) ---------- */
+function av880TufoEm(F,o,R,r,ao,wy){const sel=AV880_F,ns=(p)=>av880N3([(p[0]-o[0])*.8,(p[1]-o[1])*.8+R*.55,(p[2]-o[2])*.8]);const a0=r()*6.283;
+  for(let k=0;k<3;k++){const a=a0+k*1.047+(r()-.5)*.3,ca=Math.cos(a),sa=Math.sin(a),inc=(r()-.5)*.5,s=R*(.9+r()*.2);const c=[o[0]+(r()-.5)*R*.3,o[1]+(r()-.5)*R*.2,o[2]+(r()-.5)*R*.3];const t=ao*(.84+r()*.22);
+    av880Cartao(F,c,[ca*s,0,sa*s],[-sa*Math.sin(inc)*s*.82,Math.cos(inc)*s*.82,ca*Math.sin(inc)*s*.82],k%2?sel.selA:sel.selB,[0,1,0],0,[t*.78,t*.78,t*.78],.035,wy,1,ns,[t*1.1,t*1.1,t*1.1]);}
+  for(let k=0;k<3;k++){const a=a0+k*2.094+r()*.6,ca=Math.cos(a),sa=Math.sin(a),inc=.5+r()*.6,s=R*(.82+r()*.2);const c=[o[0]+ca*R*.22,o[1]+R*(.12+r()*.2),o[2]+sa*R*.22];const t=ao*(.94+r()*.2);
+    const nh=[ca*Math.sin(inc),Math.cos(inc),sa*Math.sin(inc)],e1=[-sa,0,ca],e2=av880X3(nh,e1);av880Cartao(F,c,[e1[0]*s,0,e1[2]*s],[e2[0]*s,e2[1]*s,e2[2]*s],k%2?sel.selB:sel.selA,nh,0,[t,t,t],.035,wy,1,ns);}}
+function av880Figueira(seed){const M=av880Molde(),F=av880Molde(),r=av880Rnd(seed),cs=AV880_M.casca,HF=3.0+r()*.5;const la=r()*6.283,lm=.1+r()*.25;
+  const eixo=(t)=>[Math.cos(la)*lm*t+Math.sin(t*Math.PI)*.12*Math.cos(la+1.7),-.4+(HF+.4)*t,Math.sin(la)*lm*t+Math.sin(t*Math.PI)*.12*Math.sin(la+1.7)];
+  const NT=7,pts=[],rs=[];for(let i=0;i<=NT;i++){const t=i/NT,p=eixo(t);pts.push(p);rs.push((.3-.11*t)*(1+.4*Math.exp(-Math.max(0,p[1])/.4)));}
+  const tom=.98+r()*.18;av880Tubo(M,pts,rs,10,cs[0],cs[1],1/1.3,(i,j)=>{const t=i/NT,v=tom*(.58+.42*av880Sm(t*HF/1.6))*(.93+.14*(((i*5+j*11)%4)/3));return [v,v*.99,v*.95];},(i)=>Math.pow(i/NT*.5,2));
+  // raízes tabulares: lâminas em cunha, curvas, do tronco ao chão
+  const nR=5+((r()*2)|0);for(let k=0;k<nR;k++){const a=k/nR*6.283+(r()-.5)*.5,ca=Math.cos(a),sa=Math.sin(a),hb=1.25+r()*.7,rb=.78+r()*.3,tr=(r()-.5)*.5;const perfil=[[0,hb],[.1,hb*.6],[.3,hb*.28],[.62,hb*.1],[1,-.3]];
+    for(const sg of [-1,1]){const k0=M.p.length/3;for(let q=0;q<perfil.length;q++){const u=perfil[q][0],yy=perfil[q][1],rr=.16+(rb-.16)*u,an=a+tr*u*u,e=.14-.02*q;
+        const nn=av880N3([-Math.sin(an)*sg+Math.cos(an)*.3,.2,Math.cos(an)*sg+Math.sin(an)*.3]);const v=tom*(.52+.3*u)*(.9+.2*r());
+        M.p.push(Math.cos(an)*rr,yy,Math.sin(an)*rr,ca*.1-sa*e*sg,yy,sa*.1+ca*e*sg);M.n.push(nn[0],nn[1],nn[2],nn[0],nn[1],nn[2]);
+        M.u.push(cs[0]+(cs[1]-cs[0])*(.5+.45*u),(yy+.3)/1.3,cs[0]+(cs[1]-cs[0])*.06,(yy+.3)/1.3);M.c.push(v,v,v*.95,v*.6,v*.6,v*.58);M.w.push(0,0,0,1,0,0,0,1);}
+      for(let q=0;q<perfil.length-1;q++){const a0=k0+q*2,b0=a0+1,c0=a0+2,d0=a0+3;if(sg>0)M.i.push(a0,b0,c0,b0,d0,c0);else M.i.push(a0,c0,b0,b0,c0,d0);}}}
+  // pernadas e ramos, tufos de folhagem, cipós e samambaias
+  const F0=eixo(1),nP=3+((r()*2)|0),a0=r()*6.283,pontas=[];
+  for(let k=0;k<nP;k++){const a=a0+k/nP*6.283+(r()-.5)*.6,ca=Math.cos(a),sa=Math.sin(a),L=2.3+r()*.8,el=.42+r()*.4;const dxz=Math.cos(el)*L,dy=Math.sin(el)*L;
+    const pp=[[F0[0],F0[1]-.25,F0[2]],[F0[0]+ca*dxz*.3,F0[1]+dy*.36,F0[2]+sa*dxz*.3],[F0[0]+ca*dxz*.66,F0[1]+dy*.72,F0[2]+sa*dxz*.66],[F0[0]+ca*dxz,F0[1]+dy*.94,F0[2]+sa*dxz]];
+    av880Galho(M,pp,.15,.045,5,[tom*.84,tom*.83,tom*.78],.25,.5);pontas.push([pp[3],a,1]);
+    for(const [u,lado] of [[.5,1],[.8,-1]]){const kk=Math.min(2,Math.floor(u*3)),f=u*3-kk,p0=pp[kk],p1=pp[kk+1],b=[p0[0]+(p1[0]-p0[0])*f,p0[1]+(p1[1]-p0[1])*f,p0[2]+(p1[2]-p0[2])*f];const a2=a+lado*(.7+r()*.5),l2=1.0+r()*.6;const e=[b[0]+Math.cos(a2)*l2,b[1]+.45+r()*.4,b[2]+Math.sin(a2)*l2];
+      av880Galho(M,[b,[(b[0]+e[0])/2,(b[1]+e[1])/2+.1,(b[2]+e[2])/2],e],.06,.02,3,[tom*.8,tom*.79,tom*.74],.4,.55);pontas.push([e,a2,.82]);}
+    if(k<2){const q=pp[1];av880Cartao(F,[q[0],q[1]+.3,q[2]],[ca*.3,0,sa*.3],[0,.36,0],AV880_F.feto,[-sa,.4,ca],.5,[.92,.96,.9],.02,.3,.85);av880Cartao(F,[q[0],q[1]+.3,q[2]],[-sa*.3,0,ca*.3],[0,.36,0],AV880_F.feto,[ca,.4,sa],.5,[.86,.9,.84],.02,.3,.85);}}
+  const topo=[F0[0],F0[1]+1.75,F0[2]];pontas.push([topo,0,1.15]);
+  let ymax=0;for(const [p,a,s] of pontas){const R=(1.16+r()*.3)*s;av880TufoEm(F,[p[0],p[1]+R*.3,p[2]],R,r,.86+.2*av880Sm((p[1]-F0[1])/2.2),.5);ymax=Math.max(ymax,p[1]+R);
+    if(s<1.05&&r()<.75){const R2=(.8+r()*.25)*s,b=a+(r()-.5)*1.6;av880TufoEm(F,[p[0]+Math.cos(b)*R*.8,p[1]-R*.1+r()*.3,p[2]+Math.sin(b)*R*.8],R2,r,.8,.5);}}
+  // cipós: fitas que pendem das pontas (o peso do vento cresce para baixo)
+  const nCp=5+((r()*3)|0);for(let k=0;k<nCp;k++){const [p,a]=pontas[(r()*(pontas.length-1))|0];const b=r()*6.283,x0=p[0]+Math.cos(b)*.45,z0=p[2]+Math.sin(b)*.45,y0=p[1]+.25,comp=Math.min(y0-.25,1.6+r()*2.4),w=.15+r()*.06,ph=r()*6.283,SG=4,cel=AV880_F.cipo,cb=Math.cos(b+1.57),sb=Math.sin(b+1.57);
+    for(let q=0;q<SG;q++){const u0=q/SG,u1=(q+1)/SG;const pt=(u)=>[x0+Math.sin(u*2.6+ph)*.12*u,y0-comp*u,z0+Math.cos(u*2.1+ph)*.12*u];const A=pt(u0),B=pt(u1);const uv=[cel[0],cel[3]-(cel[3]-cel[1])*u1,cel[2],cel[3]-(cel[3]-cel[1])*u0];const t=.78+.2*(1-u0);
+      av880Q(F,[B[0]-cb*w,B[1],B[2]-sb*w],[B[0]+cb*w,B[1],B[2]+sb*w],[A[0]+cb*w,A[1],A[2]+sb*w],[A[0]-cb*w,A[1],A[2]-sb*w],uv,[-sb,.25,cb],.5,[t,t,t],[t,t,t],.03+.1*u1*u1,.03+.1*u0*u0,.5,.9,false,null);}}
+  return {M,F,alto:ymax};}
+/* ---------- preparação aos poucos (um passo por chamada) e assentamento ---------- */
+function av880Fila(){if(AV880.fila)return AV880.fila;const X={},MO={coroas:[],amend:[],fig:[],seca:null};let eM=null,eF=null;AV880.tex=X;AV880.moldes=MO;const Q=[];
+  for(let k=0;k<4;k++)Q.push(()=>{eM=av880TexMadeira(k,eM);if(k===3)X.madeira={map:eM.map,nrm:eM.nrm};});
+  for(let k=0;k<8;k++)Q.push(()=>{eF=av880TexFolhas(k,eF);if(k===7){X.folhas=eF.tex;X.tela=eF.cv;av880Mats();}});
+  for(const sem of [8801,8802,8803,8804,8805]){let E=null;Q.push(()=>{E=av880Coroa(sem,E);if(!E.pronto)return true;MO.coroas.push(E);});}
+  for(const sem of [8811,8812,8813])Q.push(()=>{MO.amend.push(av880Amendoeira(sem));});for(const sem of [8821,8822,8823])Q.push(()=>{MO.fig.push(av880Figueira(sem));});
+  Q.push(()=>{const F=av880Molde(),r=av880Rnd(8831);av880Fronde(F,{r,seg:9,seca:true,az:0,el:.05,L:1.6,queda:.1,idade:1,tor:.25,y0:0,r0:0,lf:.2,peso:.07,tinta:[1.1,1.06,.98]});for(let i=1;i<F.w.length;i+=4){F.w[i]=0;F.w[i-1]*=.3;}MO.seca={M:av880Molde(),F};});
+  AV880.fila=Q;AV880.passo=0;return Q;}
+// um ou mais passos da preparação: até o fim da fatia em curso (`fat8Fim`), ou tudo de uma vez
+function av880Prepara(tudo){const Q=av880Fila();let lim=0;if(!tudo){try{if(typeof fat8Fim==='number'&&isFinite(fat8Fim))lim=fat8Fim;}catch(e){}}
+  while(AV880.passo<Q.length){const t0=performance.now();let mais=false;try{mais=Q[AV880.passo]()===true;}catch(e){av880Erro('passo '+AV880.passo,e);}if(!mais)AV880.passo++;const t1=performance.now(),ms=t1-t0;AV880.stats.passos++;AV880.stats.prepMs=Math.round(((AV880.stats.prepMs||0)+ms)*10)/10;if(ms>AV880.stats.maiorPassoMs)AV880.stats.maiorPassoMs=Math.round(ms*10)/10;
+    if(!tudo&&t1>=lim)break;}return AV880.passo>=Q.length;}
+// destino com tamanho certo (vetores tipados) e cópia de um molde com a matriz do indivíduo
+function av880Destino(nv,ni){return {p:new Float32Array(nv*3),n:new Float32Array(nv*3),u:new Float32Array(nv*2),c:new Float32Array(nv*3),w:new Float32Array(nv*4),i:nv>65535?new Uint32Array(ni):new Uint16Array(ni),nv:0,ni:0};}
+function av880Assenta(D,G,e,ne,tom,fase,weF,weT){const P=G.p,N=G.n,nv=P.length/3,v0=D.nv;let o3=v0*3,o2=v0*2,o4=v0*4;
+  for(let i=0,j=0,k=0;i<P.length;i+=3,j+=2,k+=4){const x=P[i],y=P[i+1],z=P[i+2];D.p[o3]=e?e[0]*x+e[4]*y+e[8]*z+e[12]:x;D.p[o3+1]=e?e[1]*x+e[5]*y+e[9]*z+e[13]:y;D.p[o3+2]=e?e[2]*x+e[6]*y+e[10]*z+e[14]:z;
+    const a=N[i],b=N[i+1],c=N[i+2];let nx=a,ny=b,nz=c;if(ne){nx=ne[0]*a+ne[3]*b+ne[6]*c;ny=ne[1]*a+ne[4]*b+ne[7]*c;nz=ne[2]*a+ne[5]*b+ne[8]*c;const l=Math.hypot(nx,ny,nz)||1;nx/=l;ny/=l;nz/=l;}D.n[o3]=nx;D.n[o3+1]=ny;D.n[o3+2]=nz;
+    D.u[o2]=G.u[j];D.u[o2+1]=G.u[j+1];D.c[o3]=G.c[i]*tom[0];D.c[o3+1]=G.c[i+1]*tom[1];D.c[o3+2]=G.c[i+2]*tom[2];D.w[o4]=G.w[k]*weF;D.w[o4+1]=G.w[k+1]*weT;D.w[o4+2]=fase;D.w[o4+3]=G.w[k+3];o3+=3;o2+=2;o4+=4;}
+  const I=G.i;let oi=D.ni;for(let i=0;i<I.length;i++)D.i[oi++]=I[i]+v0;D.nv+=nv;D.ni=oi;}
+function av880Malha(D,mat,nome){const T=THREE,g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(D.p,3));g.setAttribute('normal',new T.BufferAttribute(D.n,3));g.setAttribute('uv',new T.BufferAttribute(D.u,2));g.setAttribute('color',new T.BufferAttribute(D.c,3));g.setAttribute('av880w',new T.BufferAttribute(D.w,4));g.setIndex(new T.BufferAttribute(D.i,1));
+  g.computeBoundingBox();g.computeBoundingSphere();if(g.boundingSphere)g.boundingSphere.radius+=.6; // folga para o vento
+  const m=new T.Mesh(g,mat);m.name=nome;m.castShadow=true;m.receiveShadow=true;m.raycast=()=>{};m.userData.av880=true;m.userData.noCam=true;m.userData.papelKeepGeo=true;return m;}
+// fim da fatia em curso? (fora do jogo, ou a correr de uma vez, nunca)
+function av880Cede(){try{return typeof fat8Fim==='number'&&performance.now()>=fat8Fim;}catch(e){return false;}}
+// corre um gerador até o fim, de uma vez
+function av880Corre(it){let f0,tem=false;try{f0=fat8Fim;fat8Fim=Infinity;tem=true;}catch(e){}try{let r;do{r=it.next();}while(!r.done);return r.value;}finally{if(tem){try{fat8Fim=f0;}catch(e){}}}}
+// monta as árvores novas de um kit (uma ilha): duas malhas, no pai do kit; em fatias (cede no fim de cada árvore quando a fatia acaba)
+function* av880MontaG(g,pai){if(g.malhas)return g.malhas;if(!g.itens.length){g.feito=true;g.it=null;return [];}g.pai=pai||g.pai;pai=g.pai;const T=THREE,st=AV880.stats;let ta=performance.now(),soma=0;
+  const fecha=()=>{const d=performance.now()-ta;soma+=d;if(d>(st.maiorFatiaMs||0))st.maiorFatiaMs=Math.round(d*10)/10;};
+  while(!av880Prepara(false)){fecha();yield 'preparo';ta=performance.now();}
+  if(g.morto){g.it=null;return [];}
+  const MO=AV880.moldes,MT=av880Mats();
+  if(!MO.coroas.length||!MO.amend.length||!MO.fig.length||!MO.seca||!AV880.tex.folhas||!AV880.tex.madeira)throw new Error('moldes ou texturas em falta');
+  const NVT=15*9+3*9,NIT=14*8*6+2*8*6;const plano=[];let nvM=0,niM=0,nvF=0,niF=0,na=0;
+  for(const it of g.itens){const r=av880Rnd(((Math.round(it.x*37.1)*73856093)^(Math.round(it.z*41.3)*19349663)^0x5bd1e995)>>>0);const q={it,r};
+    if(it.t==='palmeira'){q.mo=MO.coroas[(r()*MO.coroas.length)|0];nvM+=NVT+q.mo.M.p.length/3;niM+=NIT+q.mo.M.i.length;nvF+=q.mo.F.p.length/3;niF+=q.mo.F.i.length;}
+    else if(it.t==='amendoeira'){q.fig=it.fig!==undefined?!!it.fig:(na%3)===1;na++;const L=q.fig?MO.fig:MO.amend;q.mo=L[(r()*L.length)|0];nvM+=q.mo.M.p.length/3;niM+=q.mo.M.i.length;nvF+=q.mo.F.p.length/3;niF+=q.mo.F.i.length;}
+    else{q.mo=MO.seca;nvF+=q.mo.F.p.length/3;niF+=q.mo.F.i.length;}plano.push(q);}
+  const DM=av880Destino(nvM,niM),DF=av880Destino(nvF,niF),m4=new T.Matrix4(),m3=new T.Matrix3(),qa=new T.Quaternion(),qb=new T.Quaternion(),Y=new T.Vector3(0,1,0),v=new T.Vector3(),sc=new T.Vector3(),pos=new T.Vector3();
+  if(av880Cede()){fecha();yield 'plano';ta=performance.now();}
+  for(const q of plano){const it=q.it,r=q.r,fase=r()*40;
+    if(it.t==='palmeira'){const h=it.h,dx=Math.cos(it.ry)*it.lean*h*.52,dz=Math.sin(it.ry)*it.lean*h*.52;const G=av880Molde();const tp=av880TroncoCoqueiro(G,it.x,it.y,it.z,h,dx,dz,r);av880Assenta(DM,G,null,null,[1,1,1],fase,1,1);
+      const esc=(2.3+h*.24)/3.6*(.95+r()*.1);v.set(tp.tan[0]*.75,tp.tan[1]*.75+.25,tp.tan[2]*.75).normalize();qa.setFromUnitVectors(Y,v);qb.setFromAxisAngle(Y,r()*6.283);qa.multiply(qb);pos.set(tp.topo[0],tp.topo[1]-.06,tp.topo[2]);sc.set(esc,esc,esc);m4.compose(pos,qa,sc);m3.getNormalMatrix(m4);
+      const tf=[.9+r()*.18,.92+r()*.14,.84+r()*.22];av880Assenta(DM,q.mo.M,m4.elements,m3.elements,[1,1,1],fase,esc,1);av880Assenta(DF,q.mo.F,m4.elements,m3.elements,tf,fase,esc,1);st.coqueiros++;}
+    else if(it.t==='amendoeira'){const h=it.h,ry=(it.log&&it.log.length>1?it.log[1]:r())*6.283;let sv,sh;if(q.fig){sv=(h+1.2)/(q.mo.alto||6);sh=.86+.05*h;st.figueiras++;}else{sv=h/5;sh=.84+.045*h;st.amendoeiras++;}
+      qa.setFromAxisAngle(Y,ry);pos.set(it.x,it.y,it.z);sc.set(sh,sv,sh);m4.compose(pos,qa,sc);m3.getNormalMatrix(m4);const t=.92+r()*.16,tf=[t*(.94+r()*.1),t,t*(.88+r()*.14)];
+      av880Assenta(DM,q.mo.M,m4.elements,m3.elements,[t,t,t],fase,1,.32);av880Assenta(DF,q.mo.F,m4.elements,m3.elements,tf,fase,1,.32);}
+    else{const L=1.4+(it.log&&it.log.length?it.log[0]:r())*.7,ry=(it.log&&it.log.length>1?it.log[1]:r())*6.283,esc=L/1.6;qa.setFromAxisAngle(Y,ry);pos.set(it.x,it.y+.07,it.z);sc.set(esc,esc,esc);m4.compose(pos,qa,sc);m3.getNormalMatrix(m4);const t=.9+r()*.2;av880Assenta(DF,q.mo.F,m4.elements,m3.elements,[t,t,t],fase,1,0);st.secas++;}
+    if(av880Cede()){fecha();yield 'árvore';ta=performance.now();}}
+  if(av880Cede()){fecha();yield 'malhas';ta=performance.now();}
+  const mM=av880Malha(DM,MT.madeira,g.nome+' · AV880 madeira'),mF=av880Malha(DF,MT.folhas,g.nome+' · AV880 folhas');mF.customDepthMaterial=MT.prof;
+  try{if(g.irma&&g.irma.userData&&g.irma.userData.cp539){mM.userData.cp539=true;mF.userData.cp539=true;}}catch(e){}
+  pai.add(mM);pai.add(mF);g.malhas=[mM,mF];g.feito=true;g.it=null;
+  g.tri=(DM.ni+DF.ni)/3;st.triangulos+=g.tri;st.ilhas++;fecha();st.montaMs=Math.round((st.montaMs+soma)*10)/10;av880Tique();if(av880NaSala())av880Raizes();
+  AV880.pend=AV880.kits.some(k=>k!==g&&!k.feito&&!k.falhou&&!!k.it); // R3
+  if(AV880.desfeito){for(const m of g.malhas)m.visible=false;try{av880Velhas(g,pai);}catch(e){av880Erro('velhas',e);}}
+  return g.malhas;}
+// a mesma montagem de uma vez (vitrine, sala pedida já, jogo sem a fila das fatias)
+function av880Monta(g,pai){if(g.malhas)return g.malhas;if(!g.it)g.it=av880MontaG(g,pai);return av880Corre(g.it)||[];}
+// se a montagem falhar, as árvores de hoje entram no lugar
+function av880Reserva(g,e){av880Erro('monta '+g.nome,e);g.it=null;g.falhou=true;try{if(g.malhas)for(const m of g.malhas)m.visible=false;const vs=av880Velhas(g,g.pai);for(const m of vs)m.visible=true;return vs;}catch(e2){av880Erro('reserva '+g.nome,e2);return [];}}
+// acaba já o que estiver pendente (o leitor entrou na sala, ou as fotos de antes/depois)
+function av880Termina(){let n=0;for(const g of AV880.kits){if(g.feito||g.falhou||!g.it)continue;try{av880Corre(g.it);n++;}catch(e){av880Reserva(g,e);}}AV880.pend=AV880.kits.some(g=>!g.feito&&!g.falhou&&!!g.it);av880Tique();if(av880NaSala())av880Raizes();return n;}
+// as figueiras têm raízes tabulares: o obstáculo delas (o mesmo vetor [x,z,r] de sempre, nas listas vivas) alarga de 0,42 para 0,70 m, para o
+// leitor não atravessar as raízes — só com a sala pronta e o leitor nela, para não mexer no sorteio de quem é posto depois das árvores
+function av880Raizes(){let n=0;try{if(!(AV880.raioFig>.42))return 0;const R=(typeof ROOMS!=='undefined')&&ROOMS.adv;if(!R||!R.world)return 0;const Ls=[];if(Array.isArray(R.world.obst))Ls.push(R.world.obst);
+    try{if(Array.isArray(ILHA294.obst))Ls.push(ILHA294.obst);}catch(e){}try{if(Array.isArray(NAV253.ilhaObst))Ls.push(NAV253.ilhaObst);}catch(e){}
+    for(const g of AV880.kits){if(!g.feito)continue;for(const it of g.itens){if(!it.fig||it.raiz)continue;let achou=false;for(const L of Ls)for(const o of L)if(o&&Math.abs(o[0]-it.x)<1e-6&&Math.abs(o[1]-it.z)<1e-6&&Math.abs(o[2]-.42)<1e-6){o[2]=AV880.raioFig;achou=true;}if(achou){it.raiz=true;n++;}}}
+    if(n){R.world.__nav=null;R.world.__cl=null;AV880.stats.raizes=(AV880.stats.raizes||0)+n;}}catch(e){av880Erro('raízes',e);}return n;}
+function av880NaSala(){try{return typeof ROOMS!=='undefined'&&!!ROOMS.adv&&typeof ACTIVE!=='undefined'&&ACTIVE===ROOMS.adv.scene;}catch(e){return false;}}
+// o relógio do vento: tique da sala (a sala só existe em `ROOMS` depois de acabada: tenta-se em cada montagem e ao entrar; se a sala for refeita, liga-se na nova)
+function av880Tique(){if(!AV880.vento)return;try{const R=(typeof ROOMS!=='undefined')&&ROOMS.adv;if(R&&AV880.tickR!==R&&typeof rkAddTick==='function'){rkAddTick(R,(dt)=>{AV880.U.value+=Math.min(.1,dt||.016);});AV880.tickR=R;AV880.tick=true;}}catch(e){av880Erro('tique',e);}}
+/* ---------- os embrulhos: anotar o pedido, correr a função de hoje a seco e montar no fecho do kit ---------- */
+// o fecho do kit: as árvores novas entram pela fila das fatias (`fat8Go`: preparo que falte + uma árvore de cada vez, sem travar o quadro);
+// sem a fila (`?fatias818=0`), entram já, junto com o resto da ilha. Quem entra na sala antes escoa tudo de uma vez (`av880Termina`).
+// R2: estamos dentro de um passo do acabamento (ou do pós-acabamento) escondido da sala? Ali `requestIdleCallback`/`setTimeout` estão guardados
+function av880Escondido(){try{return typeof FR819!=='undefined'&&!!FR819.rodando;}catch(e){return false;}}
+function av880Enfileira(g){fat8Go(g.it,{nome:'árvores 880 · '+g.nome,cedo:true,urgente:()=>{try{return CUR==='room'&&ROOM===ROOMS.adv;}catch(e){return false;}},erro:(e)=>{av880Reserva(g,e);}});}
+// a sala apareceu (`fr8Pos`): os kits que ficaram à espera vão para a fila das fatias (ou, sem ela, são montados já)
+function av880Soltar(){let n=0;for(const g of AV880.kits){if(!g.espera)continue;g.espera=false;if(g.feito||g.falhou||!g.it)continue;
+    try{if(typeof fat8Go==='function'&&typeof FAT818!=='undefined'&&FAT818.on)av880Enfileira(g);else av880Corre(g.it);n++;}catch(e){av880Reserva(g,e);}}return n;}
+function av880Kit(K){let g=K.__av880;if(g)return g;g={K,nome:K.nome||'ilha',itens:[],feito:false,falhou:false,it:null,irma:null,malhas:null,velhas:null,pai:null,tri:0};for(const k of AV880.kits)if(k.nome===g.nome)k.morto=true;AV880.kits=AV880.kits.filter(k=>!k.morto);AV880.kits.push(g);K.__av880=g;const f0=K.fim;
+  K.fim=function(pai){const out=f0.apply(this,arguments);if(g.it||g.feito||g.falhou||!g.itens.length)return out;g.pai=pai;g.irma=(out&&out[0])||null;g.it=av880MontaG(g,pai);
+    let fila=false;try{fila=typeof fat8Go==='function'&&typeof FAT818!=='undefined'&&FAT818.on;}catch(e){}
+    // R1: com o leitor já dentro da sala, a ilha acabou de aparecer — as árvores entram já, junto com ela (pela fila chegariam uns quadros depois)
+    if(fila&&av880NaSala()){fila=false;AV880.stats.naSala=(AV880.stats.naSala||0)+1;}
+    if(fila){try{AV880.pend=true;AV880.stats.adiadas=(AV880.stats.adiadas||0)+1;
+        // R2: num passo do acabamento escondido o kit espera a sala aparecer (`av880Soltar`, no `fr8Pos`); senão vai para a fila já
+        if(av880Escondido()){g.espera=true;AV880.stats.aEspera=(AV880.stats.aEspera||0)+1;}else av880Enfileira(g);return out;}catch(e){av880Erro('fila',e);g.espera=false;}}
+    let ms;try{ms=av880Corre(g.it)||[];}catch(e){ms=av880Reserva(g,e);}if(ms&&out&&typeof out.push==='function')for(const m of ms)out.push(m);
+    // R1: a Ilha do Duelo só junta os obstáculos dela ao mundo DEPOIS do fecho do kit: com o leitor na sala, as figueiras alargam logo a seguir
+    try{if(av880NaSala())setTimeout(()=>{try{av880Raizes();}catch(e){}},0);}catch(e){}
+    return out;};return g;}
+function av880Emb(tipo,ir,campos){const f0=AV880.orig[tipo];return function(K){if(!AV880.on||AV880.pausa||!K||typeof K.fim!=='function'||typeof K.add!=='function')return f0.apply(this,arguments);
+    const a=Array.prototype.slice.call(arguments),r=a[ir],log=[];let res;
+    let fig;
+    try{const b=a.slice();b[0]=AV880.nulo;if(typeof r==='function')b[ir]=function(){const v=r();log.push(v);return v;};
+      // uma em cada três amendoeiras do kit vira figueira (o obstáculo entra como sempre, 0,42 m: o sorteio de quem vem depois não muda)
+      if(tipo==='amendoeira'){const g0=K.__av880;let na=0;if(g0)for(const q of g0.itens)if(q.t==='amendoeira')na++;fig=(na%3)===1;}
+      res=f0.apply(this,b);}catch(e){av880Erro('a seco '+tipo,e);return f0.apply(this,a);}
+    try{const g=av880Kit(K),it={t:tipo,M:a[1],log};if(fig!==undefined)it.fig=fig;for(const k in campos)it[k]=a[campos[k]];g.itens.push(it);av880Prepara(false);}catch(e){av880Erro('anota '+tipo,e);}return res;};}
+// as árvores de hoje (v620) remontadas exatamente: mesmas funções, mesmo sorteio (regravado), num kit à parte
+function av880Velhas(g,pai){if(g.velhas)return g.velhas;const K2=t160Kit(g.nome);AV880.pausa=true;try{for(const it of g.itens){let i=0;const L=it.log,rr=()=>i<L.length?L[i++]:.5,nada=()=>{};
+      if(it.t==='palmeira')AV880.orig.palmeira(K2,it.M,it.x,it.z,it.y,it.h,it.lean,it.ry,rr,nada);else if(it.t==='amendoeira')AV880.orig.amendoeira(K2,it.M,it.x,it.z,it.y,it.h,rr,nada);else AV880.orig.folhaCaida(K2,it.M,it.x,it.z,it.y,rr);}}finally{AV880.pausa=false;}
+  const ms=K2.fim(pai||g.pai,{sombra:true});const ref=g.irma||(g.malhas&&g.malhas[0]);for(const m of ms){m.userData.noCam=true;m.userData.papelKeepGeo=true;m.userData.av880Velha=true;if(ref&&ref.userData.cp539)m.userData.cp539=true;if(m.material&&m.material.userData)m.material.userData.papelKeep=true;m.raycast=()=>{};}
+  try{if(typeof IL620!=='undefined'&&IL620.mats&&IL620.mats.prof)for(const m of ms){if(m.material===IL620.mats.fronde)m.customDepthMaterial=IL620.mats.prof.fronde;else if(m.material===IL620.mats.folhas)m.customDepthMaterial=IL620.mats.prof.folhas;}}catch(e){}
+  g.velhas=ms;return ms;}
+function av880Desfaz(){const o={ilhas:0,malhas:0};try{av880Termina();for(const g of AV880.kits){if(!(g.feito||g.falhou)||!g.pai)continue;const vs=av880Velhas(g,g.pai);for(const m of vs)m.visible=true;if(g.malhas)for(const m of g.malhas)m.visible=false;o.ilhas++;o.malhas+=vs.length;}AV880.desfeito=true;
+    try{const R=ROOMS.adv;if(R&&R.scene&&typeof fusaoLimpar==='function')fusaoLimpar(R.scene);}catch(e){}}catch(e){av880Erro('desfaz',e);o.erro=String(e&&e.message||e);}return o;}
+function av880Aplica(){const o={ilhas:0,malhas:0};try{av880Termina();for(const g of AV880.kits){if(!g.feito)continue;if(g.velhas)for(const m of g.velhas)m.visible=false;if(g.malhas)for(const m of g.malhas){m.visible=true;o.malhas++;}o.ilhas++;}AV880.desfeito=false;
+    try{const R=ROOMS.adv;if(R&&R.scene&&typeof fusaoLimpar==='function')fusaoLimpar(R.scene);}catch(e){}}catch(e){av880Erro('aplica',e);o.erro=String(e&&e.message||e);}return o;}
+// poses de câmera para as fotos de antes/depois, a partir dos lugares anotados
+function av880Poses(){const P=[],r2=(v)=>Math.round(v*100)/100,pose=(id,pos,alvo,fov)=>P.push({id,pos:pos.map(r2),alvo:alvo.map(r2),fov:fov||55});
+  try{const ks=AV880.kits.filter(g=>g.itens.length);const centro=(g)=>{let x=0,z=0,y=0,n=0;for(const it of g.itens)if(it.t==='palmeira'){x+=it.x;z+=it.z;y+=it.y;n++;}return n?[x/n,y/n,z/n,n]:[0,0,0,0];};
+    // o chão debaixo da câmera (se o mundo da sala souber responder ali; senão, a altura da árvore)
+    const chao=(x,z,y0)=>{try{const y=ROOMS.adv.world.floorY(x,z);if(typeof y==='number'&&isFinite(y)&&Math.abs(y-y0)<4)return y;}catch(e){}return y0;};
+    const perto=(g,t,de)=>{let b=null,bd=1e9;for(const it of g.itens){if(it.t!==t)continue;const d=Math.hypot(it.x-de[0],it.z-de[1]);if(d<bd){bd=d;b=it;}}return b;};
+    // de que lado olhar uma árvore de perto: a direção que passa mais longe dos outros troncos
+    const lado=(g,it,d)=>{let ba=0,bd=-1;for(let k=0;k<12;k++){const a=k/12*6.283+.3,vx=Math.cos(a)*d,vz=Math.sin(a)*d;let m=1e9;for(const o of g.itens){if(o===it||o.t==='folhaCaida')continue;let s=((o.x-it.x)*vx+(o.z-it.z)*vz)/(d*d);s=Math.max(0,Math.min(1.3,s));m=Math.min(m,Math.hypot(o.x-(it.x+vx*s),o.z-(it.z+vz*s)));}if(m>bd){bd=m;ba=a;}}return ba;};
+    const dePerto=(g,it,id,d,alt,fov)=>{const a=lado(g,it,d),x=it.x+Math.cos(a)*d,z=it.z+Math.sin(a)*d;pose(id,[x,chao(x,z,it.y)+1.75,z],[it.x,it.y+it.h*alt,it.z],fov);};
+    ks.forEach((g,gi)=>{const c=centro(g);if(!c[3])return;const tag='ilha'+(gi+1);
+      // de cima, a ilha toda; do chão, o conjunto; do mar, de longe; de perto, um coqueiro (e a copa, de baixo), uma amendoeira e uma figueira
+      let ext=0;for(const it of g.itens)ext=Math.max(ext,Math.hypot(it.x-c[0],it.z-c[2]));
+      pose(tag+'_de_cima',[c[0]+ext*.55,c[1]+ext*.95+8,c[2]+ext*1.05+6],[c[0],c[1]+2,c[2]],55);
+      {const x=c[0]+ext*.5,z=c[2]+ext*.86;pose(tag+'_do_chao',[x,chao(x,z,c[1])+1.9,z],[c[0]-ext*.1,c[1]+4.2,c[2]-ext*.2],62);}
+      {const a=Math.atan2(-c[2],-c[0])+1.2,d=ext+24;pose(tag+'_do_mar',[c[0]+Math.cos(a)*d,c[1]+5.5,c[2]+Math.sin(a)*d],[c[0],c[1]+4,c[2]],42);}
+      const p=perto(g,'palmeira',[c[0]+ext*.3,c[2]+ext*.5]);if(p){const tx=p.x+Math.cos(p.ry)*p.lean*p.h*.52,tz=p.z+Math.sin(p.ry)*p.lean*p.h*.52;dePerto(g,p,tag+'_coqueiro',p.h*.75+2.2,.62,60);
+        pose(tag+'_copa',[tx+2.6,p.y+p.h*.42,tz+3.2],[tx,p.y+p.h+.2,tz],58);}
+      let na=0,am=null,fg=null;for(const it of g.itens){if(it.t!=='amendoeira')continue;const f=it.fig!==undefined?!!it.fig:(na%3)===1;na++;if(f){if(!fg)fg=it;}else if(!am)am=it;}
+      if(am)dePerto(g,am,tag+'_amendoeira',6.2+am.h*.4,.62,58);if(fg)dePerto(g,fg,tag+'_figueira',6.8+fg.h*.4,.6,58);});
+    if(ks.length){const c=centro(ks[0]);pose('do_galeao_de_longe',[-2,6,-14],[c[0],c[1]+3,c[2]],50);}}catch(e){av880Erro('poses',e);}
+  return P;}
+// vitrine (para conferir fora das ilhas): um exemplar de cada molde numa cena dada
+function av880Vitrine(sc,x0,z0){av880Prepara(true);const g={nome:'AV880 vitrine',itens:[],feito:false};x0=x0||0;z0=z0||0;const M=null;
+  [[-9,0,6.5,.3,.6],[-5.5,-1,8,-.45,2.2],[-2.2,.6,5.2,.15,4]].forEach(q=>g.itens.push({t:'palmeira',M,x:x0+q[0],z:z0+q[1],y:0,h:q[2],lean:q[3],ry:q[4],log:[]}));
+  [[2,0,5,.2],[6.5,.5,5.6,.4],[11,-.4,4.6,.6],[15.5,.3,6,.8]].forEach(q=>g.itens.push({t:'amendoeira',M,x:x0+q[0],z:z0+q[1],y:0,h:q[2],log:[.5,q[3]]}));
+  g.itens.push({t:'folhaCaida',M,x:x0-4,z:z0+3,y:0,log:[.5,.3]});return av880Monta(g,sc);}
+if(AV880.on){try{if(typeof i503Palmeira==='function'&&typeof i503Amendoeira==='function'&&typeof i503FolhaCaida==='function'&&typeof t160Kit==='function'){
+    AV880.nulo=new Proxy({nome:'AV880 · kit a seco',n:0},{get(t,k){if(k in t)return t[k];return function(g){return (g&&g.isBufferGeometry)?g:AV880.nulo;};}});
+    AV880.orig.palmeira=i503Palmeira;AV880.orig.amendoeira=i503Amendoeira;AV880.orig.folhaCaida=i503FolhaCaida;
+    i503Palmeira=av880Emb('palmeira',8,{x:2,z:3,y:4,h:5,lean:6,ry:7});i503Amendoeira=av880Emb('amendoeira',6,{x:2,z:3,y:4,h:5});i503FolhaCaida=av880Emb('folhaCaida',5,{x:2,z:3,y:4});AV880.embrulhado=true;
+  }else av880Erro('início','funções das ilhas (v503/v620) ausentes');}catch(e){av880Erro('embrulho',e);}
+  // R2: quando o acabamento escondido de uma sala termina e ela aparece (`fr8Pos`, fora de qualquer passo), os kits à espera vão para a fila
+  try{if(typeof fr8Pos==='function'){const fp0=fr8Pos;fr8Pos=function(){const r=fp0.apply(this,arguments);try{av880Soltar();}catch(e){av880Erro('soltar',e);}return r;};AV880.fr8Pos=true;}}catch(e){av880Erro('ligar fr8Pos',e);}
+  // ao entrar na Aventura: o que ainda estiver na fila entra já (antes de a sala aparecer), o relógio do vento fica ligado e o obstáculo das figueiras alarga
+  try{if(typeof setActive==='function'){const sa0=setActive;setActive=function(sc){try{if(sc&&typeof ROOMS!=='undefined'&&ROOMS.adv&&ROOMS.adv.scene===sc){if(AV880.pend)av880Termina();av880Tique();av880Raizes();}}catch(e){av880Erro('setActive',e);}return sa0.apply(this,arguments);};}}catch(e){av880Erro('ligar setActive',e);}}
+window.__arvores880={estado:AV880,stats:AV880.stats,erros:AV880.erros,desfaz:av880Desfaz,aplica:av880Aplica,poses:av880Poses,termina:av880Termina,raizes:av880Raizes,texturas:()=>{av880Prepara(true);return AV880.tex;},moldes:()=>{av880Prepara(true);return AV880.moldes;},vitrine:av880Vitrine,
+  resumo:()=>({on:AV880.on,embrulhado:!!AV880.embrulhado,desfeito:AV880.desfeito,stats:AV880.stats,erros:AV880.erros.slice(),pendente:!!AV880.pend,vento:AV880.vento,tique:AV880.tick,ilhas:AV880.kits.map(g=>({nome:g.nome,itens:g.itens.length,feito:g.feito,falhou:!!g.falhou,naFila:!!g.it,aEspera:!!g.espera,triangulos:g.tri,malhas:g.malhas?g.malhas.map(m=>m.name):null,velhas:g.velhas?g.velhas.length:0}))})};
 
 window.__build434={revision:434,family:"web",edition:"en"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
