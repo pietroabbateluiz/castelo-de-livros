@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v894</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v895</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -125919,6 +125919,857 @@ window.__dragao880={estado:DP880,stats:DP880.stats,erros:DP880.erros,tempo:DP880
       return this.fotos.map(f=>({id:f.nome,pos:L(f.pos),alvo:L(f.alvo),fov:f.fov||32}));}catch(e){dp880Erro('poses',e);return [];}},
   fotos:[{nome:'frente',pos:[0,.25,3.4],alvo:[0,.12,-.1]},{nome:'tres-quartos',pos:[2.1,.75,2.5],alvo:[0,.1,-.15]},{nome:'perfil',pos:[3.6,.2,-.2],alvo:[0,.1,-.2]},{nome:'de-cima',pos:[0,4,-.15],alvo:[0,0,-.2]},{nome:'de-tras',pos:[-1.3,.9,-3.2],alvo:[0,.1,-.1]},
     {nome:'cabeca-frente',pos:[.05,.3,1.75],alvo:[0,.27,.5],fov:26},{nome:'cabeca-tres-quartos',pos:[.85,.45,1.5],alvo:[0,.28,.5],fov:26},{nome:'cabeca-perfil',pos:[1.35,.3,.52],alvo:[0,.28,.5],fov:26}]};
+
+/* ===================== v880 · FANTASIA: A CASA GRANDE DE COLMO COM QUATRO VEZES A ÁREA — O DOBRO EM CADA LADO —, MOBILIADA, COM O MATO EMPURRADO PARA FORA DA PLANTA (bloco `CH880`) =====================
+   Pedido do Luiz (19/11, 20:33, com foto): «quero que quadruplique o tamanho dessa casa que é a mais aos fundos dessa área da Fantasia.
+   Lembre-se de empurrar o mato mais para trás para não colidir. Quero poder entrar na casa e ter um ambiente 4 vezes maior.» Perguntado,
+   escolheu 4× a ÁREA (o dobro em cada lado), com a porta, as janelas e os móveis no tamanho de gente e a sala nova mobiliada.
+   COMO ERA: a «Casa grande de colmo» (EN «Big thatched house») é a última das sete casas do `forestVillage` da Oficina da Floresta, em
+   (0; −60): corpo redondo achatado (raios 1,68 × 1,46 na base), base de pedra, sótão fechado, telhado de colmo de duas águas com 648 feixes,
+   chaminé, três degraus, banco, floreiras, lampião, três janelas redondas e a do sótão; a v244 deu-lhe a porta que abre, o forro, um tapete,
+   uma mesa com lampião e livros, um banquinho, seis moedas e o chão de dentro; a v428 pôs lá a lata de óleo «colmo». Tudo isso em ESCALA 1,5
+   (5,04 × 4,38 m por fora, sala de 4,7 × 4,1 m, cumeeira a 5,9 m, porta de 1,26 × 2,0 m — mais baixa que o leitor): a v564 quis passar a 2,25,
+   mas o `cv564K`/`cv564B` dela vive dentro deste script e a Oficina (outro <script>) pergunta `typeof cv564K==='function'` — nunca o vê.
+   Só a parte da v244 que mora aqui «acompanhou»: o chão de dentro ficou um disco de 3,93 m de raio a 0,54 m (a casa tem 2,52 m de raio e o
+   piso dela a 0,36 m — por fora da parede o leitor andava 0,54 m acima da grama), com rampa, moedas e abertura da porta para a casa maior.
+   As peças da casa são fundidas por material com as das outras seis (`batchRigid`): pedra, madeira, guarnição, vidro aceso, ferragem e
+   musgo em malhas da vila inteira; parede, forro, telhado, tapete, livros e flores em malhas só dela; as janelas e a folha da porta são grupos.
+   AGORA (`ch880Aplica`, uma troca só, reversível):
+   · A CASA DE HOJE SAI: as 18 malhas só dela e as 4 janelas ficam escondidas; nas malhas da vila, os triângulos dela (112 de pedra, 244 de
+     madeira, 4 368 de guarnição, 24 de vidro, 36 de ferragem, 240 de musgo — achados pelo lugar, do primeiro ao último, e conferidos pela
+     contagem) e as pedras do caminho que ficariam debaixo dos degraus viram triângulos vazios, guardados para o `desfaz()`.
+   · A CASA NOVA ENTRA (grupo «Casa grande de colmo ampliada (v880)», 99 434 triângulos em 22 malhas: 18 fundidas por material + as 4 do fogo):
+     a mesma casa, com os MESMOS materiais da Oficina, no dobro da planta (10,08 × 8,77 m por fora, parede de 36 cm, sala oval de
+     9,36 × 8,05 m — 59 m², eram 15 — e 6,06 m de pé-direito; beiral a 6,9 m, cumeeira a 11,55 m), com a fachada onde estava (o centro
+     recua para z −62,19; os fundos ficam em z −66,6, longe da emenda do gramado em z −72). Parede elíptica afunilada com o vão em arco
+     recortado certo (ombreiras e intradorso), sótão em caixa com as empenas, telhado de colmo com espessura (água de cima ondulada, de
+     baixo, corte do beiral e das empenas) e 2 304 feixes no tamanho e no espaçamento de hoje, cumeeira em rolo com amarras, chaminé alta
+     de alvenaria com capelo e dois potes, soco de 40 pedras arredondadas (cada uma com a sua forma) e pedrinhas, laje de soleira,
+     três degraus em meia-lua de 18 cm, banco de encosto, duas floreiras com flores de cinco pétalas, lampião de ferro, guarnição do arco
+     com pedra de fecho. Porta e janelas no TAMANHO DE GENTE (escala 1,9: a folha da porta de hoje — a mesma, que a v244 continua a abrir
+     — passa a 1,60 × 2,53 m num vão de 1,71 × 2,58 m; as janelas, cópias exatas da de hoje, têm 1,1 m de vidro): 7 embaixo, a 1,9 m do
+     piso (dá para olhar para fora), 9 em cima e uma em cada empena. Para a parede de 6,5 m não ficar um pano liso: enxaimel de madeira
+     por fora (baldrame, cinta, frechal, dez esteios, tirante e escoras nas empenas) — `?enxaimel880=0` tira.
+   · POR DENTRO (tudo novo, tamanho de gente): piso e forro de tábuas com três vigas, mísulas e barrotes; lambris a prumo com friso, cinta,
+     frechal e esteios; janelas com vidro aceso, aro, cruzeta, peitoril e cortinas; LAREIRA de pedra encostada na parede da direita
+     (pilastras, verga em arco, consolo de madeira com castiçais, relógio e guirlanda, peito que afunila até o forro — a chaminé de fora
+     sobe por ele —, soleira, lenha, braseiro e três línguas de fogo que tremem, com um clarão no chão: malhas aditivas, NENHUMA luz nova);
+     duas poltronas com almofadas e manta sobre um tapete redondo, mesinha; MESA comprida de cavaletes com dois bancos sobre um tapete
+     (caminho de pano, castiçais, fruteira, pão, canecas, jarro, pratos, livros); duas ESTANTES de 2,95 m com seis prateleiras de lombadas e
+     escada de mão; CANTO DE LEITURA no fundo (banco de janela com colchonete, quatro almofadas e manta, mesinha com o lampião da casa,
+     tapete); cama de hóspede; aparador com louça; barril, sacas, capacho, quatro arandelas; LUSTRE de ferro com oito velas. Os materiais
+     de dentro têm um pouco de emissão quente (a mesma textura como mapa de emissão): leem como luz de fogo sem acender luz nenhuma.
+     Quatro texturas desenhadas em código (tábuas, alvenaria, panos — tapete e trama —, lombadas; 512², uma 512 × 256).
+   · TUDO O QUE DEPENDE DA CASA ACOMPANHA: `F244.casa` (centro) e `F244.porta` (a v244 abre a porta no vão novo); o chão — o piso a 0,54 m
+     em toda a planta e a subida dos degraus (o disco invisível de fora da casa acaba); o limite de andar — a sala passa do fim da vila
+     (z −64) e o interior inteiro é andável; a câmera — de dentro para na parede de dentro e no forro, de fora para na parede, e passa pelo
+     vão da porta; os obstáculos — saem os 27 da casa de hoje, entram os da nova (anel da parede sem buraco com o vão livre, móveis, banco — 82),
+     na lista viva E na lista-base (a `FANT_OBST`, que o recanto da v355 recopia a cada troca de andar da árvore); a máscara da grade de
+     caminhos da v820/v878/v881 é remendada só na região da casa (não é refeita inteira); as SEIS MOEDAS da v244 (mesmos ids) vão para os
+     cantos da sala (lareira, mesa, canto de leitura, aparador, barril, entrada); a lata de óleo «colmo» fica ao lado do aparador (`OIL428`:
+     caixa, ponto e a lata já posta); a CHAVE DE PRATA «no fim da vila, atrás da última casa» — o lugar caía no meio da sala nova — passa
+     para o canto de leitura, com a dica nova nas três línguas (`KEY_FIXO2`, o plano e a chave já posta); penas e moedas do dia que
+     ficariam na parede ou num móvel vão para o ponto livre mais perto; a trilha do duende que vem do largo acaba antes do último degrau;
+     a fumaça sai da chaminé nova.
+   · O MATO: as instâncias da vegetação da vila que ficariam dentro da planta (+ folga), nos degraus ou no banco — no jogo de hoje, 290:
+     208 de grama baixa, 64 de capim alto, 13 samambaias e 5 moitas — vão para fora pela POSIÇÃO da instância (grama para os lados e para
+     trás; capim alto e moitas só para os fundos; nada para a frente da casa), pousadas no chão lido na hora; a relva fundida do prado da
+     v456 que não tem instância (1 763 triângulos em 5 malhas) é recolhida dentro da planta (triângulos vazios, guardados).
+   TAMANHO: `?casatam880=3` dá os 15,1 × 13,2 m com cumeeira a 17,3 m do pedido escrito (o triplo da casa de hoje em cada lado; a sala fica
+   com 14,4 × 12,4 m e os fundos em z −70); o padrão (2) é o dobro em cada lado da casa que está no jogo. Se um dia a v564 passar a valer
+   na Oficina (casa de hoje em 2,25), o bloco lê a escala da casa na cena e o padrão passa a dar 15 × 13 m sozinho.
+   QUANDO: a montagem (texturas e ~100 mil triângulos; ~0,3–0,5 s de processador) corre em ~55 fatias na fila `fat8Go` assim que a
+   Fantasia fica pronta (vigia de 2 s); as últimas fatias fazem A SECO o que a troca tem de mais caro — leem o chão para onde o mato vai
+   (grade de 1 m) e escolhem os triângulos a esvaziar na vila e no prado — e a troca, que tem de ser de uma vez, fica em ~20–30 ms (só
+   aproveita esse aquecimento se for da mesma cena, de há menos de 6 s e se uma amostra do chão ainda conferir; senão lê tudo na hora).
+   Se o leitor entrar antes, a montagem termina no `setActive` da sala, atrás da transição, e a troca lê tudo na hora (~60–130 ms), antes
+   da fusão do Leve (grupos já fundidos com malhas mexidas são desfeitos e refazem-se; as que somem saem da fila de refusão).
+   Nenhuma malha nova entra na colisão da câmera (`noCam`: a câmera é tratada pela conta) nem no LOD do Papel (`papelKeepGeo`).
+   Chaves: `?casagrande880=0` (volta a casa de hoje inteira: nada é embrulhado), `?casatam880=<1,6…3,2>` (fator; padrão 2),
+   `?enxaimel880=0` (sem as madeiras de fora). Gancho `window.__casagrande880` (`estado`, `stats`, `erros`, `aplica()`, `desfaz()` — para as
+   fotos de antes/depois na mesma sessão: depois de `desfaz()` nada é refeito até `aplica()` —, `monta()`, `poses()`, `vigia()`, `medidas()`).
+   REVISÃO (24/11): R1 a câmera de 3.ª pessoa não atravessa mais os móveis, a lareira e o lambri (essas malhas de dentro entram na colisão da
+   câmera do jogo) nem as ombreiras quando o leitor está no vão da porta; R2 o chão do DECORAR (nível 0 do `keyFloors`, que também posiciona a
+   chave de prata) passa a ter o piso da casa, e as peças já postas onde agora é a casa sobem com o piso; R3 o `desfaz()` devolve também a lata e
+   a chave postas DEPOIS da troca; R4 o gancho respeita `?casagrande880=0`; R5 o mato empurrado lê o chão sem o piso da casa (não fica no ar
+   junto da parede); R6 quem corre por fora contra a parede, nos cantos de trás onde o limite da vila corta a casa, não atravessa mais para
+   dentro; R7 as esferas de recorte das malhas do mato crescem para conter as instâncias levadas para fora (não piscam conforme a câmera). */
+const CH880={on:!/[?&#]casagrande880=0/i.test(location.search+location.hash),enxaimel:!/[?&#]enxaimel880=0/i.test(location.search+location.hash),
+  fator:(()=>{try{const m=/[?&#]casatam880=([0-9.]+)/i.exec(location.search+location.hash);if(m){const v=parseFloat(m[1]);if(v>=1.6&&v<=3.2)return v;}}catch(e){}return 2;})(),
+  SP:1.9,pausa:false,orig:{},pacote:null,job:null,ficha:null,feito:null,falhou:false,tempo:0,mundoPosto:null,iv:null,erros:[],
+  stats:{montagem:null,fila:null,aplicacoes:0,desfeitas:0,setActive:0,vigia:0,tique:0,fusoesDesfeitas:0,casa:null,mato:null,mundo:null}};
+function ch880Erro(k,e){try{if(CH880.erros.length<40)CH880.erros.push(k+': '+String(e&&e.message||e));if(typeof console!=='undefined'&&console.warn)console.warn('v880 casa grande',k,e);}catch(x){}}
+function ch880Rnd(s){s=s|0;return function(){s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};}
+function ch880Hora(){return (typeof performance!=='undefined'&&performance.now)?performance.now():Date.now();}
+function ch880Passou(){try{return typeof fat8Fim!=='undefined'&&ch880Hora()>=fat8Fim;}catch(e){return false;}}
+// ---------- medidas (metros, no referencial da casa nova: origem no chão, no centro da planta; +z é a frente/porta) ----------
+// S = escala da casa de hoje (1,5 no jogo: o `cv564K` da v564 não chega ao <script> da Oficina; 2,25 se um dia chegar); K = fator pedido.
+function ch880Medidas(S,cx,cz,chao,K){K=K||CH880.fator;const S2=S*K,SP=CH880.SP,B0=1.68*.87;
+  const P={S,K,S2,SP,cx,czVelho:cz,A:1.68*S2,B:B0*S2,At:1.52*S2,Bt:1.52*.87*S2,yb:Math.max(.18,chao-.02),yt:2.325*S2,esp:.36,chao,
+    teto:2.20*S2,W:2.18*S2,ye:2.30*S2,hr:1.55*S2,bx:1.55*S2,bz:1.42*S2,colmo:.30};
+  P.cz=cz+B0*S-P.B;                                  // a fachada fica onde está
+  if(P.cz-P.B<-69.95)P.cz=-69.95+P.B;                // os fundos não passam de z ≈ −70 (a emenda do gramado e os outeiros)
+  P.zf=P.B+Math.min(1.9,.64*S*1.5);P.zb=-P.B-Math.min(1.5,.64*S*1.15); // beirais da frente e dos fundos
+  P.ai=P.A-P.esp;P.bi=P.B-P.esp;                     // interior, à altura do chão
+  P.hw=.45*SP;P.yD=chao-.02;P.yArco=P.yD+.91*SP;P.yTopo=P.yArco+P.hw; // vão da porta: meia-largura, base, arranque e topo do arco
+  P.cume=P.ye+P.hr;P.pe=P.teto-chao;                 // cumeeira e pé-direito
+  P.yJ1=chao+1.92;P.yJ2=Math.min(P.yt-1.25,chao+1.92+Math.max(2.5,(P.yt-chao)*.46)); // fiadas de janelas
+  P.yCinta=(P.yJ1+P.yJ2)/2+.05;
+  P.Rx=y=>P.A+(P.At-P.A)*Math.max(0,Math.min(1,(y-P.yb)/(P.yt-P.yb)));P.Rz=y=>P.Rx(y)*.87;
+  P.roofY=x=>P.ye+P.hr*Math.pow(Math.max(0,1-Math.abs(x)/P.W),1.1);
+  // elipse: ponto e normal (para fora) no ângulo t medido a partir da frente (+z), no raio (rx, rz)
+  P.pt=(t,rx,rz)=>[Math.sin(t)*rx,Math.cos(t)*rz];P.nrm=(t,rx,rz)=>Math.atan2(Math.sin(t)*rz,Math.cos(t)*rx);
+  P.dentro=(x,z,rx,rz)=>{const u=x/rx,w=z/rz;return u*u+w*w<1;};
+  // lareira/chaminé: encostada na parede da direita, um pouco atrás do meio, de frente para o centro da sala (lt = ângulo na elipse)
+  {P.lt=106*Math.PI/180;const y=chao+1,rx=P.Rx(y)-P.esp,rz=P.Rz(y)-P.esp,q=P.pt(P.lt,rx,rz),ny=P.nrm(P.lt,rx,rz),W=2.5,cur=(rx*rx*rz*rz)/Math.pow(Math.pow(rx*Math.cos(P.lt),2)+Math.pow(rz*Math.sin(P.lt),2),1.5),sag=W*W/(8*Math.max(2,1/cur));
+    P.lny=ny;P.lry=ny+Math.PI;P.lsag=sag-.03;P.lqx=q[0]-Math.sin(ny)*P.lsag;P.lqz=q[1]-Math.cos(ny)*P.lsag;   // o plano das costas da lareira
+    P.lx=P.lqx-Math.sin(ny)*.5;P.lz=P.lqz-Math.cos(ny)*.5;P.chTopo=P.cume+.05;                                 // o eixo da chaminé
+    P.lar=(lx,lz)=>[P.lqx+lx*Math.cos(P.lry)+lz*Math.sin(P.lry),P.lqz-lx*Math.sin(P.lry)+lz*Math.cos(P.lry)];}       // do referencial da lareira (x ao longo da parede, z para a sala) para o da casa
+  return P;}
+// ---------- texturas desenhadas em código ----------
+function ch880Tela(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return c;}
+function ch880Tex(c,nome){const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=8;t.name='ch880:'+nome;return t;}
+function ch880Hex(r,g,b){const h=v=>{v=Math.max(0,Math.min(255,Math.round(v)));return (v<16?'0':'')+v.toString(16);};return '#'+h(r)+h(g)+h(b);}
+// tábuas: 4 réguas ao comprido (u), veios, nós e pregos; serve de piso, forro, móveis e lambris (a cor do material tinge)
+function* ch880TabuasG(){const s=512,c=ch880Tela(s,s),x=c.getContext('2d'),r=ch880Rnd(8801);x.fillStyle='#b9966a';x.fillRect(0,0,s,s);const n=4,h=s/n;
+  for(let k=0;k<n;k++){const t=.86+r()*.26,y0=k*h;x.fillStyle=ch880Hex(186*t,150*t,104*t);x.fillRect(0,y0,s,h);
+    for(let i=0;i<70;i++){const y=y0+3+r()*(h-6),a=.05+r()*.12,cl=r()<.5?'rgba(70,44,22,'+a+')':'rgba(240,214,170,'+a*.8+')';x.strokeStyle=cl;x.lineWidth=.6+r()*1.6;x.beginPath();let px=-10;x.moveTo(px,y);const f=.004+r()*.012,am=1+r()*3,ph=r()*6;while(px<s+10){px+=16;x.lineTo(px,y+Math.sin(px*f*6.283+ph)*am);}x.stroke();if((i%18)===17&&ch880Passou())yield 'veios';}
+    for(let i=0;i<2;i++){if(r()<.55)continue;const kx=r()*s,ky=y0+h*(.25+r()*.5),kr=5+r()*7;for(let j=5;j>0;j--){x.strokeStyle='rgba(58,34,16,'+(.1+.07*j)+')';x.lineWidth=1.2;x.beginPath();x.ellipse(kx,ky,kr*j/2.2,kr*j/3.6,0,0,6.283);x.stroke();}x.fillStyle='rgba(48,28,14,.75)';x.beginPath();x.ellipse(kx,ky,kr*.42,kr*.3,0,0,6.283);x.fill();}
+    const e=Math.floor(r()*s);x.fillStyle='rgba(40,24,12,.55)';x.fillRect(e,y0,2,h);   // emenda de topo
+    for(const ex of [e+7,e-9+s])for(const ey of [y0+h*.22,y0+h*.78]){x.fillStyle='rgba(30,22,18,.8)';x.beginPath();x.arc(ex%s,ey,2.1,0,6.283);x.fill();x.fillStyle='rgba(255,240,210,.35)';x.beginPath();x.arc(ex%s-.6,ey-.6,.8,0,6.283);x.fill();}
+    x.fillStyle='rgba(28,16,8,.7)';x.fillRect(0,y0,s,2);x.fillStyle='rgba(255,236,200,.18)';x.fillRect(0,y0+2,s,1.5);if(ch880Passou())yield 'tábuas';}
+  yield 'ruído';const im=x.getImageData(0,0,s,s),d=im.data;for(let i=0;i<d.length;i+=4){const q=(r()-.5)*14;d[i]+=q;d[i+1]+=q;d[i+2]+=q;}x.putImageData(im,0,0);return c;}
+// alvenaria de pedra irregular em fiadas
+function* ch880PedraG(){const s=512,c=ch880Tela(s,s),x=c.getContext('2d'),r=ch880Rnd(8802);x.fillStyle='#4a4640';x.fillRect(0,0,s,s);const fi=6,h=s/fi;
+  for(let k=0;k<fi;k++){let px=-(r()*60);const y0=k*h;while(px<s){const w=46+r()*64,t=.78+r()*.4,m=3+r()*2;const tom=r();const cr=tom<.3?[150,144,134]:tom<.6?[134,128,116]:tom<.85?[158,148,128]:[120,124,122];
+      for(const ox of [0,-s,s]){const X=px+ox;if(X+w<0||X>s)continue;x.fillStyle=ch880Hex(cr[0]*t,cr[1]*t,cr[2]*t);const rr=7+r()*6;x.beginPath();x.moveTo(X+m+rr,y0+m);x.lineTo(X+w-m-rr,y0+m);x.quadraticCurveTo(X+w-m,y0+m,X+w-m,y0+m+rr);x.lineTo(X+w-m,y0+h-m-rr);x.quadraticCurveTo(X+w-m,y0+h-m,X+w-m-rr,y0+h-m);x.lineTo(X+m+rr,y0+h-m);x.quadraticCurveTo(X+m,y0+h-m,X+m,y0+h-m-rr);x.lineTo(X+m,y0+m+rr);x.quadraticCurveTo(X+m,y0+m,X+m+rr,y0+m);x.fill();
+        const g=x.createLinearGradient(0,y0+m,0,y0+h-m);g.addColorStop(0,'rgba(255,250,235,.22)');g.addColorStop(.35,'rgba(255,255,255,0)');g.addColorStop(1,'rgba(20,16,12,.34)');x.fillStyle=g;x.fill();}
+      px+=w;}if(ch880Passou())yield 'pedra';}
+  yield 'grão';for(let i=0;i<2600;i++){x.fillStyle=i%3?'rgba(30,26,22,.10)':'rgba(240,235,220,.10)';x.fillRect(r()*s,r()*s,1+r()*2.5,1+r()*2);if((i&511)===511&&ch880Passou())yield 'grão';}
+  for(let i=0;i<26;i++){x.fillStyle='rgba(84,104,60,'+(.10+r()*.14)+')';x.beginPath();x.ellipse(r()*s,r()*s,8+r()*22,4+r()*9,r()*3,0,6.283);x.fill();}return c;}
+// panos: metade esquerda (u 0…0,5) = tapete com cercadura e medalhões; metade direita = trama lisa (almofadas, cortinas, toalha)
+function* ch880PanoG(){const s=512,c=ch880Tela(s,s),x=c.getContext('2d'),r=ch880Rnd(8803),h=s/2;
+  x.fillStyle='#b8b0a4';x.fillRect(h,0,h,s);for(let y=0;y<s;y+=3){x.fillStyle=y%6?'rgba(255,255,255,.10)':'rgba(40,30,24,.12)';x.fillRect(h,y,h,1.4);}for(let X=h;X<s;X+=3){x.fillStyle=(X%6)?'rgba(40,30,24,.07)':'rgba(255,255,255,.08)';x.fillRect(X,0,1.2,s);}
+  for(let i=0;i<1500;i++){x.fillStyle='rgba(30,24,20,.06)';x.fillRect(h+r()*h,r()*s,2,1);}if(ch880Passou())yield 'pano';
+  // tapete (o material tinge: aqui vão claros e escuros neutros)
+  x.fillStyle='#8f8a84';x.fillRect(0,0,h,s);const fr=(m,cl,lw)=>{x.strokeStyle=cl;x.lineWidth=lw;x.strokeRect(m,m,h-2*m,s-2*m);};
+  x.fillStyle='#d9d2c4';x.fillRect(10,10,h-20,s-20);x.fillStyle='#7d7872';x.fillRect(26,26,h-52,s-52);fr(18,'#3b3632',5);fr(31,'#e6dfcf',3);
+  for(let i=0;i<22;i++){const t=i/22;for(const [X,Y] of [[10+t*(h-20)+5,18],[10+t*(h-20)+5,s-18]]){x.fillStyle=i%2?'#54504a':'#f0eadc';x.beginPath();x.moveTo(X,Y-6);x.lineTo(X+5,Y);x.lineTo(X,Y+6);x.lineTo(X-5,Y);x.fill();}}
+  for(let i=0;i<46;i++){const t=i/46;for(const [X,Y] of [[18,10+t*(s-20)+5],[h-18,10+t*(s-20)+5]]){x.fillStyle=i%2?'#54504a':'#f0eadc';x.beginPath();x.moveTo(X,Y-5);x.lineTo(X+6,Y);x.lineTo(X,Y+5);x.lineTo(X-6,Y);x.fill();}}
+  for(let k=0;k<3;k++){const cy=s*(.2+k*.3),cxx=h/2;for(let j=4;j>0;j--){x.fillStyle=['#e9e2d2','#55504a','#c9c1b2','#3f3a36'][j-1];x.beginPath();x.moveTo(cxx,cy-j*16);x.lineTo(cxx+j*13,cy);x.lineTo(cxx,cy+j*16);x.lineTo(cxx-j*13,cy);x.fill();}
+    for(const sx of [-1,1])for(const sy of [-1,1]){x.fillStyle='#ddd6c6';x.beginPath();x.arc(cxx+sx*70,cy+sy*44,7,0,6.283);x.fill();x.fillStyle='#4a4540';x.beginPath();x.arc(cxx+sx*70,cy+sy*44,3,0,6.283);x.fill();}}
+  for(let y=0;y<s;y+=2){x.fillStyle='rgba(20,16,12,.07)';x.fillRect(0,y,h,1);}return c;}
+// lombadas de livros: 4 prateleiras de lombadas coloridas com filetes dourados
+function* ch880LivrosG(){const w=512,hh=256,c=ch880Tela(w,hh),x=c.getContext('2d'),r=ch880Rnd(8804);x.fillStyle='#1c130c';x.fillRect(0,0,w,hh);const fi=2,h=hh/fi;
+  const cores=['#7b2f2a','#2f5a63','#8a6a2c','#3d5a34','#5b3a6b','#93502a','#2c3f66','#6e6252','#a8873e','#4a2a22','#7d8b6a','#b0a184'];
+  for(let k=0;k<fi;k++){let X=2;const y0=k*h;while(X<w-6){const bw=11+r()*17,bh=h*(.68+r()*.27),cl=cores[Math.floor(r()*cores.length)],inc=r()<.08&&X+bw+20<w;
+      x.save();x.translate(X+bw/2,y0+h-2);if(inc)x.rotate(-.16);x.fillStyle=cl;x.fillRect(-bw/2,-bh,bw,bh);
+      const g=x.createLinearGradient(-bw/2,0,bw/2,0);g.addColorStop(0,'rgba(0,0,0,.38)');g.addColorStop(.3,'rgba(255,255,255,.16)');g.addColorStop(1,'rgba(0,0,0,.42)');x.fillStyle=g;x.fillRect(-bw/2,-bh,bw,bh);
+      x.fillStyle='rgba(232,200,120,.85)';x.fillRect(-bw/2+1.5,-bh+7,bw-3,1.6);x.fillRect(-bw/2+1.5,-bh+11,bw-3,1);x.fillRect(-bw/2+1.5,-9,bw-3,1.6);if(r()<.6){x.fillRect(-bw/2+3,-bh*.58,bw-6,bh*.16);x.fillStyle=cl;x.fillRect(-bw/2+4.2,-bh*.58+1.4,bw-8.4,bh*.16-2.8);}
+      x.restore();X+=bw+(inc?9:1)+(r()<.07?10:0);}if(ch880Passou())yield 'livros';}
+  return c;}
+function* ch880TexturasG(){const T={};T.tabuas=ch880Tex(yield* ch880TabuasG(),'tabuas');yield 't1';T.pedra=ch880Tex(yield* ch880PedraG(),'pedra');yield 't2';T.pano=ch880Tex(yield* ch880PanoG(),'pano');yield 't3';T.livros=ch880Tex(yield* ch880LivrosG(),'livros');return T;}
+// ---------- acumulador de geometria (uma malha por material; a matriz corrente vale para o que for posto) ----------
+function ch880Acum(nome){const A={nome,p:[],u:[],c:[],i:[],n:null,M:null,cor:null,uvk:1,uvo:[0,0],liso:[]};
+  A.v=function(x,y,z,u,v){const M=A.M;if(M){const e=M.elements,X=e[0]*x+e[4]*y+e[8]*z+e[12],Y=e[1]*x+e[5]*y+e[9]*z+e[13],Z=e[2]*x+e[6]*y+e[10]*z+e[14];x=X;y=Y;z=Z;}A.p.push(x,y,z);A.u.push(u||0,v||0);const C=A.cor||[1,1,1];A.c.push(C[0],C[1],C[2]);return A.p.length/3-1;};
+  A.t=function(a,b,c){A.i.push(a,b,c);};
+  // com(m, f): compõe a matriz m com a corrente só durante f
+  A.com=function(m,f){const m0=A.M;A.M=m0?new THREE.Matrix4().multiplyMatrices(m0,m):m;try{f();}finally{A.M=m0;}};
+  A.em=function(x,y,z,ry,f,s,rx,rz){const m=new THREE.Matrix4().compose(new THREE.Vector3(x,y,z),new THREE.Quaternion().setFromEuler(new THREE.Euler(rx||0,ry||0,rz||0,'YXZ')),new THREE.Vector3(s||1,s||1,s||1));A.com(m,f);};
+  // quadrilátero chapado (a,b,c,d em volta, anti-horário visto de fora); uv opcional [[u,v]×4]
+  A.quad=function(a,b,c,d,uv){const k=A.uvk;if(!uv){const w=Math.hypot(b[0]-a[0],b[1]-a[1],b[2]-a[2]),h=Math.hypot(d[0]-a[0],d[1]-a[1],d[2]-a[2]);uv=[[0,0],[w*k,0],[w*k,h*k],[0,h*k]];}
+    const o=A.uvo,i0=A.v(a[0],a[1],a[2],uv[0][0]+o[0],uv[0][1]+o[1]),i1=A.v(b[0],b[1],b[2],uv[1][0]+o[0],uv[1][1]+o[1]),i2=A.v(c[0],c[1],c[2],uv[2][0]+o[0],uv[2][1]+o[1]),i3=A.v(d[0],d[1],d[2],uv[3][0]+o[0],uv[3][1]+o[1]);A.t(i0,i1,i2);A.t(i0,i2,i3);return i0;};
+  // caixa centrada na origem (w em x, h em y, d em z); faces: lista opcional das que entram ('+x','-x','+y','-y','+z','-z'); veio: eixo do comprimento da textura
+  A.caixa=function(w,h,d,op){op=op||{};const x=w/2,y=h/2,z=d/2,k=A.uvk,F=op.faces;const tem=f=>!F||F.indexOf(f)>=0;const g=op.veio||(w>=h&&w>=d?'x':(h>=d?'y':'z'));
+    const uvf=(a,b,ea,eb)=>{const la=ea===g,sw=!la&&eb===g; // u ao longo do veio
+      const U=sw?b:a,V=sw?a:b;const q=[[0,0],[U*k,0],[U*k,V*k],[0,V*k]];return sw?[q[0],q[3],q[2],q[1]]:q;};
+    if(tem('+z'))A.quad([-x,-y,z],[x,-y,z],[x,y,z],[-x,y,z],uvf(w,h,'x','y'));if(tem('-z'))A.quad([x,-y,-z],[-x,-y,-z],[-x,y,-z],[x,y,-z],uvf(w,h,'x','y'));
+    if(tem('+x'))A.quad([x,-y,z],[x,-y,-z],[x,y,-z],[x,y,z],uvf(d,h,'z','y'));if(tem('-x'))A.quad([-x,-y,-z],[-x,-y,z],[-x,y,z],[-x,y,-z],uvf(d,h,'z','y'));
+    if(tem('+y'))A.quad([-x,y,z],[x,y,z],[x,y,-z],[-x,y,-z],uvf(w,d,'x','z'));if(tem('-y'))A.quad([-x,-y,-z],[x,-y,-z],[x,-y,z],[-x,-y,z],uvf(w,d,'x','z'));};
+  A.bloco=function(cx,cy,cz,w,h,d,ry,op){A.em(cx,cy,cz,ry||0,()=>A.caixa(w,h,d,op),1,op&&op.rx,op&&op.rz);};
+  // grade paramétrica lisa: fn(u,v) → [x,y,z,(tu,tv)]; fechaU: emenda a costura em u (vértices duplicados para a textura)
+  A.grade=function(nu,nv,fn,op){op=op||{};const b=A.p.length/3,k=A.uvk,o=A.uvo;for(let j=0;j<=nv;j++)for(let i=0;i<=nu;i++){const q=fn(i/nu,j/nv);A.v(q[0],q[1],q[2],(q.length>3?q[3]:i/nu*k)+o[0],(q.length>3?q[4]:j/nv*k)+o[1]);}
+    for(let j=0;j<nv;j++)for(let i=0;i<nu;i++){const a=b+j*(nu+1)+i,c=a+nu+1;if(op.salta&&op.salta(i,j))continue;if(op.vira){A.t(a,c,a+1);A.t(c,c+1,a+1);}else{A.t(a,a+1,c);A.t(c,a+1,c+1);}}
+    A.liso.push([b,A.p.length/3,op.fechaU?nu+1:0,op.fechaV?nv+1:0,nu,nv]);return b;};
+  // torno em volta de y: perfil [[r,y],…] de baixo para cima; sx,sz achatam
+  A.torno=function(perfil,seg,op){op=op||{};const sx=op.sx||1,sz=op.sz||1,n=perfil.length-1;let L=0;const cl=[0];for(let j=0;j<n;j++){L+=Math.hypot(perfil[j+1][0]-perfil[j][0],perfil[j+1][1]-perfil[j][1]);cl.push(L);}
+    return A.grade(seg,n,(u,v)=>{const j=Math.round(v*n),a=u*6.283185307,q=perfil[j];return [Math.sin(a)*q[0]*sx,q[1],Math.cos(a)*q[0]*sz,u*(op.uu||1)*A.uvk,cl[j]*(op.vv||1)*A.uvk];},{fechaU:true});};
+  // tubo ao longo de pontos (reta entre eles), raio r (ou função do parâmetro), rad lados; tampas opcionais
+  A.tubo=function(pts,r,rad,op){op=op||{};const n=pts.length-1,V=THREE.Vector3;const P=pts.map(q=>new V(q[0],q[1],q[2]));const T=[];for(let j=0;j<=n;j++){const a=P[Math.max(0,j-1)],b=P[Math.min(n,j+1)];T.push(new V().subVectors(b,a).normalize());}
+    let N=new V(0,1,0);if(Math.abs(T[0].y)>.9)N.set(1,0,0);N.sub(T[0].clone().multiplyScalar(N.dot(T[0]))).normalize();const Ns=[],Bs=[];for(let j=0;j<=n;j++){N.sub(T[j].clone().multiplyScalar(N.dot(T[j]))).normalize();Ns.push(N.clone());Bs.push(new V().crossVectors(T[j],N).normalize());}
+    let L=0;const cl=[0];for(let j=0;j<n;j++){L+=P[j].distanceTo(P[j+1]);cl.push(L);}const rr=j=>typeof r==='function'?r(j/n):r;
+    const b=A.grade(rad,n,(u,v)=>{const j=Math.round(v*n),a=u*6.283185307,c=Math.cos(a)*rr(j),s=Math.sin(a)*rr(j);return [P[j].x+Ns[j].x*c+Bs[j].x*s,P[j].y+Ns[j].y*c+Bs[j].y*s,P[j].z+Ns[j].z*c+Bs[j].z*s,u*rad*.5*A.uvk*(op.uu||1),cl[j]*A.uvk];},{fechaU:true});
+    if(op.tampa){for(const j of [0,n]){const c0=A.v(P[j].x,P[j].y,P[j].z,0,0),b0=A.p.length/3;for(let i=0;i<=rad;i++){const a=i/rad*6.283185307,c=Math.cos(a)*rr(j),s=Math.sin(a)*rr(j);A.v(P[j].x+Ns[j].x*c+Bs[j].x*s,P[j].y+Ns[j].y*c+Bs[j].y*s,P[j].z+Ns[j].z*c+Bs[j].z*s,c,s);}for(let i=0;i<rad;i++){if(j===0)A.t(c0,b0+i+1,b0+i);else A.t(c0,b0+i,b0+i+1);}}}return b;};
+  // elipsoide (rx,ry,rz); e<1 deixa «quadrado de cantos redondos» (superelipsoide): pedras, almofadas
+  A.bola=function(rx,ry,rz,seg,an,e,op){e=e||1;op=op||{};const pw=(v)=>Math.sign(v)*Math.pow(Math.abs(v),e);const jit=op.jit||0,rn=op.rnd;
+    return A.grade(seg,an,(u,v)=>{const a=u*6.283185307,b=(v-.5)*Math.PI;const cb=Math.cos(b),sb=Math.sin(b);let k=1;if(jit&&v>0&&v<1&&u<1)k=1+(rn()-.5)*jit;else if(jit&&u===1)k=A.__k0||1;if(jit&&u===0)A.__k0=k;
+      return [pw(Math.sin(a))*pw(cb)*rx*k,pw(sb)*ry*k,pw(Math.cos(a))*pw(cb)*rz*k,u*A.uvk*(op.uu||1),v*A.uvk*(op.vv||1)];},{fechaU:true});};
+  // disco/elipse horizontal virado para cima (ou para baixo), uv em metros
+  A.disco=function(rx,rz,seg,y,baixo,a0,a1){a0=a0||0;a1=a1===undefined?6.283185307:a1;const k=A.uvk,o=A.uvo,c=A.v(0,y,0,o[0],o[1]),b=A.p.length/3;for(let i=0;i<=seg;i++){const a=a0+(a1-a0)*i/seg,X=Math.sin(a)*rx,Z=Math.cos(a)*rz;A.v(X,y,Z,X*k+o[0],Z*k+o[1]);}for(let i=0;i<seg;i++){if(baixo)A.t(c,b+i+1,b+i);else A.t(c,b+i,b+i+1);}};
+  // normais: por face, somadas nos vértices; as grades lisas emendam a costura
+  A.geo=function(){const nv=A.p.length/3,P=A.p,N=new Float32Array(nv*3),I=A.i;
+    for(let t=0;t<I.length;t+=3){const a=I[t]*3,b=I[t+1]*3,c=I[t+2]*3,e1x=P[b]-P[a],e1y=P[b+1]-P[a+1],e1z=P[b+2]-P[a+2],e2x=P[c]-P[a],e2y=P[c+1]-P[a+1],e2z=P[c+2]-P[a+2],nx=e1y*e2z-e1z*e2y,ny=e1z*e2x-e1x*e2z,nz=e1x*e2y-e1y*e2x;
+      for(const q of [a,b,c]){N[q]+=nx;N[q+1]+=ny;N[q+2]+=nz;}}
+    for(const [b,e,cu,cv,nu,nv2] of A.liso){if(cu){for(let j=0;j<=nv2;j++){const a=(b+j*cu)*3,c=(b+j*cu+nu)*3;for(let k=0;k<3;k++){const s=N[a+k]+N[c+k];N[a+k]=s;N[c+k]=s;}}}}
+    for(let i=0;i<nv;i++){const x=N[i*3],y=N[i*3+1],z=N[i*3+2],l=Math.hypot(x,y,z)||1;N[i*3]=x/l;N[i*3+1]=y/l;N[i*3+2]=z/l;}
+    const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(P),3));g.setAttribute('normal',new THREE.BufferAttribute(N,3));g.setAttribute('uv',new THREE.BufferAttribute(new Float32Array(A.u),2));
+    if(A.temCor)g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(A.c),3));g.setIndex(new THREE.BufferAttribute(nv>65535?new Uint32Array(I):new Uint16Array(I),1));g.computeBoundingSphere();g.computeBoundingBox();return g;};
+  return A;}
+// cor linear a partir de 0xRRGGBB (para a cor por vértice)
+function ch880Cor(h,k){const c=new THREE.Color(h);k=k===undefined?1:k;return [c.r*k,c.g*k,c.b*k];}
+// ---------- a casca (parede com o vão em arco, sótão, telhado de colmo, chaminé, soco de pedra, degraus, enxaimel) ----------
+function ch880Baldes(){const B={};for(const k of ['parede','telhado','pedra','tronco','guarn','vidro','escuro','musgo','flor','alven','alvenI','reboco','piso','movel','pano','livros','obj','vela']){B[k]=ch880Acum(k);}
+  B.pano.temCor=true;B.obj.temCor=true;B.movel.temCor=true;B.flor.temCor=true;
+  B.parede.uvk=1/3.2;B.reboco.uvk=1/3.2;B.telhado.uvk=1/2.4;B.pedra.uvk=1/1.5;B.tronco.uvk=1/2.2;B.guarn.uvk=1/2.2;B.alven.uvk=1/1.7;B.alvenI.uvk=1/1.7;B.piso.uvk=1/1.6;B.movel.uvk=1/1.3;B.musgo.uvk=1;B.pano.uvk=.45;return B;}
+// põe a mesma transformação em todos os baldes durante f (móveis e conjuntos feitos de vários materiais)
+function ch880Em(B,x,y,z,ry,f,s,rx,rz){const m=new THREE.Matrix4().compose(new THREE.Vector3(x,y,z),new THREE.Quaternion().setFromEuler(new THREE.Euler(rx||0,ry||0,rz||0,'YXZ')),new THREE.Vector3(s||1,s||1,s||1));const ks=Object.keys(B),old=ks.map(k=>B[k].M);
+  for(const k of ks){const A=B[k];A.M=A.M?new THREE.Matrix4().multiplyMatrices(A.M,m):m;}try{f();}finally{ks.forEach((k,i)=>{B[k].M=old[i];});}}
+function ch880Z(P,x,y,ins){const rx=P.Rx(y)-ins,rz=P.Rz(y)-ins,q=1-(x/rx)*(x/rx);return rz*Math.sqrt(q>0?q:0);}
+// parede elíptica afunilada com o vão da porta em arco; ins = recuo (0 fora; a espessura por dentro); dentro = faces para o interior
+function ch880Parede(A,P,ins,dentro,yTopo){const k=A.uvk,y0=dentro?P.chao-.02:P.yb,y1=yTopo||P.yt,Rm=(P.A+P.B)/2-ins;const wd=P.hw+.55,t0=Math.asin(wd/(P.A-ins));
+  const pto=(t,y)=>{const rx=P.Rx(y)-ins,rz=P.Rz(y)-ins;return [Math.sin(t)*rx,y,Math.cos(t)*rz,t*Rm*k,y*k];};
+  A.grade(60,3,(u,v)=>pto(t0+(2*Math.PI-2*t0)*u,y0+(y1-y0)*v),{vira:dentro});
+  const px=(x,y)=>{const rx=P.Rx(y)-ins;return [x,y,ch880Z(P,x,y,ins),Math.asin(Math.max(-1,Math.min(1,x/rx)))*Rm*k,y*k];};
+  const xb=y=>Math.sin(t0)*(P.Rx(y)-ins);
+  for(const s of [-1,1])A.grade(3,6,(u,v)=>{const y=y0+(y1-y0)*v,xa=s*P.hw,xc=s*xb(y);const x=s<0?xc+(xa-xc)*u:xa+(xc-xa)*u;return px(x,y);},{vira:dentro});
+  A.grade(14,6,(u,v)=>{const x=-P.hw+2*P.hw*u,ya=P.yArco+Math.sqrt(Math.max(0,P.hw*P.hw-x*x)),y=ya+(y1-ya)*v;return px(x,y);},{vira:dentro});}
+// o vão: ombreiras e intradorso do arco, da face de fora à de dentro
+function ch880Vao(A,P){const L=[];L.push([-P.hw,P.yD]);L.push([-P.hw,P.yArco]);for(let i=1;i<14;i++){const a=Math.PI-i/14*Math.PI;L.push([Math.cos(a)*P.hw,P.yArco+Math.sin(a)*P.hw]);}L.push([P.hw,P.yArco]);L.push([P.hw,P.yD]);
+  let s=0;for(let i=0;i<L.length-1;i++){const a=L[i],b=L[i+1],d=Math.hypot(b[0]-a[0],b[1]-a[1]),k=A.uvk;
+    A.quad([a[0],a[1],ch880Z(P,a[0],a[1],0)],[a[0],a[1],ch880Z(P,a[0],a[1],P.esp)],[b[0],b[1],ch880Z(P,b[0],b[1],P.esp)],[b[0],b[1],ch880Z(P,b[0],b[1],0)],[[0,s*k],[P.esp*k,s*k],[P.esp*k,(s+d)*k],[0,(s+d)*k]]);s+=d;}}
+function ch880Sotao(A,P){const k=A.uvk,n=28,yT=x=>P.roofY(x)-.06;
+  for(const s of [1,-1]){const z=s*P.bz;A.grade(n,4,(u,v)=>{const x=(-P.bx+2*P.bx*u)*s,ya=P.teto,yb=yT(x);return [x,ya+(yb-ya)*v,z,x*k,(ya+(yb-ya)*v)*k];});}
+  for(const s of [1,-1]){const x=s*P.bx,h=yT(x);A.quad([x,P.teto,s*P.bz],[x,P.teto,-s*P.bz],[x,h,-s*P.bz],[x,h,s*P.bz]);}
+  A.quad([-P.bx,P.teto,-P.bz],[P.bx,P.teto,-P.bz],[P.bx,P.teto,P.bz],[-P.bx,P.teto,P.bz]);}
+function* ch880Telhado(B,P){const A=B.telhado,k=A.uvk,r=ch880Rnd(8811),nu=20,nz=14,L=P.zf-P.zb,esp=P.colmo;
+  const yS=u=>P.ye+P.hr*Math.pow(1-u,1.1);
+  for(const s of [-1,1]){
+    // água de cima, com a ondulação do colmo e o beiral caído
+    A.grade(nu,nz,(u,v)=>{const z=P.zb+L*v,o=(u>0&&u<1&&v>0&&v<1)?(r()-.5)*.05:0;const cai=u>.93?(u-.93)*1.6:0;return [s*u*P.W,yS(u)+o-cai,z,z*k,u*P.W*1.25*k];},{vira:s>0});
+    // água de baixo (vista nos beirais)
+    A.grade(8,2,(u,v)=>{const z=P.zb+L*v;return [s*u*P.W,yS(u)-esp-(u>.93?(u-.93)*1.6:0),z,z*k,u*P.W*k];},{vira:s<0});
+    // corte do beiral e das empenas
+    A.grade(nz,1,(u,v)=>{const z=P.zb+L*u;return [s*P.W,yS(1)-.112-esp*v,z,z*k,v*esp*k];},{vira:s<0});
+    for(const f of [0,1]){const z=f?P.zf:P.zb;A.grade(nu,1,(u,v)=>{const cai=u>.93?(u-.93)*1.6:0;return [s*u*P.W,yS(u)-cai-esp*v,z,u*P.W*k,v*esp*k];},{vira:(s>0)===!!f});}
+    yield 'telhado';
+  }
+  // feixes de colmo: o tamanho e o espaçamento de hoje (em metros), cobrindo as duas águas
+  const So=P.S,dz=.116*So,dx=.075*2.18*So,rf=.019*So,nr=Math.max(9,Math.round(P.W/(2.18/9*So))),nc=Math.max(8,Math.floor((L-.16)/dz));let n=0;
+  for(const s of [-1,1])for(let row=0;row<nr;row++){for(let col=0;col<nc;col++){const T=((row+col)%4)?B.telhado:B.guarn,u=row/nr,z=P.zb+.1+col*dz+(r()-.5)*.03,x0=s*u*P.W,y=yS(u)+.02,kL=.9+r()*.3;
+      const pts=[[x0,y+.035*So,z],[x0+s*dx*kL,y-.10*So,z+.012*So],[x0+s*dx*2*kL,y-.23*So*kL,z-.01*So]];const b=T.p.length/3,ku=T.uvk;
+      for(let j=0;j<3;j++){const a=pts[Math.max(0,j-1)],c=pts[Math.min(2,j+1)];let tx=c[0]-a[0],ty=c[1]-a[1];const l=Math.hypot(tx,ty)||1;tx/=l;ty/=l;const rr=rf*(j===2?.7:1);
+        T.v(pts[j][0]-ty*rr,pts[j][1]+tx*rr,pts[j][2],0,j*.3*ku);T.v(pts[j][0],pts[j][1],pts[j][2]+rr,.25*ku*.3,j*.3*ku);T.v(pts[j][0]+ty*rr,pts[j][1]-tx*rr,pts[j][2],.5*ku*.3,j*.3*ku);T.v(pts[j][0],pts[j][1],pts[j][2]-rr,.75*ku*.3,j*.3*ku);}
+      for(let j=0;j<2;j++)for(let q=0;q<4;q++){const a=b+j*4+q,c=b+j*4+(q+1)%4,d=a+4,e=c+4;T.t(a,c,d);T.t(c,e,d);}n++;}
+    if(ch880Passou())yield 'colmo';}
+  // cumeeira: rolo de colmo com amarras
+  const G=B.guarn,zc0=P.zb-.12,zc1=P.zf+.12,pc=[];for(let i=0;i<=16;i++){const t=i/16;pc.push([0,P.cume+.03+Math.sin(t*Math.PI)*.07*So,zc0+(zc1-zc0)*t]);}
+  G.tubo(pc,.15*So,8,{tampa:true});for(let i=1;i<16;i+=1){const p=pc[i],pr=[];for(let q=0;q<=10;q++){const a=q/10*6.2832;pr.push([Math.sin(a)*.165*So,p[1]+Math.cos(a)*.165*So,p[2]]);}B.tronco.tubo(pr,.022*So,4);}
+  return n;}
+function ch880Chamine(B,P){const A=B.alven,x=P.lx,z=P.lz,w=.84*P.S,d=.76*P.S,y1=P.chTopo;let ym=1e9;for(const sx of [-1,1])for(const sz of [-1,1]){const q=P.lar(sx*w/2,.5+sz*d/2);ym=Math.min(ym,P.roofY(q[0]));}const y0=ym-.45,h=y1-y0;
+  ch880Em(B,x,0,z,P.lry,()=>{A.em(0,y0,0,0,()=>{const a=w/2,b=d/2,t=.93,c=[[-a,-b],[a,-b],[a,b],[-a,b]];for(let i=0;i<4;i++){const p=c[i],q=c[(i+1)%4];A.quad([q[0],0,q[1]],[p[0],0,p[1]],[p[0]*t,h,p[1]*t],[q[0]*t,h,q[1]*t]);}});
+    B.guarn.bloco(0,y1+.06,0,w+.26,.14,d+.26);B.alven.bloco(0,y1+.19,0,w+.06,.12,d+.06);B.escuro.bloco(0,y1+.26,0,w*.62,.03,d*.62);
+    for(const s of [-1,1])B.guarn.em(s*w*.24,y1+.25,0,0,()=>B.guarn.torno([[.13,0],[.15,.05],[.12,.3],[.14,.36],[.10,.36]],10));});}
+// soco: pedras de verdade em volta, laje da soleira, degraus em meia-lua
+function* ch880Soco(B,P,chaoDe){const A=B.pedra,r=ch880Rnd(8821),per=Math.PI*(3*(P.A+P.B)-Math.sqrt((3*P.A+P.B)*(P.A+3*P.B))),n=Math.round(per/.74);
+  for(let i=0;i<n;i++){const t=(i+.5)/n*2*Math.PI,pt=P.pt(t,P.A+.13,P.B+.13);if(pt[1]>0&&Math.abs(pt[0])<2.3)continue;const ny=P.nrm(t,P.A,P.B),g=chaoDe?chaoDe(pt[0],pt[1]):0;
+    const hy=.30+r()*.10+Math.max(0,P.chao-.54)*.5,cy=P.chao-.03-hy+(r()-.5)*.05+Math.min(0,g);A.em(pt[0],cy,pt[1],ny,()=>A.bola(.34+r()*.09,hy,.25+r()*.05,10,6,.62,{jit:.10,rnd:r}),1,(r()-.5)*.12,(r()-.5)*.16);if((i&7)===7&&ch880Passou())yield 'pedras do soco';}
+  // segunda fiada, miúda, entre as grandes
+  for(let i=0;i<n;i++){const t=(i+1)/n*2*Math.PI,pt=P.pt(t,P.A+.21,P.B+.21);if(pt[1]>0&&Math.abs(pt[0])<2.45)continue;if(r()<.35)continue;const g=chaoDe?chaoDe(pt[0],pt[1]):0;A.em(pt[0],g+.07,pt[1],P.nrm(t,P.A,P.B)+r(),()=>A.bola(.16+r()*.08,.12+r()*.05,.14+r()*.05,8,5,.7,{jit:.12,rnd:r}));if((i&7)===7&&ch880Passou())yield 'pedrinhas';}
+  yield 'laje';
+  const L=B.alven,k=L.uvk;
+  // aba da laje (do rodapé da parede até a borda) e a espelho dela
+  L.grade(64,1,(u,v)=>{const t=u*2*Math.PI,q=P.pt(t,P.A-.06+.34*v,P.B-.06+.34*v);return [q[0],P.chao+.004-.034*v,q[1],q[0]*k,q[1]*k];},{vira:true});
+  L.grade(64,1,(u,v)=>{const t=u*2*Math.PI,q=P.pt(t,P.A+.28,P.B+.28);return [q[0],P.chao-.03-.3*v,q[1],t*P.A*k,v*.3*k];},{vira:true});
+  // degraus em meia-lua (centro na soleira)
+  const zc=P.B-.1,nd=Math.max(2,Math.round(P.chao/.18)),esp=P.chao/nd;P.degraus=[];
+  for(let j=0;j<nd;j++){const R=1.28+j*.37,y=P.chao-j*esp+(j?0:.018);P.degraus.push([R,y]);L.em(0,0,zc,0,()=>{L.disco(R,R,20,y,false,-Math.PI/2,Math.PI/2);L.grade(20,1,(u,v)=>{const a=-Math.PI/2+u*Math.PI;return [Math.sin(a)*R,y-(esp+(j===nd-1?.25:0))*v,Math.cos(a)*R,a*R*k,v*esp*k];},{vira:true});});}
+  P.zDegrau=zc;}
+// enxaimel: frechal, cinta, baldrame e esteios de madeira por fora
+function ch880Enxaimel(B,P,angs){const A=B.tronco,sal=.075,esp=.2;
+  const cinta=(y,h,t0,t1)=>{const n=Math.max(2,Math.round((t1-t0)/(Math.PI/36)));for(let i=0;i<n;i++){const ta=t0+(t1-t0)*i/n,tb=t0+(t1-t0)*(i+1)/n;const P4=(t,yy,o)=>{const q=P.pt(t,P.Rx(yy)+o,P.Rz(yy)+o);return [q[0],yy,q[1]];};
+      const a0=P4(ta,y-h/2,sal),b0=P4(tb,y-h/2,sal),a1=P4(ta,y+h/2,sal),b1=P4(tb,y+h/2,sal),ai=P4(ta,y+h/2,-.03),bi=P4(tb,y+h/2,-.03),aj=P4(ta,y-h/2,-.03),bj=P4(tb,y-h/2,-.03);
+      A.quad(a0,b0,b1,a1);A.quad(a1,b1,bi,ai);A.quad(aj,bj,b0,a0);}};
+  const dPorta=Math.asin((P.hw+.2)/P.A);cinta(P.chao+.2,.2,dPorta,2*Math.PI-dPorta);cinta(P.yCinta,.24,0,2*Math.PI);cinta(P.yt-.16,.26,0,2*Math.PI);
+  for(const t of angs){const y0=P.chao+.3,y1=P.yt-.29,p0=P.pt(t,P.Rx(y0)+sal*.5,P.Rz(y0)+sal*.5),p1=P.pt(t,P.Rx(y1)+sal*.5,P.Rz(y1)+sal*.5),ny=P.nrm(t,P.A,P.B);
+    const len=Math.hypot(p1[0]-p0[0],y1-y0,p1[1]-p0[1]),inc=Math.atan2(Math.hypot(p1[0]-p0[0],p1[1]-p0[1]),y1-y0);
+    A.em((p0[0]+p1[0])/2,(y0+y1)/2,(p0[1]+p1[1])/2,ny,()=>A.caixa(.24,len,sal*2+.04,{faces:['+z','+x','-x'],veio:'y'}),1,-inc,0);}
+  // empena: tirante, pendural e escoras por fora do sótão (frente e fundos)
+  for(const s of [1,-1]){const z=s*(P.bz+.05),ry=s>0?0:Math.PI;A.bloco(0,P.teto+.16,z,2*P.bx+.06,.26,.12,ry,{faces:['+z','+y','-y','+x','-x'],veio:'x'});
+    const yk=P.roofY(0)-.32;A.bloco(0,(P.teto+.29+yk)/2,z,.24,yk-P.teto-.29,.12,ry,{faces:['+z','+x','-x'],veio:'y'});
+    for(const q of [-1,1]){const xa=q*P.bx*.52,ya=P.teto+.29,xb=q*.12,yb=P.teto+.29+(yk-P.teto-.29)*.62,len=Math.hypot(xb-xa,yb-ya),an=Math.atan2(yb-ya,xb-xa);
+      A.em((xa+xb)/2,(ya+yb)/2,z,ry,()=>A.caixa(len,.18,.11,{faces:['+z','+y','-y'],veio:'x'}),1,0,s>0?an:Math.PI-an);}}}
+// copia uma geometria (posições, uv, índices) para o acumulador, pela matriz m
+function ch880Copia(A,g,m){if(!g||!g.attributes||!g.attributes.position)return 0;const p=g.attributes.position,u=g.attributes.uv,I=g.index?g.index.array:null,b=A.p.length/3,e=m.elements,M0=A.M;A.M=null;const det=m.determinant()<0;
+  try{for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),z=p.getZ(i);A.v(e[0]*x+e[4]*y+e[8]*z+e[12],e[1]*x+e[5]*y+e[9]*z+e[13],e[2]*x+e[6]*y+e[10]*z+e[14],u?u.getX(i):0,u?u.getY(i):0);}}finally{A.M=M0;}
+  const n=I?I.length:p.count;for(let t=0;t<n;t+=3){const a=I?I[t]:t,c=I?I[t+1]:t+1,d=I?I[t+2]:t+2;if(a===c||c===d||a===d)continue;if(det)A.t(b+a,b+d,b+c);else A.t(b+a,b+c,b+d);}return n/3;}
+// janela redonda igual às de hoje (as quatro malhas do grupo «Janela com moldura saliente»), ou uma feita aqui se o grupo não for achado
+function ch880Janela(B,F,m){const J=F&&F.janela;if(J&&J.partes&&J.partes.length){for(const q of J.partes){const A=B[q.k];if(A)ch880Copia(A,q.g,m);}return;}
+  const r=.31;for(const [A,f] of [[B.escuro,()=>B.escuro.em(0,0,-.02,0,()=>B.escuro.torno([[r+.06,-.07],[r+.045,.07]],20),1,Math.PI/2)],[B.vidro,()=>B.vidro.em(0,0,.058,0,()=>B.vidro.disco(r-.025,r-.025,20,0),1,Math.PI/2)],
+      [B.guarn,()=>{const pr=[];for(let i=0;i<=20;i++){const a=i/20*6.2832;pr.push([Math.cos(a)*r,Math.sin(a)*r,.078]);}B.guarn.tubo(pr,.045,6);B.guarn.bloco(0,-r-.07,.08,r*2.42,.095,.29);}],
+      [B.tronco,()=>{B.tronco.bloco(0,0,.105,.038,r*1.89,.045);B.tronco.bloco(0,0,.105,r*1.89,.038,.045);for(const s of [-1,1])B.tronco.em(s*(r+.12),0,.015,s*.22,()=>B.tronco.caixa(.16,r*1.75,.055));}]])A.com(m,f);}
+function ch880MatJanela(P,t,y,gira){const o=.075*P.SP,q=P.pt(t,P.Rx(y),P.Rz(y)),ny=P.nrm(t,P.Rx(y),P.Rz(y));return new THREE.Matrix4().compose(new THREE.Vector3(q[0]+Math.sin(ny)*o,y,q[1]+Math.cos(ny)*o),new THREE.Quaternion().setFromEuler(new THREE.Euler(0,ny,0)),new THREE.Vector3(P.SP,P.SP,P.SP));}
+// miudezas de fora: guarnição do arco da porta, soleira, lampião, banco, floreiras
+function ch880Miudezas(B,P,F){const SP=P.SP,G=B.guarn,pts=[];const zf=(x,y)=>ch880Z(P,x,y,0)+.045;const hw=P.hw+.035;
+  pts.push([-hw,P.yD,zf(-hw,P.yD)]);pts.push([-hw,P.yArco,zf(-hw,P.yArco)]);for(let i=1;i<12;i++){const a=Math.PI-i/12*Math.PI,x=Math.cos(a)*hw,y=P.yArco+Math.sin(a)*hw;pts.push([x,y,zf(x,y)]);}pts.push([hw,P.yArco,zf(hw,P.yArco)]);pts.push([hw,P.yD,zf(hw,P.yD)]);
+  G.tubo(pts,.06*SP,6,{tampa:true});B.alven.bloco(0,P.chao-.016,P.B-P.esp/2+.06,2*P.hw+.5,.1,P.esp+.5);
+  // pedra de fecho e duas mísulas
+  B.pedra.em(0,P.yTopo+.1,zf(0,P.yTopo)+.03,0,()=>B.pedra.bola(.2,.24,.12,8,5,.6));
+  // lampião pendurado à direita da porta
+  {const x=P.hw+.56,y=P.yTopo+.22,zw=ch880Z(P,x,y,0),T=B.tronco,D=B.escuro;T.tubo([[x,y+.25,zw-.03],[x,y+.52,zw+.2],[x,y+.56,zw+.5],[x,y+.42,zw+.62]],.035*SP*.8,6,{tampa:true});
+    D.tubo([[x,y+.42,zw+.62],[x,y+.2,zw+.62]],.012,4);const yl=y-.06,zl=zw+.62,w=.16*SP;B.vidro.bloco(x,yl,zl,w*.86,.27*SP,w*.86);
+    D.bloco(x,yl+.27*SP/2+.02,zl,w*1.35,.045,w*1.35);D.bloco(x,yl-.27*SP/2-.02,zl,w*1.25,.045,w*1.25);D.em(x,yl+.27*SP/2+.04,zl,Math.PI/4,()=>D.torno([[w*.82,0],[w*.3,.14],[.03,.2]],4));
+    for(const sx of [-1,1])for(const sz of [-1,1])D.bloco(x+sx*w*.47,yl,zl+sz*w*.47,.022,.27*SP,.022);}
+  // banco de jardim à esquerda dos degraus
+  {const R=P.degraus[P.degraus.length-1][0],x=-(R+1.05),z=P.B+.62,T=B.tronco;G.bloco(x,.5,z,1.5,.085,.44,.08,{veio:'x'});for(const s of [-1,1]){T.bloco(x+s*.6,.24,z+s*.05,.1,.48,.4,.08);T.bloco(x+s*.6,.78,z-.2+s*.05,.09,.62,.07,.08,{rx:-.12});}
+    G.bloco(x,.92,z-.235,1.42,.2,.05,.08,{rx:-.12,veio:'x'});G.bloco(x,.68,z-.21,1.42,.1,.05,.08,{rx:-.12,veio:'x'});}
+  // floreiras sob as duas janelas da frente
+  const r=ch880Rnd(8831);for(const jt of (F.floreiras||[])){const y=jt[1]-.31*SP-.2,q=P.pt(jt[0],P.Rx(y),P.Rz(y)),ny=P.nrm(jt[0],P.Rx(y),P.Rz(y)),T=B.tronco;
+    ch880Em(B,q[0]+Math.sin(ny)*.27,y-.19,q[1]+Math.cos(ny)*.27,ny,()=>{T.caixa(1.14,.36,.5);for(const s of [-1,1])T.bloco(s*.4,-.26,-.12,.07,.2,.26,0,{rx:.5});
+      B.escuro.bloco(0,.175,0,1.04,.02,.4);
+      for(let i=0;i<11;i++){const fx=-.47+i*.094+(r()-.5)*.03,fz=(i%2?-.08:.1)+(r()-.5)*.04,h=.2+r()*.2,inc=(r()-.5)*.25;B.musgo.tubo([[fx,.17,fz],[fx+inc*.3,.17+h*.6,fz+.02],[fx+inc,.17+h,fz+.05]],.012,4);
+        for(const sd of [-1,1])B.musgo.em(fx+inc*.3+sd*.05,.17+h*.5,fz+.02,r()*3,()=>B.musgo.bola(.07,.012,.03,6,3),1,0,sd*.5);
+        B.flor.cor=ch880Cor([0xe5b072,0xe6d19e,0xb98fbb,0xe5b072,0xd97f6a][i%5]);for(let pe=0;pe<5;pe++){const a=pe/5*6.2832;B.flor.em(fx+inc+Math.cos(a)*.045,.17+h+.01,fz+.05+Math.sin(a)*.045,a,()=>B.flor.bola(.04,.016,.03,5,2));}
+        B.flor.cor=ch880Cor(0xf2d77a);B.flor.em(fx+inc,.17+h+.022,fz+.05,0,()=>B.flor.bola(.022,.018,.022,5,2));}});}}
+// ---------- o interior: sala oval de pé-direito alto, mobiliada no tamanho de gente ----------
+const CH880_TOM={noz:[.40,.28,.20],mel:[.66,.50,.35],claro:[.86,.72,.52],forro:[.46,.35,.27],vinho:[.52,.15,.14],verde:[.20,.36,.25],mostarda:[.80,.60,.24],azul:[.24,.36,.52],creme:[.90,.84,.70],cru:[.72,.64,.50],latao:[.78,.60,.25],barro:[.62,.33,.22]};
+// caixa de cantos redondos (almofadas, colchão)
+function ch880Fofo(A,w,h,d,e){A.bola(w/2,h/2,d/2,12,6,e||.5);}
+// ponto e ângulo de um móvel encostado na parede de dentro no ângulo t (em graus), afastado `dist` da face
+function ch880Enc(P,tg,dist,y){const t=tg*Math.PI/180,yy=y===undefined?P.chao+1:y,rx=P.Rx(yy)-P.esp,rz=P.Rz(yy)-P.esp,q=P.pt(t,rx,rz),ny=P.nrm(t,rx,rz);return {x:q[0]-Math.sin(ny)*dist,z:q[1]-Math.cos(ny)*dist,ry:ny+Math.PI,ny};}
+function ch880Vela(B,x,y,z,h,r){const O=B.obj;O.cor=CH880_TOM.creme;O.em(x,y,z,0,()=>O.torno([[r,0],[r,h],[r*.3,h+.008]],8));B.vela.em(x,y+h+.012,z,0,()=>B.vela.bola(r*.7,r*1.9,r*.7,6,4));}
+function ch880Castical(B,x,y,z,h){const O=B.obj;O.cor=CH880_TOM.latao;O.em(x,y,z,0,()=>O.torno([[.075,0],[.07,.012],[.02,.03],[.016,h*.5],[.03,h*.55],[.016,h*.6],[.018,h],[.05,h+.012],[.05,h+.03]],10));ch880Vela(B,x,y+h+.02,z,.17,.021);}
+function ch880Livro(B,x,y,z,ry,w,h,d,cor){const O=B.obj;O.cor=cor;O.bloco(x,y+h/2,z,w,h,d,ry);O.cor=CH880_TOM.creme;O.bloco(x+Math.cos(ry)*.004,y+h/2,z-Math.sin(ry)*.004,w-.012,h-.016,d+.004,ry);}
+// janela vista de dentro: vidro aceso, aro, cruzeta, peitoril e (nas de baixo) cortinas
+function ch880JanelaDentro(B,P,t,y,cortina,k){const yy=y,rx=P.Rx(yy)-P.esp,rz=P.Rz(yy)-P.esp,q=P.pt(t,rx,rz),ny=P.nrm(t,rx,rz),r=.3*P.SP*(k||1);
+  ch880Em(B,q[0]-Math.sin(ny)*.03,yy,q[1]-Math.cos(ny)*.03,ny+Math.PI,()=>{B.vidro.em(0,0,.012,0,()=>B.vidro.disco(r,r,20,0),1,Math.PI/2);
+    const M=B.movel;M.cor=CH880_TOM.noz;const pr=[];for(let i=0;i<=20;i++){const a=i/20*6.2832;pr.push([Math.cos(a)*(r+.02),Math.sin(a)*(r+.02),.03]);}M.tubo(pr,.05,6);
+    M.bloco(0,0,.035,.045,2*r,.03);M.bloco(0,0,.035,2*r,.045,.03);M.bloco(0,-r-.1,.1,2*r+.36,.06,.24,0,{veio:'x'});
+    if(cortina){const V=B.escuro;V.tubo([[-r-.42,r+.2,.12],[r+.42,r+.2,.12]],.018,5,{tampa:true});const C=B.pano;C.cor=cortina;const o0=C.uvo;C.uvo=[.5,0];
+      for(const s of [-1,1])C.grade(7,6,(u,v)=>{const aperto=1-.55*Math.sin(Math.min(1,v*1.25)*Math.PI)*.75,x=s*(r+.42-u*.46*aperto);return [x,r+.2-v*(2*r+.62),.12+Math.sin(u*9.42)*.035+.02,u*.22,v*.9];});
+      C.uvo=o0;}});}
+function* ch880InteriorG(B,P,F,AN,MAT){const I={obst:[],moedas:[],soltos:[],fogo:[],luz:null},c0=P.chao,ai=P.ai,bi=P.bi,M=B.movel,O=B.obj,PA=B.pano,TOM=CH880_TOM,r=ch880Rnd(8841);
+  const ob=(x,z,rr)=>I.obst.push([x,z,rr]);B.piso.uvk=1/1.25;
+  // parede de dentro, piso, forro de tábuas e vigas
+  ch880Parede(B.reboco,P,P.esp,true,P.teto+.02);{const k=B.piso.uvk;B.piso.grade(48,7,(u,v)=>{const t=u*2*Math.PI,x=Math.sin(t)*(ai+.12)*v,z=Math.cos(t)*(bi+.12)*v;return [x,c0,z,x*k,z*k];},{vira:true});}
+  M.cor=TOM.forro;M.disco(P.Rx(P.teto)-P.esp+.05,P.Rz(P.teto)-P.esp+.05,40,P.teto-.012,true);
+  {const rxT=P.Rx(P.teto)-P.esp,rzT=P.Rz(P.teto)-P.esp;M.cor=TOM.noz;for(const zf of [-.56,0,.56]){const z=zf*rzT,L=2*rxT*Math.sqrt(1-zf*zf)+.2;M.bloco(0,P.teto-.19,z,L,.34,.28,0,{faces:['-y','+z','-z'],veio:'x'});
+      for(const s of [-1,1]){const xe=s*(L/2-.42);M.em(xe,P.teto-.5,z,0,()=>M.caixa(.7,.16,.2,{faces:['-y','+z','-z','+y'],veio:'x'}),1,0,s*.75);}}
+    M.cor=TOM.mel;const nj=Math.max(5,Math.round(2*rxT/1.15));for(let i=0;i<nj;i++){const x=-rxT+(i+.5)*2*rxT/nj,L=2*rzT*Math.sqrt(Math.max(.05,1-(x/rxT)*(x/rxT)))+.1;M.bloco(x,P.teto-.085,0,.13,.15,L,0,{faces:['-y','+x','-x'],veio:'z'});}}
+  yield 'forro';
+  // lambris de tábuas a prumo e o friso
+  {const h=1.08,ins=P.esp+.028,k=M.uvk,dP=Math.asin((P.hw+.16)/ai),tl=P.lt,dl=1.36/((ai+bi)/2);M.cor=TOM.mel;
+    const faixa=(t0,t1)=>{const n=Math.max(3,Math.round((t1-t0)/(Math.PI/40)));M.grade(n,1,(u,v)=>{const t=t0+(t1-t0)*u,y=c0+h*v,q=P.pt(t,P.Rx(y)-ins,P.Rz(y)-ins);return [q[0],y,q[1],y*k*1.0,t*ai*k*.92];},{vira:true});
+      M.grade(n,1,(u,v)=>{const t=t0+(t1-t0)*u,y=c0+h,q=P.pt(t,P.Rx(y)-ins-.045*v,P.Rz(y)-ins-.045*v);return [q[0],y+.06,q[1],t*ai*k,v*.05*k];});
+      M.grade(n,1,(u,v)=>{const t=t0+(t1-t0)*u,y=c0+h+.06-.11*v,q=P.pt(t,P.Rx(y)-ins-.045,P.Rz(y)-ins-.045);return [q[0],y,q[1],t*ai*k,v*.11*k];});};
+    faixa(dP,tl-dl);faixa(tl+dl,2*Math.PI-dP);}
+  {const ins=P.esp+.05,cinta=(y,h)=>{const n=72;for(let i=0;i<n;i++){const ta=i/n*2*Math.PI,tb=(i+1)/n*2*Math.PI,Q=(t,yy,o)=>{const q=P.pt(t,P.Rx(yy)-o,P.Rz(yy)-o);return [q[0],yy,q[1]];};
+      const a0=Q(ta,y-h/2,ins),b0=Q(tb,y-h/2,ins),a1=Q(ta,y+h/2,ins),b1=Q(tb,y+h/2,ins);M.quad(b0,a0,a1,b1);M.quad(Q(tb,y-h/2,P.esp-.02),Q(ta,y-h/2,P.esp-.02),a0,b0);M.quad(b1,a1,Q(ta,y+h/2,P.esp-.02),Q(tb,y+h/2,P.esp-.02));}};
+    M.cor=TOM.noz;cinta(P.yCinta,.2);cinta(P.teto-.42,.2);
+    for(const t of AN.esteios){const y0=c0+1.14,y1=P.teto-.5,p0=P.pt(t,P.Rx(y0)-ins+.02,P.Rz(y0)-ins+.02),p1=P.pt(t,P.Rx(y1)-ins+.02,P.Rz(y1)-ins+.02),ny=P.nrm(t,P.A,P.B),len=Math.hypot(p1[0]-p0[0],y1-y0,p1[1]-p0[1]),inc=Math.atan2(Math.hypot(p1[0]-p0[0],p1[1]-p0[1]),y1-y0);
+      if(Math.abs(t-P.lt)<1.45/((ai+bi)/2))continue;M.em((p0[0]+p1[0])/2,(y0+y1)/2,(p0[1]+p1[1])/2,ny+Math.PI,()=>M.caixa(.2,len,.1,{faces:['+z','+x','-x'],veio:'y'}),1,inc,0);}}
+  yield 'lambris';for(const t of AN.baixo){ch880JanelaDentro(B,P,t,P.yJ1,Math.abs(Math.abs(t)-Math.PI)<.01?TOM.mostarda:TOM.vinho);if(ch880Passou())yield 'janela de dentro';}for(const t of AN.cima){ch880JanelaDentro(B,P,t,P.yJ2,null);if(ch880Passou())yield 'janela de dentro';}yield 'janelas de dentro';
+  // ----- lareira de pedra na parede da direita (a chaminé sobe por ela) -----
+  {const A=B.alvenI,W=2.5,D=1.02,vao=1.38,hv=1.28,hm=1.78,pe=P.teto-c0;
+    ch880Em(B,P.lqx,c0,P.lqz,P.lry,()=>{const pil=(W-vao)/2;
+      for(const s of [-1,1])A.bloco(s*(vao/2+pil/2),hm/2,D/2,pil,hm,D,0,{faces:['+z','+x','-x']});
+      // verga em arco abatido
+      A.grade(10,1,(u,v)=>{const x=-vao/2+vao*u,ya=hv-.24+.24*Math.sin(u*Math.PI);return [x,ya+(hm-ya)*v,D,x*A.uvk,(ya+(hm-ya)*v)*A.uvk];});
+      A.grade(10,1,(u,v)=>{const x=-vao/2+vao*u,ya=hv-.24+.24*Math.sin(u*Math.PI);return [x,ya,D-.5*v,x*A.uvk,v*.5*A.uvk];},{vira:true});
+      B.escuro.bloco(0,hm/2,.2,vao,hm,.04,0,{faces:['+z']});B.escuro.bloco(0,.02,.6,vao,.04,.9,0,{faces:['+y']});
+      // consolo de madeira e o peito da chaminé, que afunila até o forro
+      M.cor=TOM.noz;M.bloco(0,hm+.08,D/2+.1,W+.5,.16,D+.34,0,{veio:'x'});for(const s of [-1,1])M.bloco(s*(W/2-.18),hm-.16,D+.07,.16,.32,.2,0,{rx:0});
+      const y1=hm+.16,w1=W*.86,w2=W*.56,d2=D*.72;const cs=(w,d,y)=>[[-w/2,y,0],[w/2,y,0],[w/2,y,d],[-w/2,y,d]];const a=cs(w1,D*.94,y1),b=cs(w2,d2,pe+.03);
+      A.quad(a[3],a[2],b[2],b[3]);A.quad(a[2],a[1],b[1],b[2]);A.quad(a[0],a[3],b[3],b[0]);
+      // soleira da lareira e o braseiro
+      A.em(0,0,D-.05,0,()=>{A.disco(1.55,.95,16,.055,false,-Math.PI/2,Math.PI/2);A.grade(16,1,(u,v)=>{const an=-Math.PI/2+u*Math.PI;return [Math.sin(an)*1.55,.055-.06*v,Math.cos(an)*.95,an*A.uvk,v*.06*A.uvk];},{vira:true});});
+      const T=B.tronco;for(const [lx,lz,ry,ln] of [[-.2,.55,.25,.8],[.22,.6,-.3,.76],[0,.5,1.45,.7]])T.em(lx,.2+(ry>1?.13:0),lz,ry,()=>T.tubo([[-ln/2,0,0],[ln/2,0,0]],.085,7,{tampa:true}));
+      for(const s of [-1,1]){B.escuro.bloco(s*.42,.09,.55,.035,.18,.6);B.escuro.bloco(s*.42,.3,.84,.035,.36,.035);}
+      B.vidro.em(0,.11,.55,0,()=>B.vidro.bola(.42,.07,.28,10,4));
+      // sobre o consolo: dois castiçais, um relógio e uma guirlanda na pedra
+      const ym=hm+.16;ch880Castical(B,-1.05,ym,D*.62,.24);ch880Castical(B,1.05,ym,D*.62,.24);
+      O.cor=TOM.noz;O.bloco(0,ym+.17,D*.6,.3,.34,.14);O.cor=TOM.creme;O.em(0,ym+.2,D*.6+.073,0,()=>O.disco(.1,.1,12,0),1,Math.PI/2);O.cor=TOM.latao;O.em(0,ym+.34,D*.6,Math.PI/4,()=>O.torno([[.2,0],[.03,.1]],4));
+      const Mu=B.musgo,pr=[];for(let i=0;i<=16;i++){const an=i/16*6.2832;pr.push([Math.cos(an)*.34,ym+1.25+Math.sin(an)*.34,D*.9+.02]);}Mu.tubo(pr,.075,6);
+      O.cor=[.7,.12,.1];for(let i=0;i<9;i++){const an=i/9*6.2832+.3;O.em(Math.cos(an)*.34,ym+1.25+Math.sin(an)*.34,D*.9+.09,0,()=>O.bola(.035,.035,.035,6,4));}
+      // lenha empilhada e o atiçador
+      for(let i=0;i<7;i++){const fi=i<4?0:1,ci=i<4?i:i-4;T.em(-W/2-.4,.1+fi*.19,.2+ci*.2+fi*.1,Math.PI/2+.05*(i%3-1),()=>T.tubo([[-.3,0,0],[.3,0,0]],.095,7,{tampa:true}));}
+      B.escuro.tubo([[W/2+.26,0,.34],[W/2+.26,.95,.3],[W/2+.2,1.0,.3]],.014,5);B.escuro.bloco(W/2+.26,.02,.34,.2,.04,.2);});
+    // o fogo (três línguas que tremem) e o clarão no chão: malhas à parte, animadas
+    for(let k=0;k<3;k++){const g=new THREE.BufferGeometry(),p=[],cc=[],ix=[];const n=k===1?5:4;
+      for(let f=0;f<n;f++){const fx=(f-(n-1)/2)*.2+(r()-.5)*.08,fz=(r()-.5)*.18,h=.42+r()*.38+(k===1?.2:0),w=.11+r()*.07,ang=r()*3.14;
+        for(const pl of [0,1]){const ca=Math.cos(ang+pl*1.57),sa=Math.sin(ang+pl*1.57),b=p.length/3;const perf=[[0,0,1],[.9,.2,1],[1,.45,.85],[.62,.78,.5],[.2,1,.12]];
+          for(const [ww,hh,q] of perf)for(const s of [-1,1]){p.push(fx+ca*w*ww*s,h*hh,fz+sa*w*ww*s);const e=q*q;cc.push(1*q+.25*(1-q),.2+.7*e,.05+.35*e*e);}
+          for(let j=0;j<perf.length-1;j++){const a0=b+j*2;ix.push(a0,a0+1,a0+2,a0+1,a0+3,a0+2);}}}
+      g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(p),3));g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(cc),3));g.setIndex(ix);g.computeBoundingSphere();
+      const m=new THREE.Mesh(g,MAT.fogo);m.name='ch880 · fogo da lareira '+(k+1);{const q=P.lar((k-1)*.03,.56);m.position.set(q[0],c0+.16,q[1]);}m.rotation.y=P.lry;m.userData.noCam=true;m.userData.ch880=true;m.userData.fx=true;m.userData.papelKeep=true;m.userData.papelKeepGeo=true;m.__fusaoMoveu=9;m.castShadow=false;m.receiveShadow=false;m.renderOrder=3;I.soltos.push(m);I.fogo.push({m,ph:k*2.1,v:7+k*2.3});}
+    {const g=new THREE.BufferGeometry(),p=[0,0,.25],cc=[1,.62,.3],ix=[],n=16;for(let i=0;i<=n;i++){const an=i/n*Math.PI;p.push(Math.cos(an)*2.1,0,Math.sin(an)*2.5);cc.push(0,0,0);}for(let i=0;i<n;i++)ix.push(0,i+2,i+1);
+      g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(p),3));g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(cc),3));g.setIndex(ix);g.computeBoundingSphere();
+      const m=new THREE.Mesh(g,MAT.luz);m.name='ch880 · clarão da lareira';{const q=P.lar(0,D-.1);m.position.set(q[0],c0+.03,q[1]);}m.rotation.y=P.lry;m.userData.noCam=true;m.userData.ch880=true;m.userData.fx=true;m.userData.papelKeep=true;m.userData.papelKeepGeo=true;m.__fusaoMoveu=9;m.castShadow=false;m.receiveShadow=false;m.renderOrder=2;I.soltos.push(m);I.luz=m;}
+    for(const [lx,lz,rr] of [[0,.5,.82],[-.98,.42,.56],[.98,.42,.56],[-W/2-.4,.34,.4]]){const q=P.lar(lx,lz);ob(q[0],q[1],rr);}}
+  yield 'lareira';
+  // ----- duas poltronas diante do fogo, tapete redondo, mesinha -----
+  {const D=1.02,rr=Math.min(1.35,ai*.29),rc=P.lar(0,D+1.22);const o0=PA.uvo;PA.cor=[.42,.62,.60];PA.em(rc[0],c0+.014,rc[1],0,()=>{const b=PA.v(0,0,0,.25,.5),n=28,b0=PA.p.length/3;for(let i=0;i<=n;i++){const a=i/n*6.2832;PA.v(Math.sin(a)*rr,0,Math.cos(a)*rr,.25+Math.sin(a)*.21,.5+Math.cos(a)*.42);}for(let i=0;i<n;i++)PA.t(b,b0+i,b0+i+1);});
+    const pol=(x,z,ry,cor,manta)=>{ch880Em(B,x,c0,z,ry,()=>{M.cor=TOM.noz;for(const sx of [-1,1])for(const sz of [-1,1])M.bloco(sx*.33,.11,sz*.3,.07,.22,.07,0,{veio:'y'});M.bloco(0,.24,0,.8,.06,.74,0,{veio:'x'});
+        PA.cor=cor;PA.uvo=[.5,0];PA.em(0,.4,.03,0,()=>ch880Fofo(PA,.66,.26,.62,.45));PA.em(0,.86,-.3,0,()=>ch880Fofo(PA,.7,.9,.22,.5),1,-.16);for(const s of [-1,1])PA.em(s*.39,.55,.02,0,()=>ch880Fofo(PA,.17,.36,.68,.5));
+        PA.cor=[cor[0]*1.5+.1,cor[1]*1.4+.1,cor[2]*1.3+.08];PA.em(0,.66,-.16,0,()=>ch880Fofo(PA,.36,.34,.14,.6),1,-.3);
+        if(manta){PA.cor=manta;PA.em(.39,.75,.05,0,()=>ch880Fofo(PA,.2,.06,.5,.6));PA.em(.5,.56,.05,0,()=>ch880Fofo(PA,.05,.34,.46,.6));}PA.uvo=[0,0];});ob(x,z,.5);};
+    // as poltronas olham para o fogo (o referencial da lareira: x ao longo da parede, z para a sala)
+    {const a=P.lar(-1.22,D+1.62),b=P.lar(1.22,D+1.62);pol(a[0],a[1],P.lry+Math.PI+.4,TOM.verde,TOM.mostarda);pol(b[0],b[1],P.lry+Math.PI-.4,TOM.vinho,null);}PA.uvo=o0;
+    const mq=P.lar(1.95,D+2.3),mx=mq[0],mz=mq[1];M.cor=TOM.mel;M.em(mx,c0,mz,0,()=>M.torno([[.19,0],[.16,.03],[.035,.06],[.03,.5],[.05,.56],[.3,.58],[.31,.62],[0,.62]],14));
+    ch880Livro(B,mx-.04,c0+.62,mz+.03,.4,.2,.035,.15,TOM.azul);O.cor=TOM.creme;O.em(mx+.12,c0+.62,mz-.1,0,()=>O.torno([[.03,0],[.045,.01],[.05,.06],[.04,.06],[.035,.012],[0,.012]],10));ob(mx,mz,.33);
+    I.moedas.push(P.lar(0,D+1.15));}
+  yield 'poltronas';
+  // ----- mesa comprida de cavaletes com bancos, sobre um tapete -----
+  {const mx=-ai*.30,mz=-.02*bi,L=Math.min(2.9,bi*.72),Wm=1.02;const o0=PA.uvo;PA.cor=[.80,.34,.28];PA.em(mx,c0+.013,mz,0,()=>PA.quad([-1.25,0,L/2+.55],[1.25,0,L/2+.55],[1.25,0,-L/2-.55],[-1.25,0,-L/2-.55],[[0,0],[.5,0],[.5,1],[0,1]]));
+    ch880Em(B,mx,c0,mz,0,()=>{M.cor=TOM.mel;for(let i=0;i<3;i++)M.bloco((i-1)*Wm/3,.9,0,Wm/3-.008,.075,L,0,{veio:'z'});M.cor=TOM.noz;for(const s of [-1,1])M.bloco(0,.9,s*(L/2+.045),Wm+.02,.085,.09,0,{veio:'x'});
+      for(const s of [-1,1]){const z=s*(L/2-.42);for(const q of [-1,1])M.em(q*.2,.43,z,0,()=>M.caixa(.085,.92,.12,{veio:'y'}),1,0,q*.42);M.bloco(0,.84,z,.84,.07,.14,0,{veio:'x'});M.bloco(0,.05,z,.92,.08,.14,0,{veio:'x'});}
+      M.bloco(0,.34,0,.07,.13,L-.6,0,{veio:'z'});
+      // bancos
+      M.cor=TOM.mel;for(const s of [-1,1]){const x=s*(Wm/2+.34);M.bloco(x,.5,0,.36,.06,L-.2,0,{veio:'z'});M.cor=TOM.noz;for(const q of [-1,1]){M.bloco(x,.24,q*(L/2-.5),.3,.47,.06,0,{veio:'y'});}M.bloco(x,.2,0,.05,.09,L-1.0,0,{veio:'z'});M.cor=TOM.mel;}
+      // sobre a mesa: caminho de pano, castiçais, fruteira, pão, canecas, jarro, livros
+      PA.cor=TOM.vinho;PA.uvo=[.5,0];PA.bloco(0,.944,0,.34,.008,L+.5,0,{faces:['+y']});for(const s of [-1,1])PA.bloco(0,.84,s*(L/2+.094),.34,.2,.006,0,{faces:['+z','-z']});PA.uvo=[0,0];
+      ch880Castical(B,0,.948,-.55,.27);ch880Castical(B,0,.948,.55,.27);
+      O.cor=TOM.barro;O.em(0,.948,0,0,()=>O.torno([[.07,0],[.1,.02],[.2,.1],[.21,.115],[.18,.1],[.08,.03],[0,.03]],14));
+      for(const [ax,az,cl] of [[.06,.03,[.72,.14,.12]],[-.07,.05,[.62,.6,.2]],[0,-.08,[.75,.2,.14]],[.02,.02,[.8,.5,.15]]])O.cor=cl,O.em(ax,1.06+(ax===.02?.07:0),az,0,()=>O.bola(.055,.052,.055,8,5));
+      O.cor=[.72,.5,.26];O.em(-.22,.99,.95,.5,()=>O.bola(.2,.075,.11,10,5,.8));O.cor=TOM.claro;O.bloco(-.2,.955,.95,.56,.02,.34,.5);
+      for(const [cx2,cz2] of [[.3,.85],[-.28,-.38],[.3,-.95],[-.3,.3]]){O.cor=TOM.latao;O.em(cx2,.948,cz2,0,()=>O.torno([[.045,0],[.05,.1],[.045,.11],[.04,.11],[.04,.02],[0,.02]],10));O.em(cx2+.06,.99,cz2,0,()=>O.tubo([[0,.04,0],[.035,.03,0],[.035,-.02,0],[0,-.03,0]],.008,4));}
+      O.cor=TOM.creme;O.em(.28,.948,.25,0,()=>O.torno([[.06,0],[.1,.08],[.11,.16],[.06,.22],[.055,.3],[.07,.31],[.05,.3],[.0,.3]],12));O.em(.36,1.1,.25,0,()=>O.tubo([[0,.1,0],[.07,.08,0],[.08,-.02,0],[.02,-.06,0]],.012,5));
+      ch880Livro(B,-.27,.948,-1.0,.2,.26,.04,.19,TOM.verde);ch880Livro(B,-.26,.988,-1.01,-.1,.23,.035,.17,TOM.vinho);ch880Livro(B,-.27,1.023,-.99,.35,.2,.03,.15,TOM.mostarda);
+      for(const [px,pz] of [[-.3,.62],[.3,-.42]]){O.cor=TOM.creme;O.em(px,.95,pz,0,()=>O.torno([[.06,0],[.13,.012],[.14,.02],[.12,.014],[0,.01]],14));}});
+    for(const dz of [-1,0,1])ob(mx,mz+dz*(L/2-.5),.98);I.moedas.push([mx-1.45,mz-.2]);}
+  yield 'mesa';
+  // ----- estantes de livros na parede da esquerda, com escada de mão -----
+  {const est=(tg,escada)=>{const e=ch880Enc(P,tg,.03),W=1.9,H=2.95,D=.36;ch880Em(B,e.x,c0,e.z,e.ry,()=>{M.cor=TOM.noz;for(const s of [-1,1])M.bloco(s*(W/2-.03),H/2,D/2,.06,H,D,0,{veio:'y'});M.bloco(0,H-.03,D/2,W,.06,D+.04,0,{veio:'x'});M.bloco(0,.07,D/2,W,.14,D,0,{veio:'x'});
+        M.bloco(0,H+.05,D/2+.02,W+.12,.07,D+.1,0,{veio:'x'});B.escuro.bloco(0,H/2,.02,W-.1,H-.1,.02,0,{faces:['+z']});
+        const np=6,hp=(H-.2)/np;for(let i=0;i<np;i++){const y=.14+i*hp;M.cor=TOM.mel;if(i)M.bloco(0,y,D/2,W-.12,.035,D-.02,0,{veio:'x'});
+          const hl=hp*.8,u0=r()*.5,L=B.livros;L.quad([-W/2+.07,y+.02,D-.06],[W/2-.07,y+.02,D-.06],[W/2-.07,y+.02+hl,D-.06],[-W/2+.07,y+.02+hl,D-.06],[[u0,(i%2)*.5+.01],[u0+.8,(i%2)*.5+.01],[u0+.8,(i%2)*.5+.49],[u0,(i%2)*.5+.49]]);
+          B.escuro.quad([-W/2+.07,y+.02+hl,D-.06],[W/2-.07,y+.02+hl,D-.06],[W/2-.07,y+.02+hl,.03],[-W/2+.07,y+.02+hl,.03]);}
+        // em cima: livros deitados, um vaso de hera e um lampião
+        ch880Livro(B,-.5,H+.085,D/2,.1,.3,.05,.2,TOM.vinho);ch880Livro(B,-.5,H+.135,D/2,-.15,.26,.04,.18,TOM.azul);O.cor=TOM.barro;O.em(.45,H+.085,D/2,0,()=>O.torno([[.07,0],[.1,.12],[.11,.13],[.09,.12],[0,.11]],10));
+        for(let i=0;i<7;i++)B.musgo.em(.45+(r()-.5)*.2,H+.2+r()*.1,D/2+(r()-.5)*.16+ (i>4?.1:0),r()*3,()=>B.musgo.bola(.07,.045,.055,6,4));for(let i=0;i<3;i++)B.musgo.tubo([[.45+i*.05,H+.2,D/2+.08],[.5+i*.07,H+.05,D/2+.2],[.52+i*.09,H-.25-i*.1,D/2+.21]],.012,4);
+        if(escada){M.cor=TOM.claro;for(const s of [-1,1])M.em(.35+s*.22,1.35,D+.36,0,()=>M.caixa(.05,2.8,.06,{veio:'y'}),1,-.22);for(let i=0;i<7;i++){const yy=.25+i*.38;M.bloco(.35,yy,D+.66-yy*.223,.44,.04,.05,0,{veio:'x'});}}});
+      const tx=Math.cos(e.ny),tz=-Math.sin(e.ny);for(const s of [-1,1])ob(e.x+tx*s*.52-Math.sin(e.ny)*.22,e.z+tz*s*.52-Math.cos(e.ny)*.22,.62);if(escada)ob(e.x+tx*(-.35)-Math.sin(e.ny)*.75,e.z+tz*(-.35)-Math.cos(e.ny)*.75,.34);};
+    est(-97,false);est(-124,true);}
+  yield 'estantes';
+  // ----- canto de leitura no fundo: banco de janela com almofadas, mesinha com lampião, tapete -----
+  {const e=ch880Enc(P,180,.02),Wb=Math.min(2.5,ai*.56);const o0=PA.uvo;PA.cor=[.36,.46,.66];PA.em(e.x+.55,c0+.017,e.z+1.2,0,()=>PA.quad([-1.2,0,.55],[1.2,0,.55],[1.2,0,-.55],[-1.2,0,-.55],[[0,.1],[0,.9],[.5,.9],[.5,.1]]));
+    ch880Em(B,e.x,c0,e.z,e.ry,()=>{M.cor=TOM.mel;M.bloco(0,.24,.33,Wb,.48,.66,0,{veio:'x'});M.cor=TOM.noz;for(let i=0;i<4;i++)M.bloco(-Wb/2+(i+.5)*Wb/4,.25,.665,Wb/4-.12,.3,.02,0,{faces:['+z'],veio:'y'});M.bloco(0,.49,.35,Wb+.06,.04,.72,0,{veio:'x'});
+      for(const s of [-1,1])M.bloco(s*(Wb/2+.03),.75,.34,.07,1.5,.7,0,{veio:'y'});
+      PA.uvo=[.5,0];PA.cor=TOM.mostarda;PA.em(0,.585,.35,0,()=>ch880Fofo(PA,Wb-.08,.17,.62,.42));
+      for(const [px,cl,rz2] of [[-Wb/2+.3,TOM.vinho,.5],[-Wb/2+.62,TOM.azul,.2],[Wb/2-.32,TOM.verde,-.45],[Wb/2-.66,TOM.creme,-.15]]){PA.cor=cl;PA.em(px,.86,.2,0,()=>ch880Fofo(PA,.44,.42,.16,.55),1,-.35,rz2*.4);}
+      PA.cor=[.62,.24,.2];PA.em(.12,.7,.5,.2,()=>ch880Fofo(PA,.52,.1,.4,.6));PA.uvo=[0,0];
+      ch880Livro(B,-.22,.68,.47,.5,.24,.035,.17,TOM.azul);});
+    ob(e.x-.75,e.z+.36,.6);ob(e.x,e.z+.34,.6);ob(e.x+.75,e.z+.36,.6);
+    // mesinha redonda com o lampião da casa, livros e uma caneca
+    const mx=e.x-Wb/2-.62,mz=e.z+1.05;M.cor=TOM.mel;M.em(mx,c0,mz,0,()=>M.torno([[.24,0],[.2,.035],[.045,.07],[.04,.55],[.07,.61],[.4,.63],[.41,.67],[0,.67]],16));
+    B.vidro.bloco(mx+.08,c0+.67+.19,mz-.05,.17,.3,.17);B.escuro.bloco(mx+.08,c0+.67+.36,mz-.05,.24,.04,.24);B.escuro.bloco(mx+.08,c0+.67+.02,mz-.05,.23,.04,.23);B.escuro.em(mx+.08,c0+.67+.38,mz-.05,Math.PI/4,()=>B.escuro.torno([[.16,0],[.04,.1],[.02,.16]],4));
+    for(const sx of [-1,1])for(const sz of [-1,1])B.escuro.bloco(mx+.08+sx*.085,c0+.86,mz-.05+sz*.085,.018,.3,.018);
+    ch880Livro(B,mx-.16,c0+.67,mz+.1,.7,.24,.04,.18,TOM.vinho);ch880Livro(B,mx-.15,c0+.71,mz+.11,.4,.21,.035,.16,TOM.verde);ob(mx,mz,.45);
+    I.chave=[e.x-.7,e.z+1.42];I.moedas.push([e.x+.3,e.z+1.75]);PA.uvo=o0;}
+  yield 'canto de leitura';
+  // ----- cama de hóspede no fundo à direita -----
+  {const e=ch880Enc(P,143,.62);ch880Em(B,e.x,c0,e.z,e.ry+Math.PI/2,()=>{M.cor=TOM.noz;M.bloco(0,.62,-1.0,.07,1.24,1.08,0,{veio:'z'});M.bloco(0,.4,1.0,.07,.8,1.08,0,{veio:'z'});M.cor=TOM.mel;
+      M.bloco(-.5,.3,0,.05,.2,2.0,0,{veio:'z'});M.bloco(.5,.3,0,.05,.2,2.0,0,{veio:'z'});M.bloco(0,.22,0,1.0,.05,1.96,0,{veio:'z'});for(const sx of [-1,1])for(const sz of [-1,1])M.bloco(sx*.5,.1,sz*.98,.08,.2,.08,0,{veio:'y'});
+      const o0=PA.uvo;PA.uvo=[.5,0];PA.cor=TOM.creme;PA.em(0,.42,0,0,()=>ch880Fofo(PA,.98,.26,1.9,.4));PA.em(0,.6,-.7,0,()=>ch880Fofo(PA,.7,.16,.4,.55));
+      PA.uvo=[0,0];PA.cor=[.46,.56,.74];PA.em(0,.47,.28,0,()=>{PA.grade(6,8,(u,v)=>{const x=-.56+1.12*u,z=-.55+1.5*v,y=.12-.11*Math.pow(Math.abs(u-.5)*2,4)+Math.sin(v*14+u*3)*.006;return [x,y,z,.03+u*.44,.05+v*.9];});});PA.uvo=o0;});
+    const tx=Math.cos(e.ny),tz=-Math.sin(e.ny);ob(e.x+tx*.55,e.z+tz*.55,.62);ob(e.x-tx*.55,e.z-tz*.55,.62);}
+  // ----- aparador baixo com louça sob a janela da direita; barril e sacas à esquerda da porta -----
+  {const e=ch880Enc(P,72,.03),W=1.5,H=.98,D=.46;ch880Em(B,e.x,c0,e.z,e.ry,()=>{M.cor=TOM.mel;M.bloco(0,H/2+.04,D/2,W,H-.08,D,0,{veio:'x'});M.cor=TOM.noz;M.bloco(0,H+.02,D/2+.02,W+.1,.05,D+.08,0,{veio:'x'});M.bloco(0,.04,D/2,W-.06,.08,D-.06,0);
+      for(const s of [-1,1]){M.bloco(s*W/4,H/2+.04,D+.012,W/2-.08,H-.24,.024,0,{faces:['+z','+x','-x','+y','-y'],veio:'y'});O.cor=TOM.latao;O.em(s*.07,H/2+.06,D+.04,0,()=>O.bola(.022,.022,.022,6,4));}
+      for(let i=0;i<3;i++){O.cor=TOM.creme;O.em(-.45+i*.3,H+.045+.15,.1,0,()=>O.torno([[0,0],[.13,.0],[.15,.02],[.14,.03],[0,.02]],14),1,Math.PI/2-.25);O.cor=TOM.azul;O.em(-.45+i*.3,H+.045+.15,.118,0,()=>O.torno([[.06,.0],[.1,.0],[.1,.005],[.06,.005]],14),1,Math.PI/2-.25);}
+      O.cor=TOM.barro;O.em(.5,H+.045,.3,0,()=>O.torno([[.07,0],[.12,.1],[.12,.2],[.06,.27],[.05,.33],[.07,.34],[0,.33]],12));ch880Castical(B,-.55,H+.045,.3,.2);O.cor=TOM.claro;O.em(0,H+.045,.33,0,()=>O.torno([[.05,0],[.12,.05],[.14,.07],[.11,.055],[0,.02]],12));});
+    const tx=Math.cos(e.ny),tz=-Math.sin(e.ny);for(const s of [-1,1])ob(e.x+tx*s*.4-Math.sin(e.ny)*.25,e.z+tz*s*.4-Math.cos(e.ny)*.25,.52);
+    I.oleo=[e.x-Math.sin(e.ny)*1.25-tx*.55,e.z-Math.cos(e.ny)*1.25-tz*.55];I.moedas.push([e.x-Math.sin(e.ny)*1.35-tx*1.15,e.z-Math.cos(e.ny)*1.35-tz*1.15]);
+    const b=ch880Enc(P,-58,.52);M.cor=TOM.mel;M.em(b.x,c0,b.z,0,()=>M.torno([[.3,0],[.36,.2],[.39,.45],[.36,.72],[.3,.9],[.27,.9],[.27,.86],[0,.86]],14,{uu:2}));for(const yy of [.14,.34,.6,.8]){const rr=.3+.09*Math.sin(yy/.9*Math.PI)+.012,pr=[];for(let i=0;i<=14;i++){const a=i/14*6.2832;pr.push([b.x+Math.cos(a)*rr,c0+yy,b.z+Math.sin(a)*rr]);}B.escuro.tubo(pr,.014,4);}ob(b.x,b.z,.46);
+    const s1=ch880Enc(P,-40,.5),o0=PA.uvo;PA.uvo=[.5,0];PA.cor=TOM.cru;PA.em(s1.x,c0+.3,s1.z,.4,()=>PA.bola(.34,.32,.27,10,6,.75));PA.em(s1.x+.05,c0+.66,s1.z,.4,()=>PA.bola(.1,.08,.09,8,4));PA.cor=[.6,.52,.4];PA.em(s1.x+.5,c0+.2,s1.z+.38,1.2,()=>PA.bola(.36,.21,.26,10,6,.75));PA.uvo=o0;ob(s1.x+.1,s1.z+.08,.48);
+    I.moedas.push([b.x+.95,b.z-.2]);}
+  // capacho, cabideiro de parede e duas arandelas junto à porta
+  {const o0=PA.uvo;PA.cor=[.55,.42,.3];PA.em(0,c0+.012,bi-.95,0,()=>PA.quad([-.75,0,.45],[.75,0,.45],[.75,0,-.45],[-.75,0,-.45],[[.52,.02],[.98,.02],[.98,.3],[.52,.3]]));PA.uvo=o0;
+    for(const tg of [21,-21,128,-150]){const e=ch880Enc(P,tg,.0,c0+2.25);ch880Em(B,e.x,c0+2.25,e.z,e.ry,()=>{B.escuro.bloco(0,0,.02,.1,.26,.03);B.escuro.tubo([[0,-.06,.03],[0,-.1,.16],[0,-.02,.2]],.014,5);B.escuro.em(0,-.02,.2,0,()=>B.escuro.torno([[.02,0],[.06,.02],[.06,.035],[0,.03]],8));ch880Vela(B,0,.015,.2,.15,.02);});}
+    I.moedas.push([.25,bi-1.55]);}
+  yield 'miudezas de dentro';
+  // ----- lustre de velas pendurado na viga do meio -----
+  {const yl=c0+Math.min(3.5,P.pe*.56),R=.82,E=B.escuro,pr=[];for(let i=0;i<=24;i++){const a=i/24*6.2832;pr.push([Math.cos(a)*R,yl,Math.sin(a)*R]);}E.tubo(pr,.034,6);const pr2=[];for(let i=0;i<=16;i++){const a=i/16*6.2832;pr2.push([Math.cos(a)*R*.42,yl+.02,Math.sin(a)*R*.42]);}E.tubo(pr2,.022,5);
+    for(let i=0;i<4;i++){const a=i/4*6.2832+.39;E.tubo([[Math.cos(a)*R*.42,yl+.02,Math.sin(a)*R*.42],[Math.cos(a)*R,yl,Math.sin(a)*R]],.018,4);E.tubo([[Math.cos(a)*R,yl,Math.sin(a)*R],[Math.cos(a)*.12,yl+.95,Math.sin(a)*.12]],.012,4);}
+    E.em(0,yl+.95,0,0,()=>E.torno([[.04,-.06],[.13,0],[.1,.06],[.03,.1]],8));E.tubo([[0,yl+1.0,0],[0,P.teto-.36,0]],.016,5);
+    for(let i=0;i<8;i++){const a=i/8*6.2832,x=Math.cos(a)*R,z=Math.sin(a)*R;E.em(x,yl+.03,z,0,()=>E.torno([[.02,0],[.06,.025],[.062,.04],[0,.035]],8));ch880Vela(B,x,yl+.065,z,.17,.022);}
+    E.em(0,yl-.02,0,0,()=>E.bola(.07,.09,.07,8,5));}
+  return I;}
+// ---------- o que a casa nova aproveita da de hoje: os materiais da Oficina e a geometria da janela redonda ----------
+function ch880Base(m){try{if(typeof papelBase==='function')return papelBase(m)||m;}catch(e){}return m;}
+function ch880GeoDe(o){try{if(typeof PAPEL_GEO!=='undefined'){const r=PAPEL_GEO.get(o);if(r&&r.g)return r.g;}}catch(e){}return o.geometry;}
+function ch880Casa(sc){let c=null;try{if(typeof f244Casa==='function')c=f244Casa(sc);}catch(e){}if(!c)sc.traverse(o=>{if(!c&&o.isGroup&&/^(Casa grande de colmo|Big thatched house)$/.test(o.name||''))c=o;});return c;}
+function ch880Fontes(sc){const casa=ch880Casa(sc);if(!casa||!casa.parent)return null;const root=casa.parent,S=casa.scale.x||1.5;casa.updateMatrixWorld(true);
+  const F={casa,root,S,mats:{},unicas:[],janela:null,porta:null,janelas:[]};const cx=casa.position.x,cz=casa.position.z;
+  const hex={0x777d70:'stone',0x704b32:'wood',0xb99360:'trim',0xffd38a:'glow',0x35291f:'dark',0x617347:'moss',0xd1ba91:'wall',0xb29861:'roof',0x948168:'soil'};
+  const bx=new THREE.Box3();
+  for(const c of root.children){if(!c.isMesh||!c.geometry||c.userData.ch880)continue;const m=ch880Base(c.material);if(!m||!m.color)continue;const k=hex[m.color.getHex()];const g=ch880GeoDe(c);if(!g.boundingBox)g.computeBoundingBox();bx.copy(g.boundingBox).applyMatrix4(c.matrixWorld);
+    const so=bx.min.x>cx-2.75*S&&bx.max.x<cx+2.75*S&&bx.min.z>cz-2.4*S&&bx.max.z<cz+2.45*S&&bx.max.y<4.3*S;   // a malha é só desta casa
+    if(so){F.unicas.push(c);if(k==='wall'&&m.side===THREE.FrontSide)F.mats.wall=m;else if(k==='wall')F.mats.forro=m;else if(k==='roof')F.mats.roof=m;}
+    else if(k&&k!=='wall'&&k!=='roof'&&!F.mats[k]){F.mats[k]=m;}
+    if(!so&&k&&k!=='wall'&&k!=='roof')(F.fundidas=F.fundidas||[]).push({m:c,k});}
+  for(const c of casa.children){if(c.userData&&c.userData.rig&&c.children.some(d=>d.isMesh)){F.janelas.push(c);}else if(c.children.some(d=>d.userData&&d.userData.rig))F.porta=c;}
+  const J=F.janelas[0];if(J){const partes=[];const kk={stone:'pedra',wood:'tronco',trim:'guarn',glow:'vidro',dark:'escuro',moss:'musgo'};for(const d of J.children){if(!d.isMesh)continue;const m=ch880Base(d.material),k=kk[hex[m.color.getHex()]];if(k)partes.push({k,g:ch880GeoDe(d)});}F.janela={partes};}
+  return F;}
+// ---------- materiais ----------
+function ch880Materiais(T,F){const Std=(o,nome)=>{const m=new THREE.MeshStandardMaterial(o);m.name='ch880 '+nome;return m;};const fm=F.mats,M={};
+  const falta=(k,cor,o)=>fm[k]||Std(Object.assign({color:cor,roughness:.9},o||{}),'(sem a Oficina) '+k);
+  M.parede=falta('wall',0xd1ba91);M.telhado=falta('roof',0xb29861,{side:THREE.DoubleSide});M.pedra=falta('stone',0x777d70);M.tronco=falta('wood',0x704b32,{side:THREE.DoubleSide});M.guarn=falta('trim',0xb99360);
+  M.vidro=falta('glow',0xffd38a,{emissive:0xffb65a,emissiveIntensity:.85,roughness:.45});M.escuro=falta('dark',0x35291f);M.musgo=falta('moss',0x617347);
+  const pano=M.parede.map||null;
+  M.flor=Std({color:0xffffff,vertexColors:true,roughness:.78},'flores');
+  M.alven=Std({color:0xb4aea2,map:T.pedra,bumpMap:T.pedra,bumpScale:.035,roughness:.96},'alvenaria');
+  M.alvenI=Std({color:0xc2b8a8,map:T.pedra,bumpMap:T.pedra,bumpScale:.035,roughness:.96,emissive:0x3a2414,emissiveMap:T.pedra},'alvenaria de dentro');
+  M.reboco=Std({color:0xe2d2b0,map:pano,bumpMap:pano,bumpScale:.012,roughness:.95,emissive:0x33230f,emissiveMap:pano},'reboco de dentro');
+  M.piso=Std({color:0xd6ac78,map:T.tabuas,bumpMap:T.tabuas,bumpScale:.02,roughness:.78,emissive:0x35200f,emissiveMap:T.tabuas},'tábuas do piso');
+  M.movel=Std({color:0xffffff,vertexColors:true,map:T.tabuas,bumpMap:T.tabuas,bumpScale:.012,roughness:.7,emissive:0x2a190c,emissiveMap:T.tabuas},'marcenaria');
+  M.pano=Std({color:0xffffff,vertexColors:true,map:T.pano,roughness:.96,emissive:0x241710,emissiveMap:T.pano,side:THREE.DoubleSide},'panos');
+  M.livros=Std({color:0xffffff,map:T.livros,roughness:.82,emissive:0x2c2118,emissiveMap:T.livros},'lombadas');
+  M.obj=Std({color:0xffffff,vertexColors:true,roughness:.62,emissive:0x1d130a},'miudezas');
+  M.vela=new THREE.MeshBasicMaterial({color:0xffd98a});M.vela.name='ch880 chama das velas';
+  M.fogo=new THREE.MeshBasicMaterial({color:0xffffff,vertexColors:true,transparent:true,opacity:.92,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending});M.fogo.name='ch880 fogo';M.fogo.userData.papelKeep=true;
+  M.luz=new THREE.MeshBasicMaterial({color:0xffb060,vertexColors:true,transparent:true,opacity:.5,depthWrite:false,blending:THREE.AdditiveBlending});M.luz.name='ch880 clarão';M.luz.userData.papelKeep=true;
+  return M;}
+function* ch880Malhas(B,M,G,fora){const L=[];for(const k of Object.keys(B)){const A=B[k];if(!A.i.length)continue;if(ch880Passou())yield 'malha '+k;const o=new THREE.Mesh(A.geo(),M[k]);o.name='ch880 · '+k;o.userData.noCam=!CH880_CAM[k];o.userData.ch880=true;o.userData.papelKeepGeo=true;
+    o.castShadow=!!fora[k];o.receiveShadow=true;o.matrixAutoUpdate=false;o.updateMatrix();G.add(o);L.push(o);}return L;}
+// ---------- a montagem inteira (em fatias): devolve o pacote {P, G (grupo), malhas, obst, moedas, tick…} ----------
+const CH880_FORA={parede:1,telhado:1,pedra:1,tronco:1,guarn:1,vidro:0,escuro:1,musgo:0,flor:0,alven:1};
+// (revisão R1) malhas de DENTRO que seguram a câmera (a colisão da v190, `camHit`): marcenaria (estantes, mesa, bancos, cama, lambri, forro, vigas),
+// lombadas, alvenaria da lareira, reboco de dentro e panos (cortinas, almofadas). Sem isto o braço só parava na elipse da parede e no forro e a
+// câmera terminava dentro/atrás das estantes e da lareira. As de fora continuam `noCam` como as outras casas da vila.
+const CH880_CAM={movel:1,livros:1,alvenI:1,reboco:1,pano:1};
+function ch880Angs(P){const g=Math.PI/180;return {baixo:[36,-36,72,-72,147,-147,180].map(a=>a*g),cima:[0,36,-36,72,-72,147,-147,180,-110].map(a=>a*g),esteios:[13,-13,54,-54,91,-91,127,-127,163.5,-163.5].map(a=>a*g)};}
+function* ch880MontaG(F,P,chaoDe){const t0=ch880Hora();const T=yield* ch880TexturasG();yield 'texturas';const M=ch880Materiais(T,F),B=ch880Baldes(),AN=ch880Angs(P);F.floreiras=[[AN.baixo[0],P.yJ1],[AN.baixo[1],P.yJ1]];
+  ch880Parede(B.parede,P,0,false);ch880Vao(B.parede,P);ch880Sotao(B.parede,P);yield 'parede';
+  const nfe=yield* ch880Telhado(B,P);yield 'telhado';ch880Chamine(B,P);yield 'chaminé';yield* ch880Soco(B,P,chaoDe);yield 'soco';if(CH880.enxaimel)ch880Enxaimel(B,P,AN.esteios);yield 'enxaimel';
+  for(const t of AN.baixo){ch880Janela(B,F,ch880MatJanela(P,t,P.yJ1));if(ch880Passou())yield 'janela';}yield 'janelas';for(const t of AN.cima){ch880Janela(B,F,ch880MatJanela(P,t,P.yJ2));if(ch880Passou())yield 'janela';}yield 'janelas';
+  {const yg=P.teto+(P.cume-P.teto)*.36,k=P.SP*.9;for(const s of [1,-1])ch880Janela(B,F,new THREE.Matrix4().compose(new THREE.Vector3(0,yg,s*(P.bz+.075*P.SP)),new THREE.Quaternion().setFromEuler(new THREE.Euler(0,s>0?0:Math.PI,0)),new THREE.Vector3(k,k,k)));}
+  ch880Miudezas(B,P,F);yield 'miudezas';
+  const I=(typeof ch880InteriorG==='function')?(yield* ch880InteriorG(B,P,F,AN,M)):{obst:[],moedas:[],anim:[]};yield 'interior';
+  const G=new THREE.Group();G.name='Casa grande de colmo ampliada (v880)';G.userData.ch880=true;G.position.set(P.cx,0,P.cz);
+  const malhas=yield* ch880Malhas(B,M,G,CH880_FORA);for(const o of (I.soltos||[])){G.add(o);}G.updateMatrixWorld(true);
+  let tri=0;const por={};for(const o of malhas){const n=o.geometry.index.count/3;tri+=n;por[o.name.replace('ch880 · ','')]=n;}for(const o of (I.soltos||[]))if(o.geometry)tri+=(o.geometry.index?o.geometry.index.count:o.geometry.attributes.position.count)/3;
+  const st={ms:Math.round(ch880Hora()-t0),triangulos:Math.round(tri),malhas:malhas.length+(I.soltos||[]).length,feixes:nfe,por};CH880.stats.montagem=st;
+  return {P,G,M,T,malhas,I,st};}
+// ---------- o mundo: chão, limite de andar, câmera, obstáculos, grade de caminhos ----------
+function ch880Nivel(){try{const F=(typeof window!=='undefined')&&window.__FANT;return F&&F.lvl?F.lvl:0;}catch(e){return 0;}}
+function ch880Nivel0(fn){const F=(typeof window!=='undefined')&&window.__FANT;if(!F||!F.lvl)return fn();const lv=F.lvl;F.lvl=0;try{return fn();}finally{F.lvl=lv;}}
+function ch880Terr(x,z){try{const F=window.__FANT;if(F&&typeof F.terrainH==='function'){const y=F.terrainH(x,z);if(isFinite(y))return y;}}catch(e){}return 0;}
+// chão: o piso da casa (o da v244: `F244.casa.chao`) em toda a planta e a subida dos degraus em meia-lua
+function ch880Chao(P,x,z,y){const lx=x-P.cx,lz=z-P.cz,u=lx/(P.A+.02),w=lz/(P.B+.02);if(u*u+w*w<1)return y>P.chao?y:P.chao;
+  const D=P.degraus;if(!D||!D.length)return y;const dz=lz-P.zDegrau;if(dz<-.7)return y;const d=Math.hypot(lx,dz),r0=D[0][0]-.12,r1=D[D.length-1][0]+.12;if(d>=r1)return y;
+  const h=d<=r0?P.chao:P.chao*(1-(d-r0)/(r1-r0));return y>h?y:h;}
+// limite de andar: o interior inteiro é andável (os fundos passam do limite da vila em z ≈ −64); as paredes são os discos de obstáculo
+function ch880Clamp(P,c0,eu,args,x,z,m){const lx=x-P.cx,lz=z-P.cz,mm=Math.min(m||0,.35),rx=P.ai-mm,rz=P.bi-mm,q=(lx/rx)*(lx/rx)+(lz/rz)*(lz/rz);if(q<=1)return [x,z];
+  const p=c0.apply(eu,args);const qo=(lx/(P.A+.05))*(lx/(P.A+.05))+(lz/(P.B+.05))*(lz/(P.B+.05));
+  // (revisão R6) o limite de antes (a cápsula da sala, raio 21 m em volta de z −43…0) corta os FUNDOS da casa nova: o círculo dele passa por
+  // dentro da sala. Antes, um passo de quem corre por FORA contra a parede nos cantos de trás caía na faixa da parede além da cápsula e era
+  // levado para a elipse de DENTRO — o leitor atravessava a parede (medido a 30 quadros/s, correndo). Agora só vai para dentro o ponto da
+  // metade de DENTRO da parede (quem vem da sala); qualquer outro ponto que o limite de antes poria dentro da casa vai para o CANTO onde a
+  // cápsula sai da casa, do mesmo lado (dentro do limite e por fora da parede).
+  const px=Array.isArray(p)?p[0]:p.x,pz=Array.isArray(p)?p[1]:p.z,mexeu=Math.abs(px-x)>1e-6||Math.abs(pz-z)>1e-6;
+  // na faixa da parede (fora do vão da porta): o passo do LEITOR volta para o lado em que ele estava (dentro: para a sala; fora: a 0,25 m da
+  // face de fora); outro ponto qualquer, pela metade da parede em que caiu. Assim o passo grande de quem corre a poucos quadros/s não «fura»
+  // os discos da parede (antes: a 20 e a 12 quadros/s, correndo, de fora para dentro em qualquer ponto da parede)
+  if(qo<1&&!(lz>0&&Math.abs(lx)<P.hw+.45)){const am=P.A-P.esp/2,bm=P.B-P.esp/2;let lado=0;try{const L=ch880Leitor();if(L&&P.__lado&&Math.hypot(L[0]-x,L[1]-z)<1.5)lado=P.__lado;}catch(e){} // o lado do leitor (o passo dele)
+    if(lado>0||(lado===0&&(lx/am)*(lx/am)+(lz/bm)*(lz/bm)<1)){const k=1/Math.sqrt(q);return [P.cx+lx*k,P.cz+lz*k];}
+    const ao=P.A+.25,bo=P.B+.25,k=1/Math.sqrt((lx/ao)*(lx/ao)+(lz/bo)*(lz/bo)),fx=P.cx+lx*k,fz=P.cz+lz*k,r=c0.call(eu,fx,fz,m,args[3]),rx=Array.isArray(r)?r[0]:r.x,rz=Array.isArray(r)?r[1]:r.z;
+    if(Math.abs(rx-fx)<1e-6&&Math.abs(rz-fz)<1e-6)return [fx,fz];const c=ch880Canto(P,c0,eu,args,lx<0?-1:1,m);if(c)return [c[0],c[1]];return [fx,fz];}
+  if(!mexeu)return p;
+  if(qo<1){const am=P.A-P.esp/2,bm=P.B-P.esp/2;if((lx/am)*(lx/am)+(lz/bm)*(lz/bm)<1){const k=1/Math.sqrt(q);return [P.cx+lx*k,P.cz+lz*k];}}
+  const ux=px-P.cx,uz=pz-P.cz;if((ux/(P.A+.05))*(ux/(P.A+.05))+(uz/(P.B+.05))*(uz/(P.B+.05))<1){const c=ch880Canto(P,c0,eu,args,(lx<0||(lx===0&&ux<0))?-1:1,m);if(c)return [c[0],c[1]];}
+  return p;}
+// (revisão R6) o canto onde a cápsula do limite de antes sai da casa, do lado s (±1): bissecção no ângulo da elipse (A+0,3; B+0,3), da frente
+// (dentro do limite) para os fundos; guardado por lado e margem (a casa e a cápsula não mudam enquanto a troca vale)
+function ch880Canto(P,c0,eu,args,s,m){const C=P.__cantos||(P.__cantos={}),k=s+'|'+(+(m||0)).toFixed(3)+'|'+(args[3]?1:0);if(k in C)return C[k];
+  const ao=P.A+.3,bo=P.B+.3,pt=t=>[P.cx+s*Math.sin(t)*ao,P.cz+Math.cos(t)*bo],ok=t=>{const q=pt(t),r=c0.call(eu,q[0],q[1],m,args[3]),rx=Array.isArray(r)?r[0]:r.x,rz=Array.isArray(r)?r[1]:r.z;return Math.abs(rx-q[0])<1e-6&&Math.abs(rz-q[1])<1e-6;};
+  let a=0,b=Math.PI,res=null;try{if(ok(a)&&!ok(b)){for(let i=0;i<18;i++){const t=(a+b)/2;if(ok(t))a=t;else b=t;}res=pt(a);}}catch(e){res=null;}C[k]=res;return res;}
+// (revisão R6) a posição do leitor (3.ª ou 1.ª pessoa) e o lado da parede em que ele está (1 dentro da sala, −1 fora da casa; na faixa fica o último)
+function ch880Leitor(){try{return (typeof MODE!=='undefined'&&MODE==='fp')?[P.x,P.z]:[CH.x,CH.z];}catch(e){return null;}}
+function ch880Lado(Pm){try{const L=ch880Leitor();if(!L||ch880Nivel())return;const lx=L[0]-Pm.cx,lz=L[1]-Pm.cz;if((lx/Pm.ai)*(lx/Pm.ai)+(lz/Pm.bi)*(lz/Pm.bi)<1)Pm.__lado=1;else if((lx/Pm.A)*(lx/Pm.A)+(lz/Pm.B)*(lz/Pm.B)>1)Pm.__lado=-1;}catch(e){}}
+// câmera (braço de mola): de dentro, para na parede de dentro e no forro; de fora, para na parede — menos pelo vão da porta
+function ch880CamT(P,ox,oy,oz,dx,dy,dz,t){const lx=ox-P.cx,lz=oz-P.cz;
+  const sol=(a,b)=>{const A=dx*dx/(a*a)+dz*dz/(b*b);if(A<1e-9)return null;const Bq=2*(lx*dx/(a*a)+lz*dz/(b*b)),C=lx*lx/(a*a)+lz*lz/(b*b)-1,D=Bq*Bq-4*A*C;if(D<=0)return null;const s=Math.sqrt(D);return [(-Bq-s)/(2*A),(-Bq+s)/(2*A)];};
+  const naPorta=(te)=>{const X=lx+dx*te,Y=oy+dy*te,Z=lz+dz*te;return Z>0&&Math.abs(X)<P.hw-.1&&Y>P.chao-.05&&Y<P.yTopo-.3;};
+  // (revisão R1) a parede de verdade (do reboco à face de fora, com a conicidade) fora do vão em arco, e o forro: a câmera para 0,15 m antes.
+  // Antes, com o leitor NO VÃO (entre as duas faces) ou colado nela por fora, nada segurava a câmera; e o raio que saía/entrava pelo vão na
+  // diagonal atravessava as ombreiras e deixava a câmera do outro lado da parede.
+  const ha=P.hw-.1,marcha=(s0,tt)=>{for(let s=Math.max(.12,s0);s<tt;s+=.05){const X=lx+dx*s,Y=oy+dy*s,Z=lz+dz*s;if(Y<P.yb||Y>P.yt)continue;const ro=P.Rx(Y)+.03,so=P.Rz(Y)+.03;if((X/ro)*(X/ro)+(Z/so)*(Z/so)>=1)continue;
+      const ri=P.Rx(Y)-P.esp-.03,si=P.Rz(Y)-P.esp-.03;if((X/ri)*(X/ri)+(Z/si)*(Z/si)<=1){if(Y>P.teto-.35)return Math.max(.42,s-.15);continue;}
+      if(Z>0&&Math.abs(X)<ha&&(Y<P.yArco||X*X+(Y-P.yArco)*(Y-P.yArco)<ha*ha))continue;return Math.max(.42,s-.15);}return tt;};
+  const ui=lx/P.ai,wi=lz/P.bi;
+  if(ui*ui+wi*wi<1&&oy<P.teto){const s=sol(P.ai-.3,P.bi-.3);if(s&&s[1]>0&&s[1]<t){if(!naPorta(s[1]))t=Math.max(.42,s[1]);else t=marcha(s[1]-.3,t);}if(dy>1e-6){const tc=(P.teto-.45-oy)/dy;if(tc<t)t=Math.max(.42,tc);}return t;}
+  {const ub=lx/(P.A+.25),wb=lz/(P.B+.25);if(ub*ub+wb*wb<=1&&oy<P.ye)return marcha(.12,t);}
+  const uo=lx/P.A,wo=lz/P.B;if(uo*uo+wo*wo>1){const s=sol(P.A+.2,P.B+.2);if(s&&s[0]>0&&s[0]<t){const Y=oy+dy*s[0];if(naPorta(s[0])){t=marcha(s[0]-.05,t);const s2=sol(P.ai-.3,P.bi-.3);if(s2&&s2[1]>s[0]&&s2[1]<t)t=Math.max(.42,s2[1]);}else if(Y<P.ye+.2)t=Math.max(.42,s[0]-.05);}}
+  return t;}
+function ch880MundoInstala(R){if(R.__ch880)return R.__ch880;const W=R.world,st={P:null,ativo:false,clampAntes:W.clamp,clamp:null};
+  try{const c0=W.clamp;W.clamp=function(x,z,m,noLvl){if(st.ativo&&st.P&&(noLvl||!ch880Nivel()))return ch880Clamp(st.P,c0,this,arguments,x,z,m);return c0.apply(this,arguments);};st.clamp=W.clamp;}catch(e){ch880Erro('clamp',e);}
+  try{const t0=W.camT;W.camT=function(ox,oy,oz,dx,dy,dz,dist){const t=t0?t0.apply(this,arguments):dist;if(st.ativo&&st.P&&!ch880Nivel())return ch880CamT(st.P,ox,oy,oz,dx,dy,dz,t);return t;};}catch(e){ch880Erro('camT',e);}
+  try{const f0=R.floorY;if(typeof f0==='function')R.floorY=function(x,z){const y=f0.apply(this,arguments);if(st.ativo&&st.P&&!ch880Nivel())return ch880Chao(st.P,x,z,y);return y;};}catch(e){ch880Erro('floorY',e);}
+  try{const tk=R.tick;R.tick=function(dt){const r=tk?tk.apply(this,arguments):undefined;try{ch880Tick(dt);}catch(e){if(!CH880.erroTick){CH880.erroTick=1;ch880Erro('tique',e);}}return r;};}catch(e){ch880Erro('tick',e);}
+  // (revisão R2) o chão do nível 0 do `keyFloors` (Decorar — `dc8Fits`/`decorPlace128` —, visita, `keyFixedSpot` da chave de prata) era só o
+  // terreno: peça posta dentro da casa nascia 0,54 m abaixo do piso. Embrulha o `keyFloors` (a função da sala devolve objetos novos a cada chamada;
+  // o DEC128 copia os de uma chamada e depois guarda os seus) e marca cada piso embrulhado.
+  try{const kf0=R.keyFloors;if(typeof kf0==='function'){R.keyFloors=function(){const L=kf0.apply(this,arguments);try{ch880PisoChaves(L,st);}catch(e){}return L;};}}catch(e){ch880Erro('keyFloors',e);}
+  R.__ch880=st;return st;}
+function ch880PisoChaves(L,st){if(!Array.isArray(L))return;for(const f of L){if(!f||f.lvl!==0||typeof f.floorY!=='function'||f.__ch880)continue;const f0=f.floorY;
+    f.floorY=function(x,z){const y=f0.apply(this,arguments);return (st.ativo&&st.P)?ch880Chao(st.P,x,z,y):y;};f.__ch880=f0;}}
+// (revisão R2) peças do Decorar já postas (nível 0) onde agora é a casa: sobem com o piso, como unidade; o `desfaz()` devolve
+function ch880Decor(R,P,st,reg){reg.decor=[];try{const D=(typeof DEC128!=='undefined'&&DEC128.rooms)?DEC128.rooms.fant:null;if(!D||!D.placed||D.room!==R)return 0;
+    const kf=R.keyFloors(),f=Array.isArray(kf)?kf.find(q=>q&&q.lvl===0):null;const base=(x,z)=>{try{const f0=f&&f.__ch880;return f0?f0.call(f,x,z):ch880Terr(x,z);}catch(e){return ch880Terr(x,z);}};
+    for(const id in D.placed){const s=D.placed[id];if(!s||!s.g||(s.lvl||0)!==0)continue;const p=s.g.position;if(!ch880NaPlanta(P,p.x,p.z,0))continue;const yb=base(p.x,p.z),d=ch880Chao(P,p.x,p.z,yb)-yb;if(!(d>1e-4))continue;
+      p.y+=d;s.g.updateMatrixWorld(true);reg.decor.push([s.g,d]);}}catch(e){ch880Erro('decorar',e);}return reg.decor.length;}
+// a lista viva de obstáculos do chão (nível 0) e a lista-base (a `FANT_OBST`: o recanto da v355 recopia a viva a cada troca de nível da árvore)
+function ch880Obst(R){let L=null;try{L=ch880Nivel0(()=>R.world.obst);}catch(e){ch880Erro('obst',e);}return Array.isArray(L)?L:null;}
+function ch880ObstFixa(R){try{const kf=(R&&typeof R.keyFloors==='function')?R.keyFloors():null;const f0=Array.isArray(kf)?kf.find(f=>f&&f.lvl===0):null;
+    if(f0){if(Array.isArray(f0.baseObs))return f0.baseObs;const d=f0.world&&Object.getOwnPropertyDescriptor(f0.world,'obst');if(d&&Array.isArray(d.value))return d.value;}}catch(e){}
+  try{return (typeof COZY355!=='undefined'&&COZY355&&Array.isArray(COZY355.obstacles))?COZY355.obstacles:null;}catch(e){return null;}}
+// os obstáculos da casa de hoje (o anel `casa244Anel`, a mesa e o banco), achados pelo lugar: valem para qualquer escala da v564
+function ch880ObstVelhos(L,F){const S=F.S,cx=F.casa.position.x,cz=F.casa.position.z,out=[];if(!L)return out;const kb=S/1.5,rx=1.62*S+.12,rz=1.62*.87*S+.12;
+  for(let i=0;i<L.length;i++){const o=L[i];if(!o||o.ch880)continue;const lx=o[0]-cx,lz=o[1]-cz,rr=o[2];
+    const anel=Math.abs(rr-.42)<.01&&Math.abs(Math.hypot(lx/rx,lz/rz)-1)<.03,mesa=Math.abs(lx)<.02&&Math.abs(lz+.78*S)<.02&&Math.abs(rr-.5*kb)<.02,banco=Math.abs(lx+1.4*S)<.02&&Math.abs(lz-1.85*S)<.02&&Math.abs(rr-.45*kb)<.02;
+    if(anel||mesa||banco)out.push([i,o]);}return out;}
+function ch880ObstNovos(K){const P=K.P,L=[],mk=(x,z,r,q)=>{const o=[P.cx+x,P.cz+z,r];o.ch880=q||1;L.push(o);};
+  const rx=P.A-P.esp/2,rz=P.B-P.esp/2,per=Math.PI*(3*(rx+rz)-Math.sqrt((3*rx+rz)*(rx+3*rz))),n=Math.max(24,Math.round(per/.5));
+  for(let i=0;i<n;i++){const t=(i+.5)/n*2*Math.PI,x=Math.sin(t)*rx,z=Math.cos(t)*rz;if(z>0&&Math.abs(x)<P.hw+.36)continue;mk(x,z,.42,'parede');}
+  for(const s of [-1,1])mk(s*(P.hw+.39),Math.sqrt(Math.max(0,1-Math.pow((P.hw+.39)/rx,2)))*rz,.42,'ombreira');
+  for(const o of K.I.obst)mk(o[0],o[1],o[2],'movel');
+  const R=P.degraus?P.degraus[P.degraus.length-1][0]:2;mk(-(R+1.05),P.B+.55,.6,'banco');mk(-(R+1.6),P.B+.5,.42,'banco');
+  return L;}
+// a máscara do limite de andar guardada pela v820 (e o `Map` por chave da v878/v881): só a região da casa é refeita, em vez da grade inteira
+function ch880Grade(R,P,st){const W=R.world;try{W.__nav=null;W.__cl=null;}catch(e){}let n=0;
+  try{const L=[];try{if(W.__nv8)L.push(W.__nv8);}catch(e){}try{if(W.__nv8m&&W.__nv8m.forEach)W.__nv8m.forEach(b=>{if(b&&L.indexOf(b)<0)L.push(b);});}catch(e){}
+    for(const b of L){if(!b||!b.base||!b.N)continue;if(b.clamp!==W.clamp){if(b.clamp===st.clampAntes&&st.clamp===W.clamp)b.clamp=W.clamp;else continue;}
+      if(!/f0/.test(String(b.nk))&&String(b.nk)!=='')continue;const N=b.N,S=.3,H=N*S/2,i0=Math.max(0,Math.floor((P.cx-P.A-1.5+H)/S)),i1=Math.min(N-1,Math.ceil((P.cx+P.A+1.5+H)/S)),j0=Math.max(0,Math.floor((P.cz-P.B-2+H)/S)),j1=Math.min(N-1,Math.ceil((P.cz+P.B+3.5+H)/S));
+      ch880Nivel0(()=>{for(let j=j0;j<=j1;j++){const z=-H+(j+.5)*S;for(let i=i0;i<=i1;i++){const x=-H+(i+.5)*S,c=W.clamp(x,z,.9);b.base[j*N+i]=(Math.abs(c[0]-x)<=.01&&Math.abs(c[1]-z)<=.01)?1:0;n++;}}});}}
+  catch(e){ch880Erro('grade',e);try{W.__nv8=null;}catch(x){}try{if(W.__nv8m&&W.__nv8m.clear)W.__nv8m.clear();}catch(x){}}
+  try{if(typeof camBlockScene!=='undefined')camBlockScene=null;}catch(e){}return n;}
+// ---------- triângulos da casa de hoje nas malhas fundidas da vila (viram triângulos vazios; guardados para desfazer) ----------
+function ch880Env(F){const S=F.S,cx=F.casa.position.x,cz=F.casa.position.z,rY=x=>(2.30+1.55*Math.pow(Math.max(0,1-Math.abs(x)/(2.18*S)),1.1))*S;
+  return function(x,y,z){const lx=x-cx,lz=z-cz;if(y<2.45*S&&Math.hypot(lx,lz)<2.02*S)return true;if(y<1.35*S&&lx>-1.95*S&&lx<1.0*S&&lz>1.3*S&&lz<2.35*S)return true;
+    if(lx>.45*S&&lx<1.0*S&&lz>1.0*S&&lz<2.0*S&&y>1.4*S&&y<2.3*S)return true;if(Math.abs(lx)<2.62*S&&Math.abs(lz)<2.25*S&&y>rY(lx)-.34*S&&y<rY(lx)+.25*S)return true;
+    if(lx>.6*S&&lx<1.25*S&&lz>-.85*S&&lz<-.15*S&&y>2.2*S&&y<4.1*S)return true;return false;};}
+const CH880_CONTA={stone:112,wood:244,trim:4368,glow:24,dark:36,moss:240};
+function ch880SemPapel(m,g){try{if(typeof PAPEL_GEO!=='undefined'){const r=PAPEL_GEO.get(m);if(r&&r.g===g){m.geometry=g;PAPEL_GEO.delete(m);if(typeof PAPEL_GEO_LOD!=='undefined')PAPEL_GEO_LOD.delete(g);}}}catch(e){ch880Erro('papel',e);}}
+// faixa = true: tudo do primeiro ao último triângulo marcado (as peças de uma casa ficam seguidas na malha fundida)
+// `reg===null` = a seco (só devolve os triângulos escolhidos, não mexe em nada); `pre` = a escolha feita a seco pouco antes (vale se o índice for o mesmo vetor)
+function ch880Colapsa(m,teste,faixa,reg,cx0,cx1,cz0,cz1,pre){const g=ch880GeoDe(m),p=g&&g.attributes&&g.attributes.position,I=g&&g.index?g.index.array:null;if(!p||!I)return {n:0,marcados:0};m.updateMatrixWorld(true);const e=m.matrixWorld.elements,nt=Math.floor(I.length/3);
+  const A=(!p.isInterleavedBufferAttribute&&p.itemSize===3)?p.array:null;let id=true;for(let k=0;k<16;k++)if(Math.abs(e[k]-((k%5)?0:1))>1e-9){id=false;break;}
+  const rapida=A&&id&&cx0!==undefined; // malha no próprio mundo: os números direto do vetor, com a caixa da casa como 1.º corte
+  let prim=-1,ult=-1,marc=0,sel=faixa?null:[];
+  if(pre&&pre.I===I&&pre.nt===nt&&(faixa?pre.prim!==undefined:!!pre.sel)){if(faixa){prim=pre.prim;ult=pre.ult;marc=pre.marcados;}else{sel=pre.sel;marc=sel.length;if(marc){prim=sel[0];ult=sel[marc-1];}}}
+  else for(let t=0;t<nt;t++){const a=I[t*3],b=I[t*3+1],c=I[t*3+2];if(a===b&&b===c)continue;let x,y,z;
+    if(rapida){const xa=A[a*3],za=A[a*3+2];if(xa<cx0||xa>cx1||za<cz0||za>cz1)continue;x=(xa+A[b*3]+A[c*3])/3;y=(A[a*3+1]+A[b*3+1]+A[c*3+1])/3;z=(za+A[b*3+2]+A[c*3+2])/3;}
+    else{x=0;y=0;z=0;for(const v of [a,b,c]){const X=p.getX(v),Y=p.getY(v),Z=p.getZ(v);x+=e[0]*X+e[4]*Y+e[8]*Z+e[12];y+=e[1]*X+e[5]*Y+e[9]*Z+e[13];z+=e[2]*X+e[6]*Y+e[10]*Z+e[14];}x/=3;y/=3;z/=3;}
+    if(!teste(x,y,z))continue;marc++;if(prim<0)prim=t;ult=t;if(sel)sel.push(t);}
+  if(reg===null)return {n:0,marcados:marc,sel,prim,ult,nt,I};
+  if(prim<0)return {n:0,marcados:0};const guarda=[];const um=t=>{const a=I[t*3],b=I[t*3+1],c=I[t*3+2];if(a===b&&b===c)return;guarda.push(t,b,c);I[t*3+1]=a;I[t*3+2]=a;};
+  if(faixa){for(let t=prim;t<=ult;t++)um(t);}else for(const t of sel)um(t);
+  if(guarda.length){g.index.needsUpdate=true;reg.push({m,g,guarda});ch880SemPapel(m,g);}return {n:guarda.length/3,marcados:marc,prim,ult};}
+function ch880Devolve(reg){let n=0;for(const R of reg){const I=R.g.index.array,G=R.guarda;for(let i=0;i+2<G.length;i+=3){const t=G[i];I[t*3+1]=G[i+1];I[t*3+2]=G[i+2];n++;}R.g.index.needsUpdate=true;}reg.length=0;return n;}
+// desfaz os grupos da fusão do Leve que contêm estas malhas (refazem-se sozinhos, já com a geometria nova); `somem` = as que vão ficar
+// escondidas ou sair da cena: saem também da fila de refusão (o `fusaoDesfazer` devolve à fila as peças «que não mudaram» — e elas mudam logo a seguir)
+function ch880SemFusao(sc,malhas,somem){try{if(typeof FUSAO==='undefined'||!FUSAO.cenas||typeof fusaoDesfazer!=='function')return 0;const F=FUSAO.cenas.get(sc);if(!F)return 0;const set=new Set(malhas);let n=0;
+    if(F.grupos)for(const g of F.grupos.slice())if(g&&g.originais&&g.originais.some(o=>set.has(o))){fusaoDesfazer(g,F,sc);n++;}
+    if(somem&&somem.length&&Array.isArray(F.fila)&&F.fila.length){const fora=new Set(somem);F.fila=F.fila.map(L=>Array.isArray(L)?L.filter(o=>!fora.has(o)):L).filter(L=>!Array.isArray(L)||L.length>=3);}
+    CH880.stats.fusoesDesfeitas+=n;return n;}
+  catch(e){ch880Erro('fusão',e);try{if(typeof fusaoLimpar==='function')fusaoLimpar(sc);}catch(x){}return -1;}}
+// ---------- o mato: o que é instância sai da planta para os lados e para trás; a relva fundida do prado é recolhida ----------
+function ch880NaPlanta(P,x,z,mg){const lx=x-P.cx,lz=z-P.cz,u=lx/(P.A+mg),w=lz/(P.B+mg);if(u*u+w*w<1)return true;const D=P.degraus;if(D&&D.length){const R=D[D.length-1][0]+mg*.6,dz=lz-P.zDegrau;if(dz>-.4&&Math.hypot(lx,dz)<R)return true;
+    if(Math.abs(lx+D[D.length-1][0]+1.2)<1.25&&Math.abs(lz-P.B-.55)<.75)return true;}return false;}
+// `aq` = o que a montagem em fatias já leu (chão em grade, altura de cada malha sobre o terreno); `seco` = só lê o chão (não mexe em nada) e para
+// quando a fatia acaba (`parou`): a fila chama de novo até completar
+function ch880Mato(sc,P,R,reg,aq,seco){const re=/^(Capim|Grama|Relva|Moita|Samambaia|Tufo|Erva|Trevo|Low grass|Tall grass|Shrub|Fern|Bush|Wildflower)/i;const m=new THREE.Matrix4(),g=Math.PI/180;const st={instancias:0,porNome:{},prado:0,malhas:0};let parou=false,lidas=0;const sobreDe=(aq&&aq.sobre)||new Map();
+  // o chão do lugar novo: lido na hora (o `floorY` da sala), numa grade de 1 m com interpolação — o terreno custa caro por chamada
+  const cel=(aq&&aq.cel)||new Map(),no=(i,j)=>{const k=i*4096+j;let y=cel.get(k);if(y===undefined){if(seco&&lidas>=24&&ch880Passou()){parou=true;return 0;}try{const M=R.__ch880,a=M?M.ativo:false;if(M)M.ativo=false;try{y=R.floorY(i,j);}finally{if(M)M.ativo=a;}}catch(e){y=0;}if(!isFinite(y))y=0;cel.set(k,y);lidas++;if(aq&&aq.nos)aq.nos.push([i,j,y]);}return y;};
+  const chao=(x,z)=>{const i=Math.floor(x),j=Math.floor(z),fx=x-i,fz=z-j;return (no(i,j)*(1-fx)+no(i+1,j)*fx)*(1-fz)+(no(i,j+1)*(1-fx)+no(i+1,j+1)*fx)*fz;};
+  const x0=P.cx-P.A-3.5,x1=P.cx+P.A+3.5,z0=P.cz-P.B-2,z1=P.cz+P.B+4.5,sorte=(i,k)=>{let h=Math.imul(i+1,0x9E3779B1)^Math.imul(k+7,0x85EBCA6B);h^=h>>>15;h=Math.imul(h,0x2C1B3C6D);h^=h>>>12;return (h>>>0)/4294967296;};
+  sc.traverse(o=>{if(parou||!o.isInstancedMesh||!o.instanceMatrix||o.userData.ch880||o.userData.coin)return;const nm=o.name||'';if(!(o.userData&&o.userData.villageVegetation!==undefined)&&!(re.test(nm)&&o.instanceMatrix.count<=4000))return;
+    const ge=o.geometry;if(!ge.boundingBox)ge.computeBoundingBox();const alt=ge.boundingBox.max.y,larg=Math.max(ge.boundingBox.max.x-ge.boundingBox.min.x,ge.boundingBox.max.z-ge.boundingBox.min.z);
+    // (revisão R7) o three r128 recorta a InstancedMesh pela esfera da GEOMETRIA (a vila põe uma que cobre as instâncias de cada malha): a
+    // instância levada até ~4 m para fora ficava fora dela e piscava conforme o rumo da câmera — a esfera cresce (guardada para o desfaz())
+    const gbx=ge.boundingBox,grI=Math.hypot(Math.max(Math.abs(gbx.min.x),Math.abs(gbx.max.x)),Math.max(Math.abs(gbx.min.y),Math.abs(gbx.max.y)),Math.max(Math.abs(gbx.min.z),Math.abs(gbx.max.z)));
+    const cresce=(cx,cy,cz,r)=>{const bs=ge.boundingSphere;if(!bs||o.frustumCulled===false||!reg)return;const dx=cx-bs.center.x,dy=cy-bs.center.y,dz=cz-bs.center.z,d=Math.hypot(dx,dy,dz);if(d+r<=bs.radius)return;
+      if(!reg.esferas)reg.esferas=[];if(!reg.esferas.some(e=>e[0]===ge))reg.esferas.push([ge,bs.clone()]);const Rn=(bs.radius+d+r)/2;if(d>1e-9){const k=(Rn-bs.radius)/d;bs.center.x+=dx*k;bs.center.y+=dy*k;bs.center.z+=dz*k;}bs.radius=Rn;};o.updateMatrixWorld(true);
+    const mw=o.matrixWorld.elements;if(Math.abs(mw[0]-1)>1e-6||Math.abs(mw[5]-1)>1e-6||Math.abs(mw[10]-1)>1e-6||Math.abs(mw[1])>1e-6||Math.abs(mw[4])>1e-6)return; // só o que está direto no mundo (sem escala nem giro no objeto)
+    let mud=false,sobre=null;const N=o.instanceMatrix.count,A=o.instanceMatrix.array;
+    for(let i=0;i<N&&!parou;i++){const b=i*16,x=A[b+12]+mw[12],z=A[b+14]+mw[14];if(x<x0||x>x1||z<z0||z>z1)continue;if(A[b]===0&&A[b+5]===0&&A[b+10]===0)continue;
+      const sy=Math.sqrt(A[b+4]*A[b+4]+A[b+5]*A[b+5]+A[b+6]*A[b+6]),sx=Math.sqrt(A[b]*A[b]+A[b+1]*A[b+1]+A[b+2]*A[b+2]),h=alt*sy,alto=h>1.2,moita=larg*sx>1.5,mg=moita?1.25:alto?.85:.5;
+      if(!ch880NaPlanta(P,x,z,mg))continue;const y=A[b+13]+mw[13],q1=sorte(i,N),q2=sorte(i,N+1),q3=sorte(i,N+2);
+      // direção de saída: o lado em que já está; nada vai para a frente da casa (capim alto e moitas só para os fundos)
+      let t=Math.atan2((x-P.cx)/(P.A+mg),(z-P.cz)/(P.B+mg));const lim=(alto||moita?104:66)*g;if(Math.abs(t)<lim)t=(t<0?-1:1)*(lim+q1*(alto||moita?46:38)*g);else t+=(q1-.5)*14*g;
+      const fo=mg+.1+q2*(moita?1.7:alto?2.3:1.5)+q3*q3*.8,nx=P.cx+Math.sin(t)*(P.A+fo),nz=P.cz+Math.cos(t)*(P.B+fo);
+      if(sobre===null){sobre=sobreDe.get(o);if(sobre===undefined){sobre=y-ch880Terr(x,z);sobreDe.set(o,sobre);}} /* quanto esta malha fica acima do terreno: uma leitura só por malha */
+      const ny=chao(nx,nz)+sobre;if(seco)continue;reg.push({o,i,x:A[b+12],y:A[b+13],z:A[b+14]});A[b+12]=nx-mw[12];A[b+13]=(isFinite(ny)?ny:y)-mw[13];A[b+14]=nz-mw[14];mud=true;cresce(A[b+12],A[b+13],A[b+14],grI*Math.max(sx,sy)+.05);st.instancias++;st.porNome[nm]=(st.porNome[nm]||0)+1;}
+    if(mud)o.instanceMatrix.needsUpdate=true;});
+  st.parou=parou;return st;}
+function ch880PradoCaixa(P){return [P.cx-P.A-4.5,P.cx+P.A+4.5,P.cz-P.B-4.5,P.cz+P.B+6.5];}
+function* ch880AqueceG(sc,P,R,F){const aq={sc,t:0,cel:new Map(),nos:[],sobre:new Map(),sel:new Map(),selCasa:new Map(),veg:null};
+  try{for(let g=0;g<600;g++){const st=ch880Mato(sc,P,R,null,aq,true);if(!st.parou)break;yield 'chão do mato';}}catch(e){ch880Erro('aquece o chão do mato',e);aq.cel=new Map();aq.nos=[];aq.sobre=new Map();}
+  yield 'chão do mato';
+  try{const veg=ch880PradoMalhas(sc,P),c=ch880PradoCaixa(P);yield 'acha o prado';for(const m of veg){aq.sel.set(m,ch880Colapsa(m,(x,y,z)=>ch880NaPlanta(P,x,z,.3),false,null,c[0],c[1],c[2],c[3]));if(ch880Passou())yield 'relva do prado';}aq.veg=veg;}catch(e){ch880Erro('aquece o prado',e);aq.veg=null;aq.sel=new Map();}
+  try{const env=ch880Env(F),S=F.S,vx=F.casa.position.x,vz=F.casa.position.z,c=ch880PradoCaixa(P);for(const q of (F.fundidas||[])){aq.selCasa.set(q.m,q.k==='soil'?ch880Colapsa(q.m,(x,y,z)=>y<.4&&ch880NaPlanta(P,x,z,.2),false,null,c[0],c[1],c[2],c[3]):ch880Colapsa(q.m,env,true,null,vx-3.4*S,vx+3.4*S,vz-3.1*S,vz+3.1*S));if(ch880Passou())yield 'casa de hoje';}}catch(e){ch880Erro('aquece a casa de hoje',e);aq.selCasa=new Map();}
+  aq.t=ch880Hora();yield 'pronta para a troca';return aq;}
+// o aquecimento só vale se for desta cena, de agora há pouco, e se o chão não mudou desde então (amostra de nós conferida na hora)
+function ch880AqVale(K,sc,R){const aq=K&&K.aq;if(K)K.aq=null;if(!aq||aq.sc!==sc||!(ch880Hora()-aq.t<6000))return null;
+  try{const N=aq.nos,n=N.length,passo=Math.max(1,Math.floor(n/10));for(let k=0;k<n;k+=passo){const q=N[k];let y=R.floorY(q[0],q[1]);if(!isFinite(y))y=0;if(Math.abs(y-q[2])>1e-4){aq.cel=new Map();aq.sobre=new Map();break;}}}catch(e){aq.cel=new Map();aq.sobre=new Map();}
+  aq.nos=null;if(aq.veg)aq.veg=aq.veg.filter(m=>m&&m.parent&&m.geometry);return aq;}
+function ch880MatoVolta(reg){const tocadas=new Set();for(const q of reg){try{const A=q.o.instanceMatrix.array,b=q.i*16;A[b+12]=q.x;A[b+13]=q.y;A[b+14]=q.z;tocadas.add(q.o);}catch(e){}}for(const o of tocadas)o.instanceMatrix.needsUpdate=true;const n=reg.length;reg.length=0;try{for(const e of (reg.esferas||[]))e[0].boundingSphere=e[1];reg.esferas=[];}catch(e){}return n;}
+function ch880PradoMalhas(sc,P){const L=[],bx=new THREE.Box3(),re=/Prado|prado|meadow|Meadow|relva|Relva|grass|Grass|flores|Flores|moitas|Wildflower/;
+  sc.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||o.userData.ch880||!o.geometry||!o.geometry.index)return;const u=o.userData||{};if(u.seamlessTerrain115||u.integratedFarmSoil||u.cozyFloor355||u.terreno||u.terrain)return;
+    if(!re.test((o.name||'')+' '+((o.parent&&o.parent.name)||'')))return;const ge=ch880GeoDe(o);if(!ge.boundingBox)ge.computeBoundingBox();bx.copy(ge.boundingBox).applyMatrix4(o.matrixWorld);
+    if(bx.max.y-bx.min.y<.12)return;if(bx.max.x<P.cx-P.A-3||bx.min.x>P.cx+P.A+3||bx.max.z<P.cz-P.B-3||bx.min.z>P.cz+P.B+5)return;L.push(o);});return L;}
+// ---------- o que mora na casa: moedas, lata de óleo, chave de prata, penas, o duende que vem até a porta, a fumaça ----------
+function ch880Livre(P,obst,x,z,f){const lx=x-P.cx,lz=z-P.cz,ui=lx/(P.ai-.45),wi=lz/(P.bi-.45),uo=lx/(P.A+.75),wo=lz/(P.B+.75);const dentro=ui*ui+wi*wi<1,fora=uo*uo+wo*wo>1;if(!dentro&&!fora)return false;
+  if(fora&&ch880NaPlanta(P,x,z,.3))return false;for(const o of obst)if(Math.hypot(x-o[0],z-o[1])<o[2]+f)return false;return true;}
+// procura em anéis o ponto livre mais perto (como a v854 faz com as penas)
+function ch880Perto(P,obst,x,z,W){if(ch880Livre(P,obst,x,z,.3))return null;for(let rr=.2;rr<=5.01;rr+=.2){const n=Math.max(8,Math.round(rr*2*Math.PI/.25));for(let i=0;i<n;i++){const a=i/n*2*Math.PI,nx=x+Math.cos(a)*rr,nz=z+Math.sin(a)*rr;if(!ch880Livre(P,obst,nx,nz,.35))continue;
+      try{const c=W.clamp(nx,nz,.6),cx=Array.isArray(c)?c[0]:c.x,cz=Array.isArray(c)?c[1]:c.z;if(Math.abs(cx-nx)>.02||Math.abs(cz-nz)>.02)continue;}catch(e){}return [nx,nz];}}return null;}
+function ch880Moedas(R,K,reg){const P=K.P,st={casa:0,outras:0};let set=null;try{set=(typeof COINS!=='undefined'&&COINS.sets)?COINS.sets.fant:null;}catch(e){}if(!set||!set.coins)return st;
+  const L=K.I.moedas,novos=CH880.feito?CH880.feito.reg.obstNovos:[];
+  for(const c of set.coins){const m=/:fant:casa(\d+)$/.exec(String(c.id||''));let alvo=null;if(m){const q=L[+m[1]%Math.max(1,L.length)];if(q)alvo=[P.cx+q[0],P.cz+q[1]];}else if(c.x!==undefined&&ch880NaPlanta(P,c.x,c.z,.8)){alvo=ch880Perto(P,novos,c.x,c.z,R.world);}
+    if(!alvo)continue;const y0=(()=>{try{return R.floorY(alvo[0],alvo[1])+.5;}catch(e){return P.chao+.5;}})();
+    reg.push({c,x:c.x,z:c.z,y0:c.y0,px:c.g?c.g.position.x:0,py:c.g?c.g.position.y:0,pz:c.g?c.g.position.z:0});c.x=alvo[0];c.z=alvo[1];c.y0=y0;if(c.g)c.g.position.set(alvo[0],y0,alvo[1]);if(m)st.casa++;else st.outras++;}
+  set.__ch880=CH880.vez;return st;}
+function ch880MoedasVolta(reg,R){for(const q of reg){try{if(/:fant:casa\d+$/.test(String(q.c.id||'')))continue;q.c.x=q.x;q.c.z=q.z;q.c.y0=q.y0;if(q.c.g)q.c.g.position.set(q.px,q.py,q.pz);}catch(e){}}const n=reg.length;reg.length=0;
+  // as seis da casa: a mesma conta da v244, com o `F244.casa` já de volta
+  try{const s=COINS.sets.fant;if(s){delete s.__ch880;const C=F244.casa,kb=(typeof cv564B==='function'?cv564B():1);for(const c of s.coins){const m=/:fant:casa(\d+)$/.exec(String(c.id||''));if(!m)continue;const i=+m[1],a=i/6*Math.PI*2+.3,x=C.x+Math.cos(a)*.62*kb,z=C.z+.18*kb+Math.sin(a)*.52*kb,y0=(R&&R.floorY?R.floorY(x,z):0)+.5;c.x=x;c.z=z;c.y0=y0;if(c.g)c.g.position.set(x,y0,z);}}}catch(e){}return n;}
+function ch880Txt(pt,en,es){try{if(typeof text428==='function')return text428(pt,en,es);}catch(e){}try{const l=(document.documentElement.lang||'').toLowerCase();if(l.indexOf('en')===0)return en;if(l.indexOf('es')===0)return es;}catch(e){}return pt;}
+function ch880Itens(R,K,reg){const P=K.P,I=K.I,st={};
+  // a lata de óleo «colmo»: continua dentro, ao lado do aparador
+  try{if(typeof OIL428!=='undefined'&&I.oleo){const h=OIL428.homes.find(q=>q.id==='colmo');if(h){const x=P.cx+I.oleo[0],z=P.cz+I.oleo[1];const O=CH880.orig;if(!O.oleo)O.oleo={box:h.box.slice(),near:h.near.slice()};const g={h,box:O.oleo.box.slice(),near:O.oleo.near.slice(),item:null,lugar:[x,z]};h.box=[x-.5,x+.5,z-.5,z+.5];h.near=[x,z];
+        const it=OIL428.items&&OIL428.items.colmo;if(it&&it.g){g.item={it,at:it.at,px:it.g.position.x,py:it.g.position.y,pz:it.g.position.z};it.at={x,z};it.g.position.set(x,(()=>{try{return R.floorY(x,z);}catch(e){return P.chao;}})()+.04,z);}reg.oleo=g;st.oleo=[+x.toFixed(2),+z.toFixed(2),!!g.item];}}}catch(e){ch880Erro('óleo',e);}
+  // a chave de prata «no fim da vila, atrás da última casa»: agora dentro da casa, no canto de leitura
+  try{if(typeof KEY_FIXO2!=='undefined'&&KEY_FIXO2.fant&&I.chave){const fx=KEY_FIXO2.fant,x=P.cx+I.chave[0],z=P.cz+I.chave[1],y=P.chao+1;const O=CH880.orig;if(!O.fixo2)O.fixo2={x:fx.x,z:fx.z,raio:fx.raio,dica:fx.dica};const g={fx:Object.assign({},O.fixo2),plano:null,item:null,spot:null,lugar:[x,z]};
+      fx.x=x;fx.z=z;fx.raio=1.5;fx.dica=ch880Txt('no fim da vila, dentro da Casa grande de colmo, no canto de leitura','at the end of the village, inside the Big thatched house, in the reading nook','al final de la aldea, dentro de la Casa grande de paja, en el rincón de lectura');
+      const pl=(typeof KEY_PLANS2!=='undefined')?KEY_PLANS2.fant:null;if(pl&&!pl.lvl){g.plano={pl,x:pl.x,y:pl.y,z:pl.z};pl.x=x;pl.y=y;pl.z=z;
+        try{const sp=KEY_SPOTS2[pl.genre];if(Array.isArray(sp)){g.spot={sp,v:sp.slice()};sp[1]=x;sp[2]=y;sp[3]=z;}}catch(e){}
+        try{const it=KEYS.items2[pl.genre];if(it&&!it.got&&it.g){g.item={it,x:it.x,y:it.y,z:it.z,px:it.g.position.x,py:it.g.position.y,pz:it.g.position.z};it.x=x;it.y=y;it.z=z;it.g.position.set(x,y,z);}}catch(e){}}
+      reg.chave=g;st.chave=[+x.toFixed(2),+z.toFixed(2),!!g.plano,!!g.item];}}catch(e){ch880Erro('chave',e);}
+  // penas colecionáveis que ficariam na parede ou num móvel
+  try{const Pn=window.__penas745;if(Pn&&Pn.lugares){const ach=(Pn.estado&&Pn.estado.save&&Pn.estado.save.achados)||{};reg.penas=[];for(const id of Object.keys(Pn.lugares)){const L=Pn.lugares[id];if(!L||L.onde!=='sala'||L.sala!=='fant'||ach[id]||!isFinite(L.x))continue;if(!ch880NaPlanta(P,L.x,L.z,1))continue;
+        const a=ch880Perto(P,reg.obstNovos,L.x,L.z,R.world);if(!a)continue;const it=Pn.estado&&Pn.estado.itens&&Pn.estado.itens[id];const q={L,x:L.x,z:L.z,it:(it&&it.g)?it:null,px:0,pz:0};if(q.it){q.px=it.g.position.x;q.pz=it.g.position.z;it.g.position.x=a[0];it.g.position.z=a[1];}L.x=+a[0].toFixed(2);L.z=+a[1].toFixed(2);reg.penas.push(q);}st.penas=reg.penas.length;}}catch(e){ch880Erro('penas',e);}
+  // o duende que vem do largo até a casa: a trilha acaba antes do último degrau
+  try{if(typeof F245!=='undefined'&&F245.andarilhos&&P.degraus){reg.andar=[];const Rd=P.degraus[P.degraus.length-1][0]+.7,ox=P.cx,oz=P.cz+P.zDegrau;for(const a of F245.andarilhos){const pts=a.curva&&a.curva.points;if(!pts||!pts.length)continue;const u=pts[pts.length-1];const d=Math.hypot(u.x-ox,u.z-oz);if(d>=Rd&&!ch880NaPlanta(P,u.x,u.z,.5))continue;
+        const an=pts.length>1?pts[pts.length-2]:u,dx=an.x-ox,dz=an.z-oz,l=Math.hypot(dx,dz)||1;const np=pts.map(p=>p.clone());np[np.length-1].set(ox+dx/l*Rd,u.y,oz+dz/l*Rd);const nc=new THREE.CatmullRomCurve3(np,false,'centripetal');reg.andar.push({a,curva:a.curva,L:a.L});a.curva=nc;a.L=nc.getLength();}st.andarilhos=reg.andar.length;}}catch(e){ch880Erro('andarilhos',e);}
+  return st;}
+function ch880ItensVolta(reg){try{const g=reg.oleo;if(g){g.h.box=g.box;g.h.near=g.near;if(g.item){g.item.it.at=g.item.at;g.item.it.g.position.set(g.item.px,g.item.py,g.item.pz);}
+      // (revisão R3) lata posta pelo `oil428Build` DEPOIS da troca (no lugar novo): sai, e o `oil428Tick` põe de novo pela caixa de antes
+      else if(g.lugar){const it=OIL428.items&&OIL428.items.colmo;if(it&&it.g&&it.at&&Math.hypot(it.at.x-g.lugar[0],it.at.z-g.lugar[1])<1.2&&!(OIL428.save&&OIL428.save.collected&&OIL428.save.collected.includes('colmo'))){if(it.g.parent)it.g.parent.remove(it.g);delete OIL428.items.colmo;}}
+      reg.oleo=null;}}catch(e){ch880Erro('óleo volta',e);}
+  try{const g=reg.chave;if(g){const fx=KEY_FIXO2.fant;fx.x=g.fx.x;fx.z=g.fx.z;fx.raio=g.fx.raio;fx.dica=g.fx.dica;if(g.plano){g.plano.pl.x=g.plano.x;g.plano.pl.y=g.plano.y;g.plano.pl.z=g.plano.z;}if(g.spot){for(let i=0;i<g.spot.v.length;i++)g.spot.sp[i]=g.spot.v[i];}
+      if(g.item){const it=g.item.it;it.x=g.item.x;it.y=g.item.y;it.z=g.item.z;it.g.position.set(g.item.px,g.item.py,g.item.pz);}
+      // (revisão R3) plano ou chave feitos DEPOIS da troca (no canto de leitura): a chave volta ao plano de antes; sem plano de antes, plano e
+      // chave saem e o `keyActivate` do fim do `desfaz()` refaz tudo pelo lugar fixo de antes
+      else if(g.lugar){const pl=KEY_PLANS2.fant,it=pl?KEYS.items2[pl.genre]:null;
+        if(g.plano){if(it&&it.g&&!it.got&&Math.hypot(it.x-g.lugar[0],it.z-g.lugar[1])<.6){it.x=g.plano.x;it.y=g.plano.y;it.z=g.plano.z;it.g.position.set(it.x,it.y,it.z);}}
+        else if(pl&&!pl.lvl&&Math.hypot(pl.x-g.lugar[0],pl.z-g.lugar[1])<1.6){const gen=pl.genre;delete KEY_PLANS2.fant;try{delete KEY_SPOTS2[gen];}catch(e){}if(it&&it.g&&!it.got){if(it.g.parent)it.g.parent.remove(it.g);delete KEYS.items2[gen];}}}
+      reg.chave=null;}}catch(e){ch880Erro('chave volta',e);}
+  try{for(const q of (reg.penas||[])){q.L.x=q.x;q.L.z=q.z;if(q.it){q.it.g.position.x=q.px;q.it.g.position.z=q.pz;}}reg.penas=[];}catch(e){ch880Erro('penas volta',e);}
+  try{for(const q of (reg.andar||[])){q.a.curva=q.curva;q.a.L=q.L;}reg.andar=[];}catch(e){ch880Erro('andarilhos volta',e);}}
+function ch880Fumaca(sc,F){let fum=null;try{const V=window.__FANT&&window.__FANT.village;if(V&&V.smoke)fum=V.smoke;}catch(e){}
+  if(!fum)sc.traverse(o=>{if(!fum&&o.isGroup&&o.children.length===12&&o.children[0].isSprite&&o.children[0].userData.fx&&/Fuma|[Ss]moke|Humo/.test(o.name||''))fum=o;});return fum;}
+// ---------- o tique: o fogo treme, o clarão respira, a fumaça sai da chaminé nova ----------
+function ch880Tick(dt){const E=CH880.feito;if(!E||CH880.pausa)return;ch880Lado(E.K.P);const d=Math.min(.1,dt||.016);CH880.tempo+=d;CH880.stats.tique++;const t=CH880.tempo,K=E.K,I=K.I;
+  for(const f of I.fogo){const s=1+.16*Math.sin(t*f.v+f.ph)+.09*Math.sin(t*f.v*2.7+f.ph*1.7);f.m.scale.set(1+.05*Math.sin(t*5.1+f.ph),s,1);f.m.position.y=K.P.chao+.16+(s-1)*.02;}
+  if(I.luz)I.luz.material.opacity=.42+.1*Math.sin(t*6.3)+.06*Math.sin(t*14.7+1);
+  const fu=E.fumaca;if(fu){const dl=E.fumacaD;for(const p of fu.children){const u=p.userData,q=p.position;if(u.ch880p&&Math.abs(q.x-u.ch880p[0])<1e-7&&Math.abs(q.y-u.ch880p[1])<1e-7&&Math.abs(q.z-u.ch880p[2])<1e-7)continue;q.x+=dl[0];q.y+=dl[1];q.z+=dl[2];p.scale.multiplyScalar(1.45);u.ch880p=[q.x,q.y,q.z];}}
+  if((CH880.stats.tique&63)===1){for(const q of E.reg.ocultas)if(q[0].visible)q[0].visible=false;}}
+// ---------- a troca ----------
+function ch880Aplica(R,K){if(CH880.feito)return CH880.feito.st;const sc=R.scene,P=K.P,F=ch880Fontes(sc);if(!F)return null;const t0=ch880Hora();CH880.vez=(CH880.vez||0)+1;
+  const reg={ocultas:[],col:[],prado:[],porta:null,f244:null,obstVelhos:{viva:[],base:[]},obstNovos:[],mato:[],moedas:[],oleo:null,chave:null,penas:[],andar:[]},st={casa:{},mato:null,itens:null,obst:null,ms:0};
+  const E=CH880.feito={sc,R,K,F,reg,st,fumaca:null,fumacaD:null};const tp=st.tempos={};let ta=t0;const marca=k=>{const n=ch880Hora();tp[k]=Math.round((n-ta)*10)/10;ta=n;};
+  try{const aq=ch880AqVale(K,sc,R);st.aquecida=!!aq;const veg=(aq&&aq.veg)||ch880PradoMalhas(sc,P);marca('acha o prado');const somem=F.unicas.slice();for(const j of F.janelas)j.traverse(o=>{if(o.isMesh)somem.push(o);});ch880SemFusao(sc,somem.concat((F.fundidas||[]).map(q=>q.m),veg),somem);
+    // 1) a casa de hoje sai: as malhas só dela e as janelas ficam escondidas; nas malhas da vila inteira, os triângulos dela ficam vazios
+    for(const m of F.unicas){reg.ocultas.push([m,m.visible]);m.visible=false;}for(const j of F.janelas){reg.ocultas.push([j,j.visible]);j.visible=false;}
+    const env=ch880Env(F),S=F.S,vx=F.casa.position.x,vz=F.casa.position.z,qx0=P.cx-P.A-4.5,qx1=P.cx+P.A+4.5,qz0=P.cz-P.B-4.5,qz1=P.cz+P.B+6.5;
+    for(const q of (F.fundidas||[])){if(q.k==='soil'){const r=ch880Colapsa(q.m,(x,y,z)=>y<.4&&ch880NaPlanta(P,x,z,.2),false,reg.col,qx0,qx1,qz0,qz1,aq?aq.selCasa.get(q.m):null);st.casa.caminho=r.n;continue;}
+      const r=ch880Colapsa(q.m,env,true,reg.col,vx-3.4*S,vx+3.4*S,vz-3.1*S,vz+3.1*S,aq?aq.selCasa.get(q.m):null);st.casa[q.k]=r.n;if(CH880_CONTA[q.k]!==undefined&&r.n!==CH880_CONTA[q.k]*(1)&&F.S===1.5)ch880Erro('contagem','a malha «'+q.k+'» da vila deu '+r.n+' triângulos da casa (esperados '+CH880_CONTA[q.k]+')');}
+    marca('casa de hoje');
+    // 2) a porta de hoje (a folha que a v244 abre) vai para o vão novo, no tamanho de gente
+    if(F.porta){const pg=F.porta;reg.porta={g:pg,p:pg.position.clone(),s:pg.scale.clone()};const zl=ch880Z(P,0,P.yTopo-.3,0)-.07;const w=new THREE.Vector3(P.cx,P.yD,P.cz+zl);F.casa.updateMatrixWorld(true);F.casa.worldToLocal(w);pg.position.copy(w);pg.scale.setScalar(P.SP/F.S);pg.updateMatrixWorld(true);}
+    try{if(typeof F244!=='undefined'&&F244){const O=CH880.orig;if(!O.f244)O.f244={x:F244.casa.x,z:F244.casa.z};reg.f244={cx:O.f244.x,cz:O.f244.z,px:F244.porta?F244.porta.x:null,pz:F244.porta?F244.porta.z:null};F244.casa.x=P.cx;F244.casa.z=P.cz;if(F244.porta){F244.porta.x=P.cx;F244.porta.z=P.cz+P.B;}}}catch(e){ch880Erro('F244',e);}
+    // 3) a casa nova entra
+    sc.add(K.G);K.G.updateMatrixWorld(true);try{if(typeof papelUm==='function'&&typeof Q!=='undefined')K.G.traverse(o=>{try{papelUm(o,!!Q.papel);}catch(e){}});}catch(e){}
+    marca('casa nova');
+    // 4) obstáculos: saem os da casa de hoje, entram os da nova (lista viva e lista-base)
+    const OB=ch880Obst(R),FX=ch880ObstFixa(R);reg.listas={OB,FX};const tira=(L,dest)=>{if(!L)return;const V=ch880ObstVelhos(L,F);for(let k=V.length-1;k>=0;k--){L.splice(V[k][0],1);}for(const q of V)dest.push(q);};
+    tira(OB,reg.obstVelhos.viva);if(FX&&FX!==OB)tira(FX,reg.obstVelhos.base);reg.obstNovos=ch880ObstNovos(K);for(const o of reg.obstNovos){if(OB)OB.push(o);if(FX&&FX!==OB)FX.push(o);}
+    st.obst={saem:reg.obstVelhos.viva.length,saemBase:reg.obstVelhos.base.length,entram:reg.obstNovos.length};
+    marca('obstáculos');
+    // 5) chão, limite de andar, câmera, grade de caminhos
+    P.__lado=0;try{if(typeof CUR!=='undefined'&&CUR==='room'&&ROOM===R)ch880Lado(P);}catch(e){}const M=ch880MundoInstala(R);M.P=P;M.ativo=true;st.grade=ch880Grade(R,P,M);try{R.keyFloors();}catch(e){}st.decor=ch880Decor(R,P,M,reg);
+    marca('grade');
+    // 6) o mato sai da planta
+    st.mato=ch880Mato(sc,P,R,reg.mato,aq,false);{const c=ch880PradoCaixa(P);marca('mato: instâncias');for(const m of veg){const r=ch880Colapsa(m,(x,y,z)=>ch880NaPlanta(P,x,z,.3),false,reg.prado,c[0],c[1],c[2],c[3],aq?aq.sel.get(m):null);st.mato.prado+=r.n;if(r.n)st.mato.malhas++;}}
+    marca('mato');
+    // 7) moedas, óleo, chave, penas, o duende da trilha, a fumaça
+    st.moedas=ch880Moedas(R,K,reg.moedas);st.itens=ch880Itens(R,K,reg);
+    const fu=ch880Fumaca(sc,F);if(fu){E.fumaca=fu;const kb=F.S/1.5;E.fumacaD=[P.cx+P.lx-(F.casa.position.x+1.38*kb),P.chTopo+.3-5.97*kb,P.cz+P.lz-(F.casa.position.z-.75*kb)];}
+    marca('itens');try{if(typeof keyActivate==='function'&&typeof CUR!=='undefined'&&CUR==='room'&&typeof ROOM!=='undefined'&&ROOM===R&&reg.chave&&reg.chave.item)keyActivate();}catch(e){}marca('chaves');
+  }catch(e){ch880Erro('aplica',e);}
+  st.ms=Math.round(ch880Hora()-t0);CH880.stats.casa=st.casa;CH880.stats.mato=st.mato;CH880.stats.mundo={obst:st.obst,grade:st.grade,moedas:st.moedas,itens:st.itens,ms:st.ms,tempos:st.tempos};CH880.stats.aplicacoes++;try{ch880Tick(0);}catch(e){}return st;}
+function ch880Desfaz(){const E=CH880.feito,out={feito:false};CH880.pausa=true;if(!E)return out;const reg=E.reg,sc=E.sc,R=E.R,P=E.K.P;
+  try{ch880SemFusao(sc,E.K.malhas.concat(E.F.unicas,(E.F.fundidas||[]).map(q=>q.m),reg.prado.map(q=>q.m)),E.K.malhas.concat(E.K.I.soltos||[]));
+    ch880ItensVolta(reg);
+    const fu=E.fumaca;if(fu){for(const p of fu.children){const u=p.userData;if(u.ch880p){const q=p.position;if(Math.abs(q.x-u.ch880p[0])<1e-7&&Math.abs(q.y-u.ch880p[1])<1e-7&&Math.abs(q.z-u.ch880p[2])<1e-7){q.x-=E.fumacaD[0];q.y-=E.fumacaD[1];q.z-=E.fumacaD[2];p.scale.multiplyScalar(1/1.45);}delete u.ch880p;}}}
+    out.mato=ch880MatoVolta(reg.mato);out.prado=ch880Devolve(reg.prado);
+    const M=R.__ch880;if(M){M.ativo=false;}
+    const L=reg.listas||{};const sai=(Lx)=>{if(!Lx)return;for(const o of reg.obstNovos){const i=Lx.indexOf(o);if(i>=0)Lx.splice(i,1);}};sai(L.OB);if(L.FX&&L.FX!==L.OB)sai(L.FX);
+    const volta=(Lx,V)=>{if(!Lx)return;for(const q of V){if(Lx.indexOf(q[1])<0)Lx.splice(Math.min(q[0],Lx.length),0,q[1]);}};volta(L.OB,reg.obstVelhos.viva);if(L.FX&&L.FX!==L.OB)volta(L.FX,reg.obstVelhos.base);
+    // (a lista viva pode ter sido recopiada da base enquanto a casa nova esteve posta: confere-se também a de agora)
+    try{const OB2=ch880Obst(R);if(OB2&&OB2!==L.OB){sai(OB2);volta(OB2,reg.obstVelhos.viva);}}catch(e){}
+    if(M)ch880Grade(R,P,M);
+    try{for(const q of (reg.decor||[])){q[0].position.y-=q[1];q[0].updateMatrixWorld(true);}reg.decor=[];}catch(e){ch880Erro('decorar volta',e);}
+    if(E.K.G.parent)E.K.G.parent.remove(E.K.G);
+    try{if(reg.f244&&typeof F244!=='undefined'){F244.casa.x=reg.f244.cx;F244.casa.z=reg.f244.cz;if(F244.porta&&reg.f244.px!==null){F244.porta.x=reg.f244.px;F244.porta.z=reg.f244.pz;}}}catch(e){ch880Erro('F244 volta',e);}
+    if(reg.porta){reg.porta.g.position.copy(reg.porta.p);reg.porta.g.scale.copy(reg.porta.s);reg.porta.g.updateMatrixWorld(true);}
+    out.moedas=ch880MoedasVolta(reg.moedas,R);
+    out.triangulos=ch880Devolve(reg.col);for(const q of reg.ocultas)q[0].visible=q[1];
+    try{if(typeof keyActivate==='function'&&typeof CUR!=='undefined'&&CUR==='room'&&typeof ROOM!=='undefined'&&ROOM===R)keyActivate();}catch(e){}
+    out.feito=true;}catch(e){ch880Erro('desfaz',e);}
+  CH880.feito=null;CH880.stats.desfeitas++;return out;}
+// ---------- quando: a montagem em fatias (fila `fat8Go`), a troca no `setActive` da Fantasia ou pelo vigia ----------
+function ch880Pronta(){try{const R=(typeof ROOMS!=='undefined')?ROOMS.fant:null;if(!R||!R.ready||!R.scene||!R.world)return null;return R;}catch(e){return null;}}
+// a sala foi remontada (cena nova) com a casa nova posta: os objetos globais voltam aos valores de fábrica e a troca é refeita na cena nova
+function ch880Abandona(){const E=CH880.feito,O=CH880.orig;CH880.feito=null;try{if(E&&E.R&&E.R.__ch880)E.R.__ch880.ativo=false;}catch(e){}
+  try{if(O.f244&&typeof F244!=='undefined'){F244.casa.x=O.f244.x;F244.casa.z=O.f244.z;}}catch(e){}try{if(O.fixo2&&typeof KEY_FIXO2!=='undefined'&&KEY_FIXO2.fant)Object.assign(KEY_FIXO2.fant,O.fixo2);}catch(e){}
+  try{if(O.oleo&&typeof OIL428!=='undefined'){const h=OIL428.homes.find(q=>q.id==='colmo');if(h){h.box=O.oleo.box.slice();h.near=O.oleo.near.slice();}}}catch(e){}}
+function ch880Quer(R){if(!CH880.on||CH880.pausa||CH880.falhou)return false;if(CH880.feito){if(CH880.feito.sc===R.scene)return false;ch880Abandona();}return !!ch880Casa(R.scene);}
+function ch880Faz(R){const F=ch880Fontes(R.scene);if(!F)return null;let chao=.54;try{if(typeof F244!=='undefined'&&F244.casa&&isFinite(F244.casa.chao))chao=F244.casa.chao;}catch(e){}
+  const P=ch880Medidas(F.S,F.casa.position.x,F.casa.position.z,chao,CH880.fator);return ch880FazG(R,F,P);}
+// na fila, depois da casa montada: lê em fatias o chão para onde o mato vai e escolhe os triângulos da relva do prado — a troca fica só com o que tem de ser de uma vez
+function* ch880FazG(R,F,P){const K=yield* ch880MontaG(F,P,(x,z)=>ch880Terr(P.cx+x,P.cz+z));try{if(K&&!CH880.sinc)K.aq=yield* ch880AqueceG(R.scene,P,R,F);}catch(e){ch880Erro('aquecimento',e);}return K;}
+function ch880TiraDaFila(J){try{if(typeof FAT818==='undefined'||!J)return;const i=FAT818.fila.indexOf(J);if(i>=0)FAT818.fila.splice(i,1);if(FAT818.atual===J)FAT818.atual=null;}catch(e){}}
+function ch880Guarda(R,p){if(p){p.sc=R.scene;CH880.pacote=p;}}
+function ch880Monta(R,sinc){if(CH880.pacote&&CH880.pacote.sc===R.scene)return;if(CH880.pacote&&CH880.pacote.sc!==R.scene)CH880.pacote=null;
+  if(CH880.job){if(!sinc)return;const J=CH880.job;ch880TiraDaFila(J);CH880.job=null;CH880.ficha=null;CH880.sinc=true;try{let r;do{r=J.it.next();}while(!r.done);ch880Guarda(R,r.value);}catch(e){CH880.falhou=true;ch880Erro('montagem',e);}CH880.sinc=false;return;}
+  let it=null;try{it=ch880Faz(R);}catch(e){CH880.falhou=true;ch880Erro('montagem',e);return;}if(!it)return;
+  if(sinc||typeof fat8Go!=='function'){CH880.sinc=true;try{let r;do{r=it.next();}while(!r.done);ch880Guarda(R,r.value);}catch(e){CH880.falhou=true;ch880Erro('montagem',e);}CH880.sinc=false;return;}
+  const tok={};CH880.ficha=tok;
+  const J=fat8Go(it,{nome:'casa grande 880',cedo:true,urgente:()=>{try{return CUR==='room'&&ROOM===ROOMS.fant;}catch(e){return false;}},
+    fim:p=>{if(CH880.ficha!==tok)return;try{const Jq=CH880.job;if(Jq)CH880.stats.fila={ms:Math.round(Jq.ms),passos:Jq.passos,maior:Math.round(Jq.max*10)/10,onde:Jq.rotMax};}catch(e){}CH880.ficha=null;CH880.job=null;const R2=ch880Pronta();if(R2&&R2===R){ch880Guarda(R,p);ch880Tenta(R);}},erro:e=>{if(CH880.ficha===tok){CH880.ficha=null;CH880.job=null;}CH880.falhou=true;ch880Erro('montagem',e);}});
+  if(CH880.ficha===tok)CH880.job=J;}
+function ch880Tenta(R){if(!R||CH880.pausa||!CH880.pacote||CH880.pacote.sc!==R.scene||CH880.feito)return;try{ch880Aplica(R,CH880.pacote);}catch(e){ch880Erro('troca',e);}}
+function ch880Vigia(){try{CH880.stats.vigia++;if(!CH880.on||CH880.pausa)return;const R=ch880Pronta();if(!R||!ch880Quer(R))return;if(!(CH880.pacote&&CH880.pacote.sc===R.scene))ch880Monta(R,false);if(CH880.pacote&&CH880.pacote.sc===R.scene)ch880Tenta(R);}catch(e){ch880Erro('vigia',e);}}
+function ch880AplicaManual(){if(!CH880.on)return {erro:'bloco desligado (?casagrande880=0)'};try{CH880.pausa=false;CH880.falhou=false;const R=ch880Pronta();if(!R)return {erro:'a Fantasia não está pronta'};if(CH880.feito&&CH880.feito.sc===R.scene)return CH880.feito.st;if(CH880.feito)ch880Abandona();
+    if(!ch880Casa(R.scene))return {erro:'a Casa grande de colmo não foi achada na cena'};ch880Monta(R,true);ch880Tenta(R);return CH880.feito?CH880.feito.st:{erro:'não aplicou',erros:CH880.erros.slice(-3)};}catch(e){ch880Erro('aplica manual',e);return {erro:String(e&&e.message||e)};}}
+// poses de câmera para as fotos (mundo da Fantasia)
+function ch880Poses(){let P=null;try{P=CH880.pacote?CH880.pacote.P:null;}catch(e){}if(!P){try{const R=ch880Pronta(),F=R?ch880Fontes(R.scene):null;P=ch880Medidas(F?F.S:1.5,F?F.casa.position.x:0,F?F.casa.position.z:-60,.54,CH880.fator);}catch(e){P=ch880Medidas(1.5,0,-60,.54,CH880.fator);}}
+  const c=[P.cx,P.cz],r=v=>+v.toFixed(3),p=(x,y,z)=>[r(x),r(y),r(z)],zv=P.czVelho,k=P.K/2;
+  return [{id:'como_no_print',pos:p(c[0]+.9,3.3,zv+16.6),alvo:p(c[0],2.2+1.2*k,zv+.5),fov:55},{id:'da_praca',pos:p(c[0]+1.5,3.6,zv+16+9*k),alvo:p(c[0],P.cume*.42,c[1]),fov:55},
+    {id:'de_lado',pos:p(c[0]+P.A+11*k,4.2,c[1]+P.B+3),alvo:p(c[0],P.cume*.42,c[1]),fov:55},{id:'dos_fundos',pos:p(c[0]-7*k,5.5,c[1]-P.B-11*k),alvo:p(c[0],P.cume*.42,c[1]),fov:55},
+    {id:'de_cima',pos:p(c[0],P.cume+26*k,c[1]+2.4),alvo:p(c[0],0,c[1]+2),fov:50},{id:'porta',pos:p(c[0]+2.4,2.3,c[1]+P.B+5.6),alvo:p(c[0]+.2,2.1,c[1]+P.B),fov:60},
+    {id:'dentro_da_porta',pos:p(c[0],P.chao+1.9,c[1]+P.bi-.9),alvo:p(c[0]+.6,P.chao+1.5,c[1]-P.bi),fov:75},{id:'dentro_das_estantes',pos:p(c[0]-P.ai+1.75,P.chao+2.05,c[1]+P.bi*.2),alvo:p(c[0]+P.ai,P.chao+1.2,c[1]-P.bi*.34),fov:75},
+    {id:'dentro_do_fundo',pos:p(c[0]+P.ai*.2,P.chao+2.2,c[1]-P.bi*.6),alvo:p(c[0]-P.ai*.55,P.chao+1.1,c[1]+P.bi*.5),fov:75},{id:'lareira',pos:p(c[0]+P.lar(-.5,4.1)[0],P.chao+1.7,c[1]+P.lar(-.5,4.1)[1]),alvo:p(c[0]+P.lx,P.chao+1.3,c[1]+P.lz),fov:60},
+    {id:'forro',pos:p(c[0]-1,P.chao+1.2,c[1]+2),alvo:p(c[0]+.5,P.teto,c[1]-1),fov:75}];}
+if(CH880.on){
+  try{const sa0=setActive;setActive=function(sc){try{if(CH880.on&&!CH880.pausa&&sc&&typeof ROOMS!=='undefined'&&ROOMS.fant&&sc===ROOMS.fant.scene){CH880.stats.setActive++;const R=ch880Pronta();if(R&&ch880Quer(R)){ch880Monta(R,true);ch880Tenta(R);}}}catch(e){ch880Erro('setActive',e);}return sa0.apply(this,arguments);};}catch(e){ch880Erro('setActive0',e);}
+  try{CH880.iv=setInterval(ch880Vigia,2000);}catch(e){ch880Erro('vigia0',e);}
+  // as seis moedas da casa (v244) nascem em volta do centro da casa: com a casa nova posta, vão para os cantos da sala
+  try{if(typeof coinBuild==='function'){const cb0=coinBuild;coinBuild=function(key){const set=cb0.apply(this,arguments);try{if(key==='fant'&&set&&CH880.feito&&set.__ch880!==CH880.vez&&ROOMS.fant===CH880.feito.R)ch880Moedas(CH880.feito.R,CH880.feito.K,CH880.feito.reg.moedas);}catch(e){ch880Erro('moedas',e);}return set;};}}catch(e){ch880Erro('moedas0',e);}
+}
+window.__casagrande880={estado:CH880,stats:CH880.stats,erros:CH880.erros,aplica:ch880AplicaManual,desfaz:ch880Desfaz,monta:()=>{if(!CH880.on)return false;const R=ch880Pronta();if(R)ch880Monta(R,true);return !!CH880.pacote;},poses:ch880Poses,vigia:ch880Vigia,
+  medidas:()=>{const P=CH880.pacote&&CH880.pacote.P;if(!P)return null;const o={};for(const k of Object.keys(P))if(typeof P[k]==='number')o[k]=+P[k].toFixed(3);return o;}};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
