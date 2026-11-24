@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v895</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v896</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -126770,6 +126770,122 @@ if(CH880.on){
 }
 window.__casagrande880={estado:CH880,stats:CH880.stats,erros:CH880.erros,aplica:ch880AplicaManual,desfaz:ch880Desfaz,monta:()=>{if(!CH880.on)return false;const R=ch880Pronta();if(R)ch880Monta(R,true);return !!CH880.pacote;},poses:ch880Poses,vigia:ch880Vigia,
   medidas:()=>{const P=CH880.pacote&&CH880.pacote.P;if(!P)return null;const o={};for(const k of Object.keys(P))if(typeof P[k]==='number')o[k]=+P[k].toFixed(3);return o;}};
+
+/* ===================== v896 · FANTASIA: OS OBSTÁCULOS DO CHÃO NÃO SOMEM MAIS QUANDO A LISTA VIVA É REFEITA (escada da Grande Árvore, Decorar, visita) (bloco `OV896`) =====================
+   Defeito antigo, achado por quatro revisões de 23–24/11 (a do `FA880` na margem, observação 2; a do `CO880`, M1 e V1; a do `EM880`; a do
+   `CH880`). O dono do jogo autorizou consertar numa versão própria. Sem arte: nenhuma malha, material, luz ou textura.
+   COMO ERA: na Fantasia, `R.world.obst` (a lista viva de obstáculos do chão: a que a colisão do leitor, a navegação do clique, os bichos e os
+   blocos leem) é a cópia `combined` que o recanto da v355 junta — `a.concat(COZY355.obstacles)`, onde `a` é o que o Decorar (DEC128, que se
+   registra antes, no `finishRoom`) devolve por baixo: a lista-base do nível (`FANT_OBST` no chão) mais os discos das peças do Decorar quando há
+   peça nesse nível. A v355 guarda a cópia enquanto `a` for o mesmo e a REFAZ do zero quando `a` muda: (1) a cada troca de nível da escada da
+   Grande Árvore (chão → escada → deque e de volta; ao voltar ao chão sai uma cópia nova); (2) com peça do Decorar no chão da sala (o leitor
+   decorou a Fantasia, ou é a visita à sala de outro leitor, que chega com as peças do anfitrião), a cada mudança do Decorar — pôr, tirar,
+   mover uma peça; pôr a PRIMEIRA peça ou tirar a última também —, a cada `decorInvalidate128` dos outros sistemas (galeria, mímico…) e sempre
+   que um bloco escreve na `FANT_OBST` (o comprimento muda e o Decorar refaz a dele). Vários kits antigos empurram obstáculos SÓ na lista viva,
+   e eles sumiam na primeira recópia, pelo resto da sessão. Medido no jogo sem cabeça (v895 com todos os blocos de 880, PT e EN): 142 entradas
+   (lista viva 1 299 → 1 158) — v550 (a colina) 64, v539 (a clareira do duelo) 30, v741 (os sete conjuntos) 29: quadro de missões 6, ponto da
+   linha encantada 6, arco das rosas 4, chá no cogumelo 10, ninho do dragão 3; v619 (Casa da Clareira encantada) 12: os quatro torreões de pedra
+   (2,15 m) e os cristais; v643 (o tronco oco) 4; v715 (a torre) 3. Depois de subir e descer a escada o leitor entrava até 0,11 m do centro de
+   um torreão, atravessava o arco e o chá. Na visita (ou com peça no chão da Fantasia) a v895 já entrava na sala sem eles, e sem o da casinha da
+   v158 (1,65; −28,62), que nesse caso cai na cópia do Decorar. E o contrário: a v539 tira da lista viva o tronco de uma árvore que ela limpou,
+   (23,18; −184), que continua na lista do recanto e VOLTAVA em cada recópia (um obstáculo invisível). Os `desfaz()` do `FA880`, do `ES880` e
+   do `CG880` devolvem obstáculos só à lista viva: também sumiam na escada seguinte.
+   AGORA: o `obst` do mundo da Fantasia ganha um embrulho por cima do da v355, posto logo que ela o define (no fim do `cozy355Build`, nas duas
+   formas: a direta e a fatiada); senão no `setActive` da Fantasia ou pelo vigia de 2 s. O embrulho só olha a lista do CHÃO (nível 0): a da
+   escada e a do deque continuam as delas, intocadas, e nada do chão vai para elas. Ele guarda a lista do chão da vez e o que ela tinha ao
+   nascer; quando a v355 entrega uma cópia nova do chão, ele (a) põe nela o que a anterior tem agora e a nova não trouxe — os obstáculos dos
+   kits —, menos os discos das peças do Decorar (o `decorObstacles128` é embrulhado só para marcá-los: vêm sempre da hora, e a peça movida ou
+   tirada não deixa obstáculo para trás); e (b) tira dela o que a anterior tinha ao nascer, alguém tirou depois, e a nova trouxe de volta das
+   listas-base (o tronco da v539). Assim a lista do chão sai de cada recópia igual ao que era, mais o que entrou nas listas-base (que a v355 já
+   traz). O que os blocos tiraram de propósito (os sete da ponte do troll e os quatro da espada no lugar antigo, os 27 da casa velha) sai de
+   todas as listas e não volta. Nada é posto nas listas-base (`FANT_OBST`, `COZY355.obstacles`): as chaves, os baús, as moedas, o chão do
+   Decorar e os blocos que as leem veem o mesmo que antes (medido: chaves, baús, moedas, pratas e rubis da Fantasia nos mesmos lugares).
+   Depois de uma recópia com mudança, `__nav`/`__cl` do mundo são zerados.
+   CUSTO (jogo sem cabeça): a leitura de sempre (a mesma lista do chão) fica ~0,02 µs mais cara (uma comparação); a recópia, 0,25–0,45 ms.
+   O QUE ENTRA DAS LISTAS-BASE (revisão, 24/11): o que é posto SÓ na lista-base do chão depois de a lista viva nascer — a peça da galeria do
+   TRELLIS (v232, `g232Uma`: `floors[0].baseObs.push` + `decorInvalidate128`, quando os dados chegam no navegador; ex. o disco (−1,95; 0,15;
+   0,4) visto na conta Webmaster; o baú de prata e o Baú Monstro usam o mesmo caminho) — não está na viva até a primeira recópia e entra nela, como na v895; a
+   regra (b) não o tira (ele não estava na lista do chão ao nascer). NÃO se trata como «tirado» o que já faltava na viva na instalação: seria
+   tirar para sempre o disco dessas peças (o leitor atravessaria a peça da galeria). (Que elas só entrem na viva na primeira recópia é
+   defeito antigo da v232/v146 com o recanto da v355, fora deste bloco.)
+   REVISÃO R1: a reinstalação (outro getter posto por cima, sem sala nova) lê pelo embrulho novo — uma recópia pendente é tratada com o que a
+   lista anterior tinha (antes a cópia nova virava o ponto de partida e os 142 sumiam).
+   Chaves: `?obstaculos896=0` (fica como na v895: nada é embrulhado).
+   Gancho `window.__obstaculos896`: `estado`, `stats` (instalações e onde, recópias por causa, levados, tirados, a última, tempos), `erros`,
+   `lista()` (o que só vive na lista viva do chão, o que as listas-base têm e a lista do chão não, os discos do Decorar e o tamanho de cada uma),
+   `confere()` (o embrulho está posto no mundo de agora, por cima de tudo, e a lista do chão é a que ele acompanha, sem repetidos). */
+const OV896_Q=location.search+location.hash;
+const OV896={on:!/[?&#]obstaculos896=0/i.test(OV896_Q),erros:[],W:null,tok:null,ult:null,ini:null,lvlVisto:0,iv:null,decor:(typeof WeakSet==='function')?new WeakSet():null,
+  stats:{instalacoes:0,onde:null,recopias:0,porCausa:{nivel:0,base:0},levados:0,tirados:0,ultima:null,msMax:0,msTotal:0,setActive:0,vigia:0,discosDoDecorar:0}};
+function ov896Erro(k,e){try{if(OV896.erros.length<40)OV896.erros.push(k+': '+String(e&&e.message?e.message:e));console.warn('v896 obstáculos',k,e);}catch(x){}}
+function ov896Fant(){try{return (typeof window!=='undefined'&&window.__FANT)||null;}catch(e){return null;}}
+function ov896Pronta(){try{const R=(typeof ROOMS!=='undefined')?ROOMS.fant:null;if(!R||!R.ready||!R.world)return null;return R;}catch(e){return null;}}
+// a v355 define o `obst` dela no FIM do `cozy355Build` (o `COZY355.stats` é a última coisa que ela grava); antes disso não se embrulha (senão
+// ela embrulharia este por cima e as cópias dela ficariam fora do alcance). Sem recanto (não montado ou com erro) embrulha-se o que houver.
+function ov896RecantoPronto(){try{if(typeof COZY355==='undefined'||!COZY355)return true;if(!COZY355.ready)return false;return !!COZY355.stats||!!(COZY355.errors&&COZY355.errors.length);}catch(e){return true;}}
+function ov896Posto(R){try{const d=Object.getOwnPropertyDescriptor(R.world,'obst');return !!(d&&d.get&&OV896.tok&&d.get.__ov896===OV896.tok);}catch(e){return false;}}
+// a recópia do chão: U = a lista anterior (como está agora), I = o que ela tinha ao nascer, v = a cópia nova que a v355 acabou de fazer
+function ov896Recopia(v){const t0=performance.now(),U=OV896.ult,I=OV896.ini;let ini=null;
+  try{ini=new Set(v);   // o que a cópia nova trouxe ao nascer (antes de qualquer mudança daqui)
+    if(U&&I&&U!==v){const D=OV896.decor,AP=Array.prototype;let lev=0,tir=0;
+      // (b) o que a anterior tinha ao nascer, foi tirado dela depois e a nova trouxe de volta das listas-base: tirado de propósito, fica fora
+      const Us=new Set(U);let fora=null;for(const q of I){if(!Us.has(q)&&ini.has(q))(fora||(fora=new Set())).add(q);}
+      if(fora){for(let i=v.length-1;i>=0;i--){if(fora.has(v[i])){AP.splice.call(v,i,1);tir++;}}}
+      // (a) o que a anterior tem agora e a nova não trouxe — menos os discos das peças do Decorar, que vêm sempre da hora
+      for(let i=0;i<U.length;i++){const q=U[i];if(q&&!ini.has(q)&&!(D&&D.has(q))){AP.push.call(v,q);lev++;}}
+      if(lev||tir){try{OV896.W.__nav=null;OV896.W.__cl=null;}catch(e){}}
+      const S=OV896.stats,ms=performance.now()-t0;S.recopias++;S.porCausa[OV896.lvlVisto?'nivel':'base']++;S.levados+=lev;S.tirados+=tir;S.msTotal+=ms;if(ms>S.msMax)S.msMax=ms;
+      S.ultima={causa:OV896.lvlVisto?('troca de nível (esteve no '+OV896.lvlVisto+')'):'a lista de baixo mudou (Decorar / FANT_OBST)',levados:lev,tirados:tir,viva:v.length,ms:+ms.toFixed(3)};}
+  }catch(e){ov896Erro('recópia',e);}
+  OV896.ult=v;OV896.ini=ini;OV896.lvlVisto=0;}
+function ov896Instala(R,onde){try{if(!OV896.on)return false;const W=R.world,d=Object.getOwnPropertyDescriptor(W,'obst');
+    if(!d||typeof d.get!=='function'){OV896.stats.semGetter=(OV896.stats.semGetter||0)+1;return false;}   // lista simples: ninguém a refaz
+    if(OV896.W===W&&d.get.__ov896===OV896.tok)return true;
+    const tok={},prev=d;
+    // (o erro do getter de baixo passa adiante como antes; o que é daqui nunca lança)
+    const get=function(){const v=prev.get.call(this);
+      try{if(tok===OV896.tok&&v!==OV896.ult&&this===OV896.W&&Array.isArray(v)){const F=ov896Fant();if(F&&F.lvl)OV896.lvlVisto=F.lvl;else ov896Recopia(v);}}catch(e){ov896Erro('leitura',e);}
+      return v;};
+    get.__ov896=tok;
+    const muda=OV896.W!==W;OV896.tok=tok;OV896.W=W;
+    Object.defineProperty(W,'obst',{configurable:true,enumerable:!!d.enumerable,get,set:d.set});
+    // a lista do chão de agora: o que ela tem passa a ser o ponto de partida (o que nela só vive na lista viva será levado na próxima recópia)
+    // (revisão R1) lida PELO EMBRULHO NOVO, já posto: se a lista do chão foi refeita enquanto o embrulho de antes estava soterrado (outro bloco
+    // pôs um getter por cima) e ninguém leu ainda, a recópia é tratada aqui, levando o que a anterior tinha. Antes, `prev.get` com o token
+    // novo já valendo deixava o de baixo inerte e a cópia nova virava o ponto de partida sem levar nada (medido: os 142 sumiam). Mundo novo
+    // (sala remontada): o ponto de partida é a lista dele, sem levar nada do mundo velho.
+    const F=ov896Fant();
+    if(muda){OV896.ult=null;OV896.ini=null;}   // fora do chão: o ponto de partida é a primeira lista do chão que aparecer
+    if(!(F&&F.lvl)){const v=W.obst;if(v!==OV896.ult||!OV896.ini){OV896.ult=v;OV896.ini=Array.isArray(v)?new Set(v):null;}}
+    OV896.stats.instalacoes++;OV896.stats.onde=onde;return true;}catch(e){ov896Erro('instala '+onde,e);return false;}}
+function ov896Tenta(onde){try{if(!OV896.on)return;const R=ov896Pronta();if(!R||!ov896RecantoPronto())return;if(OV896.W===R.world&&ov896Posto(R))return;ov896Instala(R,onde);}catch(e){ov896Erro('tenta '+onde,e);}}
+function ov896Vigia(){try{OV896.stats.vigia++;ov896Tenta('vigia');}catch(e){ov896Erro('vigia',e);}}
+// listas-base do chão de agora: a `FANT_OBST` (o `baseObs` do Decorar / o `keyFloors` da sala) e a do recanto
+function ov896Fixa(R){try{const kf=(R&&typeof R.keyFloors==='function')?R.keyFloors():null,f0=Array.isArray(kf)?kf.find(f=>f&&f.lvl===0):null;
+    if(f0){if(Array.isArray(f0.baseObs))return f0.baseObs;const d=f0.world&&Object.getOwnPropertyDescriptor(f0.world,'obst');if(d&&Array.isArray(d.value))return d.value;}}catch(e){}return null;}
+function ov896Lista(){const o={on:OV896.on};try{const R=ov896Pronta(),F=ov896Fant();o.nivel=F?F.lvl:0;o.instalado=!!(R&&OV896.W===R.world&&ov896Posto(R));
+    const U=OV896.ult;if(!R||!U){o.nota='ainda sem lista do chão acompanhada';return o;}
+    const r2=v=>Math.round(v*100)/100,fx=q=>[r2(q[0]),r2(q[1]),r2(q[2])];const fixa=ov896Fixa(R)||[],coz=(typeof COZY355!=='undefined'&&COZY355&&Array.isArray(COZY355.obstacles))?COZY355.obstacles:[];
+    const base=new Set(fixa.concat(coz)),Us=new Set(U),D=OV896.decor;
+    const so=U.filter(q=>q&&!base.has(q)&&!(D&&D.has(q))),dis=U.filter(q=>q&&D&&D.has(q)),fora=fixa.concat(coz).filter(q=>!Us.has(q));
+    o.viva=U.length;o.fixa=fixa.length;o.recanto=coz.length;o.discosDoDecorar=dis.length;o.soNaViva=so.length;o.foraDaViva=fora.length;
+    o.soNaVivaLista=so.slice(0,400).map(fx);o.foraDaVivaLista=fora.slice(0,60).map(fx);}catch(e){ov896Erro('lista',e);o.erro=String(e&&e.message||e);}return o;}
+function ov896Confere(){const o={ok:false,on:OV896.on};try{if(!OV896.on){o.nota='desligado pela chave';o.ok=true;return o;}const R=ov896Pronta();if(!R){o.nota='a Fantasia não está pronta';return o;}
+    const F=ov896Fant();o.nivel=F?F.lvl:0;o.instalado=OV896.W===R.world;o.posto=ov896Posto(R);
+    if(!o.nivel){const L=R.world.obst;o.acompanhada=L===OV896.ult;o.viva=L.length;const s=new Set();let dup=0;for(const q of L){if(s.has(q))dup++;s.add(q);}o.repetidos=dup;}
+    o.recopias=OV896.stats.recopias;o.levados=OV896.stats.levados;o.tirados=OV896.stats.tirados;o.erros=OV896.erros.length;
+    o.ok=!!(o.instalado&&o.posto&&(o.nivel||(o.acompanhada&&o.repetidos===0))&&!o.erros);}catch(e){ov896Erro('confere',e);o.erro=String(e&&e.message||e);}return o;}
+if(OV896.on){
+  // os discos das peças do Decorar nascem a cada vez que o Decorar refaz a lista dele: marcados, nunca são levados de uma cópia para a outra
+  try{if(typeof decorObstacles128==='function'&&OV896.decor){const d0=decorObstacles128;decorObstacles128=function(){const r=d0.apply(this,arguments);try{if(Array.isArray(r))for(const q of r){if(q&&typeof q==='object'){OV896.decor.add(q);OV896.stats.discosDoDecorar++;}}}catch(e){ov896Erro('discos',e);}return r;};}}catch(e){ov896Erro('decorObstacles128 0',e);}
+  // o mais cedo possível: logo que a v355 define o `obst` dela (fim do `cozy355Build`, nas duas formas: a direta e a fatiada do FR819)
+  try{if(typeof cozy355Build==='function'){const c0=cozy355Build,g0=c0.__gen;
+      cozy355Build=function(){const r=c0.apply(this,arguments);ov896Tenta('cozy355');return r;};
+      if(typeof g0==='function')cozy355Build.__gen=function*(){const r=yield* g0.apply(this,arguments);ov896Tenta('cozy355');return r;};}}catch(e){ov896Erro('cozy355 0',e);}
+  try{const sa0=setActive;setActive=function(sc){try{if(sc&&typeof ROOMS!=='undefined'&&ROOMS.fant&&sc===ROOMS.fant.scene){OV896.stats.setActive++;ov896Tenta('setActive');}}catch(e){ov896Erro('setActive',e);}return sa0.apply(this,arguments);};}catch(e){ov896Erro('setActive 0',e);}
+  try{OV896.iv=setInterval(ov896Vigia,2000);}catch(e){ov896Erro('vigia 0',e);}
+}
+window.__obstaculos896={estado:OV896,stats:OV896.stats,erros:OV896.erros,lista:ov896Lista,confere:ov896Confere};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
