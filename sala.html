@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v893</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v894</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -125386,6 +125386,539 @@ window.__coelho880={on:CO880.on,stats:CO880.stats,erros:CO880.erros,P:CO880.P,TI
   passo:(dt,leitor,recorte)=>{let L=leitor;if(L===undefined){try{L=(CUR==='room'&&ROOM===ROOMS.fant)?asaPos():null;}catch(e){L=null;}}return co880Passo(dt,L||null,!!recorte);},
   desfaz:()=>{CO880.pausa=true;return co880Desfaz();},aplica:()=>{CO880.pausa=false;return co880Aplica();}};
 try{Object.defineProperty(window.__coelho880,'estado',{enumerable:true,get:co880Estado});}catch(e){co880Erro('gancho',e);}
+
+/* ===================== v880 · O DRAGÃO PRISMÁTICO É UM DRAGÃO (bloco `DP880`) =====================
+   Pedido do Luiz (19/11, com print): «Esse dragão prismático que pego no OVO dos rubis pode melhorar muito, principalmente o
+   focinho de porco dele. É UM DRAGÃO».
+   COMO ERA: o `ruby422Baby` da v422 montava o filhote de PRIMITIVAS (esferas esticadas: corpo, barriga, cabeça redonda e um
+   focinho-bola com duas «narinas» escuras na frente — o tal focinho de porco —, olhos de bola, dois cones de chifre, patas de
+   tubo, um tubo de cauda, sete cones nas costas e duas asas recortadas num `ShapeGeometry` liso com três tubos), 5 768
+   triângulos (23 072 depois do refino da v566 quando ia na vaga do voador), 14 malhas e 12 sprites; o «prismático» vinha das
+   camadas v441/v445/v446 por cima (degradê de arco-íris nas cores de vértice, textura de escamas com relevo, emissão que gira o
+   matiz, quatro faíscas em órbita).
+   AGORA: o MODELO é outro — um dragão jovem ESCULPIDO com as ferramentas da v579 (campo de distância + redes de superfície, as
+   mesmas dos dragões da loja da v624): cabeça em cunha com FOCINHO COMPRIDO que afina para a ponta, narinas na ponta viradas
+   para a frente e para cima, linha de boca com a mandíbula à parte (abre ao soprar) e dentinhos, sobrancelhas ósseas, olhos
+   amendoados nas órbitas (íris de âmbar e fenda), pálpebras que piscam, chifres anelados curvos para trás, aletas nas bochechas,
+   pescoço em S, peito e barriga de placas claras até a garganta, crista de placas da nuca à cauda, cauda longa com pluma
+   prismática de três lâminas, quatro patas com garras, e asas de verdade (úmero, antebraço, punho com garra, quatro dedos e
+   membrana recortada em arcos entre os dedos, presa ao flanco). Tudo numa PELE só com ossos (40 ossos, uma malha por material:
+   pele, membrana, olhos): as asas batem dobrando no punho, a cauda ondula, o pescoço e a cabeça olham para onde ele vira e para
+   o inimigo em que sopra, a mandíbula abre no sopro, respira e pisca — sem conta por vértice na CPU. Os estágios de
+   crescimento continuam os mesmos (a escala e a altura do voo são as da v445/v529, intocadas) e mudam as PROPORÇÕES pelos
+   ossos: filhote de cabeça grande, focinho curto, chifres e asas pequenos; adulto esguio, de pescoço, cauda, chifres e asas
+   compridos. O material é prismático de fato: cor por vértice (cauda orquídea → corpo azul → cabeça turquesa, dorso anil,
+   placas lilás-pérola), escamas em textura triplanar com relevo, e um brilho cujo MATIZ MUDA COM O ÂNGULO de visão (um termo
+   de Fresnel no sombreador, com fase que gira devagar) — se o sombreador não compilar numa placa, o material volta sozinho ao
+   liso. Membranas com nervuras, degradê da paleta do ovo e a mesma iridescência.
+   O QUE NÃO MUDA: `ruby422BabyTick` (segue, flutua, cresce, sopra, queima, barreira), a 3.ª vaga `GEAR.rubi530`, o portão do
+   Torreão (`p439*`), o vínculo e as relíquias, o cartão (a miniatura é desenhada do modelo: muda sozinha). A BOCA do modelo
+   novo fica no MESMO ponto de ancoragem do antigo — (0; 0,18; 0,65) no espaço do grupo —, que é de onde o sopro e o fogo do
+   portão nascem; quando a cabeça vira para o inimigo, o cone do sopro é reancorado na boca de verdade.
+   As geometrias, os materiais e as texturas ficam em `CP579.cache` (cache conhecido da v876: não são descartados com o modelo);
+   os materiais são `papelKeep` (no Papel o dragão continua prismático, como o antigo) e as malhas com ossos ficam fora do
+   contorno de nanquim do Papel.
+   Chaves: `?dragao880=0` volta ao modelo antigo. Gancho `window.__dragao880` (`modelo(estagio)`, `pose(g,op)`, `stats`,
+   `erros`, `liga(v)`, `ancora(g)`, `fotos`).
+   REVISÃO (revisao/dp880/REVISAO.md) — consertos na cópia revisada:
+   M1: o cone do sopro, o halo da v529 e o referencial do olhar eram calculados DENTRO do tique, antes de o rb530 (3.ª vaga) espelhar e
+       reescalar o dragão e antes de o v434 afastar o voador: o fogo nascia de 1,0 a 2,6 m da boca que se vê. Agora a reancoragem é
+       feita depois do `gearTick` inteiro (`dp880Depois`, o embrulho mais de fora), com o grupo já no lugar final; o olhar usa a
+       matriz final do quadro anterior.
+   B1: a troca na 3.ª vaga também avisa o descarte antigo do CV876 quando é ele que está ligado (`?descarte882=0&descarte876=1`).
+   B2: pontos de parada fixos no fim da encomenda (blocos, junta, olhos, texturas): nenhum passo junta mais de uma dessas contas.
+   B3: na abertura, com o dragão antigo já numa vaga (à vista), a encomenda já nasce urgente.
+   B4: a troca de modelo (chegada da encomenda, `desfaz`/`aplica`) leva junto o estado do tique da v422 — recarga do sopro, barreira de
+       20 s, queimaduras em curso e o relógio das asas: trocar não dá uma barreira de graça nem apaga as queimaduras. */
+const DP880={on:!/[?&#]dragao880=0/i.test(location.search+location.hash),erros:[],stats:{montados:0,trocas:0},tempo:{},uT:{value:0},
+  ANC:[0,.18,.65],h:{corpo:.0092,cab:.0048,mand:.0058},A:null,vivos:[],antigo:null,conferido:0,job:null,it:null,urge:false,falhou:false};
+function dp880Erro(k,e){try{if(DP880.erros.length<30)DP880.erros.push(k+': '+String(e&&e.message||e));console.warn('v880 dragão',k,e);}catch(x){}}
+const DP880_B={raiz:0,peito:1,pesc1:2,pesc2:3,pesc3:4,cabeca:5,focinho:6,mand:7,chifreD:8,chifreE:9,palpD:10,palpE:11,cauda1:12,cauda2:13,cauda3:14,cauda4:15,cauda5:16,cauda6:17,
+  pfD1:18,pfD2:19,pfE1:20,pfE2:21,ptD1:22,ptD2:23,ptE1:24,ptE2:25,asaD1:26,asaD2:27,asaD3:28,dedoD1:29,dedoD2:30,dedoD3:31,dedoD4:32,asaE1:33,asaE2:34,asaE3:35,dedoE1:36,dedoE2:37,dedoE3:38,dedoE4:39};
+const DP880_ESP=(()=>{const M=[];const N=Object.keys(DP880_B);for(const k of N){const i=DP880_B[k];let j=i;if(/D\d?$/.test(k))j=DP880_B[k.replace(/D(\d?)$/,'E$1')];else if(/E\d?$/.test(k))j=DP880_B[k.replace(/E(\d?)$/,'D$1')];M[i]=j;}return M;})();
+
+/* ---------------- anatomia: juntas (pose de descanso, espaço do modelo: +z frente, +y cima) ---------------- */
+function dp880Anat(){if(DP880.A)return DP880.A;const A={};const th=.17,c=Math.cos(th),s=Math.sin(th);A.th=th;
+  A.RA=[0,-.10,-.26];A.PE=[0,-.06,-.05];A.N1=[0,.045,.14];A.N2=[0,.185,.125];A.N3=[0,.305,.195];A.HD=[0,.30,.335];
+  A.C=[[0,-.115,-.39],[0,-.14,-.53],[0,-.145,-.67],[0,-.13,-.81],[0,-.10,-.94],[0,-.065,-1.06]];A.CF=[0,-.03,-1.16];
+  // cabeça: espaço local (y para cima do crânio, z para o focinho) → modelo
+  A.cab=p=>[p[0],A.HD[1]+p[1]*c-p[2]*s,A.HD[2]+p[1]*s+p[2]*c];A.cabN=n=>[n[0],n[1]*c-n[2]*s,n[1]*s+n[2]*c];
+  A.yb=z=>-.0245+.42*(z-.16)*(z-.16)+.014*cp579S(.11,.045,z);   // linha da boca (espaço da cabeça): desce de leve e SOBE no canto (sorriso) e na ponta
+  A.BOCA=[0,-.02,.33];A.FOC=[0,0,.19];A.MAND=[0,-.035,.04];A.CHIF=[.055,.085,-.012];
+  // olho: centro, raio, eixo do olhar (G), eixo horizontal da fenda (H: para o canto de trás, inclinado para cima) e o de cima (U); janela = meia abertura em radianos
+  A.OLHO=[.052,.051,.124];A.OLHOR=.037;{const nrm=v=>{const l=Math.hypot(v[0],v[1],v[2]);return [v[0]/l,v[1]/l,v[2]/l];},X=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+    const G=nrm([.66,.07,.75]),H0=nrm([G[2],0,-G[0]]),U0=X(G,H0),ti=.1,ct=Math.cos(ti),st=Math.sin(ti);A.olharD=G;A.olhoH=[H0[0]*ct+U0[0]*st,H0[1]*ct+U0[1]*st,H0[2]*ct+U0[2]*st];A.olhoU=X(G,A.olhoH);A.palpEixo=A.olhoH;A.jan={ah:.94,au:.68,ad:.5};}
+  // espinha: da ponta da cauda à cabeça (para o matiz, as placas, o dorso e os pesos)
+  A.esp=[A.CF,A.C[5],A.C[4],A.C[3],A.C[2],A.C[1],A.C[0],A.RA,A.PE,A.N1,A.N2,A.N3,A.HD,A.cab([0,0,.12])];
+  A.espOsso=[17,16,15,14,13,12,0,0,1,2,3,4,5];A.espL=[];A.espS=[];let S=0;for(let i=0;i+1<A.esp.length;i++){const a=A.esp[i],b=A.esp[i+1],L=Math.hypot(b[1]-a[1],b[2]-a[2]);A.espL.push(L);A.espS.push(S);S+=L;}A.espT=S;
+  // patas (lado direito, +x)
+  A.PF=[[.098,-.068,.09],[.128,-.19,.04],[.12,-.272,.105],[.12,-.293,.137]];A.PT=[[.103,-.145,-.255],[.136,-.255,-.17],[.126,-.315,-.265],[.126,-.35,-.2]];
+  A.DEDF=[[.097,-.303,.166],[.12,-.306,.174],[.143,-.303,.166]];A.DEDT=[[.103,-.36,-.162],[.126,-.363,-.154],[.149,-.36,-.162]];
+  // asa direita
+  A.SH=[.085,.07,.02];A.EL=[.33,.215,-.085];A.WR=[.615,.345,.15];A.TP=[[1.17,.50,.03],[1.05,.37,-.38],[.80,.26,-.62],[.50,.12,-.63]];A.AH=[.10,-.04,-.31];A.FM=[.125,.03,-.13];
+  A.arco=[[0,-.012,-.02],[0,-.016,-.024],[0,-.018,-.02],[.012,-.016,-.012]];
+  A.dedo=(i,u)=>{const W=A.WR,T=A.TP[i],b=A.arco[i],k=4*u*(1-u);return [W[0]+(T[0]-W[0])*u+b[0]*k,W[1]+(T[1]-W[1])*u+b[1]*k,W[2]+(T[2]-W[2])*u+b[2]*k];};
+  DP880.A=A;return A;}
+// ponto mais perto da espinha: segmento i, fração t, distância d, posição u (0 = ponta da cauda, 1 = cabeça) e a direção do dorso
+function dp880Esp(A,x,y,z,o){const P=A.esp;let bi=0,bt=0,bd=1e9;for(let i=0;i+1<P.length;i++){const a=P[i],b=P[i+1];const vy=b[1]-a[1],vz=b[2]-a[2];let t=((y-a[1])*vy+(z-a[2])*vz)/(vy*vy+vz*vz);t=t<0?0:(t>1?1:t);const dy=y-a[1]-vy*t,dz=z-a[2]-vz*t;const d=dy*dy+dz*dz;if(d<bd){bd=d;bi=i;bt=t;}}
+  o.i=bi;o.t=bt;o.d=Math.sqrt(bd+x*x);o.s=A.espS[bi]+bt*A.espL[bi];o.u=o.s/A.espT;
+  // dorso: perpendicular ao segmento, suavizado nas juntas
+  const dir=(i)=>{const a=P[i],b=P[i+1],L=A.espL[i];return [(b[2]-a[2])/L,-(b[1]-a[1])/L];};let D=dir(bi);const L=A.espL[bi];
+  if(bt<.5&&bi>0){const E=dir(bi-1),k=.5-bt;D=[D[0]*(1-k)+E[0]*k,D[1]*(1-k)+E[1]*k];}else if(bt>=.5&&bi+2<P.length){const E=dir(bi+1),k=bt-.5;D=[D[0]*(1-k)+E[0]*k,D[1]*(1-k)+E[1]*k];}
+  const dl=Math.hypot(D[0],D[1])||1;o.dy=D[0]/dl;o.dz=D[1]/dl;o.px=0;o.py=P[bi][1]+(P[bi+1][1]-P[bi][1])*bt;o.pz=P[bi][2]+(P[bi+1][2]-P[bi][2])*bt;return o;}
+// pesos ao longo da espinha (dois ossos vizinhos, meia junta de transição)
+function dp880PesoEsp(A,o,W,k){const i=o.i,L=A.espL[i],b=A.espOsso[i];let w0=0,w1=0;
+  if(i>0&&A.espOsso[i-1]!==b){const m=Math.min(L,A.espL[i-1])*.48,d=o.t*L;if(d<m)w0=.5*(1-cp579S(0,m,d));}
+  if(i+2<A.esp.length&&A.espOsso[i+1]!==b){const m=Math.min(L,A.espL[i+1])*.48,d=(1-o.t)*L;if(d<m)w1=.5*(1-cp579S(0,m,d));}
+  dp880W(W,b,(1-w0-w1)*k);if(w0)dp880W(W,A.espOsso[i-1],w0*k);if(w1)dp880W(W,A.espOsso[i+1],w1*k);}
+function dp880W(W,b,w){if(w<=.002)return;for(let i=0;i<W.n;i++)if(W.b[i]===b){W.w[i]+=w;return;}if(W.n<4){W.b[W.n]=b;W.w[W.n]=w;W.n++;}else{let m=0;for(let i=1;i<4;i++)if(W.w[i]<W.w[m])m=i;if(W.w[m]<w){W.b[m]=b;W.w[m]=w;}}}
+function dp880DistSeg(x,y,z,a,b){const vx=b[0]-a[0],vy=b[1]-a[1],vz=b[2]-a[2];let t=((x-a[0])*vx+(y-a[1])*vy+(z-a[2])*vz)/(vx*vx+vy*vy+vz*vz);t=t<0?0:(t>1?1:t);return Math.hypot(x-a[0]-vx*t,y-a[1]-vy*t,z-a[2]-vz*t);}
+
+/* ---------------- campos (escultura) ---------------- */
+function dp880Campos(A){const Ell=cp579Ell,Cone=cp579Cone,Esf=cp579Esf,UK=cp579UniaoK,Esp=cp579Espelho,Cad=cp579Cadeia,Smin=cp579Smin;const C=A.C;
+  const tr0=UK([[Ell([0,-.012,.05],[.126,.136,.168],[.3,0,0]),0],[Ell([0,-.078,-.115],[.116,.12,.18]),.07],[Ell([0,-.10,-.275],[.104,.108,.135]),.06],
+    [Esp(Ell([.07,.052,.03],[.05,.042,.075])),.05],
+    [Cad([[0,-.03,.085],A.N1,A.N2,A.N3,A.HD,A.cab([0,0,.06])],[.108,.09,.07,.06,.056,.05],.03),.06],
+    [Cad([[0,-.105,-.31],C[0],C[1],C[2],C[3],C[4],C[5],A.CF,[0,-.005,-1.215]],[.098,.083,.068,.054,.041,.03,.021,.0125,.007],.02),.05],
+    [Cad([[0,.09,.10],[0,.045,-.10],[0,-.005,-.30]],[.028,.032,.026],.02),.05]]);
+  const pf=UK([[Ell([.098,-.066,.09],[.047,.062,.058]),0],[Cone(A.PF[0],A.PF[1],.042,.031),.03],[Cone(A.PF[1],A.PF[2],.029,.023),.02],[Ell([.12,-.294,.136],[.03,.02,.038]),.016],
+    [Esf(A.DEDF[0],.0125),.006],[Esf(A.DEDF[1],.0132),.006],[Esf(A.DEDF[2],.0125),.006]]);
+  const pt=UK([[Ell([.103,-.155,-.245],[.06,.092,.1],[.35,0,0]),0],[Cone(A.PT[0],A.PT[1],.056,.037),.03],[Cone(A.PT[1],A.PT[2],.033,.024),.02],[Cone(A.PT[2],[.126,-.345,-.215],.024,.021),.012],[Ell([.126,-.352,-.195],[.03,.018,.04]),.012],
+    [Esf(A.DEDT[0],.0125),.006],[Esf(A.DEDT[1],.0132),.006],[Esf(A.DEDT[2],.0125),.006]]);
+  // placas da barriga e da garganta em relevo (degraus ao longo da espinha, só do lado do ventre)
+  const o={};const placa=s=>{const q=(((s/.046)%1)+1)%1;return cp579S(.0,.16,q)*(1-cp579S(.84,1,q));};
+  const tronco=(x,y,z)=>{const d=tr0(x,y,z);if(d>.02||d<-.03)return d;dp880Esp(A,x,y,z,o);const ry=y-o.py,rz=z-o.pz,rl=Math.hypot(x,ry,rz)||1;const v=-(ry*o.dy+rz*o.dz)/rl;if(v<.35)return d;
+    return d-.0042*cp579S(.35,.7,v)*placa(o.s)*cp579S(.02,.1,o.u);};
+  const tudo=(x,y,z)=>{const ax=x<0?-x:x;return Smin(Smin(tronco(x,y,z),pf(ax,y,z),.035),pt(ax,y,z),.04);};
+  return {tronco,tr0,pf,pt,tudo,placa};}
+// perfil por pontos [[z,valor],…] (Hermite com tangentes por diferenças): os contornos da cabeça são DESENHADOS de perfil e de cima, não soma de bolhas
+function dp880Perfil(P){const n=P.length,m=[];for(let i=0;i<n;i++){const a=P[Math.max(0,i-1)],b=P[Math.min(n-1,i+1)];m.push((b[1]-a[1])/((b[0]-a[0])||1));}
+  return z=>{if(z<=P[0][0])return P[0][1];if(z>=P[n-1][0])return P[n-1][1];let i=0;while(z>P[i+1][0])i++;const a=P[i],b=P[i+1],h=b[0]-a[0],t=(z-a[0])/h,t2=t*t,t3=t2*t;
+    return (2*t3-3*t2+1)*a[1]+(t3-2*t2+t)*h*m[i]+(3*t2-2*t3)*b[1]+(t3-t2)*h*m[i+1];};}
+// casco por seções ao longo de z: topo T, fundo B, meia largura W (na altura C, a mais larga); p = expoente da seção (2 = elipse, mais = mais quadrada); tc/tb = afilamento para cima/para baixo
+function dp880Casco(T,B,W,C,p,tc,tb){const ip=1/p;return (x,y,z)=>{const c=C(z),dy=y-c,h=Math.max(.004,dy>=0?T(z)-c:c-B(z)),v=Math.abs(dy)/h,w=Math.max(.004,W(z)*(1-(dy>=0?tc:tb)*Math.min(1,v*v))),ax=Math.abs(x)/w;
+    return (Math.pow(Math.pow(ax,p)+Math.pow(v,p),ip)-1)*Math.min(w,h);};}
+function dp880CamposCab(A){const Ell=cp579Ell,Esf=cp579Esf,UK=cp579UniaoK,Esp=cp579Espelho,Cad=cp579Cadeia,Smax=cp579Smax,Smin=cp579Smin,PF=dp880Perfil,S=cp579S;
+  // crânio + maxila: perfil de cima (testa alta, DEGRAU entre os olhos, dorso do focinho que desce e afina), de baixo, largura (cunha) e a altura mais larga
+  const T=PF([[-.06,.015],[-.04,.066],[-.008,.096],[.045,.107],[.10,.103],[.135,.088],[.165,.067],[.20,.053],[.25,.044],[.295,.039],[.33,.037],[.36,.03]]);
+  const W=PF([[-.06,.03],[-.04,.064],[-.008,.085],[.04,.092],[.09,.088],[.13,.077],[.165,.064],[.20,.054],[.25,.046],[.295,.0405],[.33,.038],[.36,.03]]);
+  const Bf=PF([[-.06,.0],[-.04,-.036],[-.008,-.056],[.04,-.064],[.1,-.06],[.2,-.055],[.3,-.045],[.36,-.04]]);
+  const C=PF([[-.06,.014],[.04,.012],[.12,.004],[.2,-.006],[.3,-.004],[.36,-.002]]);
+  const casco=dp880Casco(T,Bf,W,C,2.5,.3,.22);const nuca0=Ell([0,.012,.11],[.135,.128,.172]),nuca=(x,y,z)=>Math.min(nuca0(x,y,z),.1-z);   // só corta atrás (z < 0,1)
+  const cranio=(x,y,z)=>Smax(Smax(casco(x,y,z),nuca(x,y,z),.03),z-.35,.03);
+  // mandíbula: casco próprio da articulação ao queixo (o ângulo do maxilar fica atrás, fundo e largo; na frente é mais estreita que a maxila — o lábio de cima cobre)
+  const Bj=PF([[-.035,-.018],[-.01,-.05],[.02,-.071],[.05,-.078],[.1,-.074],[.18,-.065],[.26,-.054],[.305,-.046],[.335,-.038]]),Wj=PF([[-.035,.04],[-.012,.062],[.02,.076],[.05,.076],[.1,.066],[.18,.049],[.26,.039],[.305,.033],[.335,.025]]);
+  const cascoM=dp880Casco(z=>A.yb(z)+.014,Bj,Wj,z=>A.yb(z<.06?.06:z)-.008,2.4,.1,.38);
+  const mInt=(x,y,z)=>Smax(Smax(cascoM(x,y,z),nuca(x,y,z),.03),z-.326,.025);
+  const E=A.OLHO,r=A.OLHOR,G=A.olharD,H=A.olhoH,U=A.olhoU,J=A.jan;
+  const cheio=UK([[cranio,0],
+    [(x,y,z)=>Smax(mInt(x,y,z),z-.075,.03),.03],                                                                          // o ângulo do maxilar (a parte de trás da mandíbula é da cabeça)
+    [Ell([0,.006,.33],[.036,.032,.026]),.02],                                                                             // ponta do nariz
+    [Esp(Ell([.021,.037,.323],[.017,.0155,.022],[-.25,.35,0])),.012],                                                     // calombos das narinas
+    [Esp(Cad([[.03,.086,.178],[.058,.105,.132],[.084,.106,.068],[.081,.095,-.002]],[.011,.018,.021,.018],.012)),.022],    // sobrancelhas ósseas (em arco)
+    [Esp(Cad([[.05,.002,.2],[.08,.002,.12],[.092,-.004,.04],[.082,-.014,-.025]],[.011,.016,.02,.019],.012)),.026],        // arcada da bochecha
+    [Cad([[0,.092,.13],[0,.055,.2],[0,.042,.27],[0,.037,.315]],[.013,.011,.009,.008],.01),.02],                           // aresta do nariz
+    [Esp(Cad([[.074,-.01,.07],[.058,-.018,.15],[.046,-.016,.24],[.03,-.009,.325]],[.012,.011,.01,.009],.01)),.016],       // lábio de cima
+    [Esp(Ell(A.CHIF,[.03,.028,.036])),.03],                                                                              // base dos chifres
+    [Esp(Esf(E,r+.0045)),.014]]);                                                                                       // pálpebras: casca em volta do olho
+  // janela do olho (amêndoa): < 0 dentro, em radianos — lente entre dois arcos, mais alta em cima que embaixo
+  const janela=(x,y,z)=>{const dx=Math.abs(x)-E[0],dy=y-E[1],dz=z-E[2],dl=Math.hypot(dx,dy,dz)||1e-6,g=(dx*G[0]+dy*G[1]+dz*G[2])/dl;if(g<-.3)return 1;
+    const hh=(dx*H[0]+dy*H[1]+dz*H[2])/dl,u=(dx*U[0]+dy*U[1]+dz*U[2])/dl,ah=Math.atan2(hh,g),av=Math.asin(u<-1?-1:(u>1?1:u)),t=ah/J.ah,k=1-t*t;return Math.max(av-J.au*k,-av-J.ad*k);};
+  const orbita=(x,y,z)=>{const dl=Math.hypot(Math.abs(x)-E[0],y-E[1],z-E[2]);return Math.max(janela(x,y,z)*r,(r-.0015)-dl,dl-(r+.016));};
+  const narina=Esp(Ell([.026,.046,.333],[.0075,.0055,.0115],[-.55,.5,.25]));
+  const boca=(x,y,z)=>Math.max(y-(A.yb(z)+.0015),.046-z);       // < 0 dentro do vão da boca (abaixo da linha, à frente do canto)
+  const ceu0=Ell([0,0,.185],[.03,.019,.135]),ceu=(x,y,z)=>ceu0(x,y-(A.yb(z)+.002),z);   // céu da boca: cavidade por cima da língua
+  const cab=(x,y,z)=>{let d=cheio(x,y,z);d=Smax(d,-boca(x,y,z),.006);d=Smax(d,-ceu(x,y,z),.006);d=Smax(d,-orbita(x,y,z),.003);d=Smax(d,-narina(x,y,z),.004);return d;};
+  const m0=UK([[mInt,0],[Ell([0,-.041,.302],[.02,.013,.02]),.016]]);
+  const lin0=Ell([0,0,.19],[.019,.0095,.105]),lingua=(x,y,z)=>lin0(x,y-(A.yb(z)-.0035),z);
+  const mand=(x,y,z)=>Smin(Smax(m0(x,y,z)+.0035*S(.07,.045,z),y-(A.yb(z)-.0025),.006),lingua(x,y,z),.005);   // atrás do canto encolhe um nada: fica por dentro da cabeça
+  return {cab,mand,orbita,janela,narina,cheio,m0,lingua,W,Wj,T};}
+
+/* ---------------- peças paramétricas: acumulador (posição, cor, pesos, uv) ---------------- */
+function dp880Ac(){return {P:[],C:[],U:[],W:[],I:[],L:[],liso:0};}
+function dp880Vt(a,p,c,w,u,v){a.P.push(p[0],p[1],p[2]);a.C.push(c[0],c[1],c[2]);a.W.push(w);a.U.push(u||0,v||0);a.L.push(a.liso||0);return a.P.length/3-1;}
+function dp880Curva(pts,n,rs){const c=new THREE.CatmullRomCurve3(pts.map(p=>new THREE.Vector3(p[0],p[1],p[2])),false,'centripetal');const out=[],R=[];
+  for(let i=0;i<=n;i++){const u=i/n,p=c.getPoint(u);out.push([p.x,p.y,p.z]);if(rs){const k=u*(rs.length-1),j=Math.min(rs.length-2,Math.floor(k));R.push(rs[j]+(rs[j+1]-rs[j])*(k-j));}}return [out,R];}
+// tubo de seção elíptica ao longo de uma linha de pontos (chifre, garra, dente, osso da asa, espinho)
+function dp880Tubo(a,pts,rs,o){o=o||{};const n=pts.length,L=o.lados||8,ax=o.achata||1,up=o.cima||[0,1,0];const base=a.P.length/3;const peso=(i,u,p)=>o.peso?o.peso(u,p,i):(o.osso||0),cor=(u,an,i)=>o.cor?o.cor(u,an,i):[1,1,1];
+  for(let i=0;i<n;i++){const p=pts[i],q0=pts[Math.max(0,i-1)],q1=pts[Math.min(n-1,i+1)];let tx=q1[0]-q0[0],ty=q1[1]-q0[1],tz=q1[2]-q0[2];const tl=Math.hypot(tx,ty,tz)||1;tx/=tl;ty/=tl;tz/=tl;
+    let d=up[0]*tx+up[1]*ty+up[2]*tz,nx=up[0]-tx*d,ny=up[1]-ty*d,nz=up[2]-tz*d,nl=Math.hypot(nx,ny,nz);if(nl<1e-4){nx=1-tx*tx;ny=-ty*tx;nz=-tz*tx;nl=Math.hypot(nx,ny,nz)||1;}nx/=nl;ny/=nl;nz/=nl;
+    const bx=ty*nz-tz*ny,by=tz*nx-tx*nz,bz=tx*ny-ty*nx;const u=i/(n-1),r=rs[i],w=peso(i,u,p);
+    for(let j=0;j<L;j++){const an=j/L*6.2831853,cs=Math.cos(an)*r*ax,sn=Math.sin(an)*r;dp880Vt(a,[p[0]+bx*cs+nx*sn,p[1]+by*cs+ny*sn,p[2]+bz*cs+nz*sn],cor(u,an,i),w);}}
+  for(let i=0;i+1<n;i++)for(let j=0;j<L;j++){const a0=base+i*L+j,a1=base+i*L+(j+1)%L,b0=a0+L,b1=a1+L;a.I.push(a0,b0,a1,a1,b0,b1);}
+  if(o.tampa0!==false){const c0=dp880Vt(a,pts[0],cor(0,0,0),peso(0,0,pts[0]));for(let j=0;j<L;j++)a.I.push(c0,base+j,base+(j+1)%L);}
+  if(o.tampa1!==false){const c1=dp880Vt(a,pts[n-1],cor(1,0,n-1),peso(n-1,1,pts[n-1]));const e=base+(n-1)*L;for(let j=0;j<L;j++)a.I.push(c1,e+(j+1)%L,e+j);}}
+// grade (membrana): fn(u,v) → {p,c,w,uv}
+function dp880Grade(a,nu,nv,fn){const base=a.P.length/3;for(let i=0;i<=nu;i++)for(let j=0;j<=nv;j++){const q=fn(i/nu,j/nv);dp880Vt(a,q.p,q.c||[1,1,1],q.w,q.uv?q.uv[0]:i/nu,q.uv?q.uv[1]:j/nv);}
+  for(let i=0;i<nu;i++)for(let j=0;j<nv;j++){const a0=base+i*(nv+1)+j,a1=a0+1,b0=a0+nv+1,b1=b0+1;a.I.push(a0,b0,a1,a1,b0,b1);}}
+// triângulo de faces vivas (vértices próprios)
+function dp880Tri(a,p0,p1,p2,c0,c1,c2,w0,w1,w2){const i=dp880Vt(a,p0,c0,w0);dp880Vt(a,p1,c1,w1===undefined?w0:w1);dp880Vt(a,p2,c2,w2===undefined?w0:w2);a.I.push(i,i+1,i+2);}
+function dp880Esfera(a,c,r,osso,cor,ns,nl){ns=ns||8;nl=nl||6;const base=a.P.length/3;for(let i=0;i<=nl;i++){const ph=i/nl*Math.PI;for(let j=0;j<ns;j++){const th=j/ns*6.2831853;dp880Vt(a,[c[0]+r*Math.sin(ph)*Math.cos(th),c[1]+r*Math.cos(ph),c[2]+r*Math.sin(ph)*Math.sin(th)],cor,osso);}}
+  for(let i=0;i<nl;i++)for(let j=0;j<ns;j++){const a0=base+i*ns+j,a1=base+i*ns+(j+1)%ns,b0=a0+ns,b1=a1+ns;a.I.push(a0,a1,b0,a1,b1,b0);}}
+function dp880Espelha(a){const M=DP880_ESP,b=dp880Ac();for(let i=0;i<a.P.length;i+=3)b.P.push(-a.P[i],a.P[i+1],a.P[i+2]);b.C=a.C.slice();b.U=a.U.slice();b.L=a.L.slice();
+  b.W=a.W.map(w=>typeof w==='number'?M[w]:w.map(q=>[M[q[0]],q[1]]));for(let i=0;i<a.I.length;i+=3)b.I.push(a.I[i],a.I[i+2],a.I[i+1]);return b;}
+// acumulador → bloco (com normais pelas faces e pesos em 4 por vértice)
+function dp880Bloco(a){const nv=a.P.length/3;const pos=new Float32Array(a.P),col=new Float32Array(a.C),uv=new Float32Array(a.U),idx=new Uint32Array(a.I),nor=new Float32Array(nv*3),si=new Uint16Array(nv*4),sw=new Float32Array(nv*4);
+  for(let t=0;t<idx.length;t+=3){const i0=idx[t]*3,i1=idx[t+1]*3,i2=idx[t+2]*3;const ax=pos[i1]-pos[i0],ay=pos[i1+1]-pos[i0+1],az=pos[i1+2]-pos[i0+2],bx=pos[i2]-pos[i0],by=pos[i2+1]-pos[i0+1],bz=pos[i2+2]-pos[i0+2];
+    const nx=ay*bz-az*by,ny=az*bx-ax*bz,nz=ax*by-ay*bx;for(const k of [i0,i1,i2]){nor[k]+=nx;nor[k+1]+=ny;nor[k+2]+=nz;}}
+  for(let q=0;q<nv;q++){const l=Math.hypot(nor[q*3],nor[q*3+1],nor[q*3+2])||1;nor[q*3]/=l;nor[q*3+1]/=l;nor[q*3+2]/=l;const w=a.W[q];
+    if(typeof w==='number'){si[q*4]=w;sw[q*4]=1;}else{let s=0;for(let k=0;k<w.length&&k<4;k++)s+=w[k][1];for(let k=0;k<w.length&&k<4;k++){si[q*4+k]=w[k][0];sw[q*4+k]=w[k][1]/(s||1);}}}
+  return {pos,nor,col,uv,si,sw,idx,nv,liso:new Float32Array(a.L)};}
+// rede de superfície → bloco: cor(x,y,z,nx,ny,nz) e peso(x,y,z,W); xf leva do espaço da peça ao do modelo
+function* dp880DeRedeG(R,cor,peso,xf,xfN){const nv=R.nv,pos=R.pos,nor=R.nor;const col=new Float32Array(nv*3),si=new Uint16Array(nv*4),sw=new Float32Array(nv*4),uv=new Float32Array(nv*2),liso=new Float32Array(nv);const W={n:0,b:[0,0,0,0],w:[0,0,0,0]};
+  for(let q=0;q<nv;q++){if((q&63)===63&&dp880Hora())yield 'cor e pesos';const x=pos[q*3],y=pos[q*3+1],z=pos[q*3+2];const c=cor(x,y,z,nor[q*3],nor[q*3+1],nor[q*3+2]);col[q*3]=c[0];col[q*3+1]=c[1];col[q*3+2]=c[2];if(c[3])liso[q]=c[3];
+    W.n=0;peso(x,y,z,W);let s=0;for(let k=0;k<W.n;k++)s+=W.w[k];for(let k=0;k<W.n;k++){si[q*4+k]=W.b[k];sw[q*4+k]=W.w[k]/(s||1);}if(!W.n){sw[q*4]=1;}
+    if(xf){const p=xf([x,y,z]),n=xfN([nor[q*3],nor[q*3+1],nor[q*3+2]]);pos[q*3]=p[0];pos[q*3+1]=p[1];pos[q*3+2]=p[2];nor[q*3]=n[0];nor[q*3+1]=n[1];nor[q*3+2]=n[2];}}
+  return {pos,nor,col,uv,si,sw,idx:R.idx,nv,liso};}
+function dp880Junta(L,comUv,comPesos){const T=THREE;let nv=0,ni=0;for(const b of L){nv+=b.nv;ni+=b.idx.length;}
+  const pos=new Float32Array(nv*3),nor=new Float32Array(nv*3),col=new Float32Array(nv*3),uv=new Float32Array(nv*2),si=new Uint16Array(nv*4),sw=new Float32Array(nv*4),idx=nv>65535?new Uint32Array(ni):new Uint16Array(ni);let ov=0,oi=0;
+  const liso=(comPesos!==false&&!comUv)?new Float32Array(nv):null;
+  for(const b of L){if(liso&&b.liso)liso.set(b.liso,ov);pos.set(b.pos,ov*3);nor.set(b.nor,ov*3);col.set(b.col,ov*3);uv.set(b.uv,ov*2);si.set(b.si,ov*4);sw.set(b.sw,ov*4);for(let k=0;k<b.idx.length;k++)idx[oi+k]=b.idx[k]+ov;ov+=b.nv;oi+=b.idx.length;}
+  const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(pos,3));g.setAttribute('normal',new T.BufferAttribute(nor,3));g.setAttribute('color',new T.BufferAttribute(col,3));if(comUv)g.setAttribute('uv',new T.BufferAttribute(uv,2));
+  if(comPesos!==false){g.setAttribute('skinIndex',new T.BufferAttribute(si,4));g.setAttribute('skinWeight',new T.BufferAttribute(sw,4));}if(liso)g.setAttribute('liso880',new T.BufferAttribute(liso,1));g.setIndex(new T.BufferAttribute(idx,1));g.computeBoundingBox();g.computeBoundingSphere();return g;}
+
+/* ---------------- cores ---------------- */
+const DP880_COR=(()=>{const H=cp579Hex;return {mat:[[0,H(0xd866da)],[.16,H(0x9458ea)],[.36,H(0x5461e8)],[.58,H(0x3a82ea)],[.80,H(0x2fa6e6)],[1,H(0x2fc9d2)]],dorso:H(0x232c8c),placa:H(0xe9e5fb),placaE:H(0xa59fe6),garganta:H(0xf3e8dc),
+  perola:H(0xfff1dc),rosa:H(0xf4b6e2),lilas:H(0xb58cf4),escuro:H(0x141a4e),dente:H(0xfbf6ea),boca:H(0x8a3561),bocaF:H(0x3a1030),lingua:H(0xd9648a)};})();
+function dp880Matiz(u){const M=DP880_COR.mat;u=u<0?0:(u>1?1:u);for(let i=0;i+1<M.length;i++){if(u<=M[i+1][0]){const t=(u-M[i][0])/(M[i+1][0]-M[i][0]);return cp579Mix(M[i][1],M[i+1][1],t*t*(3-2*t));}}return M[M.length-1][1];}
+function dp880Ruido(x,y,z){return Math.sin(x*37.1+1.3)*Math.sin(y*41.7+.4)*Math.sin(z*33.9+2.1)*.5+Math.sin(x*91+y*77+.7)*Math.sin(z*83-y*59+1.9)*.5;}
+// pele do tronco/pescoço/cauda/patas: matiz pela espinha, dorso anil, ventre em placas
+function dp880CorPele(A,F,x,y,z,nx,ny,nz,o,lam){const K=DP880_COR,S=cp579S,MX=cp579Mix;dp880Esp(A,x,y,z,o);let c=dp880Matiz(o.u);const vd=ny*o.dy+nz*o.dz;
+  c=MX(c,K.dorso,S(.15,.9,vd)*.62*(1-lam));c=MX(c,[c[0]*1.25+.02,c[1]*1.25+.03,c[2]*1.2+.04],S(.35,0,Math.abs(vd))*.35);
+  if(lam<.6){const ry=y-o.py,rz=z-o.pz,rl=Math.hypot(x,ry,rz)||1,v=-(ry*o.dy+rz*o.dz)/rl;const pl=S(.34,.6,v)*(1-lam/.6)*S(.02,.1,o.u);
+    if(pl>0){const q=F.placa(o.s);let p=MX(K.placaE,MX(K.placa,K.garganta,S(.72,.95,o.u)),.25+.75*q);p=MX(p,dp880Matiz(o.u),.14);c=MX(c,p,pl);}}
+  else{c=MX(c,K.dorso,S(-.2,-.36,y)*.45);}
+  const r=1+dp880Ruido(x,y,z)*.07;return [c[0]*r,c[1]*r,c[2]*r];}
+
+/* ---------------- geometrias (uma vez por sessão; ficam em CP579.cache) ---------------- */
+function dp880Prontas(){const p=CP579.cache.get('dp880 pele');return p?{pele:p,memb:CP579.cache.get('dp880 membrana'),olhos:CP579.cache.get('dp880 olhos')}:null;}
+// hora de ceder a vez? (o relógio é o do fatiador da v818: `fat8Fim`; sem ele, nunca cede)
+function dp880Hora(){try{return performance.now()>=fat8Fim;}catch(e){return false;}}
+function* dp880RedeG(f,caixa,h){if(typeof cp579RedeG==='function')return yield* cp579RedeG(f,caixa,h);return cp579Rede(f,caixa,h);}
+// de uma vez: escoa o gerador (o que as fatias já fizeram fica valendo)
+function dp880Geos(){const c=dp880Prontas();if(c)return c;const it=DP880.it||(DP880.it=dp880GeosG());let f0,tem=false;try{f0=fat8Fim;fat8Fim=Infinity;tem=true;}catch(e){}
+  try{let r;do{r=it.next();}while(!r.done);return r.value||dp880Prontas();}finally{DP880.it=null;if(tem){try{fat8Fim=f0;}catch(e){}}}}
+function* dp880GeosG(){const k='dp880 pele';{const c=dp880Prontas();if(c)return c;}
+  const t0=performance.now();const A=dp880Anat(),B=DP880_B,K=DP880_COR,S=cp579S,MX=cp579Mix,T=THREE;const blocos=[],st=DP880.stats;
+  const ao=(f,e)=>(x,y,z,nx,ny,nz)=>.5+.5*Math.max(0,Math.min(1,f(x+nx*e,y+ny*e,z+nz*e)/e));
+  // ---- (1) tronco + pescoço + cauda + patas: uma escultura só ----
+  {const F=dp880Campos(A);const R=yield* dp880RedeG(F.tudo,[-.215,-.385,-1.235,.215,.385,.44],DP880.h.corpo);const o={},oc=ao(F.tudo,.02);
+    const lamDe=(x,y,z)=>{const dT=F.tronco(x,y,z);if(dT<.003)return [0,0];const ax=Math.abs(x),dF=F.pf(ax,y,z),dP=F.pt(ax,y,z);if(Math.min(dF,dP)>.014)return [0,0];return [S(.003,.04,dT),dF<dP?1:2];};
+    blocos.push(yield* dp880DeRedeG(R,(x,y,z,nx,ny,nz)=>{const L=lamDe(x,y,z);const c=dp880CorPele(A,F,x,y,z,nx,ny,nz,o,L[0]);const k=oc(x,y,z,nx,ny,nz);return [c[0]*k,c[1]*k,c[2]*k];},
+      (x,y,z,W)=>{const L=lamDe(x,y,z);dp880Esp(A,x,y,z,o);if(L[0]<1)dp880PesoEsp(A,o,W,1-L[0]);
+        if(L[0]>0){const J=L[1]===1?A.PF:A.PT,ax=Math.abs(x);const dU=dp880DistSeg(ax,y,z,J[0],J[1]),dL=Math.min(dp880DistSeg(ax,y,z,J[1],J[2]),dp880DistSeg(ax,y,z,J[2],J[3]));const wl=S(-.022,.022,dU-dL);
+          const b=(L[1]===1?(x>=0?B.pfD1:B.pfE1):(x>=0?B.ptD1:B.ptE1));dp880W(W,b,L[0]*(1-wl));dp880W(W,b+1,L[0]*wl);}}));
+    st.corpo={tri:R.nt||R.idx.length/3,ms:Math.round(R.ms||0)};DP880.F=F;}
+  // ---- (2) cabeça e mandíbula (espaço da cabeça → modelo) ----
+  const FC=dp880CamposCab(A);
+  if(dp880Hora())yield 'cabeça';
+  {const R=yield* dp880RedeG(FC.cab,[-.13,-.078,-.062,.13,.14,.362],DP880.h.cab);const oc=ao(FC.cab,.012);const base=dp880Matiz(1),clara=MX(base,[1,1,1],.34),E=A.OLHO,er=A.OLHOR;
+    blocos.push(yield* dp880DeRedeG(R,(x,y,z,nx,ny,nz)=>{const ax=Math.abs(x);let c=MX(base,K.dorso,S(.15,.95,ny)*.5);c=MX(c,clara,S(.1,-.6,ny)*.45+S(.24,.35,z)*.2);c=MX(c,K.placa,S(-.6,-.95,ny)*S(.06,.0,z)*.7);
+        {const nk=S(.02,-.05,z);if(nk>0){let p=MX(dp880Matiz(.955),K.dorso,S(.15,.9,ny)*.62);p=MX(p,[p[0]*1.25+.02,p[1]*1.25+.03,p[2]*1.2+.04],S(.35,0,Math.abs(ny))*.35);c=MX(c,p,nk*.85);}}   // a nuca vai para a cor do pescoço (sem degrau de cor na emenda)
+        c=MX(c,K.lilas,(S(.086,.112,y)*S(.035,.07,ax)+S(.012,.0,ax)*S(.03,.12,ny)*S(.14,.2,z))*.3);              // sobrancelhas e aresta do nariz: reflexo lilás
+        c=MX(c,clara,S(.014,.003,y-A.yb(z))*S(.05,.08,z)*S(.3,-.2,ny)*.5);                                         // lábio
+        const dl=Math.hypot(ax-E[0],y-E[1],z-E[2]),jn=FC.janela(x,y,z);c=MX(c,K.escuro,S(er+.02,er+.004,dl)*S(.3,.02,jn)*.72);   // contorno do olho
+        c=MX(c,K.escuro,S(.004,-.002,FC.narina(ax,y,z))*.92);
+        const dn=S(-.0015,-.0065,FC.cheio(x,y,z))*S(.034,.022,y-A.yb(z))*S(.04,.06,z);if(dn>0)c=MX(c,MX(K.boca,K.bocaF,S(.2,.06,z)),dn*.96);   // céu da boca
+        const k=oc(x,y,z,nx,ny,nz),r=1+dp880Ruido(x,y,z)*.06;return [c[0]*k*r,c[1]*k*r,c[2]*k*r,dn];},
+      (x,y,z,W)=>{const wf=S(.17,.26,z);dp880W(W,B.cabeca,1-wf);dp880W(W,B.focinho,wf);},A.cab,A.cabN));st.cabeca={tri:R.idx.length/3,ms:Math.round(R.ms||0)};}
+  {const R=yield* dp880RedeG(FC.mand,[-.1,-.1,-.045,.1,.012,.34],DP880.h.mand);const oc=ao(FC.mand,.01);const base=MX(dp880Matiz(1),[1,1,1],.16);
+    blocos.push(yield* dp880DeRedeG(R,(x,y,z,nx,ny,nz)=>{const q=(((z/.03)%1)+1)%1;let c=MX(base,MX(K.placaE,K.garganta,.3+.7*S(0,.2,q)*(1-S(.8,1,q))),S(-.5,-.9,ny)*S(.035,.02,Math.abs(x)-FC.W(z)*.2));const dn=S(-.0015,-.0065,FC.m0(x,y,z))*S(-.03,-.018,y-A.yb(z))*S(.04,.06,z),lg=S(.0035,.0,FC.lingua(x,y,z));if(dn>0)c=MX(c,MX(K.boca,K.bocaF,S(.2,.06,z)),dn*.96);if(lg>0)c=MX(c,K.lingua,lg*.95);const k=oc(x,y,z,nx,ny,nz);return [c[0]*k,c[1]*k,c[2]*k,Math.max(dn,lg)];},
+      (x,y,z,W)=>{dp880W(W,B.mand,1);},A.cab,A.cabN));st.mandibula={tri:R.idx.length/3};}
+  if(dp880Hora())yield 'peças';
+  // ---- (3) peças paramétricas da pele: simétricas (aS) e do lado direito (aD, depois espelhadas) ----
+  const aS=dp880Ac(),aD=dp880Ac(),mS=dp880Ac(),mD=dp880Ac();const cabP=(p)=>A.cab(p);const pesoCab=z=>{const wf=S(.17,.26,z);return wf<=0?B.cabeca:(wf>=1?B.focinho:[[B.cabeca,1-wf],[B.focinho,wf]]);};
+  // chifres: anelados, curvos para trás
+  aD.liso=1;{const [P,Rr]=dp880Curva([A.CHIF,[.074,.128,-.072],[.086,.156,-.152],[.08,.162,-.24]].map(cabP),14,[.0215,.0175,.0115,.0016]);
+    dp880Tubo(aD,P,Rr.map((r,i)=>r*(1+.07*Math.sin(i*2.6))),{lados:9,osso:B.chifreD,cima:[1,0,0],tampa0:false,cor:(u,an,i)=>{const c=MX(MX(K.lilas,K.perola,S(0,.35,u)),K.rosa,S(.55,1,u)*.6);const k=.86+.14*Math.sin(i*2.6+1.2);return [c[0]*k,c[1]*k,c[2]*k];}});}
+  // espinhos das sobrancelhas (três por lado, da arcada ao chifre): quebram a linha reta do alto da cabeça
+  for(const [b,d,h,r] of [[[.066,.116,.118],[.5,.75,-.45],.024,.0075],[[.084,.121,.074],[.62,.7,-.36],.03,.0085],[[.089,.113,.03],[.7,.55,-.45],.024,.0075]]){const l=Math.hypot(d[0],d[1],d[2]),u=[d[0]/l,d[1]/l,d[2]/l];
+    dp880Tubo(aD,[[b[0]-u[0]*.008,b[1]-u[1]*.008,b[2]-u[2]*.008],[b[0]+u[0]*h*.5,b[1]+u[1]*h*.5,b[2]+u[2]*h*.5-.003],[b[0]+u[0]*h,b[1]+u[1]*h,b[2]+u[2]*h-.01]].map(cabP),[r,r*.62,.0006],{lados:6,osso:B.cabeca,tampa0:false,cor:(q)=>MX(MX(dp880Matiz(1),K.lilas,.6),K.perola,S(.1,.8,q))});}
+  // dentes de cima (5 por lado + presa), na beira do lábio
+  for(let i=0;i<6;i++){const z=.312-i*.036,x=FC.W(z)*.9-.0065+(i===0?-.006:0),y=A.yb(z)+.005,h=i===1?.027:.0155,r=i===1?.0068:.0052;
+    dp880Tubo(aD,[cabP([x,y,z]),cabP([x+.0015,y-h,z+.002])],[r,.0005],{lados:5,peso:()=>pesoCab(z),cor:()=>K.dente,tampa0:false});}
+  // dentes de baixo (4 por lado): por dentro do lábio de cima; aparecem quando a boca abre
+  for(let i=0;i<4;i++){const z=.285-i*.05,x=FC.Wj(z)*.84-.004,y=A.yb(z)-.006;dp880Tubo(aD,[cabP([x,y,z]),cabP([x-.001,y+.0145,z-.002])],[.0046,.0005],{lados:5,osso:B.mand,cor:()=>K.dente,tampa0:false});}
+  // pálpebra de cima: calota em volta do olho, escondida sob a pele acima da janela (osso próprio; pisca girando em volta do eixo da fenda)
+  aD.liso=0;{const G=A.olharD,Hh=A.olhoH,Uu=A.olhoU,E=A.OLHO,r=A.OLHOR+.0022,am=1.0,fc=A.jan.au+.05+am;const dc=[G[0]*Math.cos(fc)+Uu[0]*Math.sin(fc),G[1]*Math.cos(fc)+Uu[1]*Math.sin(fc),G[2]*Math.cos(fc)+Uu[2]*Math.sin(fc)];
+    const e1=Hh,e2=[dc[1]*e1[2]-dc[2]*e1[1],dc[2]*e1[0]-dc[0]*e1[2],dc[0]*e1[1]-dc[1]*e1[0]];const cor=MX(dp880Matiz(1),K.dorso,.4),borda=MX(cor,K.escuro,.6);const base=aD.P.length/3,ns=14,nl=6;
+    for(let i=0;i<=nl;i++){const ph=i/nl*am;for(let j=0;j<ns;j++){const th=j/ns*6.2831853,sx=Math.sin(ph)*Math.cos(th),sy=Math.sin(ph)*Math.sin(th),cz=Math.cos(ph);
+        dp880Vt(aD,cabP([E[0]+r*(dc[0]*cz+e1[0]*sx+e2[0]*sy),E[1]+r*(dc[1]*cz+e1[1]*sx+e2[1]*sy),E[2]+r*(dc[2]*cz+e1[2]*sx+e2[2]*sy)]),i===nl?borda:cor,B.palpD);}}
+    for(let i=0;i<nl;i++)for(let j=0;j<ns;j++){const a0i=base+i*ns+j,a1=base+i*ns+(j+1)%ns,b0=a0i+ns,b1=a1+ns;aD.I.push(a0i,b0,a1,a1,b0,b1);}}
+  // espinhos das aletas da bochecha + teia (membrana)
+  aD.liso=.85;{const b0=[.088,-.008,.028],pt=[[.142,.052,-.075],[.172,-.006,-.095],[.146,-.062,-.072]],cz=[0,0,0];const esp=pt.map(p=>dp880Curva([b0,[(b0[0]+p[0])/2+.012,(b0[1]+p[1])/2,(b0[2]+p[2])/2],p],6,[.0085,.006,.0012]));
+    for(const [P,Rr] of esp)dp880Tubo(aD,P.map(cabP),Rr,{lados:6,osso:B.cabeca,tampa0:false,cor:(u)=>MX(K.lilas,K.perola,S(0,.6,u))});
+    for(let i=0;i<2;i++)dp880Grade(mD,6,5,(u,v)=>{const pa=esp[i][0][Math.round(u*6)],pb=esp[i+1][0][Math.round(u*6)];const sc=1-.3*u*u*4*v*(1-v);const p=[b0[0]+((pa[0]+(pb[0]-pa[0])*v)-b0[0])*sc,b0[1]+((pa[1]+(pb[1]-pa[1])*v)-b0[1])*sc,b0[2]+((pa[2]+(pb[2]-pa[2])*v)-b0[2])*sc];
+      return {p:cabP(p),w:B.cabeca,uv:[.25+u*.75,.3+(i+v)*.2],c:MX(K.rosa,[1,1,1],.35)};});}
+  // garras (3 por pata)
+  aD.liso=1;{const garra=(d,osso,dz)=>{const [P,Rr]=dp880Curva([[d[0],d[1]+.003,d[2]+.006*dz],[d[0],d[1]-.004,d[2]+.022*dz],[d[0],d[1]-.02,d[2]+.031*dz]],5,[.0082,.006,.0008]);dp880Tubo(aD,P,Rr,{lados:6,osso,tampa0:false,cima:[1,0,0],cor:(u)=>MX(K.lilas,K.perola,S(0,.5,u))});};
+    for(const d of A.DEDF)garra(d,B.pfD2,1);for(const d of A.DEDT)garra(d,B.ptD2,1);}
+  if(dp880Hora())yield 'crista';
+  // crista: placas da nuca à cauda (faces vivas, como cristal)
+  aS.liso=.8;{const F=DP880.F,o={},Wt={n:0,b:[0,0,0,0],w:[0,0,0,0]};const n=25;A.crista=[];
+    for(let k=0;k<n;k++){const u=.085+k/(n-1)*.86;const s=u*A.espT;let i=0;while(i+2<A.esp.length&&A.espS[i+1]<s)i++;const t=(s-A.espS[i])/A.espL[i],a=A.esp[i],b=A.esp[i+1];const py=a[1]+(b[1]-a[1])*t,pz=a[2]+(b[2]-a[2])*t;dp880Esp(A,0,py,pz,o);
+      let r=.004;for(let q=0;q<80;q++){const d=F.tr0(0,py+o.dy*r,pz+o.dz*r);if(d>=0)break;r+=Math.max(.0008,-d*.6);}
+      const perfil=Math.pow(Math.sin(Math.PI*Math.min(1,Math.max(0,(u-.06)/.9))),.6);const alt=(.022+.05*perfil*(.75+.25*Math.sin(k*2.4)))*(u>.9?.75:1),comp=.03+.03*perfil,larg=.0085+.006*perfil;
+      const ty=-o.dz,tz=o.dy;   // tangente (rumo à cabeça)
+      const pt=(al,up,lx)=>[lx,py+o.dy*(r-.006+up)+ty*al,pz+o.dz*(r-.006+up)+tz*al];const fr=pt(comp*.55,0,0),tr=pt(-comp*.6,0,0),ld=pt(-comp*.05,0,larg),le=pt(-comp*.05,0,-larg),ap=pt(-comp*.62,alt,0),mf=pt(comp*.12,alt*.5,0);
+      Wt.n=0;dp880PesoEsp(A,o,Wt,1);const w=[];for(let q=0;q<Wt.n;q++)w.push([Wt.b[q],Wt.w[q]]);const cb=MX(dp880Matiz(u),K.dorso,.5),ct=MX(MX(K.lilas,K.rosa,S(.2,.9,1-u)),K.perola,.35),cm=MX(cb,ct,.55);
+      dp880Tri(aS,fr,ld,mf,cb,cb,cm,w);dp880Tri(aS,ld,ap,mf,cb,ct,cm,w);dp880Tri(aS,ld,tr,ap,cb,cb,ct,w);dp880Tri(aS,fr,mf,le,cb,cm,cb,w);dp880Tri(aS,le,mf,ap,cb,cm,ct,w);dp880Tri(aS,le,ap,tr,cb,ct,cb,w);A.crista.push({u,ap});}}
+  // pluma da cauda: haste + três lâminas de membrana
+  {const c6=A.C[5],cf=A.CF;const dx=[0,cf[1]-c6[1],cf[2]-c6[2]],dl=Math.hypot(dx[1],dx[2]);const d=[0,dx[1]/dl,dx[2]/dl],up=[0,-d[2],d[1]];const L=.3,b=[0,cf[1]+d[1]*.03,cf[2]+d[2]*.03];
+    const hp=[];for(let i=0;i<=8;i++){const u=i/8;hp.push([0,b[1]+d[1]*L*u+up[1]*.02*u*u,b[2]+d[2]*L*u+up[2]*.02*u*u]);}
+    dp880Tubo(aS,hp,hp.map((p,i)=>.0075*(1-i/8)+.0007),{lados:6,osso:B.cauda6,tampa0:false,cor:(u)=>MX(K.lilas,K.perola,S(0,.7,u))});
+    const lam=(ang,alt,tom)=>dp880Grade(mS,10,5,(u,v)=>{const h=alt*Math.pow(Math.sin(Math.PI*Math.pow(u,.62)),.85)*(1-.16*Math.pow(Math.abs(Math.sin(u*Math.PI*4)),3));const ca=Math.cos(ang),sa=Math.sin(ang);const q=hp[Math.round(u*8*1)]||hp[8];const i0=Math.min(7,Math.floor(u*8)),f=u*8-i0;const hx=hp[i0],hy=hp[i0+1];const cy=hx[1]+(hy[1]-hx[1])*f,cz=hx[2]+(hy[2]-hx[2])*f;
+      const back=-.25*h*v;return {p:[sa*h*v,cy+up[1]*ca*h*v+d[1]*back,cz+up[2]*ca*h*v+d[2]*back],w:B.cauda6,uv:[.2+.8*u,.05+.2*v+tom],c:MX(K.rosa,[1,1,1],.3+.4*v)};});
+    lam(.62,.105,.0);lam(-.62,.105,.25);lam(Math.PI,.06,.5);}
+  if(dp880Hora())yield 'asas';
+  // asa direita: ossos em tubo + membrana
+  aD.liso=0;{const SH=A.SH,EL=A.EL,WR=A.WR,TP=A.TP;const mix3=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];const corO=(u)=>MX(MX(dp880Matiz(.5),K.dorso,.35),K.lilas,S(.2,1,u)*.5);
+    // normal do plano da asa (para a barriga da membrana)
+    const e1=[WR[0]-SH[0],WR[1]-SH[1],WR[2]-SH[2]],e2=[TP[2][0]-SH[0],TP[2][1]-SH[1],TP[2][2]-SH[2]];let Nw=[e1[1]*e2[2]-e1[2]*e2[1],e1[2]*e2[0]-e1[0]*e2[2],e1[0]*e2[1]-e1[1]*e2[0]];const nl=Math.hypot(Nw[0],Nw[1],Nw[2])*(Nw[1]<0?-1:1);Nw=[Nw[0]/nl,Nw[1]/nl,Nw[2]/nl];A.Nw=Nw;
+    dp880Tubo(aD,[mix3(SH,EL,-.06),mix3(SH,EL,.5),EL],[.034,.027,.0235],{lados:8,osso:B.asaD1,cor:()=>corO(0),cima:Nw});
+    dp880Tubo(aD,[EL,mix3(EL,WR,.5),WR],[.0235,.02,.0175],{lados:8,osso:B.asaD2,cor:()=>corO(.15),cima:Nw});
+    dp880Esfera(aD,EL,.0265,B.asaD2,corO(.1));dp880Esfera(aD,WR,.0215,B.asaD3,corO(.3));
+    aD.liso=1;{const [P,Rr]=dp880Curva([[WR[0],WR[1]+.012,WR[2]+.012],[WR[0]+.012,WR[1]+.04,WR[2]+.06],[WR[0]+.03,WR[1]+.045,WR[2]+.105]],5,[.0125,.008,.001]);dp880Tubo(aD,P,Rr,{lados:6,osso:B.asaD3,tampa0:false,cor:(u)=>MX(K.lilas,K.perola,S(0,.5,u))});}
+    aD.liso=.35;for(let i=0;i<4;i++){const P=[],Rr=[];for(let k=0;k<=9;k++){const u=k/9;P.push(A.dedo(i,u));Rr.push(.0135*(1-u)+.0032);}dp880Tubo(aD,P,Rr,{lados:6,osso:B.dedoD1+i,cima:Nw,tampa0:false,cor:(u)=>corO(.3+.7*u)});}
+    // membrana entre os dedos: borda de trás recortada em arco
+    for(let i=0;i<3;i++){const Ta=TP[i],Tb=TP[i+1],corda=Math.hypot(Tb[0]-Ta[0],Tb[1]-Ta[1],Tb[2]-Ta[2]);const mid=mix3(Ta,Tb,.5);let dw=[WR[0]-mid[0],WR[1]-mid[1],WR[2]-mid[2]];const dwl=Math.hypot(dw[0],dw[1],dw[2]);dw=[dw[0]/dwl,dw[1]/dwl,dw[2]/dwl];
+      dp880Grade(mD,12,9,(s,t)=>{const a=A.dedo(i,s),b=A.dedo(i+1,s),k=4*t*(1-t),rec=s*s*k*corda*.27,sag=-.02*Math.sin(Math.PI*t)*s;const tt=S(0,1,t);
+        return {p:[a[0]+(b[0]-a[0])*t+dw[0]*rec+Nw[0]*sag,a[1]+(b[1]-a[1])*t+dw[1]*rec+Nw[1]*sag,a[2]+(b[2]-a[2])*t+dw[2]*rec+Nw[2]*sag],w:[[B.dedoD1+i,1-tt],[B.dedoD1+i+1,tt]],uv:[s,(i+t)/4]};});}
+    // do 4.º dedo ao braço e ao flanco
+    const Au=u=>u<.5?mix3(WR,EL,u/.5):mix3(EL,SH,(u-.5)/.5),Aw=u=>u<.5?B.asaD2:B.asaD1;const AH=A.AH,FM=A.FM,T4=TP[3];
+    const Bu=u=>{if(u<.55){const t=u/.55,p=mix3(T4,AH,t),k=4*t*(1-t);const a=Au(u);const d=[a[0]-p[0],a[1]-p[1],a[2]-p[2]];return [p[0]+d[0]*k*.2,p[1]+d[1]*k*.2,p[2]+d[2]*k*.2];}const t=(u-.55)/.45,q=1-t;return [q*q*AH[0]+2*q*t*FM[0]+t*t*SH[0],q*q*AH[1]+2*q*t*FM[1]+t*t*SH[1],q*q*AH[2]+2*q*t*FM[2]+t*t*SH[2]];};
+    const Bw=u=>{if(u<.55){const t=S(0,1,u/.55);return [[B.dedoD4,1-t],[B.raiz,t]];}const t=(u-.55)/.45;return [[B.raiz,1-t],[B.peito,t]];};
+    dp880Grade(mD,16,9,(u,v)=>{const a=Au(u),b=Bu(u);const arc=A.arco[3],kb=4*v*(1-v)*Math.max(0,1-u/.3),sag=-.022*Math.sin(Math.PI*v)*Math.sin(Math.PI*Math.min(1,u*1.4));
+      const w=[[Aw(u),1-v]];for(const q of Bw(u))if(q[1]*v>.001)w.push([q[0],q[1]*v]);
+      return {p:[a[0]+(b[0]-a[0])*v+arc[0]*kb+Nw[0]*sag,a[1]+(b[1]-a[1])*v+arc[1]*kb+Nw[1]*sag,a[2]+(b[2]-a[2])*v+arc[2]*kb+Nw[2]*sag],w,uv:[v,.75+.25*u]};});
+    // propatágio: do punho ao ombro, à frente do cotovelo
+    dp880Grade(mD,8,4,(u,v)=>{const a=Au(u),l=mix3(WR,SH,u),k=.3*Math.sin(Math.PI*u);const b=[l[0]+(a[0]-l[0])*k,l[1]+(a[1]-l[1])*k,l[2]+(a[2]-l[2])*k];const w=[[Aw(u),1-v]];if((1-u)*v>.001)w.push([B.asaD2,(1-u)*v]);if(u*v>.001)w.push([B.peito,u*v]);
+      return {p:[a[0]+(b[0]-a[0])*v,a[1]+(b[1]-a[1])*v,a[2]+(b[2]-a[2])*v],w,uv:[.15+.3*v,.02+.1*u]};});}
+  yield 'blocos';
+  blocos.push(dp880Bloco(aS));yield 'bloco D';blocos.push(dp880Bloco(aD));yield 'espelho';blocos.push(dp880Bloco(dp880Espelha(aD)));yield 'junta';
+  const pele=dp880Junta(blocos,false);yield 'membrana';pele.userData.dp880='pele';
+  const memb=dp880Junta([dp880Bloco(mS),dp880Bloco(mD),dp880Bloco(dp880Espelha(mD))],true);memb.userData.dp880='membrana';
+  // ---- (4) olhos: duas esferas com a íris virada para o olhar (espaço da cabeça; filhas do osso da cabeça) ----
+  yield 'olhos';const eb=[];for(const sd of [1,-1]){const sg=new T.SphereGeometry(A.OLHOR,22,16),P=sg.attributes.position,U=sg.attributes.uv,r=A.OLHOR;for(let i=0;i<P.count;i++){const x=P.getX(i)/r,y=P.getY(i)/r,z=P.getZ(i)/r;let u=x,v=y;if(z<0){const l=Math.hypot(x,y)||1;u=x/l;v=y/l;}U.setXY(i,u*.5+.5,v*.5+.5);}
+    const G=A.olharD,q=new T.Quaternion().setFromUnitVectors(new T.Vector3(0,0,1),new T.Vector3(sd*G[0],G[1],G[2]).normalize());sg.applyMatrix4(new T.Matrix4().makeRotationFromQuaternion(q));sg.translate(sd*A.OLHO[0],A.OLHO[1],A.OLHO[2]);
+    const n=P.count;const col=new Float32Array(n*3).fill(1);eb.push({pos:sg.attributes.position.array,nor:sg.attributes.normal.array,col,uv:sg.attributes.uv.array,si:new Uint16Array(n*4),sw:new Float32Array(n*4),idx:sg.index.array,nv:n});}
+  const olhos=dp880Junta(eb,true,false);olhos.userData.dp880='olhos';
+  // texturas e materiais já ficam prontos (a troca nas vagas não paga nada)
+  try{yield 'escamas';dp880TexEscama();yield 'membrana e olho';dp880TexMembrana();dp880TexOlho();yield 'materiais';dp880Mats();}catch(e){dp880Erro('texturas',e);}
+  CP579.cache.set(k,pele);CP579.cache.set('dp880 membrana',memb);CP579.cache.set('dp880 olhos',olhos);
+  st.tri={pele:pele.index.count/3,membrana:memb.index.count/3,olhos:olhos.index.count/3};st.tri.total=st.tri.pele+st.tri.membrana+st.tri.olhos;st.vertices=pele.attributes.position.count+memb.attributes.position.count+olhos.attributes.position.count;
+  DP880.tempo.geometrias=Math.round(performance.now()-t0);DP880.it=null;return {pele,memb,olhos};}
+
+/* ---------------- texturas e materiais ---------------- */
+function dp880Tela(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return c;}
+// escamas: células (a cor vem dos vértices; aqui só o claro do centro e o escuro da borda), repete sem costura
+function dp880TexEscama(){const k='tex dp880 escama';let t=CP579.cache.get(k);if(t)return t;const W=256,N=13,c=dp880Tela(W,W),x=c.getContext('2d'),im=x.createImageData(W,W),d=im.data;let sd=88017;const r=()=>{sd=(sd*16807)%2147483647;return (sd-1)/2147483646;};
+  const P=[];for(let j=0;j<N;j++)for(let i=0;i<N;i++)P.push([(i+.18+r()*.64)/N*W,(j+.18+r()*.64)/N*W,.86+r()*.14]);const cw=W/N;
+  for(let y=0;y<W;y++)for(let xx=0;xx<W;xx++){const ci=Math.floor(xx/cw),cj=Math.floor(y/cw);let d1=1e9,d2=1e9,tom=1;
+    for(let b=-1;b<=1;b++)for(let a=-1;a<=1;a++){let ii=ci+a,jj=cj+b,ox=0,oy=0;if(ii<0){ii+=N;ox=-W;}if(ii>=N){ii-=N;ox=W;}if(jj<0){jj+=N;oy=-W;}if(jj>=N){jj-=N;oy=W;}const q=P[jj*N+ii],dx=xx-(q[0]+ox),dy=y-(q[1]+oy),dd=dx*dx+dy*dy;if(dd<d1){d2=d1;d1=dd;tom=q[2];}else if(dd<d2)d2=dd;}
+    const e=(Math.sqrt(d2)-Math.sqrt(d1))/cw,v=(158+92*cp579S(0,.32,e)-14*Math.sqrt(d1)/cw)*tom;const o=(y*W+xx)*4;d[o]=d[o+1]=d[o+2]=Math.max(0,Math.min(255,v));d[o+3]=255;}
+  x.putImageData(im,0,0);t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=8;t.encoding=THREE.sRGBEncoding;t.name='v880 escamas';CP579.cache.set(k,t);return t;}
+// membrana: u = do braço à borda, v = do 1.º dedo ao flanco; degradê da paleta do ovo, nervuras e borda luminosa
+function dp880TexMembrana(){const k='tex dp880 membrana';let t=CP579.cache.get(k);if(t)return t;const W=256,c=dp880Tela(W,W),x=c.getContext('2d');
+  const g=x.createLinearGradient(0,0,W,0);const pal=[[0,'#3c58d8'],[.25,'#5b53e0'],[.5,'#8a4fe0'],[.72,'#c456cf'],[.88,'#ee7fbb'],[1,'#ffd3a6']];for(const [p,h] of pal)g.addColorStop(p,h);x.fillStyle=g;x.fillRect(0,0,W,W);
+  const g2=x.createLinearGradient(0,0,0,W);g2.addColorStop(0,'rgba(49,218,216,.42)');g2.addColorStop(.45,'rgba(49,218,216,0)');g2.addColorStop(1,'rgba(53,133,221,.35)');x.fillStyle=g2;x.fillRect(0,0,W,W);
+  let sd=88031;const r=()=>{sd=(sd*16807)%2147483647;return (sd-1)/2147483646;};
+  x.lineCap='round';for(let i=0;i<46;i++){const y0=r()*W,y1=y0+(r()-.5)*26;x.strokeStyle='rgba(255,236,255,'+(.05+r()*.12)+')';x.lineWidth=.6+r()*1.5;x.beginPath();x.moveTo(-4,y0);x.bezierCurveTo(W*.35,y0+(r()-.5)*10,W*.7,y1,W+4,y1+(r()-.5)*8);x.stroke();}
+  for(let i=0;i<26;i++){const x0=r()*W;x.strokeStyle='rgba(30,16,90,'+(.04+r()*.07)+')';x.lineWidth=.6+r();x.beginPath();x.moveTo(x0,-4);x.quadraticCurveTo(x0+(r()-.5)*30,W*.5,x0+(r()-.5)*20,W+4);x.stroke();}
+  for(let i=0;i<=4;i++){const y=i/4*W;const gv=x.createLinearGradient(0,y-9,0,y+9);gv.addColorStop(0,'rgba(24,16,84,0)');gv.addColorStop(.5,'rgba(24,16,84,.42)');gv.addColorStop(1,'rgba(24,16,84,0)');x.fillStyle=gv;x.fillRect(0,y-9,W,18);}
+  const ge=x.createLinearGradient(W*.8,0,W,0);ge.addColorStop(0,'rgba(255,255,255,0)');ge.addColorStop(1,'rgba(255,244,230,.5)');x.fillStyle=ge;x.fillRect(W*.8,0,W*.2,W);
+  t=new THREE.CanvasTexture(c);t.wrapS=THREE.ClampToEdgeWrapping;t.wrapT=THREE.RepeatWrapping;t.anisotropy=8;t.encoding=THREE.sRGBEncoding;t.name='v880 membrana';CP579.cache.set(k,t);return t;}
+function dp880TexOlho(){const k='tex dp880 olho';let t=CP579.cache.get(k);if(t)return t;const W=128,c=dp880Tela(W,W),x=c.getContext('2d'),m=W/2,R=W*.37;
+  const ge=x.createRadialGradient(m,m,R*.9,m,m,W*.5);ge.addColorStop(0,'#fff4e2');ge.addColorStop(.5,'#f0dfe8');ge.addColorStop(1,'#b7a6d6');x.fillStyle=ge;x.fillRect(0,0,W,W);
+  const gi=x.createRadialGradient(m,m,R*.08,m,m,R);gi.addColorStop(0,'#fff0a8');gi.addColorStop(.38,'#ffc04a');gi.addColorStop(.72,'#f07a3a');gi.addColorStop(1,'#b0307e');x.fillStyle=gi;x.beginPath();x.arc(m,m,R,0,7);x.fill();
+  let sd=88047;const r=()=>{sd=(sd*16807)%2147483647;return (sd-1)/2147483646;};for(let i=0;i<70;i++){const a=r()*6.2832;x.strokeStyle=r()<.55?'rgba(255,250,210,'+(.1+r()*.25)+')':'rgba(110,20,60,'+(.1+r()*.2)+')';x.lineWidth=.6+r();x.beginPath();x.moveTo(m+Math.cos(a)*R*.3,m+Math.sin(a)*R*.3);x.lineTo(m+Math.cos(a)*R*(.72+r()*.24),m+Math.sin(a)*R*(.72+r()*.24));x.stroke();}
+  x.strokeStyle='rgba(40,10,60,.9)';x.lineWidth=R*.12;x.beginPath();x.arc(m,m,R*.95,0,7);x.stroke();
+  x.fillStyle='#07040c';x.beginPath();x.ellipse(m,m,R*.38,R*.76,0,0,7);x.fill();
+  x.fillStyle='rgba(255,255,255,.97)';x.beginPath();x.ellipse(m-R*.36,m-R*.42,R*.22,R*.16,-.6,0,7);x.fill();x.fillStyle='rgba(255,255,255,.6)';x.beginPath();x.arc(m+R*.36,m+R*.34,R*.09,0,7);x.fill();
+  t=new THREE.CanvasTexture(c);t.anisotropy=8;t.encoding=THREE.sRGBEncoding;t.name='v880 olho';CP579.cache.set(k,t);return t;}
+// sombreador: triplanar no espaço do objeto (a conta da v622) + relevo pela altura do mapa + iridescência (matiz pelo ângulo)
+const DP880_IRI=' float f880=1.0-abs(dot(normalize(normal),normalize(vViewPosition)));\n vec3 c880=0.5+0.5*cos(6.2832*(f880*uIriF880+uT880+FASE880+vec3(0.0,0.33,0.67)));\n totalEmissiveRadiance+=c880*pow(f880,uIriP880)*uIri880;\n';
+function dp880Sombreador(m,op){m.userData.dp880=op;
+  m.onBeforeCompile=function(sh){if(op.liso)return;try{sh.uniforms.uEsc880={value:op.tri||1};sh.uniforms.uRel880={value:op.rel||0};sh.uniforms.uIri880={value:op.iri};sh.uniforms.uIriF880={value:op.iriF};sh.uniforms.uIriP880={value:op.iriP};sh.uniforms.uT880=DP880.uT;
+    const un='uniform float uIri880;\nuniform float uIriF880;\nuniform float uIriP880;\nuniform float uT880;\n';
+    if(op.tri){const V='varying vec3 vP880;\nvarying vec3 vN880;\nvarying float vL880;\n';
+      sh.vertexShader='attribute float liso880;\n'+V+sh.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\n vP880=position; vN880=normal; vL880=liso880;');
+      sh.fragmentShader=V+un+'uniform float uEsc880;\nuniform float uRel880;\n'+
+        'vec3 pert880(vec3 sp,vec3 sn,vec2 dH){vec3 sx=dFdx(sp),sy=dFdy(sp);vec3 r1=cross(sy,sn),r2=cross(sn,sx);float det=dot(sx,r1);vec3 g=sign(det)*(dH.x*r1+dH.y*r2);return normalize(abs(det)*sn-g);}\n'+
+        sh.fragmentShader.replace('#include <map_fragment>',
+          'float h880=0.0;\n#ifdef USE_MAP\n vec3 bw880=pow(abs(normalize(vN880)),vec3(3.0));bw880/=(bw880.x+bw880.y+bw880.z+1e-5);vec3 P880=vP880*uEsc880;\n'+
+          ' vec4 texelColor=texture2D(map,P880.yz)*bw880.x+texture2D(map,P880.xz)*bw880.y+texture2D(map,P880.xy)*bw880.z;\n texelColor.rgb=mix(texelColor.rgb,vec3(0.86),vL880);\n h880=dot(texelColor.rgb,vec3(0.3333));\n'+
+          ' texelColor=mapTexelToLinear(texelColor);diffuseColor*=texelColor;\n#endif\n')
+        .replace('#include <normal_fragment_maps>','#include <normal_fragment_maps>\n normal=pert880(-vViewPosition,normal,vec2(dFdx(h880),dFdy(h880))*uRel880);')
+        .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\n'+DP880_IRI.replace('FASE880','vP880.y*0.9+vP880.z*0.6'));}
+    else{sh.fragmentShader=un+sh.fragmentShader.replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\n'+DP880_IRI.replace('FASE880','vUv.x*0.5+vUv.y*0.5'));}}catch(e){dp880Erro('sombreador',e);}};
+  m.customProgramCacheKey=function(){return 'dp880'+(op.tri?'t':'m')+(op.liso?'L':'');};m.needsUpdate=true;return m;}
+function dp880Mats(){let M=CP579.cache.get('mat dp880');if(M)return M;const T=THREE;
+  const pele=new T.MeshStandardMaterial({vertexColors:true,map:dp880TexEscama(),roughness:.42,metalness:.18,emissive:0x8a6cff,emissiveIntensity:.07,skinning:true});pele.name='v880 · dragão prismático · pele';
+  dp880Sombreador(pele,{tri:1/.085,rel:.0026,iri:.36,iriF:1.25,iriP:2.2,fase:0});
+  const mt=dp880TexMembrana();const memb=new T.MeshStandardMaterial({vertexColors:true,map:mt,emissiveMap:mt,emissive:0xb9a0ff,emissiveIntensity:.3,side:T.DoubleSide,roughness:.4,metalness:.1,skinning:true});memb.name='v880 · dragão prismático · membrana';
+  dp880Sombreador(memb,{tri:0,rel:0,iri:.5,iriF:1.4,iriP:1.6,fase:.2});
+  const ot=dp880TexOlho();const olho=new T.MeshStandardMaterial({map:ot,emissiveMap:ot,emissive:0xffffff,emissiveIntensity:.2,roughness:.1,metalness:0});olho.name='v880 · dragão prismático · olho';
+  for(const m of [pele,memb,olho])m.userData.papelKeep=true;
+  M={pele,memb,olho};CP579.cache.set('mat dp880',M);return M;}
+// se o sombreador não compilar nesta placa: o material volta ao liso (sem triplanar nem iridescência). Confere o material que está NA MALHA
+// (no voador é o gêmeo de recorte da v829, que chama este mesmo sombreador e partilha o `userData`: a marca `liso` vale para os dois)
+function dp880Confere(g){try{if(typeof renderer==='undefined'||!renderer||!renderer.properties)return;const D=g&&g.userData&&g.userData.dp880;if(!D)return;const M=CP579.cache.get('mat dp880');let visto=0;
+    for(const mesh of [D.pele,D.memb]){const m=mesh.material,op=m&&m.userData&&m.userData.dp880;if(!op)continue;const pr=renderer.properties.get(m),pg=pr&&(pr.program||pr.currentProgram);if(!pg)continue;visto++;const dg=pg.diagnostics;
+      if(dg&&dg.runnable===false&&!op.liso){op.liso=true;for(const x of [m,M&&(op.tri?M.pele:M.memb)]){if(!x)continue;if(op.tri)x.map=null;x.needsUpdate=true;}
+        DP880.stats.sombreador=(DP880.stats.sombreador||'')+(op.tri?'pele':'membrana')+' liso; ';dp880Erro('sombreador',(dg.fragmentShader&&dg.fragmentShader.log)||dg.programLog||'não compilou');}}
+    if(visto>=2){DP880.conferido=2;if(!DP880.stats.sombreador)DP880.stats.sombreador='ok';}}catch(e){DP880.conferido=2;}}
+
+/* ---------------- esqueleto, estágios e pose ---------------- */
+function dp880Ossos(A){const T=THREE,B=DP880_B,c=Math.cos(A.th),s=Math.sin(A.th);const qCab=new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0),A.th);
+  const base=(X,Y)=>{const x=new T.Vector3(X[0],X[1],X[2]).normalize(),y=new T.Vector3(Y[0],Y[1],Y[2]);y.addScaledVector(x,-y.dot(x)).normalize();const z=new T.Vector3().crossVectors(x,y);return new T.Quaternion().setFromRotationMatrix(new T.Matrix4().makeBasis(x,y,z));};
+  const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]],esp=p=>[-p[0],p[1],p[2]];const D=[];const def=(nome,pai,pos,q)=>{D[B[nome]]={nome,pai:pai===null?-1:B[pai],pos,q:q||null};};
+  def('raiz',null,A.RA);def('peito','raiz',A.PE);def('pesc1','peito',A.N1);def('pesc2','pesc1',A.N2);def('pesc3','pesc2',A.N3);def('cabeca','pesc3',A.HD,qCab);
+  def('focinho','cabeca',A.cab(A.FOC),qCab);def('mand','cabeca',A.cab(A.MAND),qCab);
+  for(const [sd,l] of [[1,'D'],[-1,'E']]){const m=p=>sd>0?p:esp(p);def('chifre'+l,'cabeca',m(A.cab(A.CHIF)),qCab);def('palp'+l,'cabeca',m(A.cab(A.OLHO)),qCab);
+    def('pf'+l+'1','peito',m(A.PF[0]));def('pf'+l+'2','pf'+l+'1',m(A.PF[1]));def('pt'+l+'1','raiz',m(A.PT[0]));def('pt'+l+'2','pt'+l+'1',m(A.PT[1]));
+    const Nw=m(A.Nw),SH=m(A.SH),EL=m(A.EL),WR=m(A.WR);def('asa'+l+'1','peito',SH,base(sub(EL,SH),Nw));def('asa'+l+'2','asa'+l+'1',EL,base(sub(WR,EL),Nw));
+    const mao=base(sub(m(A.TP[1]),WR),Nw);def('asa'+l+'3','asa'+l+'2',WR,mao);for(let i=0;i<4;i++)def('dedo'+l+(i+1),'asa'+l+'3',WR,base(sub(m(A.TP[i]),WR),Nw));}
+  let pai='raiz';A.C.forEach((p,i)=>{def('cauda'+(i+1),pai,p);pai='cauda'+(i+1);});return D;}
+function dp880Esqueleto(){const T=THREE,A=dp880Anat(),D=DP880.ossos||(DP880.ossos=dp880Ossos(A));const bones=D.map(d=>{const b=new T.Bone();b.name='v880 '+d.nome;return b;});const W=D.map(d=>new T.Matrix4().compose(new T.Vector3(d.pos[0],d.pos[1],d.pos[2]),d.q||new T.Quaternion(),new T.Vector3(1,1,1)));
+  const rest=[];const inv=new T.Matrix4(),loc=new T.Matrix4();
+  D.forEach((d,i)=>{const b=bones[i];if(d.pai>=0){bones[d.pai].add(b);loc.multiplyMatrices(inv.copy(W[d.pai]).invert(),W[i]);}else loc.copy(W[i]);const p=new T.Vector3(),q=new T.Quaternion(),s=new T.Vector3();loc.decompose(p,q,s);b.position.copy(p);b.quaternion.copy(q);rest.push({p:p.clone(),q:q.clone()});});
+  return {bones,rest};}
+// proporções por estágio (k: 0 = filhote … 1 = adulto) — só os ossos mudam
+function dp880Estagio(g,est){const D=g.userData.dp880,B=DP880_B,bs=D.bones,R=D.rest;const k=Math.max(0,Math.min(1,((est||1)-1)/4)),L=(a,b)=>a+(b-a)*k;D.estagio=est;D.k=k;
+  for(let i=0;i<bs.length;i++){bs[i].position.copy(R[i].p);bs[i].scale.set(1,1,1);}
+  const cab=L(1.4,1.1),foc=L(.78,1.04),pes=L(.82,1.05),cau=L(.86,1.07),asa=L(.75,.96),chi=L(.58,1.2),per=L(1.12,1);
+  bs[B.cabeca].scale.setScalar(cab);bs[B.focinho].scale.z=foc;bs[B.mand].scale.z=(.15+.16*foc)/.31;
+  for(const n of [B.pesc2,B.pesc3,B.cabeca])bs[n].position.multiplyScalar(pes);for(let n=B.cauda2;n<=B.cauda6;n++)bs[n].position.multiplyScalar(cau);
+  for(const n of [B.asaD1,B.asaE1])bs[n].scale.setScalar(asa);for(const n of [B.chifreD,B.chifreE])bs[n].scale.setScalar(chi);for(const n of [B.pfD1,B.pfE1,B.ptD1,B.ptE1])bs[n].scale.setScalar(per);
+  D.base=L(1.13,1);dp880Pose(g,D.pose||{});dp880Ancora(g);}
+// a boca volta ao ponto de ancoragem do modelo antigo (de onde o sopro e o fogo do portão nascem)
+function dp880Ancora(g){const D=g.userData.dp880;D.corpo.position.set(0,0,0);g.updateMatrixWorld(true);const v=D.v1.set(0,0,0);D.boca.localToWorld(v);g.worldToLocal(v);D.corpo.position.set(DP880.ANC[0]-v.x,DP880.ANC[1]-v.y,DP880.ANC[2]-v.z);D.corpo.updateMatrixWorld(true);}
+// pose: op = {t, bate (fase do bater das asas), dobra (0 aberta … 1 fechada), guinada, arfagem (olhar), boca (0…1), pisca (0…1), parado, sopro}
+function dp880Pose(g,op){const D=g.userData.dp880,B=DP880_B,bs=D.bones,R=D.rest,e=D.e,q=D.q;D.pose=op;const t=op.t||0,ph=op.bate===undefined?t*7:op.bate,dob=op.dobra||0,k=D.k||0;
+  const gira=(i,x,y,z)=>{e.set(x,y,z,'YXZ');bs[i].quaternion.copy(R[i].q).multiply(q.setFromEuler(e));};
+  const sn=Math.sin,parado=op.parado?0:1,bat=1-dob;
+  // tronco: balanço e respiração
+  gira(B.raiz,(sn(t*.8)*.045-.03*sn(ph)*bat)*parado,0,sn(t*1.1)*.07*parado);const resp=1+sn(t*2.3)*.022;bs[B.peito].scale.set(D.base*resp,D.base*(1+sn(t*2.3)*.012),1);gira(B.peito,sn(t*2.3)*.012-.02*sn(ph-.4)*bat,0,0);
+  // pescoço e cabeça: olhar (guinada/arfagem repartidas) + ondulação
+  const gy=op.guinada||0,ax=op.arfagem||0;gira(B.pesc1,sn(t*1.3)*.03-ax*.15,gy*.2,0);gira(B.pesc2,sn(t*1.3+.8)*.035-ax*.2,gy*.22,-gy*.05);gira(B.pesc3,sn(t*1.3+1.6)*.03-ax*.25,gy*.25,-gy*.06);
+  gira(B.cabeca,sn(t*1.7+.5)*.03*parado-ax*.4+.035*sn(ph-.8)*bat*parado,gy*.33,sn(t*.9)*.04*parado);gira(B.focinho,0,0,0);gira(B.mand,(op.boca||0)*.42+.012+sn(t*2.3)*.01,0,0);
+  // pálpebras
+  {const A=DP880.A,a=(op.pisca||0)*(A.jan.au+A.jan.ad+.1);for(const [i,sd] of [[B.palpD,1],[B.palpE,-1]]){D.v2.set(sd*A.palpEixo[0],A.palpEixo[1],A.palpEixo[2]);bs[i].quaternion.copy(R[i].q).multiply(q.setFromAxisAngle(D.v2,sd*a));}}
+  gira(B.chifreD,0,0,0);gira(B.chifreE,0,0,0);
+  // cauda: onda que desce + caracol leve
+  for(let i=0;i<6;i++){const a=.05+i*.028;gira(B.cauda1+i,(i<2?-.06:.11+i*.012)+sn(t*1.9-i*.75)*.035,sn(t*1.6-i*.8)*a*1.6+gy*-.12,0);}
+  // patas: pendem e remam de leve
+  gira(B.pfD1,.12+sn(t*2.1)*.07,0,0);gira(B.pfE1,.12+sn(t*2.1+1.1)*.07,0,0);gira(B.pfD2,-.2+sn(t*2.1+.6)*.09,0,0);gira(B.pfE2,-.2+sn(t*2.1+1.7)*.09,0,0);
+  gira(B.ptD1,.1+sn(t*1.7+.4)*.06,0,0);gira(B.ptE1,.1+sn(t*1.7+1.5)*.06,0,0);gira(B.ptD2,.12+sn(t*1.7+1)*.08,0,0);gira(B.ptE2,.12+sn(t*1.7+2.1)*.08,0,0);
+  // asas: bate no ombro, o antebraço e o punho seguem com atraso (dobram na subida); `dobra` fecha a asa em Z
+  for(const [sd,o] of [[1,0],[-1,B.asaE1-B.asaD1]]){const up=sn(ph),a=k*.06;
+    gira(B.asaD1+o,sd*(-.1*Math.cos(ph)*bat+dob*.25),sd*(.06*Math.cos(ph)*bat+dob*1.02),(.22+(.4-a)*up)*bat+dob*.34);
+    gira(B.asaD2+o,sd*dob*-.2,sd*(-.05*bat-dob*2.05),(-.05+.16*sn(ph-.75))*bat-dob*.1);
+    gira(B.asaD3+o,0,sd*(.04*Math.cos(ph-1.3)*bat+dob*2.2),(-.02+.26*sn(ph-1.45))*bat);
+    const ab=.1*Math.max(0,Math.cos(ph-1.2))*bat;for(let i=0;i<4;i++){gira(B.dedoD1+o+i,0,sd*(-(i)*(ab*.5)-dob*[0,.52,.95,1.25][i]),(.11*sn(ph-1.9)*(i+1)/4)*bat);}}}
+function dp880Monta(est){const T=THREE,t0=performance.now(),A=dp880Anat();if(!A.Nw){A.Nw=[-.29,.93,.22];}const G=dp880Geos(),M=dp880Mats(),B=DP880_B;
+  const g=new T.Group();g.name='Companion · dragão dos rubis';g.userData.pet='dragon422';g.position.set(-.85,1.55,-.35);
+  const corpo=new T.Group();corpo.name='v880 · dragão prismático';g.add(corpo);const E=dp880Esqueleto();corpo.add(E.bones[0]);
+  const pele=new T.SkinnedMesh(G.pele,M.pele);pele.name='v880 · dragão · pele';const memb=new T.SkinnedMesh(G.memb,M.memb);memb.name='v880 · dragão · asas (membrana)';corpo.add(pele);corpo.add(memb);
+  const olhos=new T.Mesh(G.olhos,M.olho);olhos.name='v880 · dragão · olhos';E.bones[B.cabeca].add(olhos);
+  const boca=new T.Object3D();boca.name='v880 boca';boca.position.set(A.BOCA[0]-A.FOC[0],A.BOCA[1]-A.FOC[1],A.BOCA[2]-A.FOC[2]);E.bones[B.focinho].add(boca);
+  g.updateMatrixWorld(true);const sk=new T.Skeleton(E.bones);pele.bind(sk,pele.matrixWorld);memb.bind(sk,memb.matrixWorld);
+  pele.castShadow=true;pele.receiveShadow=true;memb.castShadow=false;memb.receiveShadow=true;olhos.castShadow=false;
+  // faíscas em órbita (a marca do prismático) e as do focinho
+  const sparks=[],fuso=[];try{const tx=(typeof d441Faisca==='function')?d441Faisca():null;if(tx){for(let i=0;i<4;i++){const s=new T.Sprite(new T.SpriteMaterial({map:tx,color:0xffe6ff,transparent:true,opacity:.8,depthWrite:false,blending:T.AdditiveBlending}));s.scale.set(.11,.11,1);g.add(s);sparks.push(s);}}
+    const tf=(typeof v446TexFagulha==='function')?v446TexFagulha():tx;if(tf){for(let i=0;i<5;i++){const s=new T.Sprite(new T.SpriteMaterial({map:tf,color:0xfff0c0,transparent:true,depthWrite:false,blending:T.AdditiveBlending,opacity:0}));s.scale.set(.05,.05,1);s.visible=false;g.add(s);fuso.push({sp:s,t:1,dur:1});}}}catch(e){dp880Erro('faíscas',e);}
+  g.traverse(o=>{o.__fusaoMoveu=9;o.userData.noCam=true;o.userData.dynamic434=true;if(o.isMesh||o.isSprite){o.raycast=()=>{};}if(o.isMesh){o.userData.papelKeepGeo=true;o.frustumCulled=!o.isSkinnedMesh;}});
+  try{if(typeof PAPEL_HULL!=='undefined'){PAPEL_HULL.set(pele,null);PAPEL_HULL.set(memb,null);}}catch(e){}
+  const wings=[{g:new T.Object3D(),s:-1},{g:new T.Object3D(),s:1}];   // o tique da v422 escreve aqui; as asas de verdade batem nos ossos
+  g.userData.ruby422={wings,time:0,cd:1.2,mouth:new T.Vector3(),target:new T.Vector3(),dir:new T.Vector3(),up:new T.Vector3(0,1,0),fire:null,burn:0,burns:[],shield:0};
+  g.userData.dp880={corpo,bones:E.bones,rest:E.rest,sk,pele,memb,olhos,boca,sparks,fuso,e:new T.Euler(),q:new T.Quaternion(),v1:new T.Vector3(),v2:new T.Vector3(),v3:new T.Vector3(),t:Math.random()*10,gy:0,ax:0,bo:0,pisca:0,prox:2+Math.random()*3,proxFuso:3+Math.random()*4,ry:null,nasc:Date.now(),tique:0,estagio:0,k:0,base:1,pose:{t:0}};
+  let st=est;if(!st){try{st=ruby422Stage();}catch(e){st=1;}}g.userData.cm566={tri0:DP880.stats.tri.total,passes:0,dp880:true};
+  dp880Estagio(g,st||1);dp880Faiscas(g,0);
+  // os que já saíram de cena soltam a textura dos ossos e as faíscas
+  try{const agora=Date.now();DP880.vivos=DP880.vivos.filter(o=>{const D=o.userData.dp880;if(o===GEAR.pet||o===GEAR.rubi530||agora-D.nasc<12000||agora-D.tique<6000)return true;try{D.sk.dispose();for(const s of D.sparks)s.material.dispose();for(const f of D.fuso)f.sp.material.dispose();}catch(e){}return false;});DP880.vivos.push(g);}catch(e){}
+  DP880.stats.montados++;DP880.tempo.ultimo=Math.round(performance.now()-t0);if(DP880.tempo.primeiro===undefined)DP880.tempo.primeiro=DP880.tempo.ultimo;return g;}
+function dp880Faiscas(g,dt){const D=g.userData.dp880,t=D.t;const cx=D.corpo.position.x,cy=D.corpo.position.y-.04,cz=D.corpo.position.z-.08;
+  D.sparks.forEach((s,i)=>{const a=t*1.4+i*Math.PI/2;s.position.set(cx+Math.cos(a)*.44,cy+.06+Math.sin(t*2.3+i*1.3)*.16,cz+Math.sin(a)*.4);s.material.opacity=.45+Math.sin(t*5+i)*.3;const k=.085+Math.sin(t*4+i*2)*.03;s.scale.set(k,k,1);});
+  if(!D.fuso.length)return;D.proxFuso-=dt;if(D.proxFuso<=0){D.proxFuso=4+Math.random()*5;const v=D.v3.set(0,0,0);D.boca.localToWorld(v);g.worldToLocal(v);for(const o of D.fuso){o.t=0;o.dur=.6+Math.random()*.4;o.vx=(Math.random()-.5)*.25;o.vy=.15+Math.random()*.25;o.vz=.5+Math.random()*.5;o.sp.position.set(v.x,v.y+.03,v.z+.02);o.sp.visible=true;}}
+  for(const o of D.fuso){if(o.t>=o.dur){o.sp.visible=false;continue;}o.t+=dt;const u=o.t/o.dur;o.sp.position.x+=o.vx*dt;o.sp.position.y+=o.vy*dt;o.sp.position.z+=o.vz*dt;o.sp.material.opacity=(1-u)*.9;const e=.05+u*.04;o.sp.scale.set(e,e,1);}}
+// depois do tique da v422 (e das camadas v445/v529/v530): estágio, pose, materiais, faíscas e o sopro saindo da boca de verdade
+function dp880Tick(g,dt){const D=g.userData.dp880,r=g.userData.ruby422;if(!D||!r)return;dt=Math.min(.05,Math.max(0,dt||0));D.t+=dt;D.tique=Date.now();const t=D.t;
+  let st=1;try{st=ruby422Stage();}catch(e){}if(st!==D.estagio)dp880Estagio(g,st);
+  const portao=(typeof P439!=='undefined'&&P439&&P439.fase)||'';const sopro=r.burn>0&&r.fire&&r.fire.visible;
+  // olhar: para o inimigo em que sopra; senão, para onde o leitor está virando
+  let gy=0,ax=0;if(!portao){if(sopro){const v=D.v1.copy(r.target);if(D.mf&&D.t-D.mfT<.5){D.mi=(D.mi||new THREE.Matrix4()).copy(D.mf).invert();v.applyMatrix4(D.mi);}else{g.updateWorldMatrix(true,false);g.worldToLocal(v);}const hx=D.corpo.position.x,hy=D.corpo.position.y+.3,hz=D.corpo.position.z+.3;gy=Math.atan2(v.x-hx,Math.max(.05,v.z-hz));if(v.z-hz<0)gy=Math.sign(v.x-hx||1)*1.25;ax=Math.atan2(v.y-hy,Math.hypot(v.x-hx,v.z-hz));}
+    else{const p=g.parent;if(p){const y=p.rotation.y;if(D.ry!==null&&dt>0){let d=y-D.ry;while(d>Math.PI)d-=Math.PI*2;while(d<-Math.PI)d+=Math.PI*2;gy=d/dt*.22;}D.ry=y;}gy+=Math.sin(t*.37)*.12;ax=Math.sin(t*.29+1)*.05;}}
+  gy=Math.max(-1.25,Math.min(1.25,gy));ax=Math.max(-.5,Math.min(.5,ax));const kk=Math.min(1,dt*(sopro?14:4));D.gy+=(gy-D.gy)*kk;D.ax+=(ax-D.ax)*kk;
+  const abre=(sopro||portao==='fogo'||(portao==='derrete'&&P439.t<.8))?1:0;D.bo+=(abre-D.bo)*Math.min(1,dt*12);
+  D.prox-=dt;if(D.prox<=0){D.pisca=.0001;D.prox=2.5+Math.random()*4;}if(D.pisca>0){D.pisca+=dt/.2;if(D.pisca>=1)D.pisca=0;}
+  dp880Pose(g,{t,bate:r.time*7,guinada:D.gy,arfagem:D.ax,boca:D.bo,pisca:D.pisca>0?Math.sin(Math.PI*D.pisca):0,parado:!!portao});
+  // materiais: o matiz gira devagar
+  const M=CP579.cache.get('mat dp880');if(M){DP880.uT.value=t*.045;M.pele.emissive.setHSL((t*.045)%1,.75,.5);M.memb.emissive.setHSL((t*.045+.33)%1,.6,.72);}
+  dp880Faiscas(g,dt);
+  // o cone do sopro nasce na boca de verdade (a cabeça virou para o alvo)
+  if(sopro&&!portao){try{const f=r.fire,b=D.v2.set(0,0,0);D.boca.updateWorldMatrix(true,false);D.boca.localToWorld(b);const dir=D.v3.subVectors(r.target,b),len=dir.length();if(len>.05){f.position.copy(b).addScaledVector(dir,.5);f.scale.y=len;f.quaternion.setFromUnitVectors(r.up,dir.normalize());}}catch(e){}}
+  if(DP880.conferido<2&&(D.n=(D.n||0)+1)>20&&D.n%30===0)dp880Confere(g);}
+// (revisão M1) depois do `gearTick` inteiro: o grupo já está no lugar FINAL (3.ª vaga espelhada e reescalada pelo rb530; voador afastado
+// pelo v434) — o cone do sopro nasce na boca que se vê, o halo da v529 vai para a boca e a matriz final fica para o olhar do quadro seguinte
+function dp880Depois(g){const D=g&&g.userData&&g.userData.dp880,r=g&&g.userData&&g.userData.ruby422;if(!D||!r||!g.parent||!g.visible)return;
+  g.updateWorldMatrix(true,true);D.mf=(D.mf||new THREE.Matrix4()).copy(g.matrixWorld);D.mfT=D.t;const b=D.boca.getWorldPosition(D.v2);
+  try{const h=(typeof DR529!=='undefined')&&DR529&&DR529.halo;if(h&&h.parent===g)h.position.copy(g.worldToLocal(D.v1.copy(b)));}catch(e){}
+  const portao=(typeof P439!=='undefined'&&P439&&P439.fase)||'';
+  if(!portao&&r.burn>0&&r.fire&&r.fire.visible){const f=r.fire,dir=D.v3.subVectors(r.target,b),len=dir.length();if(len>.05){f.position.copy(b).addScaledVector(dir,.5);f.scale.y=len;f.quaternion.setFromUnitVectors(r.up,dir.normalize());}}}
+// troca o modelo que já está nas vagas (arranque, ou `liga`)
+function dp880Troca(){let n=0;try{const novo=o=>!!(o&&o.userData&&o.userData.dp880);const fogo=o=>{try{const f=o.userData.ruby422&&o.userData.ruby422.fire;if(f){f.parent&&f.parent.remove(f);f.geometry&&f.geometry.dispose();f.material&&f.material.dispose();o.userData.ruby422.fire=null;}}catch(e){}};
+    const leva=(de,para)=>{try{const a=de&&de.userData&&de.userData.ruby422,b=para&&para.userData&&para.userData.ruby422;if(!a||!b||a===b)return;b.shield=a.shield;b.cd=a.cd;b.time=a.time;b.burns=a.burns;}catch(e){}};   // (revisão B4)
+    const p=GEAR.pet;if(p&&p.userData&&p.userData.pet==='dragon422'&&novo(p)!==DP880.on){fogo(p);GEAR.petId=null;applyGear();leva(p,GEAR.pet);n++;}
+    const r=GEAR.rubi530;if(r&&novo(r)!==DP880.on){fogo(r);r.parent&&r.parent.remove(r);GEAR.rubi530=null;try{if(typeof cd882Aposenta==='function')cd882Aposenta(r,'rubi530');}catch(e){}try{if(typeof CV876!=='undefined'&&CV876.descarte&&typeof cv876Aposenta==='function')cv876Aposenta(r,'rubi530');}catch(e){}if(typeof rb530Sync==='function')rb530Sync();leva(r,GEAR.rubi530);n++;}   // (coordenador, revisão do CD882, B4) o dragão que sai da 3.ª vaga vai para o descarte da v882
+    DP880.stats.trocas+=n;}catch(e){dp880Erro('troca',e);}return n;}
+/* ---------------- encomenda em fatias (o fatiador da v818) ---------------- */
+// as geometrias custam ~1–2 s de processador: em vez de travar, vão para a fila do fatiador (`fat8Go`, fatias de 4–12 ms no tempo livre);
+// enquanto não chegam, quem pede o dragão recebe o modelo antigo, e as vagas são trocadas na chegada. Sem fatiador, monta na hora.
+function dp880Pede(urg){try{if(urg)DP880.urge=true;if(DP880.job||DP880.falhou||dp880Prontas())return;if(typeof fat8Go!=='function')return;
+    const it=DP880.it||(DP880.it=dp880GeosG()),t0=performance.now();
+    const J=fat8Go(it,{nome:'dragão prismático 880',cedo:true,urgente:()=>!!DP880.urge,
+      fim:()=>{try{const q=DP880.job;if(q)DP880.tempo.fatias={ms:Math.round(q.ms),passos:q.passos,max:Math.round(q.max*10)/10,espera:Math.round(performance.now()-t0)};}catch(e){}DP880.job=null;dp880Chegou();},
+      erro:e=>{DP880.job=null;DP880.it=null;DP880.falhou=true;dp880Erro('fatias',e);}});
+    DP880.job=(J&&!dp880Prontas()&&!DP880.falhou)?J:null;}catch(e){dp880Erro('pede',e);}}
+function dp880Chegou(){try{if(!dp880Prontas()||!DP880.on)return;dp880Mini();dp880Troca();}catch(e){dp880Erro('chegou',e);}}
+// a miniatura do cartão é desenhada do modelo: a que foi feita com o outro modelo é esquecida (refaz-se ao abrir a aba)
+function dp880Mini(){try{if(typeof CC549!=='undefined'&&CC549.thumbs&&CC549.thumbs.delete)CC549.thumbs.delete('dragon422');}catch(e){}}
+/* ---------------- ligação ---------------- */
+try{if(typeof ruby422Baby==='function'&&typeof ruby422BabyTick==='function'&&typeof cp579Rede==='function'){
+  const b0=ruby422Baby;DP880.antigo=b0;
+  ruby422Baby=function(){
+    if(DP880.on&&!DP880.falhou){try{
+        if(!dp880Prontas()){dp880Pede(true);let chocando=false;try{chocando=!!(RUBY422.dialog&&RUBY422.dialog.open);}catch(e){}
+          // ainda em fatias: sai o antigo e as vagas trocam na chegada — menos na hora de chocar o ovo (ali termina de uma vez: a estreia é do modelo novo)
+          if(DP880.job&&!chocando){DP880.stats.esperas=(DP880.stats.esperas||0)+1;return b0.apply(this,arguments);}}
+        let j=null;try{if(typeof CV876!=='undefined'&&CV876.descarte&&typeof cv876Ids==='function')j=cv876Ids();}catch(e){}
+        const g=dp880Monta();if(g){try{if(j&&typeof cv876Registra==='function')cv876Registra(g,j);}catch(e){}return g;}
+      }catch(e){dp880Erro('montar',e);DP880.falhou=true;}}
+    return b0.apply(this,arguments);};
+  const t0=ruby422BabyTick;ruby422BabyTick=function(g,dt){const rv=t0.apply(this,arguments);try{if(g&&g.userData&&g.userData.dp880)dp880Tick(g,dt);}catch(e){dp880Erro('tick',e);}return rv;};
+  // (revisão M1) o embrulho mais de fora do gearTick (o laço o chama pelo nome): reancora o sopro com o dragão no lugar final
+  try{if(typeof gearTick==='function'){const gt0=gearTick;gearTick=function(){const rv=gt0.apply(this,arguments);try{for(const g of [GEAR.pet,GEAR.rubi530])if(g&&g.userData&&g.userData.dp880)dp880Depois(g);}catch(e){dp880Erro('depois',e);}return rv;};}}catch(e){dp880Erro('gearTick',e);}
+  // abrir o ovo já encomenda o modelo (quem vai chocar o dragão não espera)
+  try{if(typeof egg422Open==='function'){const e0=egg422Open;egg422Open=function(){try{if(DP880.on)dp880Pede(true);}catch(e){}return e0.apply(this,arguments);};}}catch(e){dp880Erro('ovo',e);}
+  if(DP880.on){let tem=false;try{const d=RUBY422.data;tem=d.donated>=1000||(d.donated+d.wallet)>=1000||LOJA.equip.pet==='dragon422'||!!GEAR.rubi530||!!(GEAR.pet&&GEAR.pet.userData&&GEAR.pet.userData.pet==='dragon422')||(typeof WEBMASTER!=='undefined'&&!!WEBMASTER);}catch(e){}
+    DP880.stats.dono=tem;if(tem){let vis=false;try{vis=!!GEAR.rubi530||!!(GEAR.pet&&GEAR.pet.userData&&GEAR.pet.userData.pet==='dragon422');}catch(e){}if(typeof fat8Go==='function')dp880Pede(vis);else dp880Troca();}}
+}else dp880Erro('instalar','faltam ruby422Baby/ruby422BabyTick/cp579Rede');}catch(e){dp880Erro('instalar',e);}
+function dp880Atual(){try{const p=GEAR.pet;if(p&&p.userData&&p.userData.pet==='dragon422')return p;return GEAR.rubi530||null;}catch(e){return null;}}
+window.__dragao880={estado:DP880,stats:DP880.stats,erros:DP880.erros,tempo:DP880.tempo,ossos:DP880_B,
+  modelo(est){try{return dp880Monta(est||1);}catch(e){dp880Erro('modelo',e);return null;}},
+  antigo(){try{return DP880.antigo?DP880.antigo():null;}catch(e){dp880Erro('antigo',e);return null;}},
+  pose(g,op){try{if(op&&op.estagio&&g.userData.dp880.estagio!==op.estagio)dp880Estagio(g,op.estagio);dp880Pose(g,op||{});dp880Ancora(g);return true;}catch(e){dp880Erro('pose',e);return false;}},
+  ancora(g){try{const D=g.userData.dp880,v=new THREE.Vector3();g.updateMatrixWorld(true);D.boca.localToWorld(v);g.worldToLocal(v);return [+v.x.toFixed(4),+v.y.toFixed(4),+v.z.toFixed(4)];}catch(e){return null;}},
+  pronto(){return !!dp880Prontas();},pede(){dp880Pede(true);return !!DP880.job;},atual:dp880Atual,
+  // liga/desliga na hora (exato: monta de uma vez se for preciso e troca o que está nas vagas)
+  liga(v){DP880.on=!!v;if(DP880.on&&!DP880.falhou){try{dp880Geos();}catch(e){dp880Erro('liga',e);DP880.falhou=true;}}dp880Mini();return dp880Troca();},
+  aplica(){return this.liga(true);},desfaz(){return this.liga(false);},confere(g){dp880Confere(g||dp880Atual());return DP880.stats.sombreador||null;},
+  // poses de câmera em volta do dragão que está na vaga (ou de um grupo dado), em coordenadas do mundo
+  poses(g){try{g=g||dp880Atual();if(!g)return [];g.updateWorldMatrix(true,false);const v=new THREE.Vector3();const L=p=>{v.set(p[0],p[1],p[2]);g.localToWorld(v);return [+v.x.toFixed(3),+v.y.toFixed(3),+v.z.toFixed(3)];};
+      return this.fotos.map(f=>({id:f.nome,pos:L(f.pos),alvo:L(f.alvo),fov:f.fov||32}));}catch(e){dp880Erro('poses',e);return [];}},
+  fotos:[{nome:'frente',pos:[0,.25,3.4],alvo:[0,.12,-.1]},{nome:'tres-quartos',pos:[2.1,.75,2.5],alvo:[0,.1,-.15]},{nome:'perfil',pos:[3.6,.2,-.2],alvo:[0,.1,-.2]},{nome:'de-cima',pos:[0,4,-.15],alvo:[0,0,-.2]},{nome:'de-tras',pos:[-1.3,.9,-3.2],alvo:[0,.1,-.1]},
+    {nome:'cabeca-frente',pos:[.05,.3,1.75],alvo:[0,.27,.5],fov:26},{nome:'cabeca-tres-quartos',pos:[.85,.45,1.5],alvo:[0,.28,.5],fov:26},{nome:'cabeca-perfil',pos:[1.35,.3,.52],alvo:[0,.28,.5],fov:26}]};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
