@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v891</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v892</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -124803,6 +124803,192 @@ if(EM880.on){
   try{if(EM880R.on)setTimeout(em880PrepLaco,3000);}catch(e){}
 }
 window.__emenda880={estado:EM880,outeiros:EM880R,stats:EM880.stats,erros:EM880.erros,P:EM880_P,O:EM880_O,aplica:em880Aplica,desfaz:em880Desfaz,poses:em880Poses,sinc:em880Sinc,alfa:em880Alfa,relevo:em880Chao,campo:em880Rel,mascara:em880Masc};
+
+/* ===================== v880 · FANTASIA: «A ESPADA NA BIGORNA» VAI PARA A MARGEM DA CLAREIRA, ALÉM DE ONDE SE ANDA (bloco `ES880`) =====================
+   Pedido do Luiz (19/11, 20:50, com duas fotos): «Isso aqui vc pode por em algum lugar nas margens onde não consigo andar e só dá pra
+   enxergar, exemplo» — a 1.ª foto é o conjunto «A ESPADA NA BIGORNA»; a 2.ª, o exemplo de lugar: a borda de gramado enevoado, com pinheiros e
+   árvores ao fundo, além do limite de onde o leitor anda.
+   COMO ERA (v741, `FA741`, 4.º conjunto, gramado esquerdo da Grande Árvore, centro (−14,5; −20)): o rochedo com musgo, a bigorna, a espada
+   cravada que brilha e pulsa, o facho de luar, a pedra com a inscrição, sete florzinhas brancas em volta e a tabuleta «A ESPADA NA BIGORNA ·
+   puxe com jeito» — tudo fundido por material nas malhas «741 fantasia · v160 · …» (junto com os outros seis conjuntos), mais três malhas
+   próprias (os dois planos do brilho da lâmina e o cilindro do facho) e um ponto de halo. Quatro obstáculos no meio do gramado:
+   (−14,5; −20; 1,4), (−13,5; −19,45; 0,6), (−14,3; −18,45; 0,6) e o da tabuleta (−12,2; −18,8; 0,25).
+   AGORA: o conjunto inteiro vai, sem mudar de forma nem de tamanho (só posição e giro), para a clareira da margem OESTE, em (−26; −8,5) —
+   6,0 m além de onde o leitor para (x = −20,0 em 1.ª pessoa e −20,1 em 3.ª: o `move` usa `clamp(…, 1,0)` e o `moveTP`, 0,9; a linha de
+   −20,65 é a da folga 0,35 dos bichos e companheiros; a peça mais próxima do leitor, uma florzinha, fica a 3,9 m; a pedra da inscrição a
+   4,2 m, virada para ele; o rochedo a 4,9 m), no gramado raso entre o capinzal alto (que acaba em z ≈ −14,5) e a mata da
+   frente (que começa em z ≈ −7), com os pinheiros e as árvores distantes atrás. Dali ele se vê inteiro da margem do lago do oeste e da
+   trilha (por cima da água), e a lâmina acesa com o facho, por cima dos pedregulhos do limite, do gramado onde estava. Girado 1,4 rad
+   (≈ 80°): a face da inscrição e o lado largo da lâmina ficam virados para a área andável (leste, um pouco para o sul). Assenta na altura
+   do terreno do lugar novo (`R.floorY`, lido na hora; cada florzinha na altura do seu ponto). Os vértices do conjunto são movidos DENTRO
+   das malhas fundidas da v741 (nenhuma malha, material ou chamada de desenho a mais; como as malhas fundidas são grandes, o recorte por
+   distância `DES199` não o esconde no Leve/Papel); o brilho, o facho e o halo vão junto e continuam a pulsar (a animação da v741 só mexe na
+   opacidade). O conjunto não tem luz própria: nenhuma luz muda.
+   A TABULETA SAI (os triângulos dela viram triângulos vazios, guardados): a 5,5 m ou mais do leitor ninguém a lê, e uma tábua ilegível só
+   sujava o quadro. `?tabuleta880=1` leva a tabuleta junto (fica à esquerda do rochedo, virada para a área andável).
+   NO LUGAR ANTIGO: nada fica (nem pedaço, nem halo) e os quatro obstáculos saem das listas (a viva do nível do chão, a do Decorar e as
+   listas-base, se lá estiverem): o gramado fica livre para andar. No lugar novo não há obstáculo (ninguém chega lá).
+   QUANDO: logo depois de a v741 montar a sala (o `fa741Aplicar` embrulhado), no `setActive` da Fantasia (antes da fusão do Leve) ou pelo
+   vigia de 2 s; se a cena já tiver grupos da fusão com as malhas mexidas, eles são desfeitos (refazem-se sozinhos). Uma passada só e
+   de uma vez (sem fatias, para nunca haver um quadro com o conjunto pela metade): medida no node, 6–17 ms na 1.ª vez (conforme a carga
+   da máquina) — dentro da mesma tarefa em que a v741 monta os sete conjuntos (40–380 ms).
+   Chaves: `?espada880=0` (fica tudo como na v741), `?tabuleta880=1` (a tabuleta vai junto em vez de sair). Gancho `window.__espada880`
+   (`estado`, `stats`, `erros`, `P` (medidas), `aplica()`, `desfaz()` — exatos, para as fotos de antes/depois na mesma sessão: depois de
+   `desfaz()` nada é refeito até `aplica()` —, `poses()`, `vigia()`).
+   REVISÃO (23/11; nenhuma medida do conjunto mudou, a geometria que sai é idêntica à de antes):
+   R1 o `desfaz()` devolvia os quatro obstáculos no FIM da lista e em ordem invertida; agora cada um volta para o lugar de onde saiu (antes
+      do vizinho que tinha na lista; se a lista viva foi refeita entretanto, vão para o fim dela, na ordem da v741);
+   R2 texto, medidas e poses: o leitor para em x = −20,0/−20,1 (não em −20,65); `P.leitor` = 20,0; a pose `novo_da_borda` estava em
+      x = −20,4, onde o leitor não chega — vai para x = −20,0;
+   R3 `camBlockReset190` não existe no jogo: a lista de bloqueio da câmera é avisada como o `PF881`/`EM880` fazem (`camBlockT190`), em vez
+      de ficar até 3 s com as esferas de antes da troca. */
+const ES880_Q=location.search+location.hash;
+const ES880={on:!/[?&#]espada880=0/i.test(ES880_Q),tab:/[?&#]tabuleta880=1/i.test(ES880_Q),erros:[],feito:null,pausa:false,iv:null,
+  stats:{aplicacoes:0,desfeitas:0,malhas:0,vertices:0,porMalha:{},tabuleta:null,fx:0,halo:0,obst:null,dy:null,flores:null,fusoesDesfeitas:0,setActive:0,vigia:0,ms:0,msChao:0,msMalhas:0,pulada:null}};
+function es880Erro(k,e){try{if(ES880.erros.length<40)ES880.erros.push(k+': '+String(e&&e.message?e.message:e));console.warn('v880 espada',k,e);}catch(x){}}
+// ---------- medidas (metros; mundo da Fantasia) ----------
+const ES880_P={
+  de:{x:-14.5,z:-20,ry:0},            // o centro do conjunto na v741
+  para:{x:-26,z:-8.5,ry:1.4},         // o lugar novo (margem oeste, 6,0 m além de onde o leitor para) e o giro
+  // tudo o que é do conjunto nas malhas fundidas (rochedo, pedras, musgo, bigorna, espada, pedra da inscrição e as sete florzinhas)
+  caixa:{x0:-16.8,x1:-12.67,z0:-22.25,z1:-17.85,y1:4},
+  // a tabuleta (poste, tábua e o letreiro do atlas): na v741 em (x+2,3; z+1,2), virada π/3
+  placa:{x0:-12.67,x1:-11.6,z0:-19.5,z1:-18.05,y1:2,de:{x:-12.2,z:-18.8,ry:Math.PI/3},para:{x:-25.2,z:-6.1,ry:1.5}},
+  eixo:{dx:-.04,dz:0,tol:.06},        // o eixo da lâmina: os dois planos do brilho, o facho e o halo estão nele
+  flores:{n:7,a0:.4,da:.9,r0:1.75,dr:.3,tol:.075,yMax:.5}, // as florzinhas da v741: ângulo k·0,9+0,4, raio 1,75/2,05; cada uma na altura do seu chão
+  obst:[[-14.5,-20,1.4],[-13.5,-19.45,.6],[-14.3,-18.45,.6]],obstPlaca:[[-12.2,-18.8,.25]],
+  limite:20.65,                       // o raio da cápsula andável (eixo x 0, z −43…0) com a folga 0,35 (bichos, companheiros, roteiros)
+  leitor:20.0                         // (revisão R2) onde o LEITOR para: `clamp(…, 1,0)` em 1.ª pessoa (20,1 em 3.ª, folga 0,9)
+};
+// ---------- ferramentas ----------
+function es880Pronta(){try{const R=(typeof ROOMS!=='undefined')?ROOMS.fant:null;if(!R||!R.ready||!R.scene||!R.world)return null;return R;}catch(e){return null;}}
+// com o nível do chão (0) da Fantasia, mesmo com o leitor na escada ou no deque da Grande Árvore (`obst`, `clamp` e `floorY` dependem dele)
+function es880Nivel0(fn){const F=(typeof window!=='undefined')&&window.__FANT;if(!F||!F.lvl)return fn();const lv=F.lvl;F.lvl=0;try{return fn();}finally{F.lvl=lv;}}
+function es880Chao(R){const F=(typeof window!=='undefined')&&window.__FANT;return (x,z)=>{let y=NaN;try{y=es880Nivel0(()=>R.floorY?R.floorY(x,z):NaN);}catch(e){}
+    if(!isFinite(y)){try{y=F&&F.terrainH?F.terrainH(x,z):0;}catch(e){y=0;}}return isFinite(y)?y:0;};}
+// giro em torno de y (o mesmo sentido do `rotation.y` do three) e translação: do pivô `de` para o pivô `para`
+function es880Leva(de,para,x,z){const a=(para.ry||0)-(de.ry||0),c=Math.cos(a),s=Math.sin(a),dx=x-de.x,dz=z-de.z;return [para.x+dx*c+dz*s,para.z-dx*s+dz*c];}
+function es880Geo(m){try{if(typeof PAPEL_GEO!=='undefined'){const r=PAPEL_GEO.get(m);if(r&&r.g)return {g:r.g,papel:true};}}catch(e){}return {g:m.geometry,papel:false};}
+function es880SemPapel(m,r){try{if(typeof PAPEL_GEO_LOD!=='undefined')PAPEL_GEO_LOD.delete(r.g);}catch(e){}if(!r.papel)return;try{m.geometry=r.g;PAPEL_GEO.delete(m);}catch(e){es880Erro('papel',e);}}
+// o que é da v741 na cena, numa passada só: as malhas fundidas, as malhas de efeito (o brilho e o facho estão entre elas) e os pontos dos
+// halos. A v741 põe tudo como filho direto da cena; só se nada aparecer ali é que a cena inteira é percorrida.
+function es880Acha(sc){const A={malhas:[],fx:[],halos:[],fx2:[],halos2:[]},ve=o=>{const u=o.userData||{};if(o.isPoints){if(/741 halos/.test(o.name||''))A.halos.push(o);else if(u.t160&&u.fx)A.halos2.push(o);return;}if(!o.isMesh||o.isInstancedMesh)return;
+    if(/^741 fantasia · /.test(o.name||''))A.malhas.push(o);else if(u.fx){if(/^741 /.test(o.name||''))A.fx.push(o);else if(o.material&&o.material.isMeshBasicMaterial&&o.material.transparent)A.fx2.push(o);}};
+  for(const o of sc.children)ve(o);if(!A.malhas.length){A.fx.length=A.halos.length=A.fx2.length=A.halos2.length=0;sc.traverse(ve);}
+  // (se algum nome vier trocado, valem os efeitos e os halos do kit que estiverem no eixo da lâmina — o teste de posição é feito por quem usa)
+  if(!A.fx.length)A.fx=A.fx2;if(!A.halos.length)A.halos=A.halos2;return A;}
+function es880Identidade(e){return e[0]===1&&e[5]===1&&e[10]===1&&e[15]===1&&!e[1]&&!e[2]&&!e[3]&&!e[4]&&!e[6]&&!e[7]&&!e[8]&&!e[9]&&!e[11]&&!e[12]&&!e[13]&&!e[14];}
+// move, dentro de uma malha fundida, os vértices que caem nas caixas das regras ({caixa,de,para,dy(x,z,y)}); com `tira`, os triângulos da
+// caixa `tira` viram triângulos vazios. Guarda tudo o que mexe em `reg` (para o `desfaz()` exato).
+function es880MexeMalha(m,regras,tira,reg,st){const G=es880Geo(m),g=G.g,p=g&&g.attributes&&g.attributes.position;if(!p||!p.array||p.itemSize!==3||p.isInterleavedBufferAttribute)return 0;
+  const nr0=g.attributes.normal,nr=(nr0&&nr0.array&&nr0.itemSize===3&&!nr0.isInterleavedBufferAttribute)?nr0:null,I=g.index?g.index.array:null;
+  m.updateMatrixWorld(true);const M=m.matrixWorld,e=M.elements,id=es880Identidade(e);let Mi=null;if(!id){Mi=new THREE.Matrix4().copy(M);if(Mi.invert)Mi.invert();else Mi.getInverse(M);}
+  const pa=p.array,na=nr?nr.array:null,n=p.count,guarda=[],v=new THREE.Vector3(),d=new THREE.Vector3();let marca=null,nT=0;
+  // a caixa que envolve todas as caixas: rejeição rápida (quase todos os vértices das malhas fundidas são dos outros seis conjuntos)
+  let ux0=1e9,ux1=-1e9,uz0=1e9,uz1=-1e9;for(const b of regras.map(r=>r.caixa).concat(tira?[tira]:[])){if(b.x0<ux0)ux0=b.x0;if(b.x1>ux1)ux1=b.x1;if(b.z0<uz0)uz0=b.z0;if(b.z1>uz1)uz1=b.z1;}
+  for(let i=0,k=0;i<n;i++,k+=3){let x=pa[k],y=pa[k+1],z=pa[k+2];if(!id){const X=x,Y=y,Z=z;x=e[0]*X+e[4]*Y+e[8]*Z+e[12];y=e[1]*X+e[5]*Y+e[9]*Z+e[13];z=e[2]*X+e[6]*Y+e[10]*Z+e[14];}
+    if(x<=ux0||x>=ux1||z<=uz0||z>=uz1)continue;
+    if(tira&&x>tira.x0&&x<tira.x1&&z>tira.z0&&z<tira.z1&&y<tira.y1){if(!marca)marca=new Uint8Array(n);marca[i]=1;nT++;continue;}
+    let r=null;for(const q of regras){const b=q.caixa;if(x>b.x0&&x<b.x1&&z>b.z0&&z<b.z1&&y<b.y1){r=q;break;}}if(!r)continue;
+    guarda.push(i,pa[k],pa[k+1],pa[k+2],na?na[k]:0,na?na[k+1]:0,na?na[k+2]:0);
+    const q=es880Leva(r.de,r.para,x,z),ny=y+r.dy(x,z,y);
+    if(id){pa[k]=q[0];pa[k+1]=ny;pa[k+2]=q[1];}else{v.set(q[0],ny,q[1]).applyMatrix4(Mi);pa[k]=v.x;pa[k+1]=v.y;pa[k+2]=v.z;}
+    if(na){const a=(r.para.ry||0)-(r.de.ry||0),c=Math.cos(a),s=Math.sin(a);
+      if(id){const nx=na[k],nz=na[k+2];na[k]=nx*c+nz*s;na[k+2]=-nx*s+nz*c;}
+      else{d.set(na[k],na[k+1],na[k+2]).transformDirection(M);const nx=d.x*c+d.z*s,nz=-d.x*s+d.z*c;d.x=nx;d.z=nz;d.transformDirection(Mi);na[k]=d.x;na[k+1]=d.y;na[k+2]=d.z;}}}
+  // os triângulos da tabuleta (os três vértices na caixa dela) ficam vazios
+  const col=[];if(tira&&nT){if(I){const nt=Math.floor(g.index.count/3);for(let t=0;t<nt;t++){const a=I[t*3],b=I[t*3+1],c=I[t*3+2];if(a===b&&b===c)continue;if(marca[a]&&marca[b]&&marca[c]){col.push(t,b,c);I[t*3+1]=a;I[t*3+2]=a;}}}
+    else{for(let t=0;t+2<n;t+=3){if(marca[t]&&marca[t+1]&&marca[t+2]){col.push(t+1,p.getX(t+1),p.getY(t+1),p.getZ(t+1),t+2,p.getX(t+2),p.getY(t+2),p.getZ(t+2));p.setXYZ(t+1,p.getX(t),p.getY(t),p.getZ(t));p.setXYZ(t+2,p.getX(t),p.getY(t),p.getZ(t));}}}}
+  const nv=guarda.length/7,nc=I?col.length/3:col.length/8;if(!nv&&!nc)return 0;
+  if(nv||(!I&&nc)){p.needsUpdate=true;if(nr&&nv)nr.needsUpdate=true;try{g.computeBoundingSphere();g.computeBoundingBox();}catch(x){}}if(I&&nc)g.index.needsUpdate=true;
+  reg.geo.push({m,g,guarda,col,ind:!!I});reg.mexidas.push(m);es880SemPapel(m,G);
+  const nome=(m.name||'').replace(/^741 fantasia · (v160 · )?/,'').replace(/^741 /,'');st.porMalha[nome]=nv+(nc?' +'+nc+' tri. da tabuleta':'');st.vertices+=nv;st.malhas++;if(nc)st.tabuleta=(st.tabuleta||0)+nc;return nv+nc;}
+function es880VoltaGeo(reg){let n=0;for(const R of reg.geo){try{const g=R.g,p=g.attributes.position,nr=g.attributes.normal||null,G=R.guarda;
+      for(let i=0;i+6<G.length;i+=7){p.setXYZ(G[i],G[i+1],G[i+2],G[i+3]);if(nr)nr.setXYZ(G[i],G[i+4],G[i+5],G[i+6]);n++;}
+      const C=R.col;if(R.ind){const I=g.index.array;for(let i=0;i+2<C.length;i+=3){const t=C[i];I[t*3+1]=C[i+1];I[t*3+2]=C[i+2];}if(C.length)g.index.needsUpdate=true;}
+      else for(let i=0;i+3<C.length;i+=4)p.setXYZ(C[i],C[i+1],C[i+2],C[i+3]);
+      p.needsUpdate=true;if(nr)nr.needsUpdate=true;try{g.computeBoundingSphere();g.computeBoundingBox();}catch(x){}
+      const G2=es880Geo(R.m);if(G2.g===g)es880SemPapel(R.m,G2);}catch(e){es880Erro('volta',e);}}reg.geo.length=0;return n;}
+// desfaz os grupos da fusão do Leve que contêm estas malhas (refazem-se sozinhos, já com a geometria nova)
+function es880SemFusao(sc,malhas){try{if(typeof FUSAO==='undefined'||!FUSAO.cenas||typeof fusaoDesfazer!=='function')return 0;const F=FUSAO.cenas.get(sc);if(!F||!F.grupos||!F.grupos.length)return 0;const set=new Set(malhas);let n=0;
+    for(const g of F.grupos.slice())if(g&&g.originais&&g.originais.some(o=>set.has(o))){fusaoDesfazer(g,F,sc);n++;}ES880.stats.fusoesDesfeitas+=n;return n;}
+  catch(e){es880Erro('fusão',e);try{if(typeof fusaoLimpar==='function')fusaoLimpar(sc);}catch(x){}return -1;}}
+// as listas de obstáculos do chão (nível 0) da Fantasia onde um obstáculo da v741 pode estar: a viva (`R.world.obst` — a cópia que o recanto
+// da v355 junta e, com peças do Decorar na sala, a cópia do DEC128 por cima), a base dessa cópia do Decorar, a lista-base `FANT_OBST`
+// (o `baseObs`/`keyFloors`) e a do recanto (`COZY355.obstacles`)
+function es880Listas(R){const L=[],poe=a=>{if(Array.isArray(a)&&L.indexOf(a)<0)L.push(a);};
+  try{poe(es880Nivel0(()=>R.world.obst));}catch(e){es880Erro('obst',e);}
+  try{const D=(typeof DEC128!=='undefined'&&DEC128.rooms)?DEC128.rooms.fant:null,c=D&&D.obstacleCache130&&D.obstacleCache130.get(0);if(c){poe(c.base);poe(c.value);}}catch(e){}
+  try{const kf=(typeof R.keyFloors==='function')?R.keyFloors():null,f0=Array.isArray(kf)?kf.find(f=>f&&f.lvl===0):null;if(f0){poe(f0.baseObs);const d=f0.world&&Object.getOwnPropertyDescriptor(f0.world,'obst');if(d)poe(d.value);}}catch(e){}
+  try{if(typeof COZY355!=='undefined'&&COZY355)poe(COZY355.obstacles);}catch(e){}
+  return L;}
+function es880Mundo(R){try{R.world.__nav=null;R.world.__cl=null;}catch(e){}
+  try{if(typeof camBlockScene!=='undefined'&&camBlockScene===R.scene&&typeof camBlockT190!=='undefined')camBlockT190=-1e9;}catch(e){}}   // (revisão R3) `camBlockReset190` não existe: é assim que a lista da câmera se refaz (como no PF881)
+// ---------- a mudança ----------
+function es880Aplica(R){const t0=performance.now(),P=ES880_P,sc=R.scene,st=ES880.stats,reg={sc,geo:[],fx:[],halo:[],obst:[],mexidas:[]};
+  st.porMalha={};st.vertices=0;st.malhas=0;st.tabuleta=null;st.fx=0;st.halo=0;st.pulada=null;
+  const chao=es880Chao(R),yDe=chao(P.de.x,P.de.z),yPara=chao(P.para.x,P.para.z),dy=yPara-yDe;st.dy=+dy.toFixed(4);
+  // as florzinhas: cada uma assenta no chão do seu ponto novo
+  const FL=[],F=P.flores;for(let k=0;k<F.n;k++){const a=k*F.da+F.a0,rr=F.r0+(k%2)*F.dr,x=P.de.x+Math.cos(a)*rr,z=P.de.z+Math.sin(a)*rr,q=es880Leva(P.de,P.para,x,z);FL.push({x,z,dy:chao(q[0],q[1])-chao(x,z)});}
+  st.flores=FL.map(f=>+f.dy.toFixed(4));st.msChao=+(performance.now()-t0).toFixed(2);
+  const dyConj=(x,z,y)=>{if(y<yDe+F.yMax)for(const f of FL)if(Math.abs(x-f.x)<F.tol&&Math.abs(z-f.z)<F.tol)return f.dy;return dy;};
+  // (só as hastes e as corolas — malhas «741 verde» e «741 branco» — seguem a altura da sua florzinha; o resto segue o centro do rochedo)
+  const rConj={caixa:P.caixa,de:P.de,para:P.para,dy:()=>dy},rFlor={caixa:P.caixa,de:P.de,para:P.para,dy:dyConj};let tira=null,rPlaca=null;
+  if(ES880.tab){const B=P.placa,dp=chao(B.para.x,B.para.z)-chao(B.de.x,B.de.z);rPlaca={caixa:B,de:B.de,para:B.para,dy:()=>dp};}else tira=P.placa;
+  const tc=performance.now(),A=es880Acha(sc);
+  for(const m of A.malhas){try{const flor=/741 (verde|branco)$/.test(m.name||'');es880MexeMalha(m,rPlaca?[flor?rFlor:rConj,rPlaca]:[flor?rFlor:rConj],tira,reg,st);}catch(e){es880Erro('malha '+(m.name||''),e);}}
+  st.msMalhas=+(performance.now()-tc).toFixed(2);
+  if(!st.vertices){es880VoltaGeo(reg);st.pulada='o conjunto da v741 não está na cena (nenhum vértice na caixa)';ES880.feito={sc,reg,pulada:true};return st;}
+  // o brilho da lâmina (dois planos) e o facho de luar: malhas próprias no eixo da lâmina
+  const ex=P.de.x+P.eixo.dx,ez=P.de.z+P.eixo.dz;
+  try{for(const o of A.fx){const p=o.position;if(Math.abs(p.x-ex)>P.eixo.tol||Math.abs(p.z-ez)>P.eixo.tol)continue;
+      reg.fx.push({o,x:p.x,y:p.y,z:p.z,ry:o.rotation.y});const q=es880Leva(P.de,P.para,p.x,p.z);p.set(q[0],p.y+dy,q[1]);o.rotation.y+=P.para.ry-P.de.ry;o.updateMatrix();o.updateMatrixWorld(true);reg.mexidas.push(o);st.fx++;}}catch(e){es880Erro('brilho',e);}
+  // o halo da espada (um ponto do «v160 · 741 halos»)
+  try{for(const o of A.halos){if(!o.geometry||!o.geometry.attributes.position)continue;const p=o.geometry.attributes.position;let n=0;
+      for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),z=p.getZ(i);if(Math.abs(x+o.position.x-ex)>P.eixo.tol||Math.abs(z+o.position.z-ez)>P.eixo.tol)continue;
+        reg.halo.push({p,g:o.geometry,i,x,y,z});const q=es880Leva(P.de,P.para,x+o.position.x,z+o.position.z);p.setXYZ(i,q[0]-o.position.x,y+dy,q[1]-o.position.z);n++;}
+      if(n){p.needsUpdate=true;try{o.geometry.computeBoundingSphere();}catch(x){}st.halo+=n;}}}catch(e){es880Erro('halo',e);}
+  // os obstáculos do lugar antigo saem de todas as listas do chão (o da tabuleta também: ela sai ou vai junto)
+  try{const L=es880Listas(R),tirar=P.obst.concat(P.obstPlaca);let n=0;
+    for(const lista of L)for(const q of tirar){for(let i=lista.length-1;i>=0;i--){const o=lista[i];if(o&&Math.abs(o[0]-q[0])<.025&&Math.abs(o[1]-q[1])<.025&&Math.abs(o[2]-q[2])<.002){const prox=lista[i+1];lista.splice(i,1);reg.obst.push({lista,o,i,prox,viva:lista===L[0]});n++;}}}   // (revisão R1) guarda o índice e o vizinho seguinte
+    st.obst={listas:L.length,tirados:n,ficaram:L.map(l=>l.length)};es880Mundo(R);}catch(e){es880Erro('obstáculos',e);}
+  es880SemFusao(sc,reg.mexidas);
+  ES880.feito={sc,reg};st.aplicacoes++;st.ms=+(performance.now()-t0).toFixed(2);return st;}
+function es880DesfazTudo(){const F=ES880.feito;if(!F)return 0;let n=0;const reg=F.reg;
+  try{n+=es880VoltaGeo(reg);}catch(e){es880Erro('desfaz geometria',e);}
+  for(const r of reg.fx){try{r.o.position.set(r.x,r.y,r.z);r.o.rotation.y=r.ry;r.o.updateMatrix();r.o.updateMatrixWorld(true);n++;}catch(e){es880Erro('desfaz brilho',e);}}
+  {const gs=new Set();for(const r of reg.halo){try{r.p.setXYZ(r.i,r.x,r.y,r.z);r.p.needsUpdate=true;gs.add(r.g);n++;}catch(e){es880Erro('desfaz halo',e);}}for(const g of gs){try{g.computeBoundingSphere();}catch(x){}}}
+  // (de trás para a frente: cada obstáculo volta para a lista de onde saiu, se ainda não estiver lá; se a lista viva foi refeita entretanto
+  // — o recanto refaz a cópia quando o leitor sobe e desce a escada da Grande Árvore —, os que eram dela voltam para a lista viva de agora.
+  // Revisão R1: voltam para o LUGAR de onde saíram — antes do vizinho que tinham; sem ele, no índice de antes (na mesma lista) ou no fim)
+  {const R=es880Pronta();let L=[];try{if(R)L=es880Listas(R);}catch(e){}
+    for(let k=reg.obst.length-1;k>=0;k--){const r=reg.obst[k];try{const alvo=(r.viva&&L.length&&L.indexOf(r.lista)<0)?L[0]:r.lista;if(alvo.indexOf(r.o)>=0)continue;
+        let j=r.prox?alvo.indexOf(r.prox):-1;if(j<0)j=(alvo===r.lista&&typeof r.i==='number')?Math.min(r.i,alvo.length):alvo.length;alvo.splice(j,0,r.o);}catch(e){}}
+    try{if(R)es880Mundo(R);}catch(e){}}
+  es880SemFusao(F.sc,reg.mexidas);ES880.feito=null;return n;}
+function es880Tenta(R){if(!R||!ES880.on||ES880.pausa)return;if(ES880.feito&&ES880.feito.sc!==R.scene)ES880.feito=null; // (sala remontada)
+  if(ES880.feito)return;if(typeof FA741==='undefined'||!FA741.feito||!FA741.stats||FA741.stats.ms===undefined)return; // (a v741 marca `ms` quando acaba de montar e fundir)
+  try{es880Aplica(R);}catch(e){es880Erro('aplica',e);ES880.feito={sc:R.scene,reg:{sc:R.scene,geo:[],fx:[],halo:[],obst:[],mexidas:[]},pulada:true};}}
+function es880Vigia(){try{ES880.stats.vigia++;if(!ES880.on||ES880.pausa)return;const R=es880Pronta();if(R)es880Tenta(R);}catch(e){es880Erro('vigia',e);}}
+// para as fotos de antes/depois na mesma sessão
+function es880Desfaz(){let n=0;try{ES880.pausa=true;n=es880DesfazTudo();ES880.stats.desfeitas++;}catch(e){es880Erro('desfaz',e);}return {desfeitos:n};}
+function es880AplicaManual(){try{ES880.pausa=false;const R=es880Pronta();if(!R)return {erro:'a Fantasia não está pronta'};
+    if(typeof FA741!=='undefined'&&!FA741.feito&&typeof fa741Aplicar==='function'){try{fa741Aplicar();}catch(e){}}
+    es880Tenta(R);return {feito:!!(ES880.feito&&!ES880.feito.pulada),stats:ES880.stats};}catch(e){es880Erro('aplica manual',e);return {erro:String(e&&e.message||e)};}}
+// poses de câmera para as fotos (mundo da Fantasia; y relativo ao chão do ponto; todas de pontos onde o leitor chega, menos a planta;
+// revisão R2: a da borda estava em x = −20,4 — o leitor para em −20,0)
+function es880Poses(){const F=(typeof window!=='undefined')&&window.__FANT,h=(x,z)=>{try{const y=F&&F.terrainH?F.terrainH(x,z):0;return isFinite(y)?y:0;}catch(e){return 0;}},p=(x,y,z)=>[x,+(h(x,z)+y).toFixed(3),z],N=ES880_P.para,V=ES880_P.de;
+  return [{id:'lugar_antigo_como_na_foto',pos:p(-11.3,2.1,-16.3),alvo:p(V.x,.9,V.z),fov:60},{id:'lugar_antigo_do_caminho',pos:p(-9.5,1.75,-21.5),alvo:p(V.x,.8,V.z),fov:60},
+    {id:'novo_da_borda',pos:p(-ES880_P.leitor,1.75,-8.9),alvo:p(N.x,1.3,N.z),fov:60},{id:'novo_da_margem_do_lago',pos:p(-18.4,1.75,-7.6),alvo:p(N.x,1.5,N.z),fov:60},
+    {id:'novo_da_trilha',pos:p(-1,2.0,-9),alvo:p(N.x,1.6,N.z),fov:50},{id:'novo_do_gramado_antigo',pos:p(-15.5,1.75,-17.5),alvo:p(N.x,1.7,N.z),fov:60},
+    {id:'planta',pos:[-20,34,-13.99],alvo:[-20,0,-14],fov:50}];}
+if(ES880.on){
+  // logo depois de a v741 montar os conjuntos (antes de qualquer quadro e da fusão do Leve)
+  try{if(typeof fa741Aplicar==='function'){const f0=fa741Aplicar;fa741Aplicar=function(){const r=f0.apply(this,arguments);try{if(typeof FA741!=='undefined'&&FA741.feito)es880Vigia();}catch(e){es880Erro('fa741',e);}return r;};}}catch(e){es880Erro('fa741 0',e);}
+  try{const sa0=setActive;setActive=function(sc){try{if(ES880.on&&!ES880.pausa&&sc&&typeof ROOMS!=='undefined'&&ROOMS.fant&&sc===ROOMS.fant.scene){ES880.stats.setActive++;es880Vigia();}}catch(e){es880Erro('setActive',e);}return sa0.apply(this,arguments);};}catch(e){es880Erro('setActive 0',e);}
+  try{ES880.iv=setInterval(es880Vigia,2000);}catch(e){es880Erro('vigia 0',e);}
+}
+window.__espada880={estado:ES880,stats:ES880.stats,erros:ES880.erros,P:ES880_P,aplica:es880AplicaManual,desfaz:es880Desfaz,poses:es880Poses,vigia:es880Vigia};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
