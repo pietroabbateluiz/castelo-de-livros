@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v889</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v890</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -123963,6 +123963,497 @@ if(AV880.on){try{if(typeof i503Palmeira==='function'&&typeof i503Amendoeira==='f
   try{if(typeof setActive==='function'){const sa0=setActive;setActive=function(sc){try{if(sc&&typeof ROOMS!=='undefined'&&ROOMS.adv&&ROOMS.adv.scene===sc){if(AV880.pend)av880Termina();av880Tique();av880Raizes();}}catch(e){av880Erro('setActive',e);}return sa0.apply(this,arguments);};}}catch(e){av880Erro('ligar setActive',e);}}
 window.__arvores880={estado:AV880,stats:AV880.stats,erros:AV880.erros,desfaz:av880Desfaz,aplica:av880Aplica,poses:av880Poses,termina:av880Termina,raizes:av880Raizes,texturas:()=>{av880Prepara(true);return AV880.tex;},moldes:()=>{av880Prepara(true);return AV880.moldes;},vitrine:av880Vitrine,
   resumo:()=>({on:AV880.on,embrulhado:!!AV880.embrulhado,desfeito:AV880.desfeito,stats:AV880.stats,erros:AV880.erros.slice(),pendente:!!AV880.pend,vento:AV880.vento,tique:AV880.tick,ilhas:AV880.kits.map(g=>({nome:g.nome,itens:g.itens.length,feito:g.feito,falhou:!!g.falhou,naFila:!!g.it,aEspera:!!g.espera,triangulos:g.tri,malhas:g.malhas?g.malhas.map(m=>m.name):null,velhas:g.velhas?g.velhas.length:0}))})};
+
+/* ===================== v880 · FANTASIA: AS ÁRVORES TOSCAS REFEITAS NO LUGAR — COPAS DE FOLHAGEM RECORTADA NO PRADO, ABETOS DE RAMOS CAÍDOS NO HORIZONTE (bloco `AF880`) =====================
+   Pedido do Luiz (19/11, 20:48): «E tem umas árvores bem toscas em fantasia que podem melhorar» (copas em bolhas, pinheiros de cones).
+   COMO ERA: (1) as 10 árvores jovens do prado da v456, dentro da malha «vc» do prado: um cilindro, três tubinhos e quatro esferas
+   achatadas lisas cada; (2) as 9 árvores jovens da v506 (kit «Prado 506»): copa de blocos de esfera («503 copa») sobre um tubo liso («503
+   casca de palmeira»); (3) o bosque distante da mansão (v355): 68 pinheiros de seis cones lisos numa malha só; (4) as «Copas distantes»
+   da Oficina da Floresta (o horizonte: `InstancedMesh` por camada, setor e tipo), copas de lóbulos e cones simples.
+   AGORA, NO MESMO LUGAR (nenhuma posição muda; obstáculos iguais): (1)(2) quatro variantes de árvore do prado — carvalho-menino,
+   bétula-do-luar, cerejeira em flor e olmo torto —, cada uma com tronco de raízes, curva e galhos (casca de sulcos desenhada) e copa de
+   tufos (miolo irregular + cartões de ramos com folhas recortadas por alfa, de um atlas 2 × 2 desenhado em código), numa `InstancedMesh`
+   de casca e outra de copa por variante; as árvores velhas viram triângulos vazios dentro das malhas delas (guardados para o antes/depois).
+   A árvore nova segue a antiga: se outro bloco deslocar os vértices da antiga (o relevo dos outeiros, um empurrão), a nova vai junto.
+   (3) os pinheiros da mansão viram abetos de camadas de ramos caídos com pontas desiguais (4 variantes), na mesma malha. (4) as copas
+   distantes trocam só a geometria de cada lote: abetos e copas folhosas com tronco bifurcado e lóbulos irregulares, com versão de longe.
+   Montagem das texturas e geometrias em fatias na fila `fat8Go`; a troca no `setActive` da Fantasia (antes da fusão do Leve), no fim da
+   montagem e por um vigia. Materiais Lambert com cor por vértice, `papelKeep`. Sem luz nova.
+   Chave: `?arvoresfant880=0`. Gancho `window.__arvoresfant880` (`estado`, `stats`, `erros`, `aplica()`/`desfaz()`, `poses()`, `sinc()`,
+   `assenta()`, `arvores()`). (Cabeçalho escrito pelo coordenador em 23/11 a partir do código: o autor foi interrompido antes do relatório.)
+   CONSERTO (coordenador, 23/11, 1.º teste no navegador): a montagem inteira caía («Cannot read properties of undefined») porque a cerejeira
+   pedia o ladrilho 4 de um atlas que só tem quatro (0–3) — nenhuma árvore era trocada. Agora pede os ladrilhos 3, 0 e 1.
+   REVISÃO (23/11, `arvoresfant880/final/RELATORIO.md`; nenhum desenho de árvore mudou):
+   R1 cada lote de árvores do prado tem a SUA geometria-invólucro (atributos partilhados, limites próprios): os dois lotes de cada variante
+      (v456 e v506) partilhavam a geometria e um escrevia a esfera de recorte por cima da do outro — árvores inteiras sumiam conforme o lado
+      para onde a câmera olhava. A caixa leva folga vertical (os outeiros do `EM880` sobem as instâncias sem avisar).
+   R2 os lotes ficam FORA da fusão de instâncias do Leve (`__fusaoMoveu`): fundidos, caíam na densidade por distância da v241 (pensada para
+      folhas: de longe sumia até 45 % das ÁRVORES, tronco e copa) e o `desfaz()` deixava as cópias fundidas à vista por até 15 quadros
+      (antes e depois na mesma foto).
+   R3 horizonte: a geometria nova de cada lote sai com o MESMO topo da velha (escala uniforme; as da Oficina têm 0,905–1,051 de altura e as
+      novas 1,0–1,17: as copas saíam até 23 % mais altas e os abetos de perto 5 % mais baixos).
+   R4 o bosque da mansão só é lido depois da 1.ª limpeza da clareira do duelo (v539/v550, em fatias ~0,3 s depois do `finishRoom`): antes
+      dela são 80 pinheiros, 12 deles dentro da colina (ficavam na geometria guardada e nas contas).
+   R5 as árvores da v456 só entram depois do relevo da v506 (que sobe/desce os vértices delas): criadas antes, perdiam esse desnível quando o
+      relevo dos outeiros chegava no mesmo intervalo (até 0,44 m); o `af880Assenta` passa a acertar os limites dos DOIS lotes da árvore.
+   R6 miudezas: visibilidade guardada da v506 lida por baixo da fusão; quem reexibir as velhas é desfeito no passo seguinte; cena refeita →
+      relê tudo (`af880Esquece`); moldura transparente no ladrilho opaco do atlas (riscos na borda dos cartões vizinhos); contas do horizonte
+      pelo lote inteiro (o Papel desenha 60 %); `arvores()` devolve também a base da árvore velha; a pose «bosque_do_prado» estava fora da área andável.
+   R7 a montagem em fatias de verdade: as duas texturas e as quatro árvores eram um passo cada (40 / 14 / 3–7 ms; 113 ms a frio); agora são
+      geradores com ~110 cortes (o maior passo fica em ~3 ms; o acaso é consumido na mesma ordem: as geometrias saem idênticas).
+   R8 a TROCA (ler as árvores velhas e montar o bosque: ~0,1 s de uma vez) só acontece com a Fantasia em cena ou a entrar (`setActive`, atrás
+      da transição); o fim da montagem com o leitor noutro lugar não troca mais nada, e o vigia faz no máximo uma leitura pesada por passo. */
+const AF880_Q=location.search+location.hash;
+const AF880={on:!/[?&#]arvoresfant880=0/i.test(AF880_Q),erros:[],pausa:false,pronto:false,montando:false,
+  stats:{montagemMs:0,setActive:0,sinc:0,prado456:null,prado506:null,mansao:null,horizonte:null,triAntes:0,triDepois:0,trocas:0,trocaMs:0,trocaMaxMs:0},
+  tex:null,mats:null,geos:null,partes:{p456:null,p506:null,mansao:null,horiz:null},arvores:[],lotes:[],vigia:0,cena:null,grupo:null};
+// medidas (tudo em metros; as variantes são modeladas com 5 m de altura e a instância dá a escala)
+const AF880_P={alt0:5,alfa:.42,afunda:.06,escMin:.72,escMax:1.5,folgaY:4.5,espera:20,kMin:.7,kMax:1.3,
+  // tons (cor por vértice, multiplicam a textura): casca e folhagem por variante — carvalho-menino, bétula-do-luar, cerejeira em flor, olmo torto
+  casca:[[.86,.72,.58],[1.26,1.25,1.18],[.7,.54,.5],[.8,.74,.64]],
+  folha:[[.92,1.0,.86],[1.04,1.1,.9],[1.0,1.0,1.0],[.74,.94,.92]]};
+function af880Erro(k,e){try{if(AF880.erros.length<30)AF880.erros.push(k+': '+(e&&e.message||e));}catch(x){}try{console.warn('v880 árvores da Fantasia',k,e);}catch(x){}}
+/* ---------- acaso e ruído determinísticos ---------- */
+function af880Rnd(seed){let s=(Math.imul((seed^0x9e3779b9)>>>0,2654435761)>>>0)||1;const f=function(){s^=s<<13;s^=s>>>17;s^=s<<5;s>>>=0;return s/4294967296;};f();f();f();return f;}
+function af880H(i,j,k){let h=(Math.imul(i,374761393)+Math.imul(j,668265263)+Math.imul(k,1442695041)+880880)>>>0;h=Math.imul(h^(h>>>13),1274126177)>>>0;return ((h^(h>>>16))>>>0)/4294967296;}
+function af880N3(x,y,z){const i=Math.floor(x),j=Math.floor(y),k=Math.floor(z),fx=x-i,fy=y-j,fz=z-k,u=fx*fx*(3-2*fx),v=fy*fy*(3-2*fy),w=fz*fz*(3-2*fz);
+  const a=af880H(i,j,k),b=af880H(i+1,j,k),c=af880H(i,j+1,k),d=af880H(i+1,j+1,k),e=af880H(i,j,k+1),f=af880H(i+1,j,k+1),g=af880H(i,j+1,k+1),h=af880H(i+1,j+1,k+1);
+  const x0=a+(b-a)*u,x1=c+(d-c)*u,x2=e+(f-e)*u,x3=g+(h-g)*u,y0=x0+(x1-x0)*v,y1=x2+(x3-x2)*v;return y0+(y1-y0)*w;}
+const af880Liso=(a,b,x)=>{const t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-2*t);};
+/* ---------- coletor de geometria (posição, normal, uv, cor, índice) ---------- */
+function af880Buf(){return {p:[],n:[],u:[],c:[],i:[],nv:0};}
+function af880V(B,x,y,z,nx,ny,nz,u,v,r,g,b){B.p.push(x,y,z);B.n.push(nx,ny,nz);B.u.push(u,v);B.c.push(r,g,b);return B.nv++;}
+function af880Geo(B,normais){const T=THREE,g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(B.p,3));g.setAttribute('normal',new T.Float32BufferAttribute(B.n,3));
+  g.setAttribute('uv',new T.Float32BufferAttribute(B.u,2));g.setAttribute('color',new T.Float32BufferAttribute(B.c,3));g.setIndex(B.i);if(normais)g.computeVertexNormals();g.computeBoundingBox();g.computeBoundingSphere();return g;}
+// junta um coletor noutro com escala (sx,sy,sz), giro em y, translação e tom (multiplica a cor)
+function af880Junta(D,B,sx,sy,sz,ry,tx,ty,tz,tom){const c=Math.cos(ry||0),s=Math.sin(ry||0),b=D.nv,n=B.nv,P=B.p,N=B.n,C=B.c,U=B.u,t=tom||[1,1,1];
+  for(let k=0;k<n;k++){const x=P[k*3]*sx,y=P[k*3+1]*sy,z=P[k*3+2]*sz,nx=N[k*3]/sx,ny=N[k*3+1]/sy,nz=N[k*3+2]/sz,l=Math.hypot(nx,ny,nz)||1;
+    D.p.push(x*c+z*s+tx,y+ty,-x*s+z*c+tz);D.n.push((nx*c+nz*s)/l,ny/l,(-nx*s+nz*c)/l);D.u.push(U[k*2],U[k*2+1]);D.c.push(C[k*3]*t[0],C[k*3+1]*t[1],C[k*3+2]*t[2]);}
+  for(let k=0;k<B.i.length;k++)D.i.push(B.i[k]+b);D.nv+=n;}
+/* ---------- tubo de raio variável ao longo de uma curva (troncos, galhos): seção de `lados` com relevo `mod(t,a)`, cor `cor(t,a)` ---------- */
+function af880Tubo(B,pts,seg,lados,raio,mod,cor,vEsc,ponta){const T=THREE,curva=new T.CatmullRomCurve3(pts.map(p=>new T.Vector3(p[0],p[1],p[2])),false,'centripetal'),fr=curva.computeFrenetFrames(seg,false),base=B.nv,P=new T.Vector3(),A=new T.Vector3();let comp=0;
+  for(let i=0;i<=seg;i++){const t=i/seg;curva.getPoint(t,P);if(i)comp+=P.distanceTo(A);A.copy(P);const N=fr.normals[i],Bn=fr.binormals[i],r=raio(t);
+    for(let j=0;j<=lados;j++){const a=j/lados*6.2831853,ca=Math.cos(a),sa=Math.sin(a),k=r*(mod?mod(t,a):1),nx=ca*N.x+sa*Bn.x,ny=ca*N.y+sa*Bn.y,nz=ca*N.z+sa*Bn.z,c=cor(t,a);
+      af880V(B,P.x+nx*k,P.y+ny*k,P.z+nz*k,nx,ny,nz,j/lados*(lados>7?2:1),comp/(vEsc||1.2),c[0],c[1],c[2]);}}
+  for(let i=0;i<seg;i++)for(let j=0;j<lados;j++){const a=base+i*(lados+1)+j,b=a+lados+1;B.i.push(a,a+1,b,b,a+1,b+1);}
+  if(ponta){curva.getPoint(1,P);const Tg=fr.tangents[seg],c=cor(1,0),q=af880V(B,P.x+Tg.x*ponta,P.y+Tg.y*ponta,P.z+Tg.z*ponta,Tg.x,Tg.y,Tg.z,.5,(comp+ponta)/(vEsc||1.2),c[0],c[1],c[2]),u=base+seg*(lados+1);for(let j=0;j<lados;j++)B.i.push(u+j,u+j+1,q);}
+  return curva;}
+/* =====================================================================================================================================
+   TEXTURAS (desenhadas em código): o atlas de folhagem 2 × 2 (ramo em leque, ramo esguio, massa de folhas, ramo em flor) e a casca
+   ===================================================================================================================================== */
+function af880Tela(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return c;}
+// uma folha ovada com ponta: degradê da base à ponta, nervura clara e fio escuro na borda
+function af880Folha(x,cx,cy,ang,len,wid,c0,c1,fio){x.save();x.translate(cx,cy);x.rotate(ang);const g=x.createLinearGradient(0,0,len,0);g.addColorStop(0,c0);g.addColorStop(1,c1);x.fillStyle=g;
+  x.beginPath();x.moveTo(0,0);x.bezierCurveTo(len*.2,-wid*.7,len*.78,-wid*.64,len,0);x.bezierCurveTo(len*.78,wid*.64,len*.2,wid*.7,0,0);x.closePath();x.fill();
+  if(fio){x.strokeStyle=fio;x.lineWidth=1.3;x.stroke();}
+  x.strokeStyle='rgba(232,244,190,.34)';x.lineWidth=1.1;x.beginPath();x.moveTo(len*.06,0);x.lineTo(len*.92,0);x.stroke();
+  x.fillStyle='rgba(255,255,255,.07)';x.beginPath();x.ellipse(len*.5,-wid*.18,len*.26,wid*.12,0,0,6.2832);x.fill();x.restore();}
+function af880Flor(x,cx,cy,R,cor,miolo,r){x.save();x.translate(cx,cy);x.rotate(r()*6.28);for(let k=0;k<5;k++){x.rotate(6.2832/5);x.fillStyle=cor;x.beginPath();x.ellipse(R*.52,0,R*.5,R*.36,0,0,6.2832);x.fill();x.strokeStyle='rgba(120,60,90,.22)';x.lineWidth=.8;x.stroke();}
+  x.fillStyle=miolo;x.beginPath();x.arc(0,0,R*.2,0,6.2832);x.fill();x.restore();}
+const AF880_VERDES=[['#5f8558','#a3c58c'],['#688f5a','#b4d096'],['#587f60','#9cc094'],['#74965c','#c6dc9c'],['#5a8468','#98be9c']];
+// um ramo: raminhos a partir de (bx,by) e folhas ao longo deles, das de trás (escuras) para as da frente (claras)
+function* af880RamoG(x,ox,oy,S,r,op){const bx=ox+S/2,by=oy+S-5;const hastes=[];const nH=op.hastes||3;
+  for(let h=0;h<nH;h++){const a=-Math.PI/2+(nH>1?(h/(nH-1)-.5):0)*op.abre+(r()-.5)*.12,L=S*(op.alc||.6)*(.86+r()*.2)*(h===((nH-1)>>1)?1.12:1),cx=bx+Math.cos(a)*L*.5+(r()-.5)*S*.1,cy=by+Math.sin(a)*L*.5,ex=bx+Math.cos(a)*L,ey=by+Math.sin(a)*L;hastes.push([cx,cy,ex,ey]);}
+  const pt=(H,t)=>{const u=1-t;return [u*u*bx+2*u*t*H[0]+t*t*H[2],u*u*by+2*u*t*H[1]+t*t*H[3]];};
+  const lim=(v,a,b)=>Math.max(a,Math.min(b,v));const folhas=[];
+  for(const H of hastes){const n=op.porHaste||7;for(let k=0;k<n;k++){const t=.2+.8*(k+.5)/n,[px,py]=pt(H,t),[qx,qy]=pt(H,Math.min(1,t+.05)),dir=Math.atan2(qy-py,qx-px),lado=(k%2?1:-1),ang=dir+lado*(op.ang||.85)*(1-.45*t)+(r()-.5)*.3,len=S*(op.len||.2)*(.8+r()*.4)*(1-.18*t);
+      folhas.push([px,py,ang,len,len*(op.larg||.46)*(.85+r()*.3),t+r()*.25]);}
+    const [ex,ey]=pt(H,1),[fx,fy]=pt(H,.93);folhas.push([ex,ey,Math.atan2(ey-fy,ex-fx)+(r()-.5)*.25,S*(op.len||.2)*1.05,S*(op.len||.2)*(op.larg||.46),1.3]);}
+  for(let k=0;k<(op.enche||8);k++){const a=-Math.PI/2+(r()-.5)*op.abre*1.1,d=S*(.1+r()*.34);folhas.push([bx+Math.cos(a)*d,by+Math.sin(a)*d,a+(r()-.5)*1.5,S*(op.len||.2)*(.7+r()*.3),S*(op.len||.2)*(op.larg||.46)*.9,r()*.5-.4]);}
+  folhas.sort((a,b)=>a[5]-b[5]);
+  x.strokeStyle='#4d3c2a';x.lineCap='round';for(const H of hastes){x.lineWidth=S*.016;x.beginPath();x.moveTo(bx,by+4);x.quadraticCurveTo(H[0],H[1],H[2],H[3]);x.stroke();}
+  let nF=0;for(const f of folhas){if(nF++%12===11)yield 'ramo';const m=lim(f[5],0,1.3)/1.3,par=AF880_VERDES[(r()*AF880_VERDES.length)|0],esc=m<.3;let cx=f[0],cy=f[1];
+    // a folha inteira fica dentro do ladrilho (margem de 4 px): não vaza para o vizinho do atlas
+    const tx=cx+Math.cos(f[2])*f[3],ty=cy+Math.sin(f[2])*f[3];let dx=0,dy=0;if(tx<ox+5)dx=ox+5-tx;if(tx>ox+S-5)dx=ox+S-5-tx;if(ty<oy+5)dy=oy+5-ty;if(ty>oy+S-5)dy=oy+S-5-ty;cx+=dx;cy+=dy;
+    af880Folha(x,cx,cy,f[2],f[3],f[4],esc?'#3f6249':par[0],esc?'#668f6c':(m>.8?'#d8e8b4':par[1]),'rgba(26,46,30,.5)');}
+  return {bx,by,hastes,pt};}
+// (revisão R7) as texturas são desenhadas por geradores (a fila `fat8Go` corta nos `yield`: nenhum passo passa de ~3 ms); o acaso é consumido na mesma ordem
+function af880Corre(it){let r;do{r=it.next();}while(!r.done);return r.value;}
+function af880Ramo(x,ox,oy,S,r,op){return af880Corre(af880RamoG(x,ox,oy,S,r,op));}
+function af880TexFolhas(){return af880Corre(af880TexFolhasG());}
+function* af880TexFolhasG(){const S=256,c=af880Tela(S*2,S*2),x=c.getContext('2d'),r=af880Rnd(88001);x.clearRect(0,0,S*2,S*2);
+  const fundo=(ox,oy,cor)=>{x.fillStyle=cor;x.fillRect(ox,oy,S,S);};
+  // fundo quase transparente e VERDE nos ladrilhos recortados: o recorte é por limiar de alfa (0,42) e, de longe (mip), as bordas não escurecem nem somem
+  fundo(0,0,'rgba(96,134,92,.15)');fundo(S,0,'rgba(100,138,96,.15)');fundo(S,S,'rgba(130,146,118,.15)');
+  // 0 (em cima, à esquerda): ramo em leque, folhas largas
+  x.save();x.beginPath();x.rect(0,0,S,S);x.clip();yield* af880RamoG(x,0,0,S,r,{hastes:5,abre:2.6,alc:.76,porHaste:9,len:.2,larg:.62,ang:1.0,enche:26});x.restore();yield 'folhas 0';
+  // 1 (em cima, à direita): ramo esguio, folhas estreitas, mais ar entre elas
+  x.save();x.beginPath();x.rect(S,0,S,S);x.clip();yield* af880RamoG(x,S,0,S,r,{hastes:4,abre:1.75,alc:.8,porHaste:8,len:.23,larg:.31,ang:.72,enche:9});x.restore();yield 'folhas 1';
+  // 2 (embaixo, à esquerda): massa de folhas, opaca (o miolo das copas)
+  x.save();x.beginPath();x.rect(0,S,S,S);x.clip();x.fillStyle='#456e52';x.fillRect(0,S,S,S);
+  for(let k=0;k<150;k++){if(k%12===11)yield 'massa';const par=AF880_VERDES[(r()*AF880_VERDES.length)|0],fr=k/150,len=34+r()*26;af880Folha(x,r()*S,S+r()*S,r()*6.283,len,len*(.42+r()*.14),fr<.4?'#3d644c':par[0],fr<.4?'#5c8a66':(fr>.9?'#c8deac':par[1]),'rgba(24,44,30,.45)');}
+  // (revisão R6) moldura de 6 px quase transparente em volta da massa opaca: os cartões dos ladrilhos vizinhos acabam exatamente na divisa e o filtro
+  // linear misturava ali meio texel opaco (um risco verde na borda do cartão); o miolo das copas só lê o meio deste ladrilho (20…236 px)
+  {const m=6;x.clearRect(0,S,S,m);x.clearRect(0,2*S-m,S,m);x.clearRect(0,S+m,m,S-2*m);x.clearRect(S-m,S+m,m,S-2*m);x.fillStyle='rgba(96,134,92,.15)';x.fillRect(0,S,S,m);x.fillRect(0,2*S-m,S,m);x.fillRect(0,S+m,m,S-2*m);x.fillRect(S-m,S+m,m,S-2*m);}
+  x.restore();
+  // 3 (embaixo, à direita): ramo em flor — menos folhas e cachos de flores claras (a cerejeira)
+  yield 'folhas 2';x.save();x.beginPath();x.rect(S,S,S,S);x.clip();const Rm=yield* af880RamoG(x,S,S,S,r,{hastes:5,abre:2.5,alc:.74,porHaste:6,len:.19,larg:.6,ang:1.0,enche:14});
+  const rosas=['#fbe6ee','#f6cfe0','#ffffff','#f3bdd6','#fde9f1'];
+  for(const H of Rm.hastes){yield 'flores';for(let k=0;k<7;k++){const t=.25+.75*r(),p=Rm.pt(H,t),px=Math.max(S+14,Math.min(2*S-14,p[0]+(r()-.5)*S*.26)),py=Math.max(S+14,Math.min(2*S-14,p[1]+(r()-.5)*S*.2));af880Flor(x,px,py,10+r()*6,rosas[(r()*rosas.length)|0],'#f2c94c',r);}}
+  for(let k=0;k<10;k++)af880Flor(x,S+24+r()*(S-48),S+20+r()*(S*.62),8+r()*5,rosas[(r()*rosas.length)|0],'#f2c94c',r);x.restore();yield 'folhas 3';
+  const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=8;t.wrapS=t.wrapT=THREE.ClampToEdgeWrapping;t.name='880 folhagem das árvores do prado';return t;}
+// casca: sulcos verticais ondulados (escuro + aresta clara ao lado = relevo desenhado), fendas curtas, nós e grão; ladrilhável nos dois sentidos
+function af880TexCasca(){return af880Corre(af880TexCascaG());}
+function* af880TexCascaG(){const W=256,H=512,c=af880Tela(W,H),x=c.getContext('2d'),r=af880Rnd(88002);x.fillStyle='#b3a694';x.fillRect(0,0,W,H);
+  const sulco=(x0,y0,L,w,esc)=>{for(const dx of [-W,0,W])for(const dy of [-H,0,H]){const X=x0+dx,Y=y0+dy,a=(r()-.5)*12,b=(r()-.5)*12;
+      x.strokeStyle=esc;x.lineWidth=w;x.beginPath();x.moveTo(X,Y);x.bezierCurveTo(X+a,Y+L*.33,X+b,Y+L*.66,X+(a+b)*.4,Y+L);x.stroke();
+      x.strokeStyle='rgba(232,222,204,.55)';x.lineWidth=Math.max(1,w*.45);x.beginPath();x.moveTo(X+w*.8,Y);x.bezierCurveTo(X+a+w*.8,Y+L*.33,X+b+w*.8,Y+L*.66,X+(a+b)*.4+w*.8,Y+L);x.stroke();}};
+  for(let k=0;k<60;k++){if(k%8===7)yield 'sulcos';const x0=r()*W,y0=r()*H,L=70+r()*230,w=2.2+r()*5.2;sulco(x0,y0,L,w,'rgba('+(46+(r()*18|0))+','+(38+(r()*14|0))+','+(31+(r()*12|0))+',.8)');}
+  yield 'casca 1';for(let k=0;k<2400;k++){if(k%600===599)yield 'grão';x.fillStyle=r()<.5?'rgba(196,186,168,.22)':'rgba(40,32,26,.2)';x.fillRect(r()*W,r()*H,1.6,2.6);}
+  for(let k=0;k<90;k++){const X=r()*W,Y=r()*H,L=5+r()*12;x.strokeStyle='rgba(38,30,24,.5)';x.lineWidth=1;x.beginPath();x.moveTo(X,Y);x.lineTo(X+L,Y+(r()-.5)*4);x.stroke();}
+  for(let k=0;k<5;k++){const X=24+r()*(W-48),Y=40+r()*(H-80),R=7+r()*8;for(let q=3;q>0;q--){x.strokeStyle=q%2?'rgba(40,32,26,.6)':'rgba(190,178,158,.45)';x.lineWidth=1.6;x.beginPath();x.ellipse(X,Y,R*q/3,R*q/3*1.5,0,0,6.2832);x.stroke();}x.fillStyle='rgba(34,27,22,.7)';x.beginPath();x.ellipse(X,Y,R*.22,R*.34,0,0,6.2832);x.fill();}
+  const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=8;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.name='880 casca das árvores do prado';return t;}
+function af880Texturas(){if(!AF880.tex)AF880.tex={folhas:af880TexFolhas(),casca:af880TexCasca()};return AF880.tex;}
+// materiais das árvores do prado: Lambert (luz por vértice — as copas são cartões recortados com muita sobreposição), cor por vértice, `papelKeep`
+function af880Mats(){if(AF880.mats)return AF880.mats;const T=THREE,X=af880Texturas();
+  const copa=new T.MeshLambertMaterial({color:0xffffff,map:X.folhas,vertexColors:true,alphaTest:AF880_P.alfa});copa.name='880 copa de folhagem recortada';copa.userData.papelKeep=true;
+  const casca=new T.MeshLambertMaterial({color:0xffffff,map:X.casca,vertexColors:true});casca.name='880 casca esculpida';casca.userData.papelKeep=true;
+  const prof=new T.MeshDepthMaterial({depthPacking:T.RGBADepthPacking,map:X.folhas,alphaTest:AF880_P.alfa});prof.side=T.DoubleSide;
+  AF880.mats={copa,casca,prof};return AF880.mats;}
+/* =====================================================================================================================================
+   AS ÁRVORES DO PRADO (4 variantes, 5 m): tronco com raízes, curva e galhos; copa = tufos (miolo deformado por ruído + cartões de ramos
+   recortados como telhas, virados para fora), claros em cima e escuros embaixo
+   ===================================================================================================================================== */
+const AF880_UV=[[0,.5,.5,1],[.5,.5,1,1],[0,0,.5,.5],[.5,0,1,.5]]; // ladrilhos do atlas: leque, esguio, massa, flor
+// icosaedro subdividido uma vez, com vértices compartilhados (42 vértices, 80 faces)
+function af880Ico(sub){if(!AF880.ico)AF880.ico={};if(AF880.ico[sub])return AF880.ico[sub];const t=(1+Math.sqrt(5))/2;let V=[[-1,t,0],[1,t,0],[-1,-t,0],[1,-t,0],[0,-1,t],[0,1,t],[0,-1,-t],[0,1,-t],[t,0,-1],[t,0,1],[-t,0,-1],[-t,0,1]].map(v=>{const l=Math.hypot(v[0],v[1],v[2]);return [v[0]/l,v[1]/l,v[2]/l];});
+  let F=[[0,11,5],[0,5,1],[0,1,7],[0,7,10],[0,10,11],[1,5,9],[5,11,4],[11,10,2],[10,7,6],[7,1,8],[3,9,4],[3,4,2],[3,2,6],[3,6,8],[3,8,9],[4,9,5],[2,4,11],[6,2,10],[8,6,7],[9,8,1]];
+  for(let s=0;s<sub;s++){const M=new Map(),meio=(a,b)=>{const k=a<b?a+'_'+b:b+'_'+a;let i=M.get(k);if(i===undefined){const p=[V[a][0]+V[b][0],V[a][1]+V[b][1],V[a][2]+V[b][2]],l=Math.hypot(p[0],p[1],p[2]);i=V.length;V.push([p[0]/l,p[1]/l,p[2]/l]);M.set(k,i);}return i;},G=[];
+    for(const f of F){const a=meio(f[0],f[1]),b=meio(f[1],f[2]),c=meio(f[2],f[0]);G.push([f[0],a,c],[f[1],b,a],[f[2],c,b],[a,b,c]);}F=G;}
+  return AF880.ico[sub]={V,F};}
+// um tufo: miolo (casca de icosaedro deformada, textura de massa de folhas) + cartões de ramos
+function af880Tufo(B,cx,cy,cz,R,ach,nCart,r,op){const I=af880Ico(1),sem=r()*90,tom=op.tom,cc=op.centro,y0=op.y0,y1=op.y1,T2=AF880_UV[2];
+  const luz=(y)=>.6+.62*af880Liso(y0,y1,y);                 // claro em cima, escuro embaixo (a copa inteira)
+  // miolo
+  const ax=r()*6.283,ca=Math.cos(ax),sa=Math.sin(ax),b0=B.nv;
+  for(const v of I.V){const k=.64*(1+.5*(af880N3(v[0]*1.9+sem,v[1]*1.9,v[2]*1.9)-.5)+.3*(af880N3(v[0]*4.3,v[1]*4.3+sem,v[2]*4.3)-.5)),yy=v[1]<0?v[1]*.62:v[1];
+    const px=cx+v[0]*R*k,py=cy+yy*R*k*ach,pz=cz+v[2]*R*k;let nx=v[0]*.5+(px-cc[0])*.14,ny=Math.abs(v[1])*.3+.75,nz=v[2]*.5+(pz-cc[2])*.14;const l=Math.hypot(nx,ny,nz)||1;
+    const s=luz(py)*(.8+.16*af880N3(px*2.1,py*2.1,pz*2.1));
+    af880V(B,px,py,pz,nx/l,ny/l,nz/l,T2[0]+.25+.21*(v[0]*ca+v[2]*sa),T2[1]+.25+.21*(v[1]*.8+(v[2]*ca-v[0]*sa)*.5),tom[0]*s,tom[1]*s,tom[2]*s);}
+  for(const f of I.F)B.i.push(b0+f[0],b0+f[1],b0+f[2]);
+  // cartões: âncora na casca do tufo; o cartão sobe/abre para fora (inclinação θ a partir da normal), frente para fora
+  const g=2.39996323,ini=r()*6.283;let feitos=0;
+  for(let k=0;feitos<nCart&&k<nCart*3;k++){const u=1-(k+.5)/(nCart*1.25)*2;if(u<-.72)break;const rr=Math.sqrt(Math.max(0,1-u*u)),az=ini+k*g+(r()-.5)*.5;let dx=Math.cos(az)*rr,dy=u,dz=Math.sin(az)*rr;
+    if(op.semBaixo&&dy<-.35&&r()<.6)continue;
+    // direção preferida do cartão no plano tangente: para cima nas laterais, para fora no topo, pendente na barra de baixo
+    let gx=0,gy=1,gz=0;if(dy>.72){const a2=r()*6.283;gx=Math.cos(a2);gy=.15;gz=Math.sin(a2);}else if(dy<-.15){gy=-1;gx=dx*.6;gz=dz*.6;}else{gx=(r()-.5)*.9;gz=(r()-.5)*.9;}
+    let d=gx*dx+gy*dy+gz*dz,tx=gx-d*dx,ty=gy-d*dy,tz=gz-d*dz,tl=Math.hypot(tx,ty,tz);if(tl<1e-4)continue;tx/=tl;ty/=tl;tz/=tl;
+    const th=(dy<-.15?.5:.62)+r()*.6,ct=Math.cos(th),st=Math.sin(th),ux=dx*ct+tx*st,uy=dy*ct+ty*st,uz=dz*ct+tz*st;       // «para cima» do cartão
+    const wx=ty*dz-tz*dy,wy=tz*dx-tx*dz,wz=tx*dy-ty*dx;                                                                // largura = t × d (frente para fora)
+    const L=R*(op.compr||.92)*(.86+r()*.42),W=L*(.95+r()*.3),emb=R*(.42+r()*.16),axx=cx+dx*emb,ayy=cy+dy*emb*ach,azz=cz+dz*emb,curva=L*(.08+r()*.22);
+    let q=op.ladr[(r()*op.ladr.length)|0];const uvr=AF880_UV[q],inv=r()<.5,u0=inv?uvr[2]:uvr[0],u1=inv?uvr[0]:uvr[2];
+    const tomC=1+(r()-.5)*.26,quente=(r()-.5)*.1,flor=q===3;
+    const P=[[axx-wx*W*.5,ayy-wy*W*.5,azz-wz*W*.5],[axx+wx*W*.5,ayy+wy*W*.5,azz+wz*W*.5],[axx+wx*W*.5+ux*L+dx*curva,ayy+wy*W*.5+uy*L+dy*curva,azz+wz*W*.5+uz*L+dz*curva],[axx-wx*W*.5+ux*L+dx*curva,ayy-wy*W*.5+uy*L+dy*curva,azz-wz*W*.5+uz*L+dz*curva]];
+    const UVs=[[u0,uvr[1]],[u1,uvr[1]],[u1,uvr[3]],[u0,uvr[3]]],i0=B.nv;
+    for(let m=0;m<4;m++){const p=P[m];let nx=(p[0]-cx)/R*.5+(p[0]-cc[0])*.16+dx*.3,ny=Math.max(-.15,(p[1]-cy)/R*.5+(p[1]-cc[1])*.16+dy*.3)+.42,nz=(p[2]-cz)/R*.5+(p[2]-cc[2])*.16+dz*.3;const l=Math.hypot(nx,ny,nz)||1;
+      const s=luz(p[1])*tomC*(m>1?1.08:.8)*(dy<-.1?.86:1),tr=flor?(.92+tom[0]*.08):tom[0],tg=flor?(.92+tom[1]*.08):tom[1],tb=flor?(.92+tom[2]*.08):tom[2];
+      af880V(B,p[0],p[1],p[2],nx/l,ny/l,nz/l,UVs[m][0],UVs[m][1],tr*s*(1+quente),tg*s,tb*s*(1-quente));}
+    B.i.push(i0,i0+1,i0+2,i0,i0+2,i0+3,i0,i0+2,i0+1,i0,i0+3,i0+2);feitos++;}
+  return feitos;}
+// uma variante: {casca:BufferGeometry, copa:BufferGeometry, tri, raio}
+function af880Arvore(v){return af880Corre(af880ArvoreG(v));}
+function* af880ArvoreG(v){const P=AF880_P,r=af880Rnd(88100+v*977),C=af880Buf(),F=af880Buf(),tc=P.casca[v],tf=P.folha[v];
+  // forma por variante: [inclinação x, z, altura da bifurcação, raio da base, lista de tufos (dx,dy,dz,R,achatamento,cartões)]
+  const FORMA=[
+    {inc:[.3,-.12],bif:2.0,r0:.2,serp:.2,tufos:[[.15,4.12,.05,1.12,.86,34],[-1.3,3.42,.4,.98,.8,28],[1.38,3.34,-.5,.96,.8,28],[.25,3.3,1.3,.9,.78,24],[-.3,3.26,-1.3,.88,.78,24]],ladr:[0,0,0,1],compr:.92},
+    {inc:[-.2,.22],bif:2.35,r0:.15,serp:.26,tufos:[[-.1,4.42,.1,.92,1.0,29],[.82,3.62,.36,.84,.92,24],[-.88,3.4,-.3,.82,.92,24],[.16,3.0,-.82,.72,.88,19],[-.2,3.1,.86,.7,.88,19]],ladr:[1,1,1,0],compr:1.0},
+    {inc:[.22,.32],bif:1.65,r0:.19,serp:.24,tufos:[[.2,3.78,.2,1.04,.72,31],[-1.6,3.24,.24,.94,.68,26],[1.68,3.16,.6,.94,.68,26],[.4,3.18,-1.5,.9,.68,24],[.12,3.1,1.7,.86,.68,23]],ladr:[3,3,3,0,1],compr:.9},
+    {inc:[1.0,.22],bif:1.95,r0:.195,serp:.34,tufos:[[1.2,4.06,.28,1.16,.84,35],[-.05,3.56,-.6,.94,.8,26],[2.2,3.26,1.0,.82,.78,22],[.8,3.14,1.45,.84,.78,22],[2.05,3.5,-.75,.74,.78,18]],ladr:[0,1,0,0],compr:.95}][v];
+  const lobos=[];for(let k=0;k<5;k++)lobos.push([k/5*6.283+(r()-.5)*.7,.55+r()*.45]);
+  const raiz=(a)=>{let s=0;for(const q of lobos){const c=Math.cos(a-q[0]);if(c>0)s=Math.max(s,Math.pow(c,7)*q[1]);}return s;};
+  const corCasca=(esc)=>(t,a)=>{const sul=.9+.12*Math.sin(a*5+t*7)+.06*Math.sin(a*11-t*13),s=esc*sul*(.74+.3*af880Liso(0,.3,t))*(1-.2*af880Liso(.72,1,t)),mus=(1-af880Liso(0,.18,t))*.22;return [tc[0]*s*(1-mus*.5),tc[1]*s*(1+mus*.25),tc[2]*s*(1-mus*.4)];};
+  // tronco: de dentro do chão até o tufo do alto, com curva em S e base aberta em raízes
+  const topo=FORMA.tufos[0],ix=FORMA.inc[0],iz=FORMA.inc[1],sp=FORMA.serp,H=topo[1]-.25;
+  const eixo=(t)=>[ix*t*t+sp*Math.sin(t*5.2)*(1-t)*.9+(topo[0]-ix)*af880Liso(.55,1,t),-.22+(H+.22)*t,iz*t*t+sp*.7*Math.sin(t*4.1+1.3)*(1-t)+(topo[2]-iz)*af880Liso(.55,1,t)];
+  const ptsT=[];for(let k=0;k<=7;k++)ptsT.push(eixo(k/7));
+  const r0=FORMA.r0,tb=FORMA.bif/H;
+  const curvaT=af880Tubo(C,ptsT,13,10,(t)=>r0*(t<tb?1-.42*t/tb:.58*(1-.86*(t-tb)/(1-tb)))+.012,(t,a)=>1+1.5*Math.pow(Math.max(0,1-t/.2),2.1)*(.3+.7*raiz(a))+.07*Math.sin(a*5+t*7)+.035*Math.sin(a*11-t*13),corCasca(1),1.15,0);
+  // galhos: saem do tronco entre a bifurcação e o alto e acabam dentro de cada tufo lateral; raminhos secundários
+  const V3=new THREE.Vector3();yield 'eixo '+v;
+  for(let k=1;k<FORMA.tufos.length;k++){const q=FORMA.tufos[k],tt=Math.min(.86,tb+(k-1)*.07*(1-tb)*2.2+.02);curvaT.getPoint(tt,V3);const o=[V3.x,V3.y,V3.z],e=[q[0],q[1]-.1,q[2]],dx=e[0]-o[0],dz=e[2]-o[2];
+    const m1=[o[0]+dx*.3,o[1]+(e[1]-o[1])*.18-.04,o[2]+dz*.3],m2=[o[0]+dx*.72,o[1]+(e[1]-o[1])*.62,o[2]+dz*.72],rg=r0*(.4-.035*k);
+    af880Tubo(C,[o,m1,m2,e],6,6,(t)=>rg*(1-.74*t)+.01,(t,a)=>1+.08*Math.sin(a*4+t*9),corCasca(.92),1.0,.12);
+    // raminho: do meio do galho para fora/cima (aparece por baixo da copa)
+    const ra=Math.atan2(dz,dx)+(k%2?1:-1)*(.7+r()*.4),rl=.55+r()*.35,s=[o[0]+dx*.55,o[1]+(e[1]-o[1])*.42,o[2]+dz*.55];
+    af880Tubo(C,[s,[s[0]+Math.cos(ra)*rl*.5,s[1]+rl*.34,s[2]+Math.sin(ra)*rl*.5],[s[0]+Math.cos(ra)*rl,s[1]+rl*.86,s[2]+Math.sin(ra)*rl]],3,4,(t)=>rg*.34*(1-.7*t)+.006,null,corCasca(.84),1.0,.08);yield 'galho '+v+k;}
+  // um toco de galho partido no tronco (charme) e um nó
+  {curvaT.getPoint(tb*.62,V3);const a=r()*6.283,L=.26;af880Tubo(C,[[V3.x,V3.y,V3.z],[V3.x+Math.cos(a)*L*.6,V3.y+L*.3,V3.z+Math.sin(a)*L*.6],[V3.x+Math.cos(a)*L,V3.y+L*.42,V3.z+Math.sin(a)*L]],2,5,(t)=>r0*.3*(1-.3*t),null,corCasca(.8),1.0,.03);}
+  // copa
+  let y0=1e9,y1=-1e9,sx=0,sy=0,sz=0,sw=0;for(const q of FORMA.tufos){y0=Math.min(y0,q[1]-q[3]*q[4]);y1=Math.max(y1,q[1]+q[3]*q[4]*1.2);sx+=q[0]*q[3];sy+=q[1]*q[3];sz+=q[2]*q[3];sw+=q[3];}
+  const centro=[sx/sw,sy/sw-.5,sz/sw];let cart=0;yield 'tronco '+v;
+  for(let k=0;k<FORMA.tufos.length;k++){const q=FORMA.tufos[k];cart+=af880Tufo(F,q[0],q[1],q[2],q[3],q[4],q[5],r,{tom:tf,centro,y0:y0-.2,y1,ladr:FORMA.ladr,compr:FORMA.compr,semBaixo:k===0});yield 'tufo '+v+k;}
+  // raminhos soltos ao longo dos galhos, por baixo da copa (cartões pequenos pendentes)
+  const gc=af880Geo(C,true),gf=af880Geo(F,false);gc.name='880 casca · variante '+v;gf.name='880 copa · variante '+v;
+  return {casca:gc,copa:gf,tri:(C.i.length+F.i.length)/3,triCasca:C.i.length/3,triCopa:F.i.length/3,cartoes:cart};}
+/* =====================================================================================================================================
+   ABETOS (horizonte e bosque distante da mansão): camadas de ramos caídos com pontas desiguais, por baixo fechadas e escuras; só geometria
+   e cor por vértice (servem ao material sem luz das «Copas distantes» e ao material com luz do bosque da mansão). Altura 1, base em y = 0.
+   ===================================================================================================================================== */
+// v: 0 abeto cheio · 1 esguio · 2 pinheiro velho desgrenhado · 3 abeto jovem;  lod: 1 perto (≈ 500 triângulos) · 0 longe (≈ 190)
+function af880Abeto(v,lod){const r=af880Rnd(88300+v*131+lod*17),B=af880Buf();
+  const F=[{n:11,rmax:.225,pot:.9,tb:.085,cai:.62,incl:.012},{n:12,rmax:.155,pot:.78,tb:.11,cai:.8,incl:-.018},{n:9,rmax:.215,pot:1.0,tb:.25,cai:.52,incl:.05},{n:10,rmax:.245,pot:1.02,tb:.05,cai:.56,incl:.028}][v];
+  const nT=lod?F.n:Math.max(6,Math.round(F.n*.64)),lx=F.incl,lz=F.incl*.6*(v%2?-1:1);
+  const eixo=(y)=>[lx*y*y*4*(1-y*.4),lz*y*y*4*(1-y*.4)];
+  const cor=(s,q)=>[.66*s*(1+(q||0)*.5),.76*s,.66*s*(1-(q||0))];
+  // tronco (à vista só na base e entre as camadas do alto)
+  {const lados=lod?5:3,seg=lod?3:2,b0=B.nv;for(let i=0;i<=seg;i++){const y=i/seg*.93,e=eixo(y),rr=.02*(1-y)+.004;for(let j=0;j<lados;j++){const a=j/lados*6.2832,s=.8+.2*y;af880V(B,e[0]+Math.cos(a)*rr,y-(i?0:.03),e[1]+Math.sin(a)*rr,Math.cos(a),0,Math.sin(a),0,0,.44*s,.4*s,.36*s);}}
+    for(let i=0;i<seg;i++)for(let j=0;j<lados;j++){const a=b0+i*lados+j,a1=b0+i*lados+(j+1)%lados,b=a+lados,b1=a1+lados;B.i.push(a,b,a1,b,b1,a1);}
+    if(v===2&&lod){for(let k=0;k<2;k++){const a=r()*6.283,y=.1+k*.07,e=eixo(y),L=.05+r()*.03,i0=B.nv;for(let j=0;j<3;j++){const q=j/3*6.2832;af880V(B,e[0]+Math.cos(a)*.012,y+Math.cos(q)*.008,e[1]+Math.sin(a)*.012+Math.sin(q)*.008,0,1,0,0,0,.34,.31,.28);}const t=af880V(B,e[0]+Math.cos(a)*L,y+.02,e[1]+Math.sin(a)*L,0,1,0,0,0,.4,.37,.33);for(let j=0;j<3;j++)B.i.push(i0+j,i0+(j+1)%3,t);}}}
+  // camadas de ramos: saia que sai do tronco, abre e CAI, com a borda em pontas e entalhes desiguais; cada camada cobre o alto da de baixo
+  const falha=v===2?[1+((r()*2)|0),r()*6.283]:null,passo=(1-F.tb-.1)/(nT-1);
+  for(let k=0;k<nT;k++){const tau=k/(nT-1),y=F.tb+(1-F.tb-.1)*Math.pow(tau,.96)+(r()-.5)*passo*.22,e=eixo(y),R=(F.rmax*Math.pow(1-tau*.93,F.pot)+.014)*(.88+r()*.24),giro=r()*6.283;
+    const K=lod?(tau<.55?6:5):(tau<.5?5:4),N=K*2,tres=!!lod&&tau<.6,cai=F.cai*(1-1.15*tau)*(.85+r()*.3),sobe=lod?R*.42+passo*.3:R*.56+passo*.42,luzT=.82+.3*tau;
+    const anel=[];for(let j=0;j<N;j++){const ponta=j%2===0;let a=giro+j/N*6.2832+(r()-.5)*.26,comp=ponta?(.82+r()*.3):(.6+r()*.14),q=ponta?(cai*(.8+r()*.45)):(cai*.6);
+      if(falha&&k===falha[0]&&Math.cos(a-falha[1])>.2)comp*=.42;if(v===2&&ponta&&r()<.2)comp*=.6;
+      const rr=R*comp,yy=y-q*rr+(ponta?rr*.14:0);anel.push([e[0]+Math.cos(a)*rr,yy,e[1]+Math.sin(a)*rr,ponta,a,rr]);}
+    const b0=B.nv,r0=R*.1+.006;
+    for(let j=0;j<N;j++){const a=anel[j][4],c=cor(.58*luzT);af880V(B,e[0]+Math.cos(a)*r0,y+sobe,e[1]+Math.sin(a)*r0,0,1,0,0,0,c[0],c[1],c[2]);}
+    if(tres)for(let j=0;j<N;j++){const p=anel[j],a=p[4],rm=p[5]*.58,c=cor((p[3]?.86:.72)*luzT);af880V(B,e[0]+Math.cos(a)*rm,y+sobe*.5-cai*rm*.2+(p[3]?R*.035:-R*.02),e[1]+Math.sin(a)*rm,0,1,0,0,0,c[0],c[1],c[2]);}
+    for(let j=0;j<N;j++){const p=anel[j],c=cor((p[3]?1.16:.7)*luzT,p[3]?.07:0);af880V(B,p[0],p[1],p[2],0,1,0,0,0,c[0],c[1],c[2]);}
+    const filas=tres?3:2;for(let f=0;f<filas-1;f++)for(let j=0;j<N;j++){const a=b0+f*N+j,a1=b0+f*N+(j+1)%N,b=a+N,b1=a1+N;B.i.push(a,a1,b,b,a1,b1);}
+    // por baixo: leque escuro da borda até o tronco (fecha a camada; visto de baixo é sombra)
+    const cb=cor(.34*luzT),ce=cor(.5*luzT),ib=af880V(B,e[0],y+sobe*.25,e[1],0,-1,0,0,0,cb[0],cb[1],cb[2]*1.08),bb=B.nv;
+    for(let j=0;j<N;j++){const p=anel[j];af880V(B,p[0],p[1],p[2],0,-1,0,0,0,ce[0],ce[1],ce[2]*1.08);}
+    for(let j=0;j<N;j++)B.i.push(ib,bb+j,bb+(j+1)%N);}
+  // ponteiro
+  {const e=eixo(.9),e2=eixo(1),b0=B.nv,c=cor(1.08,.05);for(let j=0;j<3;j++){const a=j/3*6.2832;af880V(B,e[0]+Math.cos(a)*.014,.89,e[1]+Math.sin(a)*.014,Math.cos(a),0,Math.sin(a),0,0,c[0]*.8,c[1]*.8,c[2]*.8);}const q=af880V(B,e2[0],1,e2[1],0,1,0,0,0,c[0],c[1],c[2]);for(let j=0;j<3;j++)B.i.push(b0+j,q,b0+(j+1)%3);}
+  return B;}
+/* =====================================================================================================================================
+   COPAS FOLHOSAS DE LONGE (horizonte): tronco bifurcado e lóbulos de folhagem irregulares (fundo chato, topo em cúpula), com raminhos
+   em bico na silhueta; só geometria e cor por vértice. Altura ≈ 1, base em y = 0.
+   ===================================================================================================================================== */
+function af880Lobo(B,cx,cy,cz,R,ach,sub,sem,tom,bicos,r){const I=af880Ico(sub),b0=B.nv,pos=[];
+  for(const v of I.V){const k=1+.52*(af880N3(v[0]*1.6+sem,v[1]*1.6,v[2]*1.6)-.5)+(sub?.3*(af880N3(v[0]*3.7,v[1]*3.7+sem,v[2]*3.7)-.5):0),yy=v[1]<0?v[1]*.62:v[1];
+    const px=cx+v[0]*R*k,py=cy+yy*R*k*ach,pz=cz+v[2]*R*k,s=(.46+.6*af880Liso(-.5,.9,v[1]))*(.88+.24*af880N3(px*31+sem,py*31,pz*31));pos.push([px,py,pz,s]);
+    af880V(B,px,py,pz,v[0],v[1],v[2],0,0,tom[0]*s,tom[1]*s,tom[2]*s);}
+  for(const f of I.F)B.i.push(b0+f[0],b0+f[1],b0+f[2]);
+  // raminhos em bico: pirâmides finas de 3 faces a sair dos vértices de cima e dos lados
+  let n=0;for(let i=0;i<I.V.length&&n<bicos;i++){const v=I.V[i];if(v[1]<-.3||af880H(i,(sem*7)|0,3)>.7)continue;const p=pos[i],L=R*(.2+r()*.22),s=R*.12,ax=v[0],ay=v[1]+.35,az=v[2],al=Math.hypot(ax,ay,az);
+    let ux=-v[2],uz=v[0],ul=Math.hypot(ux,uz);if(ul<.05){ux=1;uz=0;ul=1;}ux/=ul;uz/=ul;const wx=v[1]*uz,wy=v[2]*ux-v[0]*uz,wz=-v[1]*ux,i0=B.nv,cl=p[3]*1.16,ce=p[3]*.86;
+    for(let j=0;j<3;j++){const a=j/3*6.2832+n,c=Math.cos(a)*s,d=Math.sin(a)*s;af880V(B,p[0]+ux*c+wx*d-v[0]*s*.3,p[1]+wy*d-v[1]*s*.3,p[2]+uz*c+wz*d-v[2]*s*.3,v[0],v[1],v[2],0,0,tom[0]*ce,tom[1]*ce,tom[2]*ce);}
+    const q=af880V(B,p[0]+ax/al*L,p[1]+ay/al*L,p[2]+az/al*L,v[0],v[1],v[2],0,0,tom[0]*cl,tom[1]*cl*1.03,tom[2]*cl*.94);for(let j=0;j<3;j++)B.i.push(i0+j,i0+(j+1)%3,q);n++;}}
+// v: 0 copa redonda larga · 1 copa alta em andares · 2 copa de guarda-sol torta · 3 copa dupla;  lod: 1 perto (≈ 760 triângulos) · 0 longe (≈ 150)
+function af880CopaLonge(v,lod){const r=af880Rnd(88500+v*211+lod*29),B=af880Buf();
+  const F=[{h:.34,lob:[[0,.76,0,.25,.9],[-.2,.6,.06,.2,.85],[.21,.62,-.05,.2,.85],[.03,.58,.2,.18,.85],[-.04,.6,-.2,.18,.85],[.1,.92,.04,.15,.9]]},
+    {h:.36,lob:[[0,.94,0,.15,1.0],[.05,.78,.04,.2,.95],[-.08,.6,-.03,.23,.9],[.13,.56,.12,.17,.85],[-.12,.76,.1,.14,.9],[.1,.68,-.13,.15,.9]]},
+    {h:.44,lob:[[.1,.74,0,.26,.7],[-.17,.68,.1,.2,.68],[.34,.66,-.06,.18,.68],[.07,.66,.24,.18,.68],[.02,.68,-.23,.18,.68],[.17,.88,.02,.14,.75]]},
+    {h:.34,lob:[[-.15,.72,0,.22,.92],[.2,.64,.05,.23,.9],[-.24,.52,.12,.16,.85],[.14,.86,-.02,.15,.9],[.02,.56,-.18,.17,.85],[.34,.5,-.07,.13,.85]]}][v];
+  const lob=lod?F.lob:F.lob.slice(0,4),tons=[[.69,.72,.6],[.56,.67,.57],[.63,.7,.56]];
+  // tronco e galhos
+  const cq=(s)=>()=>[.47*s,.5*s,.43*s],base=F.lob[0];
+  af880Tubo(B,[[0,-.03,0],[.012,F.h*.5,.008],[base[0]*.35,F.h,base[2]*.35]],lod?3:2,lod?5:3,(t)=>.026*(1-.45*t)+.004,(t)=>1+.9*Math.pow(Math.max(0,1-t/.22),2),cq(.8),1,0);
+  for(let k=0;k<(lod?4:2);k++){const q=lob[k];af880Tubo(B,[[base[0]*.35,F.h,base[2]*.35],[(base[0]*.35+q[0])*.5,(F.h+q[1])*.5-.02,(base[2]*.35+q[2])*.5],[q[0],q[1],q[2]]],2,3,(t)=>.014*(1-.6*t)+.003,null,cq(.7),1,0);}
+  lob.forEach((q,k)=>{af880Lobo(B,q[0],q[1],q[2],q[3]*(lod?1:1.2),q[4],lod?1:0,r()*70,tons[k%3],lod?12:3,r);});
+  return B;}
+/* =====================================================================================================================================
+   MONTAGEM (texturas + geometrias; não toca na cena): em fatias pela fila `fat8Go`; quem precisar antes acaba-a de uma vez
+   ===================================================================================================================================== */
+function* af880MontaG(){const t0=performance.now(),G={prado:[],abeto:[[],[]],longe:[[],[]]};
+  const X={};X.folhas=yield* af880TexFolhasG();yield 'folhas';X.casca=yield* af880TexCascaG();yield 'casca';AF880.tex=X;af880Mats();yield 'materiais';
+  for(let v=0;v<4;v++){G.prado.push(yield* af880ArvoreG(v));yield 'árvore '+v;}
+  for(let lod=0;lod<2;lod++)for(let v=0;v<4;v++){const B=af880Abeto(v,lod);G.abeto[lod].push(lod?{B,g:af880Geo(B,true)}:{g:af880Geo(B,true)});yield 'abeto '+lod+v;}
+  for(let lod=0;lod<2;lod++)for(let v=0;v<4;v++){const B=af880CopaLonge(v,lod);G.longe[lod].push({g:af880Geo(B,true)});yield 'copa '+lod+v;}
+  AF880.geos=G;AF880.pronto=true;AF880.stats.montagemMs=Math.round(performance.now()-t0);return G;}
+function af880Monta(sinc){if(AF880.pronto)return true;
+  if(!AF880.it){AF880.it=af880MontaG();
+    if(!sinc&&typeof fat8Go==='function'){try{fat8Go(AF880.it,{nome:'árvores da fantasia 880',cedo:true,urgente:()=>{try{return CUR==='room'&&ROOM===ROOMS.fant;}catch(e){return false;}},fim:()=>{try{af880Sinc(false);}catch(e){af880Erro('fim da montagem',e);}},erro:e=>{AF880.falhou=true;af880Erro('montagem',e);}});}catch(e){af880Erro('fila',e);}return AF880.pronto;}}
+  if(sinc&&!AF880.falhou){try{let r;do{r=AF880.it.next();}while(!r.done);}catch(e){AF880.falhou=true;af880Erro('montagem',e);}}
+  return AF880.pronto;}
+/* =====================================================================================================================================
+   LEITURA DA CENA: componentes ligados de uma malha fundida (para achar cada árvore antiga dentro das malhas do kit t160)
+   ===================================================================================================================================== */
+// devolve [{n,min,max,v0,verts}] dos vértices para os quais `serve(i)` é verdadeiro (só triângulos com os 3 vértices servidos)
+function af880Comps(g,serve,guardaVerts){const P=g.attributes.position,I=g.index.array,n=P.count,pai=new Int32Array(n),ok=new Uint8Array(n);for(let i=0;i<n;i++){pai[i]=i;ok[i]=serve(i)?1:0;}
+  const ach=(i)=>{while(pai[i]!==i){pai[i]=pai[pai[i]];i=pai[i];}return i;};
+  for(let t=0;t<I.length;t+=3){const a=I[t],b=I[t+1],c=I[t+2];if(!ok[a]||!ok[b]||!ok[c]||(a===b&&b===c))continue;const ra=ach(a),rb=ach(b);if(ra!==rb)pai[rb]=ra;const r2=ach(a),rc=ach(c);if(r2!==rc)pai[rc]=r2;}
+  const M=new Map(),A=P.array;for(let i=0;i<n;i++){if(!ok[i])continue;const r=ach(i);let q=M.get(r);if(!q){q={n:0,min:[1e9,1e9,1e9],max:[-1e9,-1e9,-1e9],v0:i,verts:guardaVerts?[]:null};M.set(r,q);}q.n++;if(q.verts)q.verts.push(i);
+    for(let k=0;k<3;k++){const v=A[i*3+k];if(v<q.min[k])q.min[k]=v;if(v>q.max[k])q.max[k]=v;}}
+  return [...M.values()];}
+function af880Tri(o){const g=o&&o.geometry;if(!g||!g.attributes||!g.attributes.position)return 0;return Math.round((g.index?g.index.count:g.attributes.position.count)/3)*(o.isInstancedMesh?o.count:1);}
+function af880Identidade(o){const e=o.matrixWorld.elements;for(let k=0;k<16;k++)if(Math.abs(e[k]-(k%5===0?1:0))>1e-6)return false;return true;}
+const AF880_HASH=(x,z)=>af880H(Math.round(x*10),Math.round(z*10),7);
+/* ---------- (1) as 10 árvores jovens da v456: dentro da malha «vc» do prado (cilindro + 3 tubinhos + 4 esferas achatadas lisas) ---------- */
+function af880Le456(sc){const T=THREE;let alvo=null;const CORES=[0x6b5340,0x40683d,0x6b9a52].map(h=>new T.Color(h));
+  const raiz=sc.getObjectByName('Prado da Clareira · relva, flores e moitas (v456)');const cand=[];(raiz||sc).traverse(o=>{if(!o.isMesh||o.isInstancedMesh||!o.geometry||!o.geometry.index||!o.geometry.attributes.color)return;if(!raiz){let ok=false;for(let p=o.parent;p;p=p.parent)if(/\(v456\)/.test(p.name||'')){ok=true;break;}if(!ok)return;}cand.push(o);});
+  let melhor=null;for(const o of cand){const C=o.geometry.attributes.color,n=C.count,tipo=new Int8Array(n).fill(-1);let q=0;const A=C.array,is=C.itemSize;
+    for(let i=0;i<n;i++){const r=A[i*is],g=A[i*is+1],b=A[i*is+2];for(let k=0;k<3;k++){const c=CORES[k];if(Math.abs(r-c.r)<.004&&Math.abs(g-c.g)<.004&&Math.abs(b-c.b)<.004){tipo[i]=k;q++;break;}}}
+    if(q>200&&(!melhor||q>melhor.q))melhor={o,tipo,q};}
+  if(!melhor)return null;const o=melhor.o,tipo=melhor.tipo,g=o.geometry;o.updateMatrixWorld(true);if(!af880Identidade(o))return {erro:'a malha da v456 não está na origem'};
+  const comps=af880Comps(g,i=>tipo[i]===0,true),arv=[];
+  for(const c of comps){const h=c.max[1]-c.min[1],wx=c.max[0]-c.min[0],wz=c.max[2]-c.min[2];if(h<1.2||wx>.5||wz>.5||Math.abs(wx-wz)>.06||c.n>24)continue;const H=h/.55;
+    arv.push({tipo:456,malha:o,ref:c.verts,x:(c.min[0]+c.max[0])/2,z:(c.min[2]+c.max[2])/2,y:c.min[1],topo:c.min[1]+H*1.1,larg:H*.9});}
+  // os triângulos das árvores (tronco, tubinhos, copas): os que têm os 3 vértices nas três cores
+  const I=g.index.array,tris=[];for(let t=0;t<I.length;t+=3){const a=I[t],b=I[t+1],c=I[t+2];if(tipo[a]>=0&&tipo[b]>=0&&tipo[c]>=0&&!(a===b&&b===c))tris.push(t);}
+  const pos=new Int32Array(tris),val=new Uint32Array(tris.length*3);for(let k=0;k<tris.length;k++){val[k*3]=I[tris[k]];val[k*3+1]=I[tris[k]+1];val[k*3+2]=I[tris[k]+2];}
+  return {malha:o,arv,pos,val,vazio:false,tri:tris.length};}
+function af880Vazio456(P,vazio){if(!P||P.vazio===vazio)return;const g=P.malha.geometry,I=g.index.array;if(g!==P.geo0&&P.geo0){return;}
+  for(let k=0;k<P.pos.length;k++){const t=P.pos[k];if(vazio){I[t+1]=I[t];I[t+2]=I[t];}else{I[t]=P.val[k*3];I[t+1]=P.val[k*3+1];I[t+2]=P.val[k*3+2];}}g.index.needsUpdate=true;P.vazio=vazio;}
+/* ---------- (2) as 9 árvores jovens da v506: malhas «503 copa» (blocos de esfera) e «503 casca de palmeira» (tubo liso) do kit «Prado 506» ---------- */
+function af880Le506(sc){let M=null;try{if(typeof ILHA503!=='undefined'&&ILHA503.mats)M=ILHA503.mats;}catch(e){}let copa=null,casca=null;
+  sc.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||!o.geometry||!o.geometry.index)return;const m=o.material,nm=(m&&m.name)||'';
+    if((M&&m===M.copa)||/503 copa$/.test(nm)){if(!copa||af880Tri(o)>af880Tri(copa))copa=o;}else if((M&&m===M.tronco)||/503 casca de palmeira$/.test(nm)){if(!casca||af880Tri(o)>af880Tri(casca))casca=o;}});
+  if(!copa||!casca)return null;copa.updateMatrixWorld(true);casca.updateMatrixWorld(true);if(!af880Identidade(copa)||!af880Identidade(casca))return {erro:'as malhas da v506 não estão na origem'};
+  const comps=af880Comps(casca.geometry,()=>true,true),arv=[],PC=copa.geometry.attributes.position,A=casca.geometry.attributes.position.array;
+  for(const c of comps){if(c.n<40||c.max[1]-c.min[1]<1.5)continue;const vs=c.verts.slice().sort((a,b)=>a-b),nb=Math.min(9,vs.length);let x=0,y=0,z=0;for(let k=0;k<nb;k++){x+=A[vs[k]*3];y+=A[vs[k]*3+1];z+=A[vs[k]*3+2];}x/=nb;y/=nb;z/=nb;
+    // o alto do tronco (último anel) e a copa por cima dele
+    let tx=0,ty=0,tz=0;for(let k=vs.length-nb;k<vs.length;k++){tx+=A[vs[k]*3];ty+=A[vs[k]*3+1];tz+=A[vs[k]*3+2];}tx/=nb;ty/=nb;tz/=nb;let topo=ty+1.2;
+    for(let i=0;i<PC.count;i++){const dx=PC.getX(i)-tx,dz=PC.getZ(i)-tz;if(dx*dx+dz*dz<5.3){const yy=PC.getY(i);if(yy>topo&&yy<ty+3.2)topo=yy;}}
+    arv.push({tipo:506,malha:casca,ref:nb<vs.length?vs.slice(0,nb):vs,x,z,y:y+.2,topo,larg:3.4});}
+  return {copa,casca,arv,oculto:false,tri:af880Tri(copa)+af880Tri(casca)};}
+/* ---------- as árvores novas do prado: uma InstancedMesh de casca e uma de copa por variante ---------- */
+function af880BaseAntiga(a){const A=a.malha.geometry.attributes.position.array,L=a.ref;let x=0,y=0,z=0;for(let k=0;k<L.length;k++){x+=A[L[k]*3];y+=A[L[k]*3+1];z+=A[L[k]*3+2];}return [x/L.length,y/L.length,z/L.length];}
+// (revisão R1) cada lote tem a sua geometria-invólucro: os atributos e o índice são os da variante (partilhados), a caixa e a esfera são do LOTE
+// (a r128 recorta a InstancedMesh pela esfera da geometria). Antes os dois lotes de cada variante partilhavam a geometria e a esfera de um apagava a do outro.
+function af880Involucro(src,nome){const T=THREE,g=new T.BufferGeometry();for(const k of ['position','normal','uv','color'])g.setAttribute(k,src.attributes[k]);g.setIndex(src.index);
+  g.boundingBox=src.boundingBox.clone();g.boundingSphere=src.boundingSphere.clone();g.name=nome;g.userData.af880Local=src.boundingBox.clone();return g;}
+function af880Limites(im){try{const T=THREE,g=im.geometry,loc=g.userData.af880Local;if(!loc)return;const b=new T.Box3(),m=new T.Matrix4(),q=new T.Box3();
+    for(let i=0;i<im.count;i++){im.getMatrixAt(i,m);b.union(q.copy(loc).applyMatrix4(m));}if(b.isEmpty())return;b.expandByScalar(.4);b.min.y-=AF880_P.folgaY;b.max.y+=AF880_P.folgaY;   // folga vertical: quem sobe/desce as instâncias (outeiros) não avisa
+    g.boundingBox=b;g.boundingSphere=b.getBoundingSphere(new T.Sphere());im.frustumCulled=true;}catch(e){af880Erro('limites',e);}}
+function af880PoePrado(sc,lista){const T=THREE,G=AF880.geos,M=af880Mats(),P=AF880_P;let grupo=AF880.grupo;
+  if(!grupo||grupo.parent!==sc){grupo=new T.Group();grupo.name='Prado da Clareira · árvores de copa recortada (v880)';grupo.userData.af880=true;sc.add(grupo);AF880.grupo=grupo;}
+  // variante por árvore (pela posição: não muda de uma sessão para outra) com rodízio para as quatro aparecerem
+  const ord=lista.slice().sort((a,b)=>AF880_HASH(a.x,a.z)-AF880_HASH(b.x,b.z));ord.forEach((a,k)=>{a.v=k%4;});
+  const D=new T.Object3D(),cor=new T.Color(),tipoL=lista.length?lista[0].tipo:0;
+  for(let v=0;v<4;v++){const L=lista.filter(a=>a.v===v);if(!L.length)continue;const V=G.prado[v],alt=V.copa.boundingBox.max.y;
+    const ic=new T.InstancedMesh(af880Involucro(V.casca,'880 casca · lote '+tipoL+' · variante '+v),M.casca,L.length),ifo=new T.InstancedMesh(af880Involucro(V.copa,'880 copa · lote '+tipoL+' · variante '+v),M.copa,L.length);ic.name='Árvores do prado (v880) · casca · variante '+v;ifo.name='Árvores do prado (v880) · copa · variante '+v;
+    L.forEach((a,i)=>{const h=AF880_HASH(a.x+3.3,a.z-1.7),h2=AF880_HASH(a.z+9.1,a.x+4.2);a.esc=Math.max(P.escMin,Math.min(P.escMax,(a.topo-a.y)/alt*1.08));a.ry=h*6.2832;a.i=i;a.ic=ic;a.ifo=ifo;
+      a.pos=[a.x,a.y-P.afunda,a.z];a.base0=af880BaseAntiga(a);D.position.set(a.pos[0],a.pos[1],a.pos[2]);D.rotation.set(0,a.ry,0);D.scale.setScalar(a.esc);D.updateMatrix();ic.setMatrixAt(i,D.matrix);ifo.setMatrixAt(i,D.matrix);
+      cor.setRGB(.93+h2*.14,.95+h*.1,.92+(1-h2)*.16);ifo.setColorAt(i,cor);cor.setRGB(.92+h*.16,.92+h*.16,.92+h*.16);ic.setColorAt(i,cor);});
+    for(const o of [ic,ifo]){o.instanceMatrix.needsUpdate=true;if(o.instanceColor)o.instanceColor.needsUpdate=true;o.userData.noCam=true;o.userData.papelKeepGeo=true;o.userData.papelKeep=true;o.userData.af880=true;o.userData.af880Lote=tipoL;o.castShadow=true;o.receiveShadow=o===ic;o.raycast=function(){};
+      o.__fusaoMoveu=9;   // (revisão R2) fora da fusão de instâncias do Leve (v230): fundidos, a densidade por distância da v241 some com árvores inteiras, e o `desfaz()` deixava as cópias à vista
+      af880Limites(o);grupo.add(o);AF880.lotes.push(o);}
+    ifo.customDepthMaterial=M.prof;}
+  for(const a of lista)AF880.arvores.push(a);grupo.updateMatrixWorld(true);}
+// as árvores novas seguem as antigas: se outro bloco deslocou os vértices da árvore antiga (relevo, empurrão) a nova vai junto; se outro
+// bloco mexeu na própria instância nova, vale a posição que ele deu (não se desfaz o que os outros fizeram)
+// (revisão R5) a regra de convivência: quem muda a posição mexe na INSTÂNCIA — por isso a instância mexida vale sempre, e a referência da árvore
+// antiga é refeita na hora (os outeiros do `EM880` sobem as duas juntas). Só quem mexe apenas nos vértices antigos é seguido pela diferença — hoje
+// é só a v506, e as árvores só são criadas depois dela (`af880Maduro`). Os limites são refeitos nos DOIS lotes da árvore (casca e copa).
+function af880Assenta(){const T=THREE,m=new T.Matrix4(),p=new T.Vector3(),q=new T.Quaternion(),s=new T.Vector3(),mexidos=new Set();let n=0;
+  const fora=(a)=>Math.abs(p.x-a.pos[0])>1e-4||Math.abs(p.y-a.pos[1])>1e-4||Math.abs(p.z-a.pos[2])>1e-4;
+  for(const a of AF880.arvores){try{const b=af880BaseAntiga(a);let quem=null;
+      a.ic.getMatrixAt(a.i,m);m.decompose(p,q,s);if(fora(a))quem=a.ic;else{a.ifo.getMatrixAt(a.i,m);m.decompose(p,q,s);if(fora(a))quem=a.ifo;}
+      if(quem){a.pos=[p.x,p.y,p.z];a.base0=b;(quem===a.ic?a.ifo:a.ic).setMatrixAt(a.i,m);mexidos.add(a.ic);mexidos.add(a.ifo);n++;continue;}   // mexeram numa metade: a outra acompanha
+      const dx=b[0]-a.base0[0],dy=b[1]-a.base0[1],dz=b[2]-a.base0[2];
+      if(Math.abs(dx)>1e-4||Math.abs(dy)>1e-4||Math.abs(dz)>1e-4){a.pos=[a.pos[0]+dx,a.pos[1]+dy,a.pos[2]+dz];a.base0=b;p.set(a.pos[0],a.pos[1],a.pos[2]);m.compose(p,q,s);a.ic.setMatrixAt(a.i,m);a.ifo.setMatrixAt(a.i,m);mexidos.add(a.ic);mexidos.add(a.ifo);n++;}}catch(e){af880Erro('assenta',e);}}
+  for(const o of mexidos){o.instanceMatrix.needsUpdate=true;af880Limites(o);}return n;}
+/* ---------- (3) o bosque distante da mansão (v355): 68 pinheiros de seis cones lisos numa malha só → abetos, na mesma malha ---------- */
+function af880LeMansao(sc){let o=null;sc.traverse(q=>{if(o||!q.isMesh||q.isInstancedMesh||!q.geometry||!q.geometry.index)return;const nm=(q.material&&q.material.name)||'';if(/^Bosque distante da mansão/.test(nm))o=q;});
+  if(!o){const gr=sc.getObjectByName('Horizonte da mansão · bosque contínuo');if(gr)gr.traverse(q=>{if(!o&&q.isMesh&&q.geometry&&q.geometry.index&&q.geometry.attributes.color)o=q;});}
+  if(!o)return null;o.updateMatrixWorld(true);if(!af880Identidade(o))return {erro:'a malha do bosque distante não está na origem'};
+  const g=o.geometry,C=g.attributes.color,comps=af880Comps(g,()=>true,false),tr=[],cones=[];
+  for(const c of comps){const wx=c.max[0]-c.min[0],wz=c.max[2]-c.min[2],h=c.max[1]-c.min[1];if(c.n===14&&wx<.8&&h>2)tr.push({x:(c.min[0]+c.max[0])/2,z:(c.min[2]+c.max[2])/2,y:c.min[1],yt:c.max[1],cones:[]});else if(c.n>=40&&h>1)cones.push(c);}
+  if(tr.length<4)return {erro:'não achei os troncos do bosque distante ('+tr.length+')'};
+  for(const c of cones){const x=(c.min[0]+c.max[0])/2,z=(c.min[2]+c.max[2])/2;let m=null,dm=1.2;for(const t of tr){const d=Math.hypot(t.x-x,t.z-z);if(d<dm){dm=d;m=t;}}if(m)m.cones.push(c);}
+  const arv=[];for(const t of tr){if(!t.cones.length)continue;t.cones.sort((a,b)=>a.min[1]-b.min[1]);const c0=t.cones[0],topo=Math.max.apply(null,t.cones.map(c=>c.max[1])),raio=Math.max(c0.max[0]-c0.min[0],c0.max[2]-c0.min[2])/2;
+    arv.push({x:t.x,z:t.z,y:t.y,topo,raio,tom:[C.getX(c0.v0)/.86,C.getY(c0.v0)/.86,C.getZ(c0.v0)/.86]});}
+  return {malha:o,antiga:g,arv,tri:af880Tri(o),nova:null,trocada:false};}
+function af880FazMansao(P){const G=AF880.geos,D=af880Buf();
+  P.arv.forEach((a,i)=>{const h=AF880_HASH(a.x,a.z),h2=AF880_HASH(a.z+5,a.x-2),v=h<.3?0:h<.55?1:h<.7?2:3,B=G.abeto[1][v].B,alt=a.topo-a.y,larg=Math.min(alt*(.86+h2*.3),a.raio*2/(.23)*1.02);
+    af880Junta(D,B,larg,alt,larg,h2*6.2832,a.x,a.y,a.z,[a.tom[0]*1.42,a.tom[1]*1.36,a.tom[2]*1.42]);});
+  const g=af880Geo(D,true);g.name='880 abetos do bosque distante da mansão';return g;}
+/* ---------- (4) as «Copas distantes» da Oficina (InstancedMesh por camada, setor e tipo): troca só a geometria de cada lote ---------- */
+function af880LeHoriz(sc){const L=[];sc.traverse(o=>{if(!o.isInstancedMesh||!o.geometry||!/^(Copas distantes|Distant canopies)/.test(o.name||''))return;const nums=(o.name.match(/\d+/g)||[]).map(Number),tri=Math.round((o.geometry.index?o.geometry.index.count:o.geometry.attributes.position.count)/3);
+    let tipo=nums.length>=2?nums[nums.length-1]:-1;if(tipo!==0&&tipo!==1)tipo=(tri===596||tri===344)?0:1;L.push({o,antiga:o.geometry,camada:nums.length?nums[0]:0,tipo,lod:tri>=400?1:0,tri,nova:null});});
+  if(!L.length)return null;return {lotes:L,trocada:false,tri:L.reduce((s,q)=>s+q.tri*q.o.count,0)};}
+// quantas instâncias o lote tem de verdade (o Papel desenha 60 % das copas distantes e guarda a contagem inteira)
+function af880Inteiro(o){let n=o.count;try{if(typeof PAPEL_MATO!=='undefined'){const q=PAPEL_MATO.get(o);if(q>n)n=q;}}catch(e){}return Math.min(n,o.instanceMatrix.count);}
+function af880FazHoriz(P){const T=THREE,G=AF880.geos,cont={},topos=new Map(),escal=new Map();
+  // (revisão R3) NO LUGAR é também do mesmo tamanho: as silhuetas da Oficina têm o topo em 0,905 (abeto de longe) a 1,051 (abeto de perto) e as
+  // novas em 1,0–1,17; a escala da instância é a mesma, então a nova é levada (escala uniforme, a partir da base) ao topo da velha de cada lote
+  const topoDe=(g)=>{const A=g.attributes.position;let t=topos.get(A);if(t===undefined){t=-1e9;for(let i=0;i<A.count;i++){const y=A.getY(i);if(y>t)t=y;}topos.set(A,t);}return t;};
+  for(const q of P.lotes){const ch=q.camada+'_'+q.tipo,k=cont[ch]=(cont[ch]||0)+1,v=(k+q.camada*3)%4,src=(q.tipo===0?G.abeto:G.longe)[q.lod][v].g,g=new T.BufferGeometry();
+    let esc=1;try{const tv=topoDe(q.antiga),tn=src.boundingBox.max.y;if(tv>.2&&tn>.2)esc=Math.max(AF880_P.kMin,Math.min(AF880_P.kMax,tv/tn));}catch(e){}
+    const ce=q.tipo+'_'+q.lod+'_'+v+'_'+esc.toFixed(4);let pos=escal.get(ce);
+    if(!pos){const A0=src.attributes.position.array,A=new Float32Array(A0.length);for(let i=0;i<A0.length;i++)A[i]=A0[i]*esc;pos=new T.BufferAttribute(A,3);escal.set(ce,pos);}
+    g.setAttribute('position',pos);for(const nome of ['normal','uv','color'])g.setAttribute(nome,src.attributes[nome]);g.setIndex(src.index);
+    const loc=src.boundingBox.clone();loc.min.multiplyScalar(esc);loc.max.multiplyScalar(esc);g.boundingBox=loc.clone();
+    // limites do lote inteiro (a r128 recorta a InstancedMesh pela esfera da geometria)
+    const b=new T.Box3(),m=new T.Matrix4(),c=new T.Box3(),n=af880Inteiro(q.o);for(let i=0;i<n;i++){q.o.getMatrixAt(i,m);b.union(c.copy(loc).applyMatrix4(m));}
+    if(!b.isEmpty()){b.expandByScalar(.35);g.boundingBox=b;g.boundingSphere=b.getBoundingSphere(new T.Sphere());}else{g.boundingSphere=src.boundingSphere.clone();g.boundingSphere.radius*=esc;g.boundingSphere.center.multiplyScalar(esc);}
+    g.name='880 '+(q.tipo===0?'abeto':'copa folhosa')+' de longe';q.nova=g;q.v=v;q.esc=esc;q.triNova=src.index.count/3;}}
+/* =====================================================================================================================================
+   APLICAR / DESFAZER
+   ===================================================================================================================================== */
+function af880Sala(){try{const R=(typeof ROOMS!=='undefined')&&ROOMS.fant;return (R&&R.scene)?R:null;}catch(e){return null;}}
+function af880NaSala(){try{const R=af880Sala();return !!R&&typeof ACTIVE!=='undefined'&&ACTIVE===R.scene;}catch(e){return false;}}
+// o que já pode ser trocado? cada parte só entra quando quem a monta acabou (as peças do prado nascem no acabamento da sala)
+// (revisão R4/R5) · v456: além de montada, a v506 já tem de ter passado o relevo dela nos vértices dessas árvores (ela mexe só nos vértices: uma
+// árvore nova criada antes perdia o desnível se outro bloco mexesse na instância no mesmo intervalo); · mansão: a limpeza da clareira do duelo
+// (v539/v550, em fatias ~0,3 s depois do `finishRoom`) tira os 12 pinheiros que caem na colina — antes dela a leitura dava 80 árvores, e as 12 ficavam na
+// geometria guardada. Quem espera desiste depois de `espera` passos do vigia (~30 s com a sala pronta) e lê o que houver.
+function af880Maduro(k){try{const tarde=AF880.vigia>AF880_P.espera;
+    if(k==='p456'||k==='p506'){const m4=typeof P456==='undefined'||!P456.on||!!(P456.stats&&P456.stats.malhas),st5=(typeof PR506!=='undefined'&&PR506.on)?PR506.stats:null,m5=typeof PR506==='undefined'||!PR506.on||!!(st5&&st5.malhas);
+      if(k==='p506')return m5;return m4&&(m5||!!(st5&&st5.relevo)||tarde);}
+    if(k==='mansao'){if(typeof CP539==='undefined'||!CP539.on)return true;const st=CP539.stats&&CP539.stats.fant;return !!(st&&st.limpeza&&st.limpeza.length)||tarde;}
+    if(k==='horiz')return typeof STABLE409==='undefined'||!!STABLE409.forest;return true;}catch(e){return true;}}
+// a visibilidade de verdade de uma malha (a fusão do Leve troca o `visible` das originais por um par get/set e guarda o valor em `__fusaoVis`)
+function af880Vis(o){return o.__fusaoVis!==undefined?!!o.__fusaoVis:o.visible!==false;}
+// (revisão R6) a cena da sala foi refeita: larga tudo o que era da cena antiga e relê na nova
+function af880Esquece(){try{af880Restaura();}catch(e){}const Pt=AF880.partes;try{if(AF880.grupo&&AF880.grupo.parent)AF880.grupo.parent.remove(AF880.grupo);}catch(e){}
+  try{if(Pt.mansao&&Pt.mansao.nova)Pt.mansao.nova.dispose();}catch(e){}
+  AF880.grupo=null;AF880.arvores.length=0;AF880.lotes.length=0;Pt.p456=Pt.p506=Pt.mansao=Pt.horiz=null;const S=AF880.stats;S.prado456=S.prado506=S.mansao=S.horizonte=null;S.triAntes=S.triDepois=0;S.refeitas=(S.refeitas||0)+1;AF880.cena=null;}
+// `aosPoucos` (vigia): no máximo UMA leitura pesada por chamada (ler e montar cada parte custa 5–90 ms de uma vez; no `setActive` tudo entra junto, atrás da transição)
+function af880Aplica(aosPoucos){if(!AF880.on||AF880.pausa)return false;const R=af880Sala();if(!R)return false;if(!af880Monta(true))return false;const sc=R.scene,Pt=AF880.partes,S=AF880.stats,t0=performance.now();let mudou=false,fundidas=false;
+  if(AF880.cena&&AF880.cena!==sc)af880Esquece();AF880.cena=sc;
+  const fus=(o)=>{if(o&&o.__fusaoVis!==undefined)fundidas=true;};
+  // (1) e (2): árvores do prado
+  let leu=0;
+  try{if(!Pt.p456&&af880Maduro('p456')){leu++;const L=af880Le456(sc);if(L&&L.erro){af880Erro('v456',L.erro);Pt.p456={falhou:true};}else if(L&&L.arv.length){L.geo0=L.malha.geometry;Pt.p456=L;af880PoePrado(sc,L.arv);S.prado456={arvores:L.arv.length,triAntes:L.tri};}}
+    if(Pt.p456&&!Pt.p456.falhou&&Pt.p456.vazio){const P4=Pt.p456,I4=P4.malha.geometry.index.array,t4=P4.pos[0];if(I4[t4]!==I4[t4+1]||I4[t4]!==I4[t4+2])P4.vazio=false;}   // alguém devolveu os triângulos velhos: esvazia de novo
+    if(Pt.p456&&!Pt.p456.falhou&&!Pt.p456.vazio){af880Vazio456(Pt.p456,true);fus(Pt.p456.malha);mudou=true;}}catch(e){af880Erro('v456',e);}
+  try{if(!Pt.p506&&!(aosPoucos&&leu)&&af880Maduro('p506')){leu++;const L=af880Le506(sc);if(L&&L.erro){af880Erro('v506',L.erro);Pt.p506={falhou:true};}else if(L&&L.arv.length){Pt.p506=L;af880PoePrado(sc,L.arv);S.prado506={arvores:L.arv.length,triAntes:L.tri};}}
+    if(Pt.p506&&!Pt.p506.falhou){const L=Pt.p506,vc=af880Vis(L.copa),vk=af880Vis(L.casca);   // (revisão R6) a visibilidade guardada é a de verdade (por baixo da fusão); se alguém reexibiu as velhas, esconde de novo
+      if(!L.oculto||vc||vk){if(!L.oculto)L.vis=[vc,vk];fus(L.copa);fus(L.casca);L.copa.visible=false;L.casca.visible=false;L.oculto=true;mudou=true;}}}catch(e){af880Erro('v506',e);}
+  if(AF880.grupo&&!AF880.grupo.visible){AF880.grupo.visible=true;mudou=true;}
+  try{if(AF880.arvores.length)af880Assenta();}catch(e){af880Erro('assenta',e);}
+  // (3) bosque distante da mansão
+  try{if(!Pt.mansao&&!(aosPoucos&&leu)&&af880Maduro('mansao')){leu++;const L=af880LeMansao(sc);if(L&&L.erro){af880Erro('mansão',L.erro);Pt.mansao={falhou:true};}else if(L&&L.arv.length){L.nova=af880FazMansao(L);Pt.mansao=L;S.mansao={arvores:L.arv.length,triAntes:L.tri,triDepois:L.nova.index.count/3};}}
+    if(Pt.mansao&&!Pt.mansao.falhou&&!Pt.mansao.trocada){const L=Pt.mansao;if(L.malha.geometry!==L.nova){L.antiga=L.malha.geometry;fus(L.malha);L.malha.geometry=L.nova;}L.trocada=true;mudou=true;}}catch(e){af880Erro('mansão',e);}
+  // (4) copas distantes
+  try{if(!Pt.horiz&&!(aosPoucos&&leu)&&af880Maduro('horiz')){leu++;const L=af880LeHoriz(sc);if(L){af880FazHoriz(L);Pt.horiz=L;let ni=0,ta=0,td=0;for(const q of L.lotes){const n=af880Inteiro(q.o);ni+=n;ta+=q.tri*n;td+=q.triNova*n;}   // (revisão R6) contas pelo lote inteiro: o Papel desenha 60 % e guarda a contagem
+        S.horizonte={lotes:L.lotes.length,instancias:ni,triAntes:ta,triDepois:td};}}
+    if(Pt.horiz&&!Pt.horiz.trocada){for(const q of Pt.horiz.lotes){if(q.o.geometry!==q.nova){q.antiga=q.o.geometry;q.o.geometry=q.nova;}}Pt.horiz.trocada=true;mudou=true;}}catch(e){af880Erro('horizonte',e);}
+  if(mudou){af880Conta();try{if(fundidas&&typeof fusaoLimpar==='function')fusaoLimpar(sc);}catch(e){af880Erro('fusão',e);}
+    const dt=+(performance.now()-t0).toFixed(1);S.trocas=(S.trocas||0)+1;S.trocaMs=dt;if(!(S.trocaMaxMs>=dt))S.trocaMaxMs=dt;}
+  return mudou;}
+function af880Conta(){const S=AF880.stats,G=AF880.geos;let a=0,d=0;try{
+    for(const k of ['prado456','prado506'])if(S[k]){a+=S[k].triAntes;let t=0;for(const q of AF880.arvores)if(q.tipo===(k==='prado456'?456:506))t+=G.prado[q.v].tri;S[k].triDepois=t;d+=t;}
+    if(S.mansao){a+=S.mansao.triAntes;d+=S.mansao.triDepois;}if(S.horizonte){a+=S.horizonte.triAntes;d+=S.horizonte.triDepois;}}catch(e){}S.triAntes=a;S.triDepois=d;}
+function af880Desfaz(){const R=af880Sala();AF880.pausa=true;if(!R)return false;return af880Restaura();}
+function af880Restaura(){const Pt=AF880.partes,cena=AF880.cena;let fundidas=false;const fus=(o)=>{if(o&&o.__fusaoVis!==undefined)fundidas=true;};
+  try{for(const o of AF880.lotes)fus(o);}catch(e){}
+  try{if(Pt.p456&&!Pt.p456.falhou){af880Vazio456(Pt.p456,false);fus(Pt.p456.malha);}}catch(e){af880Erro('desfaz v456',e);}
+  try{if(Pt.p506&&Pt.p506.oculto){const L=Pt.p506;L.copa.visible=L.vis?L.vis[0]:true;L.casca.visible=L.vis?L.vis[1]:true;L.oculto=false;}}catch(e){af880Erro('desfaz v506',e);}
+  try{if(AF880.grupo)AF880.grupo.visible=false;}catch(e){}
+  try{if(Pt.mansao&&Pt.mansao.trocada){const L=Pt.mansao;if(L.malha.geometry===L.nova)L.malha.geometry=L.antiga;fus(L.malha);L.trocada=false;}}catch(e){af880Erro('desfaz mansão',e);}
+  try{if(Pt.horiz&&Pt.horiz.trocada){for(const q of Pt.horiz.lotes)if(q.o.geometry===q.nova)q.o.geometry=q.antiga;Pt.horiz.trocada=false;}}catch(e){af880Erro('desfaz horizonte',e);}
+  try{if(fundidas&&cena&&typeof fusaoLimpar==='function')fusaoLimpar(cena);}catch(e){}
+  return true;}
+function af880Completo(){const Pt=AF880.partes;return !!(Pt.p456&&Pt.p506&&Pt.mansao&&Pt.horiz);}
+// chamado no `setActive` da Fantasia (antes da fusão do Leve), pelo fim da montagem e pelo vigia
+function af880Sinc(sinc){if(!AF880.on||AF880.pausa)return;const R=af880Sala();if(!R||!R.ready)return;AF880.stats.sinc++;
+  if(!AF880.pronto){af880Monta(!!sinc);if(!AF880.pronto)return;}
+  if(!sinc&&!af880NaSala())return;   // (revisão R8) com o leitor fora da sala a troca espera o `setActive` (atrás da transição): ler as árvores velhas e montar o bosque custa ~0,1 s de uma vez — era uma travada no meio do passeio quando a sala ficava pronta em segundo plano
+  try{af880Aplica(!sinc);}catch(e){af880Erro('aplica',e);}}
+// vigia: a sala nasce quando o leitor vai para lá; a montagem começa então (em fatias) e as partes entram à medida que ficam maduras;
+// para sozinho alguns passos depois de tudo aplicado (ou depois de ~1 min dentro da sala sem achar alguma das partes)
+function af880Vigia(){try{if(!AF880.on){af880ParaVigia();return;}const R=af880Sala();if(!R||!R.ready||AF880.pausa)return;AF880.vigia++;
+    if(!AF880.pronto)af880Monta(false);else if(af880NaSala())af880Aplica(true);
+    if(af880Completo()){AF880.folga=(AF880.folga||0)+1;if(AF880.folga>6)af880ParaVigia();}else if(AF880.vigia>45)af880ParaVigia();}catch(e){af880Erro('vigia',e);}}
+function af880ParaVigia(){try{if(AF880.relogio){clearInterval(AF880.relogio);AF880.relogio=null;}}catch(e){}}
+function af880LigaVigia(){try{if(!AF880.relogio){AF880.vigia=0;AF880.folga=0;AF880.relogio=setInterval(af880Vigia,1500);}}catch(e){}}
+// poses de câmera para as fotos (o y do chão é lido na hora)
+function af880Poses(){const R=af880Sala(),fy=(x,z)=>{try{const y=R&&R.floorY?R.floorY(x,z):0;return Number.isFinite(y)?y:0;}catch(e){return 0;}},P=(id,p,a,fov)=>({id,pos:[p[0],fy(p[0],p[2])+p[1],p[2]],alvo:[a[0],fy(a[0],a[2])+a[1],a[2]],fov:fov||55});
+  return [P('print_copas_contra_o_ceu',[15.5,1.5,-91.5],[31,4.4,-97.5],50),P('de_perto',[19.2,1.6,-100.2],[23,3.9,-101.5],55),P('bosque_do_prado',[2,2.2,-76.2],[-12,3,-92],60),P('prado_para_a_mansao',[-4,2.4,-77],[6,3.2,-110],60),
+    P('horizonte_de_pinheiros',[18,1.7,-96],[70,7,-125],50),P('horizonte_da_mansao',[-20,1.8,-112],[-62,8,-150],55),P('horizonte_da_clareira',[4,1.8,10],[-40,7,36],55)];}
+if(AF880.on){
+  try{const sa=setActive;setActive=function(sc){try{const R=af880Sala();if(R&&R.scene===sc){AF880.stats.setActive++;af880Sinc(true);af880LigaVigia();}}catch(e){af880Erro('setActive',e);}return sa.apply(this,arguments);};}catch(e){af880Erro('embrulho do setActive',e);}
+  try{af880LigaVigia();af880Sinc(false);}catch(e){}
+}
+window.__arvoresfant880={estado:AF880,stats:AF880.stats,erros:AF880.erros,P:AF880_P,
+  aplica(){AF880.pausa=false;if(!AF880.on)return false;af880Monta(true);const r=af880Aplica();return r;},desfaz(){return af880Desfaz();},
+  poses:af880Poses,sinc(){return af880Sinc(true);},assenta(){return af880Assenta();},arvores(){return AF880.arvores.map(a=>{let b=null;try{b=af880BaseAntiga(a);}catch(e){}return {tipo:a.tipo,variante:a.v,x:a.pos[0],y:a.pos[1],z:a.pos[2],escala:a.esc,giro:a.ry,velha:b?{x:b[0],y:b[1],z:b[2]}:null};});}};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
