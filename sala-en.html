@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v905</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v906</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -128322,6 +128322,40 @@ window.__alturas882={estado:AL882,stats:AL882.stats,erros:AL882.erros,get lista(
   if(typeof EG880!=='undefined'&&EG880&&EG880.levantado){CE.erro='o EG880 já tinha feito o levantamento';return;}
   if(!EG880_CESTOS.some(c=>Math.abs(c[0]+63.0)<.01&&Math.abs(c[1]-4.4)<.01)){EG880_CESTOS.push([-63.0,4.4,CE.para[0],CE.para[1]]);CE.posto=true;}
 }catch(e){try{console.error('v905',e);}catch(x){}}})();
+
+/* ===================== v906 · FANTASIA: COM A CABRA DE COMPANHEIRA, A CABRA DA PONTE DO TROLL FICA DE OUTRA COR (bloco `CA906`) =====================
+   Ponta solta da revisão do `FA880` («a cabra é o mesmo modelo do companheiro, 24 % maior e com as mesmas cores; se o leitor anda com a cabra,
+   ficam duas iguais — dá para tingir com materiais clonados»); o Luiz mandou seguir com as pontas pequenas (24/11, «ok»).
+   COMO ERA: a cabra da ponte do troll (v887, `FA880`) é a «Cabra da Montanha» da galeria de companheiros (`comp400_cabra`, v622), com as mesmas
+   cores e os mesmos materiais (partilhados pelo cache da v622). Quem tem a cabra como companheira via duas cabras iguais lado a lado na ponte.
+   AGORA: enquanto a companheira equipada (bicho ou pet) for a `comp400_cabra`, a cabra da ponte usa cópias dos materiais dela com a cor
+   multiplicada por um castanho escuro (vira um bode escuro: o desenho, as manchas e o pelo continuam, só mais escuros) — só nas malhas da
+   cabra da ponte; a companheira e o cache não mudam. Trocou de companheiro, a cabra da ponte volta às cores dela. No Papel, nada é trocado (o
+   Papel usa os materiais dele). Vigia de 1,5 s, só com a cabra da ponte na cena.
+   Chave `?cabra906=0` (como era). Gancho `window.__cabra906`: `estado`, `stats`, `forca(v)` (true/false/null: para as fotos), `erros`. */
+;(function(){try{
+  const QS=location.search+location.hash;
+  const CA={on:!/[?&#]cabra906=0/i.test(QS),tinta:0x5b4636,forca:null,clones:new Map(),erros:[],stats:{vigia:0,tingida:false,trocas:0,malhas:0}};
+  function erro(k,e){try{if(CA.erros.length<20)CA.erros.push(k+': '+String(e&&e.message||e));console.warn('v906',k,e);}catch(x){}}
+  function quer(){if(CA.forca!==null)return !!CA.forca;try{const E=LOJA&&LOJA.equip;return !!E&&(E.bicho==='comp400_cabra'||E.pet==='comp400_cabra');}catch(e){return false;}}
+  function clone(mt){let c=CA.clones.get(mt);if(c)return c;const ud=mt.userData;mt.userData={};try{c=mt.clone();}finally{mt.userData=ud;}c.name=(mt.name||'')+' · v906 bode escuro';
+    if(mt.onBeforeCompile)c.onBeforeCompile=mt.onBeforeCompile;if(mt.customProgramCacheKey)c.customProgramCacheKey=mt.customProgramCacheKey;
+    try{if(c.color)c.color.multiply(new THREE.Color(CA.tinta));else if(c.uniforms&&c.uniforms.diffuse&&c.uniforms.diffuse.value)c.uniforms.diffuse.value.multiply(new THREE.Color(CA.tinta));}catch(e){}
+    c.userData=Object.assign({},ud,{v906:true,v906orig:mt});CA.clones.set(mt,c);return c;}
+  function ajusta(){try{CA.stats.vigia++;
+      const o=(typeof FA880!=='undefined'&&FA880)?FA880.cabraObj:null,g=o&&o.g;if(!g||!g.parent)return;
+      let papel=false;try{papel=!!(typeof Q!=='undefined'&&Q&&Q.papel);}catch(e){}
+      const tingir=quer()&&!papel;
+      let n=0,t=0;
+      g.traverse(m=>{if(!m.isMesh||!m.material||Array.isArray(m.material))return;n++;const mt=m.material;
+        if(tingir){if(mt.userData&&mt.userData.v906){t++;return;}if(mt.userData&&(mt.userData.papel||mt.userData.papelMat||mt.isMeshToonMaterial))return;m.material=clone(mt);t++;CA.stats.trocas++;}
+        else if(mt.userData&&mt.userData.v906&&mt.userData.v906orig){m.material=mt.userData.v906orig;CA.stats.trocas++;}});
+      CA.stats.malhas=n;CA.stats.tingida=tingir&&t>0;
+    }catch(e){erro('ajusta',e);}}
+  window.__cabra906={estado:CA,stats:CA.stats,erros:CA.erros,forca:v=>{CA.forca=(v===null||v===undefined)?null:!!v;ajusta();return CA.stats.tingida;},ajusta};
+  if(!CA.on)return;
+  setInterval(ajusta,1500);
+}catch(e){try{console.error('v906',e);}catch(x){}}})();
 
 window.__build434={revision:434,family:"web",edition:"en"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
