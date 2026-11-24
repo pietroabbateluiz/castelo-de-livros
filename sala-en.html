@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v897</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v898</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -127618,6 +127618,381 @@ window.__tortas882={estado:PT882,stats:PT882.stats,erros:PT882.erros,get lista()
   reacerta:(k)=>pt882Reacerta(k||Object.keys(ROOMS).find(x=>{const c=pt882Cena(x);return c&&typeof ACTIVE!=='undefined'&&c.sc===ACTIVE;})),
   c465:(k)=>{const c=pt882Cena(k);const st=PT882.salas[k];return c?{corre:pt882C465Corre(c.sc),sig:pt882Sig465(c.sc),gravada:st?st.sig465:null,reacerto:st?st.reacerto:null}:null;},
   pecas:pt882Pecas,mede:pt882Mede,fotos:pt882Fotos,pose:pt882Pose,poseSai:pt882PoseSai,itens:PT882_ITENS,passarela:PT882_PAS};
+
+/* ===================== v882 · ALTURAS QUE SOBRARAM: A TORRE DO CATA-VENTO E AS MUDAS DA HORTA DO FAROESTE (7.º ANDAR), O GRAMADO DO FUNDO E OS POSTES DA ÁGORA DA UTOPIA, O BLOCO DO OUTDOOR DA DISTOPIA E AS LÁPIDES DEITADAS DO OUTONO (bloco `AL882`) =====================
+   Pedido do Luiz (19/11, ~20:05, «Alturas que sobraram»): corrigir as alturas que a varredura do FL881 achou e deixou de fora (lista no
+   relatório dele). Cada caso foi conferido no código de quem montou a peça e no jogo montado em node (v880 + blocos da v881), com sondas
+   verticais contra as malhas de chão. Só altura (e o que vai junto): nada muda de lugar em x/z, de giro, de cor ou de material.
+   COMO ERA:
+   (1) FAROESTE (`western`), ampliação da v709 (`fw709Aplicar`): cada peça foi posta na altura analítica do centro (`a289Height`), mas o
+       terreno que se vê (malha «Faroeste · terreno irregular», v289) é uma grade de 2 m fora de |x|,|z| ≤ 16 e a encosta muda sob a peça.
+       · A TORRE DO CATA-VENTO do curral (−25; 14,5): as quatro pernas de ferro (7 m) começam em y 2,309; sob as duas da frente (z 14,02) o
+         chão está a 2,136–2,199: as duas ficavam 11–17 cm no ar (as de trás já tocam ou entram até 6 cm).
+       · AS 12 MUDAS da horta do rancho (x 16,8–20,1; z 29–31,4): a esfera (raio 0,18 achatada a 0,7) fica com o fundo 7,4 cm acima da
+         altura analítica e o chão da malha ainda desce: 6–15 cm no ar.
+   (2) UTOPIA (`utopia`): o gramado da v387 é um plano de 220 × 220 m a −0,15 sob a sala inteira (os 1089 primeiros vértices da malha
+       «Utopia · cidade-jardim · v160 · vc r0.8 m0»); o piso (110,3 × 42,4 m) está a 0. Tudo o que a v387/v711 pôs FORA do piso com a base
+       em y 0 fica 15 cm no ar: a cidade-jardim do fundo (prédios, bairros laterais, árvores da transição verde) e, na frente, os postes
+       das placas «CONCORDO»/«DISCORDO» (z 21,5) e o poste do 2.º estandarte da ágora (z 22,5).
+   (3) DISTOPIA (`guerra`), cidade de fora (v573, `dt573Cidade`): o bloco de concreto escuro do outdoor (8,6 × 6,4 × 4,6 m, kit fundido com a
+       cidade inteira) tem a base num nível só (y 1,515), tirado de três pontos da linha do meio; a frente dele (z 26,65) está sobre a encosta
+       que desce para a muralha e o terreno ali fica a 0,48–0,96: até 1,04 m de vão sob a frente do bloco.
+   (4) OUTONO (`outono`), cemitério da cidade de fora (v574, `pn574Cemiterio`): as LÁPIDES DEITADAS (laje 0,6 × 0,25 × 1,4 m) foram postas
+       na horizontal com o fundo 5,5 cm abaixo da altura do centro. Os dados do FL881 não se contradizem: a função de chão e a malha do
+       terreno («532 terreno outono», o chão que se vê) dão a MESMA altura no centro (2,493 × 2,502 na 1.ª laje); a laje é que está
+       deitada atravessada numa encosta de ~45° (normal y 0,7): a ponta de cima entra no morro e a de baixo fica até 0,65 m no ar.
+   AGORA:
+   (1) Torre: «só os pés» — os 20 vértices do pé de cada perna no ar descem até o chão mais baixo sob ele (a perna fica 11–17 cm mais
+       comprida; a torre, as travessas e o cata-vento não mudam; as pernas de trás ficam como estão). Mudas: cada uma (esfera e talo, 54
+       vértices no kit «v709 · rancho») desce até o fundo da esfera encostar no chão mais baixo sob o contorno dela (raio 0,17 m).
+   (2) Utopia: SOBE O GRAMADO, não as peças — as fileiras do plano com z ≤ −48,125 (10 de 33, 330 vértices) vão de −0,15 para −0,004
+       (4 mm abaixo das bases: nenhuma face coplanar); a fileira de z −41,25 (dentro da lagoa) fica, e a faixa entre as duas vira uma
+       rampa suave (1,2°), sempre abaixo da água (−0,055) e da mureta do fundo. Nada fica coplanar com o piso (a fileira mais perto dele
+       está a 27 m). Na frente o gramado NÃO sobe (a fileira de z 20,6 está debaixo do piso e o subir faria uma faixa coplanar com ele):
+       os três postes ganham «só os pés» até o gramado (−0,15). O pórtico do jardim (UT879, base −0,24) não muda.
+   (3) Distopia: «só o pé» do bloco — os 12 vértices da face de baixo descem até o terreno mais baixo sob a pegada (grade de 0,25 m); o
+       bloco fica mais alto por baixo (no lado de cima da encosta o pé já estava enterrado), o outdoor e o andaime não mudam, e a textura
+       das laterais acompanha (v da UV corrigido pela escala de 3 m do `boxW`: nada esticado).
+   (4) Outono: cada laje deitada passa a seguir a encosta — cada vértice só sobe ou desce (y), na altura do terreno sob ele menos o
+       mesmo afundamento que tinha no centro; as faces de cima e de baixo ganham a normal inclinada. Se em algum ponto da grade 5 × 9 sob a
+       laje o fundo ainda ficar acima do terreno, a laje toda desce o que falta (nada no ar). Com «só um Δy» não havia saída: ou a laje
+       entrava inteira no morro, ou a ponta de baixo continuava 0,65 m no ar.
+   Regras comuns: a altura é medida na hora contra a malha de chão de cada sala (triângulos virados para cima; índice em grade só perto
+   das peças); só age se a peça estiver onde a varredura a achou (base esperada, contagem de vértices) e se a correção cair na faixa
+   prevista; senão a peça fica e a lista diz por quê. Os obstáculos do chão são discos 2D: nada muda neles.
+   QUANDO: no fim do `finishRoom` (embrulho `fr8Wrap`/`fr8Prev`) e no vigia de 1 s a sala entra na fila do fatiador (`fat8Go`, urgente com
+   a sala à vista) assim que as peças existem (Faroeste: v709 terminada; Utopia: v387 e v711; Distopia: v573 com o outdoor; Outono: v574
+   com o cemitério; até 30 s de espera, depois corre com o que achar). Na entrada da sala (`setActive`, antes do original) o que faltar
+   corre uma fatia de 8 ms e o resto segue urgente. O vigia (só a cena ativa, poucas leituras) refaz a sala se outro bloco mexer nos
+   vértices corrigidos. Malha-alvo fundida pelo Leve → `fusaoLimpar(cena)` antes de mexer (no `liga()`/`desliga()` também).
+   Ordem com os outros blocos: FL881/PF881 mexem em outras peças do Faroeste (fogueira, carroça, cactos, torre d'água, v437); o ZF879/ZF880
+   não alcançam o gramado (malha com mais de 240 mil índices) e nada aqui cria par coplanar.
+   Chaves: `?alturas882=0` (tudo); por sala `?al882western=0`, `?al882utopia=0`, `?al882guerra=0`, `?al882outono=0`.
+   Gancho `window.__alturas882`: `stats`, `erros`, `lista` (por peça: sala, id, nome, origem, tipo, antes/depois, Δy, motivo, estado),
+   `desliga()` / `liga()` (exatos: devolvem os valores guardados), `aplica(sala)`, `mede(sala)` (base, chão e folga de agora), `plano`,
+   `fotos(sala)` (poses de câmera para as fotos de antes/depois). */
+const AL882_Q=location.search+location.hash;
+const AL882={on:!/[?&#]alturas882=0/i.test(AL882_Q),ativo:true,erros:[],lista:[],salas:{},vigia:null,espera:{},
+  stats:{pedidos:0,feitas:0,pecas:0,corrigidas:0,jaNoChao:0,puladas:0,naoAchadas:0,refeitas:0,fusao:0,vertices:0,ms:0}};
+const AL882_SALAS=['western','utopia','guerra','outono'];
+const AL882_JOB='alturas que sobraram 882 · ';
+function al882Erro(k,e){if(AL882.erros.length<40)AL882.erros.push(k+': '+(e&&e.message||e));try{console.warn('v882',k,e);}catch(x){}}
+function al882Liga(sala){return AL882.on&&!new RegExp('[?&#]al882'+sala+'=0','i').test(AL882_Q);}
+function al882Arred(v,n){return Number.isFinite(v)?+v.toFixed(n===undefined?3:n):null;}
+function al882Rende(){return typeof fat8Fim!=='undefined'&&performance.now()>=fat8Fim;}
+// ---------- o plano (achados do FL881 de 19/11 conferidos no código e no banco) ----------
+// tipos: 'pes' (vértices do pé de pernas/postes cilíndricos: descem até o chão, o resto fica); 'mover' (a peça inteira desce: Δy);
+// 'pesCaixa' (a face de baixo de uma caixa desce até o chão, com a UV das laterais); 'gramado' (fileiras do plano da v387 sobem);
+// 'deitar' (lajes horizontais numa encosta passam a seguir o terreno, cada vértice só em y).
+function al882Plano(sala){
+  if(sala==='western'){const Y=(x,z)=>{try{return a289Height(x,z);}catch(e){return NaN;}};const pc=[];
+    // v709 · curral (cx −23, cz 22): torre do cata-vento em (cx−2; cz−7,5), pernas em ±0,8·0,6
+    const tx=-25,tz=14.5;pc.push({id:'torre-cata-vento',nome:'torre do cata-vento do curral (v709) em (−25; 14,5): pés das pernas',origem:'v709 fw709Aplicar (kit «v709 · curral»)',tipo:'pes',
+      malhas:/^v709 · curral · /,pes:[[-.48,-.48],[.48,-.48],[-.48,.48],[.48,.48]].map(([a,b],i)=>({id:'perna '+(i+1),x:tx+a,z:tz+b,raio:.12,n:20})),yBase:Y(tx,tz),tolBase:.006,faixa:[.02,.4],
+      centro:[tx,tz],motivo:'a v709 pôs as pernas na altura analítica do centro; a malha do terreno (grade de 2 m) desce sob as duas da frente: ficavam 11–17 cm no ar'});
+    // v709 · rancho (cx 24, cz 22): horta com 4 × 3 mudas
+    for(let i=0;i<4;i++)for(let j=0;j<3;j++){const px=24-7.2+i*1.1,pz=22+7+j*1.2,y=Y(px,pz);
+      pc.push({id:'muda-'+(i*3+j+1),nome:'muda '+(i*3+j+1)+' da horta do rancho (v709) em ('+px.toFixed(1)+'; '+pz.toFixed(1)+')',origem:'v709 fw709Aplicar (kit «v709 · rancho»)',tipo:'mover',
+        malhas:/^v709 · rancho · v160 · vc r0\.8 m0$/,caixa:[px-.2,y-.1,pz-.2,px+.2,y+.8,pz+.2],n:54,yBase:y+.074,tolBase:.015,anel:.17,centro:[px,pz],faixa:[-.35,-.02],
+        motivo:'a v709 desenhou a esfera 7,4 cm acima da altura analítica do centro e a malha do terreno ainda desce: a muda ficava 6–15 cm no ar'});}
+    return {sala,nome:'Faroeste',chao:{nomes:/^Faroeste · terreno irregular$/},pecas:pc};}
+  if(sala==='utopia'){const pc=[];
+    pc.push({id:'gramado-fundo',nome:'gramado da v387 atrás da lagoa (fileiras com z ≤ −48,125)',origem:'v387 utopia387Build (plano 220 × 220 a −0,15)',tipo:'gramado',
+      malha:'Utopia · cidade-jardim · v160 · vc r0.8 m0',y0:-.15,alvo:-.004,zMax:-48.12,linhas:33,passo:6.875,meio:110,nEsperado:330,centro:[0,-62],
+      refs:[[-45.5,-71.1,'bairro lateral (v387 r8) em (−45,5; −71,1)'],[45.7,-71.1,'bairro lateral em (45,7; −71,1)'],[-62,-67.1,'bairro lateral em (−62; −67,1)'],[-39,-63,'árvore da transição verde (−39; −63)'],
+        [-29,-56,'prédio (−29; −51), fundo'],[0,-59.5,'prédio (0; −53), fundo'],[-17,-43.6,'prédio (−17; −49), frente (rampa)'],[18,-44.1,'prédio (18; −49), frente (rampa)'],[9,-43,'pilar da galeria (9; −43) (rampa)'],[-24,-71,'árvore (−24; −71)']],
+      motivo:'o piso está a 0 e o gramado a −0,15: a cidade-jardim do fundo (base em 0) ficava 15 cm no ar'});
+    const cx=-37,cz=12,a=2*Math.PI/5+.3;
+    for(const [k,x,z,n] of [[1,cx-5,cz+9.5,'poste da placa «CONCORDO»'],[2,cx+5,cz+9.5,'poste da placa «DISCORDO»'],[3,cx+Math.cos(a)*10.5,cz+Math.sin(a)*10.5,'poste do 2.º estandarte']])
+      pc.push({id:'agora-poste-'+k,nome:n+' da ágora (v711) em ('+x.toFixed(2)+'; '+z.toFixed(2)+')',origem:'v711 ut711Aplicar (kit «v711 · ágora»)',tipo:'pes',malhas:/^v711 · ágora · /,
+        pes:[{id:'pé',x,z,raio:.1,n:20}],yBase:0,tolBase:.004,faixa:[.02,.3],centro:[x,z],chaoGramado:true,motivo:'o poste está fora do piso (z > 21,21), sobre o gramado a −0,15, com o pé em 0: ficava 15 cm no ar'});
+    return {sala,nome:'Utopia',chao:{nomes:/^Utopia · cidade-jardim · v160 · vc r0\.8 m0$/,vfaixa:[0,1088]},pecas:pc};}
+  if(sala==='guerra'){let ox=56.321,oz=28.95;try{const Dm=typeof DT573!=='undefined'&&DT573.dimens;if(Dm&&Dm.mur&&Number.isFinite(Dm.zS)&&!(typeof CP536!=='undefined'&&CP536.on)){ox=(Dm.mur.x0+Dm.mur.x1)/2;oz=Dm.zS;}}catch(e){}
+    return {sala,nome:'Distopia',chao:{nomes:/^532 terreno guerra$/},pecas:[{id:'outdoor-bloco',nome:'bloco de concreto do outdoor da cidade de fora (v573) em ('+ox.toFixed(2)+'; '+oz.toFixed(2)+')',origem:'v573 dt573Cidade (kit da cidade inteira)',tipo:'pesCaixa',
+      malhas:/^521 guerra · v160 · 572 573 concreto escuro$/,caixa:[ox-4.45,-30,oz-2.45,ox+4.45,60,oz+2.45],n:24,altura:6.4,uvEsc:3,faixa:[.02,2.5],centro:[ox,oz],
+      motivo:'a base do bloco foi tirada de três pontos da linha do meio; a frente fica sobre a encosta que desce: até 1 m de vão por baixo'}]};}
+  if(sala==='outono')return {sala,nome:'Outono',chao:{nomes:/^532 terreno outono$/},pecas:[{id:'lapides-deitadas',nome:'lápides deitadas do cemitério da cidade de fora (v574)',origem:'v574 pn574Cemiterio (kit da cidade inteira)',tipo:'deitar',
+    malhas:/^521 outono · v160 · vc r1 m0$/,regiao:{x0:20,x1:110,zMin:22,zMax:33},dims:[.6,.25,1.4],faixa:[.03,1.3],centro:[50,0],
+    motivo:'a laje foi posta na horizontal sobre uma encosta de ~45°: a ponta de cima entrava no morro e a de baixo ficava até 0,65 m no ar'}]};
+  return null;}
+// ---------- prontidão: as peças têm de existir ----------
+function al882Pronta(sala){const R=typeof ROOMS!=='undefined'&&ROOMS[sala];if(!R||!R.scene||!R.ready)return {ok:false};
+  try{if(sala==='western'){if(typeof FW709==='undefined'||!FW709.on)return {ok:false,pula:'sem a ampliação da v709 (FW709 desligada ou ausente)'};if(FW709.feito&&FW709.stats&&FW709.stats.pulado)return {ok:false,pula:'v709: '+FW709.stats.pulado};if(!FW709.feito||!FW709.stats||FW709.stats.ms===undefined)return al882Espera(sala,R,'v709');return {ok:true};}
+    if(sala==='utopia'){if(!(typeof UTOPIA387!=='undefined'&&UTOPIA387.rooms&&UTOPIA387.rooms.utopia)||!R.scene.getObjectByName('Utopia · cidade-jardim'))return al882Espera(sala,R,'v387');if(typeof UT711!=='undefined'&&UT711.on&&!(UT711.feito&&UT711.stats&&UT711.stats.pulado)&&(!UT711.feito||!UT711.stats||UT711.stats.ms===undefined))return al882Espera(sala,R,'v711');return {ok:true};}
+    if(sala==='guerra'){if(typeof DT573==='undefined'||!DT573.on)return {ok:false,pula:'sem a cidade da v573'};if(!(DT573.stats&&DT573.stats.cidade&&DT573.stats.cidade.outdoor))return al882Espera(sala,R,'v573 (outdoor)');
+      if(!R.scene.getObjectByName('521 guerra · v160 · 572 573 concreto escuro'))return al882Espera(sala,R,'kit da v573');return {ok:true};}
+    if(sala==='outono'){if(typeof PN574==='undefined'||!PN574.on)return {ok:false,pula:'sem a cidade da v574'};if(!(PN574.stats&&PN574.stats.campo&&PN574.stats.campo.cemiterio))return al882Espera(sala,R,'v574 (cemitério)');
+      if(!R.scene.getObjectByName('532 terreno outono'))return al882Espera(sala,R,'terreno da v532');return {ok:true};}}catch(e){al882Erro('pronta '+sala,e);}
+  return {ok:false};}
+function al882Espera(sala,R,falta,ms){const E=AL882.espera;const now=performance.now();if(!E[sala]||E[sala].sc!==R.scene)E[sala]={sc:R.scene,t:now};
+  if(now-E[sala].t>(ms||30000))return {ok:true,forcado:falta};return {ok:false,falta};}
+// ---------- utilitários de cena ----------
+function al882Fundida(o){try{const d=Object.getOwnPropertyDescriptor(o,'visible');return !!(d&&d.get);}catch(e){return false;}}
+// as malhas da cena numa travessia só, em fatias (sem `updateMatrixWorld` da cena inteira: só as malhas usadas atualizam a matriz)
+function* al882TodasG(sc){const L=[];const pilha=[sc];let n=0;while(pilha.length){const o=pilha.pop();if(o.isMesh&&!o.isInstancedMesh&&o.geometry&&o.geometry.attributes&&o.geometry.attributes.position)L.push(o);const ch=o.children;for(let i=ch.length-1;i>=0;i--)pilha.push(ch[i]);if((++n&255)===0&&al882Rende())yield 'al882 cena';}return L;}
+function al882Todas(ctx){if(!ctx.todas){const g=al882TodasG(ctx.sc);const f0=fat8Fim;fat8Fim=Infinity;let r;try{do{r=g.next();}while(!r.done);}finally{fat8Fim=f0;}ctx.todas=r.value;}return ctx.todas;}
+function al882Malhas(ctx,re){const L=[];for(const o of al882Todas(ctx))if(re.test(o.name||'')){o.updateWorldMatrix(true,false);L.push(o);}return L;}
+// longe do retângulo xz (pela esfera de limites, quando já existe; sem ela não descarta)
+function al882Longe(o,x0,z0,x1,z1){const g=o.geometry;const S=g.boundingSphere;if(!S)return false;const c=S.center.clone().applyMatrix4(o.matrixWorld);const r=S.radius*o.matrixWorld.getMaxScaleOnAxis()+.05;return c.x+r<x0||c.x-r>x1||c.z+r<z0||c.z-r>z1;}
+// vértices (índices) de uma malha dentro de um teste no mundo, em fatias
+function* al882Varre(o,teste,b){const pos=o.geometry.attributes.position,e=o.matrixWorld,v=new THREE.Vector3();const idx=[];
+  const id=al882Identidade(o),A=pos.array,is=pos.itemSize,cru=id&&!pos.isInterleavedBufferAttribute&&!pos.normalized;
+  for(let i=0;i<pos.count;i++){if((i&1023)===1023&&al882Rende())yield 'al882 varre';if(cru){const j=i*is;v.set(A[j],A[j+1],A[j+2]);}else v.fromBufferAttribute(pos,i).applyMatrix4(e);if(teste(v,i))idx.push(i);}return idx;}
+function al882Identidade(o){const m=o.matrixWorld.elements;return m[0]===1&&m[1]===0&&m[2]===0&&m[3]===0&&m[4]===0&&m[5]===1&&m[6]===0&&m[7]===0&&m[8]===0&&m[9]===0&&m[10]===1&&m[11]===0&&m[12]===0&&m[13]===0&&m[14]===0&&m[15]===1;}
+function al882Mundo(o,i,v){return v.fromBufferAttribute(o.geometry.attributes.position,i).applyMatrix4(o.matrixWorld);}
+// ---------- o chão: índice em grade (1 m) dos triângulos virados para cima das malhas de chão, só nas regiões pedidas ----------
+function* al882IndiceG(ctx,spec,regioes){const I={grade:new Map(),tri:[],malhas:[]};const ck=(a,b)=>a*100003+b;
+  const ms=al882Malhas(ctx,spec.nomes);const RG=al882JuntaRegioes(regioes),nr=RG.length;let ux0=Infinity,uz0=Infinity,ux1=-Infinity,uz1=-Infinity;for(const r of RG){if(r[0]<ux0)ux0=r[0];if(r[1]<uz0)uz0=r[1];if(r[2]>ux1)ux1=r[2];if(r[3]>uz1)uz1=r[3];}
+  yield 'al882 índice: malhas';const va=new THREE.Vector3(),vb=new THREE.Vector3(),vc=new THREE.Vector3();let passo=0;const vf=spec.vfaixa;
+  for(const o of ms){I.malhas.push(o.name);const g=o.geometry,pos=g.attributes.position,ix=g.index,n=ix?ix.count:pos.count,e=o.matrixWorld;let dentro=false;
+    // (sem fecho por triângulo e sem matriz quando a malha está na origem: o laço é o que pesa)
+    const cru=al882Identidade(o)&&!pos.isInterleavedBufferAttribute&&!pos.normalized,A=pos.array,is=pos.itemSize,IX=ix?ix.array:null;
+    for(let t=0;t+2<n;t+=3){if((++passo&255)===0&&al882Rende())yield 'al882 índice do chão';
+      const ia=IX?IX[t]:t,ib=IX?IX[t+1]:t+1,ic=IX?IX[t+2]:t+2;if(vf){if(ia<vf[0]||ia>vf[1]||ib<vf[0]||ib>vf[1]||ic<vf[0]||ic>vf[1]){if(dentro)break;continue;}dentro=true;} // o kit junta as peças em ordem: o plano é um bloco contíguo
+      if(cru){const ja=ia*is,jb=ib*is,jc=ic*is;va.set(A[ja],A[ja+1],A[ja+2]);vb.set(A[jb],A[jb+1],A[jb+2]);vc.set(A[jc],A[jc+1],A[jc+2]);}
+      else{va.fromBufferAttribute(pos,ia).applyMatrix4(e);vb.fromBufferAttribute(pos,ib).applyMatrix4(e);vc.fromBufferAttribute(pos,ic).applyMatrix4(e);}
+      const x0=va.x<vb.x?(va.x<vc.x?va.x:vc.x):(vb.x<vc.x?vb.x:vc.x),x1=va.x>vb.x?(va.x>vc.x?va.x:vc.x):(vb.x>vc.x?vb.x:vc.x),z0=va.z<vb.z?(va.z<vc.z?va.z:vc.z):(vb.z<vc.z?vb.z:vc.z),z1=va.z>vb.z?(va.z>vc.z?va.z:vc.z):(vb.z>vc.z?vb.z:vc.z);
+      if(x1<ux0||x0>ux1||z1<uz0||z0>uz1)continue;let perto=nr===1;if(!perto)for(let q=0;q<nr;q++){const r=RG[q];if(x1>=r[0]&&x0<=r[2]&&z1>=r[1]&&z0<=r[3]){perto=true;break;}}if(!perto)continue;
+      const e1x=vb.x-va.x,e1y=vb.y-va.y,e1z=vb.z-va.z,e2x=vc.x-va.x,e2y=vc.y-va.y,e2z=vc.z-va.z;const ny=e1z*e2x-e1x*e2z,nl=Math.hypot(e1y*e2z-e1z*e2y,ny,e1x*e2y-e1y*e2x);if(nl<1e-12||ny/nl<.25)continue;
+      const id=I.tri.length/9;I.tri.push(va.x,va.y,va.z,vb.x,vb.y,vb.z,vc.x,vc.y,vc.z);
+      for(let a=Math.floor(x0);a<=Math.floor(x1);a++)for(let b=Math.floor(z0);b<=Math.floor(z1);b++){const k=ck(a,b);let L=I.grade.get(k);if(!L)I.grade.set(k,L=[]);L.push(id);}}}
+  I.n=I.tri.length/9;return I;}
+// regiões (retângulos xz) que se tocam viram uma só: menos testes por triângulo
+function al882JuntaRegioes(regioes){let L=regioes.map(r=>[r[0],r[1],r[2],r[3]]);let mudou=true;while(mudou&&L.length>1){mudou=false;
+    for(let i=0;i<L.length&&!mudou;i++)for(let j=i+1;j<L.length;j++){const a=L[i],b=L[j];if(a[2]>=b[0]&&a[0]<=b[2]&&a[3]>=b[1]&&a[1]<=b[3]){L[i]=[Math.min(a[0],b[0]),Math.min(a[1],b[1]),Math.max(a[2],b[2]),Math.max(a[3],b[3])];L.splice(j,1);mudou=true;break;}}}return L;}
+function al882IndiceJa(ctx,spec,regioes){const g=al882IndiceG(ctx,spec,regioes);const f0=fat8Fim;fat8Fim=Infinity;let r;try{do{r=g.next();}while(!r.done);}finally{fat8Fim=f0;}return r.value;}
+// altura do chão em (x,z): a superfície mais alta até ytop (−Infinity se nada)
+function al882Altura(I,x,z,ytop){if(!I)return -Infinity;if(ytop===undefined)ytop=Infinity;const L=I.grade.get(Math.floor(x)*100003+Math.floor(z));let best=-Infinity;if(!L)return best;const t=I.tri;
+  for(const id of L){const j=id*9;const ax=t[j],ay=t[j+1],az=t[j+2],e1x=t[j+3]-ax,e1y=t[j+4]-ay,e1z=t[j+5]-az,e2x=t[j+6]-ax,e2y=t[j+7]-ay,e2z=t[j+8]-az;const den=e1x*e2z-e2x*e1z;if(Math.abs(den)<1e-12)continue;
+    const px=x-ax,pz=z-az;const u=(px*e2z-e2x*pz)/den,w=(e1x*pz-px*e1z)/den;if(u<-1e-6||w<-1e-6||u+w>1+1e-6)continue;const y=ay+u*e1y+w*e2y;if(y<=ytop+.02&&y>best)best=y;}
+  return best;}
+function al882ChaoPts(I,pts,ytop){let mn=Infinity,mx=-Infinity,n=0,sem=0;for(const [x,z] of pts){const g=al882Altura(I,x,z,ytop);if(!Number.isFinite(g)){sem++;continue;}if(g<mn)mn=g;if(g>mx)mx=g;n++;}return n?{min:mn,max:mx,n,sem}:null;}
+function al882Grade(x0,z0,x1,z1,d){const pts=[];const nx=Math.max(1,Math.ceil((x1-x0)/d)),nz=Math.max(1,Math.ceil((z1-z0)/d));for(let i=0;i<=nx;i++)for(let k=0;k<=nz;k++)pts.push([x0+(x1-x0)*i/nx,z0+(z1-z0)*k/nz]);return pts;}
+function al882Anel(cx,cz,r,n){const pts=[[cx,cz]];for(let k=0;k<n;k++){const a=k/n*Math.PI*2;pts.push([cx+Math.cos(a)*r,cz+Math.sin(a)*r]);}return pts;}
+// ---------- registro de vértices mexidos (exato: os valores de antes e de depois ficam guardados) ----------
+// reg = {o, geo, idx:Uint32Array, p0/p1:Float32Array (xyz local), uv:{idx,v0,v1}, nr:{idx,n0,n1}}
+function al882NovoReg(o,idx){const geo=o.geometry,pos=geo.attributes.position,a=pos.array,is=pos.itemSize;const n=idx.length;const p0=new Float32Array(n*3);
+  for(let k=0;k<n;k++){const j=idx[k]*is;p0[k*3]=a[j];p0[k*3+1]=a[j+1];p0[k*3+2]=a[j+2];}return {o,geo,pos,idx:Uint32Array.from(idx),p0,p1:Float32Array.from(p0),uv:null,nr:null,dyMax:0};}
+// desloca no mundo (só y) os vértices k do registro: dyw[k] (ou um número para todos)
+function al882RegDesloca(reg,dyw){const o=reg.o;o.updateWorldMatrix(true,false);const inv=new THREE.Matrix4().copy(o.matrixWorld).invert();const z0=new THREE.Vector3(0,0,0).applyMatrix4(inv);const d=new THREE.Vector3();
+  for(let k=0;k<reg.idx.length;k++){const dy=typeof dyw==='number'?dyw:dyw[k];if(!dy)continue;d.set(0,dy,0).applyMatrix4(inv).sub(z0);reg.p1[k*3]+=d.x;reg.p1[k*3+1]+=d.y;reg.p1[k*3+2]+=d.z;if(Math.abs(dy)>reg.dyMax)reg.dyMax=Math.abs(dy);}}
+function al882Escreve(reg,depois){const a=reg.pos.array,is=reg.pos.itemSize,P=depois?reg.p1:reg.p0;for(let k=0;k<reg.idx.length;k++){const j=reg.idx[k]*is;a[j]=P[k*3];a[j+1]=P[k*3+1];a[j+2]=P[k*3+2];}reg.pos.needsUpdate=true;
+  if(reg.uv){const ua=reg.uv.attr.array,us=reg.uv.attr.itemSize,V=depois?reg.uv.v1:reg.uv.v0;for(let k=0;k<reg.uv.idx.length;k++)ua[reg.uv.idx[k]*us+1]=V[k];reg.uv.attr.needsUpdate=true;}
+  if(reg.nr){const na=reg.nr.attr.array,ns=reg.nr.attr.itemSize,N=depois?reg.nr.n1:reg.nr.n0;for(let k=0;k<reg.nr.idx.length;k++){const j=reg.nr.idx[k]*ns;na[j]=N[k*3];na[j+1]=N[k*3+1];na[j+2]=N[k*3+2];}reg.nr.attr.needsUpdate=true;}
+  al882Limites(reg);}
+// limites: geometrias pequenas recalculam; grandes só alargam (caixa pelos vértices mexidos, esfera pelo maior deslocamento)
+function al882Limites(reg){const g=reg.geo;try{if(reg.pos.count<=6000){g.computeBoundingBox();g.computeBoundingSphere();return;}
+    if(!g.boundingBox)g.computeBoundingBox();const v=new THREE.Vector3();for(let k=0;k<reg.idx.length;k++){v.fromBufferAttribute(reg.pos,reg.idx[k]);g.boundingBox.expandByPoint(v);}
+    if(!g.boundingSphere)g.computeBoundingSphere();else if(!reg.esferaOk){g.boundingSphere.radius+=reg.dyMax;reg.esferaOk=true;}}catch(e){al882Erro('limites',e);}}
+// ---------- a correção de uma sala, em fatias ----------
+function* al882SalaG(sala){const t0=performance.now();const R=ROOMS[sala];const sc=R.scene;const plano=al882Plano(sala);if(!plano)return;
+  const st=AL882.salas[sala]={sc,feito:false,job:true,plano:plano.nome,pecas:[],indice:null,fusao:false,refeitas:(AL882.salas[sala]&&AL882.salas[sala].sc===sc&&AL882.salas[sala].refeitas)||0};
+  AL882.lista=AL882.lista.filter(e=>e.sala!==sala);const ctx={sala,R,sc,plano};ctx.todas=yield* al882TodasG(sc);yield 'al882 cena pronta';
+  // 1. alvos (uma peça por passo)
+  const itens=[];for(const pc of plano.pecas){let A=null;try{A=yield* al882Acha(ctx,pc);}catch(e){al882Erro('acha '+sala+' '+pc.id,e);}
+    if(A&&A.lapides){for(const L of A.lapides)itens.push({pc,A:L,regs:[],e:null,sub:L.id});if(!A.lapides.length)itens.push({pc,A:{achou:false,descr:'nenhuma laje achada'},regs:[],e:null});}
+    else itens.push({pc,A:A||{achou:false,descr:'erro na busca'},regs:[],e:null});yield 'al882 alvos';}
+  // 2. índice do chão (só nas regiões das peças, ± 3 m)
+  const regioes=[];for(const it of itens)if(it.A.achou&&it.A.regiao)regioes.push(it.A.regiao);
+  let I=null;if(regioes.length){const spec=Object.assign({},plano.chao);if(ctx.gramadoI0!==undefined)spec.vfaixa=[ctx.gramadoI0,ctx.gramadoI0+1088];I=yield* al882IndiceG(ctx,spec,regioes);}
+  st.indice=I?{malhas:I.malhas,triangulos:I.n}:null;yield 'al882 índice pronto';
+  // 3. fusão do Leve desfeita antes de mexer, se algum alvo estiver fundido
+  try{if(typeof fusaoLimpar==='function'&&itens.some(it=>it.A.achou&&(it.A.malhas||[]).some(al882Fundida))){fusaoLimpar(sc);st.fusao=true;AL882.stats.fusao++;}}catch(e){al882Erro('fusão '+sala,e);}
+  // 4. medir e corrigir peça a peça
+  for(const it of itens){AL882.stats.pecas++;const pc=it.pc;const e={sala,id:it.sub?pc.id+' · '+it.sub:pc.id,nome:it.sub?pc.nome+' — '+it.sub:pc.nome,origem:pc.origem,tipo:pc.tipo,alvos:it.A.descr||'',estado:'',antes:null,depois:null,dy:null,motivo:pc.motivo};it.e=e;
+    try{if(!it.A.achou){e.estado='não achada'+(it.A.porque?' ('+it.A.porque+')':'');AL882.stats.naoAchadas++;}
+      else{const r=al882Corrige(ctx,it,I);e.estado=r;if(/^corrigida/.test(r)){AL882.stats.corrigidas++;it.marca=al882Marca(it);}else if(/^já/.test(r))AL882.stats.jaNoChao++;else AL882.stats.puladas++;}}
+    catch(err){e.estado='erro: '+(err&&err.message||err);al882Erro('corrige '+e.id,err);}
+    st.pecas.push(it);AL882.lista.push(e);yield 'al882 peça';}
+  st.feito=true;AL882.stats.feitas++;AL882.stats.ms+=Math.round(performance.now()-t0);}
+// ---------- achar os alvos de uma peça ----------
+function* al882Acha(ctx,pc){const v=new THREE.Vector3();
+  if(pc.tipo==='pes'){const ms=al882Malhas(ctx,pc.malhas);const pes=[];let ok=true;
+    for(const p of pc.pes){const L=[];for(const o of ms){if(al882Longe(o,p.x-p.raio,p.z-p.raio,p.x+p.raio,p.z+p.raio))continue;
+        const idx=yield* al882Varre(o,w=>Math.abs(w.x-p.x)<=p.raio&&Math.abs(w.z-p.z)<=p.raio&&Math.abs(w.y-pc.yBase)<=pc.tolBase);if(idx.length)L.push({o,idx});}
+      const n=L.reduce((s,t)=>s+t.idx.length,0);if(n!==p.n)ok=false;pes.push({p,L,n});}
+    const malhas=[...new Set(pes.flatMap(f=>f.L.map(t=>t.o)))];
+    return {achou:ok,porque:ok?'':'contagem de vértices: '+pes.map(f=>f.n+'/'+f.p.n).join(', '),pes,malhas,descr:pes.map(f=>f.p.id+': '+f.n+' vértices').join(' · '),regiao:[pc.centro[0]-4,pc.centro[1]-4,pc.centro[0]+4,pc.centro[1]+4]};}
+  if(pc.tipo==='mover'){const ms=al882Malhas(ctx,pc.malhas);const [x0,y0,z0,x1,y1,z1]=pc.caixa;const L=[];
+    for(const o of ms){if(al882Longe(o,x0,z0,x1,z1))continue;const idx=yield* al882Varre(o,w=>w.x>=x0&&w.x<=x1&&w.y>=y0&&w.y<=y1&&w.z>=z0&&w.z<=z1);if(idx.length)L.push({o,idx});}
+    const n=L.reduce((s,t)=>s+t.idx.length,0);return {achou:n===pc.n,porque:n===pc.n?'':'contagem de vértices '+n+'/'+pc.n,L,malhas:L.map(t=>t.o),descr:n+' vértices em '+L.length+' malha(s)',regiao:[pc.centro[0]-3,pc.centro[1]-3,pc.centro[0]+3,pc.centro[1]+3]};}
+  if(pc.tipo==='pesCaixa'){const ms=al882Malhas(ctx,pc.malhas);const [x0,y0,z0,x1,y1,z1]=pc.caixa;const L=[];
+    for(const o of ms){if(al882Longe(o,x0,z0,x1,z1))continue;const idx=yield* al882Varre(o,w=>w.x>=x0&&w.x<=x1&&w.y>=y0&&w.y<=y1&&w.z>=z0&&w.z<=z1);if(idx.length)L.push({o,idx});}
+    const n=L.reduce((s,t)=>s+t.idx.length,0);if(n!==pc.n||L.length!==1)return {achou:false,porque:'contagem de vértices '+n+'/'+pc.n+' em '+L.length+' malha(s)',malhas:L.map(t=>t.o)};
+    const o=L[0].o;let yb=Infinity,yt=-Infinity;for(const i of L[0].idx){al882Mundo(o,i,v);if(v.y<yb)yb=v.y;if(v.y>yt)yt=v.y;}
+    const baixo=L[0].idx.filter(i=>Math.abs(al882Mundo(o,i,v).y-yb)<.002),cima=L[0].idx.filter(i=>Math.abs(al882Mundo(o,i,v).y-yt)<.002);
+    if(baixo.length!==12||cima.length!==12||Math.abs(yt-yb-pc.altura)>.02)return {achou:false,porque:'não é a caixa esperada ('+baixo.length+' em baixo, '+cima.length+' em cima, altura '+(yt-yb).toFixed(3)+')',malhas:[o]};
+    let bx0=Infinity,bx1=-Infinity,bz0=Infinity,bz1=-Infinity;for(const i of baixo){al882Mundo(o,i,v);bx0=Math.min(bx0,v.x);bx1=Math.max(bx1,v.x);bz0=Math.min(bz0,v.z);bz1=Math.max(bz1,v.z);}
+    return {achou:true,o,baixo,cima,yb,yt,pegada:[bx0,bz0,bx1,bz1],malhas:[o],descr:'caixa de '+(bx1-bx0).toFixed(2)+' × '+(yt-yb).toFixed(2)+' × '+(bz1-bz0).toFixed(2)+' m (12 vértices da face de baixo)',regiao:[bx0-3,bz0-3,bx1+3,bz1+3]};}
+  if(pc.tipo==='gramado'){const ms=al882Malhas(ctx,new RegExp('^'+pc.malha.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'$'));if(!ms.length)return {achou:false,porque:'malha «'+pc.malha+'» ausente'};
+    const o=ms[0];const pos=o.geometry.attributes.position;const N=pc.linhas*pc.linhas;let i0=-1;
+    for(let i=0;i<Math.min(pos.count,20000);i++){if((i&511)===511&&al882Rende())yield 'al882 gramado';al882Mundo(o,i,v);if(Math.abs(v.x+pc.meio)<.002&&Math.abs(v.z+pc.meio)<.002&&(Math.abs(v.y-pc.y0)<.002||Math.abs(v.y-pc.alvo)<.002)){i0=i;break;}}
+    if(i0<0||i0+N>pos.count)return {achou:false,porque:'plano do gramado não achado',malhas:[o]};
+    // confere a grade inteira (1089 vértices: x e z na grade de 6,875 m, y −0,15 ou já subido)
+    let ruins=0;const idx=[];for(let k=0;k<N;k++){if((k&255)===255&&al882Rende())yield 'al882 gramado';al882Mundo(o,i0+k,v);const ex=-pc.meio+(k%pc.linhas)*pc.passo,ez=-pc.meio+Math.floor(k/pc.linhas)*pc.passo;
+      if(Math.abs(v.x-ex)>.003||Math.abs(v.z-ez)>.003){ruins++;continue;}if(ez<=pc.zMax)idx.push(i0+k);}
+    if(ruins)return {achou:false,porque:ruins+' vértices fora da grade do plano',malhas:[o]};ctx.gramadoI0=i0;
+    return {achou:idx.length===pc.nEsperado,porque:idx.length===pc.nEsperado?'':'fileiras: '+idx.length+'/'+pc.nEsperado,o,i0,idx,malhas:[o],descr:idx.length+' vértices (fileiras com z ≤ '+pc.zMax+') do plano que começa no vértice '+i0,regiao:[-80,-80,80,-40]};}
+  if(pc.tipo==='deitar'){const ms=al882Malhas(ctx,pc.malhas);const R=pc.regiao,[dx,dy,dz]=pc.dims;const lap=[];let n=0;const tol=.004;
+    for(const o of ms){if(al882Longe(o,R.x0,-R.zMax,R.x1,R.zMax))continue;const pos=o.geometry.attributes.position,nr=o.geometry.attributes.normal;if(!nr)continue;
+      const cru=al882Identidade(o)&&!pos.isInterleavedBufferAttribute&&!pos.normalized,A=pos.array,is=pos.itemSize,w=new THREE.Vector3();const P=(i,out)=>{if(cru){const j=i*is;return out.set(A[j],A[j+1],A[j+2]);}return al882Mundo(o,i,out);};
+      const q=[new THREE.Vector3(),new THREE.Vector3(),new THREE.Vector3(),new THREE.Vector3()];
+      for(let i=0;i+24<=pos.count;i++){if((i&511)===511&&al882Rende())yield 'al882 lápides';P(i,w);const az=Math.abs(w.z);if(w.x<R.x0||w.x>R.x1||az<R.zMin||az>R.zMax)continue;if(Math.abs(nr.getX(i))<.99&&Math.abs(nr.getZ(i))<.99)continue;
+        // pré-filtro barato: os 4 primeiros vértices de uma BoxGeometry são a face +x (x fixo, y em dois níveis 0,25 apart, o outro eixo com 1,4 ou 0,6)
+        for(let k=0;k<4;k++)P(i+k,q[k]);const ys=Math.max(q[0].y,q[1].y,q[2].y,q[3].y)-Math.min(q[0].y,q[1].y,q[2].y,q[3].y);if(Math.abs(ys-dy)>tol)continue;
+        const fx=Math.max(q[0].x,q[1].x,q[2].x,q[3].x)-Math.min(q[0].x,q[1].x,q[2].x,q[3].x),fz=Math.max(q[0].z,q[1].z,q[2].z,q[3].z)-Math.min(q[0].z,q[1].z,q[2].z,q[3].z);
+        if(!((fx<tol&&(Math.abs(fz-dz)<tol||Math.abs(fz-dx)<tol))||(fz<tol&&(Math.abs(fx-dz)<tol||Math.abs(fx-dx)<tol))))continue;
+        let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity,z0=Infinity,z1=-Infinity;for(let k=0;k<24;k++){P(i+k,v);if(v.x<x0)x0=v.x;if(v.x>x1)x1=v.x;if(v.y<y0)y0=v.y;if(v.y>y1)y1=v.y;if(v.z<z0)z0=v.z;if(v.z>z1)z1=v.z;}
+        const sx=x1-x0,sy=y1-y0,sz=z1-z0;const caixa=Math.abs(sy-dy)<tol&&((Math.abs(sx-dx)<tol&&Math.abs(sz-dz)<tol)||(Math.abs(sx-dz)<tol&&Math.abs(sz-dx)<tol));if(!caixa)continue;
+        // só os 8 cantos da caixa (cada vértice num canto) e as faces de cima/baixo horizontais
+        let fora=0;for(let k=0;k<24;k++){P(i+k,v);const cx=Math.abs(v.x-x0)<.002||Math.abs(v.x-x1)<.002,cy=Math.abs(v.y-y0)<.002||Math.abs(v.y-y1)<.002,cz=Math.abs(v.z-z0)<.002||Math.abs(v.z-z1)<.002;if(!(cx&&cy&&cz))fora++;}if(fora)continue;
+        n++;lap.push({id:'laje '+n+' em ('+((x0+x1)/2).toFixed(2)+'; '+((z0+z1)/2).toFixed(2)+')',achou:true,o,i0:i,idx:Array.from({length:24},(_,k)=>i+k),centro:[(x0+x1)/2,(z0+z1)/2],pegada:[x0,z0,x1,z1],yb:y0,yt:y1,malhas:[o],
+          descr:'24 vértices a partir do '+i+' em «'+o.name+'»',regiao:[x0-2,z0-2,x1+2,z1+2]});i+=23;}}
+    return {lapides:lap};}
+  return {achou:false,porque:'tipo desconhecido'};}
+// ---------- medir e corrigir uma peça (devolve o estado) ----------
+function al882Corrige(ctx,it,I){const pc=it.pc,A=it.A,e=it.e,v=new THREE.Vector3();
+  if(pc.tipo==='pes'){const fazer=[];let jaTodos=true;e.antes=[];e.depois=[];e.dy=[];
+    for(const f of A.pes){const pts=[];for(const t of f.L)for(const i of t.idx){al882Mundo(t.o,i,v);pts.push([v.x,v.z]);}const G=al882ChaoPts(I,pts,pc.yBase+1.5);
+      if(!G){e.antes.push({pe:f.p.id,base:al882Arred(pc.yBase),chao:null});e.dy.push(0);continue;}const folga=pc.yBase-G.min;e.antes.push({pe:f.p.id,base:al882Arred(pc.yBase),chaoMin:al882Arred(G.min),chaoMax:al882Arred(G.max),folga:al882Arred(folga)});
+      if(folga<pc.faixa[0]){e.dy.push(0);e.depois.push({pe:f.p.id,base:al882Arred(pc.yBase),folga:al882Arred(folga),nota:folga<0?'já entra no chão':'já encosta'});continue;}
+      if(folga>pc.faixa[1]){e.dy.push(0);e.depois.push({pe:f.p.id,nota:'folga fora da faixa prevista ('+al882Arred(folga)+')'});jaTodos=false;continue;}
+      jaTodos=false;fazer.push({f,dy:-folga,G});e.dy.push(al882Arred(-folga));e.depois.push({pe:f.p.id,base:al882Arred(G.min),folga:0,enterradoMax:al882Arred(G.max-G.min)});}
+    if(!fazer.length)return jaTodos?'já no chão (nenhum pé no ar): nada a mudar':'pulada: nenhum pé na faixa prevista';
+    for(const z of fazer)for(const t of z.f.L){const reg=al882NovoReg(t.o,t.idx);al882RegDesloca(reg,z.dy);it.regs.push(reg);}
+    if(AL882.ativo)for(const reg of it.regs)al882Escreve(reg,true);AL882.stats.vertices+=it.regs.reduce((s,r)=>s+r.idx.length,0);
+    return 'corrigida (pés: '+fazer.map(z=>z.f.p.id+' desce '+(-z.dy).toFixed(3)).join(', ')+')';}
+  if(pc.tipo==='mover'){let base=Infinity;for(const t of A.L)for(const i of t.idx){al882Mundo(t.o,i,v);if(v.y<base)base=v.y;}
+    const G=al882ChaoPts(I,al882Anel(pc.centro[0],pc.centro[1],pc.anel,12),base+1.5);if(!G)return 'sem chão medido';const dy=G.min-base;
+    e.antes={base:al882Arred(base),chaoMin:al882Arred(G.min),chaoMax:al882Arred(G.max),folga:al882Arred(base-G.min)};e.dy=al882Arred(dy);
+    if(Math.abs(base-pc.yBase)>pc.tolBase)return 'base fora do esperado ('+al882Arred(base)+' × '+al882Arred(pc.yBase)+'; já corrigida ou mexida por outro bloco?)';
+    if(Math.abs(dy)<.02)return 'já no chão: nada a mudar';if(dy<pc.faixa[0]||dy>pc.faixa[1])return 'Δy fora da faixa prevista';
+    for(const t of A.L){const reg=al882NovoReg(t.o,t.idx);al882RegDesloca(reg,dy);it.regs.push(reg);}if(AL882.ativo)for(const reg of it.regs)al882Escreve(reg,true);AL882.stats.vertices+=pc.n;
+    e.depois={base:al882Arred(base+dy),folga:0,enterradoMax:al882Arred(G.max-G.min)};return dy<0?'corrigida (desceu)':'corrigida (subiu)';}
+  if(pc.tipo==='pesCaixa'){const [x0,z0,x1,z1]=A.pegada,m=.01;const G=al882ChaoPts(I,al882Grade(x0+m,z0+m,x1-m,z1-m,.25),A.yt);if(!G)return 'sem chão medido';
+    const folga=A.yb-G.min;e.antes={base:al882Arred(A.yb),topo:al882Arred(A.yt),chaoMin:al882Arred(G.min),chaoMax:al882Arred(G.max),folga:al882Arred(folga),pontos:G.n};e.dy=al882Arred(-folga);
+    if(folga<pc.faixa[0])return 'já no chão (a face de baixo encosta ou entra): nada a mudar';if(folga>pc.faixa[1])return 'folga fora da faixa prevista';
+    const o=A.o,reg=al882NovoReg(o,A.baixo);al882RegDesloca(reg,-folga);
+    // a UV das laterais acompanha (o `boxW` põe v = y/escala nas faces verticais): escala medida nos pares de baixo/cima da mesma face
+    try{const uv=o.geometry.attributes.uv,nr=o.geometry.attributes.normal;if(uv&&nr){const lat=A.baixo.filter(i=>Math.abs(nr.getY(i))<.5);const esc=[];
+        for(const i of lat){al882Mundo(o,i,v);const xb=v.x,zb=v.z;for(const j of A.cima){if(Math.abs(nr.getX(j)-nr.getX(i))>1e-3||Math.abs(nr.getZ(j)-nr.getZ(i))>1e-3)continue;const w=al882Mundo(o,j,new THREE.Vector3());if(Math.abs(w.x-xb)<.002&&Math.abs(w.z-zb)<.002){const dv=uv.getY(j)-uv.getY(i);if(Math.abs(dv)>1e-6)esc.push((A.yt-A.yb)/dv);}}}
+        esc.sort((a,b)=>a-b);const s=esc.length?esc[esc.length>>1]:NaN;
+        if(Number.isFinite(s)&&Math.abs(Math.abs(s)-pc.uvEsc)<pc.uvEsc*.05){const v0=new Float32Array(lat.length),v1=new Float32Array(lat.length);lat.forEach((i,k)=>{v0[k]=uv.getY(i);v1[k]=v0[k]-folga/s;});reg.uv={attr:uv,idx:Uint32Array.from(lat),v0,v1};e.uvEscala=al882Arred(s,3);}
+        else e.uvEscala='não medida ('+al882Arred(s,3)+'): UV sem correção';}}catch(err){al882Erro('uv',err);}
+    it.regs.push(reg);if(AL882.ativo)al882Escreve(reg,true);AL882.stats.vertices+=reg.idx.length;
+    e.depois={base:al882Arred(G.min),topo:al882Arred(A.yt),folga:0,enterradoMax:al882Arred(G.max-G.min)};return 'corrigida (a face de baixo desceu '+folga.toFixed(3)+' m)';}
+  if(pc.tipo==='gramado'){const o=A.o;let fora=0,ja=0,mn=Infinity,mx=-Infinity;for(const i of A.idx){al882Mundo(o,i,v);if(Math.abs(v.y-pc.alvo)<.001)ja++;else if(Math.abs(v.y-pc.y0)>.002)fora++;if(v.y<mn)mn=v.y;if(v.y>mx)mx=v.y;}
+    const refs=pc.refs.map(([x,z,n])=>{const g=al882Altura(I,x,z,5);return {ref:n,gramado:al882Arred(g),folgaPecaEm0:al882Arred(-g)};});e.antes={yMin:al882Arred(mn),yMax:al882Arred(mx),refs};
+    if(ja===A.idx.length)return 'já subido: nada a mudar';if(fora)return 'base fora do esperado ('+fora+' vértices fora de −0,15)';
+    const reg=al882NovoReg(o,A.idx);const dyw=A.idx.map(i=>pc.alvo-al882Mundo(o,i,v).y);al882RegDesloca(reg,dyw);it.regs.push(reg);if(AL882.ativo)al882Escreve(reg,true);AL882.stats.vertices+=reg.idx.length;e.dy=al882Arred(pc.alvo-pc.y0);
+    e.depois={y:pc.alvo,nota:'as fileiras ficam a '+pc.alvo+'; a folga nas referências sai no mede()'};
+    return 'corrigida (o gramado subiu '+(pc.alvo-pc.y0).toFixed(3)+' m em '+A.idx.length+' vértices)';}
+  if(pc.tipo==='deitar'){const o=A.o,nr=o.geometry.attributes.normal;const [x0,z0,x1,z1]=A.pegada,cx=A.centro[0],cz=A.centro[1];
+    // horizontal ainda? (as 12 de cima num y só e as 12 de baixo num y só)
+    let topo=0,fundo=0;for(const i of A.idx){const y=al882Mundo(o,i,v).y;if(Math.abs(y-A.yt)<.0015)topo++;else if(Math.abs(y-A.yb)<.0015)fundo++;}
+    if(topo!==12||fundo!==12)return 'base fora do esperado (a laje não está na horizontal: já deitada ou mexida por outro bloco?)';
+    const Tc=al882Altura(I,cx,cz);if(!Number.isFinite(Tc))return 'sem chão medido';const afunda=Tc-A.yb;
+    const chk=al882Grade(x0+.005,z0+.005,x1-.005,z1-.005,.17);const G=al882ChaoPts(I,chk);if(!G)return 'sem chão medido';
+    e.antes={fundo:al882Arred(A.yb),topo:al882Arred(A.yt),chaoCentro:al882Arred(Tc),chaoMin:al882Arred(G.min),chaoMax:al882Arred(G.max),noArMax:al882Arred(A.yb-G.min),enterradoMax:al882Arred(G.max-A.yb)};
+    const dyw=[];let dmax=0,sem=false;for(const i of A.idx){al882Mundo(o,i,v);const T=al882Altura(I,v.x,v.z);if(!Number.isFinite(T)){sem=true;break;}const d=T-Tc;dyw.push(d);if(Math.abs(d)>dmax)dmax=Math.abs(d);}
+    if(sem)return 'sem chão medido sob algum canto';if(dmax<pc.faixa[0])return 'já no chão (terreno plano sob a laje): nada a mudar';if(dmax>pc.faixa[1])return 'encosta fora da faixa prevista ('+al882Arred(dmax)+')';
+    // o fundo deitado (bilinear nos quatro cantos de baixo) contra o terreno numa grade 5 × 9: se algum ponto ficar no ar, a laje toda desce o que falta
+    const cantos=[];A.idx.forEach((i,k)=>{al882Mundo(o,i,v);if(Math.abs(v.y-A.yb)<.0015)cantos.push([v.x,v.z,v.y+dyw[k]]);});
+    const fundoEm=(x,z)=>{const u=(x-x0)/((x1-x0)||1),w=(z-z0)/((z1-z0)||1);const c=(px,pz)=>{let b=null,bd=Infinity;for(const q of cantos){const d=Math.abs(q[0]-px)+Math.abs(q[1]-pz);if(d<bd){bd=d;b=q;}}return b[2];};
+      return c(x0,z0)*(1-u)*(1-w)+c(x1,z0)*u*(1-w)+c(x0,z1)*(1-u)*w+c(x1,z1)*u*w;};
+    let noAr=0;const g5=al882Grade(x0+.005,z0+.005,x1-.005,z1-.005,Math.max((x1-x0),(z1-z0))/8);for(const [x,z] of g5){const T=al882Altura(I,x,z);if(Number.isFinite(T)){const gap=fundoEm(x,z)-T;if(gap>noAr)noAr=gap;}}
+    const extra=noAr>.005?-noAr:0;const reg=al882NovoReg(o,A.idx);al882RegDesloca(reg,dyw.map(d=>d+extra));
+    // normais: as faces de cima e de baixo inclinam com a encosta (plano ajustado aos quatro cantos); as laterais continuam verticais
+    let sa=0,sb=0,sxx=0,szz=0;for(const q of cantos){const ddx=q[0]-cx,ddz=q[1]-cz;sxx+=ddx*ddx;szz+=ddz*ddz;sa+=(q[2]-A.yb)*ddx;sb+=(q[2]-A.yb)*ddz;}
+    const a=sxx>1e-9?sa/sxx:0,b=szz>1e-9?sb/szz:0;if(nr){const ni=[],n0=[],n1=[];for(const i of A.idx){const ny=nr.getY(i);if(Math.abs(ny)<.9)continue;const s=ny>0?1:-1;const L=Math.hypot(a,1,b);ni.push(i);n0.push(nr.getX(i),nr.getY(i),nr.getZ(i));n1.push(-a*s/L,s/L,-b*s/L);}
+      reg.nr={attr:nr,idx:Uint32Array.from(ni),n0:Float32Array.from(n0),n1:Float32Array.from(n1)};}
+    it.regs.push(reg);if(AL882.ativo)al882Escreve(reg,true);AL882.stats.vertices+=24;e.dy={min:al882Arred(Math.min(...dyw)+extra),max:al882Arred(Math.max(...dyw)+extra),extra:al882Arred(extra),afundamento:al882Arred(afunda)};
+    e.depois={inclinacaoGraus:al882Arred(Math.atan(Math.hypot(a,b))*180/Math.PI,1),noArMax:al882Arred(Math.max(0,noAr+extra)),afundamentoNoCentro:al882Arred(afunda-extra)};
+    return 'corrigida (deitada na encosta: cada vértice só em y, de '+al882Arred(Math.min(...dyw)+extra)+' a '+al882Arred(Math.max(...dyw)+extra)+')';}
+  return 'tipo desconhecido';}
+// onde estão os vértices corrigidos (para o vigia perceber se outro bloco os mudou depois)
+function al882Marca(it){const out=[];for(const reg of it.regs){const k=reg.idx.length>>1;out.push({reg,k,geo:reg.o.geometry,y:reg.p1[k*3+1]});}return out;}
+// ---------- fila do fatiador ----------
+function al882Pede(sala,agora){try{if(!al882Liga(sala))return;const R=typeof ROOMS!=='undefined'&&ROOMS[sala];if(!R||!R.scene)return;
+    const st=AL882.salas[sala];if(st&&st.sc===R.scene&&(st.feito||st.job||st.pulado))return;
+    const pr=al882Pronta(sala);if(pr.pula){AL882.salas[sala]={sc:R.scene,pulado:pr.pula,pecas:[]};return;}if(!pr.ok)return;
+    AL882.stats.pedidos++;const it=al882SalaG(sala);const ref0=st&&st.sc===R.scene?st.refeitas||0:0;AL882.salas[sala]={sc:R.scene,job:true,pecas:[],refeitas:ref0};
+    const fim=()=>{const s=AL882.salas[sala];if(s)s.job=false;if(s&&pr.forcado)s.semEsperar=pr.forcado;};const erro=e=>{const s=AL882.salas[sala];if(s){s.job=false;s.feito=true;s.falhou=true;}al882Erro('sala '+sala,e);};
+    const vista=()=>{try{return typeof ACTIVE!=='undefined'&&ACTIVE===R.scene;}catch(e){return false;}};
+    if(agora||typeof fat8Go!=='function'){const f0=typeof fat8Fim!=='undefined'?fat8Fim:undefined;fat8Fim=Infinity;let r;try{do{r=it.next();}while(!r.done);}catch(e){erro(e);return;}finally{fat8Fim=f0;}fim();return;}
+    fat8Go(it,{nome:AL882_JOB+sala,urgente:vista,fim,erro});}catch(e){al882Erro('pede '+sala,e);}}
+function al882Termina(nome){const F=typeof FAT818!=='undefined'?FAT818:null;if(!F||!F.fila)return false;let J=null;
+  if(F.atual&&F.atual.nome===nome){J=F.atual;F.atual=null;}else{const i=F.fila.findIndex(j=>j&&j.nome===nome);if(i>=0)J=F.fila.splice(i,1)[0];}
+  if(!J||!J.it)return false;const f0=fat8Fim;fat8Fim=Infinity;try{let r;do{r=J.it.next();}while(!r.done);if(J.fim)J.fim(r.value);}catch(e){if(J.erro)J.erro(e);else al882Erro('termina',e);}finally{fat8Fim=f0;}return true;}
+// na entrada da sala: o que faltar corre UMA fatia (8 ms) e o resto segue urgente na fila (as correções são de centímetros: um instante depois é
+// melhor que o quadro parado na porta)
+function al882Fatia(nome){const F=typeof FAT818!=='undefined'?FAT818:null;if(!F||!F.fila)return false;let J=null,atual=false;
+  if(F.atual&&F.atual.nome===nome){J=F.atual;atual=true;}else J=F.fila.find(j=>j&&j.nome===nome)||null;if(!J||!J.it)return false;
+  const tira=()=>{if(atual){if(F.atual===J)F.atual=null;}else{const i=F.fila.indexOf(J);if(i>=0)F.fila.splice(i,1);}};
+  const f0=fat8Fim;fat8Fim=performance.now()+8;let r=null;try{do{r=J.it.next();}while(!r.done&&performance.now()<fat8Fim);}
+  catch(e){tira();if(J.erro)J.erro(e);else al882Erro('fatia',e);return false;}finally{fat8Fim=f0;}
+  if(r&&r.done){tira();if(J.fim){try{J.fim(r.value);}catch(e){al882Erro('fim',e);}}}return true;}
+function al882Agora(sala){try{const R=ROOMS[sala];const st=AL882.salas[sala];if(st&&st.sc===R.scene&&st.job){al882Fatia(AL882_JOB+sala);return;}al882Pede(sala);}catch(e){al882Erro('agora '+sala,e);}}
+// ---------- vigia (1 s, barato): pede as salas prontas; na cena ativa, confere os vértices corrigidos ----------
+function al882Vigia(){if(!AL882.on)return;for(const sala of AL882_SALAS){try{if(!al882Liga(sala))continue;const R=typeof ROOMS!=='undefined'&&ROOMS[sala];if(!R||!R.scene)continue;
+      const st=AL882.salas[sala];if(!st||st.sc!==R.scene||(!st.feito&&!st.job&&!st.pulado)){al882Pede(sala);continue;}
+      if(!st.feito||!AL882.ativo||st.falhou)continue;let vista=false;try{vista=typeof ACTIVE!=='undefined'&&ACTIVE===R.scene;}catch(e){}if(!vista)continue;
+      let trocada=false;for(const it of st.pecas){if(!it.marca||it.mexida)continue;for(const m of it.marca){const o=m.reg.o;if(o.geometry!==m.geo){trocada=true;break;}const a=m.reg.pos.array;const y=a[m.reg.idx[m.k]*m.reg.pos.itemSize+1];
+          if(Math.abs(y-m.y)>.003){it.mexida=true;if(it.e)it.e.estado+=' · depois mexida por outro bloco (deixada como está)';break;}}if(trocada)break;}
+      // geometria trocada (sala refeita, malha clonada ou montada de novo): mede e corrige de novo (até 2 vezes por cena); a base esperada impede corrigir duas vezes
+      if(trocada&&(st.refeitas||0)<2){const ref=(st.refeitas||0)+1;AL882.stats.refeitas++;delete AL882.salas[sala];delete AL882.espera[sala];al882Pede(sala);const s2=AL882.salas[sala];if(s2)s2.refeitas=ref;}}catch(e){al882Erro('vigia '+sala,e);}}}
+// ---------- liga / desliga (o «antes» em tempo de execução, para as fotos) ----------
+function al882LigaTudo(sim){sim=!!sim;try{if(AL882.ativo===sim)return true;AL882.ativo=sim;
+    for(const sala in AL882.salas){const st=AL882.salas[sala];if(!st||!st.pecas)continue;const R=ROOMS[sala];if(!R||R.scene!==st.sc)continue;
+      try{if(typeof fusaoLimpar==='function'&&st.pecas.some(it=>it.regs&&it.regs.some(r=>al882Fundida(r.o))))fusaoLimpar(st.sc);}catch(e){al882Erro('fusão liga',e);}
+      for(const it of st.pecas)for(const reg of it.regs||[])al882Escreve(reg,sim);}
+    return true;}catch(e){al882Erro('liga',e);return false;}}
+// ---------- medir agora (para o teste e as fotos): o estado atual da geometria, peça a peça ----------
+function al882Mede(sala){const out=[];try{const R=ROOMS[sala];if(!R||!R.scene)return out;const sc=R.scene;const plano=al882Plano(sala);if(!plano)return out;
+    const st=AL882.salas[sala];let itens=(st&&st.sc===sc&&st.feito&&st.pecas&&st.pecas.length)?st.pecas:null;const ctx={sala,R,sc,plano};
+    if(!itens){itens=[];const f0=fat8Fim;fat8Fim=Infinity;try{for(const pc of plano.pecas){const g=al882Acha(ctx,pc);let r;do{r=g.next();}while(!r.done);const A=r.value;if(A&&A.lapides){for(const L of A.lapides)itens.push({pc,A:L,sub:L.id});}else itens.push({pc,A:A||{achou:false}});}}finally{fat8Fim=f0;}}
+    const regioes=itens.filter(it=>it.A.achou&&it.A.regiao).map(it=>it.A.regiao);const spec=Object.assign({},plano.chao);
+    const gi=itens.find(it=>it.pc.tipo==='gramado'&&it.A.achou);if(gi)spec.vfaixa=[gi.A.i0,gi.A.i0+1088];const I=regioes.length?al882IndiceJa(ctx,spec,regioes):null;const v=new THREE.Vector3();
+    for(const it of itens){const pc=it.pc,A=it.A;const m={id:it.sub?pc.id+' · '+it.sub:pc.id,tipo:pc.tipo,achou:!!A.achou,centro:A.centro||pc.centro};if(!A.achou){out.push(m);continue;}
+      if(pc.tipo==='pes'){m.pes=A.pes.map(f=>{let b=Infinity;const pts=[];for(const t of f.L)for(const i of t.idx){al882Mundo(t.o,i,v);if(v.y<b)b=v.y;pts.push([v.x,v.z]);}const G=al882ChaoPts(I,pts,b+1.5);
+          return {pe:f.p.id,base:al882Arred(b),chaoMin:G?al882Arred(G.min):null,chaoMax:G?al882Arred(G.max):null,folga:G?al882Arred(b-G.min):null};});m.peNoChao=m.pes.every(p=>p.folga!==null&&p.folga<=.012);}
+      else if(pc.tipo==='mover'){let b=Infinity;for(const t of A.L)for(const i of t.idx){al882Mundo(t.o,i,v);if(v.y<b)b=v.y;}const G=al882ChaoPts(I,al882Anel(pc.centro[0],pc.centro[1],pc.anel,12),b+1.5);
+        m.base=al882Arred(b);m.chaoMin=G?al882Arred(G.min):null;m.chaoMax=G?al882Arred(G.max):null;m.folga=G?al882Arred(b-G.min):null;m.peNoChao=m.folga!==null&&m.folga<=.012;}
+      else if(pc.tipo==='pesCaixa'){let b=Infinity;for(const i of A.baixo){al882Mundo(A.o,i,v);if(v.y<b)b=v.y;}const [x0,z0,x1,z1]=A.pegada;const G=al882ChaoPts(I,al882Grade(x0+.01,z0+.01,x1-.01,z1-.01,.25),A.yt);
+        m.base=al882Arred(b);m.chaoMin=G?al882Arred(G.min):null;m.chaoMax=G?al882Arred(G.max):null;m.folga=G?al882Arred(b-G.min):null;m.peNoChao=m.folga!==null&&m.folga<=.012;}
+      else if(pc.tipo==='gramado'){let mn=Infinity,mx=-Infinity;for(const i of A.idx){const y=al882Mundo(A.o,i,v).y;if(y<mn)mn=y;if(y>mx)mx=y;}m.yMin=al882Arred(mn);m.yMax=al882Arred(mx);
+        m.refs=pc.refs.map(([x,z,n])=>{const g=al882Altura(I,x,z,5);return {ref:n,gramado:al882Arred(g),folgaPecaEm0:al882Arred(-g)};});m.agua=al882Arred(al882Altura(I,0,-43,5));m.peNoChao=m.refs.filter(r=>!/rampa/.test(r.ref)).every(r=>r.folgaPecaEm0!==null&&r.folgaPecaEm0<=.012);}
+      else if(pc.tipo==='deitar'){const [x0,z0,x1,z1]=A.pegada;const cantos=[];let yb=Infinity,yt=-Infinity;for(const i of A.idx){al882Mundo(A.o,i,v);cantos.push([v.x,v.y,v.z]);}
+        // fundo: o mais baixo dos dois vértices de cada canto (x,z)
+        const porXZ=new Map();for(const [x,y,z] of cantos){const k=x.toFixed(3)+','+z.toFixed(3);const c=porXZ.get(k);if(!c)porXZ.set(k,[x,z,y,y]);else{c[2]=Math.min(c[2],y);c[3]=Math.max(c[3],y);}}
+        const cs=[...porXZ.values()];const fundoEm=(x,z)=>{const u=(x-x0)/((x1-x0)||1),w=(z-z0)/((z1-z0)||1);const c=(px,pz)=>{let b=null,bd=Infinity;for(const q of cs){const d=Math.abs(q[0]-px)+Math.abs(q[1]-pz);if(d<bd){bd=d;b=q;}}return b;};
+          const A0=c(x0,z0),A1=c(x1,z0),A2=c(x0,z1),A3=c(x1,z1);return [A0[2]*(1-u)*(1-w)+A1[2]*u*(1-w)+A2[2]*(1-u)*w+A3[2]*u*w,A0[3]*(1-u)*(1-w)+A1[3]*u*(1-w)+A2[3]*(1-u)*w+A3[3]*u*w];};
+        let noAr=-Infinity,enterra=-Infinity,cobre=-Infinity;for(const [x,z] of al882Grade(x0+.005,z0+.005,x1-.005,z1-.005,Math.max(x1-x0,z1-z0)/8)){const T=al882Altura(I,x,z);if(!Number.isFinite(T))continue;const [fb,ft]=fundoEm(x,z);noAr=Math.max(noAr,fb-T);enterra=Math.max(enterra,T-fb);cobre=Math.max(cobre,T-ft);}
+        m.noArMax=al882Arred(noAr);m.fundoEnterradoMax=al882Arred(enterra);m.terrenoAcimaDoTopo=al882Arred(cobre);m.peNoChao=noAr<=.012;m.alturaCentro=al882Arred(al882Altura(I,A.centro[0],A.centro[1]));}
+      out.push(m);}}
+  catch(e){al882Erro('mede '+sala,e);}return out;}
+// ---------- poses de câmera para as fotos (olho a 1,6 m do chão do lugar da câmera, olhando a base) ----------
+function al882Fotos(sala){const F=[];try{const R=ROOMS[sala];if(!R)return F;const fov=(typeof camera!=='undefined'&&camera&&camera.fov)||60;const fy=(x,z)=>{let y=0;try{y=R.floorY?R.floorY(x,z):0;}catch(e){}return Number.isFinite(y)?y:0;};
+    const pose=(id,peca,pos,alvo,nota)=>F.push({id:sala+'-'+id,sala,peca,pos:pos.map(v=>+v.toFixed(2)),alvo:alvo.map(v=>+v.toFixed(2)),fov,nota});
+    if(sala==='western'){pose('torre-cata-vento','torre-cata-vento',[-19.8,fy(-19.8,11.5)+1.6,11.5],[-25,2.45,14.1],'pés das duas pernas da frente (z 14,02)');pose('horta','mudas',[22.5,fy(22.5,27.5)+1.6,27.5],[18.45,2.75,30.2],'as 12 mudas da horta do rancho');}
+    else if(sala==='utopia'){pose('cidade-esquerda','gramado-fundo',[-40,1.6,-20.4],[-48,1.2,-64],'bairros laterais e transição verde (x −40…−77, z −54…−77)');pose('cidade-centro','gramado-fundo',[0,1.6,-20.4],[0,1.5,-50],'cidade-jardim atrás da lagoa');
+      pose('agora-postes','agora-poste-1',[-37,1.6,16.5],[-37,.6,21.8],'postes «CONCORDO»/«DISCORDO» (z 21,5) e o do 2.º estandarte (z 22,5), fora do piso');}
+    else if(sala==='guerra'){const pc=al882Plano('guerra').pecas[0];const [ox,oz]=pc.centro;pose('outdoor-bloco-de-cima','outdoor-bloco',[ox,20,oz-5.95],[ox,1,oz-2.3],'vista alta sobre a muralha: de dentro do campo a frente do bloco não aparece (a muralha de 5,4–6,2 m fica 1,45 m à frente dele)');pose('outdoor-do-campo','outdoor-bloco',[ox,fy(ox,oz-14)+1.6,oz-14],[ox,9,oz-2.3],'do campo: o outdoor por cima da muralha (o pé do bloco fica escondido)');}
+    else if(sala==='outono'){const st=AL882.salas.outono;const its=(st&&st.pecas||[]).filter(it=>it.A&&it.A.achou&&it.e&&it.e.antes).sort((p,q)=>(q.e.antes.noArMax||0)-(p.e.antes.noArMax||0)).slice(0,3);
+      // câmera dentro do campo, 2,5 m antes da grade de ferro do cemitério (z ±24,85), olhando o meio do topo da laje (o centro não muda)
+      for(const it of its){const [cx,cz]=it.A.centro;const zc=cz>0?22.35:-22.35;pose('lapide '+it.sub,it.sub,[cx+2.5,fy(cx+2.5,zc)+1.6,zc],[cx,it.A.yt,cz],'laje deitada na encosta (antes: '+it.e.antes.noArMax+' m no ar na ponta de baixo)');}
+      if(!its.length)pose('cemiterio-norte','lapides-deitadas',[40,fy(40,-21)+1.6,-21],[40,2.2,-27.4],'cemitério do norte');}}catch(e){al882Erro('fotos',e);}return F;}
+// ---------- instalação ----------
+if(AL882.on){
+  try{const fr0=finishRoom;finishRoom=fr8Wrap(function*(key){const r=(yield* fr8Prev(fr0,this,arguments,"AL882"));if(AL882_SALAS.indexOf(key)>=0){try{al882Pede(key);}catch(e){al882Erro('finishRoom '+key,e);}}return r;});}catch(e){al882Erro('finishRoom',e);}
+  try{const sa0=setActive;setActive=function(sc){try{if(sc&&typeof ROOMS!=='undefined'){for(const k of AL882_SALAS){const R=ROOMS[k];if(R&&R.scene===sc&&R.ready&&al882Liga(k))al882Agora(k);}}}catch(e){al882Erro('setActive',e);}return sa0.apply(this,arguments);};}catch(e){al882Erro('setActive0',e);}
+  try{AL882.vigia=setInterval(al882Vigia,1000);}catch(e){al882Erro('vigia',e);}
+}
+window.__alturas882={estado:AL882,stats:AL882.stats,erros:AL882.erros,get lista(){return AL882.lista;},liga:()=>al882LigaTudo(true),desliga:()=>al882LigaTudo(false),
+  aplica:(s)=>{const ks=s?[s]:AL882_SALAS;for(const k of ks){try{const st=AL882.salas[k];if(st&&st.job)al882Termina(AL882_JOB+k);const s2=AL882.salas[k];
+        if(s2&&s2.pecas){for(const it of s2.pecas)for(const reg of it.regs||[])al882Escreve(reg,false);delete AL882.salas[k];} // devolve o de antes e mede de novo
+        delete AL882.espera[k];al882Pede(k,true);}catch(e){al882Erro('aplica '+k,e);}}return ks.map(k=>!!(AL882.salas[k]&&AL882.salas[k].feito));},
+  mede:al882Mede,fotos:al882Fotos,plano:al882Plano,salas:AL882_SALAS};
 
 window.__build434={revision:434,family:"web",edition:"en"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
