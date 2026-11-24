@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v892</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v893</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -124989,6 +124989,403 @@ if(ES880.on){
   try{ES880.iv=setInterval(es880Vigia,2000);}catch(e){es880Erro('vigia 0',e);}
 }
 window.__espada880={estado:ES880,stats:ES880.stats,erros:ES880.erros,P:ES880_P,aplica:es880AplicaManual,desfaz:es880Desfaz,poses:es880Poses,vigia:es880Vigia};
+
+/* ===================== v880 · FANTASIA: OS COELHOS DA CASA DA CLAREIRA CORREM, SALTITAM, FAREJAM, FICAM DE PÉ E FOGEM DO LEITOR (bloco `CO880`) =====================
+   Pedido do Luiz (19/11, 20:47, com foto do coelho diante da Casa da Clareira): «A movimentação desse coelho em fantasia precisa melhorar
+   muito, ele precisa ficar correndo pelo local e etc, não parado».
+   COMO ERA: os três «Fauna · rabbit» da v378 (`fauna378Build`, modelo esculpido da v433 `forest433Animal('rabbit')`: 44 elipsoides fundidos
+   em DUAS malhas por coelho — «433 woodland rabbit · v160 · vc r1 m0», 8 436 triângulos, e «… vc r0.8 m0», olhos e boca, 416 —, 1,3 m de
+   comprimento, orelhas a 1,3 m), nos jardins da Casa da Clareira, em (−24; −116), (27,9; −123,5) e (−30; −154). A «animação» (`pose()` no
+   `COZY355.tick358`, só com o leitor em z < −85): a cada 9 s o bloco inteiro sobe 16 cm e desce (0,85 s), DESLIZA ±35 cm para a frente e para
+   trás sem mexer uma pata, oscila 4,6° e «respira» 1,2 % na altura. Sem partes, sem esqueleto, sem obstáculo, sem conversa.
+   AGORA: (1) ARTICULADO SEM TROCAR O MODELO — as duas malhas são separadas, pelos componentes ligados (cada elipsoide é uma ilha de
+   triângulos), em 11 peças rígidas com os MESMOS vértices, cores e materiais: tronco (com peito, tufos e rabo), cabeça (focinho, bochechas,
+   bigodes, nariz; + olhos e boca na 2.ª malha), 2 orelhas (com o rosa de dentro), 2 coxas, 2 pés, 2 braços (com mão e dedos), numa hierarquia
+   de juntas (corpo inteiro → quadris/pés e tronco → cabeça → orelhas, braços). Parado na pose neutra é idêntico, vértice a vértice, ao de
+   antes. As geometrias das peças são feitas uma vez e servem aos três.
+   (2) VIDA — cada coelho tem um território de 14 m de raio em volta do lugar de sempre (mais 4 m de margem só para fugir), recortado numa
+   máscara de 0,3 m feita NA HORA com `R.world.clamp` (0,9 m de folga da borda) e `R.world.obst` (cada disco inflado 0,78 m: lago, muros,
+   canteiros, postes, árvores, casa) e inundada a partir da casa dele: só entra onde se chega andando; a máscara é refeita sozinha quando a
+   lista de obstáculos muda (assinatura conferida a cada meio segundo). Comportamento: TIROS de 7–17 m em galope (saltos de 1,7 m a ~5 m/s,
+   às vezes com uma quebra no meio), corridas médias, saltitos curtos de pastar; entre eles ofega, fareja o chão e o ar, levanta nas patas
+   de trás e olha em volta, limpa a cara com as duas patas, come grama (abaixa, puxa, mastiga) e de vez em quando dá um pulo de alegria com
+   meia-volta no ar. O galope é um ciclo de salto de verdade: as coxas empurram e esticam para trás com os pés em ponta, o corpo sobe em arco
+   de nariz para cima, estica no ar (esmaga-e-estica ao longo da espinha), os braços alcançam o chão primeiro, as pernas de trás passam para
+   a frente e encolhem; as orelhas deitam para trás com o vento e batem com atraso; a cabeça fica estabilizada. Vira SEMPRE o corpo para onde
+   vai (curvas fechadas: pára e gira em pulinhos no lugar); a posição só avança ao longo do rumo do salto.
+   (3) MEDO — leitor a menos de 3,6 m (4,6 m se vier correndo): susto, meia-volta e FUGA em ziguezague a ~7 m/s, escolhendo a cada salto
+   (entre 24 candidatos conferidos na máscara) o que mais afasta do leitor; a mais de 10 m freia, vira-se para o leitor, fica de pé de
+   orelhas em pé a olhar para ele e volta ao normal. Encurralado, encolhe-se de orelhas baixas e tenta de novo.
+   (4) CHÃO — a altura é `R.floorY` lida a cada quadro na posição do coelho (o relevo que outro bloco der ao gramado é seguido na hora, o
+   corpo inclina com a rampa). Nunca entra em obstáculo, água (o lago é obstáculo), parede nem casa: cada salto é conferido na máscara.
+   CUSTO: nada com o leitor fora da Fantasia, com janela aberta, ou a mais de 45 m do coelho (fica na última pose); perto, ~25 µs por coelho
+   por quadro (transformações de 11 juntas, sem mexer em vértices). 11 malhas por coelho no lugar de 2 (mesmos triângulos e materiais).
+   Sem luz nova, sem obstáculo novo, sem textura. Tempo do jogo (o `dt` do tique da sala, quadros de até 0,1 s).
+   NÃO MEXE: patos, pássaros e borboletas da v378, os coelhinhos e o cervo da pradaria (v506/v690), o modelo e as cores do coelho.
+   Chave: `?coelho880=0` (tudo como era). Gancho `window.__coelho880`: `estado` (lista viva), `stats`, `erros`, `para()`/`segue()`,
+   `pose(nome,fase,i)` (salto, tiro, saltita, empe, alerta, fareja, come, limpa, senta, binky, agacha — para fotos), `passo(dt,leitor)`,
+   `desfaz()`/`aplica()` (antes/depois exatos), `poses()`, `reinicia(semente)`.
+   REVISÃO (23/11, revisor do lote 880 — medido no jogo de verdade sem cabeça, v892 + este bloco e a pilha v899): cinco consertos, nada de arte.
+   R1 o território lê o mundo no NÍVEL 0 da Grande Árvore (a lista viva e o `clamp` mudam com o nível do leitor) e soma, aos obstáculos de agora,
+      os que estavam em volta da casa do coelho quando o bloco aplicou: a cada troca de nível a lista viva é recopiada da lista-base e perde os que
+      só viviam nela — entre eles os quatro torreões de pedra e os cristais da v619 nos cantos da Casa da Clareira; sem isto, depois de o leitor subir
+      e descer a escada, o coelho do jardim noroeste entrava no torreão (5 vezes em 10 min, até 0,5 m para dentro).
+   R2 `desfaz()` devolve cada coelho na pose exata da v378 naquele instante (lugar, giro e escala que o `pose()` dela daria), não na casa nua.
+   R3 Papel: as peças herdam o material original guardado pelo Papel (`PAPEL_ORIG`) e o `desfaz()` devolve-o às malhas de antes — sem isto, ao
+      sair do Papel cada coelho ganhava um clone próprio do material dos olhos (as originais voltam ao material partilhado) e, depois de um `desfaz()`
+      feito no Papel, as malhas de antes ficavam sem o caminho de volta.
+   R4 o vigia não reembrulha o tique com o jogo em pausa (`window.__pause`, placa de vídeo perdida).
+   R5 ao adormecer (leitor a mais de 45 m) no meio de um salto, o coelho pousa no ponto do salto e senta: antes ficava parado no ar, na pose do salto
+      (até 0,3 m acima da grama), visível de longe — o recorte por distância (`DES199`) já não o esconde depois do primeiro movimento. */
+const CO880_Q=(()=>{try{return location.search+location.hash;}catch(e){return '';}})();
+const CO880={on:!/[?&#]coelho880=0/i.test(CO880_Q),erros:[],feito:false,parado:false,pausa:false,lista:[],tempo:0,geos:new Map(),R:null,lant:null,lvx:0,lvz:0,
+  P:{RT:14,MG:4,CEL:.3,FOLGA:.78,BORDA:.9,SUSTO:3.6,SUSTO_VEL:2.9,CALMA:10,LONGE:45,SEMENTE:8801},
+  // tipos de salto: comprimento (m), duração (s), altura (m), vigor da pose (0…1) e velocidade relativa no contacto (0 = pára a cada salto)
+  TIPOS:{saltita:{L:.62,T:.46,H:.10,v:.26,vc:0},corre:{L:1.38,T:.36,H:.25,v:.82,vc:.70},tiro:{L:1.72,T:.335,H:.31,v:1,vc:.74},fuga:{L:2.2,T:.29,H:.26,v:1,vc:.82}},
+  stats:{aplicacoes:0,desfeitas:0,coelhos:0,articulados:0,pecas:0,malhasAntes:0,malhasDepois:0,triangulos:0,msRig:0,mascaras:0,msMascara:0,celulas:[],saltos:0,giros:0,tiros:0,corridas:0,saltitos:0,fugas:0,alertas:0,encurralado:0,replanejos:0,curvasRetas:0,fusoesDesfeitas:0,setActive:0,vigia:0,tiques:0,religado:0}};
+function co880Erro(onde,e){try{if(CO880.erros.length<24)CO880.erros.push(onde+': '+(e&&e.message||e));if(typeof console!=='undefined'&&console.warn)console.warn('v880 coelho',onde,e);}catch(x){}}
+function co880Agora(){try{return performance.now();}catch(e){return 0;}}
+function co880Rnd(s){s=(s>>>0)||1;return function(){s^=s<<13;s>>>=0;s^=s>>>17;s^=s<<5;s>>>=0;return s/4294967296;};}
+function co880Ang(a){a=(a+Math.PI)%(2*Math.PI);if(a<0)a+=2*Math.PI;return a-Math.PI;} // para (−π, π]
+function co880S(x){x=x<0?0:x>1?1:x;return x*x*(3-2*x);}
+// ---------- juntas (no espaço do modelo: frente +z, cima +y, esquerda +x) e parâmetros da pose ----------
+const CO880_PV={cm:[0,.36,-.10],tronco:[0,.26,-.30],pescoco:[0,.52,.12],orelha:[.105,.80,.27],ombro:[.135,.40,.22],quadril:[.20,.34,-.24],tornozelo:[.22,.075,-.22]};
+const CO880_NOMES=['tronco','cabeça','orelha esquerda','orelha direita','coxa esquerda','coxa direita','pé esquerdo','pé direito','braço esquerdo','braço direito'];
+// Y altura do salto · ARF nariz para cima · K estica ao longo da espinha · TR tronco erguido · TRY/TRZ tronco desce/avança · CB* cabeça
+// (arfagem, rumo, rolagem — estabilizada) · OR* orelhas para trás (E, D) e abertas · CX* coxas para trás · PE* pés em ponta · BR* braços
+// para a frente (E, D) e para dentro · RES respiração · ROL corpo deitado na curva
+const CO880_I={Y:0,ARF:1,K:2,TR:3,TRY:4,TRZ:5,CBP:6,CBY:7,CBR:8,ORE:9,ORD:10,ORA:11,CXE:12,CXD:13,PEE:14,PED:15,BRE:16,BRD:17,BRA:18,RES:19,ROL:20,N:21};
+const CO880_G=Math.PI/180;
+// curvas periódicas do ciclo de salto (Catmull-Rom em nós não uniformes)
+function co880Tab(us,vs){const n=us.length-1,m=new Float32Array(n+1);for(let i=0;i<=n;i++){const ia=i===0?n-1:i-1,ib=i===n?1:i+1,ua=i===0?us[n-1]-1:us[ia],ub=i===n?us[1]+1:us[ib];m[i]=(vs[ib]-vs[ia])/(ub-ua);}return {us,vs,m,n};}
+function co880Val(T,u){const us=T.us;let i=0;while(i<T.n-1&&u>=us[i+1])i++;const h=us[i+1]-us[i],t=(u-us[i])/h,t2=t*t,t3=t2*t;return (2*t3-3*t2+1)*T.vs[i]+(t3-2*t2+t)*h*T.m[i]+(3*t2-2*t3)*T.vs[i+1]+(t3-t2)*h*T.m[i+1];}
+// fases: 0 pés de trás no chão, corpo recolhido · .12 empurra · .26 decola (pernas esticadas, nariz para cima) · .5 auge, esticado ·
+// .72 desce de nariz para baixo, braços à frente · .86 mãos no chão, pernas passando para a frente · 1 = 0
+const CO880_U=[0,.12,.26,.5,.72,.86,1];
+const CO880_T={arf:co880Tab(CO880_U,[5,14,20,3,-13,-9,5]),k:co880Tab(CO880_U,[.90,.96,1.08,1.12,1.05,.95,.90]),
+  cx:co880Tab(CO880_U,[-36,5,55,42,0,-38,-36]),pe:co880Tab(CO880_U,[0,30,88,96,40,-12,0]),br:co880Tab(CO880_U,[-12,-20,10,58,46,5,-12]),
+  cbp:co880Tab(CO880_U,[-3,-9,-13,-2,9,6,-3]),orf:co880Tab(CO880_U,[-6,-10,4,14,6,-4,-6]),tr:co880Tab(CO880_U,[4,6,2,0,-3,-5,4]),ty:co880Tab(CO880_U,[-.035,-.01,0,0,0,-.02,-.035])};
+function co880Pulso(t,per,larg){const x=((t%per)+per)%per/per;return x<larg?Math.sin(x/larg*Math.PI):0;} // pulso curto periódico (tique de orelha, puxão)
+function co880Zera(P){P.fill(0);P[CO880_I.K]=1;return P;}
+// o ciclo de salto: u fase (0…1), v vigor (0 saltito … 1 galope), H altura do salto (m), vira curva do salto (rad)
+function co880PoseSalto(P,u,v,H,vira){const I=CO880_I,T=CO880_T,g=CO880_G,a=.45+.55*v;co880Zera(P);
+  const s=Math.max(0,Math.min(1,(u-.13)/.74)),ar=Math.sin(Math.PI*s);P[I.Y]=H*ar;
+  P[I.ARF]=co880Val(T.arf,u)*g*a;P[I.K]=1+(co880Val(T.k,u)-1)*a;P[I.TR]=co880Val(T.tr,u)*g*a;P[I.TRY]=co880Val(T.ty,u)*a;
+  const u2=(u+.975)%1,u3=(u+.95)%1; // as pernas de trás quase juntas; as mãos uma logo depois da outra
+  P[I.CXE]=co880Val(T.cx,u)*g*a;P[I.CXD]=co880Val(T.cx,u2)*g*a;P[I.PEE]=co880Val(T.pe,u)*g*a;P[I.PED]=co880Val(T.pe,u2)*g*a;
+  P[I.BRE]=co880Val(T.br,u)*g*a;P[I.BRD]=co880Val(T.br,u3)*g*a;
+  const vc=Math.max(-1.2,Math.min(1.2,vira));P[I.CBP]=co880Val(T.cbp,u)*g*a;P[I.CBY]=vc*.4*(1-co880S(u/.5));P[I.ROL]=-vc*.28*ar;
+  const ob=(6+52*v)*g,of=(.45+.75*v)*g;P[I.ORE]=ob+co880Val(T.orf,u)*of;P[I.ORD]=ob+co880Val(T.orf,(u+.93)%1)*of;P[I.ORA]=(3+7*v)*g;return P;}
+// pulo de alegria: salto alto no lugar com meia-volta, coices e orelhas a bater
+function co880PoseBinky(P,u,H){const I=CO880_I,g=CO880_G;co880Zera(P);const s=Math.max(0,Math.min(1,(u-.16)/.68)),ar=Math.sin(Math.PI*s),ag=co880S(Math.min(u/.16,(1-u)/.14,1));
+  P[I.Y]=H*ar;P[I.K]=1-.1*(1-ag)+.08*ar;P[I.TRY]=-.04*(1-ag);P[I.ARF]=(16*Math.sin(Math.PI*2*s)*.6+6*(1-ag))*g;P[I.ROL]=22*g*Math.sin(Math.PI*2*s);
+  P[I.CXE]=(50*ar*Math.max(0,Math.sin(Math.PI*2*s+.4))-20*(1-ag))*g;P[I.CXD]=(50*ar*Math.max(0,Math.sin(Math.PI*2*s+2.2))-20*(1-ag))*g;P[I.PEE]=P[I.CXE]*.9;P[I.PED]=P[I.CXD]*.9;
+  P[I.BRE]=(30*ar+18*Math.sin(Math.PI*3*s))*g;P[I.BRD]=(30*ar-18*Math.sin(Math.PI*3*s))*g;P[I.CBP]=6*g*ar;P[I.CBR]=-14*g*Math.sin(Math.PI*2*s);
+  P[I.ORE]=(20+38*Math.sin(Math.PI*2*s-.5))*g*ar;P[I.ORD]=(20+38*Math.sin(Math.PI*2*s-1.4))*g*ar;P[I.ORA]=10*g*ar;return P;}
+// sentado (a pose do modelo): respira, vira as orelhas, olha de leve para os lados, mexe o nariz
+function co880PoseSenta(P,t,fase){const I=CO880_I,g=CO880_G;co880Zera(P);P[I.RES]=.011*Math.sin(t*2.3+fase);
+  P[I.ORE]=(3*Math.sin(t*.63+fase)+24*co880Pulso(t+fase*3,5.3,.07))*g;P[I.ORD]=(3*Math.sin(t*.48+fase+2)+24*co880Pulso(t+fase*5+2.1,7.1,.05))*g;P[I.ORA]=2*g;
+  P[I.CBY]=(10*Math.sin(t*.5+fase)+5*Math.sin(t*1.13+fase*2))*g;P[I.CBP]=(2*Math.sin(t*.8+fase)+.7*Math.sin(t*17))*g;return P;}
+// as coisas que ele faz parado; A = {nome,t,dur,olhar}; tt = relógio do coelho; olhar = rumo do leitor relativo ao corpo (alerta)
+function co880PoseParado(P,A,tt,fase,olhar){const I=CO880_I,g=CO880_G,t=A.t,nome=A.nome;co880PoseSenta(P,tt,fase);
+  const a=co880S(Math.min(t/.38,(A.dur-t)/.32,1)),b1=1-a;
+  if(nome==='empe'||nome==='alerta'){const al=nome==='alerta';let ol=olhar;if(!al||ol===undefined||ol===null){const s=Math.sin(t*1.35+fase);ol=(s<0?-1:1)*Math.pow(Math.abs(s),.45)*.74;}
+    ol=Math.max(-1.3,Math.min(1.3,ol));P[I.TR]=(al?66:60)*g*a;P[I.TRY]=.045*a;P[I.CBY]=P[I.CBY]*b1+ol*a;P[I.CBP]=P[I.CBP]*b1+((al?10:6)+3*Math.sin(t*1.1))*g*a;
+    P[I.BRE]=P[I.BRD]=-22*g*a;P[I.BRA]=9*g*a;P[I.CXE]=P[I.CXD]=6*g*a;
+    P[I.ORE]=P[I.ORE]*b1+(al?-4:-2+5*Math.sin(t*2.1))*g*a;P[I.ORD]=P[I.ORD]*b1+(al?-4:-2+5*Math.sin(t*1.7+1))*g*a;P[I.ORA]=(al?1:5)*g;if(al)P[I.TRZ]=.004*Math.sin(t*31)*a;}
+  else if(nome==='limpa'){const w=t*9.5;P[I.TR]=40*g*a;P[I.TRY]=.03*a;P[I.CBP]=P[I.CBP]*b1+(-12+5*Math.sin(w*.5+.6))*g*a;P[I.CBY]=P[I.CBY]*b1+6*g*Math.sin(t*1.3)*a;P[I.CBR]=5*g*Math.sin(w*.5)*a;
+    P[I.BRE]=(54+13*Math.sin(w))*g*a;P[I.BRD]=(54+13*Math.sin(w+Math.PI))*g*a;P[I.BRA]=24*g*a;P[I.CXE]=P[I.CXD]=5*g*a;
+    P[I.ORE]=P[I.ORE]*b1+(12+8*Math.sin(w*.5))*g*a;P[I.ORD]=P[I.ORD]*b1+(12-8*Math.sin(w*.5))*g*a;}
+  else if(nome==='come'){const c=(t%2.5)/2.5,b=co880S(Math.min(c/.12,(.64-c)/.1,1))*a,m=a-b; // b: de cabeça na grama; m: mastigando de cabeça erguida
+    P[I.TR]=-9*g*b;P[I.TRZ]=.03*b;P[I.CBP]=P[I.CBP]*b1+(-52*b-3*m+2.2*b*Math.sin(t*14)+5*b*co880Pulso(t,1.15,.14)+1.4*m*Math.sin(t*10.5))*g;
+    P[I.CBY]=P[I.CBY]*b1+8*g*Math.sin(t*.9)*a;P[I.CBR]=2.6*g*m*Math.sin(t*10.5);P[I.ORE]=P[I.ORE]*b1+(13*m+38*b)*g;P[I.ORD]=P[I.ORD]*b1+(15*m+34*b)*g;P[I.BRE]=P[I.BRD]=4*g*b;}
+  else if(nome==='fareja'){const b=co880S((A.dur*.58-t)/.35+.5)*a,m=a-b; // b: nariz no chão, varrendo; m: nariz no ar
+    P[I.TR]=(-7*b+12*m)*g;P[I.TRZ]=.025*b;P[I.CBP]=P[I.CBP]*b1+(-42*b+26*m+2*b*Math.sin(t*16)+1.5*m*Math.sin(t*18))*g;P[I.CBY]=P[I.CBY]*b1+(22*b*Math.sin(t*2.1)+14*m*Math.sin(t*1.4))*g;
+    P[I.ORE]=P[I.ORE]*b1+(22*b-9*m)*g;P[I.ORD]=P[I.ORD]*b1+(18*b-9*m)*g;P[I.ORA]=4*g;}
+  else if(nome==='ofega'){P[I.RES]=.021*Math.sin(t*9.5);P[I.ORE]+=16*g*a;P[I.ORD]+=18*g*a;P[I.CBP]+=1.8*g*Math.sin(t*9.5);}
+  else if(nome==='susto'){P[I.TRY]=-.05;P[I.K]=.95;P[I.CBP]=12*g;P[I.ORE]=P[I.ORD]=-5*g;P[I.ORA]=0;P[I.CXE]=P[I.CXD]=-14*g;}
+  else if(nome==='agacha'){P[I.TRY]=-.06*a;P[I.K]=1+.04*a;P[I.CBP]=-7*g*a;P[I.CBY]*=b1;P[I.ORE]=P[I.ORD]=74*g*a;P[I.ORA]=8*g*a;P[I.RES]=.02*Math.sin(t*11);}
+  return P;}
+// ---------- o modelo em peças ----------
+// classe de um componente pelo centro da caixa dele: 0 tronco · 1 cabeça · 2/3 orelha E/D · 4/5 coxa · 6/7 pé · 8/9 braço (E = +x)
+function co880Classe(cx,cy,cz){const s=cx<0?1:0,ax=Math.abs(cx);
+  if(ax<.03)return (cy>.5&&cz>.2)?1:0;
+  if(cy>.8)return 2+s;
+  if(cy>.5&&cz>.3)return 1;
+  if(cz>.15&&cy<.5)return 8+s;
+  if(cy<.16&&cz<.1&&cz>-.25)return 6+s;
+  if(cy<.34&&cz<-.15)return 4+s;
+  return 0;}
+function co880Pivo(k){const V=CO880_PV,s=(k%2===0)?1:-1,q=k<2?(k?V.pescoco:V.tronco):k<4?V.orelha:k<6?V.quadril:k<8?V.tornozelo:V.ombro;return k<2?q:[s*q[0],q[1],q[2]];}
+// triângulos de cada classe (componentes ligados pela lista de índices)
+function co880Separa(geo){const P=geo.attributes.position,X=geo.index;if(!P||!X||P.isInterleavedBufferAttribute||!P.array)return null;const N=P.count,ia=X.array,pa=P.array,nt=(X.count/3)|0,pai=new Int32Array(N);for(let i=0;i<N;i++)pai[i]=i;
+  const acha=i=>{while(pai[i]!==i){pai[i]=pai[pai[i]];i=pai[i];}return i;};
+  for(let t=0;t<nt;t++){const a=acha(ia[t*3]),b=acha(ia[t*3+1]);if(a!==b)pai[b]=a;const c=acha(ia[t*3+2]),a2=acha(a);if(a2!==c)pai[c]=a2;}
+  const cx=new Float32Array(N*6),tem=new Uint8Array(N),cl=new Int8Array(N);
+  for(let i=0;i<N;i++){const r=acha(i),q=r*6,x=pa[i*3],y=pa[i*3+1],z=pa[i*3+2];if(!tem[r]){tem[r]=1;cx[q]=cx[q+3]=x;cx[q+1]=cx[q+4]=y;cx[q+2]=cx[q+5]=z;}else{if(x<cx[q])cx[q]=x;if(y<cx[q+1])cx[q+1]=y;if(z<cx[q+2])cx[q+2]=z;if(x>cx[q+3])cx[q+3]=x;if(y>cx[q+4])cx[q+4]=y;if(z>cx[q+5])cx[q+5]=z;}}
+  for(let r=0;r<N;r++)if(tem[r]){const q=r*6;cl[r]=co880Classe((cx[q]+cx[q+3])/2,(cx[q+1]+cx[q+4])/2,(cx[q+2]+cx[q+5])/2);}
+  const tris=[];for(let k=0;k<10;k++)tris.push([]);for(let t=0;t<nt;t++)tris[cl[acha(ia[t*3])]].push(t);return tris;}
+function co880GeoPeca(geo,tris,pv){const ia=geo.index.array,N=geo.attributes.position.count,mapa=new Int32Array(N).fill(-1),ordem=new Int32Array(Math.min(N,tris.length*3)),idx=new Uint32Array(tris.length*3);let nv=0;
+  for(let q=0;q<tris.length;q++){const t=tris[q];for(let k=0;k<3;k++){const v=ia[t*3+k];let n=mapa[v];if(n<0){n=nv;mapa[v]=nv;ordem[nv++]=v;}idx[q*3+k]=n;}}
+  const out=new THREE.BufferGeometry();for(const nome in geo.attributes){const A=geo.attributes[nome];if(!A||A.isInterleavedBufferAttribute||!A.array)continue;const it=A.itemSize,src=A.array,dst=new src.constructor(nv*it);
+    for(let n=0;n<nv;n++){const v=ordem[n]*it;for(let k=0;k<it;k++)dst[n*it+k]=src[v+k];}
+    if(nome==='position')for(let n=0;n<nv;n++){dst[n*3]-=pv[0];dst[n*3+1]-=pv[1];dst[n*3+2]-=pv[2];}
+    out.setAttribute(nome,new THREE.BufferAttribute(dst,it,!!A.normalized));}
+  out.setIndex(new THREE.BufferAttribute(nv>65535?idx:new Uint16Array(idx),1));out.computeBoundingSphere();out.computeBoundingBox();return out;}
+// as peças de uma geometria (guardadas: os três coelhos partilham as geometrias). null = não é o modelo esperado
+function co880Pecas(geo,principal){let q=CO880.geos.get(geo);if(q!==undefined)return q;q=null;try{const tris=co880Separa(geo);if(tris){let ok=true;if(principal)for(let k=0;k<10;k++)if(!tris[k].length)ok=false;
+      if(ok){q=[];for(let k=0;k<10;k++)q.push(tris[k].length?co880GeoPeca(geo,tris[k],co880Pivo(k)):null);}}}catch(e){co880Erro('peças',e);q=null;}CO880.geos.set(geo,q);return q;}
+function co880Malha(geo,src,nome){const m=new THREE.Mesh(geo,src.material);m.name=(src.name||'coelho')+' · 880 '+nome;m.castShadow=src.castShadow;m.receiveShadow=src.receiveShadow;m.frustumCulled=src.frustumCulled;m.renderOrder=src.renderOrder;
+  m.layers.mask=src.layers.mask;m.userData=Object.assign({},src.userData,{co880:true});m.raycast=()=>{};m.__fusaoMoveu=9;
+  try{if(typeof PAPEL_ORIG!=='undefined'&&PAPEL_ORIG.has(src))PAPEL_ORIG.set(m,PAPEL_ORIG.get(src));}catch(e){} // R3: o Papel sabe voltar a peça ao material de antes
+  return m;}
+// monta as juntas dentro do grupo do coelho; devolve {raiz,tronco,cabeca,orelha[2],coxa[2],pe[2],braco[2],malhas[],orig[]}
+function co880Rig(g){const V=CO880_PV,orig=g.children.filter(o=>o.isMesh&&o.geometry&&o.geometry.attributes&&o.geometry.attributes.position);if(!orig.length)return null;
+  const G=n=>{const o=new THREE.Group();o.name='880 coelho · '+n;o.__fusaoMoveu=9;return o;},sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]];
+  const J={raiz:G('corpo inteiro'),tronco:null,cabeca:null,orelha:[],coxa:[],pe:[],braco:[],coxaM:[null,null],peY:0,malhas:[],orig,pecas:0};J.raiz.rotation.order='YXZ';J.raiz.position.set(V.cm[0],V.cm[1],V.cm[2]);J.raiz.userData.co880=true;
+  // a malha principal (a de mais triângulos) decide: sem as dez classes, o coelho anda inteiro, sem juntas
+  let maior=orig[0];for(const o of orig){const n=o.geometry.index?o.geometry.index.count:0;if(n>(maior.geometry.index?maior.geometry.index.count:0))maior=o;}
+  const pp=co880Pecas(maior.geometry,true);
+  if(pp){J.tronco=G('tronco');J.tronco.position.fromArray(sub(V.tronco,V.cm));J.raiz.add(J.tronco);J.cabeca=G('cabeça');J.cabeca.position.fromArray(sub(V.pescoco,V.tronco));J.tronco.add(J.cabeca);
+    for(let k=0;k<2;k++){const o=G(CO880_NOMES[2+k]);o.position.fromArray(sub(co880Pivo(2+k),V.pescoco));J.cabeca.add(o);J.orelha.push(o);
+      const b=G(CO880_NOMES[8+k]);b.position.fromArray(sub(co880Pivo(8+k),V.tronco));J.tronco.add(b);J.braco.push(b);
+      const c=G(CO880_NOMES[4+k]);c.position.fromArray(sub(co880Pivo(4+k),V.cm));J.raiz.add(c);J.coxa.push(c);
+      const p=G(CO880_NOMES[6+k]);p.position.fromArray(sub(co880Pivo(6+k),co880Pivo(4+k)));J.peY=p.position.y;c.add(p);J.pe.push(p);}
+    const junta=k=>k===0?J.tronco:k===1?J.cabeca:k<4?J.orelha[k-2]:k<6?J.coxa[k-4]:k<8?J.pe[k-6]:J.braco[k-8];
+    for(const o of orig){const q=o===maior?pp:co880Pecas(o.geometry,false);
+      if(!q){const m=co880Malha(o.geometry,o,'inteira');m.position.fromArray(sub([0,0,0],V.tronco));J.tronco.add(m);J.malhas.push(m);continue;} // malha desconhecida: vai inteira com o tronco
+      for(let k=0;k<10;k++){if(!q[k])continue;const m=co880Malha(q[k],o,CO880_NOMES[k]);junta(k).add(m);J.malhas.push(m);J.pecas++;if(o===maior&&(k===4||k===5))J.coxaM[k-4]=m;}}}
+  else for(const o of orig){const m=co880Malha(o.geometry,o,'inteira');m.position.fromArray(sub([0,0,0],V.cm));J.raiz.add(m);J.malhas.push(m);}
+  return J;}
+const CO880_TMP={};const CO880_XZ=[0,0];
+function co880Quat(q,rx1,ry,rx2,rz){const T=CO880_TMP;if(!T.a){T.a=new THREE.Quaternion();T.x=new THREE.Vector3(1,0,0);T.y=new THREE.Vector3(0,1,0);T.z=new THREE.Vector3(0,0,1);}
+  q.setFromAxisAngle(T.x,rx1);q.multiply(T.a.setFromAxisAngle(T.y,ry));q.multiply(T.a.setFromAxisAngle(T.x,rx2));if(rz)q.multiply(T.a.setFromAxisAngle(T.z,rz));return q;}
+// põe a pose C.P nas juntas (C.incl = inclinação do chão no rumo do coelho)
+function co880Poe(C){const J=C.J,P=C.P,I=CO880_I,V=CO880_PV,K=P[I.K],sy=Math.pow(K,-.62),sx=Math.pow(K,-.3);
+  J.raiz.position.set(0,V.cm[1]*sy+P[I.Y],V.cm[2]);J.raiz.rotation.set(-(P[I.ARF]+C.incl),0,P[I.ROL]);J.raiz.scale.set(sx,sy,K);
+  if(!J.tronco)return;const tr=P[I.TR],rs=1+P[I.RES];
+  J.tronco.position.set(0,V.tronco[1]-V.cm[1]+P[I.TRY],V.tronco[2]-V.cm[2]+P[I.TRZ]);J.tronco.rotation.x=-tr;J.tronco.scale.set(rs,rs,1);
+  co880Quat(J.cabeca.quaternion,tr,P[I.CBY],-P[I.CBP],P[I.CBR]); // a cabeça desfaz a subida do tronco: fica nivelada
+  J.orelha[0].rotation.set(-P[I.ORE],0,-P[I.ORA]);J.orelha[1].rotation.set(-P[I.ORD],0,P[I.ORA]);
+  for(let k=0;k<2;k++){const cx=P[I.CXE+k],e=cx>0?Math.min(1,cx/.96):0; // perna para trás: a coxa estica e o pé afasta-se do quadril (a perna desdobra)
+    J.coxa[k].rotation.x=cx;J.pe[k].rotation.x=P[I.PEE+k];J.pe[k].position.y=J.peY-.10*e;if(J.coxaM[k])J.coxaM[k].scale.y=1+.26*e;}
+  J.braco[0].rotation.set(-P[I.BRE],0,-P[I.BRA]);J.braco[1].rotation.set(-P[I.BRD],0,P[I.BRA]);}
+// ---------- o território: máscara de células livres alcançáveis a partir da casa ----------
+// R1 (revisão): lê no nível 0 da Grande Árvore (como o `es880Nivel0`) e guarda os obstáculos em volta da casa na chegada
+function co880Nivel0(fn){let F=null;try{F=(typeof window!=='undefined')?window.__FANT:null;}catch(e){}if(!F||!F.lvl)return fn();const lv=F.lvl;F.lvl=0;try{return fn();}finally{F.lvl=lv;}}
+function co880Obst0(C,W){const out=[];try{const ob=co880Nivel0(()=>W.obst)||[],lim=CO880.P.RT+CO880.P.MG+6;for(let q=0;q<ob.length;q++){const o=ob[q];if(!o||!(o[2]>-.06))continue;const dx=o[0]-C.hx,dz=o[1]-C.hz;if(dx>-lim&&dx<lim&&dz>-lim&&dz<lim)out.push([+o[0],+o[1],+o[2]]);}}catch(e){co880Erro('obstáculos da chegada',e);}return out;}
+function co880Assina(C,W){let s=0;try{const ob=co880Nivel0(()=>W.obst)||[],lim=CO880.P.RT+CO880.P.MG+6;for(let q=0;q<ob.length;q++){const o=ob[q];if(!o)continue;const dx=o[0]-C.hx,dz=o[1]-C.hz;if(dx>-lim&&dx<lim&&dz>-lim&&dz<lim)s+=o[0]*3.1+o[1]*7.7+o[2]*13.3;}}catch(e){}return s;}
+function co880Mascara(C,R){return co880Nivel0(()=>co880MascaraN0(C,R));}
+function co880MascaraN0(C,R){const t0=co880Agora(),P=CO880.P,W=R.world,cel=P.CEL,raio=P.RT+P.MG,n=Math.ceil(raio/cel),D=2*n+1,x0=C.hx-n*cel,z0=C.hz-n*cel;
+  let M=C.M;if(!M||M.D!==D)M=C.M={D,n,cel,x0,z0,livre:new Uint8Array(D*D),zona:new Uint8Array(D*D),pai:new Int32Array(D*D),fila:new Int32Array(D*D),celulas:0};
+  const L=M.livre,Z=M.zona;L.fill(1);Z.fill(0);M.celulas=0;
+  // (1) a borda do mundo: `clamp` com 0,9 m de folga (como a grade de caminhos do jogo), de 2 em 2 células; reprovou → o bloco 3×3 em volta
+  const cl=W.clamp;for(let j=0;j<D;j+=2)for(let i=0;i<D;i+=2){const x=x0+i*cel,z=z0+j*cel;let ok=false;try{const c=cl.call(W,x,z,P.BORDA);ok=!!c&&Math.abs(c[0]-x)<.02&&Math.abs(c[1]-z)<.02;}catch(e){}
+    if(!ok)for(let b=j-1;b<=j+1;b++)for(let a=i-1;a<=i+1;a++)if(a>=0&&b>=0&&a<D&&b<D)L[b*D+a]=0;}
+  // (2) os obstáculos de agora, inflados pela folga do corpo
+  // R1 (revisão): os obstáculos de agora + os da chegada (os que a escada da Grande Árvore apagou da lista viva continuam a valer)
+  const ob=(W.obst||[]).concat(C.ob0||[]),lado=(D-1)*cel;let nOb=0;for(let q=0;q<ob.length;q++){const o=ob[q];if(!o||!(o[2]>-.06))continue;const rr=o[2]+P.FOLGA,ox=o[0]-x0,oz=o[1]-z0;if(ox<-rr||oz<-rr||ox>lado+rr||oz>lado+rr)continue;nOb++;
+    const i0=Math.max(0,Math.ceil((ox-rr)/cel)),i1=Math.min(D-1,Math.floor((ox+rr)/cel)),j0=Math.max(0,Math.ceil((oz-rr)/cel)),j1=Math.min(D-1,Math.floor((oz+rr)/cel)),r2=rr*rr;
+    for(let j=j0;j<=j1;j++){const dz=j*cel-oz;for(let i=i0;i<=i1;i++){const dx=i*cel-ox;if(dx*dx+dz*dz<r2)L[j*D+i]=0;}}}
+  // (3) inunda a partir da casa (ou da célula livre mais próxima dela): 1 = território, 2 = margem de fuga
+  let s=n*D+n;if(!L[s]){let d2m=1e9;for(let b=-20;b<=20;b++)for(let a=-20;a<=20;a++){const p=(n+b)*D+n+a;if(L[p]&&a*a+b*b<d2m){d2m=a*a+b*b;s=p;}}}
+  if(L[s]){const F=M.fila,RT2=P.RT*P.RT,R2=raio*raio;let a=0,b=0;F[b++]=s;Z[s]=1;
+    while(a<b){const p=F[a++],i=p%D,j=(p-i)/D;for(let k=0;k<4;k++){const i2=i+(k===0?1:k===1?-1:0),j2=j+(k===2?1:k===3?-1:0);if(i2<0||j2<0||i2>=D||j2>=D)continue;const p2=j2*D+i2;if(Z[p2]||!L[p2])continue;const dx=(i2-n)*cel,dz=(j2-n)*cel,d2=dx*dx+dz*dz;if(d2>R2)continue;Z[p2]=d2<=RT2?1:2;F[b++]=p2;}}M.celulas=b;}
+  M.assin=co880Assina(C,W);M.clamp=cl;M.obst=nOb;C.tAssin=C.t;const ms=co880Agora()-t0;CO880.stats.mascaras++;CO880.stats.msMascara=Math.round((CO880.stats.msMascara+ms)*100)/100;CO880.stats.celulas[C.i]=M.celulas;return M;}
+function co880Zona(C,x,z){const M=C.M;if(!M)return 0;const i=Math.round((x-M.x0)/M.cel),j=Math.round((z-M.z0)/M.cel);if(i<0||j<0||i>=M.D||j>=M.D)return 0;return M.zona[j*M.D+i];}
+function co880Reta(C,ax,az,bx,bz){const M=C.M;if(!M)return false;const d=Math.hypot(bx-ax,bz-az),k=Math.max(1,Math.ceil(d/(M.cel*.25)));for(let q=1;q<=k;q++){const t=q/k;if(!co880Zona(C,ax+(bx-ax)*t,az+(bz-az)*t))return false;}return true;}
+function co880DistSeg(px,pz,ax,az,bx,bz){const dx=bx-ax,dz=bz-az,l2=dx*dx+dz*dz;let t=l2>0?((px-ax)*dx+(pz-az)*dz)/l2:0;t=t<0?0:t>1?1:t;return Math.hypot(px-ax-dx*t,pz-az-dz*t);}
+// caminho pela máscara (busca em largura) com a corda puxada; devolve pontos [x,z] ou null
+function co880Caminho(C,ax,az,bx,bz){const M=C.M,D=M.D,Z=M.zona,pai=M.pai,F=M.fila,ci=x=>Math.round((x-M.x0)/M.cel),cj=z=>Math.round((z-M.z0)/M.cel);
+  const si=ci(ax),sj=cj(az),gi=ci(bx),gj=cj(bz);if(si<0||sj<0||gi<0||gj<0||si>=D||sj>=D||gi>=D||gj>=D)return null;const s=sj*D+si,g=gj*D+gi;if(!Z[s]||!Z[g])return null;
+  pai.fill(-1);pai[s]=s;let a=0,b=0,achou=false;F[b++]=s;
+  while(a<b){const p=F[a++];if(p===g){achou=true;break;}const i=p%D,j=(p-i)/D;for(let k=0;k<8;k++){const di=k<4?(k===0?1:k===1?-1:0):(k<6?1:-1),dj=k<4?(k===2?1:k===3?-1:0):(k%2?1:-1),i2=i+di,j2=j+dj;if(i2<0||j2<0||i2>=D||j2>=D)continue;const p2=j2*D+i2;if(pai[p2]>=0||!Z[p2])continue;if(k>=4&&(!Z[j*D+i2]||!Z[j2*D+i]))continue;pai[p2]=p;F[b++]=p2;}}
+  if(!achou)return null;const pts=[];for(let p=g;p!==s;p=pai[p]){const i=p%D;pts.push([M.x0+i*M.cel,M.z0+((p-i)/D)*M.cel]);}pts.reverse();
+  const out=[];let cx=ax,cz=az,k=0;while(k<pts.length){let m=pts.length-1;while(m>k&&!co880Reta(C,cx,cz,pts[m][0],pts[m][1]))m--;out.push(pts[m]);cx=pts[m][0];cz=pts[m][1];k=m+1;}return out;}
+// ---------- saltos ----------
+// avanço ao longo do salto: Hermite com velocidade v0 na saída e v1 na chegada (0 = parado; ~0,75 = galope contínuo)
+function co880Avanco(u,v0,v1){const u2=u*u,u3=u2*u;return (u3-2*u2+u)*v0+(3*u2-2*u3)+(u3-u2)*v1;}
+// rumo durante o salto: vira no começo (até a fase 0,24, pés no chão) — nos giros e no pulo de alegria, ao longo do ar
+function co880Virou(S,u){return S.binky?co880S((u-.16)/.66):S.L<.02?co880S((u-.08)/.72):co880S(u/.24);}
+// começa um salto. A posição NUNCA anda de lado: é a integral da velocidade ao longo do rumo do corpo naquele instante (24 passos, guardada
+// em S.tab no referencial do rumo final) — uma curva suave que sai no rumo antigo e chega EXATAMENTE ao ponto conferido na máscara; para
+// isso o rumo final passa um pouco do rumo da corda (dois passos de ponto fixo).
+function co880Parte(C,b){const dx=b.x-C.x,dz=b.z-C.z,L=Math.hypot(dx,dz),S={x0:C.x,z0:C.z,x1:b.x,z1:b.z,yaw0:C.yaw,yaw1:b.yaw,vira:co880Ang(b.yaw-C.yaw),T:Math.max(.12,b.T),H:b.H,v:b.v,v0:b.v0||0,v1:b.v1||0,u:0,L,binky:!!b.binky,giro:!!b.giro,tab:null};
+  if(L>=.02){const N=24,tab=new Float32Array((N+1)*2),corda=Math.atan2(dx,dz);let vira=co880Ang(corda-C.yaw),yaw1=corda,X=0,Z=1;
+    for(let it=0;it<3;it++){X=0;Z=0;let sa=0;for(let k=0;k<N;k++){const um=(k+.5)/N,sb=co880Avanco((k+1)/N,S.v0,S.v1),th=-vira*(1-co880S(um/.24));X+=(sb-sa)*Math.sin(th);Z+=(sb-sa)*Math.cos(th);sa=sb;tab[(k+1)*2]=X;tab[(k+1)*2+1]=Z;}
+      if(it<2){yaw1=corda-Math.atan2(X,Z);vira=co880Ang(yaw1-C.yaw);}}
+    const e=L/(Math.hypot(X,Z)||1);for(let k=0;k<tab.length;k++)tab[k]*=e;S.tab=tab;S.yaw1=yaw1;S.vira=vira;
+    // a curva tem de caber no território (a corda já foi conferida): se a barriga da curva sai, gira no lugar primeiro e vai reto
+    if(Math.abs(vira)>.2&&!b.reto&&C.M){let ok=true;for(let k=2;k<24&&ok;k+=2){co880Onde(S,k/24,CO880_XZ);if(!co880Zona(C,CO880_XZ[0],CO880_XZ[1]))ok=false;}
+      if(!ok){const resto=[];co880Giros(resto,C.x,C.z,C.yaw,co880Ang(corda-C.yaw),true);resto.push(Object.assign({},b,{yaw:corda,v0:0,reto:true}));C.fila.unshift.apply(C.fila,resto);CO880.stats.curvasRetas++;co880Parte(C,C.fila.shift());return;}}}
+  C.est=1;C.s=S;}
+// posição no salto (fase u) → [x,z] em `out`
+function co880Onde(S,u,out){if(!S.tab){out[0]=S.x0;out[1]=S.z0;return out;}const q=Math.max(0,Math.min(24,u*24)),k=Math.min(23,q|0),f=q-k,t=S.tab,lx=t[k*2]+(t[k*2+2]-t[k*2])*f,lz=t[k*2+1]+(t[k*2+3]-t[k*2+1])*f,s=Math.sin(S.yaw1),c=Math.cos(S.yaw1);out[0]=S.x0+lx*c+lz*s;out[1]=S.z0-lx*s+lz*c;return out;}
+function co880Pousa(C){const S=C.s;C.x=S.x1;C.z=S.z1;C.yaw=co880Ang(S.yaw0+S.vira);C.est=0;C.percorrido+=S.L;if(S.giro)CO880.stats.giros++;else CO880.stats.saltos++;}
+// pulinhos de girar no lugar (quando a curva pedida é fechada demais para um salto de corrida)
+function co880Giros(fila,x,z,yaw,vira,rapido){const k=Math.ceil(Math.abs(vira)/1.25);for(let m=1;m<=k;m++)fila.push({x,z,yaw:yaw+vira*m/k,T:rapido?.15:.23,H:rapido?.05:.07,v:.18,v0:0,v1:0,giro:true});}
+function co880Enfileira(C,pts,T){const fila=C.fila,foge=T===CO880.TIPOS.fuga;fila.length=0;let x=C.x,z=C.z,yaw=C.yaw,primeiro=true;
+  for(let q=0;q<pts.length;q++){const px=pts[q][0],pz=pts[q][1],d=Math.hypot(px-x,pz-z);if(d<.08)continue;const rumo=Math.atan2(px-x,pz-z),vira=co880Ang(rumo-yaw);
+    if(Math.abs(vira)>(foge?2.3:primeiro?1.0:.95)){if(fila.length)fila[fila.length-1].v1=0;co880Giros(fila,x,z,yaw,vira,foge);primeiro=true;}
+    const n=Math.max(1,Math.round(d/T.L)),passo=d/n,f=passo/T.L;for(let m=1;m<=n;m++){fila.push({x:x+(px-x)*m/n,z:z+(pz-z)*m/n,yaw:rumo,T:T.T*(.55+.45*f),H:T.H*Math.sqrt(Math.min(1.2,f)),v:T.v,v0:primeiro?0:T.vc,v1:T.vc});primeiro=false;}
+    x=px;z=pz;yaw=rumo;}
+  if(fila.length)fila[fila.length-1].v1=0;return fila.length;}
+// escolhe um destino no território e enfileira os saltos até lá
+function co880Planeja(C,tipo,L){const P=CO880.P,r=C.rnd,T=CO880.TIPOS[tipo],dmin=tipo==='tiro'?7:tipo==='corre'?4:1.4,dmax=tipo==='tiro'?17:tipo==='corre'?9:4.2;let reserva=null,caminho=null;
+  for(let k=0;k<22&&!caminho;k++){const a=r()*6.2832,rr=P.RT*Math.sqrt(r()),x=C.hx+Math.sin(a)*rr,z=C.hz+Math.cos(a)*rr;if(co880Zona(C,x,z)!==1)continue;const d=Math.hypot(x-C.x,z-C.z);if(d<dmin||d>dmax)continue;
+    if(k<12&&Math.abs(co880Ang(Math.atan2(x-C.x,z-C.z)-C.yaw))>1.15)continue; // de preferência para a frente (sem girar no lugar antes de partir)
+    if(L&&Math.hypot(x-L.x,z-L.z)<6)continue;
+    if(co880Reta(C,C.x,C.z,x,z)){if(L&&co880DistSeg(L.x,L.z,C.x,C.z,x,z)<4.4)continue;caminho=[[x,z]];
+      if(tipo!=='saltita'&&d>6&&r()<.6){const lado=(r()<.5?-1:1)*(.16+r()*.2)*d,mx=(C.x+x)/2+(z-C.z)/d*lado,mz=(C.z+z)/2-(x-C.x)/d*lado; // uma quebra no meio do tiro
+        if(co880Zona(C,mx,mz)===1&&co880Reta(C,C.x,C.z,mx,mz)&&co880Reta(C,mx,mz,x,z)&&!(L&&Math.hypot(mx-L.x,mz-L.z)<5))caminho=[[mx,mz],[x,z]];}}
+    else if(k>=14&&!reserva)reserva=[x,z];}
+  if(!caminho&&reserva){caminho=co880Caminho(C,C.x,C.z,reserva[0],reserva[1]);CO880.stats.replanejos++;}
+  if(!caminho||!caminho.length)return false;return co880Enfileira(C,caminho,T)>0;}
+// o que fazer agora (calmo): mexer-se na maior parte do tempo; parado, sempre fazendo alguma coisa
+function co880Escolhe(C,L){const r=C.rnd,S=CO880.stats;C.est=0;const dL=L?Math.hypot(C.x-L.x,C.z-L.z):1e9;
+  const pm=C.nPar>=2?1:C.nMov>=4?.25:C.nPar===1?.86:.7;
+  if(C.M&&C.M.celulas>40&&co880Zona(C,C.x,C.z)&&r()<pm){const q=r(),tipo=q<.46?'tiro':q<.70?'corre':'saltita';
+    if(co880Planeja(C,tipo,L)){C.nMov++;C.nPar=0;if(tipo==='tiro')S.tiros++;else if(tipo==='corre')S.corridas++;else S.saltitos++;C.depois=tipo==='saltita'?null:{nome:'ofega',t:0,dur:.3+r()*.45};co880Parte(C,C.fila.shift());return;}}
+  C.nPar++;C.nMov=0;let nome;const q=r();
+  if(dL<8&&q<.45)nome='alerta';else{const lista=['fareja','come','empe','limpa','binky'],pesos=[.25,.27,.22,.15,.11];let x=r(),k=0;while(k<4&&x>=pesos[k]){x-=pesos[k];k++;}nome=lista[k];if(nome===C.ultimo)nome=lista[(k+1+((r()*3)|0))%5];}
+  C.ultimo=nome;
+  if(nome==='binky'){co880Parte(C,{x:C.x,z:C.z,yaw:C.yaw+(r()<.5?-1:1)*(1.7+r()*1.2),T:.62,H:.5,v:.7,v0:0,v1:0,binky:true,giro:true});C.depois={nome:'senta',t:0,dur:.35+r()*.4};return;}
+  if(nome==='alerta')S.alertas++;
+  C.at={nome,t:0,dur:nome==='fareja'?1.7+r()*1.1:nome==='come'?2.4+r()*1.4:nome==='empe'?1.8+r()*1.3:nome==='limpa'?1.9+r()*1.2:1.5+r()*1};}
+// susto: larga o que está fazendo e foge (no meio de um salto, foge ao pousar)
+function co880Assusta(C,L){C.modo='fuga';C.nFuga=0;C.fimFuga=false;C.zig=C.rnd()<.5?1:-1;C.zigN=0;C.fila.length=0;C.depois=null;C.nPar=0;C.nMov=0;CO880.stats.fugas++;C.fugas++;if(C.est===0)C.at={nome:'susto',t:0,dur:.09};}
+const CO880_LEQUE=[0,.35,-.35,.7,-.7,1.1,-1.1,1.6,-1.6,2.2,-2.2,3.1416];
+function co880Foge(C,L){const P=CO880.P,T=CO880.TIPOS.fuga,r=C.rnd;C.est=0;if(!L){C.modo='calmo';co880Escolhe(C,L);return;}
+  const dx=C.x-L.x,dz=C.z-L.z,d=Math.hypot(dx,dz);
+  if(C.fimFuga||(C.nFuga>=60&&d>6)){ // longe o bastante: vira-se para o leitor e fica de pé, a olhar para ele
+    C.modo='calmo';C.imune=.25;C.fimFuga=false;const vira=co880Ang(Math.atan2(-dx,-dz)-C.yaw);C.fila.length=0;if(Math.abs(vira)>.6)co880Giros(C.fila,C.x,C.z,C.yaw,vira-(vira>0?.25:-.25),false);
+    C.depois={nome:'alerta',t:0,dur:1.7+r()*1};CO880.stats.alertas++;if(C.fila.length)co880Parte(C,C.fila.shift());else{C.at=C.depois;C.depois=null;}return;}
+  const fora=Math.atan2(dx,dz);if(C.zigN<=0){C.zig=-C.zig;C.zigN=1+(r()<.45?1:0);}C.zigN--;const base=fora+C.zig*(.42+r()*.3)*(1-Math.min(.6,Math.max(0,(C.chega-2.4)/3)));let melhor=null,ms=-1e9;
+  for(let q=0;q<CO880_LEQUE.length;q++){const da=CO880_LEQUE[q],a=base+da;for(let f=1;f>.3;f-=.33){const Lb=T.L*f,x1=C.x+Math.sin(a)*Lb,z1=C.z+Math.cos(a)*Lb;if(!co880Reta(C,C.x,C.z,x1,z1))continue;
+      const d1=Math.hypot(x1-L.x,z1-L.z);if(d1<2.2||(d1<d-.3&&d1<4.2))continue;const dh=Math.hypot(x1-C.hx,z1-C.hz);
+      let nota=d1-Math.abs(da)*.55-Math.abs(co880Ang(a-C.yaw))*.25-(1-f)*1.6-Math.max(0,dh-P.RT+2)*.9;if(nota<=ms)continue;
+      // olha um salto adiante: lugar de onde não se sai (canto de muro, beira do lago) perde
+      let saida=false;for(let w=-1;w<=1&&!saida;w++){const a2=a+w*.75;if(co880Reta(C,x1,z1,x1+Math.sin(a2)*T.L,z1+Math.cos(a2)*T.L))saida=true;}if(!saida)nota-=3;
+      if(nota>ms){ms=nota;melhor={x:x1,z:z1,yaw:a,L:Lb};}}}
+  if(melhor)C.nAgacha=0;
+  if(!melhor){ // encurralado (canto de muro, lago, fim do território): dispara pela máscara até um ponto longe do leitor, nem que passe perto dele
+    CO880.stats.encurralado++;let alvo=null,na=-1e9,buscas=0;for(let k=0;k<18;k++){const a=r()*6.2832,rr=P.RT*Math.sqrt(r()),x=C.hx+Math.sin(a)*rr,z=C.hz+Math.cos(a)*rr;if(co880Zona(C,x,z)!==1)continue;const d2=Math.hypot(x-L.x,z-L.z);if(d2<7)continue;
+      let cam=null,folga=0;if(co880Reta(C,C.x,C.z,x,z)){cam=[[x,z]];folga=co880DistSeg(L.x,L.z,C.x,C.z,x,z);}
+      else if(buscas<3){buscas++;cam=co880Caminho(C,C.x,C.z,x,z);if(cam&&cam.length){folga=1e9;let ax=C.x,az=C.z;for(const p of cam){folga=Math.min(folga,co880DistSeg(L.x,L.z,ax,az,p[0],p[1]));ax=p[0];az=p[1];}}}
+      if(!cam||!cam.length)continue;const nota=Math.min(4,folga)*2+d2*.2;if(nota>na){na=nota;alvo={cam,folga};}}
+    // só dispara rente ao leitor (a menos de 1 m) depois de se encolher duas vezes sem achar outra saída
+    if(alvo&&(alvo.folga>=1||C.nAgacha>=2)&&co880Enfileira(C,alvo.cam,T)>0){C.nAgacha=0;C.nFuga+=2;co880Parte(C,C.fila.shift());return;}
+    C.nAgacha++;    C.at={nome:'agacha',t:0,dur:.4};C.nFuga++;return;} // sem saída nenhuma: encolhe-se, de orelhas baixas, e tenta de novo
+  const vira=co880Ang(melhor.yaw-C.yaw),parado=C.nFuga===0||Math.abs(vira)>1.75,ultimo=d>P.CALMA-1.9+(C.chega>2.6?4:0)&&C.nFuga>=2;if(ultimo)C.fimFuga=true;
+  const b={x:melhor.x,z:melhor.z,yaw:melhor.yaw,T:T.T*(.6+.4*melhor.L/T.L)+(parado?.04:0),H:T.H,v:T.v,v0:parado?0:T.vc,v1:ultimo?0:T.vc};C.nFuga++;
+  C.fila.length=0;co880Parte(C,b);} // a meia-volta da largada faz-se no próprio salto, em curva (se a curva não couber, `co880Parte` gira no lugar primeiro)
+function co880Proximo(C,L){
+  if(C.fila.length){const b=C.fila[0];
+    // calmo, o próximo salto cairia perto do leitor (ele andou para o caminho do tiro): não vai ao encontro dele — assusta-se aqui mesmo
+    if(L&&C.modo!=='fuga'&&!b.giro&&C.imune<=0&&Math.hypot(b.x-L.x,b.z-L.z)<CO880.P.SUSTO+1.2){C.est=0;co880Assusta(C,L);return;}
+    if(b.giro||co880Reta(C,C.x,C.z,b.x,b.z)){co880Parte(C,C.fila.shift());return;}C.fila.length=0;CO880.stats.replanejos++;} // o caminho fechou (obstáculo novo): replaneja
+  if(C.modo==='fuga'){co880Foge(C,L);return;}
+  if(C.depois){C.at=C.depois;C.depois=null;C.est=0;return;}
+  co880Escolhe(C,L);}
+// fora da máscara (obstáculo novo em cima dele): pula para a célula livre mais próxima
+function co880Reposiciona(C){if(!C.M||co880Zona(C,C.x,C.z))return;const M=C.M,D=M.D,i0=Math.round((C.x-M.x0)/M.cel),j0=Math.round((C.z-M.z0)/M.cel);let m=-1,d2m=1e9;
+  for(let b=-14;b<=14;b++)for(let a=-14;a<=14;a++){const i=i0+a,j=j0+b;if(i<0||j<0||i>=D||j>=D||!M.zona[j*D+i])continue;const d2=a*a+b*b;if(d2<d2m){d2m=d2;m=j*D+i;}}
+  if(m<0)return;const i=m%D,x=M.x0+i*M.cel,z=M.z0+((m-i)/D)*M.cel;C.fila.length=0;C.fila.push({x,z,yaw:Math.atan2(x-C.x,z-C.z),T:.4,H:.3,v:.8,v0:0,v1:0,giro:true});CO880.stats.replanejos++;}
+// um coelho, um passo de tempo
+function co880Anda(C,dt,L,R){const P=CO880.P,I=CO880_I;C.t+=dt;
+  if(!C.M||C.refaz||C.M.clamp!==R.world.clamp||(C.t-C.tAssin>.5&&(C.tAssin=C.t,co880Assina(C,R.world)!==C.M.assin))){
+    if(!C.M||CO880.vez){CO880.vez=false;C.refaz=false;co880Mascara(C,R);co880Reposiciona(C);}else C.refaz=true;} // no máximo uma máscara refeita por quadro
+  let olhar=null;
+  if(L){const dL=Math.hypot(C.px-L.x,C.pz-L.z),chega=dL>.01?Math.max(0,(CO880.lvx*(C.px-L.x)+CO880.lvz*(C.pz-L.z))/dL):0;C.dL=dL;C.chega=chega;if(C.imune>0)C.imune-=dt;
+    // susto: leitor a menos de 3,6 m; vindo depressa na direção dele (mais de 2,6 m/s), assusta de mais longe (até 6,5 m)
+    if(C.modo!=='fuga'&&C.imune<=0&&dL<P.SUSTO+Math.min(P.SUSTO_VEL,Math.max(0,chega-2.6)*.9))co880Assusta(C,L);
+    olhar=co880Ang(Math.atan2(L.x-C.px,L.z-C.pz)-C.pyaw);}else C.dL=1e9;
+  let resto=dt;for(let it=0;it<8&&resto>1e-6;it++){
+    if(C.est===1){const S=C.s,du=resto/S.T;if(S.u+du>=1){resto=(S.u+du-1)*S.T;co880Pousa(C);co880Proximo(C,L);}else{S.u+=du;resto=0;}}
+    else{const A=C.at;if(A.t+resto>=A.dur){resto=A.t+resto-A.dur;A.t=A.dur;co880Proximo(C,L);}else{A.t+=resto;resto=0;}}}
+  // posição, rumo e pose de agora
+  let x=C.x,z=C.z,yaw=C.yaw,taxa=14;const alvo=C.alvo;
+  if(C.est===1){const S=C.s,u=S.u,xz=co880Onde(S,u,CO880_XZ);x=xz[0];z=xz[1];yaw=S.yaw0+S.vira*co880Virou(S,u);
+    if(S.binky)co880PoseBinky(alvo,u,S.H);else co880PoseSalto(alvo,u,S.v,S.H,S.giro?0:S.vira);taxa=30;if(S.giro)C.tPar+=dt;else C.tMov+=dt;}
+  else{co880PoseParado(alvo,C.at,C.t,C.fase,olhar);if(C.at.nome==='susto')taxa=40;C.tPar+=dt;}
+  const w=1-Math.exp(-dt*taxa),Pp=C.P;for(let k=0;k<I.N;k++)Pp[k]+=(alvo[k]-Pp[k])*w;if(C.est===1)Pp[I.Y]=alvo[I.Y];
+  // chão (lido agora) e inclinação da rampa no rumo do coelho
+  let y=C.y;try{const f=R.floorY(x,z);if(isFinite(f))y=f;}catch(e){}C.y=y;
+  C.tIncl-=dt;if(C.est===1||C.tIncl<=0){C.tIncl=.4;try{const sx=Math.sin(yaw)*.4,cz=Math.cos(yaw)*.4,a=R.floorY(x+sx,z+cz),b=R.floorY(x-sx,z-cz);if(isFinite(a)&&isFinite(b))C.inclAlvo=Math.max(-.42,Math.min(.42,Math.atan2(a-b,.8)));}catch(e){}}
+  C.incl+=(C.inclAlvo-C.incl)*(1-Math.exp(-dt*8));
+  C.px=x;C.pz=z;C.pyaw=yaw;C.g.position.set(x,y,z);C.g.rotation.set(0,yaw,0);co880Poe(C);}
+// R5 (revisão): ao adormecer (leitor a mais de 45 m) no meio de um salto, o coelho pousa no ponto já conferido e senta — não fica parado no ar
+function co880Adormece(C,R){if(C.est!==1||!C.s)return;co880Pousa(C);C.fila.length=0;C.depois=null;C.modo='calmo';C.at={nome:'senta',t:0,dur:.6};co880Zera(C.P);co880Zera(C.alvo);
+  let y=C.y;try{const f=R.floorY(C.x,C.z);if(isFinite(f))y=f;}catch(e){}C.y=y;C.px=C.x;C.pz=C.z;C.pyaw=C.yaw;C.g.position.set(C.x,y,C.z);C.g.rotation.set(0,C.yaw,0);co880Poe(C);CO880.stats.pousouParaDormir=(CO880.stats.pousouParaDormir||0)+1;}
+// todos os coelhos: leitor = {x,z} (null: sem leitor — ninguém foge nem dorme); recorte = dorme a mais de 45 m
+function co880Passo(dt,leitor,recorte){if(!CO880.feito)return 0;const R=CO880.R;dt=Math.max(0,Math.min(.1,+dt||0));CO880.tempo+=dt;CO880.vez=true;let n=0;
+  // velocidade do leitor (suavizada; um salto de mais de 3 m num quadro é teletransporte, não corrida)
+  if(leitor&&dt>0){const A=CO880.lant;if(A){const dx=leitor.x-A.x,dz=leitor.z-A.z,w=1-Math.exp(-dt*10);if(Math.hypot(dx,dz)>3){CO880.lvx=0;CO880.lvz=0;}else{CO880.lvx+=(dx/dt-CO880.lvx)*w;CO880.lvz+=(dz/dt-CO880.lvz)*w;}A.x=leitor.x;A.z=leitor.z;}else{CO880.lant={x:leitor.x,z:leitor.z};CO880.lvx=0;CO880.lvz=0;}}else if(!leitor){CO880.lant=null;CO880.lvx=0;CO880.lvz=0;}
+  for(const C of CO880.lista){if(recorte&&leitor&&Math.hypot(C.px-leitor.x,C.pz-leitor.z)>CO880.P.LONGE){if(!C.dorme){C.dorme=true;try{co880Adormece(C,R);}catch(e){co880Erro('adormece',e);}}continue;}C.dorme=false;n++;
+    try{co880Anda(C,dt,leitor,R);}catch(e){if(!C.erro){C.erro=1;co880Erro('coelho '+C.i,e);}}}return n;}
+function co880Tique(dt){if(!CO880.feito||CO880.parado||CO880.pausa)return;let aqui=false;try{aqui=CUR==='room'&&ROOM===ROOMS.fant;}catch(e){}if(!aqui)return;
+  try{if((typeof document!=='undefined'&&document.hidden)||(typeof uiBlocked==='function'&&uiBlocked()))return;}catch(e){}
+  let p=null;try{p=asaPos();}catch(e){}CO880.stats.tiques++;co880Passo(dt,p,true);}
+// embrulha o tique da sala; se o embrulho for posto duas vezes (religado pelo vigia com o antigo ainda na cadeia), só o de fora anda os coelhos
+function co880LigaTick(R){try{const tk=R.tick;if(tk&&tk.__co880)return;const novo=function(dt){CO880.prof=(CO880.prof||0)+1;let r;try{r=tk?tk.apply(this,arguments):undefined;}finally{CO880.prof--;}
+      if(!CO880.prof){try{co880Tique(dt);}catch(e){if(!CO880.erroTick){CO880.erroTick=1;co880Erro('tique',e);}}}return r;};novo.__co880=true;R.tick=novo;}catch(e){co880Erro('liga tique',e);}}
+// ---------- aplica / desfaz ----------
+function co880Novo(a,i){const g=a.g,N=CO880_I.N;return {i,a,g,hx:a.x,hz:a.z,x:a.x,z:a.z,yaw:co880Ang(a.angle||0),px:a.x,pz:a.z,pyaw:co880Ang(a.angle||0),y:0,incl:0,inclAlvo:0,tIncl:0,t:0,tAssin:-9,fase:(a.phase||0)+i*.7,
+  rnd:co880Rnd(CO880.P.SEMENTE+i*7919),P:co880Zera(new Float32Array(N)),alvo:co880Zera(new Float32Array(N)),est:0,at:{nome:'senta',t:0,dur:.3+i*.45},s:null,fila:[],depois:null,modo:'calmo',nFuga:0,fimFuga:false,zig:1,zigN:0,imune:0,dL:1e9,
+  nMov:0,nPar:1,ultimo:'',M:null,J:null,refaz:false,dorme:false,chega:0,nAgacha:0,percorrido:0,tMov:0,tPar:0,fugas:0,erro:0};}
+function co880Aplica(){if(CO880.feito)return true;try{const R=(typeof ROOMS!=='undefined')?ROOMS.fant:null,S=(typeof COZY355!=='undefined')?COZY355:null,F=S&&S.fauna378;if(!R||!R.scene||!R.world||typeof R.floorY!=='function'||!S||!S.ready||!F||!Array.isArray(F.animals))return false;
+    const t0=co880Agora(),bichos=F.animals.filter(a=>a&&a.kind==='rabbit'&&a.g&&a.g.isObject3D);if(!bichos.length)return false;const st=CO880.stats;let fundido=false;st.malhasAntes=0;st.malhasDepois=0;st.pecas=0;st.articulados=0;st.triangulos=0;
+    CO880.lista.length=0;CO880.R=R;CO880.fauna=F;
+    bichos.forEach((a,i)=>{const C=co880Novo(a,i),J=co880Rig(a.g);if(!J)return;C.J=J;C.idx=F.animals.indexOf(a);C.ob0=co880Obst0(C,R.world);
+      for(const o of J.orig){if(o.__fusaoVis!==undefined)fundido=true;st.malhasAntes++;st.triangulos+=o.geometry.index?o.geometry.index.count/3:o.geometry.attributes.position.count/3;}
+      for(const o of J.orig)a.g.remove(o);a.g.add(J.raiz);a.g.scale.set(1,1,1);a.g.rotation.set(0,C.yaw,0);st.malhasDepois+=J.malhas.length;st.pecas+=J.pecas;if(J.tronco)st.articulados++;
+      try{const f=R.floorY(C.x,C.z);if(isFinite(f))C.y=f;}catch(e){}a.g.position.set(C.x,C.y,C.z);co880Poe(C);CO880.lista.push(C);});
+    if(!CO880.lista.length)return false;
+    // saem da lista da v378 (o `pose()` dela deslizava-os de volta para casa a cada tique); voltam no `desfaz()`
+    for(const C of CO880.lista){const k=F.animals.indexOf(C.a);if(k>=0)F.animals.splice(k,1);}
+    if(fundido){try{if(typeof fusaoLimpar==='function'){fusaoLimpar(R.scene);st.fusoesDesfeitas++;}}catch(e){co880Erro('fusão',e);}}
+    co880LigaTick(R);CO880.feito=true;st.aplicacoes++;st.coelhos=CO880.lista.length;st.msRig=Math.round((co880Agora()-t0)*100)/100;return true;}catch(e){co880Erro('aplica',e);return false;}}
+// R2 (revisão): a pose que o `pose()` da v378 daria agora a este coelho (mesma conta)
+function co880PoseV378(a,g,F){const t=(F&&isFinite(F.time))?F.time:0,p=a.phase||0,ang=a.angle||0,c=(t+p)%9,j=c<.85?Math.sin(c/.85*Math.PI):0,mv=Math.sin(t*.17+p)*.35;
+  g.position.set(a.x+Math.sin(ang)*mv,j*.16,a.z+Math.cos(ang)*mv);g.rotation.set(0,ang+Math.sin(t*.34+p)*.08,0);g.scale.set(1,1+Math.sin(t*2+p)*.012,1);}
+function co880Desfaz(){if(!CO880.feito)return false;try{const F=CO880.fauna;
+    for(const C of CO880.lista.slice().sort((p,q)=>p.idx-q.idx)){const g=C.g,J=C.J;try{g.remove(J.raiz);
+        const mats=new Map();for(const m of J.malhas){const b=(m.name||'').split(' · 880 ')[0];if(!mats.has(b))mats.set(b,m);} // se o Papel trocou os materiais entretanto, os originais acompanham
+        const PO=(typeof PAPEL_ORIG!=='undefined')?PAPEL_ORIG:null;
+        for(const o of J.orig){const pc=mats.get(o.name);if(pc){o.material=pc.material;try{if(PO){if(PO.has(pc))PO.set(o,PO.get(pc));else PO.delete(o);}}catch(e){}}g.add(o);} // R3
+        co880PoseV378(C.a,g,F); // R2: a pose da v378 de agora (era a casa nua: até 0,35 m, 4,6° e 1,2 % de diferença)
+        if(F&&Array.isArray(F.animals)&&F.animals.indexOf(C.a)<0)F.animals.splice(Math.min(Math.max(0,C.idx),F.animals.length),0,C.a);}catch(e){co880Erro('desfaz '+C.i,e);}}
+    CO880.lista.length=0;CO880.feito=false;CO880.stats.desfeitas++;return true;}catch(e){co880Erro('desfaz',e);return false;}}
+// ---------- gancho ----------
+function co880Estado(){return CO880.lista.map(C=>({i:C.i,casa:[C.hx,C.hz],x:+C.px.toFixed(3),y:+C.y.toFixed(3),z:+C.pz.toFixed(3),rumo:+C.pyaw.toFixed(3),modo:C.modo,fazendo:C.est===1?(C.s.binky?'binky':C.s.giro?'gira':'salta'):C.at.nome,fase:C.est===1?+C.s.u.toFixed(3):+C.at.t.toFixed(2),
+  leitor:C.dL<1e8?+C.dL.toFixed(2):null,dorme:C.dorme,percorrido:+C.percorrido.toFixed(2),emMovimento:+C.tMov.toFixed(2),parado:+C.tPar.toFixed(2),fugas:C.fugas,zona:co880Zona(C,C.px,C.pz),celulas:C.M?C.M.celulas:0,obstChegada:C.ob0?C.ob0.length:0,articulado:!!(C.J&&C.J.tronco)}));}
+// pose fixa para fotos: nome (salto, tiro, saltita, empe, alerta, fareja, come, limpa, senta, binky, agacha), fase 0…1, i (coelho; sem i: todos). `pose()` sem nome solta.
+function co880Pose(nome,fase,i){if(!CO880.feito)return null;if(!nome){CO880.parado=false;return {solto:true};}CO880.parado=true;const u=Math.max(0,Math.min(.9999,fase===undefined?.5:+fase)),out=[];
+  for(const C of CO880.lista){if(i!==undefined&&i!==null&&C.i!==i)continue;const P=C.P;
+    if(nome==='salto'||nome==='tiro'||nome==='saltita'){const T=CO880.TIPOS[nome==='salto'?'corre':nome];co880PoseSalto(P,u,T.v,T.H,0);}
+    else if(nome==='binky')co880PoseBinky(P,u,.5);
+    else{const dur=nome==='come'?2.5:3;co880PoseParado(P,{nome,t:u*dur,dur:nome==='come'?1e9:dur},u*dur,C.fase,nome==='alerta'?.5:null);}
+    C.g.position.set(C.px,C.y,C.pz);C.g.rotation.set(0,C.pyaw,0);co880Poe(C);out.push({i:C.i,nome,fase:u,x:C.px,z:C.pz,y:C.y+P[CO880_I.Y]});}return out;}
+function co880Poses(){const out=[];for(const C of CO880.lista){const x=C.px,z=C.pz,y=C.y,sx=Math.sin(C.pyaw),cz=Math.cos(C.pyaw);
+    out.push({id:'coelho'+C.i+'_perfil',pos:[x+cz*3.4,y+.75,z-sx*3.4],alvo:[x,y+.5,z],fov:38});
+    out.push({id:'coelho'+C.i+'_tres_quartos',pos:[x+sx*2.6+cz*2.2,y+1.15,z+cz*2.6-sx*2.2],alvo:[x,y+.5,z],fov:40});
+    out.push({id:'coelho'+C.i+'_gramado',pos:[C.hx+(C.hx>0?9:-9),y+7.5,C.hz+17],alvo:[C.hx,y,C.hz],fov:58});}return out;}
+// volta os coelhos para casa com uma semente (testes repetíveis)
+function co880Reinicia(sem){if(sem!==undefined)CO880.P.SEMENTE=sem>>>0;for(const C of CO880.lista){const N=co880Novo(C.a,C.i);N.J=C.J;N.M=C.M;N.idx=C.idx;N.ob0=C.ob0;N.tAssin=0;Object.assign(C,N);try{const f=CO880.R.floorY(C.x,C.z);if(isFinite(f))C.y=f;}catch(e){}C.g.position.set(C.x,C.y,C.z);C.g.rotation.set(0,C.yaw,0);co880Poe(C);}return CO880.lista.length;}
+// ---------- quando: no `setActive` da Fantasia (antes da fusão do Leve) e num vigia leve (a clareira pode acabar de montar depois) ----------
+function co880Tenta(){if(!CO880.on||CO880.pausa||CO880.feito)return CO880.feito;return co880Aplica();}
+if(CO880.on){
+  try{const sa0=setActive;setActive=function(sc){try{if(!CO880.feito&&sc&&typeof ROOMS!=='undefined'&&ROOMS.fant&&sc===ROOMS.fant.scene){CO880.stats.setActive++;co880Tenta();}}catch(e){co880Erro('setActive',e);}return sa0.apply(this,arguments);};}catch(e){co880Erro('setActive0',e);}
+  try{co880Tenta();}catch(e){co880Erro('início',e);}
+  // vigia: aplica quando a clareira ficar pronta e religa o tique se outro bloco o tiver trocado sem chamar o anterior
+  try{CO880.vigia=setInterval(()=>{try{CO880.stats.vigia++;if(!CO880.feito){co880Tenta();return;}const R=CO880.R;let aqui=false;try{aqui=CUR==='room'&&ROOM===R;}catch(e){}
+        if(aqui&&!CO880.parado&&!CO880.pausa){const n=CO880.stats.tiques;if(CO880.vigiaN===n&&CO880.vigiaAqui&&!(typeof window!=='undefined'&&window.__pause)&&!(typeof document!=='undefined'&&document.hidden)&&!(typeof uiBlocked==='function'&&uiBlocked())){co880LigaTick(R);CO880.stats.religado++;}CO880.vigiaN=n;}CO880.vigiaAqui=aqui;}catch(e){co880Erro('vigia',e);}},2500);}catch(e){co880Erro('vigia0',e);}
+}
+window.__coelho880={on:CO880.on,stats:CO880.stats,erros:CO880.erros,P:CO880.P,TIPOS:CO880.TIPOS,interno:CO880,
+  para:()=>{CO880.parado=true;return true;},segue:()=>{CO880.parado=false;return true;},pose:co880Pose,poses:co880Poses,reinicia:co880Reinicia,
+  passo:(dt,leitor,recorte)=>{let L=leitor;if(L===undefined){try{L=(CUR==='room'&&ROOM===ROOMS.fant)?asaPos():null;}catch(e){L=null;}}return co880Passo(dt,L||null,!!recorte);},
+  desfaz:()=>{CO880.pausa=true;return co880Desfaz();},aplica:()=>{CO880.pausa=false;return co880Aplica();}};
+try{Object.defineProperty(window.__coelho880,'estado',{enumerable:true,get:co880Estado});}catch(e){co880Erro('gancho',e);}
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
