@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v912</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v913</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -130259,6 +130259,623 @@ window.__fadas912={get estado(){return FD912.on?(FD912.ativo?FD912.estado:'desli
       const dir=cam.clone().sub(c).setY(0);if(dir.lengthSq()<1e-4)dir.copy(fw);dir.normalize();
       out.push({id:'fadas-conjunto',pos:a(c.clone().addScaledVector(dir,Math.max(5,sp*1.2+3)).setY(c.y+1.2)),alvo:a(c),fov:55,nota:'as '+perto.length+' fadas desta parte da clareira (grossas)'});}
     catch(e){fd912Erro('fotos',e);}return out;}};
+
+/* ===================== v913 · OS QUATRO INIMIGOS DA V210 VIRAM ESCULPIDOS (bloco `IN913`) =====================
+   Pedido do Luiz (25/11, «ok»): trocar os bichos e figuras ainda montados com primitivas por modelos esculpidos, dos mais visíveis para os
+   menos — agora os INIMIGOS DO COMBATE («precisam ficar esteticamente lindos»). Primeiro lote: os quatro da v210 (v194).
+   COMO ERA (`t210Minotauro`, `t210Armadura`, `t210Soldadinho`, `t210Oni`, peças do kit `t210Pecas`/`t210Monta`):
+   · MINOTAURO (Mitologia, 6 por sala): 17 malhas de tubos, esferas e toros (13 686 triângulos), 0,85 × 2,10 × 0,72 m, pelo quase preto,
+     machado de duas lâminas de bronze, olhos de brasa;
+   · ARMADURA ANDANTE (Clássicos): 13 malhas (12 506), 0,85 × 2,64 × 0,77 (com a lança), tronco em torno, pernas e braços de cilindros,
+     elmo de esfera com a pluma de tubos, escudo de calota, lança, capa e flâmula de pano;
+   · SOLDADINHO DE CORDA (Infantil): 12 malhas (7 330), 0,45 × 1,56 × 0,44, cilindros pintados, barretina, espingarda com rolha e a chave;
+   · MÁSCARA ONI (Autoajuda): superfície paramétrica com relevo (9 malhas, 11 156), cabeleira de lâminas com textura, chifres de tubo.
+   AGORA: cada um esculpido por campo de distância (escultor da v622) peça por peça, nos MESMOS pivôs que o `userData.anim` já anima:
+   · MINOTAURO: homem-touro musculoso — peito e ombros enormes, trapézio alto, abdômen marcado, braços grossos com veias, punhos de 4
+     dedos; cabeça de touro com testa larga, focinho largo com narinas, argola de bronze no nariz, orelhas de lado, chifres longos e
+     curvos com anéis (marfim → ponta escura), olhos fundos sob a sobrancelha; pernas de touro de pelo escuro e desgrenhado com tufo no
+     boleto e cascos fendidos; cauda com tufo; tanga de couro com cinto de fivela, correia no peito, ombreira e braçadeiras de bronze;
+     machado de duas lâminas em meia-lua com o cabo enrolado em couro.
+   · ARMADURA ANDANTE: armadura de placas oca — elmo de crânio com crista e viseira de bico com a fenda (os olhos acesos no escuro da
+     fenda) e respiros, barbote e golas, gorjal, peitoral com nervura, cinto com fivela, faldas em três lâminas e escarcelas, ombreiras de
+     três lâminas sobrepostas com rebites, braçais com lâminas, cotoveleiras com asa, manoplas de dedos articulados, coxotes com lâminas,
+     joelheiras com asa, grevas com panturrilha e sabatões de lâminas; aço claro e frio, gasto (manchas e riscos), num material próprio menos
+     metálico (correção: com o metal da v194 saía azul-marinho), com bordas de latão; ombreiras e faldas de 2,6 cm numa malha própria; pluma vermelha;
+     lança de haste de madeira com folha de aço, guarda-mão em funil e anéis; escudo de bico vermelho com borda de ouro, umbo e o medalhão
+     do livro (a textura do escudo velho). A capa e a flâmula de pano (com vento) continuam as de hoje.
+   · SOLDADINHO DE CORDA: lata pintada e lustrosa — rosto redondo com bochechas rosadas, nariz e bigode, olhos de conta azul acesos;
+     barretina alta com pala, aro e faixa de latão, escudete, cordão, pompom e penacho; casaca vermelha com abas, gola de latão,
+     talabartes brancos cruzados, cinto com fivela, duas fileiras de botões dourados e dragonas com franja; luvas e punhos brancos; calças
+     azuis com faixa amarela e botas pretas; espingarda de madeira com cano de aço, bandas de latão e a rolha na boca; a CHAVE DE CORDA de
+     latão (laço em oito) nas costas, girando como hoje.
+   · MÁSCARA ONI (refeita depois das fotos: a 1.ª saiu uma bola): placa de laca vermelha de 3 cm, larga e pouco curva, com o relevo
+     esculpido — vincos na testa, sobrancelhas grossas e bravas com tiras de ouro, órbitas fundas com pálpebras e os olhos esbugalhados (a íris
+     do olho velho), maçãs, nariz largo com narinas, lábio de cima arreganhado e a boca rasgada aberta; queixo próprio que abre; 2 presas
+     grandes embaixo e 2 em cima e as fileiras de dentes; chifres de marfim a ouro com anel; borda de ouro; cabeleira preto-acinzentada em
+     mechas grossas e desgrenhadas que saem da borda de cima e dos lados.
+   Como no Lobo mau da v910 (`PR910`): o embrulho de cada construtor guarda o inimigo criado; quando o modelo fica pronto (montagem uma
+   vez, em fatias do `fat8Go`), as malhas novas entram como FILHAS dos grupos que o `userData.anim` anima (cada uma no espaço do seu grupo)
+   e as velhas ficam com a GEOMETRIA VAZIA (não mexe na visibilidade). O olho velho continua o MESMO objeto com o MESMO material próprio
+   (o `cavFerir` e a telegrafia da v474 o acendem) e ganha a geometria nova (dois globos assentados na pele); os brilhos ficam. Andar,
+   ataque, sono, barra de vida, dano, queda e combate (pelo grupo e pela distância) continuam os mesmos. Geometria e materiais
+   partilhados por tipo; FINO para no máximo 2 grandes na tela, GROSSO (`mo907Agrupa`) para o resto. Sem `InstancedMesh`, sem luz nova,
+   sem obstáculo, `noCam`, raio vazio, `papelKeepGeo`, Papel pelo `papelUm`. Os metais, o couro e o osso usam os materiais da v194 (os
+   mesmos que a sala já compilou); o pelo e a laca têm material próprio. No troféu da Minha Sala (v498) as malhas novas ficam de ouro.
+   Chaves: `?inimigos913=0` (tudo como era: nem os embrulhos entram), `?inimigos913mino=0`, `?inimigos913arm=0`, `?inimigos913sold=0`,
+   `?inimigos913oni=0`.
+   Gancho `window.__inimigos913`: `estado`, `stats`, `erros`, `desliga()`, `liga()`, `pausa(v)` (congela as poses dos inimigos velhos e
+   novos, com o bloco ligado ou desligado), `fotos(sala)` (poses {id, pos, alvo, fov}), `passo(dt)`, `info()`. */
+const IN913_Q=(()=>{try{return location.search+location.hash;}catch(e){return '';}})();
+const IN913={on:!/[?&#]inimigos913=0/i.test(IN913_Q),
+  conj:{minotauro:!/[?&#]inimigos913mino=0/i.test(IN913_Q),armadura:!/[?&#]inimigos913arm=0/i.test(IN913_Q),soldadinho:!/[?&#]inimigos913sold=0/i.test(IN913_Q),oni:!/[?&#]inimigos913oni=0/i.test(IN913_Q)},
+  ativo:true,pausado:false,corte:false,estado:'espera',erros:[],job:null,M:{},falhou:{},regs:[],
+  PX_FINO:110,PX_GROSSO:90,MAX_FINOS:2,
+  stats:{quadros:0,cpuMs:0,fatias:0,maiorFatiaMs:0,ondeMaior:null,montagens:{},tipos:{}}};
+function in913Erro(k,e){try{if(IN913.erros.length<40)IN913.erros.push(k+': '+String(e&&e.message||e).slice(0,300));console.warn('v913 inimigos',k,e);}catch(x){}}
+const in913Tri=g=>g?(g.index?g.index.count:g.attributes.position.count)/3:0;
+const IN913_VAZIA=(()=>{const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(3),3));g.setDrawRange(0,0);g.boundingSphere=new THREE.Sphere(new THREE.Vector3(),0.01);g.boundingBox=new THREE.Box3(new THREE.Vector3(),new THREE.Vector3());return g;})();
+for(const t of ['minotauro','armadura','soldadinho','oni'])IN913.stats.tipos[t]={registrados:0,trocados:0,destrocados:0};
+
+/* ---------------- 1) embrulhos: guardam cada inimigo criado (a troca é feita quando o modelo estiver pronto) ---------------- */
+function in913Registra(g,tipo){try{if(!g||!g.isObject3D)return;const velhas=[];g.traverse(o=>{if(o.isMesh)velhas.push(o);});
+    const olho=(g.userData.olhos||[])[0]||null;const rec={g,tipo,velhas,olho,olhoMat:olho&&olho.material,troca:null,P:null};try{rec.P=IN913_TIPOS[tipo].partes(g);}catch(e){}IN913.regs.push(rec);IN913.stats.tipos[tipo].registrados++;   /* (coordenador, 25/11) o esqueleto é lido na hora em que o inimigo nasce (pose de repouso): depois que ele anda, as posições dos grupos mudam e a busca por posição falhava («esqueleto inesperado») ao religar ou ao voltar à sala */
+    if(IN913.M[tipo]&&IN913.ativo)in913Troca(rec);}catch(e){in913Erro('registrar '+tipo,e);}}
+if(IN913.on){
+  if(IN913.conj.minotauro){try{const f0=t210Minotauro;t210Minotauro=function(){const g=f0.apply(this,arguments);in913Registra(g,'minotauro');return g;};}catch(e){in913Erro('ligar t210Minotauro',e);}}
+  if(IN913.conj.armadura){try{const f0=t210Armadura;t210Armadura=function(){const g=f0.apply(this,arguments);in913Registra(g,'armadura');return g;};}catch(e){in913Erro('ligar t210Armadura',e);}}
+  if(IN913.conj.soldadinho){try{const f0=t210Soldadinho;t210Soldadinho=function(){const g=f0.apply(this,arguments);in913Registra(g,'soldadinho');return g;};}catch(e){in913Erro('ligar t210Soldadinho',e);}}
+  if(IN913.conj.oni){try{const f0=t210Oni;t210Oni=function(){const g=f0.apply(this,arguments);in913Registra(g,'oni');return g;};}catch(e){in913Erro('ligar t210Oni',e);}}}
+
+/* ---------------- 2) utilidades de campo e de cor ---------------- */
+const in913L=(r,g,b)=>[r,g,b];                                            // cor de vértice já em LINEAR (a tela do jogo não corrige o gama)
+function in913Lim(f,c,r){return (x,y,z)=>{const d=Math.hypot(x-c[0],y-c[1],z-c[2])-r;return d>0.04?d:f(x,y,z);};}   // caixa esférica barata para detalhe miúdo
+function in913Anel(c,R,r,eixo){return (x,y,z)=>{let a,b,w;const px=x-c[0],py=y-c[1],pz=z-c[2];if(eixo==='x'){a=py;b=pz;w=px;}else if(eixo==='y'){a=px;b=pz;w=py;}else{a=px;b=py;w=pz;}return Math.hypot(Math.hypot(a,b)-R,w)-r;};}
+function in913AnelE(c,ra,rb,r){return (x,y,z)=>{const px=x-c[0],py=y-c[1],pz=z-c[2];const k=Math.hypot(px/ra,pz/rb);const de=(k-1)*Math.min(ra,rb);return Math.hypot(de,py)-r;};}  // toro elíptico deitado (cinto)
+const in913EspZ=f=>(x,y,z)=>f(x,y,Math.abs(z));
+const in913Casca=(f,t)=>(x,y,z)=>Math.abs(f(x,y,z))-t;
+function in913Ruido(H,f,amp,freq){return (x,y,z)=>{const d=f(x,y,z);if(d>amp*3||d<-amp*3)return d;return d+amp*H.ruido(x*freq+3.1,y*freq,z*freq+7.7);};}
+function in913Desl(f,p){return (x,y,z)=>f(x+p[0],y+p[1],z+p[2]);}            // campo no espaço do pai → espaço do pivô p
+// olho assentado na superfície: o ponto pedido desce pelo gradiente até a pele e o globo fica uma fração para dentro
+function in913Assenta(f,p,r,frac){let x=p[0],y=p[1],z=p[2];const e=1e-4;let n=[0,0,1];
+  for(let i=0;i<14;i++){const d=f(x,y,z);const gx=(f(x+e,y,z)-f(x-e,y,z))/(2*e),gy=(f(x,y+e,z)-f(x,y-e,z))/(2*e),gz=(f(x,y,z+e)-f(x,y,z-e))/(2*e);const l=Math.hypot(gx,gy,gz)||1;n=[gx/l,gy/l,gz/l];x-=n[0]*d;y-=n[1]*d;z-=n[2]*d;if(Math.abs(d)<1e-5)break;}
+  const k=frac===undefined?0.42:frac;return {c:[x-n[0]*r*k,y-n[1]*r*k,z-n[2]*r*k],n};}
+// cor com sombra de cantinho (pelo próprio campo) e um leve ruído
+function in913CorAO(H,campo,cor,eA,k0,ruido){return (x,y,z,nx,ny,nz)=>{const c=cor(x,y,z,nx,ny,nz);const o=H.cl(campo(x+nx*eA,y+ny*eA,z+nz*eA)/eA,0,1);const r=ruido?(1-ruido/2+ruido*(0.5+0.5*H.ruido(x*41+1.3,y*41,z*41+2.9))):1;const k=(k0+(1-k0)*o)*r;return [c[0]*k,c[1]*k,c[2]*k];};}
+// geometria de um par de globos (olhos) na orientação das normais; uv opcional como o t162OlhoGeo (íris na frente, +z)
+function in913Olhos(A,r,esc,seg,uv){const T=THREE;const L=[];for(const sd of [1,-1]){const g=new T.SphereGeometry(r,seg||16,Math.max(8,Math.round((seg||16)*0.75)));
+    if(uv){const p=g.attributes.position,u=g.attributes.uv;for(let i=0;i<p.count;i++){const x=p.getX(i)/r,y=p.getY(i)/r,z=p.getZ(i)/r;let a=x,b=y;if(z<0){const l=Math.hypot(x,y)||1;a=x/l;b=y/l;}u.setXY(i,a*0.5+0.5,b*0.5+0.5);}}
+    else g.deleteAttribute('uv');
+    if(esc)g.scale(esc[0],esc[1],esc[2]);const n=new T.Vector3(sd*A.n[0],A.n[1],A.n[2]).normalize();const q=new T.Quaternion().setFromUnitVectors(new T.Vector3(0,0,1),n);
+    g.applyMatrix4(new T.Matrix4().compose(new T.Vector3(sd*A.c[0],A.c[1],A.c[2]),q,new T.Vector3(1,1,1)));if(sd<0&&false)g;L.push(g);}
+  const out=in913JuntaSimples(L);return out;}
+function in913JuntaSimples(L){const T=THREE;let nv=0,ni=0;const at=['position','normal'].concat(L.every(g=>g.attributes.uv)?['uv']:[]).concat(L.every(g=>g.attributes.color)?['color']:[]);
+  for(const g of L){nv+=g.attributes.position.count;ni+=g.index?g.index.count:g.attributes.position.count;}const A={};for(const n of at)A[n]=new Float32Array(nv*(n==='uv'?2:3));
+  const I=new (nv>65535?Uint32Array:Uint16Array)(ni);let ov=0,oi=0;
+  for(const g of L){const k=g.attributes.position.count;for(const n of at)A[n].set(g.attributes[n].array,ov*(n==='uv'?2:3));if(g.index){const ix=g.index.array;for(let j=0;j<ix.length;j++)I[oi+j]=ix[j]+ov;oi+=ix.length;}else{for(let j=0;j<k;j++)I[oi+j]=j+ov;oi+=k;}ov+=k;}
+  const out=new T.BufferGeometry();for(const n of at)out.setAttribute(n,new T.BufferAttribute(A[n],n==='uv'?2:3));out.setIndex(new T.BufferAttribute(I,1));out.computeBoundingSphere();out.computeBoundingBox();return out;}
+// média das cores de vértice (linear) de uma geometria — para o relatório
+function in913CorMedia(g){const c=g&&g.attributes.color;if(!c)return null;const A=c.array;let s=[0,0,0];for(let i=0;i<A.length;i+=3){s[0]+=A[i];s[1]+=A[i+1];s[2]+=A[i+2];}const n=A.length/3;return s.map(v=>+(v/n).toFixed(3));}
+
+/* ---------------- 3) uma peça: malha fina (escultor da v622, em fatias) e a grossa (mo907Agrupa); espelho opcional ---------------- */
+function* in913PecaG(H,M,o){const t=performance.now();const g=yield* fat8Call(H.malha,['v913hc '+o.nome,o.f,o.B,o.h,null]);
+  // (correção) a cor por vértice é calculada aqui, em fatias: dentro do cp579Geo ela era um laço só (até 63 ms numa fatia com o campo das placas)
+  if(o.cor&&!g.attributes.color){const P=g.attributes.position.array,N=g.attributes.normal.array,n=P.length/3,C=new Float32Array(n*3);
+    for(let i=0;i<n;i++){const c=o.cor(P[i*3],P[i*3+1],P[i*3+2],N[i*3],N[i*3+1],N[i*3+2]);C[i*3]=c[0];C[i*3+1]=c[1];C[i*3+2]=c[2];if((i&31)===31&&performance.now()>=fat8Fim)yield 'cor '+o.nome;}
+    g.setAttribute('color',new THREE.BufferAttribute(C,3));}M.passos['esc '+o.nome]=Math.round(performance.now()-t);yield o.nome;
+  const gg=yield* mo907Agrupa(g,o.cel||(o.fina?Math.min(o.h*3.4,o.fina):o.h*3.4));   // (correção) placa fina: a célula da grossa não passa da espessura (senão a grossa fura)yield o.nome+' grossa';
+  const base={k:o.k||o.nome,mat:o.mat,fino:g,grosso:gg};const out=[];
+  for(const pv of [].concat(o.pivo)){if(pv.charAt(0)==='~'){out.push(Object.assign({},base,{pivo:pv.slice(1),fino:mo907Espelha(g),grosso:mo907Espelha(gg),esp:true}));}else out.push(Object.assign({},base,{pivo:pv}));}
+  for(const p of out){if(o.ref)p.ref=o.ref;M.partes.push(p);M.triFino+=in913Tri(p.fino);M.triGrosso+=in913Tri(p.grosso);}
+  M.cores[o.nome]=in913CorMedia(g);return out;}
+
+/* ---------------- 4) MINOTAURO (unidade: metros; espaço de cada pivô do `t210Minotauro`; chão em y = 0 na raiz) ---------------- */
+// pivôs na raiz: corpo (0,0,0) · braço D (0,33; 1,5; 0) / E espelhado · machado na mão (0; −0,68; 0,14 no braço, girado 0,45 em x no repouso)
+// cabeça (0; 1,62; 0,06) · rabo (0; 0,98; −0,17) · coxa (±0,13; 0,93; 0) · canela no joelho (0; −0,45; 0,03 na coxa; chão em y = −0,48)
+const IN913_MP={cab:[0,1.62,0.06],rabo:[0,0.98,-0.17],braco:[0.33,1.5,0],coxa:[0.13,0.93,0],canela:[0,-0.45,0.03]};
+function in913CamposMino(H){const {Ell,Cone,Esf,UK,Cad,Menos,Esp,Smax,Smin,Cx,S}=H;
+  // ---- tronco (pelo) ----
+  const T=[];
+  T.push([Ell([0,1.33,-0.01],[0.235,0.245,0.165]),0]);                                   // caixa torácica
+  T.push([Esp(Ell([0.1,1.375,0.088],[0.128,0.088,0.078],[0.15,0,-0.12])),0.05]);         // peitorais
+  T.push([Ell([0,1.12,0.02],[0.172,0.17,0.13]),0.07]);                                    // abdômen
+  for(const [y,z] of [[1.205,0.128],[1.125,0.138],[1.045,0.132]])T.push([Esp(Ell([0.043,y,z],[0.036,0.03,0.026])),0.018]);   // gomos do abdômen
+  T.push([Esp(Ell([0.155,1.15,0.07],[0.04,0.09,0.06],[0,0,0.25])),0.03]);                  // oblíquos
+  T.push([Ell([0,0.99,0.0],[0.19,0.1,0.145]),0.05]);                                      // cintura
+  T.push([Ell([0,0.92,-0.01],[0.195,0.1,0.145]),0.04]);                                   // bacia
+  T.push([Esp(Ell([0.085,0.9,-0.075],[0.1,0.1,0.085])),0.04]);                             // glúteos
+  T.push([Esp(Ell([0.14,1.28,-0.07],[0.12,0.2,0.1],[0,0,0.2])),0.06]);                    // dorsais
+  T.push([Esp(Esf([0.318,1.49,0.0],0.115)),0.05]);                                        // deltoides (centro no pivô do braço)
+  T.push([Esp(Cone([0.04,1.605,-0.03],[0.24,1.535,-0.02],0.088,0.07)),0.06]);             // trapézio alto
+  T.push([Cone([0,1.47,-0.01],[0,1.68,0.05],0.135,0.115),0.05]);                          // pescoço grosso
+  T.push([Esp(Ell([0.12,1.48,0.065],[0.13,0.045,0.055],[0,0,-0.25])),0.035]);             // clavículas
+  T.push([Esp(Ell([0.2,1.22,0.05],[0.03,0.06,0.045],[0,0,0.3])),0.02]);                   // serrátil
+  const tronco=UK(T);
+  // couro: cinto (cinta colada na cintura), correia diagonal colada no peito/costas, tanga da frente e de trás
+  const cinto=(x,y,z)=>Smax(Math.abs(tronco(x,y,z)-0.013)-0.013,Math.abs(y-0.99)-0.036,0.006);
+  const nC=[0.82,0.57,0],dC=0.709;const correia=(x,y,z)=>Smax(Math.abs(tronco(x,y,z)-0.011)-0.0105,Math.abs(nC[0]*x+nC[1]*y-dC)-0.024,0.005);
+  const tanga=(x,y,z)=>{const t=(0.985-y)/0.3,ra=0.205+0.05*Math.max(0,t),rb=0.155+0.04*Math.max(0,t);const k=Math.hypot(x/ra,z/rb);const de=(k-1)*Math.min(ra,rb);
+    let d=Math.abs(de)-0.012;d=Smax(d,Math.abs(y-0.83)-0.155+0.008*Math.sin(x*70+z*40),0.004);const w=0.105+Math.max(0,t)*0.035;d=Smax(d,Math.abs(x)-w,0.006);return d;};
+  const couro=UK([[cinto,0],[correia,0.004],[tanga,0.006]]);
+  // bronze: fivela, tachas no cinto, ombreira de duas lâminas no ombro esquerdo, fecho da correia
+  const BZ=[[Cx([0,0.99,0.168],[0.052,0.044,0.012],0.007),0]];
+  const cin0=Ell([0,0.99,0.0],[0.19,0.1,0.145]);for(let i=0;i<8;i++){const a=(i+0.5)/8*Math.PI*2;if(Math.abs(Math.sin(a))<0.12&&Math.cos(a)>0)continue;const A=in913Assenta((x,y,z)=>cin0(x,y,z)-0.026,[Math.sin(a)*0.25,0.99,Math.cos(a)*0.2],0.012,0.2);BZ.push([Esf(A.c,0.011),0.002]);}
+  const lam=(c,r,n,d0)=>{const e=Ell(c,r);return (x,y,z)=>Smax(Math.abs(e(x,y,z))-0.0095,-(n[0]*x+n[1]*y+n[2]*z-d0),0.004);};
+  BZ.push([lam([-0.31,1.5,0],[0.165,0.125,0.165],[-0.34,0.94,0],-0.34*-0.31+0.94*1.535),0]);
+  BZ.push([lam([-0.345,1.43,0],[0.145,0.11,0.155],[-0.6,0.8,0],-0.6*-0.345+0.8*1.47),0.003]);
+  BZ.push([Esf([-0.355,1.545,0.0],0.016),0.004]);
+  BZ.push([Cx([0.1,1.29,0.165],[0.026,0.026,0.01],0.005,[0,0,-0.6]),0.003]);              // fecho da correia no peito
+  const bronze=UK(BZ);
+  // ---- braço direito (espaço do pivô do ombro; o esquerdo é o espelho) ----
+  const A0=[];
+  A0.push([Esf([0,-0.01,0],0.105),0]);                                                    // ombro
+  A0.push([Ell([0,-0.16,0.036],[0.09,0.125,0.09]),0.05]);                                 // bíceps
+  A0.push([Ell([0,-0.15,-0.035],[0.088,0.14,0.082]),0.05]);                               // tríceps
+  A0.push([Esf([0,-0.32,0.0],0.07),0.05]);                                                // cotovelo
+  A0.push([Cad([[0,-0.33,0.02],[0,-0.44,0.065],[0,-0.6,0.11]],[0.078,0.074,0.052]),0.04]); // antebraço
+  A0.push([Ell([0.012,-0.41,0.06],[0.072,0.09,0.07]),0.04]);                              // massa do antebraço
+  let braco0=UK(A0);
+  // veias assentadas na pele (bíceps e antebraço)
+  const veia=(pts,r)=>{const P=pts.map(p=>in913Assenta(braco0,p,0,0).c);return Cad(P,P.map(()=>r));};
+  const VE=[[veia([[0.03,-0.08,0.14],[0.035,-0.17,0.14],[0.02,-0.27,0.11]],0.0068),0.006],[veia([[0.02,-0.27,0.11],[0.0,-0.35,0.1],[-0.02,-0.45,0.13],[-0.02,-0.56,0.15]],0.006),0.005],
+    [veia([[0.0,-0.35,0.1],[0.04,-0.42,0.13],[0.05,-0.52,0.15]],0.0055),0.005]];
+  // punho fechado em volta do cabo (eixo do cabo no repouso: (0; cos 0,45; sen 0,45) pela mão)
+  const c=[0,-0.685,0.14],ax=[0,Math.cos(0.45),Math.sin(0.45)],u=[1,0,0],v=[0,ax[2],-ax[1]];const P3=(s,th,R)=>[c[0]+ax[0]*s+R*(Math.cos(th)*u[0]+Math.sin(th)*v[0]),c[1]+ax[1]*s+R*(Math.cos(th)*u[1]+Math.sin(th)*v[1]),c[2]+ax[2]*s+R*(Math.cos(th)*u[2]+Math.sin(th)*v[2])];
+  const MAO=[[Ell([0.028,-0.675,0.125],[0.042,0.07,0.058],[-0.45,0,0]),0]];
+  for(let i=0;i<4;i++){const s=(1.5-i)*0.025;MAO.push([Cad([P3(s,-0.5,0.03),P3(s,0.6,0.043),P3(s,1.7,0.043),P3(s,2.7,0.038)],[0.0175-i*0.001,0.0175-i*0.001,0.016-i*0.001,0.014-i*0.001]),0.008]);}
+  MAO.push([Cad([P3(0.06,-0.9,0.035),P3(0.075,0.3,0.045),P3(0.07,1.4,0.038)],[0.019,0.017,0.014]),0.01]);   // polegar por cima
+  const mao=UK(MAO);
+  const braco=UK([[braco0,0],[UK(VE),0.004],[mao,0.03]]);
+  const furo=Cone([c[0]-ax[0]*0.2,c[1]-ax[1]*0.2,c[2]-ax[2]*0.2],[c[0]+ax[0]*0.2,c[1]+ax[1]*0.2,c[2]+ax[2]*0.2],0.025,0.025);   // o cabo passa por dentro
+  const bracoF=Menos(braco,furo,0.004);
+  // braçadeira de bronze colada no antebraço
+  const a0=[0,-0.43,0.062],a1=[0,-0.6,0.108];const ad=[a1[0]-a0[0],a1[1]-a0[1],a1[2]-a0[2]];const al=Math.hypot(...ad);ad[0]/=al;ad[1]/=al;ad[2]/=al;
+  const bracad=(x,y,z)=>{const t=(x-a0[0])*ad[0]+(y-a0[1])*ad[1]+(z-a0[2])*ad[2];const bo=0.004*S(0.012,0.0,Math.abs(t-0.012))+0.004*S(0.012,0.0,Math.abs(t-al+0.012));return Smax(Math.abs(braco0(x,y,z)-0.013-bo)-0.012,Math.abs(t-al/2)-al/2,0.004);};
+  // ---- coxa (espaço do quadril) e canela (espaço do joelho) ----
+  const coxa=in913Ruido(H,UK([[Cad([[0,0.04,0],[0,-0.2,0.035],[0,-0.44,0.03]],[0.125,0.115,0.08]),0],[Ell([0,-0.15,0.06],[0.097,0.15,0.08]),0.05],[Ell([0,-0.19,-0.04],[0.092,0.15,0.08]),0.05],[Esf([0,0.0,0],0.122),0.04],[Esf([0,-0.45,0.035],0.075),0.04]]),0.006,55);
+  const can0=UK([[Esf([0,0,0],0.078),0],[Ell([0,-0.08,-0.03],[0.077,0.12,0.082]),0.04],[Esf([0,-0.215,-0.07],0.05),0.04],[Cad([[0,-0.22,-0.068],[0,-0.38,-0.02]],[0.046,0.038]),0.03],[Esf([0,-0.395,-0.003],0.046),0.03],[Cad([[0,-0.4,0],[0,-0.448,0.026]],[0.039,0.042]),0.02]]);
+  const tufo=in913Ruido(H,Ell([0,-0.385,-0.012],[0.07,0.052,0.072]),0.014,48);
+  const canela=UK([[in913Ruido(H,can0,0.005,60),0],[tufo,0.02]]);
+  const dedoE=Ell([0.025,-0.455,0.035],[0.029,0.03,0.058]);const dedoC=(x,y,z)=>Smax(Smax(dedoE(x,y,z),-(y+0.48),0.004),y+0.433,0.006);
+  const casco=UK([[Esp(dedoC),0],[Esp(Ell([0.03,-0.432,-0.04],[0.012,0.01,0.014])),0.004]]);   // dois dedos fendidos e os esporões atrás
+  // ---- cabeça (espaço do pivô do pescoço) ----
+  const HC=[];
+  HC.push([Ell([0,0.1,0.0],[0.115,0.115,0.125]),0]);                                     // crânio
+  HC.push([Ell([0,0.18,0.03],[0.118,0.056,0.088]),0.04]);                                // testa larga (entre os chifres)
+  HC.push([Ell([0,0.12,0.09],[0.1,0.09,0.06]),0.04]);                                    // face
+  HC.push([Cad([[0,0.09,0.1],[0,0.052,0.2],[0,0.027,0.255]],[0.086,0.081,0.073]),0.05]); // focinho largo
+  HC.push([Ell([0,0.026,0.268],[0.09,0.063,0.046]),0.03]);                               // espelho do focinho
+  HC.push([Esp(Ell([0.075,0.03,0.07],[0.062,0.087,0.09])),0.05]);                        // bochechas
+  HC.push([Ell([0,-0.032,0.15],[0.07,0.042,0.1]),0.04]);                                 // queixo
+  HC.push([Esp(Ell([0.068,0.158,0.106],[0.056,0.024,0.04],[0,0,0.35])),0.022]);         // sobrancelha franzida
+  HC.push([Cone([0,-0.13,-0.04],[0,0.08,0.0],0.128,0.11),0.06]);                         // pescoço
+  HC.push([Ell([0,-0.06,0.06],[0.052,0.072,0.06]),0.04]);                                // papada
+  const orA=Ell([0.178,0.118,-0.02],[0.078,0.026,0.042],[0,0.25,-0.35]),orB=Ell([0.185,0.124,-0.006],[0.06,0.016,0.028],[0,0.25,-0.35]);const orelha=(x,y,z)=>Smax(orA(x,y,z),-orB(x,y,z),0.006);
+  HC.push([Esp(orelha),0.015]);
+  HC.push([in913Ruido(H,Ell([0,0.212,0.058],[0.072,0.036,0.05]),0.012,70),0.02]);          // topete crespo
+  let cab0=UK(HC);
+  const cab=Menos(cab0,UK([[Esp(Esf([0.09,0.106,0.117],0.023)),0],[Esp(Ell([0.036,0.021,0.308],[0.017,0.013,0.022])),0],[Ell([0,-0.006,0.235],[0.072,0.0045,0.06]),0]]),0.007);
+  const chifre1=(x,y,z)=>{const d=Cad([[0.08,0.18,0.0],[0.17,0.222,0.01],[0.25,0.302,0.06],[0.282,0.4,0.14],[0.262,0.472,0.222]],[0.049,0.041,0.031,0.018,0.005])(x,y,z);
+    const s=Math.hypot(x-0.08,y-0.18,z);return d+0.0042*(0.5+0.5*Math.cos(s*95))*S(0.2,0.06,s);};
+  const chifres=Esp(chifre1);
+  const argola=in913Anel([0,-0.011,0.309],0.031,0.0062,'z');
+  const olhoP=[0.09,0.106,0.122];
+  // ---- rabo (espaço do pivô) ----
+  const rabo=UK([[Cad([[0,0.0,0],[0,-0.1,-0.07],[0,-0.28,-0.11],[0,-0.47,-0.09]],[0.028,0.024,0.018,0.014]),0],[in913Ruido(H,Ell([0,-0.56,-0.078],[0.045,0.095,0.046]),0.013,60),0.02]]);
+  // ---- machado (espaço do pivô na mão; cabo em +y) ----
+  const cabo=UK([[Cone([0,-0.4,0],[0,0.86,0],0.023,0.021),0],[((cn)=>(x,y,z)=>{const d=cn(x,y,z);if(d>0.01)return d;const ph=Math.atan2(z,x)+y*55;return d+0.0032*S(0.55,1,Math.sin(ph));})(Cone([0,-0.19,0],[0,0.13,0],0.029,0.029)),0.002]]);
+  const lamina=(x,y,z)=>{const w=Math.abs(z);let d=Math.max(0.03-w,Math.hypot(y-0.78,w+0.01)-0.33,-(Math.hypot(y-0.78-0.26,w-0.085)-0.205),-(Math.hypot(y-0.78+0.26,w-0.085)-0.205));
+    const th=0.0072+0.009*(1-S(0.05,0.29,w));return Math.max(d,Math.abs(x)-th);};
+  const ferro=UK([[lamina,0],[Cx([0,0.78,0],[0.036,0.1,0.036],0.01),0.006],[Cone([0,0.86,0],[0,0.975,0],0.024,0.003),0.004],[Esf([0,-0.415,0],0.034),0],[in913Anel([0,0.672,0],0.037,0.006,'y'),0.002],[in913Anel([0,0.888,0],0.035,0.006,'y'),0.002]]);
+  return {tronco,couro,bronze,braco:bracoF,braco0,bracad,coxa,canela,casco,cab,cab0,chifres,argola,olhoP,rabo,cabo,ferro};}
+// cores (linear): pelo castanho com peito e focinho mais claros, pernas mais escuras; couro, chifre marfim → ponta escura, bronze
+function in913CoresMino(H){const {S,MX}=H;const C={pelo:in913L(0.72,0.48,0.31),peito:in913L(0.8,0.6,0.42),costas:in913L(0.58,0.37,0.23),perna:in913L(0.52,0.33,0.2),escuro:in913L(0.4,0.25,0.16),
+    focinho:in913L(0.7,0.56,0.47),nariz:in913L(0.13,0.1,0.1),orelhaD:in913L(0.62,0.4,0.36),couro:in913L(0.52,0.32,0.17),couroE:in913L(0.32,0.19,0.1),marfim:in913L(0.88,0.8,0.62),ponta:in913L(0.16,0.13,0.11),
+    bronze:in913L(1.0,0.92,0.8),bronzeE:in913L(0.55,0.45,0.32),casco:in913L(0.12,0.1,0.09),madeira:in913L(0.5,0.32,0.17),fio:in913L(0.95,0.95,0.95)};return C;}
+function* in913MinoG(){const T=THREE,BI=window.__bichos622,H=BI&&BI.h;if(!H||typeof H.malha!=='function')throw Error('escultor da v622 ausente');
+  if(typeof mo907Agrupa!=='function'||typeof mo907Espelha!=='function')throw Error('funções do MO907 ausentes');
+  const t0=performance.now();const M={partes:[],passos:{},cores:{},triFino:0,triGrosso:0,mats:{}};const F=in913CamposMino(H),C=in913CoresMino(H),{S,MX,fbm}=H;
+  const P=IN913_MP;
+  // tronco: peito e abdômen claros, costas escuras, pelo mais escuro embaixo da cintura
+  const corTronco=in913CorAO(H,F.tronco,(x,y,z,nx,ny,nz)=>{let c=MX(C.pelo,C.peito,S(0.0,0.6,nz)*S(0.95,1.15,y)*S(0.22,0.05,Math.abs(x)));c=MX(c,C.costas,S(0.0,-0.6,nz)*0.8);c=MX(c,C.perna,S(1.0,0.9,y));
+    c=MX(c,C.escuro,S(1.55,1.66,y)*0.35);const r=0.9+0.2*fbm(x*30,y*30,z*30);return [c[0]*r,c[1]*r,c[2]*r];},0.025,0.6,0.1);
+  yield* in913PecaG(H,M,{nome:'mino tronco',f:F.tronco,B:[-0.45,0.78,-0.27,0.45,1.72,0.27],h:0.024,cor:corTronco,mat:'pelo',pivo:'corpo'});
+  yield* in913PecaG(H,M,{fina:0.024,nome:'mino couro',f:F.couro,B:[-0.32,0.62,-0.24,0.32,1.62,0.24],h:0.0175,cor:in913CorAO(H,F.couro,(x,y,z,nx,ny,nz)=>{const k=0.85+0.3*fbm(x*60,y*60,z*60);const b=S(0.69,0.675,y)+S(0.012,0.004,Math.abs(Math.abs(y-0.99)-0.03));const c=MX(C.couro,C.couroE,b*0.7);return [c[0]*k,c[1]*k,c[2]*k];},0.012,0.55),mat:'couro',pivo:'corpo'});
+  yield* in913PecaG(H,M,{fina:0.019,nome:'mino bronze',f:F.bronze,B:[-0.52,0.9,-0.24,0.32,1.7,0.24],h:0.015,cor:in913CorAO(H,F.bronze,(x,y,z)=>MX(C.bronze,C.bronzeE,0.25+0.3*fbm(x*80,y*80,z*80)),0.01,0.55),mat:'bronze',pivo:'corpo'});
+  // braços
+  const corBraco=in913CorAO(H,F.braco,(x,y,z,nx,ny,nz)=>{let c=MX(C.pelo,C.costas,S(0.0,-0.7,nz)*0.6);c=MX(c,C.escuro,S(-0.62,-0.7,y)*0.35);const r=0.9+0.2*fbm(x*30+5,y*30,z*30);return [c[0]*r,c[1]*r,c[2]*r];},0.018,0.6,0.08);
+  yield* in913PecaG(H,M,{nome:'mino braco',k:'braco',f:F.braco,B:[-0.13,-0.79,-0.13,0.13,0.12,0.22],h:0.0165,cor:corBraco,mat:'pelo',pivo:['bracoD','~bracoE']});
+  yield* in913PecaG(H,M,{nome:'mino bracadeira',k:'bracadeira',f:F.bracad,B:[-0.11,-0.64,-0.03,0.11,-0.38,0.2],h:0.0145,cor:in913CorAO(H,F.bracad,(x,y,z)=>MX(C.bronze,C.bronzeE,0.2+0.3*fbm(x*90,y*90,z*90)),0.01,0.6),mat:'bronze',pivo:['bracoD','~bracoE']});
+  // cabeça, chifres, argola
+  const corCab=in913CorAO(H,F.cab,(x,y,z,nx,ny,nz)=>{const ax=Math.abs(x);let c=MX(C.pelo,C.focinho,S(0.17,0.24,z)*S(0.13,0.06,y));c=MX(c,C.nariz,S(0.255,0.29,z)*S(0.09,0.04,y)*S(0.1,0.06,ax));
+    c=MX(c,C.escuro,S(0.19,0.24,y)*0.55);c=MX(c,C.escuro,S(0.03,0.015,Math.hypot(ax-0.09,y-0.106,z-0.117))*0.8);if(ax>0.13&&y>0.09&&y<0.15&&nz>0.1)c=MX(c,C.orelhaD,0.6);
+    const r=0.9+0.2*fbm(x*34,y*34,z*34+2);return [c[0]*r,c[1]*r,c[2]*r];},0.012,0.55,0.08);
+  yield* in913PecaG(H,M,{nome:'mino cabeca',k:'cabeca',f:F.cab,B:[-0.27,-0.16,-0.15,0.27,0.27,0.33],h:0.014,cor:corCab,mat:'pelo',pivo:'cab'});
+  yield* in913PecaG(H,M,{nome:'mino chifres',k:'chifres',f:F.chifres,B:[-0.33,0.12,-0.06,0.33,0.49,0.25],h:0.012,cor:in913CorAO(H,F.chifres,(x,y,z)=>{const s=Math.hypot(Math.abs(x)-0.08,y-0.18,z);let c=MX(C.marfim,C.ponta,S(0.2,0.36,s));c=MX(c,C.ponta,S(0.03,0.0,s)*0.5);const k=0.9+0.15*fbm(x*70,y*70,z*70);return [c[0]*k,c[1]*k,c[2]*k];},0.008,0.6),mat:'osso',pivo:'cab'});
+  yield* in913PecaG(H,M,{nome:'mino argola',k:'argola',f:F.argola,B:[-0.045,-0.055,0.29,0.045,0.03,0.325],h:0.0045,cor:()=>C.bronze,mat:'bronze',pivo:'cab'});
+  // rabo, coxas, canelas, cascos
+  yield* in913PecaG(H,M,{nome:'mino rabo',k:'rabo',f:F.rabo,B:[-0.07,-0.68,-0.16,0.07,0.04,0.04],h:0.012,cor:in913CorAO(H,F.rabo,(x,y,z)=>MX(C.costas,C.escuro,S(-0.4,-0.55,y)),0.01,0.6,0.1),mat:'pelo',pivo:'rabo'});
+  const corPerna=(campo)=>in913CorAO(H,campo,(x,y,z,nx,ny,nz)=>{let c=MX(C.perna,C.escuro,0.35+0.4*S(0.4,0.75,fbm(x*40,y*40,z*40)));return c;},0.016,0.55,0.12);
+  yield* in913PecaG(H,M,{nome:'mino coxa',k:'coxa',f:F.coxa,B:[-0.16,-0.54,-0.15,0.16,0.17,0.16],h:0.018,cor:corPerna(F.coxa),mat:'pelo',pivo:['coxaD','~coxaE']});
+  yield* in913PecaG(H,M,{nome:'mino canela',k:'canela',f:F.canela,B:[-0.11,-0.47,-0.14,0.11,0.09,0.1],h:0.0135,cor:corPerna(F.canela),mat:'pelo',pivo:['canelaD','~canelaE']});
+  yield* in913PecaG(H,M,{nome:'mino casco',k:'casco',f:F.casco,B:[-0.07,-0.49,-0.07,0.07,-0.42,0.11],h:0.0085,cor:in913CorAO(H,F.casco,(x,y,z)=>MX(C.casco,C.ponta,S(-0.44,-0.475,y)*0.6),0.006,0.6),mat:'couro',pivo:['canelaD','~canelaE']});
+  // machado
+  yield* in913PecaG(H,M,{nome:'mino cabo',k:'cabo',f:F.cabo,B:[-0.04,-0.42,-0.04,0.04,0.88,0.04],h:0.0105,cor:in913CorAO(H,F.cabo,(x,y,z)=>{const em=y>-0.19&&y<0.13;const c=em?MX(C.couro,C.couroE,0.4+0.4*fbm(x*90,y*90,z*90)):MX(C.madeira,C.couroE,0.3*fbm(x*20,y*120,z*20)+0.15);return c;},0.006,0.7),mat:'couro',pivo:'mach'});
+  yield* in913PecaG(H,M,{nome:'mino ferro',k:'ferro',f:F.ferro,B:[-0.05,-0.46,-0.33,0.05,0.99,0.33],h:0.011,cor:in913CorAO(H,F.ferro,(x,y,z)=>{const w=Math.abs(z);let c=MX(C.bronze,C.bronzeE,0.25+0.35*fbm(x*60,y*60,z*60));c=MX(c,C.fio,S(0.26,0.3,w)*S(0.04,0.1,Math.abs(y-0.78)+0.05));return c;},0.008,0.6),mat:'bronze',pivo:'mach'});
+  // olhos: dois globos assentados na pele da cabeça (a geometria entra no olho VELHO, que guarda o material próprio)
+  const A=in913Assenta(F.cab0,F.olhoP,0.021,0.45);M.olhoGeo=in913Olhos(A,0.021,[1.12,0.86,0.8],16,false);M.triFino+=in913Tri(M.olhoGeo);M.triGrosso+=in913Tri(M.olhoGeo);
+  // materiais: o pelo é próprio (textura de pelo em triplanar, sem UV); bronze, couro e osso são os da v194 (já compilados na sala)
+  {const t=performance.now();if(!BI.cache.has('tex pelo')&&typeof mo907TexPeloG==='function')yield* mo907TexPeloG(BI);M.passos['tex pelo']=Math.round(performance.now()-t);}yield 'mino textura';
+  let tx=null;try{tx=H.texDe&&H.texDe('pelo');}catch(e){}
+  const pelo=new T.MeshStandardMaterial({map:tx&&tx.map||null,color:0xffffff,vertexColors:true,roughness:0.9,metalness:0,emissive:0x100604,emissiveIntensity:0.5});pelo.name='v913 pelo do minotauro';if(tx&&tx.map&&H.triplanar)H.triplanar(pelo,1/0.2,0.0016);
+  let V=null;try{V=typeof t210MinoMats==='function'?t210MinoMats():null;}catch(e){}
+  const liso=(nome,op)=>{const m=new T.MeshStandardMaterial(Object.assign({color:0xffffff,vertexColors:true},op));m.name='v913 '+nome;return m;};
+  M.mats={pelo,bronze:V&&V.bronze||liso('bronze',{color:0xd0a050,roughness:0.3,metalness:0.85,emissive:0x2a1804,emissiveIntensity:0.5}),couro:V&&V.couro||liso('couro',{roughness:0.55,metalness:0.1}),osso:V&&V.osso||liso('chifre',{roughness:0.4,metalness:0.05})};
+  M.ms=Math.round(performance.now()-t0);return M;}
+// esqueleto do minotauro velho: grupos pelos lugares (o mesmo do `t210Minotauro`)
+function in913PartesMino(g){const raiz=g.children.find(o=>o.isGroup&&/raiz/.test(o.name||''));if(!raiz)return null;const corpo=raiz.children.find(o=>o.isGroup&&o.position.lengthSq()<1e-6);if(!corpo)return null;
+  const P={corpo};const near=(o,p)=>Math.abs(o.position.x-p[0])<0.02&&Math.abs(o.position.y-p[1])<0.02&&Math.abs(o.position.z-p[2])<0.02;
+  for(const o of corpo.children){if(!o.isGroup)continue;if(near(o,[0.33,1.5,0]))P.bracoD=o;else if(near(o,[-0.33,1.5,0]))P.bracoE=o;else if(near(o,IN913_MP.cab))P.cab=o;else if(near(o,IN913_MP.rabo))P.rabo=o;}
+  for(const o of raiz.children){if(!o.isGroup)continue;if(near(o,[0.13,0.93,0]))P.coxaD=o;else if(near(o,[-0.13,0.93,0]))P.coxaE=o;}
+  if(P.bracoD)P.mach=P.bracoD.children.find(o=>o.isGroup&&near(o,[0,-0.68,0.14]));
+  for(const k of ['coxaD','coxaE'])if(P[k])P[k.replace('coxa','canela')]=P[k].children.find(o=>o.isGroup&&near(o,IN913_MP.canela));
+  for(const k of ['bracoD','bracoE','cab','rabo','coxaD','coxaE','mach','canelaD','canelaE'])if(!P[k])return null;
+  return {piv:P,manter:[],ref:{}};}
+
+/* ---------------- 8) tipos, montagem (uma vez; em fatias) ---------------- */
+// raio e centro (y no espaço do grupo) da esfera de cada tipo: escolha FINO/GROSSO pelo tamanho na tela
+const IN913_TIPOS={minotauro:{gera:()=>in913MinoG(),partes:g=>in913PartesMino(g),raio:1.1,cy:-0.33},armadura:{gera:()=>in913ArmG(),partes:g=>in913PartesArm(g),raio:1.3,cy:-0.08},
+  soldadinho:{gera:()=>in913SoldG(),partes:g=>in913PartesSold(g),raio:0.82,cy:-0.56},oni:{gera:()=>in913OniG(),partes:g=>in913PartesOni(g),raio:0.58,cy:0.06}};
+function* in913MontaG(quer){for(const t of Object.keys(IN913_TIPOS)){if(!quer[t]||IN913.M[t]||IN913.falhou[t])continue;
+    try{const M=yield* IN913_TIPOS[t].gera();IN913.M[t]=M;IN913.stats.montagens[t]={ms:M.ms,triFino:M.triFino,triGrosso:M.triGrosso,cores:M.cores,passos:M.passos};}catch(e){IN913.falhou[t]=true;in913Erro('montagem '+t,e);}yield t;}}
+function in913Monta(quer){if(IN913.job)return;const st=IN913.stats;IN913.estado='montando';const t0=performance.now();
+  const fim=()=>{const J=IN913.job;IN913.job=null;if(J){st.fatias+=J.passos||0;const mx=Math.round((J.max||0)*10)/10;if(mx>=st.maiorFatiaMs){st.maiorFatiaMs=mx;st.ondeMaior=J.rotMax;}st.cpuMs+=Math.round(J.ms||0);}st.relogioMs=Math.round(performance.now()-t0);
+    IN913.estado=Object.keys(IN913.falhou).length?'erro':'pronto';in913TodosTroca();};
+  const erro=e=>{IN913.job=null;IN913.estado='erro';in913Erro('montagem',e);};
+  try{if(typeof fat8Go==='function'){const J=fat8Go(in913MontaG(quer),{nome:'v913 inimigos esculpidos',urgente:()=>{try{return in913DaCena(ACTIVE).length>0;}catch(e){return false;}},fim,erro});if(IN913.estado==='montando')IN913.job=J;}
+    else{const it=in913MontaG(quer);let r;do{r=it.next();}while(!r.done);fim();}}catch(e){erro(e);}}
+
+/* ---------------- 9) a troca: malhas novas nos pivôs do inimigo velho ---------------- */
+function in913Trofeu(g){for(let p=g.parent;p;p=p.parent)if(p.userData&&p.userData.trofeu498)return true;return false;}
+// fusão do Leve: um inimigo parado (dormindo) pode ter as malhas velhas fundidas numa cópia estática — desfaz esses grupos antes de esvaziar as
+// velhas (senão a cópia mostraria o modelo velho até ele andar) e marca velhas e novas para a fusão não as pegar (como os bichos esculpidos)
+function in913SoltaFusao(g,objs){try{let sc=g;while(sc.parent)sc=sc.parent;if(!sc.isScene||typeof FUSAO==='undefined'||typeof fusaoDesfazer!=='function')return 0;const F=FUSAO.cenas.get(sc);if(!F||!F.grupos||!F.grupos.length)return 0;
+  const S=new Set(objs);let n=0;for(const gr of F.grupos.slice())if(gr.originais&&gr.originais.some(o=>S.has(o))){fusaoDesfazer(gr,F,sc);n++;}IN913.stats.fusoesDesfeitas=(IN913.stats.fusoesDesfeitas||0)+n;return n;}catch(e){in913Erro('fusão',e);return 0;}}
+function in913Troca(rec){if(!rec||rec.troca||rec.falhou)return !!(rec&&rec.troca);const M=IN913.M[rec.tipo];if(!M)return false;
+  let P=rec.P||null;if(!P){try{P=IN913_TIPOS[rec.tipo].partes(rec.g);}catch(e){in913Erro('esqueleto '+rec.tipo,e);}}if(!P){rec.falhou=true;in913Erro(rec.tipo,'esqueleto inesperado');return false;}
+  const trofeu=in913Trofeu(rec.g);const tr={novos:[],velhas:[],olho:null,fino:!!rec.ultFino,papel:null,trofeu,vis:false,d:1e9,px:0};const manter=new Set(P.manter||[]);
+  for(const o of rec.velhas){if(o===rec.olho||manter.has(o)||o.geometry===IN913_VAZIA)continue;tr.velhas.push({o,geo:o.geometry});}
+  const ouro=trofeu&&tr.velhas[0]?tr.velhas[0].o.material:null;   // troféu da v498: tudo de ouro
+  for(const p of M.partes){const pai=P.piv[p.pivo];if(!pai){in913Erro(rec.tipo,'pivô ausente '+p.pivo);continue;}
+    const m=new THREE.Mesh(p.grosso,ouro||M.mats[p.mat]);m.name='v913 '+rec.tipo+' · '+p.k+(p.esp?' (espelho)':'');m.castShadow=true;m.receiveShadow=false;if(!trofeu)m.raycast=()=>{};
+    m.userData.papelKeepGeo=true;m.userData.noCam=true;m.userData.in913=p.k;m.__p=p;m.__fusaoMoveu=9;
+    if(p.ref&&P.ref&&P.ref[p.ref]){const o=P.ref[p.ref];m.position.copy(o.position);m.quaternion.copy(o.quaternion);m.scale.copy(o.scale);}
+    pai.add(m);tr.novos.push(m);}
+  in913SoltaFusao(rec.g,tr.velhas.map(v=>v.o).concat(rec.olho?[rec.olho]:[]));
+  for(const v of tr.velhas){v.fm=v.o.__fusaoMoveu;v.o.__fusaoMoveu=9;v.o.geometry=IN913_VAZIA;}
+  if(rec.olho&&M.olhoGeo){tr.olho={o:rec.olho,geo:rec.olho.geometry};rec.olho.geometry=M.olhoGeo;}
+  const on=!!(typeof Q!=='undefined'&&Q.papel);if(!trofeu)for(const m of tr.novos){try{if(typeof papelUm==='function')papelUm(m,on);}catch(e){}}tr.papel=on;
+  rec.troca=tr;IN913.stats.tipos[rec.tipo].trocados++;return true;}
+function in913Destroca(rec){const tr=rec&&rec.troca;if(!tr)return;rec.ultFino=!!tr.fino;for(const m of tr.novos){if(m.parent)m.parent.remove(m);}for(const v of tr.velhas){v.o.geometry=v.geo;v.o.__fusaoMoveu=v.fm;}if(tr.olho)tr.olho.o.geometry=tr.olho.geo;
+  rec.troca=null;IN913.stats.tipos[rec.tipo].destrocados++;}
+function in913TodosTroca(){if(!IN913.ativo)return;for(const r of IN913.regs){if(IN913.M[r.tipo]&&!r.troca){try{in913Troca(r);}catch(e){in913Erro('troca '+r.tipo,e);}}}
+  if(IN913.regs.length>300){IN913.regs=IN913.regs.filter(r=>{let p=r.g;while(p.parent)p=p.parent;return p.isScene||r.troca;});}}
+function in913Dentro(o,sc){for(let p=o;p;p=p.parent)if(p===sc)return true;return false;}
+function in913DaCena(sc){const L=[];if(!sc)return L;for(const r of IN913.regs)if(r.g.parent&&in913Dentro(r.g,sc))L.push(r);return L;}
+
+/* ---------------- 10) FINO / GROSSO pelo tamanho na tela (sem corte por frustum: o frustum só escolhe os finos) ---------------- */
+const IN913_T={fr:new THREE.Frustum(),PV:new THREE.Matrix4(),esf:new THREE.Sphere(),cam:new THREE.Vector3(),c:new THREE.Vector3()};
+function in913Camera(){const W=IN913_T;let foco=800;try{camera.updateMatrixWorld();W.cam.setFromMatrixPosition(camera.matrixWorld);W.PV.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);W.fr.setFromProjectionMatrix(W.PV);foco=(innerHeight||800)/(2*Math.tan((camera.fov||60)*Math.PI/360));}catch(e){}return foco;}
+function in913AtualizaLOD(L){const W=IN913_T;const foco=in913Camera();const cand=[];const st={n:L.length,trocados:0,finos:0,grossos:0,visiveis:0,triNovos:0,triVelhos:0,chamadas:0};const on=!!(typeof Q!=='undefined'&&Q.papel);
+  for(const r of L){if(!r.troca&&IN913.M[r.tipo])in913Troca(r);const tr=r.troca;if(!tr)continue;st.trocados++;
+    if(tr.papel!==on&&!tr.trofeu){for(const m of tr.novos){try{papelUm(m,on);}catch(e){}}tr.papel=on;}
+    for(const v of tr.velhas)if(v.o.geometry!==IN913_VAZIA)v.o.geometry=IN913_VAZIA;   // alguém devolveu a geometria velha: esvazia de novo
+    let vis=r.g.visible;for(let p=r.g.parent;p&&vis;p=p.parent)if(!p.visible&&!p.isScene)vis=false;
+    const D=IN913_TIPOS[r.tipo];r.g.updateMatrixWorld(false);W.c.set(0,D.cy,0).applyMatrix4(r.g.matrixWorld);const s=Math.max(0.01,r.g.scale.x);W.esf.set(W.c,D.raio*s);const naTela=W.fr.intersectsSphere(W.esf),dentro=vis&&(!IN913.corte||naTela);
+    const d=Math.max(0.05,W.c.distanceTo(W.cam));tr.d=d;tr.px=D.raio*s*foco/d;tr.vis=dentro;const quer=tr.fino?tr.px>IN913.PX_GROSSO:tr.px>IN913.PX_FINO;tr.fino=false;if(quer&&dentro&&naTela)cand.push(tr);}
+  cand.sort((a,b)=>a.d-b.d);for(let i=0;i<cand.length&&i<IN913.MAX_FINOS;i++)cand[i].fino=true;
+  for(const r of L){const tr=r.troca;if(!tr)continue;const nivel=tr.fino?'fino':'grosso';for(const m of tr.novos){const geo=m.__p[nivel];if(m.geometry!==geo)m.geometry=geo;}
+    if(tr.vis){st.visiveis++;if(tr.fino)st.finos++;else st.grossos++;for(const m of tr.novos){st.triNovos+=in913Tri(m.geometry);st.chamadas++;}if(tr.olho)st.triNovos+=in913Tri(tr.olho.o.geometry);
+      for(const v of tr.velhas)st.triVelhos+=in913Tri(v.geo);if(tr.olho)st.triVelhos+=in913Tri(tr.olho.geo);}}
+  st.triAMais=st.triNovos-st.triVelhos;return st;}
+
+/* ---------------- 11) a cada quadro; pausa (congela as poses dos velhos e dos novos — também com o bloco desligado) ---------------- */
+function in913Quadro(dt){if(!IN913.on)return;const st=IN913.stats;st.quadros++;const sc=ACTIVE;if(!sc)return;const L=in913DaCena(sc);if(!L.length)return;
+  const falta={};let algum=false;for(const r of L){if(!IN913.M[r.tipo]&&!IN913.falhou[r.tipo]){falta[r.tipo]=true;algum=true;}}
+  if(algum&&!IN913.job)in913Monta(falta);
+  if(IN913.pausado)in913Congela(L);
+  if(!IN913.ativo)return;
+  try{IN913.ult=in913AtualizaLOD(L);}catch(e){in913Erro('quadro',e);}}
+function in913Congela(L){const guarda=o=>{if(!o.__in913pose)o.__in913pose={p:o.position.clone(),r:o.rotation.clone(),s:o.scale.clone()};else{o.position.copy(o.__in913pose.p);o.rotation.copy(o.__in913pose.r);o.scale.copy(o.__in913pose.s);}};
+  try{for(const r of L){guarda(r.g);r.g.traverse(o=>{if(o!==r.g&&!o.isMesh&&!o.isPoints&&!o.isSprite)guarda(o);});}}catch(e){in913Erro('pausa',e);}}
+function in913Descongela(){try{for(const r of IN913.regs)r.g.traverse(o=>{if(o.__in913pose)delete o.__in913pose;});}catch(e){}}
+
+/* ---------------- 12) ligar ao jogo e o gancho ---------------- */
+if(IN913.on){try{const p0=polishTick;polishTick=function(dt){const r=p0.apply(this,arguments);try{in913Quadro(Math.min(0.1,Math.max(0,dt||0)));}catch(e){in913Erro('polishTick',e);}return r;};}catch(e){in913Erro('ligar polishTick',e);}}
+// poses de foto: para cada tipo na sala, um de perto (~1,5 m) e um de corpo inteiro (~3,5 m); a câmera fica DENTRO da sala e sem parede na frente
+// (confere com um raio até o alvo e, se bater, gira em volta do inimigo até achar uma vista livre)
+function in913Fotos(filtro){const T=THREE,out=[];const sc=ACTIVE;if(!sc)return out;const a=v=>[+v.x.toFixed(3),+v.y.toFixed(3),+v.z.toFixed(3)];
+  const R=Object.values(ROOMS).find(x=>x&&x.scene===sc);const W=R&&R.world;const ray=new T.Raycaster();try{ray.camera=camera;}catch(e){}
+  const alvoDe={minotauro:[1.75,0.62],armadura:[1.62,0.58],soldadinho:[1.15,0.4],oni:[1.42,1.42]};   // altura (acima do chão) do rosto e do meio do corpo
+  const livre=(p,q)=>{try{const d=q.clone().sub(p);const L=d.length();ray.set(p,d.normalize());ray.far=L-0.35;ray.near=0.05;const hs=ray.intersectObjects(sc.children,true);for(const h of hs){if(h.object&&h.object.isMesh&&h.object.visible&&!(h.object.userData&&h.object.userData.in913))return false;}return true;}catch(e){return true;}};
+  const dentro=p=>{try{if(!W||!W.clamp)return true;const c=W.clamp(p.x,p.z,0.3);const cx=Array.isArray(c)?c[0]:c.x,cz=Array.isArray(c)?c[1]:c.z;return Math.hypot(cx-p.x,cz-p.z)<0.02;}catch(e){return true;}};
+  const vistos=new Set();
+  for(const r of in913DaCena(sc)){if(vistos.has(r.tipo)||(filtro&&filtro!==r.tipo&&IN913_TIPOS[filtro]))continue;if(!r.g.visible||in913Trofeu(r.g))continue;vistos.add(r.tipo);
+    r.g.updateMatrixWorld(true);const p=new T.Vector3(),q=new T.Quaternion(),s=new T.Vector3();r.g.matrixWorld.decompose(p,q,s);const fw=new T.Vector3(0,0,1).applyQuaternion(q).setY(0);if(fw.lengthSq()<1e-6)fw.set(0,0,1);fw.normalize();
+    const chao=r.tipo==='oni'?p.y-1.35:p.y-1.35-0.0;const [hR,hM]=alvoDe[r.tipo];
+    for(const [id,alt,dist,fov,nota] of [['perto',hR,1.5,40,'o rosto de perto (~1,5 m, versão fina)'],['inteiro',hM,3.5,45,'o corpo inteiro (~3,5 m)']]){
+      const alvo=new T.Vector3(p.x,chao+alt,p.z);let pos=null,ok=false;
+      for(const ang of [0.45,-0.45,1.0,-1.0,0.0,1.6,-1.6,2.3,-2.3,3.1]){const dir=fw.clone().applyAxisAngle(new T.Vector3(0,1,0),ang);const c=alvo.clone().addScaledVector(dir,dist);c.y=alvo.y+(id==='perto'?0.08:0.45);if(dentro(c)&&livre(c,alvo)){pos=c;ok=true;break;}if(!pos)pos=c;}
+      out.push({id:r.tipo+'-'+id,pos:a(pos),alvo:a(alvo),fov,nota:nota+(ok?'':' — ATENÇÃO: nenhuma vista livre achada')});}}
+  return out;}
+window.__inimigos913={get estado(){return IN913.on?(IN913.ativo?IN913.estado:'desligado'):'chave=0';},stats:IN913.stats,erros:IN913.erros,S:IN913,
+  desliga(){IN913.ativo=false;for(const r of IN913.regs){try{in913Destroca(r);}catch(e){in913Erro('desliga',e);}}return this.info();},
+  liga(){IN913.ativo=true;in913TodosTroca();try{IN913.ult=in913AtualizaLOD(in913DaCena(ACTIVE));}catch(e){in913Erro('liga',e);}return this.info();},
+  // avança o jogo dt segundos com o leitor na sala (o relógio da sala e o polishTick)
+  passo(dt){dt=dt||1/60;try{if(typeof CUR!=='undefined'&&CUR==='room'&&ROOM&&ROOM.tick)ROOM.tick(dt);polishTick(dt);}catch(e){in913Erro('passo',e);}return this.info();},
+  pausa(v){IN913.pausado=v===undefined?true:!!v;if(!IN913.pausado)in913Descongela();else{try{in913Congela(in913DaCena(ACTIVE));}catch(e){}}return IN913.pausado;},
+  info(){const m=IN913.M;const mod={};for(const t in IN913_TIPOS)mod[t]=m[t]?{triFino:m[t].triFino,triGrosso:m[t].triGrosso,ms:m[t].ms}:(IN913.falhou[t]?'falhou':null);
+    let L=[];try{L=in913DaCena(ACTIVE);}catch(e){}const porTipo={};for(const r of L){const q=porTipo[r.tipo]||(porTipo[r.tipo]={n:0,trocados:0});q.n++;if(r.troca)q.trocados++;}
+    return {estado:this.estado,conj:IN913.conj,naSala:porTipo,lod:IN913.ult||null,modelos:mod,tipos:IN913.stats.tipos,erros:IN913.erros.length};},
+  fotos(sala){try{return in913Fotos(sala);}catch(e){in913Erro('fotos',e);return [];}}};
+
+/* ---------------- 5) ARMADURA ANDANTE (oca: aço de placas; espaço de cada pivô do `t210Armadura`; chão em y = 0 na raiz) ---------------- */
+// pivôs: corpo (0,0,0) · braço D (0,255; 1,38; 0) / E espelhado · lança na mão D (0; −0,62; 0,05; 0,35 em x no repouso) · escudo: malha do
+// braço E em (−0,07; −0,45; 0,07) girada −0,9 em y (a peça nova copia esse lugar) · elmo (0; 1,52; 0) · pernas (±0,1; 0,95; 0) rígidas (chão em −0,95)
+function in913CamposArm(H){const {Ell,Cone,Esf,UK,Cad,Menos,Esp,Smax,Cx,S}=H;
+  // ---- tronco: peitoral com nervura, costas, gorjal, faldas em lâminas, cinto, ombreiras de 3 lâminas sobrepostas ----
+  const peito0=Ell([0,1.27,0.0],[0.2,0.255,0.15]);
+  const peito=(x,y,z)=>{let d=peito0(x,y,z);if(z>0)d-=0.011*Math.max(0,1-Math.abs(x)/0.04)*S(0.0,0.08,z)*S(1.02,1.12,y)*S(1.5,1.4,y);return d;};
+  const TR=[[peito,0],[Ell([0,1.06,0.0],[0.175,0.12,0.13]),0.05]];
+  for(let i=0;i<3;i++){const y0=1.0-i*0.062,r0=0.172+i*0.016,r1=r0+0.014;TR.push([(x,y,z)=>{const t=(y0-y)/0.072;const r=r0+(r1-r0)*Math.max(0,Math.min(1,t));const k=Math.hypot(x/r,z/(r*0.78));return Smax((k-1)*r*0.78,Math.abs(y-(y0-0.036))-0.036,0.004);},0.003]);}
+  TR.push([(x,y,z)=>{const k=Math.hypot(x/0.12,z/0.1);return Smax((k-1)*0.1,Math.abs(y-1.5)-0.055,0.006);},0.02]);                 // gorjal
+  TR.push([(x,y,z)=>{const k=Math.hypot(x/0.135,z/0.112);return Smax((k-1)*0.112,Math.abs(y-1.455)-0.018,0.004);},0.008]);
+  const falda=(x,y,z)=>{const ax=Math.abs(x);const t=(0.9-y)/0.16;const r=0.19+0.03*Math.max(0,t);const k=Math.hypot(x/r,z/(r*0.8));let d=Math.abs((k-1)*r*0.8)-0.013;d=Smax(d,Math.abs(y-0.82)-0.085,0.004);d=Smax(d,Math.abs(ax-0.11)-0.085,0.006);d=Smax(d,-z+0.02,0.004);return d;};
+  const faldaP=falda;
+  const lames=[];for(let i=0;i<3;i++){const c=[0.235+i*0.024,1.445-i*0.066,0],r=[0.13-i*0.012,0.098,0.142-i*0.01];const e=Ell(c,r);const n=[0.52,0.85,0];const d0=n[0]*c[0]+n[1]*c[1]-0.012;
+    lames.push([(x,y,z)=>Smax(Math.abs(e(x,y,z))-0.013,-(n[0]*x+n[1]*y-d0),0.004),0.003]);}   // (v913 correção) lâminas de 2,6 cm: as de 1,7 cm furavam na malha
+  const ombro=Esp(UK(lames));
+  const cinto=(x,y,z)=>{const k=Math.hypot(x/0.188,z/0.145);return Smax(Math.abs((k-1)*0.145)-0.012,Math.abs(y-1.01)-0.022,0.004);};
+  const RB=[];const rebite=(f,p)=>{const A=in913Assenta(f,p,0.011,0.55);RB.push([Esf(A.c,0.011),0.002]);};
+  for(const sx of [-1,1]){for(const y of [1.15,1.3,1.42])rebite(peito0,[sx*0.16,y,0.08]);for(let i=0;i<3;i++)rebite((x,y,z)=>lames[i][0](Math.abs(x),y,z),[sx*(0.3+i*0.028),1.45-i*0.066,0.06]);}
+  const tronco=UK([[UK(TR),0],[cinto,0.003],[Cx([0,1.01,0.155],[0.032,0.028,0.012],0.006),0.003]]);
+  const placas=UK([[ombro,0],[faldaP,0.004],[UK(RB),0.002]]);   // ombreiras, faldas e rebites: peça própria com malha mais fina
+  // ---- braço direito (espaço do ombro): braçal com lâminas, cotoveleira com asa, antebraço, manopla de dedos articulados em volta da haste ----
+  const BR=[[Cone([0,-0.02,0],[0,-0.27,0.0],0.058,0.052),0],[Esf([0,0,0],0.062),0.02]];
+  for(const y of [-0.06,-0.12])BR.push([in913Anel([0,y,0],0.058,0.008,'y'),0.006]);
+  BR.push([Esf([0,-0.31,-0.008],0.062),0.02]);BR.push([Ell([0.056,-0.31,-0.008],[0.012,0.062,0.072]),0.008]);
+  BR.push([Cone([0,-0.34,0.0],[0,-0.55,0.012],0.052,0.046),0.02]);BR.push([Cone([0,-0.53,0.012],[0,-0.6,0.02],0.05,0.064),0.006]);
+  const c=[0,-0.62,0.05],ax=[0,Math.cos(0.35),Math.sin(0.35)],u=[1,0,0],v=[0,ax[2],-ax[1]];const P3=(s,th,R)=>[c[0]+ax[0]*s+R*(Math.cos(th)*u[0]+Math.sin(th)*v[0]),c[1]+ax[1]*s+R*(Math.cos(th)*u[1]+Math.sin(th)*v[1]),c[2]+ax[2]*s+R*(Math.cos(th)*u[2]+Math.sin(th)*v[2])];
+  BR.push([Ell([0.03,-0.625,0.03],[0.036,0.06,0.05],[-0.35,0,0]),0.01]);
+  for(let i=0;i<4;i++){const s=(1.5-i)*0.022;for(let j=0;j<3;j++){const t0=-0.4+j*1.05,t1=t0+1.0;BR.push([Cad([P3(s,t0,0.036),P3(s,t1,0.037)],[0.0145,0.014]),0.002]);}}
+  BR.push([Cad([P3(0.055,-0.9,0.032),P3(0.068,0.3,0.04),P3(0.062,1.3,0.034)],[0.016,0.015,0.013]),0.006]);
+  const furo=Cone([c[0]-ax[0]*0.2,c[1]-ax[1]*0.2,c[2]-ax[2]*0.2],[c[0]+ax[0]*0.2,c[1]+ax[1]*0.2,c[2]+ax[2]*0.2],0.022,0.022);
+  const braco=Menos(UK(BR),furo,0.003);
+  // ---- escudo (espaço da malha velha: frente em +z): escudo de bico com borda, umbo e o medalhão do livro (a textura do escudo velho) ----
+  const cz=x=>0.035-0.9*x*x;
+  const esc2=(x,y)=>{const ax=Math.abs(x);const da=y<0?Math.hypot(ax+0.165,y)-0.33:ax-0.165;return Math.max(y-0.19,ax-0.165,da);};
+  const escudo=(x,y,z)=>{const d2=esc2(x,y);const bo=0.006*S(-0.022,-0.008,d2);return Math.max(d2,Math.abs(z-cz(x))-0.013-bo);};
+  const escudoF=UK([[escudo,0],[Ell([0,0.02,cz(0)+0.004],[0.088,0.088,0.016]),0.006]]);
+  // ---- lança (espaço do pivô na mão; haste em +y) ----
+  const haste=Cone([0,-0.62,0],[0,1.6,0],0.024,0.018);
+  const folha=(x,y,z)=>{const t=(y-1.62)/0.28;if(t<-0.05||t>1.05)return Math.max(1.62-y,y-1.9,Math.hypot(x,z)-0.05);const w=Math.max(0.001,0.044*Math.sin(Math.PI*Math.min(1,Math.max(0,t))*0.92+0.12)*(1-0.15*t));
+    const th=0.0068+0.007*Math.max(0,1-Math.abs(x)/w);return Math.max(Math.abs(x)-w,Math.abs(z)-th,1.62-y,y-1.9);};
+  const pontaL=UK([[folha,0],[Cone([0,1.54,0],[0,1.64,0],0.024,0.02),0.004],[in913Anel([0,1.56,0],0.025,0.006,'y'),0.002],[in913Anel([0,0.3,0],0.024,0.006,'y'),0],
+    [((cc)=>(x,y,z)=>Smax(Math.abs(cc(x,y,z))-0.0095,Math.abs(y-0.175)-0.072,0.003))(Cone([0,0.1,0],[0,0.25,0],0.075,0.026)),0.004],[Esf([0,-0.63,0],0.028),0.004]]);
+  // ---- elmo (espaço do pescoço): crânio com crista, viseira de bico com a fenda dos olhos e respiros, barbote, golas; pluma ----
+  const EL=[[Ell([0,0.17,-0.005],[0.125,0.145,0.14]),0],[Ell([0,0.265,-0.01],[0.013,0.08,0.13]),0.008],[Ell([0,0.13,0.08],[0.108,0.1,0.092]),0.03],[Ell([0,0.06,0.05],[0.112,0.07,0.1]),0.03]];
+  for(const y of [0.02,0.05])EL.push([(x,y2,z)=>{const k=Math.hypot(x/0.112,z/0.11);return Smax((k-1)*0.11,Math.abs(y2-y)-0.014,0.004);},0.004]);
+  EL.push([Esp(Esf([0.122,0.165,0.0],0.013)),0.003]);
+  let elmo0=UK(EL);
+  const fenda=Cx([0,0.163,0.16],[0.088,0.0085,0.07],0.003);const respiros=[];for(let i=0;i<5;i++)for(let j=0;j<2;j++)respiros.push([Esf([0.03+i*0.014,0.105-j*0.02,0.165-i*0.009],0.0062),0]);
+  const elmo=Menos(Menos(elmo0,fenda,0.002),UK(respiros),0.001);
+  const PL=[];for(let i=0;i<9;i++){const a=(i-4)*0.085,r=[0.036,0.032,0.02,0.006];const sa=Math.sin(a);PL.push([in913Ruido(H,Cad([[sa*0.01,0.3,-0.01],[sa*0.05,0.43+0.01*Math.cos(i),-0.12],[sa*0.09,0.4,-0.3],[sa*0.11,0.26,-0.43-0.02*Math.abs(i-4)]],r),0.005,80),0.014]);}
+  const pluma=UK(PL.concat([[Cone([0,0.27,0.0],[0,0.32,-0.02],0.022,0.016),0.006]]));
+  // ---- perna (espaço do quadril; chão em −0,95): coxote com lâminas, joelheira com asa, greva com panturrilha, sabatão de lâminas ----
+  const PE=[[Cone([0,-0.02,0],[0,-0.4,0.005],0.092,0.076),0],[Esf([0,0,0],0.088),0.02]];
+  for(const y of [-0.04,-0.1])PE.push([in913Anel([0,y,0.003],0.09,0.008,'y'),0.006]);
+  PE.push([Esf([0,-0.45,0.026],0.07),0.02]);PE.push([Ell([0.062,-0.45,0.02],[0.012,0.058,0.064]),0.008]);
+  PE.push([Cone([0,-0.5,0.0],[0,-0.86,-0.004],0.07,0.054),0.02]);PE.push([Ell([0,-0.6,-0.028],[0.062,0.12,0.066]),0.04]);
+  const sab0=Ell([0,-0.912,0.05],[0.062,0.045,0.13]);const sab=(x,y,z)=>{let d=Smax(sab0(x,y,z),-(y+0.95),0.004);if(d<0.01&&z>-0.03)d+=0.0035*S(0.6,1,Math.cos((z-0.0)*95));return d;};
+  PE.push([sab,0.02]);PE.push([in913Anel([0,-0.88,0.0],0.056,0.007,'y'),0.006]);
+  const perna=UK(PE);
+  return {tronco,placas,braco,escudo:escudoF,esc2,cz,haste,ponta:pontaL,elmo,elmo0,pluma,perna};}
+function* in913ArmG(){const T=THREE,BI=window.__bichos622,H=BI&&BI.h;if(!H||typeof H.malha!=='function')throw Error('escultor da v622 ausente');
+  const t0=performance.now();const M={partes:[],passos:{},cores:{},triFino:0,triGrosso:0,mats:{}};const F=in913CamposArm(H),{S,MX,fbm}=H;
+  const C={aco:in913L(0.6,0.63,0.68),aco2:in913L(0.5,0.53,0.58),gasto:in913L(0.42,0.43,0.46),ouro:in913L(0.95,0.74,0.3),escuro:in913L(0.04,0.04,0.05),couro:in913L(0.32,0.2,0.11),
+    verm:in913L(0.5,0.035,0.045),verm2:in913L(0.32,0.02,0.03),madeira:in913L(0.46,0.29,0.15),pluma:in913L(0.72,0.08,0.1),pluma2:in913L(0.5,0.04,0.06)};
+  // aço com marcas de uso: manchas, riscos e bordas um pouco mais claras; o ouro das bordas por cor de vértice (material de aço da v194)
+  const usa=(x,y,z,c)=>{const m=fbm(x*22+1,y*22,z*22+3);const r=0.5+0.5*Math.sin((x*0.7+y*1.3+z*0.4)*260+fbm(x*40,y*40,z*40)*6);let k=0.86+0.2*m-0.08*S(0.85,1,r);return [c[0]*k,c[1]*k,c[2]*k];};
+  const corTronco=in913CorAO(H,F.tronco,(x,y,z,nx,ny,nz)=>{let c=MX(C.aco,C.aco2,S(1.15,0.95,y)*0.6);const ax=Math.abs(x);
+    if(Math.abs(y-1.01)<0.024)c=C.couro;if(Math.abs(y-1.01)<0.03&&ax<0.035&&z>0.14)c=C.ouro;
+    for(let i=0;i<3;i++){const yb=1.0-i*0.062-0.072;if(Math.abs(y-yb)<0.006)c=C.ouro;}
+    if(y>1.44&&y<1.475&&nz>-0.5)c=MX(c,C.ouro,0.85);if(y>1.548&&ny>0.5&&Math.hypot(x,z)<0.11)c=C.escuro;
+    if(ax>0.2&&y>1.3)c=MX(c,C.ouro,S(0.006,0.0,Math.abs((0.52*ax+0.85*y)-(0.52*0.235+0.85*1.445-0.012))-0.0)*0.9);
+    return usa(x,y,z,c);},0.014,0.5);
+  yield* in913PecaG(H,M,{nome:'arm tronco',f:F.tronco,B:[-0.42,0.7,-0.24,0.42,1.6,0.24],h:0.018,cor:corTronco,mat:'aco',pivo:'corpo'});
+  yield* in913PecaG(H,M,{nome:'arm placas',k:'placas',f:F.placas,B:[-0.43,0.7,-0.24,0.43,1.6,0.24],h:0.0125,cor:in913CorAO(H,F.placas,(x,y,z,nx,ny,nz)=>{let c=C.aco;const ax=Math.abs(x);if(y<1.0)c=MX(C.aco,C.aco2,0.5);
+    if(ax>0.2&&y>1.3)c=MX(c,C.ouro,S(0.006,0.0,Math.abs((0.52*ax+0.85*y)-(0.52*0.235+0.85*1.445-0.012)))*0.9);return usa(x,y,z,c);},0.012,0.5),mat:'aco',pivo:'corpo',cel:0.026});
+  const corBraco=in913CorAO(H,F.braco,(x,y,z)=>{let c=C.aco;if(Math.abs(y+0.06)<0.007||Math.abs(y+0.12)<0.007)c=C.ouro;if(y<-0.59)c=MX(C.aco2,C.gasto,0.4);return usa(x,y,z,c);},0.01,0.5);
+  yield* in913PecaG(H,M,{nome:'arm braco',k:'braco',f:F.braco,B:[-0.1,-0.7,-0.1,0.1,0.08,0.13],h:0.013,cor:corBraco,mat:'aco',pivo:['bracoD','~bracoE']});
+  const corEsc=in913CorAO(H,F.escudo,(x,y,z,nx,ny,nz)=>{const d2=F.esc2(x,y);let c=z>F.cz(x)+0.004||nz>0.6?MX(C.verm,C.verm2,0.3+0.4*fbm(x*30,y*30,z*30)):C.aco2;if(d2>-0.02)c=C.ouro;if(Math.hypot(x,y-0.02)<0.095&&z>F.cz(0))c=C.ouro;if(nz<-0.6&&Math.abs(y)<0.03)c=C.couro;return usa(x,y,z,c);},0.008,0.6);
+  yield* in913PecaG(H,M,{fina:0.026,nome:'arm escudo',k:'escudo',f:F.escudo,B:[-0.2,-0.31,-0.06,0.2,0.22,0.08],h:0.0125,cor:corEsc,mat:'aco',pivo:'bracoE',ref:'escudo'});
+  yield* in913PecaG(H,M,{nome:'arm haste',k:'haste',f:F.haste,B:[-0.035,-0.64,-0.035,0.035,1.62,0.035],h:0.014,cor:in913CorAO(H,F.haste,(x,y,z)=>{const k=0.85+0.3*fbm(x*30,y*90,z*30);return [C.madeira[0]*k,C.madeira[1]*k,C.madeira[2]*k];},0.006,0.7),mat:'fosco',pivo:'lanca'});
+  yield* in913PecaG(H,M,{fina:0.0136,nome:'arm ponta',k:'ponta',f:F.ponta,B:[-0.09,-0.67,-0.09,0.09,1.92,0.09],h:0.0078,cor:in913CorAO(H,F.ponta,(x,y,z)=>{let c=C.aco;if(Math.abs(y-1.56)<0.012||Math.abs(y-0.3)<0.012||y<-0.6)c=C.ouro;if(y>1.64)c=MX(C.aco,in913L(0.95,0.96,0.98),S(0.012,0.02,Math.abs(x)+0.0));return usa(x,y,z,c);},0.006,0.6),mat:'aco',pivo:'lanca'});
+  const corElmo=in913CorAO(H,F.elmo,(x,y,z,nx,ny,nz)=>{let c=C.aco;if(Math.abs(y-0.163)<0.0095&&z>0.06&&Math.abs(x)<0.09)c=C.escuro;if(Math.abs(y-0.163)<0.016&&Math.abs(y-0.163)>=0.0095&&z>0.1&&Math.abs(x)<0.095)c=C.ouro;
+    if(Math.abs(x)<0.016&&y>0.24)c=MX(c,C.ouro,0.7);if(y<0.065)c=MX(c,C.aco2,0.6);return usa(x,y,z,c);},0.01,0.45);
+  yield* in913PecaG(H,M,{nome:'arm elmo',k:'elmo',f:F.elmo,B:[-0.15,-0.02,-0.17,0.15,0.36,0.2],h:0.0103,cor:corElmo,mat:'aco',pivo:'elmo'});
+  yield* in913PecaG(H,M,{nome:'arm pluma',k:'pluma',f:F.pluma,B:[-0.16,0.2,-0.5,0.16,0.48,0.04],h:0.011,cor:in913CorAO(H,F.pluma,(x,y,z)=>{if(y<0.33&&z>-0.03)return C.ouro;return MX(C.pluma,C.pluma2,S(0.3,0.75,fbm(x*50,y*50,z*50)));},0.01,0.55),mat:'fosco',pivo:'elmo'});
+  const corPerna=in913CorAO(H,F.perna,(x,y,z)=>{let c=C.aco;if(Math.abs(y+0.04)<0.008||Math.abs(y+0.1)<0.008||Math.abs(y+0.88)<0.008)c=C.ouro;if(y<-0.86)c=MX(C.aco2,C.gasto,0.3);return usa(x,y,z,c);},0.012,0.5);
+  yield* in913PecaG(H,M,{nome:'arm perna',k:'perna',f:F.perna,B:[-0.12,-0.96,-0.12,0.12,0.1,0.2],h:0.0175,cor:corPerna,mat:'aco',pivo:['pernaD','~pernaE']});
+  // medalhão: o disco com a textura do escudo velho (vermelho, aro de ouro e o livro), na frente do umbo
+  const md=new T.CircleGeometry(0.078,36);md.translate(0,0.02,F.cz(0)+0.004+0.0175);M.partes.push({k:'medalhao',mat:'escudoTex',pivo:'bracoE',ref:'escudo',fino:md,grosso:md});M.triFino+=in913Tri(md);M.triGrosso+=in913Tri(md);
+  // olhos: dois globos achatados no fundo da fenda da viseira (o olho velho acende no escuro da fenda)
+  M.olhoGeo=in913Olhos({c:[0.045,0.163,0.098],n:[0.25,0,1]},0.016,[1.45,0.62,0.6],14,false);M.triFino+=in913Tri(M.olhoGeo);M.triGrosso+=in913Tri(M.olhoGeo);
+  let V=null;try{V=typeof t210ArmMats==='function'?t210ArmMats():null;}catch(e){}
+  const liso=(nome,op)=>{const m=new T.MeshStandardMaterial(Object.assign({color:0xffffff,vertexColors:true},op));m.name='v913 '+nome;return m;};
+  const acoM=liso('aço da armadura',{metalness:0.4,roughness:0.36,emissive:0x0a0e14,emissiveIntensity:0.35});if(typeof t162Aro==='function'){try{t162Aro(acoM,0xa8c8ff,0.2,2.6);}catch(e){}}
+  M.mats={aco:acoM,fosco:V&&V.fosco||liso('fosco',{roughness:0.75,metalness:0}),escudoTex:V&&V.escudo||liso('escudo',{roughness:0.5,metalness:0.2,vertexColors:false,color:0xa8222a})};
+  M.ms=Math.round(performance.now()-t0);return M;}
+function in913PartesArm(g){const raiz=g.children.find(o=>o.isGroup&&/raiz/.test(o.name||''));if(!raiz)return null;const corpo=raiz.children.find(o=>o.isGroup&&o.position.lengthSq()<1e-6);if(!corpo)return null;
+  const P={corpo};const near=(o,p)=>Math.abs(o.position.x-p[0])<0.02&&Math.abs(o.position.y-p[1])<0.02&&Math.abs(o.position.z-p[2])<0.02;const manter=[],ref={};
+  for(const o of corpo.children){if(o.isGroup){if(near(o,[0.255,1.38,0]))P.bracoD=o;else if(near(o,[-0.255,1.38,0]))P.bracoE=o;else if(near(o,[0,1.52,0]))P.elmo=o;}else if(o.isMesh&&/capa/.test(o.material&&o.material.name||''))manter.push(o);}
+  for(const o of raiz.children){if(!o.isGroup)continue;if(near(o,[0.1,0.95,0]))P.pernaD=o;else if(near(o,[-0.1,0.95,0]))P.pernaE=o;}
+  if(P.bracoD)P.lanca=P.bracoD.children.find(o=>o.isGroup&&near(o,[0,-0.62,0.05]));
+  if(P.bracoE)ref.escudo=P.bracoE.children.find(o=>o.isMesh&&near(o,[-0.07,-0.45,0.07]));
+  if(P.lanca)for(const o of P.lanca.children)if(o.isMesh&&/flâmula|flamula/.test(o.material&&o.material.name||''))manter.push(o);
+  for(const k of ['bracoD','bracoE','elmo','pernaD','pernaE','lanca'])if(!P[k])return null;if(!ref.escudo)return null;
+  return {piv:P,manter,ref};}
+
+/* ---------------- 6) SOLDADINHO DE CORDA (lata pintada; espaço de cada pivô do `t210Soldadinho`; chão em y = 0 na raiz) ---------------- */
+// pivôs: corpo (0,0,0) · braço D (0,175; 0,97; 0) / E espelhado · espingarda na mão D (0; −0,345; 0,03; 0,25 em x no repouso) · cabeça (0; 1,02; 0)
+// chave (0; 0,84; −0,13; gira em z) · pernas (±0,075; 0,64; 0) (chão em −0,64)
+function in913CamposSold(H){const {Ell,Cone,Esf,UK,Cad,Menos,Esp,Smax,Cx,S}=H;
+  // ---- casaca (tinta): peito em barril, abas que abrem embaixo, gola; talabartes cruzados e cinto colados na casaca ----
+  const casaca0=UK([[Ell([0,0.84,0.0],[0.135,0.19,0.118]),0],[Ell([0,0.91,0.018],[0.13,0.115,0.11]),0.04],[Esp(Esf([0.13,0.97,0],0.05)),0.03]]);
+  const abas0=(x,y,z)=>{const t=(0.7-y)/0.18;const r=0.138+0.024*Math.max(0,Math.min(1,t));const k=Math.hypot(x/r,z/(r*0.92));return Smax((k-1)*r*0.92,Math.abs(y-0.61)-0.09,0.01);};
+  const abas=Menos(abas0,(x,y,z)=>Math.max(Math.abs(x)-0.006-(0.66-y)*0.12,0.0-z,y-0.66),0.004);
+  const casaca=UK([[casaca0,0],[abas,0.02]]);
+  const tal=(n,d)=>(x,y,z)=>Smax(Math.abs(casaca0(x,y,z)-0.006)-0.0055,Math.abs(n[0]*x+n[1]*y-d)-0.016,0.003);
+  const cintoT=(x,y,z)=>Smax(Math.abs(casaca(x,y,z)-0.007)-0.007,Math.abs(y-0.672)-0.02,0.003);
+  const corpoT=UK([[casaca,0],[tal([0.7,0.71],0.71*0.84),0.003],[tal([-0.7,0.71],0.71*0.84),0.003],[cintoT,0.003],[Cone([0,1.0,0],[0,1.05,0.0],0.075,0.07),0.02]]);
+  // latão: botões em duas fileiras, fivela, gola, dragonas com franja, encaixe da chave
+  const LT=[[Cx([0,0.672,0.122],[0.03,0.024,0.01],0.006),0],[in913Anel([0,1.022,0.002],0.073,0.013,'y'),0.004]];
+  for(let i=0;i<4;i++)for(const sx of [-1,1]){const A=in913Assenta(casaca0,[sx*0.045,0.74+i*0.06,0.13],0.011,0.3);LT.push([Esf(A.c,0.011),0.002]);}
+  for(const sx of [-1,1]){LT.push([Ell([sx*0.132,1.0,0.0],[0.062,0.018,0.066],[0,0,-sx*0.25]),0.004]);
+    for(let k=0;k<9;k++){const a=(k/8-0.5)*2.4;const p0=[sx*(0.132+0.055*Math.cos(a)),0.99-0.012*Math.cos(a),0.06*Math.sin(a)];LT.push([Cone(p0,[p0[0]+sx*0.006,p0[1]-0.05,p0[2]],0.007,0.005),0.003]);}}
+  LT.push([Cone([0,0.84,-0.112],[0,0.84,-0.13],0.03,0.03),0.003]);
+  const latao=UK(LT);
+  // ---- braço direito (espaço do ombro): manga vermelha com punho branco, luva branca fechada em volta da coronha ----
+  const BR=[[Esf([0,-0.005,0],0.05),0],[Cone([0,0,0],[0,-0.27,0.01],0.046,0.041),0.02],[Cone([0,-0.265,0.01],[0,-0.31,0.012],0.049,0.049),0.006],
+    [Ell([0,-0.345,0.014],[0.042,0.05,0.044]),0.012],[Ell([-0.03,-0.335,0.04],[0.014,0.026,0.014],[0.3,0,0.3]),0.006]];
+  const braco=Menos(UK(BR),Cone([0,-0.345-Math.cos(0.25)*0.2,0.03-Math.sin(0.25)*0.2],[0,-0.345+Math.cos(0.25)*0.2,0.03+Math.sin(0.25)*0.2],0.017,0.017),0.003);
+  // ---- espingarda (espaço do pivô na mão; cano em +y): coronha e guarda-mão de madeira, cano de aço com a rolha na boca; latão: bandas ----
+  const EM=[[Cx([0,-0.07,-0.012],[0.024,0.1,0.036],0.012,[0.12,0,0]),0],[Cx([0,0.2,0.004],[0.017,0.17,0.02],0.008),0.01],[Cone([0,0.04,0.024],[0,0.67,0.024],0.014,0.012),0.004],[Esf([0,0.685,0.024],0.019),0.004]];
+  const esp=UK(EM);const espL=UK([[in913Anel([0,0.12,0.012],0.025,0.006,'y'),0],[in913Anel([0,0.3,0.012],0.024,0.006,'y'),0],[in913Anel([0,0.46,0.018],0.022,0.006,'y'),0]]);
+  // ---- cabeça (espaço do pescoço): rosto redondo de lata, nariz, orelhas, bigode; barretina alta com pala, placa, cordões, pompom e penacho ----
+  const CB=[[Ell([0,0.105,0.0],[0.1,0.106,0.1]),0],[Esf([0,0.094,0.1],0.017),0.01],[Esp(Ell([0.098,0.1,0.0],[0.016,0.026,0.02])),0.008],[Cone([0,-0.02,0],[0,0.04,0],0.05,0.06),0.02]];
+  CB.push([Esp(Cad([[0.004,0.072,0.1],[0.03,0.068,0.097],[0.055,0.077,0.085],[0.064,0.092,0.072]],[0.011,0.0125,0.008,0.004])),0.004]);   // bigode
+  const rosto=UK(CB);
+  const cil=Cone([0,0.17,-0.004],[0,0.405,-0.004],0.101,0.094),pala=Ell([0,0.172,0.06],[0.1,0.012,0.08]);
+  const barretina=UK([[cil,0],[(x,y,z)=>Smax(pala(x,y,z),0.02-z,0.004),0.006],
+    [in913Ruido(H,Cone([0,0.45,0],[0,0.565,-0.006],0.03,0.005),0.004,120),0.01],[Esf([0,0.44,0.0],0.036),0.01],
+    [(x,y,z)=>Smax(Math.abs(cil(x,y,z)-0.004)-0.0045,Math.abs(y-0.215-0.03*Math.cos(x*14))-0.0055,0.002),0.002]]);
+  const cabL=UK([[in913Anel([0,0.405,-0.004],0.096,0.009,'y'),0],[in913Anel([0,0.172,-0.004],0.102,0.008,'y'),0],[((pl)=>(x,y,z)=>Smax(pl(x,y,z),Math.hypot(x,(y-0.3)*0.85)-0.04+(y<0.27?(0.27-y)*0.6:0),0.003))(((cl)=>(x,y,z)=>Math.abs(cl(x,y,z)-0.004)-0.0035)(Cone([0,0.17,-0.004],[0,0.405,-0.004],0.101,0.094))),0.002],
+    [((an)=>(x,y,z)=>Smax(an(x,y,z),y-0.1,0.002))(in913Anel([0,0.12,0.0],0.104,0.006,'x')),0.002]]);
+  // ---- chave de corda (espaço do pivô; haste em −z; gira em z): haste, colar e o laço em oito ----
+  const chave=UK([[Cone([0,0,0.01],[0,0,-0.1],0.012,0.012),0],[in913Anel([0,0,-0.03],0.017,0.006,'z'),0.003],[Esf([0,0,-0.105],0.02),0.006],[in913Anel([0.05,0,-0.112],0.04,0.011,'y'),0.008],[in913Anel([-0.05,0,-0.112],0.04,0.011,'y'),0.008]]);
+  // ---- perna (espaço do quadril; chão em −0,64): calça azul com faixa, bota preta lustrosa ----
+  const perna=UK([[Esf([0,0,0],0.058),0],[Cone([0,0,0],[0,-0.44,0],0.058,0.05),0.02],[Cone([0,-0.42,0],[0,-0.585,0.0],0.059,0.057),0.008],[in913Anel([0,-0.43,0],0.06,0.007,'y'),0.004],
+    [((pe)=>(x,y,z)=>Smax(pe(x,y,z),-(y+0.64),0.004))(Ell([0,-0.606,0.034],[0.059,0.036,0.098])),0.014]]);
+  return {corpoT,casaca0,latao,braco,esp,espL,rosto,barretina,cabL,chave,perna};}
+function* in913SoldG(){const T=THREE,BI=window.__bichos622,H=BI&&BI.h;if(!H||typeof H.malha!=='function')throw Error('escultor da v622 ausente');
+  const t0=performance.now();const M={partes:[],passos:{},cores:{},triFino:0,triGrosso:0,mats:{}};const F=in913CamposSold(H),{S,MX,fbm}=H;
+  const C={verm:in913L(0.8,0.1,0.085),branco:in913L(0.92,0.9,0.85),azul:in913L(0.16,0.24,0.62),amarelo:in913L(0.98,0.78,0.22),preto:in913L(0.07,0.07,0.085),pele:in913L(0.95,0.72,0.58),
+    rosa:in913L(0.95,0.45,0.45),madeira:in913L(0.52,0.3,0.14),aco:in913L(0.45,0.46,0.5),rolha:in913L(0.62,0.42,0.25),latao:in913L(1,0.95,0.86)};
+  const tinta=(c,x,y,z)=>{const k=0.94+0.1*fbm(x*50,y*50,z*50);return [c[0]*k,c[1]*k,c[2]*k];};   // tinta de lata com pinceladas leves
+  const corCorpo=in913CorAO(H,F.corpoT,(x,y,z,nx,ny,nz)=>{let c=C.verm;const dc=F.casaca0(x,y,z);
+    if(dc>0.004&&Math.abs(y-0.672)<0.022)c=C.branco;else if(dc>0.004&&y>0.69&&(Math.abs(0.7*x+0.71*y-0.71*0.84)<0.018||Math.abs(-0.7*x+0.71*y-0.71*0.84)<0.018))c=C.branco;if(y>0.995)c=C.verm;
+    if(y<0.535)c=MX(c,C.branco,0.0);return tinta(c,x,y,z);},0.01,0.6);
+  yield* in913PecaG(H,M,{nome:'sold corpo',k:'casaca',f:F.corpoT,B:[-0.2,0.5,-0.18,0.2,1.07,0.18],h:0.014,cor:corCorpo,mat:'tinta',pivo:'corpo'});
+  yield* in913PecaG(H,M,{nome:'sold latao',k:'latao',f:F.latao,B:[-0.21,0.63,-0.14,0.21,1.05,0.14],h:0.009,cor:in913CorAO(H,F.latao,()=>C.latao,0.008,0.6),mat:'latao',pivo:'corpo'});
+  yield* in913PecaG(H,M,{nome:'sold braco',k:'braco',f:F.braco,B:[-0.065,-0.41,-0.06,0.065,0.06,0.07],h:0.011,cor:in913CorAO(H,F.braco,(x,y,z)=>tinta(y<-0.262?C.branco:C.verm,x,y,z),0.008,0.65),mat:'tinta',pivo:['bracoD','~bracoE']});
+  yield* in913PecaG(H,M,{nome:'sold espingarda',k:'espingarda',f:F.esp,B:[-0.035,-0.2,-0.06,0.035,0.71,0.05],h:0.009,cor:in913CorAO(H,F.esp,(x,y,z)=>{let c=C.madeira;if(Math.hypot(x,z-0.024)<0.0155&&y>0.38)c=C.aco;if(y>0.668)c=C.rolha;return tinta(c,x,y,z);},0.006,0.65),mat:'tinta',pivo:'esp'});
+  yield* in913PecaG(H,M,{nome:'sold bandas',k:'bandas',f:F.espL,B:[-0.035,0.1,-0.02,0.035,0.48,0.045],h:0.006,cor:()=>C.latao,mat:'latao',pivo:'esp'});
+  const corRosto=in913CorAO(H,F.rosto,(x,y,z,nx,ny,nz)=>{const ax=Math.abs(x);let c=C.pele;if(Math.hypot(ax-0.058,y-0.085,(z-0.075)*1.2)<0.03)c=MX(c,C.rosa,0.85);if(y<0.095&&y>0.06&&z>0.07&&ax<0.07&&Math.abs(y-(0.072+0.0035*ax*100*ax))<0.014&&nz>0.2)c=C.preto;if(y<0.0)c=MX(c,C.pele,1);return tinta(c,x,y,z);},0.008,0.65);
+  yield* in913PecaG(H,M,{nome:'sold rosto',k:'rosto',f:F.rosto,B:[-0.13,-0.03,-0.12,0.13,0.22,0.13],h:0.0085,cor:corRosto,mat:'tinta',pivo:'cab'});
+  yield* in913PecaG(H,M,{nome:'sold barretina',k:'barretina',f:F.barretina,B:[-0.12,0.15,-0.12,0.12,0.58,0.16],h:0.01,cor:in913CorAO(H,F.barretina,(x,y,z)=>{let c=C.preto;if(y>0.418)c=y>0.475?MX(C.verm,C.branco,S(0.52,0.545,y)):C.verm;if(Math.abs(y-0.215-0.03*Math.cos(x*14))<0.008&&Math.hypot(x,z+0.004)>0.1)c=C.branco;return tinta(c,x,y,z);},0.008,0.6),mat:'tinta',pivo:'cab'});
+  yield* in913PecaG(H,M,{nome:'sold cab latao',k:'latao cab',f:F.cabL,B:[-0.12,0.0,-0.12,0.12,0.42,0.12],h:0.0075,cor:()=>C.latao,mat:'latao',pivo:'cab'});
+  yield* in913PecaG(H,M,{nome:'sold chave',k:'chave',f:F.chave,B:[-0.105,-0.06,-0.17,0.105,0.06,0.02],h:0.007,cor:in913CorAO(H,F.chave,()=>C.latao,0.006,0.6),mat:'latao',pivo:'chave'});
+  yield* in913PecaG(H,M,{nome:'sold perna',k:'perna',f:F.perna,B:[-0.075,-0.65,-0.075,0.075,0.07,0.14],h:0.012,cor:in913CorAO(H,F.perna,(x,y,z)=>{let c=y<-0.42?C.preto:C.azul;if(y>=-0.42&&x>0.048&&Math.abs(z)<0.012)c=C.amarelo;if(Math.abs(y+0.43)<0.008)c=C.preto;return tinta(c,x,y,z);},0.008,0.6),mat:'tinta',pivo:['pernaD','~pernaE']});
+  // olhos: duas contas assentadas no rosto (o olho velho, azul aceso)
+  const A=in913Assenta(F.rosto,[0.036,0.12,0.095],0.0135,0.35);M.olhoGeo=in913Olhos(A,0.0135,[0.85,1.15,0.7],12,false);M.triFino+=in913Tri(M.olhoGeo);M.triGrosso+=in913Tri(M.olhoGeo);
+  let V=null;try{V=typeof t210SoldMats==='function'?t210SoldMats():null;}catch(e){}
+  const liso=(nome,op)=>{const m=new T.MeshStandardMaterial(Object.assign({color:0xffffff,vertexColors:true},op));m.name='v913 '+nome;return m;};
+  M.mats={tinta:V&&V.tinta||liso('tinta',{roughness:0.3,metalness:0.06}),latao:V&&V.ouro||liso('latão',{color:0xe8b440,roughness:0.25,metalness:0.85,emissive:0x2a1a02,emissiveIntensity:0.5})};
+  M.ms=Math.round(performance.now()-t0);return M;}
+function in913PartesSold(g){const raiz=g.children.find(o=>o.isGroup&&/raiz/.test(o.name||''));if(!raiz)return null;const corpo=raiz.children.find(o=>o.isGroup&&o.position.lengthSq()<1e-6);if(!corpo)return null;
+  const P={corpo};const near=(o,p)=>Math.abs(o.position.x-p[0])<0.02&&Math.abs(o.position.y-p[1])<0.02&&Math.abs(o.position.z-p[2])<0.02;
+  for(const o of corpo.children){if(!o.isGroup)continue;if(near(o,[0.175,0.97,0]))P.bracoD=o;else if(near(o,[-0.175,0.97,0]))P.bracoE=o;else if(near(o,[0,1.02,0]))P.cab=o;else if(near(o,[0,0.84,-0.13]))P.chave=o;}
+  for(const o of raiz.children){if(!o.isGroup)continue;if(near(o,[0.075,0.64,0]))P.pernaD=o;else if(near(o,[-0.075,0.64,0]))P.pernaE=o;}
+  if(P.bracoD)P.esp=P.bracoD.children.find(o=>o.isGroup&&near(o,[0,-0.345,0.03]));
+  for(const k of ['bracoD','bracoE','cab','chave','pernaD','pernaE','esp'])if(!P[k])return null;
+  return {piv:P,manter:[],ref:{}};}
+
+/* ---------------- 7) MÁSCARA ONI (espaço da `cara` do `t210Oni`: rosto para +z; a mandíbula no grupo `mi`, girado −0,15 dentro do `mand`) ---------------- */
+// (v913 correção, depois das fotos) a 1.ª versão, casca de elipsoide, saiu uma bola vermelha; agora é uma MÁSCARA: uma placa de 3 cm que segue uma
+// superfície larga e pouco curva com o relevo esculpido (como a máscara da v194): vincos na testa, sobrancelhas grossas e bravas, órbitas fundas com
+// pálpebras, maçãs, nariz largo com narinas, lábio de cima arreganhado, boca rasgada aberta; queixo próprio com lábio de baixo; 2 presas grandes
+// embaixo e 2 em cima; chifres, tiras e borda de ouro; cabeleira preto-acinzentada em mechas grossas e desgrenhadas que saem da borda.
+// pivôs: cara (0; 0,05; 0 na raiz) · mand (0; −0,1; −0,02 na cara) → mi (rx −0,15): o queixo é feito no espaço da cara e levado ao do mi
+const IN913_ONI={zb:(x,y)=>0.115-0.75*x*x-0.35*(y-0.07)*(y-0.07),ym:x=>-0.098+0.55*x*x,yj:x=>-0.148+0.35*x*x};
+function in913OniRelevo(x,y,S){const bx=Math.abs(x),E=Math.exp;let d=0;
+  const yb=0.135+0.42*(bx-0.03);d+=0.042*E(-((y-yb)*(y-yb))/0.0005)*S(0.005,0.045,bx)*(1-S(0.19,0.23,bx));          // sobrancelhas grossas e bravas (descem para o meio)
+  d+=0.02*E(-(x*x/0.0006+(y-0.125)*(y-0.125)/0.0008));                                                               // nó entre as sobrancelhas
+  d-=0.01*E(-((bx-0.016)*(bx-0.016))/0.00003)*S(0.09,0.12,y)*(1-S(0.17,0.2,y));                                      // vincos verticais do cenho
+  for(const yk of [0.205,0.235,0.265]){const q=y-yk-0.012*Math.cos(x*18);d-=0.008*E(-(q*q)/0.00004)*(1-S(0.14,0.2,bx));}   // vincos da testa
+  const de=Math.hypot((bx-0.092)/0.055,(y-0.06)/0.045);d-=0.035*(1-S(0.6,1.05,de));d+=0.016*E(-((de-1.05)*(de-1.05))/0.03); // órbitas e pálpebras
+  d+=0.03*E(-(((bx-0.13)/0.05)**2+((y+0.02)/0.04)**2));                                                              // maçãs
+  d+=0.03*E(-(x*x/0.0012+((y-0.07)/0.06)**2));d+=0.065*E(-((x/0.045)**2+((y+0.02)/0.04)**2));d+=0.035*E(-(((bx-0.05)/0.03)**2+((y+0.035)/0.025)**2));
+  d-=0.03*E(-(((bx-0.032)/0.012)**2+((y+0.045)/0.009)**2));                                                          // nariz largo, asas e narinas
+  const yl=-0.085+0.5*x*x;d+=0.03*E(-((y-yl)*(y-yl))/0.0003)*(1-S(0.13,0.18,bx));                                    // lábio de cima arreganhado
+  return d;}
+function in913OniRelevoJ(x,y,S){const bx=Math.abs(x),E=Math.exp;const yl=IN913_ONI.yj(x)+0.002;return 0.028*E(-((y-yl)*(y-yl))/0.0003)*(1-S(0.12,0.17,bx))+0.025*E(-((x/0.05)**2+((y+0.25)/0.035)**2));}
+// placa de espessura t que segue a superfície z = zf(x,y) (dividida pelo gradiente para ficar perto de uma distância), recortada pelo contorno 2D
+function in913Placa(zf,contorno,t,Smax,grad){return (x,y,z)=>{const c=contorno(x,y);if(c>0.05)return c;const z0=zf(x,y);const g=grad(x,y);const n=Math.sqrt(1+g[0]*g[0]+g[1]*g[1]);   // gradiente da base (analítico): 1 avaliação do relevo por amostra
+  const ds=Math.max(z-z0,(z0-t)-z)/n;return Smax(ds,c,0.006);};}
+function in913CamposOni(H){const {Ell,Cone,Esf,UK,Cad,Menos,Esp,Smax,Cx,S}=H;const O=IN913_ONI;
+  const zf=(x,y)=>O.zb(x,y)+in913OniRelevo(x,y,S);
+  const contorno=(x,y)=>Math.max((Math.hypot(x/0.235,(y-0.08)/0.24)-1)*0.2,O.ym(x)-y);
+  const mas=in913Placa(zf,contorno,0.03,Smax,(x,y)=>[-1.5*x,-0.7*(y-0.07)]);
+  const goela=Ell([0,-0.125,0.02],[0.15,0.05,0.04]);
+  const mascara=UK([[mas,0],[goela,0.004]]);
+  // queixo (espaço da cara, levado ao do mi)
+  const zj=(x,y)=>0.1-0.9*x*x-0.6*(y+0.2)*(y+0.2)+in913OniRelevoJ(x,y,S);
+  const contJ=(x,y)=>Math.max((Math.hypot(x/0.2,(y+0.2)/0.12)-1)*0.12,y-O.yj(x),-(y+0.31));
+  const queixoC=in913Placa(zj,contJ,0.03,Smax,(x,y)=>[-1.8*x,-1.2*(y+0.2)]);
+  // ouro: chifres com anel, tiras sobre as sobrancelhas, borda da máscara (fora da boca)
+  const OU=[];for(const sx of [-1,1]){OU.push([Cad([[sx*0.12,0.24,0.03],[sx*0.17,0.33,0.02],[sx*0.22,0.43,0.04],[sx*0.24,0.54,0.1]],[0.048,0.04,0.028,0.005]),0]);OU.push([in913Anel([sx*0.125,0.25,0.03],0.042,0.01,'y'),0.004]);}
+  const tira=[];for(let i=0;i<=7;i++){const bx=0.03+i/7*0.16,yb=0.135+0.42*(bx-0.03)+0.012;tira.push([bx,yb,zf(bx,yb)+0.004]);}
+  OU.push([Esp(Cad(tira,tira.map((p,i)=>0.011-0.004*Math.abs(i-3.5)/3.5))),0.003]);
+  OU.push([(x,y,z)=>{const c=contorno(x,y);if(c>0.03||y<O.ym(x)+0.02)return Math.max(c,0.02);const z0=zf(x,y);return Smax(Math.abs(c+0.007)-0.007,Math.abs(z-z0+0.01)-0.014,0.003);},0.003]);
+  const ouro=UK(OU);
+  // presas e dentes: em cima (na cara) e embaixo (no queixo)
+  const DS=[];for(let i=0;i<8;i++){const x=(i-3.5)*0.024,y=O.ym(x);DS.push([Cx([x,y-0.008,zf(x,y+0.01)-0.016],[0.0095,0.013,0.007],0.004),0.002]);}
+  for(const sx of [-1,1]){const x=sx*0.105,y=O.ym(x);DS.push([Cone([x,y+0.005,zf(x,y+0.01)-0.016],[x*0.96,y-0.06,zf(x,y)-0.008],0.015,0.002),0.003]);}
+  const dentes=UK(DS);
+  const DI=[];for(let i=0;i<6;i++){const x=(i-2.5)*0.022,y=O.yj(x);DI.push([Cx([x,y+0.008,zj(x,y-0.01)-0.016],[0.009,0.012,0.007],0.004),0.002]);}
+  for(const sx of [-1,1]){const x=sx*0.072,y=O.yj(x);DI.push([Cad([[x,y-0.01,zj(x,y-0.012)-0.017],[x*1.05,y+0.045,zj(x,y)-0.012],[x*1.12,y+0.092,zj(x,y)-0.004]],[0.021,0.013,0.002]),0.003]);}   // as 2 presas grandes de baixo
+  const dentesIC=UK(DI);
+  const cs=Math.cos(-0.15),sn=Math.sin(-0.15);const paraMi=f=>(x,y,z)=>f(x,y*cs-z*sn-0.1,y*sn+z*cs-0.02);
+  // cabeleira: mechas grossas e desgrenhadas que saem da borda de cima e dos lados, abrem para fora e caem; e uma massa escura atrás (não deixa ver o oco)
+  const nuca=Ell([0,0.06,-0.08],[0.2,0.25,0.1]);const CA=[[(x,y,z)=>Smax(nuca(x,y,z),z+0.0,0.01),0]];
+  const r=H.rnd(19415);for(let i=0;i<26;i++){const q=i/25,a=(q-0.5)*Math.PI*1.7+(r()-0.5)*0.12;const sa=Math.sin(a),ca=Math.cos(a);
+    const p0=[sa*0.225,0.08+ca*0.235,-0.025-r()*0.02];const L=0.7+r()*0.5,ab=0.07+0.06*r();const bx=(r()-0.5)*0.08,bz=(r()-0.5)*0.06;const sobe=ca>0.3?0.05+0.06*r():0;
+    const p1=[p0[0]+sa*ab,p0[1]+ca*ab*0.8+sobe,p0[2]-0.05];const p2=[p0[0]+sa*(ab+0.07)+bx,p0[1]+ca*0.05+sobe*0.6-0.12*L,p0[2]-0.15+bz];const p3=[p0[0]+sa*(ab+0.1)+bx*2,p0[1]-0.08-0.3*L,p0[2]-0.24+bz*1.5];
+    CA.push([Cad([p0,p1,p2,p3],[0.042+0.01*r(),0.038,0.024,0.007]),0.012]);}
+  const cabelo=in913Ruido(H,UK(CA),0.004,45);
+  return {mascara,mas,zf,ouro,dentes,queixo:paraMi(queixoC),dentesI:paraMi(dentesIC),cabelo};}
+function* in913OniG(){const T=THREE,BI=window.__bichos622,H=BI&&BI.h;if(!H||typeof H.malha!=='function')throw Error('escultor da v622 ausente');
+  const t0=performance.now();const M={partes:[],passos:{},cores:{},triFino:0,triGrosso:0,mats:{}};const F=in913CamposOni(H),{S,MX,fbm}=H;
+  const C={laca:in913L(0.8,0.06,0.04),laca2:in913L(0.58,0.035,0.025),dentro:in913L(0.14,0.04,0.03),goela:in913L(0.06,0.01,0.01),ouro:in913L(1,0.95,0.86),marfim:in913L(1,0.97,0.88),dente:in913L(0.95,0.93,0.86),
+    cabelo:in913L(0.15,0.14,0.15),mecha:in913L(0.3,0.29,0.31)};
+  const laca=(x,y,z,nx,ny,nz)=>{let c=MX(C.laca,C.laca2,0.2+0.35*fbm(x*18,y*18,z*18));if(nz<-0.3)c=C.dentro;if(z<0.05&&y<-0.08&&y>-0.17&&Math.abs(x)<0.15)c=C.goela;return c;};
+  yield* in913PecaG(H,M,{fina:0.03,nome:'oni mascara2',k:'mascara',f:F.mascara,B:[-0.25,-0.18,-0.05,0.25,0.33,0.24],h:0.0085,cor:in913CorAO(H,F.mascara,laca,0.01,0.5),mat:'laca',pivo:'cara'});
+  yield* in913PecaG(H,M,{nome:'oni ouro2',k:'ouro',f:F.ouro,B:[-0.29,-0.12,-0.06,0.29,0.56,0.2],h:0.008,cor:in913CorAO(H,F.ouro,(x,y,z)=>{if(y>0.22&&Math.abs(x)>0.08)return MX(C.marfim,C.ouro,S(0.3,0.5,y));return C.ouro;},0.006,0.6),mat:'ouro',pivo:'cara'});
+  yield* in913PecaG(H,M,{nome:'oni dentes2',k:'dentes',f:F.dentes,B:[-0.15,-0.2,0.0,0.15,-0.04,0.16],h:0.0045,cor:in913CorAO(H,F.dentes,()=>C.dente,0.004,0.6),mat:'osso',pivo:'cara'});
+  yield* in913PecaG(H,M,{fina:0.03,nome:'oni queixo2',k:'queixo',f:F.queixo,B:[-0.22,-0.24,-0.08,0.22,0.08,0.18],h:0.0085,cor:in913CorAO(H,F.queixo,(x,y,z,nx,ny,nz)=>{let c=MX(C.laca,C.laca2,0.2+0.35*fbm(x*18,y*18,z*18));if(nz<-0.3)c=C.dentro;return c;},0.01,0.5),mat:'laca',pivo:'mi'});
+  yield* in913PecaG(H,M,{nome:'oni dentes baixo2',k:'dentes baixo',f:F.dentesI,B:[-0.13,-0.11,-0.04,0.13,0.11,0.17],h:0.004,cor:in913CorAO(H,F.dentesI,()=>C.dente,0.004,0.6),mat:'osso',pivo:'mi'});
+  yield* in913PecaG(H,M,{nome:'oni cabelo2',k:'cabeleira',f:F.cabelo,B:[-0.58,-0.66,-0.46,0.58,0.52,0.03],h:0.016,cor:in913CorAO(H,F.cabelo,(x,y,z)=>MX(C.cabelo,C.mecha,S(0.55,0.8,fbm(x*30+3,y*30,z*30))*0.8),0.012,0.6),mat:'cabelo',pivo:'cara'});
+  // olhos esbugalhados: dois globos com a íris na frente, no fundo das órbitas (o material próprio do olho velho tem a textura da íris)
+  const zc=F.zf(0.092,0.06)-0.002;const nO=[0.25,0.04,1],lO=Math.hypot(...nO);M.olhoGeo=in913Olhos({c:[0.092,0.06,zc-0.03],n:nO.map(v=>v/lO)},0.043,[1,0.92,0.85],22,true);M.triFino+=in913Tri(M.olhoGeo);M.triGrosso+=in913Tri(M.olhoGeo);
+  let tx=null;{const t=performance.now();if(!BI.cache.has('tex pelo')&&typeof mo907TexPeloG==='function')yield* mo907TexPeloG(BI);try{tx=BI.cache.has('tex pelo')&&H.texDe?H.texDe('pelo'):null;}catch(e){}M.passos['tex pelo']=Math.round(performance.now()-t);}yield 'oni textura';
+  let V=null;try{V=typeof t210OniMats==='function'?t210OniMats():null;}catch(e){}
+  const liso=(nome,op)=>{const m=new T.MeshStandardMaterial(Object.assign({color:0xffffff,vertexColors:true},op));m.name='v913 '+nome;return m;};
+  const lacaM=liso('laca da oni',{roughness:0.2,metalness:0.05,emissive:0x1a0302,emissiveIntensity:0.5});if(typeof t162Aro==='function'){try{t162Aro(lacaM,0xff6030,0.22,3.0);}catch(e){}}
+  const cab=liso('cabeleira da oni',{map:tx&&tx.map||null,roughness:0.75,emissive:0x060506,emissiveIntensity:0.3});if(tx&&tx.map&&H.triplanar)H.triplanar(cab,1/0.12,0.0014);
+  M.mats={laca:lacaM,cabelo:cab,ouro:V&&V.ouro||liso('ouro',{color:0xe8b848,roughness:0.28,metalness:0.85,emissive:0x3a2604,emissiveIntensity:0.5}),osso:V&&V.osso||liso('dentes',{color:0xfff8ec,roughness:0.35})};
+  M.ms=Math.round(performance.now()-t0);return M;}
+function in913PartesOni(g){const raiz=g.children.find(o=>o.isGroup&&/raiz/.test(o.name||''));if(!raiz)return null;const cara=raiz.children.find(o=>o.isGroup&&Math.abs(o.position.y-0.05)<0.02);if(!cara)return null;
+  const mand=g.userData.mand;if(!mand||mand.parent!==cara)return null;const mi=mand.children.find(o=>o.isGroup);if(!mi)return null;return {piv:{cara,mi},manter:[],ref:{}};}
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
