@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v910</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v911</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -129706,6 +129706,295 @@ window.__prado910={get estado(){return PR910.on?(PR910.ativo?PR910.estado:'desli
           const meio=A.p.clone().setY(chao+0.6);out.push({id:'lobo-inteiro',pos:a(meio.clone().addScaledVector(A.lado,3.2).addScaledVector(A.fw,1.4).setY(chao+1.2)),alvo:a(meio),fov:45,nota:'o lobo de lado, corpo inteiro (~3,5 m)'});
           const c=new T.Vector3();for(const g of L)c.add(g.position);c.multiplyScalar(1/L.length);c.y=chao+0.5;let sp=0;for(const g of L)sp=Math.max(sp,Math.abs(g.position.x-c.x),Math.abs(g.position.z-c.z));out.push({id:'lobos-conjunto',pos:a(c.clone().add(new T.Vector3(0,0,Math.max(9,sp*1.25+4))).setY(chao+3.2)),alvo:a(c),fov:55,nota:'os lobos da sala (grossos)'});}}}
     catch(e){pr910Erro('fotos',e);}return out;}};
+
+/* ===================== v911 · OS FANTASMAS ACORRENTADOS DO HALLOWEEN VIRAM ESCULPIDOS (bloco `FT911`) =====================
+   Pedido do Luiz (25/11, «ok»): trocar os bichos e figuras ainda montados com primitivas por modelos esculpidos («precisam ficar
+   esteticamente lindos»). Quinto lote (depois do `MO907`, `AV908`, `TE909` e `PR910`): os 16 fantasmas acorrentados da sala de Halloween.
+   COMO ERA (`hq558Fantasma`, v558, no lugar da `tr507Fantasma`): 16 fantasmas na biblioteca de Terror (`ROOMS.lib`: 3 da v507, 6 da v551,
+     3 da v553, 4 da v557; `TR507.fantasmas` e `HQ558.fant`), cada um um grupo com: corpo de `LatheGeometry` de 48 lados deformada
+     (`hq558Corpo`: capuz, ombros, 6 farrapos), braços de tubo, farrapos das mangas de CONE, dedos de tubo — tudo no material de aparição
+     próprio (`hq558Mat`: ShaderMaterial com contorno aceso/fresnel, faixas que sobem, tremor e a barra que some embaixo, o pano a ondular
+     no vértice, `uSeed` por fantasma) —, rosto em sombra de círculo, órbitas de círculo, olhos de esfera acesos, boca de círculo, metade
+     com correntes de toros, aura e fiapos em sprites. Voam em roda (`tr507Tick`) e respiram/inclinam (`hq558Tick`).
+   AGORA: um FANTASMA ESCULPIDO por campo de distância (as ferramentas da v579/v622), montado UMA vez em fatias (`fat8Go`) e partilhado:
+   · MORTALHA: capuz pontudo que cai sobre os ombros em capelete, a abertura funda do capuz com a beira grossa, pregas que descem dos
+     ombros e se abrem para baixo, ombros e peito sob o pano, e a barra desfeita em 16 TIRAS compridas e irregulares (cada uma com a sua
+     largura, comprimento, desvio e torção) que se afinam até sumir — o fade do shader apaga as pontas;
+   · BRAÇOS estendidos com MANGAS largas de boca de sino, ocas (a mão sai de dentro), a boca recortada em dentes e o pano que pende
+     embaixo do antebraço desfeito em tiras (tiras do próprio pano, não cones);
+   · MÃOS ossudas (peça própria, mais fina): pulso com os ossos à mostra, metacarpos, nós grossos e quatro dedos compridos de três
+     falanges com nós em cada junta, curvados como garras, e o polegar;
+   · ROSTO fundo dentro do capuz (peça própria, cor por vértice, sem luz: em sombra como o de antes): crânio, arcada, órbitas fundas,
+     maçãs salientes, bochechas cavadas, a cavidade do nariz e a BOCA ABERTA EM GRITO com o queixo caído, sobre um forro escuro que enche
+     o fundo do capuz; os OLHOS acesos (as esferas do material da v558) nas órbitas, no lugar exato de antes (os sprites de brilho
+     continuam a casar com eles);
+   · CORRENTES para os mesmos fantasmas que as tinham: grilheta de banda larga no pulso e 11 elos ovais de verdade, entrelaçados (cada
+     elo a 90° do anterior), que pendem e arrastam um pouco para trás; material de ferro de antes.
+   O corpo usa o MESMO material de aparição de cada fantasma (o objeto `hq558Mat` dele: fresnel, faixas, tremor, fade e o pano a ondular no
+   vértice continuam iguais; a malha nova tem `position` no mesmo espaço da velha — o do grupo, com o kit da v558 assado). O rosto, os
+   olhos e a corrente ganham o MESMO balanço de pano do shader (as mesmas `uT`/`uSeed`, partilhadas) para não descolarem do capuz e do pulso.
+   As malhas novas entram como FILHAS do grupo de cada fantasma: posição, giro, inclinação, respiração, trajetória e fase são as do jogo, no
+   mesmo instante; aura, brilho dos olhos e fiapos (sprites) ficam como estão. As velhas ficam invisíveis só quando o novo está pronto
+   (reforçado a cada quadro). Duas versões: FINA (o modelo exato) para no máximo `MAX_FINOS` fantasmas grandes na tela, GROSSA (agrupada)
+   para os outros — sem corte por frustum próprio. Sem luz nova, sem obstáculo, `noCam`, raio vazio, fora da fusão do Leve; Papel como os
+   de antes (o material de aparição, o rosto e os olhos ficam; a corrente segue o `papelUm`).
+   Chave: `?fantasmas911=0` (tudo como era: nem os embrulhos entram).
+   Gancho `window.__fantasmas911`: `estado`, `stats`, `erros`, `desliga()`, `liga()`, `pausa(v)` (congela os fantasmas velhos e novos — e os
+   morcegos/corvos da sala — para as fotos de antes/depois no mesmo instante, mesmo com o bloco desligado), `fotos(sala)` (poses {id, pos,
+   alvo, fov}: um fantasma de perto, um de corpo inteiro, o conjunto), `passo(dt)`, `info()`, `modelo()`. */
+const FT911_Q=(()=>{try{return location.search+location.hash;}catch(e){return '';}})();
+const FT911={on:!/[?&#]fantasmas911=0/i.test(FT911_Q),ativo:true,pausado:false,corte:false,estado:'espera',erros:[],job:null,M:null,falhou:false,
+  regs:new Map(),   // g → registro {f, g, velhos:[{o,vis,tri}], novos:{corpo,rosto,olhos,corr}, mats:[], corrente, fino, dentro}
+  NOME:'ft911e',KIT:{y:-0.95,s:0.92},PX_FINO:140,PX_GROSSO:115,MAX_FINOS:2,RAIO:1.02,
+  stats:{quadros:0,trocados:0,destrocados:0,cpuMs:0,fatias:0,maiorFatiaMs:0,ondeMaior:null,relogioMs:0,montagem:null}};
+function ft911Erro(k,e){try{if(FT911.erros.length<40)FT911.erros.push(k+': '+String(e&&e.message||e).slice(0,300));console.warn('v911 fantasmas',k,e);}catch(x){}}
+const ft911Tri=g=>g?(g.index?g.index.count:g.attributes.position.count)/3:0;
+
+/* ---------------- 1) campos de distância (espaço do KIT da v558: metros, y de −0,42 (fim das tiras) a 1,8 (ponta do capuz), frente +z) ---------------- */
+// tira da barra: pano vertical curvado no cilindro em volta do eixo y; s = 0 em cima (yT) e 1 embaixo (yB); rp/tp = raio e ângulo do ponto
+function ft911TiraBarra(o){const th=o.th,yT=o.yT,yB=o.yB,L=yT-yB,R0=o.R0,R1=o.R1,w0=o.w0,t0=o.t0,cur=o.cur,fa=o.fase,tor=o.tor;
+  return (x,y,z,rp,tp)=>{if(y>yT+0.05||y<yB-0.05)return Math.max(y-yT,yB-y);const s=Math.max(0,Math.min(1,(yT-y)/L));
+    let dt=tp-th;dt-=Math.round(dt/6.283185)*6.283185;const R=R0+(R1-R0)*s*s;const uc=cur*Math.sin(s*2.4+fa)*s;
+    const qt=rp*dt-uc,qr=rp-R;const a=tor*s,ca=Math.cos(a),sa=Math.sin(a);const q1=ca*qt+sa*qr,q2=-sa*qt+ca*qr;
+    const w=w0*Math.pow(1-s,0.9)+0.0012,t=t0*(0.3+0.7*cp579S(0,0.14,s))*(1-0.5*s);const ex=Math.abs(q1)-w,ey=Math.abs(q2)-t;
+    return Math.max(Math.hypot(Math.max(ex,0),Math.max(ey,0))+Math.min(Math.max(ex,ey),0),y-yT,yB-y);};}
+// tira que pende de um ponto T (em cima) por L metros; plano da tira girado `a` em volta de y; `cv` = desvio [x,z] na ponta (curva s²)
+function ft911TiraPende(T,L,w0,t0,a,cv){const ca=Math.cos(a),sa=Math.sin(a);
+  return (x,y,z)=>{if(y>T[1]+0.04||y<T[1]-L-0.04)return Math.max(y-T[1],T[1]-L-y);const s=Math.max(0,Math.min(1,(T[1]-y)/L));
+    const px=x-(T[0]+cv[0]*s*s),pz=z-(T[2]+cv[1]*s*s);const qa=ca*px-sa*pz,qn=sa*px+ca*pz;const w=w0*Math.pow(1-s,0.85)+0.001,t=t0*(1-0.5*s);
+    const ex=Math.abs(qa)-w,ey=Math.abs(qn)-t;return Math.max(Math.hypot(Math.max(ex,0),Math.max(ey,0))+Math.min(Math.max(ex,ey),0),y-T[1],T[1]-L-y);};}
+// campo que só é calculado perto da caixa B (fora dela devolve a distância à caixa: nunca maior que a verdadeira)
+function ft911Perto(B,f,m){const x0=B[0]-m,y0=B[1]-m,z0=B[2]-m,x1=B[3]+m,y1=B[4]+m,z1=B[5]+m;
+  return (x,y,z)=>{const dx=Math.max(x0-x,0,x-x1),dy=Math.max(y0-y,0,y-y1),dz=Math.max(z0-z,0,z-z1);if(dx>0||dy>0||dz>0)return Math.sqrt(dx*dx+dy*dy+dz*dz)+m*0.5;return f(x,y,z);};}
+const FT911_NORM=v=>{const l=Math.hypot(v[0],v[1],v[2])||1;return [v[0]/l,v[1]/l,v[2]/l];};
+// pontos do braço direito (x > 0; o esquerdo é o espelho): ombro, cotovelo, boca da manga, pulso
+const FT911_BR={om:[0.19,1.245,0.0],co:[0.3,1.13,0.205],bo:[0.288,1.002,0.522],pu:[0.287,0.994,0.556]};
+function ft911CamposCorpo(){const Ell=cp579Ell,Cone=cp579Cone,Smin=cp579Smin,Smax=cp579Smax,Cad=cp579Cadeia,S=cp579S;
+  // ---- capuz: casca pontuda, capelete até os ombros, abertura funda com a beira dobrada ----
+  const cap1=Ell([0,1.59,-0.015],[0.172,0.2,0.19]),cap2=Cone([0,1.67,-0.055],[0,1.84,-0.18],0.14,0.014),cap3=Cone([0,1.5,-0.02],[0,1.3,-0.025],0.15,0.235);
+  const cav=Ell([0,1.552,0.14],[0.104,0.146,0.165]);
+  const capuz=(x,y,z,rp,tp)=>{let d=Smin(Smin(cap1(x,y,z),cap2(x,y,z),0.07),cap3(x,y,z),0.09);
+    const tras=S(0.25,-0.55,Math.cos(tp));const u=Math.pow(0.5+0.5*Math.cos(9*tp+1.1+(y-1.55)*3.2),2.2);d-=0.008*u*tras*S(1.84,1.6,y)*S(1.3,1.45,y);   // pregas do capuz
+    const dc=cav(x,y,z);d=Smax(d,-dc,0.03);d-=0.011*S(0.035,0.0,Math.abs(dc))*S(0.03,0.11,z);return d;};
+  // ---- ombros caídos, peito e a coluna da mortalha (elíptica: mais larga que funda) que se afina para baixo, com pregas ----
+  const omb=cp579Espelho(Ell([0.155,1.215,-0.005],[0.125,0.085,0.125],[0,0,-0.32])),peito=Ell([0,1.12,0.02],[0.2,0.165,0.14]);
+  const colR=Cad([[0,1.2,-0.02],[0,0.95,-0.03],[0,0.7,-0.045],[0,0.48,-0.06],[0,0.36,-0.065]],[0.225,0.228,0.2,0.155,0.11],0.05);
+  const col=(x,y,z)=>colR(x,y,(z+0.03)*1.22-0.03)*0.86;
+  const corpo=(x,y,z,rp,tp)=>{let d=Smin(Smin(omb(x,y,z),peito(x,y,z),0.06),col(x,y,z),0.08);
+    const A=0.004+0.016*S(1.15,0.6,y);const fase=7*tp+0.9*Math.sin(3*tp+1.3)+y*1.1;const u=Math.pow(0.5+0.5*Math.cos(fase),2.4);d-=A*u;
+    d-=0.006*S(1.1,0.7,y)*Math.pow(Math.max(0,Math.cos(2*tp+0.4)),6);return d;};
+  // ---- a barra: 16 tiras irregulares que começam na cintura, abraçam o corpo e descem convergindo, cada vez mais finas ----
+  const r=(()=>{let s=9117;return ()=>{s=(s*16807)%2147483647;return (s-1)/2147483646;};})();const TB=[];const N=16;
+  for(let i=0;i<N;i++){const th=(i+0.5)/N*6.283185+(r()-0.5)*0.3;const fr=Math.cos(th);const yT=0.8+0.16*r();const yB=-0.64+0.42*r()*r()+(fr>0.4?0.08:0)+(i%5===2?0.22:0);
+    const el=0.225/Math.sqrt(Math.sin(th)**2+(1.22*Math.cos(th))**2);const R0=el*(1-0.06*(yT-0.8)/0.16)+0.004;TB.push(ft911TiraBarra({th,yT,yB,R0,R1:0.035+0.07*r(),w0:0.07+0.035*r(),t0:0.0185+0.004*r(),cur:(r()-0.5)*0.14,fase:r()*6,tor:(r()-0.5)*1.2}));}
+  const barra=(x,y,z,rp,tp)=>{let d=1e9;for(const f of TB)d=Smin(d,f(x,y,z,rp,tp),0.014);return d;};
+  // ---- manga direita: sino largo e oco, a boca recortada em dentes, o pano que pende sob o antebraço desfeito em tiras ----
+  const B=FT911_BR;const ax=FT911_NORM([B.bo[0]-B.co[0],B.bo[1]-B.co[1],B.bo[2]-B.co[2]]);
+  const ua=FT911_NORM([ax[2],0,-ax[0]]),va=[ax[1]*ua[2]-ax[2]*ua[1],ax[2]*ua[0]-ax[0]*ua[2],ax[0]*ua[1]-ax[1]*ua[0]];
+  const mFora=Cad([B.om,B.co,B.bo],[0.082,0.094,0.14],0.05);
+  const mPende=Ell([0.294,0.925,0.39],[0.052,0.115,0.15],[0.5,0,0]);                    // o pano que pende sob o antebraço (cortina)
+  const mDentro=Cone([0.298,1.07,0.31],[B.bo[0]+ax[0]*0.08,B.bo[1]+ax[1]*0.08,B.bo[2]+ax[2]*0.08],0.055,0.125);
+  const TP=[];{const ts=[[0.27,0.86,0.47,0.3,0.032,0.35,[0.0,-0.09]],[0.3,0.825,0.43,0.42,0.036,-0.15,[0.03,-0.13]],[0.322,0.86,0.47,0.26,0.03,-0.5,[0.05,-0.08]],
+    [0.3,0.83,0.36,0.36,0.035,0.1,[0.0,-0.14]],[0.282,0.87,0.3,0.24,0.028,0.4,[-0.02,-0.1]],[0.31,0.9,0.5,0.18,0.026,-0.3,[0.02,-0.06]],[0.29,0.85,0.4,0.33,0.03,0.6,[-0.03,-0.12]]];
+    for(const t of ts)TP.push(ft911TiraPende([t[0],t[1],t[2]],t[3],t[4],0.0115,t[5],t[6]));}
+  const manga0=(x,y,z)=>{let d=Smin(mFora(x,y,z),mPende(x,y,z),0.06);
+    const px=x-B.bo[0],py=y-B.bo[1],pz=z-B.bo[2];const al=px*ax[0]+py*ax[1]+pz*ax[2];const fi=Math.atan2(px*va[0]+py*va[1]+pz*va[2],px*ua[0]+py*ua[1]+pz*ua[2]);
+    const dente=0.02*Math.sin(5*fi+0.7)+0.011*Math.sin(11*fi+2.1)-0.012;d=Smax(d,al-dente,0.006);d=Smax(d,-mDentro(x,y,z),0.01);
+    for(const f of TP)d=Smin(d,f(x,y,z),0.012);return d;};
+  const manga=ft911Perto([0.08,0.4,-0.1,0.45,1.36,0.62],manga0,0.06);
+  // ---- o corpo inteiro (sem as mãos) ----
+  const f=(x,y,z)=>{const rp=Math.hypot(x,z),tp=Math.atan2(x,z);let d=corpo(x,y,z,rp,tp);d=Smin(d,capuz(x,y,z,rp,tp),0.05);if(y<1.02)d=Smin(d,barra(x,y,z,rp,tp),0.03);
+    return Smin(d,manga(Math.abs(x),y,z),0.035);};
+  return {f,caixa:[-0.46,-0.68,-0.36,0.46,1.87,0.66]};}
+// mão direita ossuda (x > 0; palma para baixo, dedos para a frente em garra; o polegar do lado de dentro), com os dois ossos do antebraço
+function ft911CampoMao(){const Cone=cp579Cone,Esf=cp579Esf,Ell=cp579Ell;const W=FT911_BR.pu;const L=[];
+  const P=(dx,dy,dz)=>[W[0]+dx,W[1]+dy,W[2]+dz];
+  L.push([Cone(P(0.012,0.03,-0.1),P(0.011,0.002,-0.006),0.0095,0.0085),0]);L.push([Cone(P(-0.008,0.028,-0.1),P(-0.01,0.0,-0.006),0.0088,0.008),0.004]); // rádio e ulna
+  L.push([Esf(P(0.012,0.002,-0.006),0.0108),0.006]);L.push([Esf(P(-0.011,0.0,-0.005),0.0098),0.006]);L.push([Ell(P(0,-0.001,0.004),[0.019,0.009,0.012]),0.008]); // pulso
+  L.push([Ell(P(0,-0.004,0.036),[0.029,0.0078,0.033]),0.01]);                         // palma magra
+  const dedos=[[-0.023,-0.13,[0.05,0.035,0.028],0.0074],[-0.0075,-0.04,[0.057,0.04,0.031],0.0078],[0.0075,0.05,[0.053,0.037,0.028],0.0074],[0.022,0.15,[0.042,0.03,0.023],0.0068]];
+  for(const [lx,yaw,ls,r0] of dedos){const b=P(lx*0.5,0.002,0.006),k=P(lx,0.0,0.067-Math.abs(lx)*0.25);
+    L.push([Cone(b,k,0.0048,0.006),0.0035]);L.push([Esf(k,r0*1.34),0.0035]);         // metacarpo e o nó grosso
+    let p=k,pit=0.3;const rs=[r0,r0*0.86,r0*0.74,0.002];
+    for(let j=0;j<3;j++){const d=[Math.sin(yaw)*Math.cos(pit),-Math.sin(pit),Math.cos(yaw)*Math.cos(pit)];const q=[p[0]+d[0]*ls[j],p[1]+d[1]*ls[j],p[2]+d[2]*ls[j]];
+      L.push([Cone(p,q,rs[j],rs[j+1]),0.0022]);if(j<2)L.push([Esf(q,rs[j+1]*1.26),0.0022]);p=q;pit+=j===0?0.52:0.48;}}
+  {let p=P(-0.019,-0.004,0.014),pit=0.25;const seg=[[-0.019,0.032,0.0082,0.0072],[-0.011,0.03,0.0072,0.006],[-0.005,0.025,0.006,0.002]];
+    for(const [dx,dz,r1,r2] of seg){const q=[p[0]+dx,p[1]-Math.sin(pit)*dz,p[2]+dz];L.push([Cone(p,q,r1,r2),0.0028]);if(r2>0.003)L.push([Esf(q,r2*1.26),0.0028]);p=q;pit+=0.35;}}
+  return {f:cp579UniaoK(L),caixa:[W[0]-0.075,W[1]-0.11,W[2]-0.115,W[0]+0.075,W[1]+0.05,W[2]+0.19]};}
+// rosto em sombra: crânio, arcada, órbitas fundas, maçãs, bochechas cavadas, a cavidade do nariz e a boca em grito com o queixo caído
+const FT911_OLHO={x:0.043,y:1.586,z:0.104,r:0.0136};
+function ft911CampoRosto(){const Ell=cp579Ell,Sp=cp579Espelho,Mn=cp579Menos,O=FT911_OLHO;const L=[];
+  L.push([Ell([0,1.607,0.022],[0.061,0.074,0.074]),0]);                                // testa e crânio
+  L.push([Ell([0,1.547,0.045],[0.06,0.056,0.06]),0.028]);                             // meio do rosto
+  L.push([Sp(Ell([0.046,1.556,0.075],[0.02,0.0115,0.023])),0.011]);                   // maçãs
+  L.push([Sp(Ell([0.035,1.613,0.09],[0.031,0.0098,0.02],[0,0,-0.18])),0.011]);        // arcada
+  L.push([Ell([0,1.468,0.052],[0.049,0.054,0.048]),0.028]);                            // maxilar caído (grito)
+  L.push([Ell([0,1.423,0.072],[0.025,0.018,0.023]),0.014]);                            // ponta do queixo
+  L.push([Ell([0,1.553,0.101],[0.0105,0.026,0.014]),0.009]);                           // dorso do nariz
+  let f=cp579UniaoK(L);
+  f=Mn(f,Sp(Ell([0.06,1.5,0.09],[0.014,0.028,0.017])),0.009);                      // bochechas cavadas
+  f=Mn(f,Sp(Ell([O.x,O.y,0.121],[0.0235,0.021,0.038])),0.006);                        // órbitas fundas
+  f=Mn(f,Ell([0,1.538,0.121],[0.008,0.0125,0.024]),0.004);                            // cavidade do nariz
+  f=Mn(f,Ell([0,1.476,0.115],[0.025,0.05,0.06]),0.006);                               // boca aberta em grito
+  const g=(x,y,z)=>Math.max(f(x,y,z),-(z-0.005));                                      // só a máscara da frente (o fundo do capuz é o forro)
+  return {f:g,rosto:f,caixa:[-0.09,1.36,-0.01,0.09,1.7,0.13]};}
+// cor do rosto (linear, sem luz: MeshBasic): sombra azulada, as saliências pálidas, órbitas, nariz e boca negros
+function ft911CorRosto(F){const S=cp579S,MX=cp579Mix,O=FT911_OLHO;const base=[0.03,0.038,0.056],palido=[0.2,0.245,0.285],negro=[0.0035,0.004,0.006],forro=[0.008,0.01,0.015],brilho=[0.05,0.15,0.14];
+  return (x,y,z,nx,ny,nz)=>{const sal=S(0.15,0.85,nz*0.75+ny*0.45+0.1);const eA=0.008;const o=Math.max(0,Math.min(1,F.rosto(x+nx*eA,y+ny*eA,z+nz*eA)/eA));
+    let c=MX(base,palido,sal*o*o*0.85);c=MX(negro,c,S(0.15,0.75,o));
+    const de=Math.hypot(Math.abs(x)-O.x,y-O.y,z-O.z);c=MX(c,brilho,S(0.032,0.015,de)*0.7);c=MX(c,forro,S(0.04,0.008,z));return c;};}
+// forro escuro que enche o fundo do capuz (atrás do rosto): elipsoide de poucas faces, cor quase preta
+function ft911Forro(w,h){const T=THREE;const g=new T.SphereGeometry(1,w,h);g.deleteAttribute('uv');g.scale(0.097,0.137,0.016);g.translate(0,1.552,0.062);
+  const n=g.attributes.position.count,c=new Float32Array(n*3);for(let i=0;i<n;i++){c[i*3]=0.008;c[i*3+1]=0.01;c[i*3+2]=0.015;}g.setAttribute('color',new T.BufferAttribute(c,3));return g;}
+// corrente direita: grilheta no pulso e elos ovais entrelaçados que pendem e arrastam para trás (geometria paramétrica, com normais)
+function ft911Corrente(nc,nt,ng,ngt){const T=THREE,P=[],N=[],I=[];const W=FT911_BR.pu;const ax=FT911_NORM([-0.004,-0.06,1]);
+  const anel=(C,U,V,Wd,R,rt,sa,nU,nV)=>{// toro de seção achatada (sa = alongamento ao longo de Wd); U,V no plano do anel
+    const v0=P.length/3;for(let i=0;i<nU;i++){const a=i/nU*6.283185,ca=Math.cos(a),sa2=Math.sin(a);const rd=[U[0]*ca+V[0]*sa2,U[1]*ca+V[1]*sa2,U[2]*ca+V[2]*sa2];
+      for(let j=0;j<nV;j++){const b=j/nV*6.283185,cb=Math.cos(b),sb=Math.sin(b);const n=FT911_NORM([rd[0]*cb/1+Wd[0]*sb/sa,rd[1]*cb+Wd[1]*sb/sa,rd[2]*cb+Wd[2]*sb/sa]);
+        P.push(C[0]+rd[0]*(R+rt*cb)+Wd[0]*rt*sa*sb,C[1]+rd[1]*(R+rt*cb)+Wd[1]*rt*sa*sb,C[2]+rd[2]*(R+rt*cb)+Wd[2]*rt*sa*sb);N.push(n[0],n[1],n[2]);}}
+    for(let i=0;i<nU;i++)for(let j=0;j<nV;j++){const a=v0+i*nV+j,b=v0+((i+1)%nU)*nV+j,c=v0+((i+1)%nU)*nV+(j+1)%nV,d=v0+i*nV+(j+1)%nV;I.push(a,b,c,a,c,d);}};
+  const elo=(C,Y,X,a,b,rt,nU,nV)=>{// elo oval: dois semicírculos de raio a ligados por retas de 2b, no plano (X, Y); Y = eixo comprido
+    const Z=[X[1]*Y[2]-X[2]*Y[1],X[2]*Y[0]-X[0]*Y[2],X[0]*Y[1]-X[1]*Y[0]];const v0=P.length/3;const per=2*Math.PI*a+4*b;
+    for(let i=0;i<nU;i++){const u=i/nU*per;let cx,cy,nx,ny;
+      if(u<2*b){cx=a;cy=-b+u;nx=1;ny=0;}else if(u<2*b+Math.PI*a){const t=(u-2*b)/a;cx=a*Math.cos(t);cy=b+a*Math.sin(t);nx=Math.cos(t);ny=Math.sin(t);}
+      else if(u<4*b+Math.PI*a){const t=u-2*b-Math.PI*a;cx=-a;cy=b-t;nx=-1;ny=0;}else{const t=(u-4*b-Math.PI*a)/a+Math.PI;cx=a*Math.cos(t);cy=-b+a*Math.sin(t);nx=Math.cos(t);ny=Math.sin(t);}
+      for(let j=0;j<nV;j++){const t=j/nV*6.283185,ct=Math.cos(t),st=Math.sin(t);const n=[(X[0]*nx+Y[0]*ny)*ct+Z[0]*st,(X[1]*nx+Y[1]*ny)*ct+Z[1]*st,(X[2]*nx+Y[2]*ny)*ct+Z[2]*st];
+        P.push(C[0]+X[0]*cx+Y[0]*cy+n[0]*rt,C[1]+X[1]*cx+Y[1]*cy+n[1]*rt,C[2]+X[2]*cx+Y[2]*cy+n[2]*rt);N.push(n[0],n[1],n[2]);}}
+    for(let i=0;i<nU;i++)for(let j=0;j<nV;j++){const a2=v0+i*nV+j,b2=v0+((i+1)%nU)*nV+j,c=v0+((i+1)%nU)*nV+(j+1)%nV,d=v0+i*nV+(j+1)%nV;I.push(a2,b2,c,a2,c,d);}};
+  // grilheta: banda larga em volta do pulso, perpendicular ao antebraço
+  const U0=FT911_NORM([1,0,0]),V0=FT911_NORM([ax[1]*U0[2]-ax[2]*U0[1],ax[2]*U0[0]-ax[0]*U0[2],ax[0]*U0[1]-ax[1]*U0[0]]);
+  anel(W,U0,V0,ax,0.0265,0.0068,1.7,ng,ngt);
+  // elos: caminho que desce da base da grilheta e arrasta para trás
+  const a=0.0105,b=0.011,rt=0.0052,passo=2*(a+b)-2.2*rt;let y0=W[1]-0.0265-0.004;const C0=[W[0],y0-0.004,W[2]];
+  const cam=s=>[C0[0]+0.012*s,C0[1]-0.95*s+0.04*s*s,C0[2]-0.12*s*s];let s=0;
+  for(let k=0;k<11;k++){const s0=s;const p0=cam(s0);let s1=s0;for(let it=0;it<30;it++){s1+=0.004;const p1=cam(s1);if(Math.hypot(p1[0]-p0[0],p1[1]-p0[1],p1[2]-p0[2])>=passo)break;}
+    const pm=cam((s0+s1)/2),p1=cam(s1);const Y=FT911_NORM([p0[0]-p1[0],p0[1]-p1[1],p0[2]-p1[2]]);const Xa=k%2?[0,0,1]:[1,0,0];   // cada elo a 90° do anterior
+    const X=FT911_NORM([Xa[0]-Y[0]*(Xa[0]*Y[0]+Xa[1]*Y[1]+Xa[2]*Y[2]),Xa[1]-Y[1]*(Xa[0]*Y[0]+Xa[1]*Y[1]+Xa[2]*Y[2]),Xa[2]-Y[2]*(Xa[0]*Y[0]+Xa[1]*Y[1]+Xa[2]*Y[2])]);
+    elo(pm,Y,X,a,b,rt,nc,nt);s=s1;}
+  const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(P,3));g.setAttribute('normal',new T.Float32BufferAttribute(N,3));g.setIndex(I);g.computeBoundingBox();g.computeBoundingSphere();return g;}
+
+/* ---------------- 2) montagem do modelo (uma vez; em fatias) ---------------- */
+function ft911MatKit(){return new THREE.Matrix4().makeTranslation(0,FT911.KIT.y,0).multiply(new THREE.Matrix4().makeScale(FT911.KIT.s,FT911.KIT.s,FT911.KIT.s));}
+function* ft911ModeloG(){const T=THREE,BI=window.__bichos622,H=BI&&BI.h;const t0=performance.now(),passos={};const NM=FT911.NOME;
+  if(!H||typeof H.malha!=='function'||typeof cp579Rede!=='function')throw Error('escultor da v622 ausente');
+  if(typeof mo907Junta!=='function'||typeof mo907Agrupa!=='function'||typeof mo907Espelha!=='function')throw Error('funções do MO907 ausentes');
+  const Kt=ft911MatKit();const tempo=(k,t)=>{passos[k]=Math.round(performance.now()-t);};
+  // corpo (mortalha, capuz, mangas, tiras) e a mão direita (espelhada para a esquerda)
+  const FC=ft911CamposCorpo();let t=performance.now();const gC=yield* fat8Call(H.malha,[NM+' corpo',FC.f,FC.caixa,0.0195,null]);tempo('esc corpo',t);yield 'corpo';
+  const FM=ft911CampoMao();t=performance.now();const gM=yield* fat8Call(H.malha,[NM+' mão',FM.f,FM.caixa,0.0045,null]);tempo('esc mão',t);yield 'mão';
+  const gME=mo907Espelha(gM);yield 'espelho';
+  t=performance.now();const corpoF=yield* mo907Junta([{geo:gC,M:Kt},{geo:gM,M:Kt},{geo:gME,M:Kt}]);tempo('junta corpo',t);yield 'junta corpo';
+  t=performance.now();const gCg=yield* mo907Agrupa(gC,0.058);const gMg=yield* mo907Agrupa(gM,0.013);const gMEg=mo907Espelha(gMg);const corpoG=yield* mo907Junta([{geo:gCg,M:Kt},{geo:gMg,M:Kt},{geo:gMEg,M:Kt}]);tempo('grossa corpo',t);yield 'grossa corpo';
+  // rosto (com cor) e olhos
+  const FR=ft911CampoRosto();t=performance.now();const gR=yield* fat8Call(H.malha,[NM+' rosto',FR.f,FR.caixa,0.0056,ft911CorRosto(FR)]);tempo('esc rosto',t);yield 'rosto';
+  const rostoF=yield* mo907Junta([{geo:gR,M:Kt},{geo:ft911Forro(20,14),M:Kt}]);const rostoG=yield* mo907Junta([{geo:(yield* mo907Agrupa(gR,0.012)),M:Kt},{geo:ft911Forro(10,7),M:Kt}]);yield 'grossa rosto';
+  const O=FT911_OLHO;const olho=(w,h)=>{const s=new T.SphereGeometry(O.r,w,h);s.deleteAttribute('uv');return s;};
+  const olhosDe=(w,h)=>{const s=olho(w,h);return mo907Junta([1,-1].map(sd=>({geo:s,M:Kt.clone().multiply(new T.Matrix4().makeTranslation(sd*O.x,O.y,O.z))})));};
+  const olhosF=yield* olhosDe(16,12),olhosG=yield* olhosDe(8,6);yield 'olhos';
+  // correntes (as duas)
+  t=performance.now();const cF=ft911Corrente(16,7,32,8),cG=ft911Corrente(8,4,12,5);
+  const corrF=yield* mo907Junta([{geo:cF,M:Kt},{geo:mo907Espelha(cF),M:Kt}]),corrG=yield* mo907Junta([{geo:cG,M:Kt},{geo:mo907Espelha(cG),M:Kt}]);tempo('correntes',t);yield 'correntes';
+  for(const g of [corpoF,corpoG]){g.computeBoundingSphere();g.boundingSphere.radius+=0.12;} // o balanço do pano no shader passa um pouco da malha
+  const fino={corpo:corpoF,rosto:rostoF,olhos:olhosF,corr:corrF},grosso={corpo:corpoG,rosto:rostoG,olhos:olhosG,corr:corrG};
+  const tri=V=>({corpo:ft911Tri(V.corpo),rosto:ft911Tri(V.rosto),olhos:ft911Tri(V.olhos),corr:ft911Tri(V.corr)});
+  const bb=new T.Box3().setFromBufferAttribute(corpoF.attributes.position);
+  const corMedia=(()=>{const c=rostoF.attributes.color.array;let r=0,g=0,b=0;const n=c.length/3;for(let i=0;i<n;i++){r+=c[i*3];g+=c[i*3+1];b+=c[i*3+2];}return [+(r/n).toFixed(4),+(g/n).toFixed(4),+(b/n).toFixed(4)];})();
+  const M={fino,grosso,tri:{fino:tri(fino),grosso:tri(grosso)},caixaGrupo:[bb.min.x,bb.min.y,bb.min.z,bb.max.x,bb.max.y,bb.max.z].map(v=>+v.toFixed(3)),corMediaRosto:corMedia,passos,ms:Math.round(performance.now()-t0)};
+  M.tri.fino.mao=ft911Tri(gM)*2;M.tri.fino.soCorpo=ft911Tri(gC);
+  FT911.stats.montagem={ms:M.ms,tri:M.tri,caixaGrupo:M.caixaGrupo,corMediaRosto:corMedia,passos};return M;}
+function ft911Monta(){if(FT911.job||FT911.M||FT911.falhou)return;FT911.estado='montando';const st=FT911.stats;const t0=performance.now();
+  const fim=M=>{const J=FT911.job;FT911.job=null;if(J){st.fatias=J.passos;st.maiorFatiaMs=Math.round(J.max*10)/10;st.ondeMaior=J.rotMax;st.cpuMs=Math.round(J.ms);}st.relogioMs=Math.round(performance.now()-t0);
+    if(!M){FT911.falhou=true;FT911.estado='erro';return;}FT911.M=M;FT911.estado='pronto';try{ft911TrocaTodos();}catch(e){ft911Erro('trocar',e);}};
+  const erro=e=>{FT911.job=null;FT911.falhou=true;FT911.estado='erro';ft911Erro('montagem',e);};
+  try{if(typeof fat8Go==='function'){const J=fat8Go(ft911ModeloG(),{nome:'v911 fantasmas esculpidos',urgente:()=>ft911Fontes(ACTIVE).length>0,fim,erro});if(FT911.estado==='montando')FT911.job=J;}
+    else{const it=ft911ModeloG();let r;do{r=it.next();}while(!r.done);fim(r.value);}}catch(e){erro(e);}}
+
+/* ---------------- 3) materiais: o balanço de pano do shader da v558 nos materiais do rosto, dos olhos e da corrente ---------------- */
+// mesma conta do HQ558_VS (x primeiro, com o z de antes; depois z), com as MESMAS uniformes do material de aparição do fantasma
+const FT911_BAL='\n float lw911=1.0-smoothstep(-0.75,0.35,transformed.y);\n transformed.x+=(sin(uT*1.9+transformed.y*5.0+uSeed)*0.035+sin(uT*3.1+transformed.z*6.0+uSeed*1.7)*0.018)*(0.25+lw911*1.9);\n transformed.z+=cos(uT*1.6+transformed.y*4.0+uSeed*0.7)*0.03*(0.25+lw911*2.0);\n';
+function ft911Balanca(m,A){m.onBeforeCompile=function(sh){sh.uniforms.uT=A.uniforms.uT;sh.uniforms.uSeed=A.uniforms.uSeed;
+    sh.vertexShader='uniform float uT;\nuniform float uSeed;\n'+sh.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>'+FT911_BAL);};
+  m.customProgramCacheKey=function(){return 'ft911bal';};m.needsUpdate=true;return m;}
+let FT911_MROSTO=null;
+function ft911MatRosto(){if(!FT911_MROSTO){FT911_MROSTO=new THREE.MeshBasicMaterial({vertexColors:true});FT911_MROSTO.name='v911 rosto em sombra';FT911_MROSTO.userData.papelKeep=true;}return FT911_MROSTO;}
+
+/* ---------------- 4) os fantasmas da cena: troca nas filhas do grupo de cada um ---------------- */
+function ft911Dentro(o,sc){for(let p=o;p;p=p.parent)if(p===sc)return true;return false;}
+function ft911Fontes(sc){const L=[];if(!sc||!FT911.on)return L;try{if(typeof HQ558==='undefined'||!HQ558.fant)return L;for(const f of HQ558.fant)if(f&&f.g&&f.mat&&f.g.parent&&ft911Dentro(f.g,sc))L.push(f);}catch(e){ft911Erro('fontes',e);}return L;}
+function ft911Classe(o,f){let m=o.material;try{if(typeof PAPEL_ORIG!=='undefined'&&PAPEL_ORIG.has(o))m=PAPEL_ORIG.get(o)||m;}catch(e){}const n=(m&&m.name)||'';if(o.material===f.mat)return 'corpo';if(/558 rosto/.test(n))return 'rosto';if(/558 órbita/.test(n))return 'orbita';if(/558 olho/.test(n))return 'olho';if(/558 corrente/.test(n))return 'corrente';return 'outro';}
+function ft911Registro(f){let R=FT911.regs.get(f.g);if(R)return R;const g=f.g;R={f,g,velhos:[],novos:null,mats:[],corrente:false,fino:false,dentro:false,filhos0:g.children.length,olhoMat:null,ferro:null};
+  const orig=o=>{try{if(typeof PAPEL_ORIG!=='undefined'&&PAPEL_ORIG.has(o)){const m=PAPEL_ORIG.get(o);if(m&&m.isMaterial)return m;}}catch(e){}return o.material;}; // no Papel, o material de antes da troca
+  for(const o of g.children){if(!o.isMesh||o.isSprite)continue;const k=ft911Classe(o,f);if(k==='outro')continue;R.velhos.push({o,k,vis:o.visible,tri:ft911Tri(o.geometry)});if(k==='corrente'){R.corrente=true;R.ferro=orig(o);}if(k==='olho')R.olhoMat=orig(o);}
+  FT911.regs.set(g,R);return R;}
+function ft911Novos(R){const T=THREE,M=FT911.M,f=R.f;if(R.novos)return R.novos;const N={};
+  const malha=(k,geo,mat,ordem)=>{const m=new T.Mesh(geo,mat);m.name='v911 fantasma · '+k;m.renderOrder=ordem;m.castShadow=false;m.receiveShadow=false;m.frustumCulled=true;m.raycast=()=>{};
+    m.userData.noCam=true;m.userData.papelKeepGeo=true;m.userData.ft911=k;m.__fusaoMoveu=9;m.__k=k;N[k]=m;return m;};
+  malha('corpo',M.grosso.corpo,f.mat,4);
+  const mr=ft911Balanca(ft911MatRosto().clone(),f.mat);mr.name='v911 rosto em sombra';mr.userData.papelKeep=true;R.mats.push(mr);malha('rosto',M.grosso.rosto,mr,3.5);
+  const ob=R.olhoMat||new T.MeshBasicMaterial({color:0xc8fff0,transparent:true,opacity:1,depthWrite:false});const mo=ft911Balanca(ob.clone(),f.mat);mo.name='v911 olho aceso';mo.userData.papelKeep=true;R.mats.push(mo);malha('olhos',M.grosso.olhos,mo,6);
+  if(R.corrente&&R.ferro){const mc=ft911Balanca(R.ferro.clone(),f.mat);mc.name='v911 corrente';R.mats.push(mc);malha('corr',M.grosso.corr,mc,4);}
+  R.novos=N;return N;}
+function ft911Troca(f){if(!FT911.M||!FT911.ativo)return false;const R=ft911Registro(f);const N=ft911Novos(R);if(R.dentro)return true;
+  const on=!!(typeof Q!=='undefined'&&Q.papel);
+  for(const k in N){const m=N[k];if(m.parent!==R.g)R.g.add(m);if(k==='corr'){try{if(typeof papelUm==='function')papelUm(m,on);}catch(e){}}}R.papel=on;
+  for(const v of R.velhos)v.o.visible=false;R.dentro=true;FT911.stats.trocados++;return true;}
+function ft911Destroca(R){if(!R||!R.dentro)return;for(const k in R.novos){const m=R.novos[k];if(m.parent)m.parent.remove(m);}for(const v of R.velhos)v.o.visible=v.vis;R.dentro=false;FT911.stats.destrocados++;}
+function ft911TrocaTodos(){if(!FT911.M||!FT911.ativo)return;try{if(typeof HQ558==='undefined')return;for(const f of HQ558.fant){if(f&&f.g&&f.g.parent&&f.mat){try{ft911Troca(f);}catch(e){ft911Erro('troca',e);}}}}catch(e){ft911Erro('trocar todos',e);}}
+
+/* ---------------- 5) a cada quadro (depois do polishTick): troca os que faltam, escolhe as versões e mantém as velhas escondidas ---------------- */
+const FT911_T={c:new THREE.Vector3(),cam:new THREE.Vector3(),fr:new THREE.Frustum(),PV:new THREE.Matrix4(),esf:new THREE.Sphere()};
+function ft911Camera(){const W=FT911_T;let foco=800;try{camera.updateMatrixWorld();W.cam.setFromMatrixPosition(camera.matrixWorld);W.PV.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);W.fr.setFromProjectionMatrix(W.PV);foco=(innerHeight||800)/(2*Math.tan((camera.fov||60)*Math.PI/360));}catch(e){}return foco;}
+function ft911Atualiza(L){const W=FT911_T,M=FT911.M;const foco=ft911Camera();const cand=[];const st={n:L.length,trocados:0,visiveis:0,finos:0,grossos:0,triNovos:0,triVelhos:0,chamadas:0,velhosVisiveis:0};
+  const on=!!(typeof Q!=='undefined'&&Q.papel);
+  for(const f of L){const R=ft911Registro(f);if(!R.dentro)ft911Troca(f);if(!R.dentro)continue;st.trocados++;
+    for(const v of R.velhos){if(v.o.visible)v.o.visible=false;st.triVelhos+=v.tri;}                 // alguém mostrou a velha: esconde de novo
+    if(R.papel!==on&&R.novos.corr){try{papelUm(R.novos.corr,on);}catch(e){}R.papel=on;}
+    let vis=R.g.visible;for(let p=R.g.parent;p&&vis;p=p.parent)if(!p.visible&&!p.isScene)vis=false;R.vis=vis;
+    R.g.updateMatrixWorld(false);W.c.set(0,-0.25,0.1).applyMatrix4(R.g.matrixWorld);W.esf.set(W.c,FT911.RAIO*1.15);const naTela=W.fr.intersectsSphere(W.esf);
+    const d=Math.max(0.05,W.c.distanceTo(W.cam));R.d=d;R.px=FT911.RAIO*foco/d;const quer=R.fino?R.px>FT911.PX_GROSSO:R.px>FT911.PX_FINO;R.fino=false;if(quer&&vis&&naTela)cand.push(R);}
+  cand.sort((a,c)=>a.d-c.d);for(let i=0;i<cand.length&&i<FT911.MAX_FINOS;i++)cand[i].fino=true;
+  for(const f of L){const R=FT911.regs.get(f.g);if(!R||!R.dentro)continue;const nivel=R.fino?'fino':'grosso';
+    for(const k in R.novos){const m=R.novos[k],geo=M[nivel][k];if(m.geometry!==geo)m.geometry=geo;}
+    if(R.vis){st.visiveis++;if(R.fino)st.finos++;else st.grossos++;for(const k in R.novos){st.triNovos+=ft911Tri(R.novos[k].geometry);st.chamadas++;}}}
+  for(const f of L){const R=FT911.regs.get(f.g);if(R)for(const v of R.velhos)if(v.o.visible)st.velhosVisiveis++;}
+  st.triAMais=st.triNovos-st.triVelhos;return st;}
+function ft911Quadro(dt){if(!FT911.on)return;const st=FT911.stats;st.quadros++;const sc=ACTIVE;if(!sc)return;
+  const L=ft911Fontes(sc);if(!L.length)return;
+  if(!FT911.M){if(!FT911.job&&!FT911.falhou)ft911Monta();return;}
+  if(!FT911.ativo)return;
+  try{FT911.cena=ft911Atualiza(L);}catch(e){ft911Erro('quadro',e);}}
+
+/* ---------------- 6) ligar ao jogo e o gancho ---------------- */
+if(FT911.on){
+  try{const p0=polishTick;polishTick=function(dt){const r=p0.apply(this,arguments);try{ft911Quadro(dt);}catch(e){ft911Erro('polishTick',e);}return r;};}catch(e){ft911Erro('ligar polishTick',e);}
+  // pausa (fotos de antes/depois no mesmo instante): congela o relógio da sala (trajetórias) e o da v558 (balanço, respiração, olhos, fiapos),
+  // valha o bloco ligado ou desligado — as figuras velhas também param
+  try{const t0=tr507Tick;tr507Tick=function(R,dt){if(FT911.pausado)return;return t0.apply(this,arguments);};}catch(e){ft911Erro('ligar tr507Tick',e);}
+  try{const h0=hq558Tick;hq558Tick=function(dt){if(FT911.pausado)return;return h0.apply(this,arguments);};}catch(e){ft911Erro('ligar hq558Tick',e);}
+}
+window.__fantasmas911={get estado(){return FT911.on?(FT911.ativo?FT911.estado:'desligado'):'chave=0';},stats:FT911.stats,erros:FT911.erros,S:FT911,
+  desliga(){FT911.ativo=false;for(const R of FT911.regs.values()){try{ft911Destroca(R);}catch(e){ft911Erro('desliga',e);}}return this.info();},
+  liga(){FT911.ativo=true;ft911TrocaTodos();try{const L=ft911Fontes(ACTIVE);if(L.length&&FT911.M)FT911.cena=ft911Atualiza(L);}catch(e){ft911Erro('liga',e);}return this.info();},
+  // avança o jogo dt segundos com o leitor na sala: o relógio da sala (trajetórias), o polishTick (a troca e as versões) e o relógio da v558
+  passo(dt){dt=dt||1/60;try{if(CUR==='room'&&ROOM&&ROOM.tick)ROOM.tick(dt);polishTick(dt);if(typeof hq558Tick==='function')hq558Tick(dt);}catch(e){ft911Erro('passo',e);}return this.info();},
+  pausa(v){FT911.pausado=v===undefined?true:!!v;for(const k of ['__morcegos907','__terror909']){try{const G=window[k];if(G&&typeof G.pausa==='function')G.pausa(FT911.pausado);}catch(e){}}return FT911.pausado;},
+  info(){const M=FT911.M,c=FT911.cena||null;let pior=null;
+    if(M){const tf=M.tri.fino,tg=M.tri.grosso;const n=c?c.n:0,nc=c?Math.round(n/2):0;const um=(t,corr)=>t.corpo+t.rosto+t.olhos+(corr?t.corr:0);
+      const L=[...FT911.regs.values()].filter(R=>R.dentro&&R.vis!==false);const fins=Math.min(FT911.MAX_FINOS,L.length);let tot=0,tv=0;
+      L.forEach((R,i)=>{tot+=um(i<fins?tf:tg,R.corrente);for(const v of R.velhos)tv+=v.tri;});pior={finos:fins,grossos:L.length-fins,triNovos:tot,triVelhos:tv,triAMais:tot-tv};}
+    return {estado:this.estado,cena:c,piorCaso:pior,modelo:M?{tri:M.tri,caixaGrupo:M.caixaGrupo,corMediaRosto:M.corMediaRosto,ms:M.ms}:null,registrados:FT911.regs.size,erros:FT911.erros.length};},
+  modelo(){return FT911.M;},
+  // poses {id, pos, alvo, fov}: um fantasma de perto (~1,5 m do rosto), um de corpo inteiro (~4 m) e o conjunto da sala
+  fotos(sala){const T=THREE,out=[];const a=v=>[+v.x.toFixed(3),+v.y.toFixed(3),+v.z.toFixed(3)];try{const L=ft911Fontes(ACTIVE).filter(f=>f.g.visible);if(!L.length)return out;
+      const W=ft911Camera();const cam=FT911_T.cam.clone();L.sort((p,q)=>p.g.getWorldPosition(new T.Vector3()).distanceTo(cam)-q.g.getWorldPosition(new T.Vector3()).distanceTo(cam));
+      const g=L[0].g;g.updateMatrixWorld(true);const P=v=>new T.Vector3(v[0],v[1],v[2]).applyMatrix4(g.matrixWorld);
+      const fw=new T.Vector3(0,0,1).transformDirection(g.matrixWorld).setY(0);if(fw.lengthSq()<1e-6)fw.set(0,0,1);fw.normalize();const lado=new T.Vector3(fw.z,0,-fw.x);
+      const rosto=P([0,0.5,0.12]);out.push({id:'fantasma-perto',pos:a(rosto.clone().addScaledVector(fw,1.4).addScaledVector(lado,0.45).add(new T.Vector3(0,-0.12,0))),alvo:a(rosto.clone().add(new T.Vector3(0,-0.12,0))),fov:45,nota:'o rosto, as mãos e as mangas a ~1,5 m (versão fina)'});
+      const meio=P([0,-0.3,0.15]);out.push({id:'fantasma-inteiro',pos:a(meio.clone().addScaledVector(fw,3.4).addScaledVector(lado,2.0).add(new T.Vector3(0,0.35,0))),alvo:a(meio),fov:50,nota:'o fantasma inteiro de 3/4 a ~4 m (fino)'});
+      const g0=g.getWorldPosition(new T.Vector3());const ps=L.map(f=>f.g.getWorldPosition(new T.Vector3())).filter(p=>Math.hypot(p.x-g0.x,p.z-g0.z)<14);const c=new T.Vector3();ps.forEach(p=>c.add(p));c.multiplyScalar(1/ps.length);
+      let sp=0;ps.forEach(p=>sp=Math.max(sp,Math.hypot(p.x-c.x,p.z-c.z)));const dir=cam.clone().sub(c).setY(0);if(dir.lengthSq()<1e-4)dir.copy(fw);dir.normalize();
+      out.push({id:'fantasmas-conjunto',pos:a(c.clone().addScaledVector(dir,Math.max(6,sp*1.3+4.5)).setY(c.y+2.2)),alvo:a(c),fov:60,nota:'os '+ps.length+' fantasmas desta área da sala (grossos), vistos do lado do leitor'});}
+    catch(e){ft911Erro('fotos',e);}return out;}};
 
 window.__build434={revision:434,family:"web",edition:"en"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
