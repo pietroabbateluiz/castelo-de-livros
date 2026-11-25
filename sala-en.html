@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v908</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v909</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -128950,6 +128950,347 @@ window.__aves908={get estado(){return AV908.on?(AV908.ativo?AV908.estado:'deslig
       const meio=alvo.clone().addScaledVector(dir,6);meio.y=pous?alvo.y+1:Math.max(1.6,alvo.y-1.5);out.push({id:f.tipo+'-meio-'+lo,pos:a(meio),alvo:a(alvo),fov:60,nota:'a mesma a ~6 m (versão grossa)'});
       const g=new T.Vector3();ok.forEach(i=>g.add(P[i]));g.multiplyScalar(1/ok.length);const cc=new T.Vector3(c[0],1.7,c[1]);const d2=g.clone().sub(cc).setY(0);if(d2.lengthSq()<1e-4)d2.set(0,0,1);d2.normalize();
       const longe=cc.clone().addScaledVector(d2,-3);longe.y=1.7;out.push({id:f.tipo+'-longe',pos:a(longe),alvo:a(g),fov:60,nota:'o conjunto ('+f.n+') de longe'});}
+    return out;}};
+
+/* ===================== v909 · OS CORVOS E AS GÁRGULAS DA BIBLIOTECA DE TERROR VIRAM ESCULPIDOS (bloco `TE909`) =====================
+   Pedido do Luiz (24/11, 20:50, «ok, siga com esses»): trocar os bichos e figuras ainda montados com primitivas por modelos esculpidos
+   («precisam ficar esteticamente lindos»). Terceiro lote (depois do `MO907`, morcegos, e do `AV908`), todo na biblioteca de Terror
+   (`ROOMS.lib`, gênero charneca).
+   COMO ERA:
+   · CORVOS (`hq554Corvo`, v554): 12, todos pousados — 1 no braço do espantalho (kit «551 decoração» da `hw551Aplica`), 5 nas lápides
+     (`hw561CorvoLapide`) e 6 nas pontas da grade (`hw561CorvoGrade`), kit «557 cemitério» da `hw557Aplica` —, cada um com 2 esferas
+     achatadas (corpo, cabeça), 2 esferas de asa, cone de bico, contas de olho, cilindros de pata e 3 caixas de cauda (~1 784 triângulos),
+     FUNDIDOS pelo `t160Kit` nas malhas de material do kit (não dava para esconder um corvo sem mexer na decoração inteira);
+   · GÁRGULAS DA BIBLIOTECA (`gargoyle`, v149): 3 grupos em `GOTHG` — uma ×1,15 no pedestal da parede (18,84; 1,3; 0) e duas ×0,38 nas
+     pontas da cornija da lareira —, 43 malhas de esferas, cones, cilindros, caixas, asa de recorte extrudado e cauda em tubo (3 922
+     triângulos cada), olhos de brasa que pulsam (`GOTH.eyes`, `libTick`); no Leve/Papel a maior parte já vinha fundida pela FUSÃO;
+   · GÁRGULAS DO CEMITÉRIO (`hw557Gargula`, v557): 4 — 2 nos pilares da capela (y 7,9) e 2 nos cantos da torre (y 11,9) —, esferas,
+     cones, asas chatas extrudadas e olhos vermelhos (~996 triângulos), também fundidas no kit «557 cemitério».
+   AGORA:
+   · os embrulhos de `hq554Corvo` e `hw557Gargula` guardam o quadro de cada peça (posição, giro e escala no espaço do pai) e mandam a
+     geometria VELHA para um kit próprio que sai, com o mesmo material e o mesmo pai, logo depois do `fim()` do kit original (mesmo
+     visual, mas em malhas separadas, marcadas `te909velho` e fora da fusão): assim o velho pode ficar invisível sem tocar no resto;
+   · CORVO esculpido, derivado como as aves do `AV908` (espécie nova `corvo` no `AV908_ESP`, ferramentas da `VO623` montadas pelo
+     `comp400Build` com pálpebras da v625, penas da v630 e materiais gêmeos da v829): preto-azulado com reflexo azul-roxo-verde, bico
+     grosso, comprido e escuro com cerdas na base, olhos escuros, cauda em leque de 12 penas, peito e papo cheios, pés escuros de pé no
+     poleiro. Mesmos lugares e giros (o comprimento de antes, 0,45 m); asas recolhidas; a cabeça vira e bica devagar (cada um na sua
+     fase). `InstancedMesh` (6 quadros: corpo, cabeça, braço e mão de cada lado), FINA (o modelo exato) para no máximo 2 grandes na
+     tela, GROSSA para o resto (como o `AV908`);
+   · GÁRGULA esculpida de verdade (campo de distância da v579/v622: `window.__bichos622.h`): criatura agachada — coxas grossas, canelas
+     e jarretes, pés de 3 dedos com garras; braços retos à frente com mãos de 4 dedos e garras na beira —, asas de morcego DOBRADAS nas
+     costas (osso do braço até o punho alto acima dos ombros, polegar com garra, três dedos e a membrana com a borda de trás recortada),
+     coluna de vértebras com espinhos, costelas marcadas, cauda enrolada no pé com ponta de lança, cabeça de focinho com arcada
+     pesada, maçãs, narinas, boca aberta com língua e quatro presas, orelhas pontudas e chifres curvos para trás; órbitas fundas com os
+     olhos de brasa (os da biblioteca continuam a pulsar com o `libTick`; os do cemitério continuam vermelhos). Pedra: cor por vértice
+     (veios, oclusão pelo campo inteiro nas dobras, MUSGO nas faces de cima, MANCHAS DE CHUVA em estrias verticais, líquen claro) com
+     a textura de pedra desenhada em código (grão, poros, bexigas e trincas) em triplanar com relevo (`triplanar` da v622). Uma
+     malha só partilhada pelas 7 (`InstancedMesh`): FINA (três partes em resoluções diferentes: corpo, cabeça e patas) para no máximo
+     2 grandes na tela e GROSSA (agrupada) para o resto. Mesmo lugar, mesmo giro e o tamanho da cabeça de antes; o pedestal, a cornija,
+     os pilares e a torre continuam (são outras peças); as gárgulas de hoje não têm obstáculo próprio e nada muda em `R.world.obst`.
+   Os velhos continuam a existir; ficam invisíveis só quando o modelo novo do conjunto está pronto (os grupos da v149 saem da fusão
+   na hora: `fusaoDesfazer` dos grupos que os contêm). Montagem uma vez, em fatias do `fat8Go`; sem luz nova; sem obstáculo; fora da
+   colisão da câmera (`noCam`) e do raio; `papelKeepGeo`; a pedra e os olhos com `papelKeep` (como a gárgula da v639), o corvo com os
+   materiais do companheiro (`papelUm`). Usa as funções do `MO907` (`mo907Junta`, `mo907Agrupa`, `mo907Espelha`) e do `AV908`
+   (`av908EspG`, `av908Matrizes`), que existem mesmo com `?morcegos907=0` / `?aves908=0`.
+   Chaves: `?terror909=0` (tudo como era: nem os embrulhos entram), `?terror909corvos=0`, `?terror909gargulas=0`.
+   Gancho `window.__terror909`: `estado`, `stats`, `erros`, `desliga()`, `liga()`, `pausa(v)` (congela o relógio das cabeças dos corvos
+   — e os morcegos do `MO907`, se houver — para fotos de antes/depois no mesmo instante), `fotos()` (poses {id, pos, alvo, fov}),
+   `passo(dt)`, `info()`, `rebanho()`.
+   MEDIDAS (node, v908): montagem 986 ms de processador em 93 fatias (maior 33 ms: a textura de penas da v630, numa fatia só dela); depois
+   0,09–0,14 ms por quadro para os 19. Triângulos (fina/grossa): corvo 35 456 / 6 208, gárgula 46 448 / 6 773. A mais na biblioteca sobre
+   os velhos: +67 mil agora (câmera da entrada), +87 mil todos grossos, pior caso do lote +224 555 (2 corvos finos + 2 gárgulas finas, tudo
+   na tela); com o pior caso dos morcegos do `MO907`, +396 611. Chamadas: corvos 7–22, gárgulas 3–4. */
+const TE909={on:!/[?&#]terror909=0/i.test(location.search+location.hash),
+  conj:{corvos:!/[?&#]terror909corvos=0/i.test(location.search+location.hash),gargulas:!/[?&#]terror909gargulas=0/i.test(location.search+location.hash)},
+  ativo:true,pausado:false,corte:false,   // (coordenador, 24/11) sem corte por frustum: no navegador, a câmera desenhada não era a do instante do polishTick e peças sumiam; o frustum só escolhe as versões finas
+  estado:'espera',erros:[],job:null,rel:0,reg:[],rebanhos:[],M:{corvo:null,garg:null},falhou:{},
+  PX_FINO:85,PX_GROSSO:70,MAX_FINOS:2,PX_FINO_G:105,PX_GROSSO_G:88,MAX_FINAS_G:2,COMP_CORVO:0.45,ALT:{v149:1.19,v557:0.47},
+  stats:{quadros:0,instalados:0,reinstalados:0,cpuMs:0,fatias:0,maiorFatiaMs:0,ondeMaior:null,montagens:{},registrados:{corvos:0,gargulas:0},kitsVelhos:0}};
+function te909Erro(k,e){try{if(TE909.erros.length<40)TE909.erros.push(k+': '+String(e&&e.message||e).slice(0,300));console.warn('v909 terror',k,e);}catch(x){}}
+const te909Tri=g=>g?(g.index?g.index.count:g.attributes.position.count)/3:0;
+
+/* ---------------- 1) os embrulhos: guardam o quadro e desviam a geometria velha para um kit próprio ---------------- */
+// matriz do quadro atual do kit (as colunas pelos pontos K.pt: o kit só empilha giros e escala uniforme)
+function te909QuadroK(K){const o=K.pt(0,0,0),a=K.pt(1,0,0),b=K.pt(0,1,0),c=K.pt(0,0,1);
+  return new THREE.Matrix4().set(a[0]-o[0],b[0]-o[0],c[0]-o[0],o[0],a[1]-o[1],b[1]-o[1],c[1]-o[1],o[1],a[2]-o[2],b[2]-o[2],c[2]-o[2],o[2],0,0,0,1);}
+// depois do fim() do kit original, o kit dos velhos sai no MESMO pai com as MESMAS opções; as malhas entram na lista devolvida
+// (quem chamou faz com elas o mesmo que faz com as outras: noCam, papelKeepGeo…)
+function te909EmbrulhaFim(K){if(K.__te909fim)return;K.__te909fim=true;const f0=K.fim;
+  K.fim=function(pai,opt){const out=f0.apply(this,arguments);
+    for(const conj of ['corvos','gargulas']){const Kp=K['__te909'+conj];if(!Kp)continue;K['__te909'+conj]=null;
+      try{const ms=Kp.fim(pai,Object.assign({},opt||{},{nome:((opt&&opt.nome)||K.nome)+' · v909 '+conj+' velhos'}));
+        for(const m of ms){m.userData.te909velho=conj;m.__fusaoMoveu=2;} // fora da fusão do Leve: esconder fica exato
+        for(const r of Kp.__recs){r.pai=pai;r.velhos=ms;}TE909.stats.kitsVelhos++;if(Array.isArray(out))for(const m of ms)out.push(m);}catch(e){te909Erro('kit velho '+conj,e);}}
+    return out;};}
+function te909Desvia(conj,orig,K,args,extra){const T=THREE;
+  K.push(args[2],args[3],args[4],args[5]||0);const Mq=te909QuadroK(K);K.pop();
+  const ch='__te909'+conj;let Kp=K[ch];if(!Kp){Kp=K[ch]=t160Kit((K.nome||'v160')+' · v909 '+conj+' velhos');Kp.__recs=[];te909EmbrulhaFim(K);}
+  const rec=Object.assign({conj,M:Mq,kit:K.nome,pai:null,velhos:null,id:TE909.reg.length},extra||{});Kp.__recs.push(rec);TE909.reg.push(rec);TE909.stats.registrados[conj]++;
+  const Mt=te909QuadroK(K),P=new T.Vector3(),Qt=new T.Quaternion(),S=new T.Vector3();Mt.decompose(P,Qt,S);const e=new T.Euler().setFromQuaternion(Qt,'YXZ');
+  Kp.push(P.x,P.y,P.z,e.y,e.x,e.z,S.x);try{const a=Array.prototype.slice.call(args);a[0]=Kp;return orig.apply(null,a);}finally{Kp.pop();}}
+if(TE909.on){
+  if(TE909.conj.corvos)try{const c0=hq554Corvo;hq554Corvo=function(K,M,x,y,z,ry){try{if(K&&typeof K.pt==='function'&&typeof K.fim==='function')return te909Desvia('corvos',c0,K,arguments,{tipo:'corvo',ph:((TE909.reg.length*2.39996)%6.2832)});}catch(e){te909Erro('corvo',e);}return c0.apply(this,arguments);};}catch(e){te909Erro('ligar hq554Corvo',e);}
+  if(TE909.conj.gargulas)try{const g0=hw557Gargula;hw557Gargula=function(K,M,x,y,z,ry){try{if(K&&typeof K.pt==='function'&&typeof K.fim==='function')return te909Desvia('gargulas',g0,K,arguments,{tipo:'v557'});}catch(e){te909Erro('gárgula',e);}return g0.apply(this,arguments);};}catch(e){te909Erro('ligar hw557Gargula',e);}
+}
+
+/* ---------------- 2) o CORVO: espécie nova no AV908 (forma e paleta), montada pelo av908EspG ---------------- */
+function te909FormaCorvo(){return {h:{corpo:0.0055,cab:0.0038,bico:0.003},corpo:{r:[0.056,0.052,0.098]},cab:{c:[0,0.062,0.108],r:0.033,sx:0.94,sz:1.1},
+  olho:{c:[0.022,0.07,0.122],r:0.0056},bico:{base:[0,0.057,0.137],comp:0.063,alt:0.019,larg:0.013,curva:0.012,ponta:0.0024,forma:0.6},
+  asa:{ombro:[0.044,0.02,0.038],La:0.11,Lh:0.125,np:10,ns:10,compP:0.15,largP:0.032,compS:0.09,largS:0.035,osso:0.009,leque0:0.22,leque1:0.8},
+  cauda:{base:[0,0.008,-0.1],n:12,comp:0.125,larg:0.03,abre:0.5,queda:0.24},
+  peito:[[0,-0.006,0.06],[0.043,0.043,0.047]],   // peito e papo cheios (as penas eriçadas da garganta)
+  cera:[[0,0.0655,0.137],[0.0092,0.0058,0.014]]};} // cerdas nasais que cobrem a base do bico
+function te909PaletaCorvo(P){const H=window.__bichos622.h,{S,HX,MX,mul,fbm,IRIS}=H;
+  const C={pr:HX(0x22242c),prE:HX(0x111217),az:HX(0x3a4c80),rx:HX(0x4a3870),vd:HX(0x254a42),bico:HX(0x18181c),cz:HX(0x34343c)};
+  // (coordenador, 25/11) olhos amarelos como os do corvo velho (no escuro da charneca o corvo preto de olho escuro sumia) e o preto um pouco
+  // mais claro, com o brilho azul-arroxeado mais forte
+  P.olho.iris={esc:'#3a2408',escBorda:'#160c02',i0:'#ffe27a',i1:'#f2b634',i2:'#8a5410',ri:0.6,pp:0.24};
+  const iri=(n,z)=>MX(MX(C.az,C.rx,0.5+0.5*Math.sin(n[0]*3.1+n[2]*2.3+z*40)),C.vd,0.3*(0.5+0.5*Math.sin(n[1]*5+z*25)));
+  P.asa.cor=(t,u,v,k)=>{const b=t==='P'?MX(C.prE,C.cz,0.18*S(0.5,1,u)):C.pr;return MX(b,MX(C.az,C.rx,k),0.18*S(0.05,0.6,u)*S(1,0.72,u));};
+  P.cauda.cor=(u,v,t)=>MX(C.prE,MX(C.az,C.rx,t),0.16*S(0.1,0.7,u));
+  P.cor=(p,n,parte)=>{const [x,y,z]=p;if(parte==='bico')return MX(C.bico,C.cz,0.3*S(0.0,0.6,(z-0.137)/0.063)*S(0.055,0.068,y));
+    let c=MX(C.pr,iri(n,z),S(-0.3,0.9,n[1])*0.34+0.08);
+    if(parte==='cab')c=MX(c,C.prE,S(0.052,0.04,y)*S(0.105,0.13,z)*0.5);
+    return mul(c,0.9+0.18*fbm(x*90,y*90,z*90));};
+  return P;}
+function te909RegistraCorvo(){if(typeof AV908_ESP==='undefined'||typeof av908Forma!=='function'||typeof av908P!=='function')throw Error('AV908 ausente');
+  if(!AV908_ESP.corvo)AV908_ESP.corvo={id:'comp400_corvo909',chave:'corvo909',forma:'corvo',paleta:'corvo',pes:{tipo:'pousado',cor:0x1c1c22},voo:{a0:0.16,a1:0.5,m0:0.06,m1:0.32},cel:[0.011,0.0075,0.005],nome:'Corvo'};
+  if(!av908Forma.__te909){const f0=av908Forma;av908Forma=function(nome){return nome==='corvo'?te909FormaCorvo():f0.apply(this,arguments);};av908Forma.__te909=true;}
+  if(!av908P.__te909){const p0=av908P;av908P=function(forma,paleta){if(paleta!=='corvo')return p0.apply(this,arguments);return te909PaletaCorvo(p0.call(this,forma,'tordo'));};av908P.__te909=true;}}
+
+/* ---------------- 3) a GÁRGULA esculpida (unidade: a cabeça a ~0,93 do chão, base em y = 0, de frente para +z) ---------------- */
+// união suave com esferas-limite: item [f, k, centro, raio]; a peça cuja esfera está a mais de d + k do ponto não muda o smin e é pulada
+function te909UKB(L){const n=L.length,F=L.map(e=>e[0]),K=L.map(e=>e[1]),CX=L.map(e=>e[2][0]),CY=L.map(e=>e[2][1]),CZ=L.map(e=>e[2][2]),RR=L.map(e=>e[3]);const sm=cp579Smin;
+  return (x,y,z)=>{let d=1e9;for(let i=0;i<n;i++){const dx=x-CX[i],dy=y-CY[i],dz=z-CZ[i];const lb=Math.sqrt(dx*dx+dy*dy+dz*dz)-RR[i];if(lb>d+K[i])continue;const v=F[i](x,y,z);d=d===1e9?v:sm(d,v,K[i]);}return d;};}
+function te909Tri3(a,b,c){const sub=(u,v)=>[u[0]-v[0],u[1]-v[1],u[2]-v[2]],dot=(u,v)=>u[0]*v[0]+u[1]*v[1]+u[2]*v[2],cr=(u,v)=>[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
+  const ba=sub(b,a),cb=sub(c,b),ac=sub(a,c),nor=cr(ba,ac),n1=cr(ba,nor),n2=cr(cb,nor),n3=cr(ac,nor),dba=dot(ba,ba),dcb=dot(cb,cb),dac=dot(ac,ac),dn=dot(nor,nor);const cl=(v)=>v<0?0:(v>1?1:v);
+  return (x,y,z)=>{const pa=[x-a[0],y-a[1],z-a[2]],pb=[x-b[0],y-b[1],z-b[2]],pc=[x-c[0],y-c[1],z-c[2]];
+    if(Math.sign(dot(n1,pa))+Math.sign(dot(n2,pb))+Math.sign(dot(n3,pc))<2){const s1=cl(dot(ba,pa)/dba),s2=cl(dot(cb,pb)/dcb),s3=cl(dot(ac,pc)/dac);
+      const e=(u,s,p)=>{const qx=u[0]*s-p[0],qy=u[1]*s-p[1],qz=u[2]*s-p[2];return qx*qx+qy*qy+qz*qz;};return Math.sqrt(Math.min(e(ba,s1,pa),e(cb,s2,pb),e(ac,s3,pc)));}
+    const k=dot(nor,pa);return Math.sqrt(k*k/dn);};}
+function te909CamposGargula(H){const {Ell:Ell0,Cone:Cone0,Esf:Esf0,UK,Cad:Cad0,Menos,Esp}=H;
+  // as peças levam a esfera-limite junto (centro, raio) para a te909UKB
+  const B=(f,c,R)=>{f.__b=[c,R];return f;};const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1],a[2]-b[2]);
+  const Ell=(c,r,rot)=>B(Ell0(c,r,rot),c,Math.max(r[0],r[1],r[2]));const Esf=(c,r)=>B(Esf0(c,r),c,r);
+  const Cone=(a,b,r1,r2)=>B(Cone0(a,b,r1,r2),[(a[0]+b[0])/2,(a[1]+b[1])/2,(a[2]+b[2])/2],dist(a,b)/2+Math.max(r1,r2));
+  const Cad=(pts,rs,k)=>{const c=[0,0,0];for(const p of pts){c[0]+=p[0]/pts.length;c[1]+=p[1]/pts.length;c[2]+=p[2]/pts.length;}let R=0;for(let i=0;i<pts.length;i++)R=Math.max(R,dist(pts[i],c)+rs[i]);return B(Cad0(pts,rs,k),c,R+(k||0));};
+  const UKB=L=>te909UKB(L.map(e=>{const b=e[0].__b||[[0,0.5,0],9];return [e[0],e[1],b[0],b[1]];}));
+  const laje=(f,c,n,t)=>{const l=Math.hypot(n[0],n[1],n[2]),a=n[0]/l,b=n[1]/l,d=n[2]/l;const g=(x,y,z)=>Math.max(f(x,y,z),Math.abs((x-c[0])*a+(y-c[1])*b+(z-c[2])*d)-t);if(f.__b)g.__b=f.__b;return g;};
+  // ---- corpo (sem cabeça e sem patas): o lado +x, espelhado ----
+  const LB=[];
+  LB.push([Cad([[0,0.24,-0.12],[0,0.42,-0.02],[0,0.58,0.09]],[0.15,0.16,0.13],0.04),0]);   // tronco curvado para a frente
+  LB.push([Ell([0,0.5,0.08],[0.15,0.14,0.13]),0.05]);                                        // peito
+  LB.push([Ell([0,0.63,0.1],[0.22,0.08,0.12]),0.05]);                                        // ombros
+  LB.push([Cone([0,0.6,0.12],[0,0.73,0.25],0.1,0.07),0.04]);                                 // pescoço
+  const dorso=[[0,0.72,0.13],[0,0.68,0.03],[0,0.6,-0.06],[0,0.5,-0.13],[0,0.39,-0.19],[0,0.28,-0.23],[0,0.2,-0.24]];
+  for(let i=0;i<dorso.length;i++){const p=dorso[i];LB.push([Esf(p,0.026-0.002*i),0.016]);if(i>=1&&i<=4)LB.push([Cone(p,[p[0],p[1]+0.045,p[2]-0.035],0.016,0.002),0.006]);} // vértebras e espinhos
+  for(let i=0;i<4;i++){const y=0.53-0.055*i;LB.push([Cad([[0.06,y+0.035,0.15-0.012*i],[0.14,y+0.01,0.1-0.01*i],[0.165,y-0.015,-0.01],[0.13,y-0.04,-0.11]],[0.011,0.013,0.012,0.008]),0.012]);} // costelas
+  LB.push([Cad([[0.1,0.26,-0.13],[0.17,0.29,-0.02],[0.23,0.3,0.09]],[0.088,0.078,0.066]),0.045]);LB.push([Esf([0.235,0.3,0.1],0.056),0.025]);              // coxa e joelho
+  LB.push([Cad([[0.235,0.3,0.1],[0.23,0.12,-0.08]],[0.056,0.042]),0.028]);LB.push([Esf([0.23,0.115,-0.08],0.042),0.02]);      // canela e jarrete
+  LB.push([Cad([[0.23,0.11,-0.08],[0.23,0.04,0.02]],[0.04,0.034]),0.02]);                                                    // metatarso
+  LB.push([Cad([[0.15,0.6,0.1],[0.17,0.42,0.15]],[0.066,0.05]),0.04]);LB.push([Esf([0.17,0.42,0.15],0.048),0.02]);              // braço e cotovelo
+  LB.push([Cad([[0.17,0.42,0.15],[0.11,0.16,0.22]],[0.048,0.038]),0.02]);                                                       // antebraço
+  const pu=[0.21,0.95,-0.16];                                                                                                 // punho da asa dobrada
+  LB.push([Cad([[0.14,0.63,0],[0.2,0.78,-0.08],pu],[0.03,0.024,0.02]),0.03]);LB.push([Cone(pu,[0.22,1.0,-0.1],0.014,0.002),0.004]);
+  const dd=[[[0.235,0.72,-0.25],[0.24,0.44,-0.29]],[[0.2,0.68,-0.235],[0.19,0.37,-0.25]],[[0.16,0.7,-0.19],[0.14,0.43,-0.2]]];   // dedos da asa (de fora para dentro)
+  for(const d of dd)LB.push([Cad([pu,d[0],d[1]],[0.017,0.013,0.007]),0.008]);
+  // membrana dobrada em PREGAS: painéis triangulares entre os ossos (cada um com a sua inclinação) até o quadril, borda de baixo recortada
+  const quad=[0.12,0.4,-0.15],omb=[0.14,0.63,0];const t=0.0165;
+  const pain=[[pu,dd[0][1],dd[1][1]],[pu,dd[1][1],dd[2][1]],[pu,dd[2][1],quad],[omb,pu,quad]];
+  let mem=te909UKB(pain.map(tr=>{const f=te909Tri3(tr[0],tr[1],tr[2]);const c=[(tr[0][0]+tr[1][0]+tr[2][0])/3,(tr[0][1]+tr[1][1]+tr[2][1])/3,(tr[0][2]+tr[1][2]+tr[2][2])/3];let R=0;for(const q of tr)R=Math.max(R,dist(q,c));return [(x,y,z)=>f(x,y,z)-t,0.012,c,R+t];}));
+  mem=B(Menos(mem,UK([[Esf([0.245,0.36,-0.28],0.05),0],[Esf([0.2,0.31,-0.255],0.045),0],[Esf([0.165,0.37,-0.205],0.04),0],[Esf([0.13,0.37,-0.17],0.03),0]]),0.008),[0.18,0.62,-0.17],0.38);
+  LB.push([mem,0.01]);
+  const corpoS=Esp(UKB(LB));
+  const rabo=UK([[Cad([[0,0.22,-0.2],[0.06,0.1,-0.26],[0.16,0.045,-0.26],[0.24,0.035,-0.18],[0.26,0.035,-0.07],[0.245,0.035,0.03]],[0.045,0.036,0.028,0.021,0.015,0.011]),0],[Ell([0.243,0.035,0.075],[0.032,0.012,0.042]),0.006]]);
+  const corpo=UK([[corpoS,0],[rabo,0.025]]);
+  // ---- cabeça ----
+  const LH=[];
+  LH.push([Ell([0,0.83,0.3],[0.12,0.105,0.13]),0]);                                                   // crânio
+  LH.push([Cad([[0,0.885,0.385],[0.05,0.88,0.39],[0.1,0.865,0.355]],[0.024,0.027,0.019]),0.015]);    // arcada pesada
+  LH.push([Ell([0.075,0.79,0.37],[0.045,0.035,0.05]),0.02]);                                         // maçãs
+  LH.push([Ell([0,0.78,0.45],[0.075,0.058,0.1]),0.03]);                                              // focinho
+  LH.push([Ell([0.035,0.765,0.5],[0.035,0.028,0.05]),0.015]);                                        // beiços
+  LH.push([Cad([[0,0.85,0.4],[0,0.81,0.53]],[0.03,0.022]),0.02]);                                    // cana do nariz
+  LH.push([Ell([0,0.705,0.42],[0.068,0.038,0.095]),0.03]);                                           // queixo
+  LH.push([Cone([0,0.74,0.24],[0,0.8,0.28],0.07,0.09),0.03]);                                        // nuca
+  LH.push([laje(Cad([[0.09,0.86,0.27],[0.155,0.915,0.245],[0.225,0.955,0.205]],[0.036,0.024,0.003]),[0.155,0.915,0.245],[0.2,-0.5,0.85],0.009),0.012]); // orelhas pontudas
+  LH.push([Cad([[0.055,0.9,0.27],[0.1,0.98,0.24],[0.13,1.04,0.17],[0.13,1.07,0.09],[0.11,1.06,0.03]],[0.028,0.023,0.016,0.009,0.003]),0.01]); // chifres
+  LH.push([Cone([0.036,0.742,0.52],[0.038,0.703,0.53],0.011,0.0015),0.003]);LH.push([Cone([0.019,0.748,0.545],[0.02,0.72,0.552],0.007,0.001),0.002]); // presas de cima
+  LH.push([Cone([0.03,0.722,0.5],[0.031,0.754,0.507],0.009,0.0012),0.003]);                         // presas de baixo
+  const olho=[0.052,0.822,0.402,0.017];
+  let cab=Esp(UKB(LH));
+  cab=Menos(cab,UK([[Ell([0,0.735,0.49],[0.054,0.016,0.075]),0],[Esp(Esf([0.022,0.8,0.548],0.011)),0],[Esp(Esf([olho[0],olho[1]+0.002,olho[2]+0.004],0.024)),0]]),0.007); // boca, narinas, órbitas
+  cab=UK([[cab,0],[Ell([0,0.722,0.47],[0.028,0.01,0.045]),0.006]]);                                  // língua
+  // ---- patas (só o lado +x; a do outro lado é a malha espelhada) ----
+  const LP=[];
+  LP.push([Ell([0.1,0.06,0.25],[0.05,0.04,0.058]),0]);LP.push([Cad([[0.11,0.17,0.22],[0.1,0.08,0.245]],[0.04,0.036]),0.02]);
+  for(const a of [-0.5,-0.17,0.17,0.5]){const s=Math.sin(a);const b=[0.1+0.04*s,0.05,0.275],m=[0.1+0.06*s,0.035,0.305],t=[0.1+0.07*s,0.018,0.332];LP.push([Cad([b,m,t],[0.016,0.012,0.009]),0.008]);LP.push([Cone(t,[t[0]+0.004*s,t[1]-0.016,t[2]+0.03],0.0085,0.001),0.002]);}
+  LP.push([Ell([0.23,0.03,0.07],[0.055,0.028,0.075]),0.02]);LP.push([Cad([[0.23,0.1,-0.06],[0.23,0.04,0.02]],[0.04,0.034]),0.02]);
+  for(const a of [-0.38,0,0.38]){const s=Math.sin(a);const b=[0.23+0.03*s,0.028,0.11],m=[0.23+0.06*s,0.02,0.16],t=[0.23+0.075*s,0.013,0.2];LP.push([Cad([b,m,t],[0.018,0.014,0.01]),0.008]);LP.push([Cone(t,[t[0]+0.01*s,t[1]-0.012,t[2]+0.034],0.0095,0.0012),0.002]);}
+  const pata=UKB(LP);
+  const todo=UK([[corpo,0],[cab,0.02],[Esp(pata),0.01]]);
+  return {corpo,cab,pata,todo,olho,alt:0.935};}
+// cor da pedra por vértice: veios, oclusão nas dobras (campo inteiro), manchas de chuva em estrias verticais, musgo em cima, líquen
+function te909CorPedra(H,F){const {S,HX,MX,mul,fbm,cl}=H;const C={base:HX(0xb2aeba),esc:HX(0x625e6c),musgo:HX(0x56702f),musgoE:HX(0x2e4120),liquen:HX(0xbab69c),chuva:HX(0x46444e)};   // (coordenador, 25/11) pedra ~15 % mais clara: as gárgulas pequenas da lareira sumiam na madeira escura
+  return (x,y,z,nx,ny,nz)=>{let c=MX(C.base,C.esc,0.3+0.35*fbm(x*5+1.3,y*5,z*5));c=mul(c,0.88+0.24*fbm(x*28,y*28,z*28));
+    const eA=0.025;const o=cl(F.todo(x+nx*eA,y+ny*eA,z+nz*eA)/eA,0,1);c=mul(c,0.42+0.58*o);
+    const st=S(0.05,0.55,fbm(x*26+7.1,y*1.4,z*26+2.3))*S(0.85,0.25,Math.abs(ny))*(0.7+0.3*S(0.6,0.1,y));c=MX(c,C.chuva,st*0.55);
+    const mz=S(0.25,0.8,ny)*S(0.0,0.5,fbm(x*8+3,y*8,z*8+5));c=MX(c,MX(C.musgo,C.musgoE,0.5+0.5*fbm(x*40,y*40,z*40)),Math.min(1,mz*(1.1-0.5*o))*0.9);
+    const lq=S(0.55,0.75,fbm(x*14+11,y*14,z*14))*S(-0.2,0.4,ny)*0.35;c=MX(c,C.liquen,lq);return c;};}
+// textura de pedra (clara, periódica 512²: a cor vem dos vértices) — grão em três escalas, bexigas, poros, trincas e pintas; em fatias
+function* te909TexPedraG(){const BI=window.__bichos622,H=BI.h,T=THREE;const k='tex v909 pedra';if(BI.cache.has(k))return BI.cache.get(k);const t0=performance.now();
+  const W=512,B=new Float32Array(W*W);const r=H.rnd(9091);const cl=H.cl;
+  const hp=(i,j,P,s)=>H.hash3(((i%P)+P)%P,((j%P)+P)%P,s);
+  const vn=(x,y,P,s)=>{const i=Math.floor(x),j=Math.floor(y),fx=x-i,fy=y-j,u=fx*fx*(3-2*fx),v=fy*fy*(3-2*fy);const a=hp(i,j,P,s),b=hp(i+1,j,P,s),c=hp(i,j+1,P,s),d=hp(i+1,j+1,P,s);const e=a+(b-a)*u;return e+((c+(d-c)*u)-e)*v;};
+  for(let y=0;y<W;y++){for(let x=0;x<W;x++){const u=x/W,v=y/W;const n=0.45*vn(u*8,v*8,8,1)+0.32*vn(u*24,v*24,24,2)+0.23*vn(u*72,v*72,72,3);B[y*W+x]=150+90*n;}if((y&15)===15&&performance.now()>=fat8Fim)yield 'pedra grão';}
+  const carimbo=(px,py,rr,val,a)=>{const r1=rr+0.75,x0=Math.floor(px-r1),x1=Math.ceil(px+r1),y0=Math.floor(py-r1),y1=Math.ceil(py+r1);
+    for(let y=y0;y<=y1;y++){const yy=((y%W)+W)%W,dy=y-py;for(let x=x0;x<=x1;x++){const dx=x-px,d=Math.sqrt(dx*dx+dy*dy);const w=cl(rr+0.5-d,0,1)*a;if(w<=0)continue;const i=yy*W+(((x%W)+W)%W);B[i]+=(val-B[i])*w;}}};
+  for(let i=0;i<240;i++){carimbo(r()*W,r()*W,3+r()*5,118+r()*30,0.3+r()*0.2);if((i&31)===31&&performance.now()>=fat8Fim)yield 'pedra bexigas';}
+  for(let i=0;i<2600;i++){carimbo(r()*W,r()*W,0.7+r()*1.8,70+r()*45,0.5+r()*0.4);if((i&127)===127&&performance.now()>=fat8Fim)yield 'pedra poros';}
+  for(let i=0;i<26;i++){let x=r()*W,y=r()*W,a=r()*6.2832;const n=30+(r()*70|0),lw=0.55+r()*0.6;for(let s=0;s<n;s++){a+=(r()-0.5)*0.7;x+=Math.cos(a)*2;y+=Math.sin(a)*2;carimbo(x,y,lw*(1-0.6*s/n),64,0.75);if(r()<0.04){const b=a+(r()<0.5?1:-1)*(0.8+r()*0.6);let bx=x,by=y;for(let q=0;q<10;q++){bx+=Math.cos(b)*2;by+=Math.sin(b)*2;carimbo(bx,by,lw*0.5,72,0.6);}}}
+    if(performance.now()>=fat8Fim)yield 'pedra trincas';}
+  for(let i=0;i<14000;i++){carimbo(r()*W,r()*W,0.5,120+r()*125,0.45);if((i&1023)===1023&&performance.now()>=fat8Fim)yield 'pedra pintas';}
+  const cv=document.createElement('canvas');cv.width=W;cv.height=W;const cx=cv.getContext('2d'),im=cx.createImageData(W,W),d=im.data;
+  for(let i=0;i<W*W;i++){const v=cl(Math.round(B[i]),0,255);d[i*4]=v;d[i*4+1]=v;d[i*4+2]=Math.min(255,v+3);d[i*4+3]=255;if((i&16383)===16383&&performance.now()>=fat8Fim)yield 'pedra tela';}
+  cx.putImageData(im,0,0);yield 'pedra tela';
+  const map=new T.CanvasTexture(cv);map.wrapS=map.wrapT=T.RepeatWrapping;map.anisotropy=8;try{map.encoding=T.sRGBEncoding;}catch(e){}
+  const t={map,B,ms:Math.round(performance.now()-t0)};BI.cache.set(k,t);return t;}
+function* te909GargulaG(){const T=THREE,BI=window.__bichos622,H=BI&&BI.h;if(!H||typeof H.malha!=='function'||typeof H.triplanar!=='function')throw Error('escultor da v622 ausente');
+  if(typeof mo907Junta!=='function'||typeof mo907Agrupa!=='function'||typeof mo907Espelha!=='function')throw Error('funções do MO907 ausentes');
+  const t0=performance.now(),passos={};const F=te909CamposGargula(H),cor=te909CorPedra(H,F);
+  const parte=function*(nome,f,Bx,h){const t=performance.now();const g=yield* fat8Call(H.malha,['v909 gárgula '+nome,f,Bx,h,cor]);passos['esc '+nome]=Math.round(performance.now()-t);return g;};
+  const gC=yield* parte('corpo',F.corpo,[-0.345,-0.02,-0.39,0.345,1.03,0.33],0.017);yield 'corpo';
+  const gH=yield* parte('cabeça',F.cab,[-0.26,0.64,0.13,0.26,1.1,0.58],0.009);yield 'cabeça';
+  const gP=yield* parte('pata',F.pata,[0.03,-0.02,-0.12,0.31,0.21,0.38],0.008);yield 'pata';
+  let tx;{const t=performance.now();tx=yield* te909TexPedraG();passos['tex pedra']=Math.round(performance.now()-t);}
+  const mat=new T.MeshStandardMaterial({map:tx.map,color:0xffffff,vertexColors:true,roughness:0.94,metalness:0});mat.name='v909 pedra da gárgula';mat.userData.papelKeep=true;H.triplanar(mat,1/0.3,0.0045);
+  const t3=performance.now();const gPE=mo907Espelha(gP);
+  const fina=yield* mo907Junta([{geo:gC,M:null},{geo:gH,M:null},{geo:gP,M:null},{geo:gPE,M:null}]);passos.juntar=Math.round(performance.now()-t3);yield 'juntou';
+  const t4=performance.now();const grossa=yield* mo907Agrupa(fina,0.04);passos.grossa=Math.round(performance.now()-t4);yield 'grossa';
+  const esfera=new T.SphereGeometry(1,10,8);esfera.deleteAttribute('uv');
+  const olhoA=new T.MeshStandardMaterial({color:0x2a2020,emissive:0xff8a30,emissiveIntensity:0.6,roughness:0.4});olhoA.name='v909 olho de brasa (biblioteca)';olhoA.userData.papelKeep=true;
+  const olhoV=new T.MeshBasicMaterial({color:new T.Color(0xff2010).lerp(new T.Color(1,1,1),0.2)});olhoV.name='v909 olho vermelho (cemitério)';olhoV.userData.papelKeep=true;
+  fina.computeBoundingBox();const bb=fina.boundingBox;
+  const M={fina,grossa,mat,esfera,olhoA,olhoV,olho:F.olho,alt:F.alt,raio:0.62,caixa:[bb.min.x,bb.min.y,bb.min.z,bb.max.x,bb.max.y,bb.max.z].map(v=>+v.toFixed(3)),
+    triFina:te909Tri(fina),triGrossa:te909Tri(grossa),tri:{corpo:te909Tri(gC),cabeca:te909Tri(gH),pata:te909Tri(gP)},passos,ms:Math.round(performance.now()-t0)};
+  TE909.stats.montagens.garg={ms:M.ms,triFina:M.triFina,triGrossa:M.triGrossa,partes:M.tri,caixa:M.caixa,passos};return M;}
+
+/* ---------------- 4) montagem (uma vez; em fatias) ---------------- */
+function* te909MontaG(quer){
+  if(quer.corvos&&!TE909.M.corvo&&!TE909.falhou.corvo){try{te909RegistraCorvo();yield 'antes das penas';try{const VO=window.__voadores623;VO.h.matPena();VO.h.matAsa();}catch(e){}yield 'penas'; // a textura de penas da v630 numa fatia só dela
+    const M=yield* av908EspG('corvo');TE909.M.corvo=M;TE909.stats.montagens.corvo={ms:M.ms,triFino:M.triFino,triGrosso:M.triGrosso,comprimento:M.comp,envergadura:M.env,passos:M.passos};}catch(e){TE909.falhou.corvo=true;te909Erro('montagem do corvo',e);}yield 'corvo';}
+  if(quer.gargulas&&!TE909.M.garg&&!TE909.falhou.garg){try{TE909.M.garg=yield* te909GargulaG();}catch(e){TE909.falhou.garg=true;te909Erro('montagem da gárgula',e);}yield 'gárgula';}}
+function te909Monta(quer){if(TE909.job)return;const st=TE909.stats;TE909.estado='montando';const t0=performance.now();
+  const fim=()=>{const J=TE909.job;TE909.job=null;if(J){st.fatias+=J.passos;const mx=Math.round(J.max*10)/10;if(mx>=st.maiorFatiaMs){st.maiorFatiaMs=mx;st.ondeMaior=J.rotMax;}st.cpuMs+=Math.round(J.ms);}st.relogioMs=Math.round(performance.now()-t0);TE909.estado=(TE909.falhou.corvo||TE909.falhou.garg)?'erro':'pronto';};
+  const erro=e=>{TE909.job=null;TE909.estado='erro';te909Erro('montagem',e);};
+  try{if(typeof fat8Go==='function'){const J=fat8Go(te909MontaG(quer),{nome:'v909 corvos e gárgulas esculpidos',urgente:()=>{const f=te909Fontes(ACTIVE);return f.corvos.length+f.garg.length>0;},fim,erro});if(TE909.estado==='montando')TE909.job=J;}
+    else{const it=te909MontaG(quer);let r;do{r=it.next();}while(!r.done);fim();}}catch(e){erro(e);}}
+
+/* ---------------- 5) as fontes da cena (velhos) ---------------- */
+function te909Dentro(o,sc){for(let p=o;p;p=p.parent)if(p===sc)return true;return false;}
+const TE909_W={p:new THREE.Vector3(),q:new THREE.Quaternion(),s:new THREE.Vector3(),M:new THREE.Matrix4()};
+function te909Fontes(sc){const out={corvos:[],garg:[]};if(!sc||!TE909.on)return out;
+  try{for(const r of TE909.reg){if(!r.pai||!r.velhos||!te909Dentro(r.pai,sc))continue;if(r.conj==='corvos'&&TE909.conj.corvos)out.corvos.push(r);else if(r.conj==='gargulas'&&TE909.conj.gargulas)out.garg.push(r);}}catch(e){te909Erro('fontes kit',e);}
+  try{if(TE909.conj.gargulas&&typeof GOTH!=='undefined'&&GOTH.eyes){const vistos=new Set();for(const e of GOTH.eyes){const g=e&&e.parent;if(!g||vistos.has(g)||!te909Dentro(g,sc))continue;vistos.add(g);out.garg.push({conj:'gargulas',tipo:'v149',g,id:'v149-'+vistos.size});}}}catch(e){te909Erro('fontes v149',e);}
+  return out;}
+// pose de mundo (sem escala) e escala velha de uma fonte
+function te909Pose(f,p,q){const W=TE909_W;if(f.g){f.g.updateMatrixWorld(true);f.g.matrixWorld.decompose(p,q,W.s);return W.s.x;}
+  W.M.copy(f.M);if(f.pai&&!f.pai.isScene){f.pai.updateMatrixWorld(true);W.M.premultiply(f.pai.matrixWorld);}W.M.decompose(p,q,W.s);return W.s.x;}
+// grupos da fusão do Leve que contêm algum destes objetos: desfeitos na hora (o velho some no mesmo quadro)
+function te909SoltaFusao(sc,objs){try{const F=typeof FUSAO!=='undefined'&&FUSAO.cenas.get(sc);if(!F||!F.grupos.length)return 0;const S=new Set(objs);let n=0;for(const g of F.grupos.slice())if(g.originais.some(o=>S.has(o))){fusaoDesfazer(g,F,sc);n++;}return n;}catch(e){te909Erro('fusão',e);return 0;}}
+function te909VelhosDe(fontes){const L=[],vistos=new Set();for(const f of fontes){const objs=f.g?[f.g]:(f.velhos||[]);for(const o of objs)if(!vistos.has(o)){vistos.add(o);L.push(o);}}return L;}
+
+/* ---------------- 6) instalação por cena ---------------- */
+function te909NovoIM(geo,mat,n,nome,q){const T=THREE;const im=new T.InstancedMesh(geo,mat,Math.max(1,n));im.count=0;im.visible=false;im.instanceMatrix.setUsage(T.DynamicDrawUsage);im.frustumCulled=false;im.castShadow=false;im.receiveShadow=false;
+  im.raycast=()=>{};im.name=nome;im.userData.noCam=true;im.userData.papelKeepGeo=true;im.userData.te909=true;im.__q=q;im.__tri=te909Tri(geo);return im;}
+function te909Assin(L){return L.map(f=>f.id).join(',');}
+function te909InstalaC(sc,fontes){const T=THREE,M=TE909.M.corvo;const R={sc,fontes,assin:te909Assin(fontes),aves:[],ims:{fino:[],grosso:[]},velhos:[],dentro:false,stats:{}};
+  for(const f of fontes)R.aves.push({f,M,pos:new T.Vector3(),q:new T.Quaternion(),k:1,oy:0,ph:0,gl:1,dobra:1,dobraAlvo:1,yaw:0,pitch:0,fino:false,vis:true,idx:-1,nivel:null});
+  for(const nivel of ['fino','grosso'])for(const q of AV908_Q)for(const p of (M[nivel][q]||[]))R.ims[nivel].push(te909NovoIM(p.geo,p.mat,fontes.length,'v909 corvo · '+nivel+' · '+q+' · '+p.nome,q));
+  for(const o of te909VelhosDe(fontes))R.velhos.push({o,vis:o.visible});let tv=0;for(const v of R.velhos)tv+=te909Tri(v.o.geometry);R.triVelho=tv;
+  TE909.stats.instalados++;return R;}
+function te909InstalaG(sc,fontes){const T=THREE,M=TE909.M.garg;const R={sc,fontes,assin:te909Assin(fontes),lista:[],ims:{},velhos:[],dentro:false,stats:{}};
+  for(const f of fontes)R.lista.push({f,pos:new T.Vector3(),q:new T.Quaternion(),s:1,fino:false,vis:true});
+  const n=fontes.length,nA=fontes.filter(f=>f.tipo==='v149').length,nV=n-nA;
+  R.ims.fino=te909NovoIM(M.fina,M.mat,n,'v909 gárgula · fina',null);R.ims.grosso=te909NovoIM(M.grossa,M.mat,n,'v909 gárgula · grossa',null);
+  R.ims.olhoA=te909NovoIM(M.esfera,M.olhoA,2*nA,'v909 gárgula · olhos de brasa',null);R.ims.olhoV=te909NovoIM(M.esfera,M.olhoV,2*nV,'v909 gárgula · olhos vermelhos',null);
+  for(const o of te909VelhosDe(fontes))R.velhos.push({o,vis:o.visible});
+  let tv=0;for(const v of R.velhos)v.o.traverse(o=>{if(o.isMesh)tv+=te909Tri(o.geometry);});R.triVelho=tv;
+  TE909.stats.instalados++;return R;}
+function te909Poe(R){if(!R||R.dentro)return;const L=R.ims.fino&&R.ims.fino.isInstancedMesh?Object.values(R.ims):[].concat(R.ims.fino,R.ims.grosso);
+  for(const im of L){R.sc.add(im);try{if(typeof papelUm==='function')papelUm(im,!!(typeof Q!=='undefined'&&Q.papel));}catch(e){}}R.dentro=true;}
+function te909Tira(R){if(!R||!R.dentro)return;const L=R.ims.fino&&R.ims.fino.isInstancedMesh?Object.values(R.ims):[].concat(R.ims.fino,R.ims.grosso);
+  for(const im of L){R.sc.remove(im);im.visible=false;}for(const v of R.velhos)v.o.visible=v.vis;R.dentro=false;}
+function te909Descarta(R){te909Tira(R);const L=R.ims.fino&&R.ims.fino.isInstancedMesh?Object.values(R.ims):[].concat(R.ims.fino,R.ims.grosso);for(const im of L){try{im.dispose&&im.dispose();}catch(e){}}}
+// os velhos ficam invisíveis (e fora da fusão) — reforçado a cada quadro, antes do desenho
+function te909Esconde(R){let soltar=null;for(const v of R.velhos){if(v.o.visible){v.o.visible=false;(soltar||(soltar=[])).push(v.o);}}
+  if(soltar){const objs=[];for(const o of soltar)o.traverse(m=>{if(m.isMesh)objs.push(m);});te909SoltaFusao(R.sc,objs);}}
+
+/* ---------------- 7) a cada quadro ---------------- */
+const TE909_T={p:new THREE.Vector3(),q:new THREE.Quaternion(),s:new THREE.Vector3(),Ms:new THREE.Matrix4(),Tr:new THREE.Matrix4(),Me:new THREE.Matrix4(),
+  fr:new THREE.Frustum(),PV:new THREE.Matrix4(),esf:new THREE.Sphere(),cam:new THREE.Vector3(),c:new THREE.Vector3()};
+function te909Camera(){const W=TE909_T;let foco=800;try{camera.updateMatrixWorld();W.cam.setFromMatrixPosition(camera.matrixWorld);W.PV.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);W.fr.setFromProjectionMatrix(W.PV);foco=(innerHeight||800)/(2*Math.tan((camera.fov||60)*Math.PI/360));}catch(e){}return foco;}
+function te909AtualizaC(R,dt){const W=TE909_T,M=R.aves.length?R.aves[0].M:null;if(!M)return;if(!R.dentro)te909Poe(R);const foco=te909Camera();const T0=TE909.rel;
+  const cand=[];
+  for(const b of R.aves){te909Pose(b.f,b.pos,b.q);b.k=TE909.COMP_CORVO/(M.comp||0.45);b.oy=-M.pesMinY;b.dobra=1;b.gl=1;b.ph=0;const ph=b.f.ph||0;
+    b.yaw=0.55*Math.sin(T0*0.37+ph*1.3)+0.2*Math.sin(T0*1.13+ph*2.1);b.pitch=0.42*Math.pow(Math.max(0,Math.sin(T0*0.8+ph*1.7)),8)-0.06;
+    const r=M.comp*0.5*b.k;W.c.set(0,0.12,0).applyQuaternion(b.q).add(b.pos);W.esf.set(W.c,r*1.3+0.2);b.naTela=W.fr.intersectsSphere(W.esf);b.vis=!TE909.corte||b.naTela;const d=Math.max(0.05,W.c.distanceTo(W.cam));b.d=d;b.px=r*foco/d;
+    const quer=b.fino?b.px>TE909.PX_GROSSO:b.px>TE909.PX_FINO;if(quer&&b.vis&&b.naTela)cand.push(b);b.fino=false;}
+  cand.sort((a,c)=>a.d-c.d);for(let i=0;i<cand.length&&i<TE909.MAX_FINOS;i++)cand[i].fino=true;
+  const cont={fino:0,grosso:0};let triN=0,cham=0;
+  for(const b of R.aves){b.nivel=null;b.idx=-1;if(!b.vis)continue;const nivel=b.fino?'fino':'grosso';const idx=cont[nivel]++;b.nivel=nivel;b.idx=idx;const Q6=av908Matrizes(b);for(const im of R.ims[nivel])im.setMatrixAt(idx,Q6[im.__q]);}
+  for(const nivel in R.ims)for(const im of R.ims[nivel]){const c=cont[nivel];im.count=c;im.visible=c>0;if(c>0){im.instanceMatrix.needsUpdate=true;triN+=c*im.__tri;cham++;}}
+  te909Esconde(R);
+  R.stats={n:R.aves.length,visiveis:cont.fino+cont.grosso,finos:cont.fino,grossos:cont.grosso,triNovos:triN,triVelhos:R.triVelho,triAMais:triN-R.triVelho,chamadas:cham};}
+function te909AtualizaG(R){const W=TE909_T,M=TE909.M.garg;if(!R.dentro)te909Poe(R);const foco=te909Camera();
+  const cand=[];
+  for(const g of R.lista){const s0=te909Pose(g.f,g.pos,g.q);g.s=s0*(g.f.tipo==='v149'?TE909.ALT.v149:TE909.ALT.v557)/M.alt;
+    const r=M.raio*g.s;W.c.set(0,0.5*g.s,0).applyQuaternion(g.q).add(g.pos);W.esf.set(W.c,r*1.2);g.naTela=W.fr.intersectsSphere(W.esf);g.vis=!TE909.corte||g.naTela;const d=Math.max(0.05,W.c.distanceTo(W.cam));g.d=d;g.px=r*foco/d;
+    const quer=g.fino?g.px>TE909.PX_GROSSO_G:g.px>TE909.PX_FINO_G;if(quer&&g.vis&&g.naTela)cand.push(g);g.fino=false;}
+  cand.sort((a,c)=>a.d-c.d);for(let i=0;i<cand.length&&i<TE909.MAX_FINAS_G;i++)cand[i].fino=true;
+  const cont={fino:0,grosso:0,olhoA:0,olhoV:0};const o=M.olho;
+  for(const g of R.lista){g.nivel=null;g.idx=-1;if(!g.vis)continue;const nivel=g.fino?'fino':'grosso';const idx=cont[nivel]++;g.nivel=nivel;g.idx=idx;
+    W.s.set(g.s,g.s,g.s);W.Ms.compose(g.pos,g.q,W.s);R.ims[nivel].setMatrixAt(idx,W.Ms);
+    const qo=g.f.tipo==='v149'?'olhoA':'olhoV';for(const sd of [1,-1]){W.Tr.makeTranslation(sd*o[0],o[1],o[2]);W.Me.multiplyMatrices(W.Ms,W.Tr);W.Tr.makeScale(o[3],o[3],o[3]);W.Me.multiply(W.Tr);R.ims[qo].setMatrixAt(cont[qo]++,W.Me);}}
+  let triN=0,cham=0;for(const k in R.ims){const im=R.ims[k],c=cont[k];im.count=c;im.visible=c>0;if(c>0){im.instanceMatrix.needsUpdate=true;triN+=c*im.__tri;cham++;}}
+  try{const e=GOTH.eyes[0];if(e&&e.material)M.olhoA.emissiveIntensity=e.material.emissiveIntensity;}catch(x){} // o mesmo pulso do libTick
+  te909Esconde(R);
+  R.stats={n:R.lista.length,visiveis:cont.fino+cont.grosso,finas:cont.fino,grossas:cont.grosso,triNovos:triN,triVelhos:R.triVelho,triAMais:triN-R.triVelho,chamadas:cham};}
+function te909Quadro(dt){if(!TE909.on)return;const st=TE909.stats;st.quadros++;dt=Math.min(0.1,Math.max(0,dt||0));if(!TE909.pausado)TE909.rel+=dt;const sc=ACTIVE;if(!sc)return;
+  const fontes=te909Fontes(sc);const temC=fontes.corvos.length>0,temG=fontes.garg.length>0;if(!temC&&!temG)return;
+  const falta={corvos:temC&&!TE909.M.corvo&&!TE909.falhou.corvo,gargulas:temG&&!TE909.M.garg&&!TE909.falhou.garg};if((falta.corvos||falta.gargulas)&&!TE909.job)te909Monta(falta);
+  if(!TE909.ativo)return;
+  let F=TE909.rebanhos.find(x=>x.sc===sc);if(!F){F={sc,C:null,G:null};try{for(const V of TE909.rebanhos.slice())if(!Object.values(ROOMS).some(R=>R&&R.scene===V.sc)){if(V.C)te909Descarta(V.C);if(V.G)te909Descarta(V.G);TE909.rebanhos.splice(TE909.rebanhos.indexOf(V),1);}}catch(e){}TE909.rebanhos.push(F);}
+  try{if(temC&&TE909.M.corvo){if(F.C&&F.C.assin!==te909Assin(fontes.corvos)){te909Descarta(F.C);F.C=null;st.reinstalados++;}if(!F.C)F.C=te909InstalaC(sc,fontes.corvos);te909AtualizaC(F.C,dt);}}catch(e){te909Erro('quadro corvos',e);}
+  try{if(temG&&TE909.M.garg){if(F.G&&F.G.assin!==te909Assin(fontes.garg)){te909Descarta(F.G);F.G=null;st.reinstalados++;}if(!F.G)F.G=te909InstalaG(sc,fontes.garg);te909AtualizaG(F.G);}}catch(e){te909Erro('quadro gárgulas',e);}}
+
+/* ---------------- 8) ligar ao jogo e o gancho ---------------- */
+if(TE909.on){try{const p0=polishTick;polishTick=function(dt){const r=p0.apply(this,arguments);try{te909Quadro(dt);}catch(e){te909Erro('polishTick',e);}return r;};}catch(e){te909Erro('ligar polishTick',e);}}
+window.__terror909={get estado(){return TE909.on?(TE909.ativo?TE909.estado:'desligado'):'chave=0';},stats:TE909.stats,erros:TE909.erros,S:TE909,
+  desliga(){TE909.ativo=false;for(const F of TE909.rebanhos){te909Tira(F.C);te909Tira(F.G);}return this.info();},
+  liga(){TE909.ativo=true;const F=TE909.rebanhos.find(x=>x.sc===ACTIVE);if(F){try{if(F.C){te909Poe(F.C);te909AtualizaC(F.C,0);}if(F.G){te909Poe(F.G);te909AtualizaG(F.G);}}catch(e){te909Erro('liga',e);}}return this.info();},
+  // avança o jogo dt segundos com o leitor na sala (o relógio da sala e o polishTick)
+  passo(dt){dt=dt||1/60;try{if(CUR==='room'&&ROOM&&ROOM.tick)ROOM.tick(dt);polishTick(dt);}catch(e){te909Erro('passo',e);}return this.info();},
+  pausa(v){TE909.pausado=v===undefined?true:!!v;try{if(window.__morcegos907&&typeof window.__morcegos907.pausa==='function')window.__morcegos907.pausa(TE909.pausado);}catch(e){}return TE909.pausado;},
+  info(){const F=TE909.rebanhos.find(x=>x.sc===ACTIVE);const mc=TE909.M.corvo,mg=TE909.M.garg;
+    return {estado:this.estado,conj:TE909.conj,corvos:F&&F.C?F.C.stats:null,gargulas:F&&F.G?F.G.stats:null,dentro:{corvos:!!(F&&F.C&&F.C.dentro),gargulas:!!(F&&F.G&&F.G.dentro)},
+      modelos:{corvo:mc?{triFino:mc.triFino,triGrosso:mc.triGrosso,comprimento:mc.comp,ms:mc.ms}:null,gargula:mg?{triFina:mg.triFina,triGrossa:mg.triGrossa,ms:mg.ms,caixa:mg.caixa}:null},registrados:TE909.stats.registrados,erros:TE909.erros.length};},
+  rebanho(){return TE909.rebanhos.find(x=>x.sc===ACTIVE)||null;},
+  // poses de câmera {id, pos, alvo, fov}: corvo de perto, gárgula da biblioteca de perto e de corpo inteiro, gárgula do cemitério, o conjunto
+  fotos(){const T=THREE,out=[];const sc=ACTIVE;const f=te909Fontes(sc);const p=new T.Vector3(),q=new T.Quaternion(),a=v=>[+v.x.toFixed(3),+v.y.toFixed(3),+v.z.toFixed(3)];
+    const frente=(qq)=>new T.Vector3(0,0,1).applyQuaternion(qq).setY(0).normalize();
+    try{const c=f.corvos.find(r=>/551/.test(r.kit))||f.corvos[0];if(c){te909Pose(c,p,q);const fw=frente(q),al=p.clone().add(new T.Vector3(0,0.14,0));
+        out.push({id:'corvo-perto',pos:a(al.clone().addScaledVector(fw,1.0).add(new T.Vector3(0,0.12,0)).addScaledVector(new T.Vector3(fw.z,0,-fw.x),0.35)),alvo:a(al),fov:40,nota:'o corvo do espantalho a ~1 m (versão fina)'});
+        const g2=f.corvos.filter(r=>r!==c);if(g2.length){const r2=g2[g2.length-1];te909Pose(r2,p,q);const fw2=frente(q),al2=p.clone().add(new T.Vector3(0,0.14,0));out.push({id:'corvo-grade',pos:a(al2.clone().addScaledVector(fw2,1.6).add(new T.Vector3(0,-0.5,0))),alvo:a(al2),fov:45,nota:'um corvo da grade (2,33 m) a ~1,7 m'});}}}catch(e){te909Erro('fotos corvo',e);}
+    try{const L=f.garg.filter(r=>r.tipo==='v149').map(r=>{const s=te909Pose(r,p,q);return {r,s,p:p.clone(),q:q.clone()};}).sort((x,y)=>y.s-x.s);
+      if(L.length){const G=L[0],fw=frente(G.q),sN=G.s*TE909.ALT.v149/(TE909.M.garg?TE909.M.garg.alt:0.935);const cab=G.p.clone().add(new T.Vector3(0,0.82*sN,0)).addScaledVector(fw,0.35*sN);
+        out.push({id:'gargula-biblioteca-perto',pos:a(cab.clone().addScaledVector(fw,1.3).add(new T.Vector3(0,0.05,0)).addScaledVector(new T.Vector3(fw.z,0,-fw.x),0.45)),alvo:a(cab),fov:45,nota:'a cabeça da gárgula do pedestal a ~1,4 m (versão fina)'});
+        const meio=G.p.clone().add(new T.Vector3(0,0.5*sN,0));out.push({id:'gargula-biblioteca-inteira',pos:a(meio.clone().addScaledVector(fw,3.2).add(new T.Vector3(0,0.35,0)).addScaledVector(new T.Vector3(fw.z,0,-fw.x),1.0)),alvo:a(meio),fov:50,nota:'a gárgula do pedestal de corpo inteiro (~3,4 m)'});
+        if(L.length>=3){const c=L[1].p.clone().add(L[2].p).multiplyScalar(0.5),fw3=frente(L[1].q.clone().slerp(L[2].q,0.5));const al=c.clone().add(new T.Vector3(0,0.2,0));out.push({id:'conjunto-lareira',pos:a(al.clone().addScaledVector(fw3.lengthSq()>0.5?fw3:new T.Vector3(0,0,1),4.5).setY(2.2)),alvo:a(al),fov:55,nota:'as duas gárgulas da cornija da lareira'});}}}catch(e){te909Erro('fotos v149',e);}
+    try{const L=f.garg.filter(r=>r.tipo==='v557');if(L.length){const r=L.find(x=>x.M.elements[13]<9)||L[0];te909Pose(r,p,q);const fw=frente(q),al=p.clone().add(new T.Vector3(0,0.3,0));
+        out.push({id:'gargula-cemiterio-perto',pos:a(al.clone().addScaledVector(fw,1.4).add(new T.Vector3(0,0.15,0)).addScaledVector(new T.Vector3(fw.z,0,-fw.x),0.4)),alvo:a(al),fov:45,nota:'gárgula do pilar da capela a ~1,5 m (câmera no ar)'});
+        out.push({id:'gargula-cemiterio-chao',pos:a(al.clone().addScaledVector(fw,6).setY(1.7)),alvo:a(al),fov:50,nota:'a mesma vista do chão (~8 m)'});
+        const c=new T.Vector3();for(const x of L){te909Pose(x,p,q);c.add(p);}c.multiplyScalar(1/L.length);out.push({id:'conjunto-cemiterio',pos:a(c.clone().add(new T.Vector3(0,0,14)).setY(3)),alvo:a(c),fov:55,nota:'a capela com as quatro gárgulas'});}}catch(e){te909Erro('fotos v557',e);}
     return out;}};
 
 window.__build434={revision:434,family:"web",edition:"en"};
