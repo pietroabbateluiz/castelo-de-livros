@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v906</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v907</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -128356,6 +128356,281 @@ window.__alturas882={estado:AL882,stats:AL882.stats,erros:AL882.erros,get lista(
   if(!CA.on)return;
   setInterval(ajusta,1500);
 }catch(e){try{console.error('v906',e);}catch(x){}}})();
+
+/* ===================== v907 · OS MORCEGOS DE PRIMITIVAS VIRAM O MORCEGO ESCULPIDO (bloco `MO907`) =====================
+   Pedido do Luiz (24/11, 20:50, «ok, siga com esses»): trocar os bichos ainda montados com primitivas por modelos esculpidos,
+   começando pelos mais visíveis. Primeiro lote: os MORCEGOS.
+   COMO ERA: três conjuntos de morcegos de primitivas lisas —
+   · Halloween (biblioteca de Terror, `ROOMS.lib`): `TR507.morcegos`, 30 morcegos (6 da v507, 12 da v551, 5 da v553, 7 da v557),
+     cada um com o `hq554Morcego` (esfera achatada de corpo, esfera de cabeça, cones de orelha, esferas de olho, cilindros de pata,
+     asas planas de `ShapeGeometry`, ~2 456 triângulos e 7 malhas = 7 chamadas de desenho cada); voam em roda pelo `tr507Tick`
+     (B.a += dt·vel/r; rotation.y = −a + π/2, ou seja, voavam DE LADO, com a cabeça para fora da roda) e as asas giram ±0,7 rad
+     a 14 rad/s;
+   · salão gótico (`ROOMS.lib`, `tg639Aplica`): `TG639.vivo.morcegos`, 6 morcegos (esferas, cones e asas planas, 168 triângulos),
+     `tg639Tick` (a = t·vel + ph, inclinados 0,3 rad, asas ±0,7 rad a 7–11 rad/s);
+   · sótão do Paranormal (`ROOMS.outono`, v161): `T161.anim.outono.morcegos`, uma malha instanciada de 14 morcegos (recorte chato
+     + esferinha, 80 triângulos) cujas «asas batem» achatando a escala x (|sin(t·f + i)|).
+   AGORA: os três conjuntos usam o MORCEGO DOS COMPANHEIROS (`comp400Build('comp400_morcego')`: escultura da v622/v623 — corpo e
+   cabeça por campo de distância, focinho, orelhas, olhos nas órbitas com pálpebras da v625, asa com braço, mão e dedos com
+   membrana, materiais «gêmeos» da v829 com luz de recorte). A malha é montada UMA vez (em fatias pelo `fat8Go`: as quatro
+   esculturas passam pelo `malha` fatiado da v622 com as MESMAS chaves do `BI.cache`, então companheiro e morcegos da sala
+   partilham as geometrias) e partilhada por todos, em `InstancedMesh` por cena: corpo (corpo+cabeça), olhos, pálpebras e, de cada
+   lado, braço (osso + membrana) e mão (dedos + membrana) — o lado esquerdo com a geometria espelhada (sem matriz de escala
+   negativa). Duas versões: FINA (o modelo exato, 37 924 triângulos) para quem aparece grande na tela (raio projetado acima de
+   ~85 px, uns 2,7–3,6 m conforme a tela; volta à grossa abaixo de 70 px; no máximo 4 finos por cena) e GROSSA para os outros
+   (corpo e cabeça agrupados por célula de 11 mm e por direção da normal — as orelhas continuam finas —, olhos como contas escuras
+   no corpo, osso do braço e dedos como tubos de 6 e 5 lados ao longo das mesmas cadeias da escultura, a mesma membrana: 1 819
+   triângulos). A cada quadro, DEPOIS do `polishTick` (já com a pose deste quadro calculada pelo jogo), copia-se a pose de cada
+   morcego velho (posição, giro e inclinação: mesmos lugares, trajetórias, alturas, velocidades e fases) para as instâncias;
+   as asas batem dobrando no punho (braço .16 + .5·sin φ, mão .1 + .4·sin(φ − 1), a mão com atraso), com a fase φ tirada do
+   relógio e da fase de cada morcego velho (dessincronizadas, no ritmo de antes). Os do Halloween passam a olhar para onde voam
+   (o giro velho −π/2); os outros dois conjuntos já voavam de frente. Tamanho: a envergadura de antes (×1,1 no Halloween e no
+   gótico, ×0,82 no Paranormal). Os velhos continuam a existir e a ser animados pelo jogo, só ficam invisíveis (e só depois de o
+   novo estar pronto). Nada por vértice no processador a cada quadro; sem luz nova; sem obstáculo; fora da colisão da câmera
+   (`noCam`) e do raio (`raycast` vazio); `papelKeepGeo` como o companheiro (no Papel os materiais seguem o `papelApply`).
+   Chaves: `?morcegos907=0` (tudo como era), `?morcegos907hw=0` (Halloween), `?morcegos907tg=0` (gótico), `?morcegos907pn=0`
+   (Paranormal). Gancho `window.__morcegos907`: `estado`, `stats`, `erros`, `desliga()`, `liga()`, `fotos(sala)`, `passo(dt)`,
+   `pausa(v)` (congela os relógios dos três conjuntos velhos: fotos de antes/depois no mesmo instante), `info()`, `rebanho()`.
+   MEDIDAS (node, v906): montagem 210–360 ms de processador em 34–47 fatias de no máximo ~13–15 ms (a textura de pelo da v622 também
+   em fatias quando ainda não existe); depois, 0,07 ms por quadro para os 36 morcegos da biblioteca; chamadas de desenho por cena:
+   9 (só grossos) a 20 (com finos), antes 7 por morcego; triângulos a mais na biblioteca (30 + 6): ~20 mil com todos grossos, pior
+   caso (4 finos + 32 grossos, todos na tela) +172 mil sobre os velhos do Papel/Leve (+135 mil sobre os de 2 456 do modo normal). */
+const MO907={on:!/[?&#]morcegos907=0/i.test(location.search+location.hash),
+  conj:{hw:!/[?&#]morcegos907hw=0/i.test(location.search+location.hash),tg:!/[?&#]morcegos907tg=0/i.test(location.search+location.hash),pn:!/[?&#]morcegos907pn=0/i.test(location.search+location.hash)},
+  ativo:true,pausado:false,corte:false,   // (coordenador, 24/11) sem corte por frustum: no navegador, a câmera desenhada não era a do instante do polishTick e peças sumiam; o frustum só escolhe as versões finas
+  estado:'espera',erros:[],M:null,job:null,rebanhos:[],
+  K:{hw:1.1,tg:1.1,pn:.82},FIX:{hw:-Math.PI/2,tg:0,pn:0},PX_FINO:85,PX_GROSSO:70,MAX_FINOS:4,RAIO:.36,
+  stats:{montagemMs:0,fatias:0,maiorFatiaMs:0,passos:{},triFino:0,triGrosso:0,quadros:0,instalados:0,reinstalados:0,cacheJa:null,pecasFino:0,pecasGrosso:0}};
+function mo907Erro(k,e){try{if(MO907.erros.length<40)MO907.erros.push(k+': '+String(e&&e.message||e).slice(0,300));console.warn('v907 morcegos',k,e);}catch(x){}}
+
+/* ---------------- geometria: juntar, espelhar, agrupar ---------------- */
+// junta peças {geo, M} numa geometria indexada (só os atributos que todas têm: position, normal, color, uv)
+function* mo907Junta(lista,extra){const T=THREE;const nomes=['position','normal','color','uv'].filter(n=>lista.every(p=>p.geo.attributes[n]||(extra&&extra[n])));
+  let nv=0,ni=0;for(const p of lista){nv+=p.geo.attributes.position.count;ni+=p.geo.index?p.geo.index.count:p.geo.attributes.position.count;}
+  const A={};for(const n of nomes)A[n]=new Float32Array(nv*(n==='uv'?2:3));const I=new Uint32Array(ni);let ov=0,oi=0;const v=new T.Vector3(),nm=new T.Matrix3();
+  for(const p of lista){const g=p.geo,c=g.attributes.position.count,M=p.M||new T.Matrix4();nm.getNormalMatrix(M);
+    for(const n of nomes){const at=g.attributes[n];const k=n==='uv'?2:3;const dst=A[n];
+      if(!at){const val=extra[n];for(let i=0;i<c;i++)for(let j=0;j<k;j++)dst[(ov+i)*k+j]=val[j];continue;}
+      for(let i=0;i<c;i++){if(n==='position'){v.fromBufferAttribute(at,i).applyMatrix4(M);dst[(ov+i)*3]=v.x;dst[(ov+i)*3+1]=v.y;dst[(ov+i)*3+2]=v.z;}
+        else if(n==='normal'){v.fromBufferAttribute(at,i).applyMatrix3(nm).normalize();dst[(ov+i)*3]=v.x;dst[(ov+i)*3+1]=v.y;dst[(ov+i)*3+2]=v.z;}
+        else for(let j=0;j<k;j++)dst[(ov+i)*k+j]=at.array[i*at.itemSize+j];
+        if((i&1023)===1023&&performance.now()>=fat8Fim)yield 'junta';}}
+    if(g.index){const ix=g.index.array;for(let i=0;i<ix.length;i++)I[oi+i]=ix[i]+ov;oi+=ix.length;}else{for(let i=0;i<c;i++)I[oi+i]=ov+i;oi+=c;}
+    ov+=c;if(performance.now()>=fat8Fim)yield 'junta';}
+  const out=new T.BufferGeometry();for(const n of nomes)out.setAttribute(n,new T.BufferAttribute(A[n],n==='uv'?2:3));out.setIndex(new T.BufferAttribute(I,1));out.computeBoundingBox();out.computeBoundingSphere();return out;}
+// lado esquerdo: espelho em x baked na geometria (normais com x trocado e triângulos com a volta invertida) — sem matriz de determinante negativo
+function mo907Espelha(geo){const g=geo.clone();g.applyMatrix4(new THREE.Matrix4().makeScale(-1,1,1));const ix=g.index.array;for(let i=0;i<ix.length;i+=3){const t=ix[i+1];ix[i+1]=ix[i+2];ix[i+2]=t;}g.index.needsUpdate=true;g.computeBoundingBox();g.computeBoundingSphere();return g;}
+// versão grossa: agrupa os vértices por célula da grade E por direção da normal (6 faixas ±x ±y ±z), média de posição, normal e
+// cor; como a frente e o verso de uma orelha (ou os lados de um dedo) caem em faixas diferentes, as peças finas continuam inteiras
+function* mo907Agrupa(geo,cel){const T=THREE;const P=geo.attributes.position.array,N=geo.attributes.normal.array,C=geo.attributes.color?geo.attributes.color.array:null,U=geo.attributes.uv?geo.attributes.uv.array:null;
+  const nv=P.length/3,rep=new Int32Array(nv),mapa=new Map();const acc=[];let nc=0;
+  for(let i=0;i<nv;i++){const x=P[i*3],y=P[i*3+1],z=P[i*3+2],nx=N[i*3],ny=N[i*3+1],nz=N[i*3+2];const ax=Math.abs(nx),ay=Math.abs(ny),az=Math.abs(nz);
+    const f=ax>=ay&&ax>=az?(nx>0?0:1):(ay>=az?(ny>0?2:3):(nz>0?4:5));const ch=((((Math.floor(x/cel)+4096)*8192+(Math.floor(y/cel)+4096))*8192+(Math.floor(z/cel)+4096))*8)+f;
+    let k=mapa.get(ch);if(k===undefined){k=nc++;mapa.set(ch,k);acc.push([0,0,0,0,0,0,0,0,0,0,0,0]);}const a=acc[k];a[0]+=x;a[1]+=y;a[2]+=z;a[3]+=nx;a[4]+=ny;a[5]+=nz;if(C){a[6]+=C[i*3];a[7]+=C[i*3+1];a[8]+=C[i*3+2];}if(U){a[10]+=U[i*2];a[11]+=U[i*2+1];}a[9]++;rep[i]=k;
+    if((i&1023)===1023&&performance.now()>=fat8Fim)yield 'agrupa';}
+  const ix=geo.index.array,I=[];const vistos=new Set();
+  for(let t=0;t<ix.length;t+=3){const a=rep[ix[t]],b=rep[ix[t+1]],c=rep[ix[t+2]];if(a===b||b===c||a===c)continue;const m=Math.min(a,b,c);const ch=m===a?a+','+b+','+c:(m===b?b+','+c+','+a:c+','+a+','+b);if(vistos.has(ch))continue;vistos.add(ch);I.push(a,b,c);
+    if((t&6143)===6141&&performance.now()>=fat8Fim)yield 'agrupa';}
+  const pos=new Float32Array(nc*3),nor=new Float32Array(nc*3),col=C?new Float32Array(nc*3):null,uv=U?new Float32Array(nc*2):null;
+  for(let k=0;k<nc;k++){const a=acc[k],n=a[9];pos[k*3]=a[0]/n;pos[k*3+1]=a[1]/n;pos[k*3+2]=a[2]/n;const l=Math.hypot(a[3],a[4],a[5])||1;nor[k*3]=a[3]/l;nor[k*3+1]=a[4]/l;nor[k*3+2]=a[5]/l;if(col){col[k*3]=a[6]/n;col[k*3+1]=a[7]/n;col[k*3+2]=a[8]/n;}if(uv){uv[k*2]=a[10]/n;uv[k*2+1]=a[11]/n;}}
+  const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(pos,3));g.setAttribute('normal',new T.BufferAttribute(nor,3));if(col)g.setAttribute('color',new T.BufferAttribute(col,3));if(uv)g.setAttribute('uv',new T.BufferAttribute(uv,2));
+  g.setIndex(new T.BufferAttribute(nc>65535?new Uint32Array(I):new Uint16Array(I),1));g.computeBoundingBox();g.computeBoundingSphere();return g;}
+const mo907Tri=g=>g?(g.index?g.index.count:g.attributes.position.count)/3:0;
+// versão grossa dos ossos finos (braço e dedos): tubos de poucos lados ao longo das MESMAS cadeias da escultura, com tampa nas pontas
+function mo907Tubo(cadeias,lados,cor){const T=THREE,P=[],N=[],C=[],I=[];const v=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]],nr=a=>{const l=Math.hypot(a[0],a[1],a[2])||1;return [a[0]/l,a[1]/l,a[2]/l];},cr=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+  const pv=(p,n)=>{P.push(p[0],p[1],p[2]);N.push(n[0],n[1],n[2]);C.push(cor[0],cor[1],cor[2]);return P.length/3-1;};
+  for(const [pts,rs] of cadeias){const n=pts.length,an=[];
+    for(let i=0;i<n;i++){const t=nr(i===0?v(pts[1],pts[0]):(i===n-1?v(pts[n-1],pts[n-2]):v(pts[i+1],pts[i-1])));let u=Math.abs(t[1])<.9?[0,1,0]:[1,0,0];const b=nr(cr(t,u));u=cr(b,t);an.push({t,u,b,v0:P.length/3});
+      for(let k=0;k<lados;k++){const a=k/lados*6.2832,c=Math.cos(a),s=Math.sin(a);const d=[u[0]*c+b[0]*s,u[1]*c+b[1]*s,u[2]*c+b[2]*s];pv([pts[i][0]+d[0]*rs[i],pts[i][1]+d[1]*rs[i],pts[i][2]+d[2]*rs[i]],d);}}
+    for(let i=0;i+1<n;i++){const a=an[i].v0,b=an[i+1].v0;for(let k=0;k<lados;k++){const k1=(k+1)%lados;I.push(a+k,b+k,a+k1,a+k1,b+k,b+k1);}}
+    for(const [i,sg] of [[0,-1],[n-1,1]]){const t=an[i].t,c=pv([pts[i][0]+t[0]*rs[i]*sg,pts[i][1]+t[1]*rs[i]*sg,pts[i][2]+t[2]*rs[i]*sg],[t[0]*sg,t[1]*sg,t[2]*sg]);const a=an[i].v0;for(let k=0;k<lados;k++){const k1=(k+1)%lados;if(sg>0)I.push(a+k,a+k1,c);else I.push(a+k1,a+k,c);}}}
+  const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(P,3));g.setAttribute('normal',new T.Float32BufferAttribute(N,3));g.setAttribute('color',new T.Float32BufferAttribute(C,3));g.setIndex(I);g.computeBoundingBox();g.computeBoundingSphere();return g;}
+const mo907CorMedia=g=>{const c=g.attributes.color;if(!c)return [.2,.15,.25];let r=0,gg=0,b=0;for(let i=0;i<c.count;i++){r+=c.getX(i);gg+=c.getY(i);b+=c.getZ(i);}return [r/c.count,gg/c.count,b/c.count];};
+
+/* ---------------- a textura de pelo da v622 em fatias ---------------- */
+// cópia FIEL do `texDe('pelo')` da v622 (mesma semente, mesmos traços, mesma ordem de contas: sai idêntica — conferido em node), só que
+// num gerador que cede a vez ao fatiador; vai para o MESMO lugar do `BI.cache` ('tex pelo'). Sem ela, a 1.ª montagem numa sala
+// sem outro bicho de pelo levava 74 ms de uma vez.
+function* mo907TexPeloG(BI,guardar){const T=THREE,H=BI.h,cl=H.cl,W=512,Hh=512;const t0=performance.now();const r=H.rnd(6220+'pelo'.length*31);const B=new Float32Array(W*Hh);B.fill(206);
+  const carimbo=(px,py,rr,val,a)=>{const r1=rr+0.75,x0=Math.floor(px-r1),x1=Math.ceil(px+r1),y0=Math.floor(py-r1),y1=Math.ceil(py+r1);
+    for(let y=y0;y<=y1;y++){const yy=((y%Hh)+Hh)%Hh,dy=y-py;for(let x=x0;x<=x1;x++){const dx=x-px,d=Math.sqrt(dx*dx+dy*dy);const w=cl(rr+0.5-d,0,1)*a;if(w<=0)continue;const i=yy*W+(((x%W)+W)%W);B[i]+=(val-B[i])*w;}}};
+  const traco=(x0,y0,cx,cy,x1,y1,larg,val,a)=>{const L=Math.hypot(x1-x0,y1-y0);const n=Math.max(2,Math.ceil(L/Math.max(0.6,larg*0.45)));const aa=1-Math.pow(1-a,1/Math.max(1,n*0.35));
+    for(let i=0;i<=n;i++){const t=i/n,u=1-t;const px=u*u*x0+2*u*t*cx+t*t*x1,py=u*u*y0+2*u*t*cy+t*t*y1;carimbo(px,py,larg*0.5*(1-0.45*t),val,aa);}};
+  const n=11000,comp=15,larg=2.0;
+  for(let i=0;i<n;i++){const px=r()*W,py=r()*Hh,Lc=comp*(0.55+r()*0.9),a=(r()-0.5)*0.55;const v=r();const c=v<0.45?150+v*130:226+(v-0.45)*52;const cv2=(r()-0.5)*4;
+    traco(px,py,px+Math.sin(a)*Lc*0.5+cv2,py+Math.cos(a)*Lc*0.5,px+Math.sin(a)*Lc,py+Math.cos(a)*Lc,larg*(0.6+r()*0.8),c,0.35+r()*0.5);
+    if((i&63)===63&&performance.now()>=fat8Fim)yield 'pelo traços';}
+  const tela=()=>{const c=document.createElement('canvas');c.width=W;c.height=Hh;return c;};
+  const cv1=tela(),x1=cv1.getContext('2d'),im1=x1.createImageData(W,Hh),d1=im1.data;
+  for(let i=0;i<W*Hh;i++){const v=cl(Math.round(B[i]),0,255);d1[i*4]=v;d1[i*4+1]=v;d1[i*4+2]=v;d1[i*4+3]=255;if((i&8191)===8191&&performance.now()>=fat8Fim)yield 'pelo tela';}
+  x1.putImageData(im1,0,0);yield 'pelo tela';
+  const forca=3.2,cv2=tela(),x2=cv2.getContext('2d'),im2=x2.createImageData(W,Hh),d2=im2.data;
+  for(let y=0;y<Hh;y++){for(let x=0;x<W;x++){const xm=(x-1+W)%W,xp=(x+1)%W,ym=(y-1+Hh)%Hh,yp=(y+1)%Hh;const dx=(B[y*W+xp]-B[y*W+xm])/255*forca,dy=(B[yp*W+x]-B[ym*W+x])/255*forca;
+      const nx=-dx,ny=dy,nz=1,l=Math.sqrt(nx*nx+ny*ny+nz*nz);const i=(y*W+x)*4;d2[i]=(nx/l*0.5+0.5)*255;d2[i+1]=(ny/l*0.5+0.5)*255;d2[i+2]=(nz/l*0.5+0.5)*255;d2[i+3]=255;}
+    if((y&7)===7&&performance.now()>=fat8Fim)yield 'pelo relevo';}
+  x2.putImageData(im2,0,0);yield 'pelo relevo';
+  if(guardar===false)return {B,cv1,cv2};
+  if(BI.cache.has('tex pelo'))return BI.cache.get('tex pelo'); // alguém a fez enquanto isto corria: fica a de lá
+  const map=new T.CanvasTexture(cv1);map.wrapS=map.wrapT=T.RepeatWrapping;map.anisotropy=4;try{map.encoding=T.sRGBEncoding;}catch(e){}
+  const nm=new T.CanvasTexture(cv2);nm.wrapS=nm.wrapT=T.RepeatWrapping;nm.anisotropy=4;
+  const t={map,nm,B};BI.cache.set('tex pelo',t);BI.stats['tex pelo']=Math.round(performance.now()-t0);return t;}
+
+/* ---------------- montagem do modelo (uma vez; em fatias) ---------------- */
+// 1) as quatro esculturas pelo `malha` fatiado da v622, com as MESMAS chaves e argumentos do `constroiVoador`/`AVE.morcego` da v623
+//    (o companheiro e os morcegos partilham o `BI.cache`); 2) `comp400Build` (já com as geometrias em cache: rápido) dá a hierarquia,
+//    os materiais gêmeos da v829 e as pálpebras da v625; 3) as peças são juntadas por quadro (corpo · braço · mão) e por material.
+function* mo907MontaG(){const T=THREE;const t0=performance.now();const st=MO907.stats;const VO=window.__voadores623,BI=window.__bichos622;
+  if(!VO||!BI||!BI.h||typeof VO.def!=='function'||typeof comp400Build!=='function'||typeof cp579Cadeia!=='function'||typeof cp579UniaoK!=='function')throw Error('companheiros v622/v623 ausentes');
+  const H=BI.h,ID='comp400_morcego',D=VO.def(ID);if(!D||!D.corpo||!D.cab)throw Error('definição do morcego ausente');
+  const passo=(nome,ms)=>{st.passos[nome]=Math.round(ms);};
+  st.cacheJa={corpo:BI.cache.has('geo '+ID+' corpo'),cab:BI.cache.has('geo '+ID+' cab'),osso:BI.cache.has('geo '+ID+' osso braço'),dedos:BI.cache.has('geo '+ID+' dedos')};
+  // campo de oclusão do corpo inteiro (igual ao campoVoa da v623) e a cor das partes (igual ao corVoa)
+  const fg=D._fg||(D._fg=cp579UniaoK([[D.corpo,0],[D.cab.f,0.006]].concat(D.bico?[[D.bico,0.003]]:[]).concat((D.aoExtra||[]).map(e=>[e,0.004]))));
+  const corVoa=(parte,piv)=>{const eA=0.012;return (x,y,z,nx,ny,nz)=>{const X=x+piv[0],Y=y+piv[1],Z=z+piv[2];const c=D.cor([X,Y,Z],[nx,ny,nz],parte,D);const o=H.cl(fg(X+nx*eA,Y+ny*eA,Z+nz*eA)/eA,0,1);const k=0.55+0.45*o;return [c[0]*k,c[1]*k,c[2]*k];};};
+  const osso=H.HX(0x3a2a48),corO=()=>osso;const Lb=0.13,dedos=[[0.17,0.008,0.045],[0.2,0.0,-0.035],[0.16,0,-0.11],[0.09,0,-0.14]];
+  const ob1=cp579Cadeia([[0,0,0],[0.06,0.006,-0.004],[Lb,0.004,0.004]],[0.007,0.005,0.0045],0.003);
+  const fd=cp579UniaoK(dedos.map(q=>[cp579Cadeia([[0,0,0],[q[0]*0.45,0.002,q[2]*0.45],q],[0.0042,0.0028,0.0012],0.002),0.002]).concat([[cp579Cadeia([[0,0,0],[0.012,0.006,0.016]],[0.004,0.002],0),0.002]]));
+  const voa=function*(nome,fG,piv,h,parte){if(BI.cache.has('geo '+ID+' '+nome))return;const t=performance.now();const Bg=yield* fat8Call(H.caixaDe,[fG,D.caixa,0.015]);if(!Bg)throw Error('parte vazia '+nome);
+    const B=[Bg[0]-piv[0],Bg[1]-piv[1],Bg[2]-piv[2],Bg[3]-piv[0],Bg[4]-piv[1],Bg[5]-piv[2]];yield* fat8Call(H.malha,[ID+' '+nome,H.deslo(fG,piv),B,h,corVoa(parte,piv)]);passo('esc '+nome,performance.now()-t);};
+  const loc=function*(nome,f,Bx,h){if(BI.cache.has('geo '+ID+' '+nome))return;const t=performance.now();const B=yield* fat8Call(H.caixaDe,[f,Bx,0.01]);if(!B)throw Error('parte vazia '+nome);yield* fat8Call(H.malha,[ID+' '+nome,f,B,h,corO]);passo('esc '+nome,performance.now()-t);};
+  yield* voa('corpo',D.corpo,[0,0,0],0.0032,'corpo');yield 'corpo';
+  yield* voa('cab',D.cab.f,D.cab.piv,0.0026,'cab');yield 'cab';
+  yield* loc('osso braço',ob1,[-0.03,-0.03,-0.04,Lb+0.03,0.03,0.04],0.0022);yield 'osso';
+  yield* loc('dedos',fd,[-0.03,-0.03,-0.17,0.23,0.04,0.07],0.002);yield 'dedos';
+  // texturas e materiais (cache da v622/v623: na maioria das vezes já existem) — cada um num passo próprio
+  {const t=performance.now();if(!BI.cache.has('tex pelo'))yield* mo907TexPeloG(BI);H.texDe('pelo');passo('tex pelo',performance.now()-t);}yield 'tex';
+  {const t=performance.now();try{VO.h.matMembrana('morcego',0xffffff);}catch(e){}passo('mat membrana',performance.now()-t);}yield 'mat';
+  // o companheiro montado (todas as camadas: v623, v625, v629/v630/v633 (sem efeito no morcego), v829)
+  let g;{const t=performance.now();g=yield* fat8Call(comp400Build,[ID]);passo('comp400Build',performance.now()-t);}
+  if(!g)throw Error('comp400Build devolveu nada');yield 'grupo';
+  const geoDe=n=>BI.cache.get('geo '+ID+' '+n);let usaCache=0;g.traverse(o=>{if(o.isMesh&&['corpo','cab','osso braço','dedos'].some(n=>o.geometry===geoDe(n)))usaCache++;});st.partilha=usaCache; // 1+1+2+2 = 6 se tudo veio do cache
+  g.position.set(0,0,0);g.rotation.set(0,0,0);g.scale.set(1,1,1);g.updateMatrixWorld(true);
+  const body=g.getObjectByName('body400'),wR=body&&body.children.find(o=>o.name==='wing400_1_0');const mR=wR&&wR.children.find(o=>o.name==='mao623');if(!body||!wR||!mR)throw Error('esqueleto do morcego inesperado');
+  const relDe=(o,base)=>new T.Matrix4().copy(base.matrixWorld).invert().multiply(o.matrixWorld);
+  const grupos=(raiz,pula)=>{const mp=new Map();raiz.traverse(o=>{if(!o.isMesh||!o.visible)return;for(let p=o;p&&p!==raiz;p=p.parent)if(pula&&pula(p))return;const m=o.material;if(Array.isArray(m))return;let L=mp.get(m);if(!L)mp.set(m,L=[]);L.push({geo:o.geometry,M:relDe(o,raiz),nome:o.name});});return mp;};
+  const fino={},grosso={};const t3=performance.now();
+  // quadro do corpo (tudo fora das asas), quadro do braço direito (fora da mão) e quadro da mão direita
+  const qCorpo=grupos(body,p=>/^wing400_/.test(p.name)),qBraco=grupos(wR,p=>p===mR),qMao=grupos(mR,null);
+  const lista=[];for(const [q,mp] of [['corpo',qCorpo],['braco',qBraco],['mao',qMao]])for(const [m,L] of mp)lista.push({q,m,L});
+  for(const it of lista){const geo=yield* mo907Junta(it.L);(fino[it.q]=fino[it.q]||[]).push({geo,mat:it.m,nome:it.L.map(x=>x.nome).join('+')});}
+  passo('juntar',performance.now()-t3);yield 'juntou';
+  // versão grossa: corpo+cabeça (pele) com os olhos como contas escuras, braço, mão; sem pálpebras
+  const t4=performance.now();const pele=fino.corpo.find(p=>p.geo.attributes.color&&/pelo/.test(p.mat.name||''))||fino.corpo.find(p=>p.geo.attributes.color);
+  for(const q of ['corpo','braco','mao']){for(const p of fino[q]){if(q==='corpo'&&p!==pele)continue;let geo;const nt=mo907Tri(p.geo);
+      if(nt<200)geo=p.geo;else if(q==='corpo')geo=yield* mo907Agrupa(p.geo,0.011);
+      else if(q==='braco')geo=mo907Tubo([[[[0,0,0],[0.06,0.006,-0.004],[Lb,0.004,0.004]],[0.007,0.005,0.0045]]],6,mo907CorMedia(p.geo));
+      else geo=mo907Tubo(dedos.map(d=>[[[0,0,0],[d[0]*0.45,0.002,d[2]*0.45],d],[0.0042,0.0028,0.0014]]).concat([[[[0,0,0],[0.012,0.006,0.016]],[0.004,0.002]]]),5,mo907CorMedia(p.geo));
+      (grosso[q]=grosso[q]||[]).push({geo,mat:p.mat,nome:p.nome+' (grossa)'});}}
+  {const olhos=[];body.traverse(o=>{if(o.isMesh&&/^eye400_/.test(o.parent&&o.parent.name||'')&&!/pálpebra/.test(o.name)){const s=new T.SphereGeometry((o.geometry.boundingSphere||{radius:.006}).radius*1.05,6,4);s.deleteAttribute('uv');olhos.push({geo:s,M:relDe(o,body)});}});
+    if(olhos.length&&grosso.corpo&&grosso.corpo[0]){const b=grosso.corpo[0];b.geo=yield* mo907Junta([{geo:b.geo,M:null}].concat(olhos),{color:[0.02,0.015,0.03]});b.nome+=' + olhos';}}
+  passo('grossa',performance.now()-t4);yield 'grossa';
+  // espelhos do lado esquerdo
+  for(const V of [fino,grosso]){V.bracoE=V.braco.map(p=>({geo:mo907Espelha(p.geo),mat:p.mat,nome:p.nome+' (esq.)'}));V.maoE=V.mao.map(p=>({geo:mo907Espelha(p.geo),mat:p.mat,nome:p.nome+' (esq.)'}));V.bracoD=V.braco;V.maoD=V.mao;delete V.braco;delete V.mao;}
+  const soma=V=>Object.values(V).reduce((s,L)=>s+L.reduce((a,p)=>a+mo907Tri(p.geo),0),0);
+  const M={fino,grosso,ombro:wR.position.clone(),mao:mR.position.clone(),env:0};
+  {const B=new T.Box3().setFromObject(body);M.env=+(B.max.x-B.min.x).toFixed(4);M.caixa=[B.min.x,B.min.y,B.min.z,B.max.x,B.max.y,B.max.z].map(v=>+v.toFixed(4));}
+  st.triFino=soma(fino);st.triGrosso=soma(grosso);st.pecasFino=Object.values(fino).reduce((s,L)=>s+L.length,0);st.pecasGrosso=Object.values(grosso).reduce((s,L)=>s+L.length,0);
+  st.pecas={};for(const [nv,V] of [['fino',fino],['grosso',grosso]]){st.pecas[nv]={};for(const q in V)st.pecas[nv][q]=V[q].map(p=>p.nome+' · '+(p.mat.name||p.mat.type)+' · '+mo907Tri(p.geo));}
+  st.envergaduraModelo=M.env;st.montagemMs=Math.round(performance.now()-t0);
+  // o grupo do companheiro não vai para a cena (só serviu de molde); as geometrias e os materiais ficam (partilhados com o cache)
+  return M;}
+function mo907Monta(){if(MO907.job||MO907.M||MO907.estado==='erro')return;MO907.estado='montando';const st=MO907.stats;const t0=performance.now();
+  const fim=M=>{const J=MO907.job;MO907.job=null;if(J){st.fatias=J.passos;st.maiorFatiaMs=Math.round(J.max*10)/10;st.ondeMaior=J.rotMax;st.fatiasGrandes=J.gr||null;st.cpuMs=Math.round(J.ms);}
+    if(!M){MO907.estado='erro';return;}MO907.M=M;MO907.estado='pronto';st.relogioMs=Math.round(performance.now()-t0);};
+  const erro=e=>{MO907.job=null;MO907.estado='erro';mo907Erro('montagem',e);};
+  try{if(typeof fat8Go==='function'){const J=fat8Go(mo907MontaG(),{nome:'v907 morcego esculpido',urgente:()=>mo907Fontes(ACTIVE).length>0,fim,erro});if(MO907.estado==='montando')MO907.job=J;}
+    else{const it=mo907MontaG();let r;do{r=it.next();}while(!r.done);fim(r.value);}}catch(e){erro(e);}}
+
+/* ---------------- os conjuntos de morcegos velhos de cada cena ---------------- */
+// cada fonte: {tipo, n, pose(i, pos, quat) → φ (fase da asa) ou null, esconde(v), objs (para restaurar)}
+function mo907Fontes(sc){const L=[];if(!sc)return L;
+  try{if(MO907.conj.hw&&typeof TR507!=='undefined'&&TR507.morcegos&&TR507.morcegos.length&&ROOMS.lib&&ROOMS.lib.scene===sc){const A=TR507.morcegos;
+      L.push({tipo:'hw',n:A.length,lista:A,objs:()=>A.map(b=>b.g),pose:(i,p,q)=>{const b=A[i],g=b&&b.g;if(!g)return null;p.copy(g.position);q.copy(g.quaternion);return TR507.t*14+(b.ph||0)+Math.PI;}});}}catch(e){mo907Erro('fonte hw',e);}
+  try{if(MO907.conj.tg&&typeof TG639!=='undefined'&&TG639.vivo&&TG639.vivo.morcegos&&TG639.vivo.morcegos.length&&ROOMS.lib&&ROOMS.lib.scene===sc){const V=TG639.vivo,A=V.morcegos;
+      L.push({tipo:'tg',n:A.length,lista:A,objs:()=>A.map(b=>b.g),pose:(i,p,q)=>{const b=A[i],g=b&&b.g;if(!g)return null;p.copy(g.position);q.copy(g.quaternion);return V.t*(b.bat||8)+(b.ph||0);}});}}catch(e){mo907Erro('fonte tg',e);}
+  try{const A=MO907.conj.pn&&typeof T161!=='undefined'&&T161.anim&&T161.anim.outono&&T161.anim.outono.morcegos;if(A&&A.im&&A.im.parent===sc&&A.B&&A.B.length){const im=A.im,B=A.B,Mx=new THREE.Matrix4(),s=new THREE.Vector3();
+      L.push({tipo:'pn',n:Math.min(im.count,B.length),lista:B,objs:()=>[im],pose:(i,p,q)=>{im.getMatrixAt(i,Mx);Mx.decompose(p,q,s);return 2*(A.t*(B[i].f||10)+i);}});}}catch(e){mo907Erro('fonte pn',e);}
+  return L;}
+const MO907_QUADROS=['corpo','bracoD','maoD','bracoE','maoE'];
+function mo907Instala(sc){const T=THREE,M=MO907.M;const fontes=mo907Fontes(sc);if(!fontes.length)return null;
+  const F={sc,fontes,assin:fontes.map(f=>f.tipo+f.n).join(','),bats:[],ims:{fino:[],grosso:[]},velhos:[],noPapel:null,dentro:false,stats:{}};
+  for(const f of fontes)for(let i=0;i<f.n;i++)F.bats.push({f,i,k:MO907.K[f.tipo]||1,fix:MO907.FIX[f.tipo]||0,fino:false,px:0,vis:true,pos:new T.Vector3(),th:0,ps:0});
+  const n=F.bats.length;
+  for(const nivel of ['fino','grosso'])for(const q of MO907_QUADROS)for(const p of (M[nivel][q]||[])){const im=new T.InstancedMesh(p.geo,p.mat,n);im.count=0;im.visible=false;
+      im.instanceMatrix.setUsage(T.DynamicDrawUsage);im.frustumCulled=false;im.castShadow=false;im.receiveShadow=false;im.raycast=()=>{};im.name='v907 morcego · '+nivel+' · '+q+' · '+p.nome;
+      im.userData.noCam=true;im.userData.papelKeepGeo=true;im.userData.mo907=nivel;im.__q=q;im.__tri=mo907Tri(p.geo);F.ims[nivel].push(im);}
+  // os velhos: guarda a visibilidade de agora (para `desliga()` voltar exatamente a ela)
+  for(const f of fontes)for(const o of f.objs())F.velhos.push({o,vis:o.visible});
+  MO907.stats.instalados++;return F;}
+function mo907Poe(F){if(F.dentro)return;for(const nivel in F.ims)for(const im of F.ims[nivel]){F.sc.add(im);try{if(typeof papelUm==='function')papelUm(im,!!(typeof Q!=='undefined'&&Q.papel));}catch(e){}}F.dentro=true;}
+function mo907Tira(F){if(!F.dentro)return;for(const nivel in F.ims)for(const im of F.ims[nivel]){F.sc.remove(im);im.visible=false;}for(const v of F.velhos)v.o.visible=v.vis;F.dentro=false;}
+function mo907Descarta(F){mo907Tira(F);for(const nivel in F.ims)for(const im of F.ims[nivel]){try{im.dispose&&im.dispose();}catch(e){}}const i=MO907.rebanhos.indexOf(F);if(i>=0)MO907.rebanhos.splice(i,1);}
+
+/* ---------------- a cada quadro ---------------- */
+const MO907_T={p:new THREE.Vector3(),q:new THREE.Quaternion(),qf:new THREE.Quaternion(),s:new THREE.Vector3(),Mb:new THREE.Matrix4(),Ma:new THREE.Matrix4(),Mh:new THREE.Matrix4(),R:new THREE.Matrix4(),Tr:new THREE.Matrix4(),
+  fr:new THREE.Frustum(),PV:new THREE.Matrix4(),esf:new THREE.Sphere(),cam:new THREE.Vector3(),Y:new THREE.Vector3(0,1,0)};
+// as cinco matrizes de um morcego (corpo, braço e mão de cada lado) a partir da pose copiada (b.pos, b.q), da escala b.k e da fase b.ph
+const MO907_Q5={corpo:new THREE.Matrix4(),bracoD:new THREE.Matrix4(),maoD:new THREE.Matrix4(),bracoE:new THREE.Matrix4(),maoE:new THREE.Matrix4()};
+function mo907Matrizes(b,out){const W=MO907_T,M=MO907.M,O=out||MO907_Q5;const th=.16+.5*Math.sin(b.ph),ps=.1+.4*Math.sin(b.ph-1.0);b.th=th;b.ps=ps;
+  W.s.set(b.k,b.k,b.k);O.corpo.compose(b.pos,b.q,W.s);
+  for(const sd of [1,-1]){const A=sd>0?O.bracoD:O.bracoE,Hm=sd>0?O.maoD:O.maoE;W.Tr.makeTranslation(sd*M.ombro.x,M.ombro.y,M.ombro.z);A.multiplyMatrices(O.corpo,W.Tr);W.R.makeRotationZ(sd*th);A.multiply(W.R);
+    W.Tr.makeTranslation(sd*M.mao.x,M.mao.y,M.mao.z);Hm.multiplyMatrices(A,W.Tr);W.R.makeRotationZ(sd*ps);Hm.multiply(W.R);}
+  return O;}
+function mo907Atualiza(F){const T=THREE,W=MO907_T,M=MO907.M;
+  // a lista de velhos mudou (a v551/v553/v557 acrescentam morcegos depois da v507; o gótico entra 1,5 s depois)? reinstala
+  const assin=mo907Fontes(F.sc).map(f=>f.tipo+f.n).join(',');if(assin!==F.assin){const sc=F.sc;mo907Descarta(F);const N=mo907Instala(sc);if(N){MO907.rebanhos.push(N);MO907.stats.reinstalados++;mo907Poe(N);mo907Atualiza(N);}return;}
+  if(!F.dentro)mo907Poe(F);
+  let foco=800;try{camera.updateMatrixWorld();W.cam.setFromMatrixPosition(camera.matrixWorld);W.PV.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);W.fr.setFromProjectionMatrix(W.PV);foco=(innerHeight||800)/(2*Math.tan((camera.fov||60)*Math.PI/360));}catch(e){}
+  // 1) poses (cópia dos velhos) e quem fica fino
+  const cand=[];
+  for(const b of F.bats){const ph=b.f.pose(b.i,W.p,W.q);if(ph===null||!isFinite(W.p.x)){b.vis=false;continue;}b.pos.copy(W.p);b.q=b.q||new T.Quaternion();b.q.copy(W.q);if(b.fix){W.qf.setFromAxisAngle(W.Y,b.fix);b.q.multiply(W.qf);}
+    b.ph=ph;const r=MO907.RAIO*b.k;W.esf.set(b.pos,r*1.6+.3);b.naTela=W.fr.intersectsSphere(W.esf);b.vis=!MO907.corte||b.naTela;const d=Math.max(.05,b.pos.distanceTo(W.cam));b.d=d;b.px=r*foco/d;
+    const quer=b.fino?b.px>MO907.PX_GROSSO:b.px>MO907.PX_FINO;if(quer&&b.vis&&b.naTela)cand.push(b);b.fino=false;}
+  cand.sort((a,c)=>a.d-c.d);for(let i=0;i<cand.length&&i<MO907.MAX_FINOS;i++)cand[i].fino=true;
+  // 2) matrizes: corpo; braço = corpo·T(ombro)·Rz(θ); mão = braço·T(punho)·Rz(ψ) — o esquerdo com a geometria espelhada e os ângulos trocados
+  const cont={fino:0,grosso:0};const L={fino:F.ims.fino,grosso:F.ims.grosso};let triN=0;
+  for(const b of F.bats){b.nivel=null;b.idx=-1;if(!b.vis)continue;const nivel=b.fino?'fino':'grosso';const idx=cont[nivel]++;b.nivel=nivel;b.idx=idx;const Q5=mo907Matrizes(b);
+    for(const im of L[nivel])im.setMatrixAt(idx,Q5[im.__q]);}
+  for(const nivel in L)for(const im of L[nivel]){const n=cont[nivel];im.count=n;im.visible=n>0;if(n>0){im.instanceMatrix.needsUpdate=true;triN+=n*im.__tri;}}
+  // 3) os velhos ficam invisíveis (o jogo continua a animá-los); se outro sistema os mostrar, voltam a sumir aqui, antes do desenho
+  let triV=0;for(const v of F.velhos){if(v.o.visible)v.o.visible=false;}
+  if(!F.triVelho){F.triVelho=0;for(const v of F.velhos){let t=0;v.o.traverse(o=>{if(o.isMesh)t+=mo907Tri(o.geometry)*(o.isInstancedMesh?o.count:1);});F.triVelho+=t;}}triV=F.triVelho;
+  F.stats={n:F.bats.length,visiveis:cont.fino+cont.grosso,finos:cont.fino,grossos:cont.grosso,triNovos:triN,triVelhos:triV,triAMais:triN-triV,chamadas:L.fino.filter(i=>i.visible).length+L.grosso.filter(i=>i.visible).length};}
+function mo907Quadro(dt){if(!MO907.on)return;MO907.stats.quadros++;const sc=ACTIVE;if(!sc)return;
+  if(!MO907.M){if(MO907.estado==='espera'&&mo907Fontes(sc).length)mo907Monta();return;}
+  if(!MO907.ativo)return;
+  let F=MO907.rebanhos.find(x=>x.sc===sc);if(!F){F=mo907Instala(sc);if(!F)return;
+    try{for(const V of MO907.rebanhos.slice())if(!Object.values(ROOMS).some(R=>R&&R.scene===V.sc))mo907Descarta(V);}catch(e){} // salas desmontadas: solta os rebanhos velhos
+    MO907.rebanhos.push(F);}
+  try{mo907Atualiza(F);}catch(e){mo907Erro('quadro',e);}}
+
+/* ---------------- ligar ao jogo ---------------- */
+if(MO907.on){
+  try{const p0=polishTick;polishTick=function(dt){const r=p0.apply(this,arguments);try{mo907Quadro(dt);}catch(e){mo907Erro('polishTick',e);}return r;};}catch(e){mo907Erro('ligar polishTick',e);}
+  // pausa (para as fotos de antes/depois no mesmo instante): congela os relógios dos três conjuntos velhos
+  try{const t0=tr507Tick;tr507Tick=function(R,dt){if(MO907.pausado)return;return t0.apply(this,arguments);};}catch(e){mo907Erro('ligar tr507Tick',e);}
+  try{const t1=tg639Tick;tg639Tick=function(dt,V){if(MO907.pausado)return;return t1.apply(this,arguments);};}catch(e){mo907Erro('ligar tg639Tick',e);}
+}
+function mo907PausaPN(){try{for(const p of POLISH_TICKS){if(p.__mo907||String(p.fn).indexOf('t161.morcegos')<0)continue;const f0=p.fn;p.fn=function(dt){if(MO907.pausado)return;return f0.apply(this,arguments);};p.__mo907=true;}}catch(e){mo907Erro('pausa pn',e);}}
+window.__morcegos907={get estado(){return MO907.on?(MO907.ativo?MO907.estado:'desligado'):'chave=0';},stats:MO907.stats,erros:MO907.erros,S:MO907,
+  desliga(){MO907.ativo=false;for(const F of MO907.rebanhos)mo907Tira(F);return this.info();},
+  liga(){MO907.ativo=true;const F=MO907.rebanhos.find(x=>x.sc===ACTIVE);if(F){mo907Poe(F);try{mo907Atualiza(F);}catch(e){mo907Erro('liga',e);}}return this.info();},
+  // avança o jogo dt segundos já com o leitor na sala (o relógio da sala e o polishTick: os velhos andam e os novos copiam)
+  passo(dt){dt=dt||1/60;try{if(CUR==='room'&&ROOM&&ROOM.tick)ROOM.tick(dt);polishTick(dt);}catch(e){mo907Erro('passo',e);}return this.info();},
+  pausa(v){MO907.pausado=v===undefined?true:!!v;mo907PausaPN();return MO907.pausado;},
+  info(){const F=MO907.rebanhos.find(x=>x.sc===ACTIVE);return {estado:this.estado,cena:F?F.fontes.map(f=>f.tipo+':'+f.n).join(' '):null,dentro:F?F.dentro:false,quadro:F?F.stats:null,triFino:MO907.stats.triFino,triGrosso:MO907.stats.triGrosso,erros:MO907.erros.length};},
+  rebanho(){return MO907.rebanhos.find(x=>x.sc===ACTIVE)||null;},
+  // poses de câmera {id, pos, alvo, fov} perto (≈1,6 m: versão fina) e longe (versão grossa) dos morcegos da sala ativa; sala: 'halloween' | 'gotico' | 'paranormal' (ou nada: todas da cena)
+  fotos(sala){const T=THREE,out=[];const tipo={halloween:'hw',hw:'hw',gotico:'tg',gótico:'tg',tg:'tg',paranormal:'pn',pn:'pn',sotao:'pn',sótão:'pn'}[String(sala||'').toLowerCase()]||null;
+    const fontes=mo907Fontes(ACTIVE).filter(f=>!tipo||f.tipo===tipo);const p=new T.Vector3(),q=new T.Quaternion(),a=v=>[+v.x.toFixed(3),+v.y.toFixed(3),+v.z.toFixed(3)];
+    for(const f of fontes){const P=[];for(let i=0;i<f.n;i++){f.pose(i,p,q);P.push(p.clone());}if(!P.length)continue;
+      const centro=(i)=>{const b=f.lista[i];if(f.tipo==='pn')return new T.Vector3(0,P[i].y,b.cz);return new T.Vector3(b.cx,P[i].y,b.cz);};
+      let lo=0;for(let i=1;i<P.length;i++)if(P[i].y<P[lo].y)lo=i;const c=centro(lo),alvo=P[lo];const dir=c.clone().sub(alvo).setY(0);if(dir.lengthSq()<1e-4)dir.set(1,0,0);dir.normalize();
+      const perto=alvo.clone().addScaledVector(dir,1.5);perto.y=alvo.y-.45;out.push({id:f.tipo+'-perto-'+lo,pos:a(perto),alvo:a(alvo),fov:45,nota:'morcego '+lo+' a ~1,6 m (versão fina)'});
+      const meio=alvo.clone().addScaledVector(dir,6);meio.y=Math.max(1.6,alvo.y-1.5);out.push({id:f.tipo+'-meio-'+lo,pos:a(meio),alvo:a(alvo),fov:60,nota:'o mesmo a ~6 m (versão grossa)'});
+      const g=new T.Vector3();P.forEach(v=>g.add(v));g.multiplyScalar(1/P.length);const c2=centro(lo).clone();c2.y=1.7;const longe=c2.clone().addScaledVector(g.clone().sub(c2).setY(0).normalize(),-3);longe.y=1.7;
+      out.push({id:f.tipo+'-longe',pos:a(longe),alvo:a(g),fov:60,nota:'o bando ('+f.n+') de longe'});}
+    return out;}};
 
 window.__build434={revision:434,family:"web",edition:"pt"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
