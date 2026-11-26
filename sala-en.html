@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v916</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v917</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -132635,6 +132635,864 @@ window.__inimigos916={get estado(){return IN916.on?(IN916.ativo?IN916.estado:'de
     let L=[];try{L=in916DaCena(ACTIVE);}catch(e){}const porTipo={};for(const r of L){const q=porTipo[r.tipo]||(porTipo[r.tipo]={n:0,trocados:0});q.n++;if(r.troca)q.trocados++;}
     return {estado:this.estado,conj:IN916.conj,naSala:porTipo,lod:IN916.ult||null,modelos:mod,tipos:IN916.stats.tipos,erros:IN916.erros.length};},
   fotos(sala){try{return in916Fotos(sala);}catch(e){in916Erro('fotos',e);return [];}}};
+
+/* ===================== v917 · BUG, PEIXE-RELÓGIO, CALDEIRA, LOUVA-A-DEUS E DRONE DA V519 VIRAM ESCULPIDOS (bloco `IN917`) =====================
+   Pedido do Luiz (25/11, 16:14, «ok, e siga»): os inimigos que faltam trocam as primitivas por modelos esculpidos («precisam ficar
+   esteticamente lindos»). Este bloco faz os cinco da v519 (`in519Base`); o `IN918` faz os da v162 e os esqueletos da Galeria.
+   Motor copiado do `IN915`/`IN916` (sufixo 917).
+   COMO ERA (`in519Bug`, `in519Peixe`, `in519Caldeira`, `in519Louva`, `in519Drone`; peças do `t160Kit` fundidas por material no `fim`):
+   · BUG DE PIXELS (Digital/digital, paira): 5 malhas (1 764 triângulos), 1,10 × 1,10 × 0,16 m — «space invader» CHATO de caixas, tubos e bolinhas;
+   · PEIXE DOS DOMINGOS (Realismo/realismo, 6 por sala, nada no ar): 7 malhas (4 908), 0,63 × 1,08 × 2,21 — corpo de torno com escamas pintadas,
+     nadadeiras de forma plana, um relógio de bolso de cilindros em cada flanco, olhos de bola;
+   · CALDEIRA ERRANTE (Steampunk/steampunk, anda): 8 malhas (6 952), 1,34 × 2,15 × 0,90 — cilindro com rebites pintados, porta de disco,
+     manômetro, chaminé e pernas de cilindro, braços de tubo com bolas;
+   · LOUVA-A-DEUS SOLAR (Solarpunk/solarpunk, anda): 8 malhas (7 715), 1,77 × 2,26 × 1,53 — abdome de esferas, cabeça de cone de 3 lados, asas
+     planas com a textura de células solares;
+   · DRONE DE VIGILÂNCIA (Guerra/guerra, paira): 20 malhas (4 484), 1,33 × 2,39 × 2,13 (com o feixe) — caixa com textura de painel, hélices de
+     caixinhas, gimbal de bola.
+   AGORA (cada peça esculpida por campo de distância — escultor da v622 —, em LÂMINA paramétrica de duas faces para nadadeiras, asas e
+   hélices, ou em geometria explícita onde ela é melhor — voxels, tubos finos, aros —, nos MESMOS pivôs que o `userData.anim` anima;
+   ver a descrição de cada um nas seções 4 a 8):
+   · BUG: besouro de VOXELS de verdade (cubos chanfrados numa grade 3D, arestas acesas numa malha à parte), cara de frente com sobrancelha
+     brava de pixels, mandíbulas e antenas em degrau, carapaça com costura e manchas, patas em degrau, cubos «glitch» fora da grade;
+   · PEIXE: escamas UMA A UMA em relevo (telhas), sombreado de peixe, opérculo, lábios, olho de vidro com pupila e brilho, nadadeiras de
+     membrana com raios, e o relógio de bolso em cada flanco (caixa serrilhada, coroa, mostrador em textura própria, ponteiros);
+   · CALDEIRA: ferro fundido com cintas e rebites um a um, portinhola com fendas por onde passa a luz de HOJE, manômetro com mostrador
+     próprio, visores de vidro aceso como olhos, chaminé oca, volante e válvula de segurança, canos de cobre com luvas, pernas articuladas;
+   · LOUVA-A-DEUS: cabeça triangular com olhos compostos facetados, protórax comprido, abdome segmentado, patas raptoriais com espinhos
+     dourados, patas finas articuladas, asas de membrana com nervuras douradas e PAINÉIS SOLARES entre elas (textura própria, brilho azul);
+   · DRONE: casco aerodinâmico com linhas de painel, braços em X com faixas, motores aletados, protetores, hélices torcidas que GIRAM como
+     hoje, gimbal de garfo com a bola da câmera e a objetiva, antenas, domo do GPS, luzes de navegação.
+   Mesmo método do `IN913`–`IN916`: o embrulho de cada construtor guarda o inimigo e lê o esqueleto NA HORA em que ele nasce (`rec.P`); com o
+   modelo pronto (montagem uma vez, em fatias do `fat8Go`) as malhas novas entram como FILHAS dos grupos e as velhas ficam com a GEOMETRIA
+   VAZIA. NOVO: os modelos da v519 têm uma malha por OLHO, cada uma com o seu material — todas continuam o MESMO objeto com o MESMO material
+   e ganham a geometria nova do seu olho. Ficam como hoje: a luz da fornalha da caldeira (malha com o brilho animado), o feixe do drone (cone
+   animado) e os Sprites (brilhos, vapor). FINO para no máximo 2 grandes na tela, GROSSO (`mo907Agrupa`, a lâmina ou o tubo em grade menor)
+   para o resto. Sem corte por frustum, sem `InstancedMesh`, sem luz, sem obstáculo, `noCam`, raio vazio, `papelKeepGeo`, `__fusaoMoveu`
+   (fora da fusão do Leve; os grupos já fundidos com as malhas velhas são desfeitos), Papel pelo `papelUm`; no troféu da Minha Sala (v498)
+   as malhas novas ficam de ouro.
+   Chaves: `?inimigos917=0` (tudo como era: nem os embrulhos entram), `?inimigos917bug=0`, `?inimigos917peixe=0`, `?inimigos917cald=0`,
+   `?inimigos917louva=0`, `?inimigos917drone=0`.
+   Gancho `window.__inimigos917`: `estado`, `stats`, `erros`, `desliga()`, `liga()`, `pausa(v)` (congela as poses dos inimigos velhos e novos,
+   com o bloco ligado ou desligado), `fotos(sala)` (poses {id, pos, alvo, fov} de perto e de corpo inteiro, câmera dentro da sala e sem nada
+   na frente), `passo(dt)`, `info()`. */
+const IN917_Q=(()=>{try{return location.search+location.hash;}catch(e){return '';}})();
+const IN917={on:!/[?&#]inimigos917=0/i.test(IN917_Q),
+  conj:{bug:!/[?&#]inimigos917bug=0/i.test(IN917_Q),peixe:!/[?&#]inimigos917peixe=0/i.test(IN917_Q),caldeira:!/[?&#]inimigos917cald=0/i.test(IN917_Q),
+    louva:!/[?&#]inimigos917louva=0/i.test(IN917_Q),drone:!/[?&#]inimigos917drone=0/i.test(IN917_Q)},
+  ativo:true,pausado:false,corte:false,estado:'espera',erros:[],job:null,M:{},falhou:{},regs:[],
+  PX_FINO:110,PX_GROSSO:90,MAX_FINOS:2,
+  stats:{quadros:0,cpuMs:0,fatias:0,maiorFatiaMs:0,ondeMaior:null,montagens:{},tipos:{}}};
+function in917Erro(k,e){try{if(IN917.erros.length<40)IN917.erros.push(k+': '+String(e&&e.message||e).slice(0,300));console.warn('v917 inimigos',k,e);}catch(x){}}
+const in917Tri=g=>g?(g.index?g.index.count:g.attributes.position.count)/3:0;
+const IN917_VAZIA=(()=>{const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(3),3));g.setDrawRange(0,0);g.boundingSphere=new THREE.Sphere(new THREE.Vector3(),0.01);g.boundingBox=new THREE.Box3(new THREE.Vector3(),new THREE.Vector3());return g;})();
+for(const t of ['bug','peixe','caldeira','louva','drone'])IN917.stats.tipos[t]={registrados:0,trocados:0,destrocados:0};
+
+/* ---------------- 1) embrulhos: guardam cada inimigo criado (a troca é feita quando o modelo estiver pronto) ---------------- */
+/* o esqueleto (os grupos que o userData.anim anima) é lido AQUI, na hora em que o inimigo nasce (pose de repouso), e fica guardado em rec.P:
+   depois que ele anda/gira, buscar os grupos pela posição viva falharia ao religar (liga()) ou ao voltar à sala */
+/* NOVO no IN917: os modelos da v519 têm UM olho por malha, cada um com o SEU material (in519Olhos) — todos ficam como o mesmo objeto com o
+   mesmo material e ganham a geometria nova (rec.olhos; rec.olho = o primeiro, como nos blocos anteriores) */
+function in917Registra(g,tipo){try{if(!g||!g.isObject3D)return;const velhas=[];g.traverse(o=>{if(o.isMesh)velhas.push(o);});
+    const olhos=(g.userData.olhos||[]).filter(o=>o&&o.isMesh);const olho=olhos[0]||null;
+    const rec={g,tipo,velhas,olho,olhoMat:olho&&olho.material,olhos,olhoMats:olhos.map(o=>o.material),troca:null,P:null};
+    try{rec.P=IN917_TIPOS[tipo].partes(g);}catch(e){}
+    IN917.regs.push(rec);IN917.stats.tipos[tipo].registrados++;
+    if(IN917.M[tipo]&&IN917.ativo)in917Troca(rec);}catch(e){in917Erro('registrar '+tipo,e);}}
+/* embrulho dos construtores da v519 (chamados pelo nome dentro do in519Mesh, na hora: o embrulho vale); o n474Prepara roda depois, no in519Mesh */
+if(IN917.on){
+  for(const [t,nome] of [['bug','in519Bug'],['peixe','in519Peixe'],['caldeira','in519Caldeira'],['louva','in519Louva'],['drone','in519Drone']]){if(!IN917.conj[t])continue;
+    try{if(nome==='in519Bug'){const f0=in519Bug;in519Bug=function(){const g=f0.apply(this,arguments);in917Registra(g,'bug');return g;};}
+      else if(nome==='in519Peixe'){const f0=in519Peixe;in519Peixe=function(){const g=f0.apply(this,arguments);in917Registra(g,'peixe');return g;};}
+      else if(nome==='in519Caldeira'){const f0=in519Caldeira;in519Caldeira=function(){const g=f0.apply(this,arguments);in917Registra(g,'caldeira');return g;};}
+      else if(nome==='in519Louva'){const f0=in519Louva;in519Louva=function(){const g=f0.apply(this,arguments);in917Registra(g,'louva');return g;};}
+      else if(nome==='in519Drone'){const f0=in519Drone;in519Drone=function(){const g=f0.apply(this,arguments);in917Registra(g,'drone');return g;};}}catch(e){in917Erro('ligar '+nome,e);}}}
+
+/* ---------------- 2) utilidades de campo e de cor ---------------- */
+const in917L=(r,g,b)=>[r,g,b];                                            /* cor de vértice já em LINEAR (a tela do jogo não corrige o gama) */
+function in917Lim(f,c,r){return (x,y,z)=>{const d=Math.hypot(x-c[0],y-c[1],z-c[2])-r;return d>0.04?d:f(x,y,z);};}   /* caixa esférica barata para detalhe miúdo */
+function in917LimCx(f,B,m){m=m||0.04;return (x,y,z)=>{const d=Math.max(B[0]-x,x-B[3],B[1]-y,y-B[4],B[2]-z,z-B[5]);return d>m?d:f(x,y,z);};}   /* caixa alinhada */
+function in917Anel(c,R,r,eixo){return (x,y,z)=>{let a,b,w;const px=x-c[0],py=y-c[1],pz=z-c[2];if(eixo==='x'){a=py;b=pz;w=px;}else if(eixo==='y'){a=px;b=pz;w=py;}else{a=px;b=py;w=pz;}return Math.hypot(Math.hypot(a,b)-R,w)-r;};}
+function in917AnelO(c,ax,R,r){const l=Math.hypot(...ax);const a=ax.map(q=>q/l);return (x,y,z)=>{const px=x-c[0],py=y-c[1],pz=z-c[2];const w=px*a[0]+py*a[1]+pz*a[2];const qx=px-w*a[0],qy=py-w*a[1],qz=pz-w*a[2];return Math.hypot(Math.hypot(qx,qy,qz)-R,w)-r;};}   /* toro de eixo qualquer */
+function in917AnelE(c,ra,rb,r){return (x,y,z)=>{const px=x-c[0],py=y-c[1],pz=z-c[2];const k=Math.hypot(px/ra,pz/rb);const de=(k-1)*Math.min(ra,rb);return Math.hypot(de,py)-r;};}  /* toro elíptico deitado */
+const in917Casca=(f,t)=>(x,y,z)=>Math.abs(f(x,y,z))-t;
+function in917Desl(f,p){return (x,y,z)=>f(x+p[0],y+p[1],z+p[2]);}            /* campo no espaço do pai → espaço do pivô p */
+/* elipse 2D aproximada (distância em unidades de comprimento), com giro */
+function in917El2(x,y,cx,cy,a,b,rot){let u=x-cx,v=y-cy;if(rot){const c=Math.cos(rot),s=Math.sin(rot);const U=c*u+s*v,V=-s*u+c*v;u=U;v=V;}return (Math.hypot(u/a,v/b)-1)*Math.min(a,b);}
+/* elipsoide orientado: eixos u e v (unitários, ortogonais), w = u × v; raios r=[ru,rv,rw] (limite de Inigo Quilez) */
+function in917EllO(c,u,v,r){const l=Math.hypot(...u);u=u.map(q=>q/l);let d=u[0]*v[0]+u[1]*v[1]+u[2]*v[2];v=[v[0]-d*u[0],v[1]-d*u[1],v[2]-d*u[2]];const lv=Math.hypot(...v);v=v.map(q=>q/lv);
+  const w=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];const rm=Math.min(...r);
+  return (x,y,z)=>{const px=x-c[0],py=y-c[1],pz=z-c[2];const a=(px*u[0]+py*u[1]+pz*u[2])/r[0],b=(px*v[0]+py*v[1]+pz*v[2])/r[1],e=(px*w[0]+py*w[1]+pz*w[2])/r[2];
+    const k0=Math.sqrt(a*a+b*b+e*e);const k1=Math.sqrt(a*a/(r[0]*r[0])+b*b/(r[1]*r[1])+e*e/(r[2]*r[2]));return k1>1e-12?k0*(k0-1)/k1:-rm;};}
+/* placa (pena, folha): contorno 2D em (s ao longo de u, t ao longo de v) dado por largura(s) em [0,L], espessura T (afina na ponta), curvatura cv */
+function in917Placa(c,u,v,L,larg,T,cv){const l=Math.hypot(...u);u=u.map(q=>q/l);let d=u[0]*v[0]+u[1]*v[1]+u[2]*v[2];v=[v[0]-d*u[0],v[1]-d*u[1],v[2]-d*u[2]];const lv=Math.hypot(...v);v=v.map(q=>q/lv);
+  const w=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];cv=cv||0;
+  return (x,y,z)=>{const px=x-c[0],py=y-c[1],pz=z-c[2];const s=px*u[0]+py*u[1]+pz*u[2],t=px*v[0]+py*v[1]+pz*v[2];let n=px*w[0]+py*w[1]+pz*w[2];
+    const sc=Math.max(0,Math.min(L,s));const W=larg(sc/L);n-=cv*(t*t)/(W*W+1e-6)*W*0.5+cv*0.15*s*s/L;   /* concha leve */
+    const dS=Math.max(-s,s-L);const dT=Math.abs(t)-W;const e2=Math.max(dS,dT);const tt=T*(1-0.55*sc/L);
+    const fora=Math.hypot(Math.max(dS,0),Math.max(dT,0))+Math.min(e2,0);return Math.max(fora,Math.abs(n)-tt);};}
+function in917Ruido(H,f,amp,freq){return (x,y,z)=>{const d=f(x,y,z);if(d>amp*3||d<-amp*3)return d;return d+amp*H.ruido(x*freq+3.1,y*freq,z*freq+7.7);};}
+/* olho assentado na superfície: o ponto pedido desce pelo gradiente até a pele e o globo fica uma fração para dentro */
+function in917Assenta(f,p,r,frac){let x=p[0],y=p[1],z=p[2];const e=1e-4;let n=[0,0,1];
+  for(let i=0;i<14;i++){const d=f(x,y,z);const gx=(f(x+e,y,z)-f(x-e,y,z))/(2*e),gy=(f(x,y+e,z)-f(x,y-e,z))/(2*e),gz=(f(x,y,z+e)-f(x,y,z-e))/(2*e);const l=Math.hypot(gx,gy,gz)||1;n=[gx/l,gy/l,gz/l];x-=n[0]*d;y-=n[1]*d;z-=n[2]*d;if(Math.abs(d)<1e-5)break;}
+  const k=frac===undefined?0.42:frac;return {c:[x-n[0]*r*k,y-n[1]*r*k,z-n[2]*r*k],n};}
+/* cor com sombra de cantinho (pelo próprio campo) e um leve ruído */
+function in917CorAO(H,campo,cor,eA,k0,ruido){return (x,y,z,nx,ny,nz)=>{const c=cor(x,y,z,nx,ny,nz);const o=H.cl(campo(x+nx*eA,y+ny*eA,z+nz*eA)/eA,0,1);const r=ruido?(1-ruido/2+ruido*(0.5+0.5*H.ruido(x*41+1.3,y*41,z*41+2.9))):1;const k=(k0+(1-k0)*o)*r;return [c[0]*k,c[1]*k,c[2]*k];};}
+/* globos (olhos): lista de {c,n} já no espaço do pivô do olho; esc = achatamento local (x lado, y alto, z fundo) */
+function in917Globos(L,r,esc,seg,giroZ){const T=THREE;const G=[];for(const A of L){const g=new T.SphereGeometry(r,seg||16,Math.max(8,Math.round((seg||16)*0.75)));g.deleteAttribute('uv');
+    if(esc)g.scale(esc[0],esc[1],esc[2]);if(A.rz)g.rotateZ(A.rz);const n=new T.Vector3(A.n[0],A.n[1],A.n[2]).normalize();const q=new T.Quaternion().setFromUnitVectors(new T.Vector3(0,0,1),n);
+    g.applyMatrix4(new T.Matrix4().compose(new T.Vector3(A.c[0],A.c[1],A.c[2]),q,new T.Vector3(1,1,1)));G.push(g);}
+  return in917JuntaSimples(G);}
+function in917JuntaSimples(L){const T=THREE;let nv=0,ni=0;const at=['position','normal'].concat(L.every(g=>g.attributes.uv)?['uv']:[]).concat(L.every(g=>g.attributes.color)?['color']:[]);
+  for(const g of L){nv+=g.attributes.position.count;ni+=g.index?g.index.count:g.attributes.position.count;}const A={};for(const n of at)A[n]=new Float32Array(nv*(n==='uv'?2:3));
+  const I=new (nv>65535?Uint32Array:Uint16Array)(ni);let ov=0,oi=0;
+  for(const g of L){const k=g.attributes.position.count;for(const n of at)A[n].set(g.attributes[n].array,ov*(n==='uv'?2:3));if(g.index){const ix=g.index.array;for(let j=0;j<ix.length;j++)I[oi+j]=ix[j]+ov;oi+=ix.length;}else{for(let j=0;j<k;j++)I[oi+j]=j+ov;oi+=k;}ov+=k;}
+  const out=new T.BufferGeometry();for(const n of at)out.setAttribute(n,new T.BufferAttribute(A[n],n==='uv'?2:3));out.setIndex(new T.BufferAttribute(I,1));out.computeBoundingSphere();out.computeBoundingBox();return out;}
+/* média das cores de vértice (linear) de uma geometria — para o relatório */
+function in917CorMedia(g){const c=g&&g.attributes.color;if(!c)return null;const A=c.array;let s=[0,0,0];for(let i=0;i<A.length;i+=3){s[0]+=A[i];s[1]+=A[i+1];s[2]+=A[i+2];}const n=A.length/3;return s.map(v=>+(v/n).toFixed(3));}
+function in917Mat(nome,op){const m=new THREE.MeshStandardMaterial(Object.assign({color:0xffffff,vertexColors:true,roughness:0.6,metalness:0},op||{}));m.name='v917 '+nome;return m;}
+
+/* ---------------- 3) uma peça: malha fina (escultor da v622, em fatias) e a grossa (mo907Agrupa); espelho opcional ---------------- */
+/* o.fina: espessura da placa — a célula da grossa não passa dela (senão a grossa fura: lição das ombreiras da v913) */
+function* in917PecaG(H,M,o){const t=performance.now();const g=yield* fat8Call(H.malha,['v917 '+o.nome,o.f,o.B,o.h,null]);
+  /* a cor por vértice é calculada aqui, em fatias (dentro do cp579Geo ela era um laço só) */
+  if(o.cor&&!g.attributes.color){const P=g.attributes.position.array,N=g.attributes.normal.array,n=P.length/3,C=new Float32Array(n*3);
+    for(let i=0;i<n;i++){const c=o.cor(P[i*3],P[i*3+1],P[i*3+2],N[i*3],N[i*3+1],N[i*3+2]);C[i*3]=c[0];C[i*3+1]=c[1];C[i*3+2]=c[2];if((i&31)===31&&performance.now()>=fat8Fim)yield 'cor '+o.nome;}
+    g.setAttribute('color',new THREE.BufferAttribute(C,3));}
+  M.passos['esc '+o.nome]=Math.round(performance.now()-t);yield o.nome;
+  const gg=yield* mo907Agrupa(g,o.cel||(o.fina?Math.min(o.h*3.4,o.fina):o.h*3.4));yield o.nome+' grossa';
+  const base={k:o.k||o.nome,mat:o.mat,fino:g,grosso:gg};const out=[];
+  for(const pv of [].concat(o.pivo)){if(pv.charAt(0)==='~'){out.push(Object.assign({},base,{pivo:pv.slice(1),fino:mo907Espelha(g),grosso:mo907Espelha(gg),esp:true}));}else out.push(Object.assign({},base,{pivo:pv}));}
+  for(const p of out){M.partes.push(p);M.triFino+=in917Tri(p.fino);M.triGrosso+=in917Tri(p.grosso);}
+  M.cores[o.nome]=in917CorMedia(g);return out;}
+/* pano em lâmina (capa, gola, fitas, toga): superfície paramétrica fn(u,v) → [x,y,z] com espessura 2t (as duas faces e as bordas), cor por
+   face (lado +1 = o lado da normal ∂u×∂v); fino e grosso pela resolução da grade (o pano liso não precisa do escultor) */
+function* in917LaminaG(fn,nu,nv,t,cor,fechaU){const T=THREE;const NU=fechaU?nu:nu+1,NV=nv+1,e=1e-3;const P=[],N=[],C=[],I=[],U=[];const tf=typeof t==='function'?t:()=>t;
+  const ponto=(u,v)=>fn(u,v);const nor=(u,v)=>{const ua=Math.max(0,u-e),ub=Math.min(1,u+e),va=Math.max(0,v-e),vb=Math.min(1,v+e);const a=ponto(ua,v),b=ponto(ub,v),c=ponto(u,va),d=ponto(u,vb);
+    const pu=[b[0]-a[0],b[1]-a[1],b[2]-a[2]],pv=[d[0]-c[0],d[1]-c[1],d[2]-c[2]];const n=[pu[1]*pv[2]-pu[2]*pv[1],pu[2]*pv[0]-pu[0]*pv[2],pu[0]*pv[1]-pu[1]*pv[0]];const l=Math.hypot(...n)||1;return {n:[n[0]/l,n[1]/l,n[2]/l],pu,pv};};
+  const G=[];for(let j=0;j<NV;j++){for(let i=0;i<NU;i++){const u=i/nu,v=j/nv;const p=ponto(u,v);const q=nor(u,v);G.push({p,n:q.n,pu:q.pu,pv:q.pv,u,v});}if(performance.now()>=fat8Fim)yield 'lâmina';}
+  const add=(p,n,c,uv)=>{P.push(p[0],p[1],p[2]);N.push(n[0],n[1],n[2]);C.push(c[0],c[1],c[2]);U.push(uv[0],uv[1]);return P.length/3-1;};   /* uv = (u,v) do parâmetro (NOVO no IN917: as asas do louva-a-deus usam textura) */
+  const idx=[[],[]];for(const lado of [1,-1]){if(performance.now()>=fat8Fim)yield 'lâmina';for(const g of G){const tt=tf(g.u,g.v);idx[lado>0?0:1].push(add([g.p[0]+g.n[0]*tt*lado,g.p[1]+g.n[1]*tt*lado,g.p[2]+g.n[2]*tt*lado],[g.n[0]*lado,g.n[1]*lado,g.n[2]*lado],cor(g.u,g.v,lado,g.p),[g.u,g.v]));}}
+  const K=(i,j)=>j*NU+(i%NU);const iu=nu;
+  for(let j=0;j<nv;j++)for(let i=0;i<iu;i++){const a=K(i,j),b=K(i+1,j),c=K(i+1,j+1),d=K(i,j+1);const A=idx[0],B=idx[1];I.push(A[a],A[b],A[c],A[a],A[c],A[d]);I.push(B[a],B[c],B[b],B[a],B[d],B[c]);}
+  /* bordas: tiras entre as duas faces, viradas para fora (confere a normal do quadrado e vira se precisar) */
+  const borda=(lista,dir)=>{const v0=[];for(const k of lista){const g=G[k];const dd=dir(g);const l=Math.hypot(...dd)||1;const n=[dd[0]/l,dd[1]/l,dd[2]/l];const c=cor(g.u,g.v,1,g.p);
+      const tt=tf(g.u,g.v);v0.push([add([g.p[0]+g.n[0]*tt,g.p[1]+g.n[1]*tt,g.p[2]+g.n[2]*tt],n,c,[g.u,g.v]),add([g.p[0]-g.n[0]*tt,g.p[1]-g.n[1]*tt,g.p[2]-g.n[2]*tt],n,c,[g.u,g.v]),n]);}
+    for(let k=0;k+1<v0.length;k++){const [a,b,n]=v0[k],[c,d]=v0[k+1];const pa=[P[a*3],P[a*3+1],P[a*3+2]],pb=[P[b*3],P[b*3+1],P[b*3+2]],pc=[P[c*3],P[c*3+1],P[c*3+2]];
+      const e1=[pb[0]-pa[0],pb[1]-pa[1],pb[2]-pa[2]],e2=[pc[0]-pa[0],pc[1]-pa[1],pc[2]-pa[2]];const fn2=[e1[1]*e2[2]-e1[2]*e2[1],e1[2]*e2[0]-e1[0]*e2[2],e1[0]*e2[1]-e1[1]*e2[0]];
+      if(fn2[0]*n[0]+fn2[1]*n[1]+fn2[2]*n[2]>=0)I.push(a,b,c,b,d,c);else I.push(a,c,b,b,c,d);}};
+  const L0=[],L1=[],R0=[],R1=[];for(let i=0;i<=nu;i++){L0.push(K(i,0));L1.push(K(i,nv));}for(let j=0;j<NV;j++){R0.push(j*NU);R1.push(j*NU+nu);}
+  borda(L0,g=>[-g.pv[0],-g.pv[1],-g.pv[2]]);borda(L1,g=>g.pv);if(!fechaU){borda(R0,g=>[-g.pu[0],-g.pu[1],-g.pu[2]]);borda(R1,g=>g.pu);}
+  const geo=new T.BufferGeometry();geo.setAttribute('position',new T.BufferAttribute(new Float32Array(P),3));geo.setAttribute('normal',new T.BufferAttribute(new Float32Array(N),3));
+  geo.setAttribute('color',new T.BufferAttribute(new Float32Array(C),3));geo.setAttribute('uv',new T.BufferAttribute(new Float32Array(U),2));geo.setIndex(new T.BufferAttribute(P.length/3>65535?new Uint32Array(I):new Uint16Array(I),1));geo.computeBoundingSphere();geo.computeBoundingBox();return geo;}
+function* in917PecaLamina(M,o){const t=performance.now();const g=yield* in917LaminaG(o.fn,o.res[0],o.res[1],o.t,o.cor,o.fechaU);yield o.nome;const gg=yield* in917LaminaG(o.fn,o.resG[0],o.resG[1],o.t,o.cor,o.fechaU);yield o.nome+' grossa';
+  M.passos['lam '+o.nome]=Math.round(performance.now()-t);const base={k:o.k||o.nome,mat:o.mat,fino:g,grosso:gg};const out=[];
+  for(const pv of [].concat(o.pivo)){if(pv.charAt(0)==='~'){out.push(Object.assign({},base,{pivo:pv.slice(1),fino:mo907Espelha(g),grosso:mo907Espelha(gg),esp:true}));}else out.push(Object.assign({},base,{pivo:pv}));}
+  for(const p of out){M.partes.push(p);M.triFino+=in917Tri(p.fino);M.triGrosso+=in917Tri(p.grosso);}M.cores[o.nome]=in917CorMedia(g);return out;}
+/* pena (ou folha) em lâmina: base, direção do comprimento u, da largura v; ponta redonda, raque mais escura; dobra = curvatura para fora */
+function in917PenaFn(b,u,v,L,W,dobra,larg){const lu=Math.hypot(...u);u=u.map(q=>q/lu);let d=u[0]*v[0]+u[1]*v[1]+u[2]*v[2];v=[v[0]-d*u[0],v[1]-d*u[1],v[2]-d*u[2]];const lv=Math.hypot(...v);v=v.map(q=>q/lv);
+  const n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];dobra=dobra||0;
+  return (a,s)=>{const ponta=s<0.62?1:Math.sqrt(Math.max(0.0004,1-((s-0.62)/0.38)*((s-0.62)/0.38)));const pe=0.45+0.55*Math.min(1,s/0.12);const w=(larg?larg(s):W)*ponta*pe;const q=(a-0.5)*w;
+    const o=dobra*(s*s*L*0.18+((a-0.5)*2)*((a-0.5)*2)*w*0.12);return [b[0]+u[0]*L*s+v[0]*q+n[0]*o,b[1]+u[1]*L*s+v[1]*q+n[1]*o,b[2]+u[2]*L*s+v[2]*q+n[2]*o];};}
+function* in917PenasG(L,res,t){const G=[];for(const p of L){G.push(yield* in917LaminaG(p.fn,res[0],res[1],t,(a,s,lado,P)=>p.cor(a,s,P)));if(performance.now()>=fat8Fim)yield 'penas';}return in917JuntaSimples(G);}
+function* in917PecaPronta(M,o){const g=o.fino,gg=o.grosso;yield o.nome;const base={k:o.k||o.nome,mat:o.mat,fino:g,grosso:gg};const out=[];
+  for(const pv of [].concat(o.pivo)){if(pv.charAt(0)==='~'){out.push(Object.assign({},base,{pivo:pv.slice(1),fino:mo907Espelha(g),grosso:mo907Espelha(gg),esp:true}));}else out.push(Object.assign({},base,{pivo:pv}));}
+  for(const p of out){M.partes.push(p);M.triFino+=in917Tri(p.fino);M.triGrosso+=in917Tri(p.grosso);}M.cores[o.nome]=in917CorMedia(g);return out;}
+function in917NovoM(){return {partes:[],passos:{},cores:{},triFino:0,triGrosso:0,mats:{}};}
+function in917H(){const BI=window.__bichos622,H=BI&&BI.h;if(!H||typeof H.malha!=='function')throw Error('escultor da v622 ausente');return H;}
+
+/* ---------------- 4) BUG DE PIXELS (espaço do `519 corpo` do `in519Bug`: y para cima, a cara para +z; paira) ---------------- */
+/* COMO ERA: um «space invader» chato (10 × 8 caixas de 8 cm, 12 cm de fundo) com patas e antenas de tubo, bolinhas nas pontas e uma caixa
+   translúcida em volta. AGORA: o visual pixelado É o tema — um besouro de VOXELS de verdade numa grade 3D de 6,4 cm: cada voxel é um cubo
+   CHANFRADO (faces planas + chanfros), as faces que encostam no vizinho somem; os chanfros vão numa malha à parte com brilho próprio mais
+   forte (as «arestas luminosas» da grade). Cabeça de frente com a testa em degrau (sobrancelha brava de pixels escuros), mandíbulas em
+   degrau, carapaça em domo com a costura no meio e manchas claras em padrão de pixel, pronoto, ventre; três pares de patas em degraus de
+   pixel com garra; antenas em degrau com a ponta clara; alguns cubos «glitch» deslocados da grade (verdes, um ciano e um magenta, como
+   uma falha de vídeo). Os olhos (as duas malhas velhas, cada uma com o seu material aceso) viram blocos 2 × 2 de pixels chanfrados.
+   Geometria explícita (não o escultor): cubos nítidos e poucos triângulos. pivô único: corpo (0, 0, 0) */
+const IN917_BUG_U=0.064;
+/* cubo chanfrado: centro c, meia-aresta h, chanfro k; faces (6, cada uma pulada se `pula[f]`), chanfros (12) e cantos (8) em listas separadas */
+function in917CuboCh(c,h,k,cor,corB,pula,F,B){const a=h-k;
+  const quad=(L,p0,p1,p2,p3,n,cc)=>{const o=L.P.length/3;for(const p of [p0,p1,p2,p3]){L.P.push(c[0]+p[0],c[1]+p[1],c[2]+p[2]);L.N.push(n[0],n[1],n[2]);L.C.push(cc[0],cc[1],cc[2]);}
+    /* orientação pela normal */const e1=[p1[0]-p0[0],p1[1]-p0[1],p1[2]-p0[2]],e2=[p2[0]-p0[0],p2[1]-p0[1],p2[2]-p0[2]];const fn=[e1[1]*e2[2]-e1[2]*e2[1],e1[2]*e2[0]-e1[0]*e2[2],e1[0]*e2[1]-e1[1]*e2[0]];
+    if(fn[0]*n[0]+fn[1]*n[1]+fn[2]*n[2]>=0)L.I.push(o,o+1,o+2,o,o+2,o+3);else L.I.push(o,o+2,o+1,o,o+3,o+2);};
+  const tri=(L,p0,p1,p2,n,cc)=>{const o=L.P.length/3;for(const p of [p0,p1,p2]){L.P.push(c[0]+p[0],c[1]+p[1],c[2]+p[2]);L.N.push(n[0],n[1],n[2]);L.C.push(cc[0],cc[1],cc[2]);}
+    const e1=[p1[0]-p0[0],p1[1]-p0[1],p1[2]-p0[2]],e2=[p2[0]-p0[0],p2[1]-p0[1],p2[2]-p0[2]];const fn=[e1[1]*e2[2]-e1[2]*e2[1],e1[2]*e2[0]-e1[0]*e2[2],e1[0]*e2[1]-e1[1]*e2[0]];
+    if(fn[0]*n[0]+fn[1]*n[1]+fn[2]*n[2]>=0)L.I.push(o,o+1,o+2);else L.I.push(o,o+2,o+1);};
+  /* faces: eixo e (0 x, 1 y, 2 z), sinal s */
+  for(let e=0;e<3;e++)for(const s of [1,-1]){const f=e*2+(s>0?0:1);if(pula&&pula[f])continue;const u=(e+1)%3,v=(e+2)%3;const P=(du,dv)=>{const p=[0,0,0];p[e]=s*h;p[u]=du;p[v]=dv;return p;};const n=[0,0,0];n[e]=s;
+    quad(F,P(-a,-a),P(a,-a),P(a,a),P(-a,a),n,cor);}
+  /* chanfros: arestas paralelas ao eixo e, nos cantos (su, sv) do plano u-v */
+  const r2=Math.SQRT1_2;
+  for(let e=0;e<3;e++){const u=(e+1)%3,v=(e+2)%3;for(const su of [1,-1])for(const sv of [1,-1]){const P=(de,pu,pv)=>{const p=[0,0,0];p[e]=de;p[u]=pu;p[v]=pv;return p;};const n=[0,0,0];n[u]=su*r2;n[v]=sv*r2;
+      quad(B,P(-a,su*h,sv*a),P(a,su*h,sv*a),P(a,su*a,sv*h),P(-a,su*a,sv*h),n,corB);}}
+  /* cantos */
+  const r3=1/Math.sqrt(3);for(const sx of [1,-1])for(const sy of [1,-1])for(const sz of [1,-1])tri(B,[sx*h,sy*a,sz*a],[sx*a,sy*h,sz*a],[sx*a,sy*a,sz*h],[sx*r3,sy*r3,sz*r3],corB);}
+function in917GeoListas(L){const T=THREE;const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(new Float32Array(L.P),3));g.setAttribute('normal',new T.BufferAttribute(new Float32Array(L.N),3));
+  g.setAttribute('color',new T.BufferAttribute(new Float32Array(L.C),3));g.setIndex(new T.BufferAttribute(L.P.length/3>65535?new Uint32Array(L.I):new Uint16Array(L.I),1));g.computeBoundingBox();g.computeBoundingSphere();return g;}
+/* o desenho em voxels: lista {i,j,k (x = (i+0,5)·u, y = j·u, z = k·u), cor, borda, desl (deslocamento fora da grade, glitch)} */
+function in917BugVoxels(){const u=IN917_BUG_U;const V=new Map();const C={verde:in917L(0.18,0.72,0.32),verdeEsc:in917L(0.09,0.45,0.18),claro:in917L(0.45,0.95,0.56),escuro:in917L(0.03,0.1,0.055),ventre:in917L(0.14,0.56,0.26),
+    borda:in917L(0.5,1.0,0.62),bordaEsc:in917L(0.2,0.7,0.34),ciano:in917L(0.15,0.85,0.95),magenta:in917L(0.9,0.2,0.75)};
+  const put=(i,j,k,cor,borda)=>{V.set(i+','+j+','+k,{i,j,k,cor,borda:borda||C.borda});};
+  const X=i=>(i+0.5)*u,Y=j=>j*u,Z=k=>k*u;
+  const ell=(cx,cy,cz,rx,ry,rz,fn)=>{for(let i=-10;i<10;i++)for(let j=-8;j<=12;j++)for(let k=-7;k<=6;k++){const x=X(i),y=Y(j),z=Z(k);const q=((x-cx)/rx)**2+((y-cy)/ry)**2+((z-cz)/rz)**2;if(q<=1)fn(i,j,k,x,y,z,q);}};
+  /* carapaça (élitros) em domo, atrás e acima da cabeça: costura no meio, manchas claras em padrão, borda clara */
+  ell(0,0.07,-0.1,0.33,0.31,0.2,(i,j,k,x,y,z,q)=>{let cor=C.verde;const ai=i<0?-i-1:i;   /* ai = coluna a partir do meio (0 = colada à costura) */
+    if(ai===0&&z>-0.12)cor=C.escuro;else if(q>0.72)cor=C.verdeEsc;
+    const mancha=[[2,3],[3,1],[1,0],[3,-2],[2,-3],[4,4]].some(([a,b])=>ai===a&&j===b);if(mancha&&ai!==0)cor=C.claro;put(i,j,k,cor,ai===0?C.bordaEsc:C.borda);});
+  /* pronoto (escudo do tórax) por cima da junção cabeça–carapaça */
+  ell(0,0.15,0.06,0.25,0.11,0.12,(i,j,k)=>{const ai=i<0?-i-1:i;put(i,j,k,ai>=3?C.verdeEsc:C.verde);});
+  /* ventre (embaixo, à frente) */
+  ell(0,-0.14,0.0,0.2,0.12,0.13,(i,j,k)=>{put(i,j,k,C.ventre,C.bordaEsc);});
+  /* cabeça de frente: bloco largo com a testa em degrau */
+  for(let i=-3;i<3;i++)for(let j=-1;j<=2;j++)for(let k=1;k<=3;k++){const ai=i<0?-i-1:i;if(j===2&&ai===2)continue;if(k===3&&(j===-1&&ai===2))continue;put(i,j,k,C.verde);}
+  /* sobrancelha brava: pixels escuros em degrau acima dos olhos (desce para o meio) */
+  for(const [ai,j] of [[2,3],[1,2],[0,2]])for(const s of [1,-1]){const i=s>0?ai:-ai-1;put(i,j,4,C.escuro,C.bordaEsc);}
+  for(const s of [1,-1]){const i=s>0?2:-3;put(i,3,3,C.escuro,C.bordaEsc);}
+  /* boca: fenda escura e as mandíbulas em degrau, curvas para dentro */
+  for(let i=-2;i<2;i++)put(i,-1,3,C.escuro,C.bordaEsc);
+  for(const s of [1,-1]){const I=a=>s>0?a:-a-1;put(I(2),-2,3,C.verdeEsc);put(I(2),-2,4,C.claro);put(I(2),-3,4,C.claro);put(I(1),-4,4,C.claro);put(I(1),-3,3,C.verdeEsc);}
+  /* antenas em degrau a partir da testa; ponta clara */
+  for(const s of [1,-1]){const I=a=>s>0?a:-a-1;for(const [a,j,k] of [[1,3,2],[1,4,2],[2,5,1],[2,6,1],[3,7,1],[3,8,0]])put(I(a),j,k,C.verdeEsc);put(I(4),9,0,C.claro);put(I(4),10,0,C.claro);put(I(3),9,0,C.claro);put(I(3),10,0,C.claro);}
+  /* patas: três pares em degraus (para fora e para baixo), garra clara na ponta */
+  const pata=(s,j0,k0,passos)=>{const I=a=>s>0?a:-a-1;let a=4,j=j0,k=k0;for(const p of passos){if(p==='x')a++;else if(p==='y')j--;else if(p==='Y')j++;else if(p==='z')k++;else if(p==='Z')k--;else if(p==='g')j--;put(I(a),j,k,p==='g'?C.claro:C.verdeEsc,C.borda);}};
+  for(const s of [1,-1]){pata(s,1,1,['x','x','Y','x','y','y','x','y','y','g']);pata(s,-1,0,['x','x','x','y','y','x','y','g']);pata(s,-3,-1,['x','y','x','Z','y','x','g']);}
+  /* cubos glitch deslocados da grade */
+  const L=[...V.values()];
+  const glitch=[{i:5,j:4,k:0,d:[0.45,0.2,0.3],cor:C.claro},{i:-6,j:1,k:1,d:[-0.4,0,0.25],cor:C.verde},{i:1,j:6,k:0,d:[0.3,0.4,0.2],cor:C.ciano},{i:-3,j:-4,k:2,d:[-0.35,-0.3,0.3],cor:C.magenta},
+    {i:5,j:-2,k:1,d:[0.55,0,0],cor:C.verdeEsc},{i:-5,j:5,k:-1,d:[-0.3,0.35,0],cor:C.claro},{i:2,j:-4,k:3,d:[0.5,-0.2,0.2],cor:C.verde},{i:-2,j:4,k:-3,d:[0,0.6,0],cor:C.verdeEsc}];
+  for(const q of glitch)L.push({i:q.i,j:q.j,k:q.k,cor:q.cor,borda:q.cor===C.ciano||q.cor===C.magenta?q.cor:C.borda,desl:q.d,solto:true});
+  return {L,V,C};}
+function* in917BugGeosG(fino){const u=IN917_BUG_U;const {L,V}=in917BugVoxels();const F={P:[],N:[],C:[],I:[]},B={P:[],N:[],C:[],I:[]};let n=0;yield 'bug voxels';
+  for(const v of L){if(((++n)&31)===0&&performance.now()>=fat8Fim)yield 'bug voxels';const d=v.desl||[0,0,0];const c=[(v.i+0.5+d[0])*u,v.j*u+d[1]*u,v.k*u+d[2]*u];
+    const viz=(di,dj,dk)=>!v.solto&&V.has((v.i+di)+','+(v.j+dj)+','+(v.k+dk));const pula=[viz(1,0,0),viz(-1,0,0),viz(0,1,0),viz(0,-1,0),viz(0,0,1),viz(0,0,-1)];
+    const h=v.solto?u*0.44:u*0.5;in917CuboCh(c,h,fino?u*0.13:0.0001,v.cor,v.borda,pula,F,fino?B:{P:[],N:[],C:[],I:[]});}
+  return {faces:in917GeoListas(F),arestas:fino?in917GeoListas(B):null};}
+/* olhos: cada um um bloco 2 × 2 de pixels chanfrados na testa (espaço do corpo) */
+function in917BugOlho(s){const u=IN917_BUG_U;const F={P:[],N:[],C:[],I:[]};const q=u*0.6;const cx=s*(1.5*u),cy=1.0*u,cz=3.5*u+q*0.5-0.003;
+  for(const a of [-1,1])for(const b of [-1,1]){const pula=[a<0,a>0,b<0,b>0,false,true];in917CuboCh([cx+a*q*0.5*1.02,cy+b*q*0.5*1.02,cz-0.004],q*0.5,q*0.11,[1,1,1],[1,1,1],null,F,F);}
+  const g=in917GeoListas(F);g.deleteAttribute('color');return g;}
+function* in917BugG(){const t0=performance.now();const M=in917NovoM();
+  const fi=yield* in917BugGeosG(true);yield 'bug voxels';const gr=yield* in917BugGeosG(false);yield 'bug voxels grossos';
+  /* fino: faces + chanfros (malha própria, brilho forte); grosso: só as faces (cubos retos), sem chanfros */
+  yield* in917PecaPronta(M,{nome:'bug voxels',k:'voxels',fino:fi.faces,grosso:gr.faces,mat:'voxel',pivo:'corpo'});
+  yield* in917PecaPronta(M,{nome:'bug arestas',k:'arestas',fino:fi.arestas,grosso:IN917_VAZIA,mat:'aresta',pivo:'corpo'});
+  M.olhoGeos=[in917BugOlho(-1),in917BugOlho(1)];for(const g of M.olhoGeos){M.triFino+=in917Tri(g);M.triGrosso+=in917Tri(g);}
+  M.mats={voxel:in917Mat('voxels do bug',{roughness:0.5,metalness:0.05,emissive:0x0c4a1c,emissiveIntensity:0.55}),
+    aresta:in917Mat('arestas acesas do bug',{roughness:0.35,emissive:0x2aff66,emissiveIntensity:0.55})};
+  M.ms=Math.round(performance.now()-t0);return M;}
+function in917PartesBug(g){const corpo=g.children.find(o=>o.isGroup&&o.name==='519 corpo');if(!corpo)return null;return {piv:{corpo},manter:[],ref:{}};}
+
+/* ---------------- 5) PEIXE-RELÓGIO «Peixe dos domingos» (espaço do `519 corpo` do `in519Peixe`: y para cima, o focinho para +z; nada no ar) ---------------- */
+/* COMO ERA: corpo de torno com a textura de escamas pintada, nadadeiras de forma plana com tubinhos, arcos de marfim, um relógio de bolso
+   (cilindros e toros) em cada flanco com o mostrador em textura, olhos de bola. AGORA: peixe de corpo alto (o mesmo perfil e tamanho),
+   ESCAMAS UMA A UMA em relevo (fileiras desencontradas que se sobrepõem como telhas, a borda livre virada para a cauda, mais clara, com a
+   sombra da escama de cima), sombreado de peixe (dorso cobre-escuro, flanco laranja, ventre creme), linha lateral pontilhada, opérculo com
+   a fenda das guelras, lábios e a boca entreaberta; OLHO DE VIDRO (o olho velho aceso vira uma lente abaulada) num aro de marfim, com a
+   pupila preta e o brilho; nadadeiras de MEMBRANA com raios (pregas em sanfona, raios escuros, borda clara recortada entre os raios):
+   dorsal, anal, caudal bifurcada, peitorais e pélvicas; e o RELÓGIO DE BOLSO incrustado em cada flanco (como hoje): caixa de latão com a
+   lateral serrilhada, aro, coroa serrilhada com o anel, mostrador esmaltado (textura própria com algarismos romanos, trilha dos minutos e
+   o pequeno dos segundos) e ponteiros de aço azulado. pivô único: corpo (0, 0, 0); os brilhos (Sprites) de hoje ficam. */
+const IN917_PX={Z:[-0.95,-0.92,-0.84,-0.62,-0.30,0.0,0.28,0.52,0.70,0.80,0.84,0.87],R:[0,0,0.09,0.2,0.3,0.34,0.33,0.27,0.18,0.08,0,0],W:0.72,
+  RC:0.186,C:[0.2,0.02,0.08]};   /* perfil do corpo (o mesmo da v519), largura relativa, raio e centro do relógio (lado direito) */
+function in917PxR(z){const Z=IN917_PX.Z,R=IN917_PX.R;if(z<=Z[1]||z>=Z[10])return 0;let i=1;while(i<Z.length-2&&z>Z[i+1])i++;   /* Catmull-Rom */
+  const t=(z-Z[i])/(Z[i+1]-Z[i]);const p0=R[i-1],p1=R[i],p2=R[i+1],p3=R[i+2];const t2=t*t,t3=t2*t;return Math.max(0,0.5*((2*p1)+(-p0+p2)*t+(2*p0-5*p1+4*p2-p3)*t2+(-p0+3*p1-3*p2+p3)*t3));}
+function in917CamposPeixe(H){const {Ell,Cone,UK,Smin,Smax,Menos,Esp,S}=H;const W=IN917_PX.W,RC=IN917_PX.RC,CC=IN917_PX.C;
+  const zArc=y=>0.385+0.85*y*y;                        /* borda de trás do opérculo (convexa para a cauda) */
+  const corpo0=(x,y,z)=>{const zc=Math.max(-0.915,Math.min(0.835,z));const r=Math.max(in917PxR(zc),0.006);const k=Math.hypot(x/(W*r),y/r);let d=(k-1)*W*r;if(zc!==z)d=Math.hypot(Math.max(d,0),z-zc)+Math.min(d,0)*0;return d;};
+  /* escamas: fileiras ao longo de z (0 logo atrás do opérculo), N colunas em volta, desencontradas; a escama visível é a mais à frente das
+     que cobrem o ponto (a de cima, como telha); devolve {h (0..1 relevo), dr (posição na escama: + para a cauda), borda, id} */
+  const SZ=0.05,NC=34;
+  const escama=(x,y,z)=>{const rf=(0.44-z)/SZ;const th=Math.atan2(y,x/W);const cp=th*NC/(2*Math.PI);let best=null;
+    for(let k=Math.floor(rf)-1;k<=Math.floor(rf)+1;k++){if(k<0)continue;const off=(k&1)?0.5:0;const cc0=Math.round(cp-off)+off;
+      for(let j=-1;j<=1;j++){const cc=cc0+j;const dr=rf-k,dc=cp-cc;const dd=Math.hypot(dr*1.05,dc);if(dd<0.78&&(!best||k<best.k))best={k,dr,dc,dd,id:k*97+Math.round(cc*2)};}}
+    return best;};
+  const relevo=(x,y,z)=>{if(z>zArc(y)-0.015||z<-0.84)return 0;const e=escama(x,y,z);if(!e)return 0;const ap=S(0.42,zArc(y)-0.015,z);   /* some perto do opérculo */
+    return (0.3+0.7*S(-0.35,0.62,e.dr))*(1-S(0.6,0.78,e.dd))*(1-ap);};
+  const AMP=0.0055;
+  const olhoC=[0.128,0.15,0.575];
+  const bossa=Esp(Ell(olhoC,[0.062,0.066,0.07]));
+  const labio=(x,y,z)=>{const yy=(y+0.035)/0.55-0.035;return in917AnelO([0,-0.035,0.826],[0,0.12,1],0.05,0.015)(x,yy,z)*0.55;};
+  const boca=Ell([0,-0.035,0.862],[0.046,0.016,0.045]);
+  const tambor=(x,y,z)=>{const ax=Math.abs(x);const dx=Math.abs(ax-0.12)-0.11;const dr=Math.hypot(y-CC[1],z-CC[2])-(RC+0.002);return Math.min(Math.max(dx,dr),0)+Math.hypot(Math.max(dx,0),Math.max(dr,0));};
+  const corpo=(x,y,z)=>{let d=corpo0(x,y,z);if(d>0.06)return d;
+    d=Smin(d,bossa(x,y,z),0.035);d=Smin(d,tambor(x,y,z),0.04);d=Smin(d,labio(x,y,z),0.012);d=Smax(d,-boca(x,y,z),0.006);
+    if(d<0.02&&d>-0.02){const za=zArc(y);if(Math.abs(y)<0.27&&Math.abs(x)>0.04){d+=0.0055*Math.exp(-Math.pow((z-za)/0.009,2));if(z>za&&z<0.62)d-=0.0025*S(za,za+0.03,z)*(1-S(0.55,0.62,z));}
+      d-=AMP*relevo(x,y,z);}
+    return d;};
+  /* caixa do relógio (lado direito; o esquerdo é o espelho): tambor de latão com a lateral serrilhada, aro, coroa e o anel */
+  const caixa0=(x,y,z)=>{const dy=y-CC[1],dz=z-CC[2];const rr=Math.hypot(dy,dz);const dx=Math.abs(x-0.2335)-0.0285;let dr=rr-RC;
+      if(x>0.19&&x<0.255){const a=Math.atan2(dy,dz);dr-=0.0016*Math.max(0,Math.cos(a*56));}
+      dr=Math.max(dr,0.154-rr);   /* só o anel da caixa (o fundo e a face de dentro ficam sob o mostrador e a carne: não gastam triângulos) */
+      let d=Math.min(Math.max(dx,dr),0)+Math.hypot(Math.max(dx,0),Math.max(dr,0))-0.003;
+      d=Smin(d,in917Anel([0.262,CC[1],CC[2]],0.172,0.0135,'x')(x,y,z),0.006);            /* aro */
+      d=Math.min(d,Math.hypot(Math.hypot(y-CC[1],z-CC[2]),Math.max(Math.abs(x-0.262)-0.004,0))-0.009);   /* eixo dos ponteiros */
+      return d;};
+  const coroa=(x,y,z)=>{const py=CC[1]+RC;let d=Cone([0.212,py-0.01,CC[2]],[0.212,py+0.035,CC[2]],0.015,0.014)(x,y,z);
+      const cy=py+0.05;const a=Math.atan2(x-0.212,z-CC[2]);const cr=Math.hypot(x-0.212,z-CC[2])-0.027+0.0018*Math.max(0,Math.cos(a*18));const dc=Math.max(cr,Math.abs(y-cy)-0.016)-0.002;d=Smin(d,dc,0.004);
+      d=Math.min(d,in917Anel([0.212,cy+0.055,CC[2]],0.04,0.0065,'x')(x,y,z));return d;};
+  const caixa=(x,y,z)=>Math.min(caixa0(x,y,z),coroa(x,y,z));
+  /* aro do olho (marfim) */
+  const A=in917Assenta((x,y,z)=>Smin(corpo0(x,y,z),bossa(x,y,z),0.035),[olhoC[0]+0.06,olhoC[1],olhoC[2]+0.01],0,0);
+  const aroO=in917AnelO(A.c,A.n,0.047,0.0085);
+  return {corpo,corpo0,escama,relevo,zArc,caixa,aroO,olhoA:A,AMP};}
+/* textura do mostrador: esmalte creme, algarismos romanos, trilha dos minutos, pequeno dos segundos (desenhada em código) */
+function in917TexMostrador(){const c=document.createElement('canvas');c.width=c.height=512;const x=c.getContext('2d');const C=256;
+  const g=x.createRadialGradient(C,C-40,40,C,C,250);g.addColorStop(0,'#fbf4e2');g.addColorStop(1,'#e8dcc0');x.fillStyle=g;x.fillRect(0,0,512,512);
+  x.strokeStyle='#3a2c1e';x.lineWidth=3;x.beginPath();x.arc(C,C,238,0,7);x.stroke();x.lineWidth=1.5;x.beginPath();x.arc(C,C,222,0,7);x.stroke();
+  for(let i=0;i<60;i++){const a=i/60*Math.PI*2;const L=i%5?10:18;x.lineWidth=i%5?1.6:3.4;x.beginPath();x.moveTo(C+Math.sin(a)*236,C-Math.cos(a)*236);x.lineTo(C+Math.sin(a)*(236-L),C-Math.cos(a)*(236-L));x.stroke();}
+  x.fillStyle='#2a1f16';x.textAlign='center';x.textBaseline='middle';const R=['XII','I','II','III','IV','V','VI','VII','VIII','IX','X','XI'];
+  for(let i=0;i<12;i++){const a=i/12*Math.PI*2;x.save();x.translate(C+Math.sin(a)*182,C-Math.cos(a)*182);x.rotate(a);x.font='bold '+(R[i].length>2?40:46)+'px Georgia, serif';x.fillText(R[i],0,0);x.restore();}
+  x.strokeStyle='#5a4632';x.lineWidth=2;x.beginPath();x.arc(C,C+112,40,0,7);x.stroke();for(let i=0;i<12;i++){const a=i/12*Math.PI*2;x.beginPath();x.moveTo(C+Math.sin(a)*40,C+112-Math.cos(a)*40);x.lineTo(C+Math.sin(a)*32,C+112-Math.cos(a)*32);x.stroke();}
+  x.strokeStyle='#1c2a5a';x.lineWidth=2.5;x.beginPath();x.moveTo(C,C+112);x.lineTo(C+22,C+92);x.stroke();
+  /* um solzinho (domingo) sob o XII */x.fillStyle='#b8862a';x.beginPath();x.arc(C,C-92,13,0,7);x.fill();for(let i=0;i<12;i++){const a=i/12*Math.PI*2;x.beginPath();x.moveTo(C+Math.sin(a)*16,C-92-Math.cos(a)*16);x.lineTo(C+Math.sin(a+0.13)*24,C-92-Math.cos(a+0.13)*24);x.lineTo(C+Math.sin(a-0.13)*24,C-92-Math.cos(a-0.13)*24);x.fill();}
+  const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=8;return t;}
+/* disco do mostrador com UV (lado sd = +1 direito, −1 esquerdo; os algarismos não podem sair espelhados) */
+function in917DiscoMostrador(sd,R,x0,seg){const T=THREE;const P=[],N=[],U=[],C=[],I=[];const CC=IN917_PX.C;P.push(sd*x0,CC[1],CC[2]);N.push(sd,0,0);U.push(0.5,0.5);C.push(1,1,1);
+  for(let r=1;r<=3;r++)for(let i=0;i<seg;i++){const a=i/seg*Math.PI*2;const rr=R*r/3;const dz=Math.sin(a)*rr,dy=Math.cos(a)*rr;const cup=0.002*(1-(rr/R)*(rr/R));
+    P.push(sd*(x0+cup),CC[1]+dy,CC[2]+dz);N.push(sd,0,0);const dir=sd>0?-1:1;U.push(0.5+dir*dz/(2*R),0.5+dy/(2*R));C.push(1,1,1);}
+  for(let i=0;i<seg;i++){I.push(0,1+i,1+(i+1)%seg);}for(let r=0;r<2;r++)for(let i=0;i<seg;i++){const a=1+r*seg+i,b=1+r*seg+(i+1)%seg,c=1+(r+1)*seg+i,d=1+(r+1)*seg+(i+1)%seg;I.push(a,c,b,b,c,d);}
+  if(sd<0)for(let i=0;i<I.length;i+=3){const t=I[i+1];I[i+1]=I[i+2];I[i+2]=t;}
+  /* orientação: confere com a normal e vira se precisar */
+  const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(new Float32Array(P),3));g.setAttribute('normal',new T.BufferAttribute(new Float32Array(N),3));g.setAttribute('uv',new T.BufferAttribute(new Float32Array(U),2));g.setAttribute('color',new T.BufferAttribute(new Float32Array(C),3));
+  const ix=I.slice();const p=(k)=>[P[k*3],P[k*3+1],P[k*3+2]];{const a=p(ix[0]),b=p(ix[1]),c=p(ix[2]);const e1=[b[0]-a[0],b[1]-a[1],b[2]-a[2]],e2=[c[0]-a[0],c[1]-a[1],c[2]-a[2]];const fx=e1[1]*e2[2]-e1[2]*e2[1];if(fx*sd<0)for(let i=0;i<ix.length;i+=3){const t=ix[i+1];ix[i+1]=ix[i+2];ix[i+2]=t;}}
+  g.setIndex(ix);g.computeBoundingBox();g.computeBoundingSphere();return g;}
+/* nadadeira em leque: base B(u), ponta E(u), N raios; pregas em sanfona ao longo de nrm; borda recortada entre os raios */
+function in917NadFn(B,E,N,amp,nrm){return (u,v)=>{const b=B(u),e=E(u);const pr=Math.cos(2*Math.PI*N*u);const esc=1-0.075*(0.5-0.5*pr);const vv=v*esc;const o=amp*Math.pow(v,0.7)*pr;
+    return [b[0]+(e[0]-b[0])*vv+nrm[0]*o,b[1]+(e[1]-b[1])*vv+nrm[1]*o,b[2]+(e[2]-b[2])*vv+nrm[2]*o];};}
+function in917NadCor(N,C){return (u,v)=>{const pr=Math.cos(2*Math.PI*N*u);let c=H917MX(C.membrana,C.raio,0.85*Math.max(0,(pr-0.55)/0.45));c=H917MX(c,C.borda,0.75*Math.max(0,(v-0.78)/0.22));c=H917MX(c,C.base,Math.max(0,(0.12-v)/0.12)*0.8);return c;};}
+const H917MX=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];
+function* in917PeixeG(){const H=in917H();const t0=performance.now();const M=in917NovoM();const F=in917CamposPeixe(H),{S,MX}=H;const W=IN917_PX.W,CC=IN917_PX.C;
+  const C={dorso:in917L(0.42,0.15,0.05),flanco:in917L(0.86,0.4,0.13),ventre:in917L(0.95,0.8,0.56),borda:in917L(1.0,0.72,0.36),sombra:in917L(0.3,0.1,0.04),labio:in917L(0.78,0.36,0.26),boca:in917L(0.16,0.04,0.035),
+    guelra:in917L(0.4,0.07,0.06),cabeca:in917L(0.8,0.42,0.18),latao:in917L(0.86,0.68,0.36),marfim:in917L(0.92,0.86,0.72),
+    membrana:in917L(0.9,0.56,0.24),raio:in917L(0.5,0.22,0.07),bordaN:in917L(0.98,0.82,0.55),baseN:in917L(0.7,0.3,0.1),aco:in917L(0.06,0.08,0.18)};
+  const corCorpo=in917CorAO(H,F.corpo,(x,y,z)=>{const r=Math.max(0.01,in917PxR(Math.max(-0.9,Math.min(0.83,z))));const t=y/r;   /* −1 ventre … +1 dorso */
+    let c=t>0?MX(C.flanco,C.dorso,S(0.15,0.8,t)):MX(C.flanco,C.ventre,S(-0.1,-0.7,t));
+    const za=F.zArc(y);if(z>za-0.012){c=MX(c,C.cabeca,0.35);if(Math.abs(y)<0.27&&Math.abs(z-za)<0.012&&Math.abs(x)>0.04)c=MX(c,C.guelra,0.7);
+      const db=Math.hypot(x/0.046,(y+0.035)/0.016,(z-0.862)/0.045);if(db<1.25&&z>0.8)c=C.boca;else if(z>0.79&&Math.abs(y+0.035)<0.04)c=MX(c,C.labio,0.7);return c;}
+    if(z<-0.84)return c;const e=F.escama(x,y,z);if(!e)return c;
+    const hsh=((e.id*2654435761)>>>0)/4294967296;c=MX(c,hsh<0.5?C.dorso:C.borda,0.12*Math.abs(hsh-0.5)*2);
+    if(e.dd>0.56&&e.dr>0.1)c=MX(c,C.borda,0.55*S(0.56,0.7,e.dd)*(1-S(0.74,0.79,e.dd)));         /* borda livre clara */
+    if(e.dr<-0.05)c=MX(c,C.sombra,0.5*S(-0.05,-0.35,e.dr));                                     /* sombra da escama de cima */
+    const ll=0.035+0.05*Math.sin((z+0.3)*2.2);if(Math.abs(y-ll)<0.016&&e.dd<0.22&&Math.abs(x)>0.05)c=MX(c,C.sombra,0.7);  /* linha lateral */
+    return c;},0.022,0.55,0.06);
+  yield* in917PecaG(H,M,{nome:'peixe corpo',k:'corpo',f:F.corpo,B:[-0.32,-0.37,-0.93,0.32,0.37,0.89],h:0.0126,cor:corCorpo,mat:'escamas',pivo:'corpo'});
+  yield* in917PecaG(H,M,{nome:'peixe caixa',k:'caixa',f:F.caixa,B:[0.195,-0.18,-0.12,0.29,0.38,0.28],h:0.0072,cor:in917CorAO(H,F.caixa,()=>C.latao,0.005,0.6),mat:'latao',pivo:['corpo','~corpo']});
+  yield* in917PecaG(H,M,{nome:'peixe aro do olho',k:'aroOlho',f:F.aroO,B:[F.olhoA.c[0]-0.07,F.olhoA.c[1]-0.07,F.olhoA.c[2]-0.07,F.olhoA.c[0]+0.07,F.olhoA.c[1]+0.07,F.olhoA.c[2]+0.07],h:0.005,cor:()=>C.marfim,mat:'marfim',pivo:['corpo','~corpo']});
+  /* mostradores (dois, sem espelho, por causa dos algarismos) */
+  const dD=in917DiscoMostrador(1,0.158,0.2565,40),dE=in917DiscoMostrador(-1,0.158,0.2565,40);
+  yield* in917PecaPronta(M,{nome:'peixe mostrador direito',k:'mostradorD',fino:dD,grosso:dD,mat:'mostrador',pivo:'corpo'});
+  yield* in917PecaPronta(M,{nome:'peixe mostrador esquerdo',k:'mostradorE',fino:dE,grosso:dE,mat:'mostrador',pivo:'corpo'});
+  /* ponteiros (lâminas) — 10 h 10 no lado direito */
+  const ponteiro=(L,larg,dy,dz,cauda)=>(u,v)=>{const s=-cauda+(L+cauda)*v;const w=larg(v)*(u-0.5);return [0.2615,CC[1]+dy*s+dz*w,CC[2]+dz*s-dy*w];};   /* direção (dy,dz) no plano do mostrador */
+  const hh=ponteiro(0.095,v=>0.006+0.012*Math.exp(-Math.pow((v-0.72)/0.12,2))+0.004*Math.exp(-Math.pow((v-0.05)/0.06,2)),0.5,0.866,0.02);
+  const mm=ponteiro(0.138,v=>0.0075*(1-0.7*v)+0.003*Math.exp(-Math.pow((v-0.04)/0.05,2)),0.5,-0.866,0.025);
+  const pv=[];for(const f of [hh,mm]){pv.push(yield* in917LaminaG(f,4,18,0.0012,()=>C.aco));}
+  const pt=in917JuntaSimples(pv);yield* in917PecaPronta(M,{nome:'peixe ponteiros',k:'ponteiros',fino:pt,grosso:pt,mat:'aco',pivo:['corpo','~corpo']});
+  /* nadadeiras */
+  const R=z=>in917PxR(z);const NX=[1,0,0];
+  const nads=[];
+  {const N=12;const B=u=>{const z=0.3-0.6*u;return [0,R(z)-0.012,z];};const E=u=>{const b=B(u);const h=0.06+0.2*S(0,0.22,u)*(1-0.62*S(0.22,1,u));return [0,b[1]+h,b[2]-0.1-0.06*u];};
+    nads.push({nome:'dorsal',fn:in917NadFn(B,E,N,0.007,NX),N,res:[N*4,9],resG:[N,3],pivo:'corpo'});}
+  {const N=9;const B=u=>{const z=0.06-0.38*u;return [0,-R(z)+0.012,z];};const E=u=>{const b=B(u);const h=0.05+0.15*S(0,0.3,u)*(1-0.5*S(0.3,1,u));return [0,b[1]-h,b[2]-0.09];};
+    nads.push({nome:'anal',fn:in917NadFn(B,E,N,0.006,NX),N,res:[N*4,8],resG:[N,3],pivo:'corpo'});}
+  {const N=16;const B=u=>[0,-0.07+0.14*u,-0.84];const E=u=>{const a=Math.abs(2*u-1);return [0,(u-0.5)*0.86,-0.86-(0.27+0.21*Math.pow(a,1.3))];};
+    nads.push({nome:'caudal',fn:in917NadFn(B,E,N,0.008,NX),N,res:[N*4,10],resG:[N,3],pivo:'corpo'});}
+  {const N=7;const b0=[0.16,-0.12,0.34],b1=[0.14,-0.18,0.32];const B=u=>[b0[0]+(b1[0]-b0[0])*u,b0[1]+(b1[1]-b0[1])*u,b0[2]+(b1[2]-b0[2])*u];
+    const E=u=>{const b=B(u);const L=0.17-0.05*u;const d=[0.32,-0.55-0.25*u,-0.75];const l=Math.hypot(...d);return [b[0]+d[0]/l*L,b[1]+d[1]/l*L,b[2]+d[2]/l*L];};
+    const e0=E(0.5),bb=B(0.5);const t1=[b1[0]-b0[0],b1[1]-b0[1],b1[2]-b0[2]],t2=[e0[0]-bb[0],e0[1]-bb[1],e0[2]-bb[2]];let n=[t1[1]*t2[2]-t1[2]*t2[1],t1[2]*t2[0]-t1[0]*t2[2],t1[0]*t2[1]-t1[1]*t2[0]];const nl=Math.hypot(...n);n=n.map(q=>q/nl);
+    nads.push({nome:'peitoral',fn:in917NadFn(B,E,N,0.006,n),N,res:[N*4,8],resG:[N,3],pivo:['corpo','~corpo']});}
+  {const N=6;const b0=[0.085,-0.25,0.2],b1=[0.075,-0.27,0.15];const B=u=>[b0[0]+(b1[0]-b0[0])*u,b0[1]+(b1[1]-b0[1])*u,b0[2]+(b1[2]-b0[2])*u];
+    const E=u=>{const b=B(u);const L=0.15-0.04*u;const d=[0.25,-0.6,-0.75];const l=Math.hypot(...d);return [b[0]+d[0]/l*L,b[1]+d[1]/l*L,b[2]+d[2]/l*L];};
+    const e0=E(0.5),bb=B(0.5);const t1=[b1[0]-b0[0],b1[1]-b0[1],b1[2]-b0[2]],t2=[e0[0]-bb[0],e0[1]-bb[1],e0[2]-bb[2]];let n=[t1[1]*t2[2]-t1[2]*t2[1],t1[2]*t2[0]-t1[0]*t2[2],t1[0]*t2[1]-t1[1]*t2[0]];const nl=Math.hypot(...n);n=n.map(q=>q/nl);
+    nads.push({nome:'pélvica',fn:in917NadFn(B,E,N,0.005,n),N,res:[N*4,7],resG:[N,3],pivo:['corpo','~corpo']});}
+  for(const q of nads){const cor=in917NadCor(q.N,{membrana:C.membrana,raio:C.raio,borda:C.bordaN,base:C.baseN});
+    yield* in917PecaLamina(M,{nome:'peixe nadadeira '+q.nome,k:'nad '+q.nome,fn:q.fn,res:q.res,resG:q.resG,t:(u,v)=>0.0024*(1-0.6*v),cor:(u,v)=>cor(u,v),mat:'nadadeira',pivo:q.pivo});}
+  /* olho de vidro: o olho velho aceso vira uma lente abaulada no aro de marfim; pupila preta e brilho à parte */
+  const A=F.olhoA;const rL=0.04;const cL=[A.c[0]-A.n[0]*rL*0.25,A.c[1]-A.n[1]*rL*0.25,A.c[2]-A.n[2]*rL*0.25];
+  const lente=sd=>in917Globos([{c:[sd*cL[0],cL[1],cL[2]],n:[sd*A.n[0],A.n[1],A.n[2]]}],rL,[1,1,0.62],18);
+  M.olhoGeos=[lente(-1),lente(1)];for(const g of M.olhoGeos){M.triFino+=in917Tri(g);M.triGrosso+=in917Tri(g);}
+  const fr=rL*0.62*0.97;const pc=[cL[0]+A.n[0]*fr,cL[1]+A.n[1]*fr,cL[2]+A.n[2]*fr];
+  const pup=in917Globos([{c:pc,n:A.n}],0.017,[1,1.15,0.25],14);yield* in917PecaPronta(M,{nome:'peixe pupila',k:'pupila',fino:pup,grosso:pup,mat:'pupila',pivo:['corpo','~corpo']});
+  const bc=[pc[0]+0.004,pc[1]+0.012,pc[2]+0.008];const bri=in917Globos([{c:bc,n:A.n}],0.0055,[1,1,0.6],10);yield* in917PecaPronta(M,{nome:'peixe brilho',k:'brilho',fino:bri,grosso:bri,mat:'brilho',pivo:['corpo','~corpo']});
+  let tex=null;try{tex=in917TexMostrador();}catch(e){in917Erro('textura do mostrador',e);}
+  M.mats={escamas:in917Mat('escamas do peixe',{roughness:0.42,metalness:0.08}),nadadeira:in917Mat('nadadeiras do peixe',{roughness:0.55}),
+    latao:in917Mat('latão do relógio do peixe',{roughness:0.3,metalness:0.45,emissive:0x1a1004,emissiveIntensity:0.4}),marfim:in917Mat('aro do olho do peixe',{roughness:0.4}),
+    mostrador:in917Mat('mostrador do peixe',{map:tex,roughness:0.42}),aco:in917Mat('ponteiros do peixe',{roughness:0.3,metalness:0.3}),
+    pupila:in917Mat('pupila do peixe',{color:0x050505,vertexColors:false,roughness:0.15}),brilho:in917Mat('brilho do olho do peixe',{color:0xffffff,vertexColors:false,emissive:0xffffff,emissiveIntensity:0.8,roughness:0.2})};
+  for(const k in M.mats)M.mats[k].userData.papelKeep=true;
+  M.ms=Math.round(performance.now()-t0);return M;}
+function in917PartesPeixe(g){const corpo=g.children.find(o=>o.isGroup&&o.name==='519 corpo');if(!corpo)return null;return {piv:{corpo},manter:[],ref:{}};}
+
+/* ---------------- 6) CALDEIRA VIVA «Caldeira errante» (espaço do `519 corpo` do `in519Caldeira`: y para cima, a frente para +z; anda, os pés no chão) ---------------- */
+/* COMO ERA: cilindro e meia esfera com a textura de rebites pintada, toros de latão, um disco escuro de porta com 5 caixinhas de grade,
+   manômetro de cilindros, chaminé de cilindros, braços de tubo com bolas de latão nas mãos, pernas de cilindro e pés de caixa.
+   AGORA: caldeira de FERRO FUNDIDO de verdade — casco levemente abaulado com cintas rebitadas (rebites um a um), costura vertical rebitada
+   nas costas, saia de base alargada, cúpula rebitada; na frente uma CARA: a portinhola redonda da fornalha (moldura de latão, dobradiças,
+   trinco, chapa com fendas por onde passa a luz de dentro, que é a de hoje), o MANÔMETRO de latão (mostrador próprio com a escala e a faixa
+   vermelha, ponteiro) entre os dois OLHOS (visores de vidro aceso com aro de latão: o olho velho); chaminé de ferro com a boca alargada e
+   oca e a cinta de latão; volante de válvula de latão na cúpula e uma válvula de segurança com alavanca; CANOS DE COBRE com luvas de latão
+   (um sobe pelo lado esquerdo até a válvula, outro desce da chaminé com um registro), o visor de nível de água; braços de cano de ferro
+   com cotovelo de latão articulado e mão de três garras; PERNAS de ferro articulado: quadril de rótula, coxa, joelho de dobradiça, canela
+   com o pistão de latão, tornozelo e pé de chapa com três dedos rebitados. Fuligem perto da fornalha e da boca da chaminé, ferrugem nas
+   juntas. pivô único: corpo (0, 0, 0); ficam como hoje a luz da fornalha (malha com o brilho animado) e os brilhos e o vapor (Sprites). */
+/* cilindro de topo reto entre a e b, raio r (Inigo Quilez) */
+function in917Cil(a,b,r){const bx=b[0]-a[0],by=b[1]-a[1],bz=b[2]-a[2];const bb=bx*bx+by*by+bz*bz;
+  return (x,y,z)=>{const px=x-a[0],py=y-a[1],pz=z-a[2];const pb=px*bx+py*by+pz*bz;const qx=px*bb-bx*pb,qy=py*bb-by*pb,qz=pz*bb-bz*pb;const X=Math.hypot(qx,qy,qz)-r*bb;const Y=Math.abs(pb-bb*0.5)-bb*0.5;
+    const x2=X*X,y2=Y*Y*bb;const d=Math.max(X,Y)<0?-Math.min(x2,y2):((X>0?x2:0)+(Y>0?y2:0));return Math.sign(d)*Math.sqrt(Math.abs(d))/bb;};}
+const IN917_CD={rb:y=>0.38-0.04*(Math.max(-0.59,Math.min(0.27,y))+0.59)/0.86+0.008*Math.sin(Math.PI*Math.max(0,Math.min(1,(y+0.59)/0.86))),
+  porta:[0,-0.1],man:[0,0.205],olho:0.175,olhoY:0.215,chamine:[0.16,-0.06]};
+function in917CamposCaldeira(H){const {Ell,Cone,UK,Smin,Smax,Menos,Esp,S,Cad}=H;const rb=IN917_CD.rb;const TAU=Math.PI*2;
+  const rebR=(y0,R,n,r)=>(x,y,z)=>{const a=Math.atan2(x,z);const ak=Math.round(a*n/TAU)*TAU/n;return Math.hypot(x-Math.sin(ak)*R,y-y0,z-Math.cos(ak)*R)-r;};
+  /* casco: cilindro abaulado, cúpula, saia; cintas (y −0,50 e a costura da cúpula 0,26) e a costura de trás, rebitadas */
+  const casco0=(x,y,z)=>{const r=Math.hypot(x,z);let d=Math.max(r-rb(y),Math.abs(y+0.16)-0.43);d=Smin(d,Ell([0,0.27,0],[0.345,0.17,0.345])(x,y,z),0.02);
+    const saia=Math.max(r-(0.395+0.03*S(-0.56,-0.63,y)),Math.abs(y+0.6)-0.035);d=Smin(d,saia,0.012);return d;};
+  const cinta=(yb,hh)=>(x,y,z)=>Math.max(Math.abs(y-yb)-hh,Math.hypot(x,z)-(rb(yb)+0.011))-0.002;
+  const costura=(x,y,z)=>{if(z>0)return 1;const r=Math.hypot(x,z);return Math.max(Math.abs(x)-0.03,r-(rb(y)+0.009),Math.abs(y+0.16)-0.43)-0.002;};
+  const rebCostura=(x,y,z)=>{if(z>0)return 1;const yk=Math.max(-0.56,Math.min(0.22,Math.round((y+0.56)/0.078)*0.078-0.56));return Math.hypot(x,y-yk,z+rb(yk)+0.013)-0.0135;};
+  const rebites=(x,y,z)=>{let d=1;for(const yy of [-0.515,-0.485])d=Math.min(d,rebR(yy,rb(-0.5)+0.013,21,0.0125)(x,y,z));
+    d=Math.min(d,rebR(0.262,rb(0.26)+0.013,20,0.0125)(x,y,z));d=Math.min(d,rebR(0.36,0.268,14,0.012)(x,y,z));d=Math.min(d,rebCostura(x,y,z));
+    if(z>0){const pc=IN917_CD.porta;const a=Math.atan2(y-pc[1],x-pc[0]);const ak=Math.round(a*12/TAU)*TAU/12;if(Math.hypot(x-pc[0],y-pc[1])<0.27){const R=0.235;d=Math.min(d,Math.hypot(x-pc[0]-Math.cos(ak)*R,y-pc[1]-Math.sin(ak)*R,z-(rb(y)+0.002))-0.012);}}
+    return d;};
+  /* chaminé de ferro: cone de base larga, cinta, boca alargada e OCA */
+  const ch=IN917_CD.chamine;
+  const chamine=(x,y,z)=>{const r=Math.hypot(x-ch[0],z-ch[1]);let d=Math.max(r-(0.155-0.045*S(0.36,0.8,y)),Math.abs(y-0.6)-0.24);
+    d=Smin(d,Math.max(r-(0.11+0.06*S(0.8,0.9,y)),Math.abs(y-0.87)-0.04),0.02);d=Smax(d,-Math.max(r-0.085,0.8-y),0.008);
+    d=Smin(d,Math.max(r-0.168,Math.abs(y-0.42)-0.035),0.01);return d;};
+  /* portinhola: chapa redonda com fendas (a luz de hoje passa por elas), sobre a moldura */
+  const pc=IN917_CD.porta;const zP=0.393;
+  const chapa=(x,y,z)=>{let d=Math.max(Math.hypot(x-pc[0],y-pc[1])-0.168,Math.abs(z-zP)-0.011)-0.003;
+    for(let k=-2;k<=2;k++){const yy=pc[1]+k*0.052;const L=Math.sqrt(Math.max(0,0.125*0.125-(k*0.052)*(k*0.052)))+0.012;d=Smax(d,-(Math.max(Math.abs(y-yy)-0.0115,Math.abs(x-pc[0])-L)),0.003);}
+    return d;};
+  /* LATÃO: moldura da porta, dobradiças, trinco, caixa do manômetro, aros dos olhos, volante, válvula de segurança, luvas dos canos,
+     rótulas e cotovelos, pistões */
+  const moldura=in917Anel([pc[0],pc[1],0.383],0.19,0.022,'z');
+  const dobra=UK([[in917Cil([-0.205,-0.02,0.395],[-0.205,0.04,0.395],0.016),0],[in917Cil([-0.205,-0.24,0.395],[-0.205,-0.18,0.395],0.016),0],
+    [Cone([-0.205,0.01,0.395],[-0.13,0.01,0.405],0.012,0.01),0.004],[Cone([-0.205,-0.21,0.395],[-0.13,-0.21,0.405],0.012,0.01),0.004]]);
+  const trinco=UK([[Cone([0.13,-0.1,0.405],[0.24,-0.06,0.42],0.012,0.014),0],[Ell([0.245,-0.058,0.423],[0.022,0.018,0.018]),0.008],[in917Cil([0.13,-0.1,0.398],[0.13,-0.1,0.415],0.02),0.004]]);
+  const nM=[0,Math.sin(0.18),Math.cos(0.18)];const mc=[IN917_CD.man[0],IN917_CD.man[1],0.345];
+  const manCaixa=(x,y,z)=>{const px=x-mc[0],py=y-mc[1],pz=z-mc[2];const w=px*nM[0]+py*nM[1]+pz*nM[2];const qx=px-w*nM[0],qy=py-w*nM[1],qz=pz-w*nM[2];const rr=Math.hypot(qx,qy,qz);
+    const anel=(r0,r1,w0,w1)=>{const dr=Math.max(rr-r1,r0-rr),dw=Math.abs(w-(w0+w1)/2)-(w1-w0)/2;return Math.min(Math.max(dr,dw),0)+Math.hypot(Math.max(dr,0),Math.max(dw,0));};
+    let d=anel(0.066,0.083,0.0,0.05)-0.003;d=Smin(d,anel(0.062,0.08,0.048,0.058)-0.003,0.004);   /* caixa rasa e o aro (anel: o mostrador aparece no meio) */
+    return Math.min(d,Math.hypot(rr,Math.max(Math.abs(w-0.056)-0.004,0))-0.007);};
+  const manPe=Cone([0,0.115,0.33],[0,0.15,0.36],0.018,0.014);
+  const aroOlho=sd=>{const c=[sd*IN917_CD.olho,IN917_CD.olhoY,rb(IN917_CD.olhoY)*Math.cos(Math.asin(IN917_CD.olho/rb(IN917_CD.olhoY)))+0.004];const n=[sd*0.45,0.05,0.89];return in917AnelO(c,n,0.042,0.011);};
+  const volante=(x,y,z)=>{const c=[-0.17,0.525,0.02];let d=in917Anel(c,0.085,0.011,'y')(x,y,z);const a=Math.atan2(z-c[2],x-c[0]);const ak=Math.round(a*4/TAU)*TAU/4;
+    d=Math.min(d,Cone(c,[c[0]+Math.cos(ak)*0.085,c[1],c[2]+Math.sin(ak)*0.085],0.008,0.008)(x,y,z));d=Smin(d,in917Cil([c[0],0.39,c[2]],[c[0],0.545,c[2]],0.016)(x,y,z),0.006);
+    d=Smin(d,in917Cil([c[0],0.405,c[2]],[c[0],0.45,c[2]],0.035)(x,y,z),0.006);return d;};
+  const seguranca=UK([[in917Cil([-0.03,0.4,0.2],[-0.03,0.48,0.2],0.026),0],[Ell([-0.03,0.495,0.2],[0.03,0.022,0.03]),0.008],[Cone([-0.03,0.505,0.2],[0.12,0.47,0.22],0.008,0.007),0.004],[Esf3([0.125,0.468,0.222],0.02),0.004]]);
+  function Esf3(c,r){return (x,y,z)=>Math.hypot(x-c[0],y-c[1],z-c[2])-r;}
+  /* braços (cano de ferro) e pernas (ferro articulado); as juntas de latão à parte */
+  const OMB=[0.33,0.05,-0.08],COT=[0.56,-0.12,0.06],PUN=[0.49,-0.5,0.35],MAO=[0.42,-0.6,0.41];
+  const QUA=[0.24,-0.62,0.0],JOE=[0.25,-0.86,0.035],TOR=[0.24,-1.06,0.045];
+  const braco=UK([[Cone(OMB,COT,0.062,0.056),0],[Cone(COT,PUN,0.056,0.05),0],
+    [(x,y,z)=>{const d=Cone(OMB,COT,0.066,0.06)(x,y,z);const t=((x-OMB[0])*(COT[0]-OMB[0])+(y-OMB[1])*(COT[1]-OMB[1])+(z-OMB[2])*(COT[2]-OMB[2]))/0.093;return d+0.012*(1-Math.min(1,Math.abs(((t*7)%1+1)%1-0.5)*8));},0.004]]);
+  const mao=UK([[Ell([MAO[0],MAO[1]+0.03,MAO[2]-0.01],[0.06,0.05,0.06]),0],
+    ...[-1,0,1].map(k=>[Cad([[MAO[0]+k*0.04,MAO[1]-0.01,MAO[2]+0.03],[MAO[0]+k*0.05,MAO[1]-0.07,MAO[2]+0.07],[MAO[0]+k*0.045,MAO[1]-0.12,MAO[2]+0.06]],[0.02,0.017,0.011]),0.01]),
+    [Cad([[MAO[0]-0.05,MAO[1]+0.01,MAO[2]-0.04],[MAO[0]-0.08,MAO[1]-0.06,MAO[2]-0.02],[MAO[0]-0.07,MAO[1]-0.1,MAO[2]+0.01]],[0.019,0.015,0.01]),0.01]]);
+  const perna=UK([[in917Cil(QUA,JOE,0.088),0],[in917Cil([JOE[0],JOE[1],JOE[2]],TOR,0.074),0],
+    [in917Cil([JOE[0]-0.08,JOE[1],JOE[2]],[JOE[0]+0.08,JOE[1],JOE[2]],0.07),0.006],
+    [(x,y,z)=>{const fz=0.095;let d=H.Cx([TOR[0],-1.17,fz],[0.14,0.05,0.2],0.03)(x,y,z);for(const k of [-1,0,1])d=Smin(d,Ell([TOR[0]+k*0.085,-1.185,fz+0.2],[0.045,0.04,0.06])(x,y,z),0.02);
+      d=Smin(d,Ell([TOR[0],-1.17,fz-0.2],[0.08,0.045,0.05])(x,y,z),0.02);return Math.max(d,-1.24-y);},0.02],[Cone(TOR,[TOR[0],-1.12,0.06],0.06,0.075),0.02]]);
+  const ferroMembros=Esp(UK([[braco,0],[mao,0.015],[perna,0]]));
+  const juntas=Esp(UK([[Esf3(COT,0.066),0],[in917AnelO(OMB,[0.8,-0.1,0.4],0.07,0.02),0],[in917AnelO(PUN,[0.3,-0.9,0.5],0.054,0.015),0],[Esf3(TOR,0.06),0],
+    [in917Cil([JOE[0]-0.088,JOE[1],JOE[2]],[JOE[0]+0.088,JOE[1],JOE[2]],0.045),0],[in917Cil([TOR[0],-0.88,0.12],[TOR[0],-1.03,0.12],0.024),0],[in917Cil([TOR[0],-0.98,0.12],[TOR[0],-1.06,0.12],0.034),0.006],
+    [Cone([TOR[0],-0.88,0.12],[JOE[0],JOE[1],0.07],0.02,0.02),0.004]]));
+  /* canos de cobre (com luvas de latão) e o visor de nível */
+  const cano1=[[-0.335,0.03,0.13],[-0.43,0.22,0.15],[-0.37,0.46,0.08],[-0.21,0.505,0.03]];
+  const cano2=[[0.25,0.44,-0.07],[0.39,0.4,-0.09],[0.43,0.2,-0.06],[0.345,0.04,-0.1]];
+  const cobre=UK([[Cad(cano1,[0.026,0.026,0.026,0.026],0.01),0],[Cad(cano2,[0.024,0.024,0.024,0.024],0.01),0]]);
+  const luvas=UK([...[cano1[0],cano1[3],cano2[0],cano2[3]].map(p=>[Esf3(p,0.037),0]),[Ell([-0.43,0.22,0.15],[0.034,0.034,0.034]),0],
+    [in917Anel([0.43,0.26,-0.06],0.04,0.008,'x'),0],[in917Cil([0.405,0.26,-0.06],[0.47,0.26,-0.06],0.009),0],
+    [in917Cil([0.27,-0.06,0.27],[0.27,-0.02,0.27],0.022),0],[in917Cil([0.27,0.19,0.27],[0.27,0.23,0.27],0.022),0],[Cone([0.27,-0.04,0.27],[0.25,-0.04,0.25],0.012,0.012),0],[Cone([0.27,0.21,0.27],[0.25,0.21,0.25],0.012,0.012),0]]);
+  const visor=in917Cil([0.27,-0.02,0.27],[0.27,0.19,0.27],0.015);
+  const ferroCorpo=(x,y,z)=>{let d=casco0(x,y,z);if(d>0.08)return Math.min(d,chamine(x,y,z));d=Smin(d,cinta(-0.5,0.03)(x,y,z),0.004);d=Smin(d,cinta(0.262,0.022)(x,y,z),0.004);d=Smin(d,costura(x,y,z),0.003);
+    d=Smin(d,chamine(x,y,z),0.02);return d;};
+  /* rebites numa malha à parte (mais fina que o casco) */
+  const rebitesC=(x,y,z)=>{const c=casco0(x,y,z);if(c>0.06||c<-0.06)return Math.abs(c)+0.01;return rebites(x,y,z);};
+  const latao=UK([[moldura,0],[dobra,0.003],[trinco,0],[manCaixa,0],[manPe,0.006],[aroOlho(1),0],[aroOlho(-1),0],[volante,0],[seguranca,0]]);
+  return {ferroCorpo,rebitesC,casco0,chamine,chapa,latao,ferroMembros,juntas,cobre,luvas,visor,nM,mc,rb};}
+/* textura do mostrador do manômetro (escala 0–10 com a faixa vermelha) */
+function in917TexManometro(){const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d');const C=128;
+  x.fillStyle='#f6f0e0';x.fillRect(0,0,256,256);x.strokeStyle='#2a2018';x.lineWidth=3;x.beginPath();x.arc(C,C,120,0,7);x.stroke();
+  const a0=Math.PI*0.75,a1=Math.PI*2.25;x.lineWidth=10;x.strokeStyle='#c0281c';x.beginPath();x.arc(C,C,92,a0+(a1-a0)*0.78,a1);x.stroke();
+  x.strokeStyle='#2a2018';for(let i=0;i<=50;i++){const a=a0+(a1-a0)*i/50;const L=i%5?8:16;x.lineWidth=i%5?1.5:3;x.beginPath();x.moveTo(C+Math.cos(a)*100,C+Math.sin(a)*100);x.lineTo(C+Math.cos(a)*(100-L),C+Math.sin(a)*(100-L));x.stroke();}
+  x.fillStyle='#2a2018';x.font='bold 22px Georgia, serif';x.textAlign='center';x.textBaseline='middle';for(let i=0;i<=10;i+=2){const a=a0+(a1-a0)*i/10;x.fillText(String(i),C+Math.cos(a)*68,C+Math.sin(a)*68);}
+  x.font='bold 16px Georgia, serif';x.fillText('ATM',C,C+44);
+  const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=8;return t;}
+/* disco com UV num plano qualquer (centro c, normal n, «para cima» up) */
+function in917DiscoUV(c,n,up,R,seg){const T=THREE;const nl=Math.hypot(...n);n=n.map(q=>q/nl);let d=up[0]*n[0]+up[1]*n[1]+up[2]*n[2];let v=[up[0]-d*n[0],up[1]-d*n[1],up[2]-d*n[2]];const vl=Math.hypot(...v);v=v.map(q=>q/vl);
+  const u=[v[1]*n[2]-v[2]*n[1],v[2]*n[0]-v[0]*n[2],v[0]*n[1]-v[1]*n[0]];   /* u = v × n: a direita de quem olha de frente */
+  const P=[c[0],c[1],c[2]],N=[n[0],n[1],n[2]],U=[0.5,0.5],C=[1,1,1],I=[];
+  for(let i=0;i<seg;i++){const a=i/seg*Math.PI*2;const cu=Math.cos(a)*R,cv=Math.sin(a)*R;P.push(c[0]+u[0]*cu+v[0]*cv,c[1]+u[1]*cu+v[1]*cv,c[2]+u[2]*cu+v[2]*cv);N.push(n[0],n[1],n[2]);U.push(0.5+cu/(2*R),0.5+cv/(2*R));C.push(1,1,1);}
+  for(let i=0;i<seg;i++)I.push(0,1+i,1+(i+1)%seg);
+  const p=k=>[P[k*3],P[k*3+1],P[k*3+2]];{const a=p(0),b=p(1),cc=p(2);const e1=[b[0]-a[0],b[1]-a[1],b[2]-a[2]],e2=[cc[0]-a[0],cc[1]-a[1],cc[2]-a[2]];const f=[e1[1]*e2[2]-e1[2]*e2[1],e1[2]*e2[0]-e1[0]*e2[2],e1[0]*e2[1]-e1[1]*e2[0]];
+    if(f[0]*n[0]+f[1]*n[1]+f[2]*n[2]<0)for(let i=0;i<I.length;i+=3){const t=I[i+1];I[i+1]=I[i+2];I[i+2]=t;}}
+  const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(new Float32Array(P),3));g.setAttribute('normal',new T.BufferAttribute(new Float32Array(N),3));g.setAttribute('uv',new T.BufferAttribute(new Float32Array(U),2));
+  g.setAttribute('color',new T.BufferAttribute(new Float32Array(C),3));g.setIndex(I);g.computeBoundingBox();g.computeBoundingSphere();return {g,u,v,n};}
+function* in917CaldeiraG(){const H=in917H();const t0=performance.now();const M=in917NovoM();const F=in917CamposCaldeira(H),{S,MX}=H;const rb=F.rb;
+  const C={ferro:in917L(0.47,0.42,0.37),ferroClaro:in917L(0.66,0.6,0.52),fuligem:in917L(0.1,0.09,0.085),ferrugem:in917L(0.5,0.25,0.11),escuro:in917L(0.16,0.14,0.13),
+    latao:in917L(0.86,0.68,0.36),cobre:in917L(0.85,0.45,0.28),verdete:in917L(0.38,0.6,0.5),vidro:in917L(0.75,0.88,0.92)};
+  const pc=IN917_CD.porta,ch=IN917_CD.chamine;
+  const corFerro=(x,y,z,nx,ny,nz)=>{let c=C.ferro;const r=Math.hypot(x,z);
+    if(F.casco0(x,y,z)>0.006&&y>-0.66&&y<0.45)c=MX(C.ferro,C.ferroClaro,0.45);                     /* cintas e costura mais claras (arestas gastas) */
+    const n=0.5+0.5*H.ruido(x*9+1.7,y*9,z*9+4.1);if(n>0.72)c=MX(c,C.ferrugem,S(0.72,0.9,n)*0.6);   /* ferrugem em manchas */
+    if(z>0.2){const dp=Math.hypot(x-pc[0],y-pc[1]);c=MX(c,C.fuligem,0.65*(1-S(0.2,0.34,dp))*S(0.3,0.36,z));}   /* fuligem em volta da fornalha */
+    const dc=Math.hypot(x-ch[0],z-ch[1]);if(y>0.7&&dc<0.2)c=MX(c,C.fuligem,0.75*S(0.72,0.88,y));
+    if(y<-0.56)c=MX(c,C.escuro,0.3);return c;};
+  yield* in917PecaG(H,M,{nome:'caldeira casco',k:'casco',f:F.ferroCorpo,B:[-0.45,-0.67,-0.45,0.45,0.93,0.45],h:0.0192,cor:in917CorAO(H,F.ferroCorpo,corFerro,0.025,0.5,0.08),mat:'ferro',pivo:'corpo'});
+  yield* in917PecaG(H,M,{nome:'caldeira rebites',k:'rebites',f:F.rebitesC,B:[-0.43,-0.54,-0.43,0.43,0.39,0.43],h:0.0084,cor:(x,y,z)=>MX(C.ferroClaro,C.ferro,0.3),mat:'ferro',pivo:'corpo'});
+  yield* in917PecaG(H,M,{nome:'caldeira membros',k:'membros',f:F.ferroMembros,B:[-0.67,-1.25,-0.16,0.67,0.13,0.52],h:0.0162,cor:in917CorAO(H,F.ferroMembros,(x,y,z)=>{let c=C.ferro;const n=0.5+0.5*H.ruido(x*11,y*11+3,z*11);if(n>0.7)c=MX(c,C.ferrugem,0.5*S(0.7,0.9,n));if(y<-1.15)c=MX(c,C.escuro,0.4);return c;},0.02,0.5,0.08),mat:'ferro',pivo:'corpo'});
+  yield* in917PecaG(H,M,{nome:'caldeira portinhola',k:'porta',f:F.chapa,B:[-0.19,-0.29,0.37,0.19,0.09,0.42],h:0.0082,cor:in917CorAO(H,F.chapa,(x,y,z)=>MX(C.escuro,C.ferroClaro,0.25*S(0.15,0.17,Math.hypot(x-pc[0],y-pc[1]))),0.006,0.5),mat:'ferro',pivo:'corpo'});
+  yield* in917PecaG(H,M,{nome:'caldeira latão',k:'latao',f:F.latao,B:[-0.285,-0.33,-0.09,0.29,0.57,0.45],h:0.009,cor:in917CorAO(H,F.latao,()=>C.latao,0.006,0.6),mat:'latao',pivo:'corpo'});
+  yield* in917PecaG(H,M,{nome:'caldeira juntas',k:'juntas',f:F.juntas,B:[-0.65,-1.1,-0.19,0.65,0.14,0.43],h:0.0128,cor:in917CorAO(H,F.juntas,()=>C.latao,0.008,0.6),mat:'latao',pivo:'corpo'});
+  yield* in917PecaG(H,M,{nome:'caldeira cobre',k:'cobre',f:F.cobre,B:[-0.47,0.0,-0.14,0.47,0.54,0.19],h:0.0118,cor:in917CorAO(H,F.cobre,(x,y,z)=>{const n=0.5+0.5*H.ruido(x*14,y*14,z*14+2);return n>0.74?MX(C.cobre,C.verdete,0.6*S(0.74,0.9,n)):C.cobre;},0.008,0.6),mat:'cobre',pivo:'corpo'});
+  yield* in917PecaG(H,M,{nome:'caldeira luvas',k:'luvas',f:F.luvas,B:[-0.48,-0.08,-0.15,0.49,0.55,0.31],h:0.0085,cor:()=>C.latao,mat:'latao',pivo:'corpo'});
+  yield* in917PecaG(H,M,{nome:'caldeira visor',k:'visor',f:F.visor,B:[0.25,-0.03,0.25,0.29,0.2,0.29],h:0.006,cor:(x,y,z)=>y<0.1?in917L(0.3,0.5,0.62):C.vidro,mat:'vidro',pivo:'corpo'});
+  /* mostrador do manômetro (textura) e o ponteiro (lâmina) */
+  const mc=F.mc,nM=F.nM;const dc=[mc[0]+nM[0]*0.049,mc[1]+nM[1]*0.049,mc[2]+nM[2]*0.049];const D=in917DiscoUV(dc,nM,[0,1,0],0.066,32);
+  yield* in917PecaPronta(M,{nome:'caldeira mostrador',k:'mostrador',fino:D.g,grosso:D.g,mat:'mostrador',pivo:'corpo'});
+  const ang=Math.PI*0.75+Math.PI*1.5*0.83;const dir=[D.u[0]*Math.cos(ang)-D.v[0]*Math.sin(ang),D.u[1]*Math.cos(ang)-D.v[1]*Math.sin(ang),D.u[2]*Math.cos(ang)-D.v[2]*Math.sin(ang)];   /* canvas tem y para baixo */
+  const per=[dir[1]*nM[2]-dir[2]*nM[1],dir[2]*nM[0]-dir[0]*nM[2],dir[0]*nM[1]-dir[1]*nM[0]];const o=[dc[0]+nM[0]*0.004,dc[1]+nM[1]*0.004,dc[2]+nM[2]*0.004];
+  const pont=yield* in917LaminaG((u,v)=>{const s=-0.012+0.068*v;const w=(0.006*(1-0.75*v))*(u-0.5);return [o[0]+dir[0]*s+per[0]*w,o[1]+dir[1]*s+per[1]*w,o[2]+dir[2]*s+per[2]*w];},3,10,0.0012,()=>in917L(0.55,0.06,0.04));
+  yield* in917PecaPronta(M,{nome:'caldeira ponteiro',k:'ponteiro',fino:pont,grosso:pont,mat:'aco',pivo:'corpo'});
+  /* olhos: visores de vidro aceso nos aros de latão (o olho velho) */
+  const lente=sd=>{const yO=IN917_CD.olhoY,xO=sd*IN917_CD.olho;const zO=rb(yO)*Math.cos(Math.asin(IN917_CD.olho/rb(yO)))+0.004;return in917Globos([{c:[xO,yO,zO-0.008],n:[sd*0.45,0.05,0.89]}],0.036,[1,1,0.5],18);};
+  M.olhoGeos=[lente(-1),lente(1)];for(const g of M.olhoGeos){M.triFino+=in917Tri(g);M.triGrosso+=in917Tri(g);}
+  let tex=null;try{tex=in917TexManometro();}catch(e){in917Erro('textura do manômetro',e);}
+  M.mats={ferro:in917Mat('ferro fundido da caldeira',{roughness:0.62,metalness:0.35}),latao:in917Mat('latão da caldeira',{roughness:0.3,metalness:0.45,emissive:0x1a1004,emissiveIntensity:0.4}),
+    cobre:in917Mat('cobre da caldeira',{roughness:0.33,metalness:0.45,emissive:0x1a0804,emissiveIntensity:0.35}),vidro:in917Mat('visor de nível da caldeira',{roughness:0.08,emissive:0x203038,emissiveIntensity:0.5}),
+    mostrador:in917Mat('mostrador do manômetro',{map:tex,roughness:0.4}),aco:in917Mat('ponteiro do manômetro',{roughness:0.4})};
+  for(const k in M.mats)M.mats[k].userData.papelKeep=true;
+  M.ms=Math.round(performance.now()-t0);return M;}
+/* a fornalha (malha com o brilho animado) fica como é */
+function in917PartesCaldeira(g){const corpo=g.children.find(o=>o.isGroup&&o.name==='519 corpo');if(!corpo)return null;const forn=corpo.children.find(o=>o.name==='519 fornalha');return {piv:{corpo},manter:forn?[forn]:[],ref:{}};}
+
+/* ---------------- 7) LOUVA-A-DEUS SOLAR (espaço do `519 corpo` do `in519Louva`: y para cima, a frente para +z; anda; asas nos dois grupos animados) ---------------- */
+/* COMO ERA: abdome de 6 esferas, tórax de tubo, cabeça de cone de 3 lados, olhos de bola, patas de tubo com 5 cones, asas de forma plana
+   com a textura de células solares e 4 caixinhas de prata. AGORA: louva-a-deus de verdade na pose de reza — CABEÇA TRIANGULAR (larga em
+   cima, afinando até as mandíbulas e os palpos), OLHOS COMPOSTOS grandes nos cantos de cima (os olhos velhos acesos, agora com as facetas
+   em relevo e a pseudopupila escura), três ocelos e antenas finas; PROTÓRAX comprido e fino com a quilha e o alargamento onde nascem as
+   patas da frente; o dorso do tórax subindo até a raiz das asas; ABDOME de sete segmentos que se sobrepõem, achatado, com as bordas
+   claras e os cercos na ponta; PATAS RAPTORIAIS com coxa, fêmur achatado com duas fileiras de espinhos de ponta dourada, tíbia dobrada com
+   espinhos e o gancho; quatro patas finas articuladas (fêmur, joelho, tíbia, tarso de contas e garras). ASAS de membrana com NERVURAS
+   (anterior mais estreita e posterior larga em leque, em cada grupo animado): as células entre as nervuras douradas são PAINÉIS SOLARES
+   (textura própria, com brilho próprio azul como hoje). pivôs: corpo (0, 0, 0), asaE (−0,06; 0,22; −0,05) e asaD (0,06; 0,22; −0,05). */
+/* tubo liso explícito: cadeia de pontos (Catmull-Rom), raios, lados; quadros por transporte paralelo (sem torcer); cor(t) por anel; tampas */
+function in917TuboLiso(pts,rs,lados,porSeg,cor){const T=THREE;const P=[],N=[],C=[],I=[];const n=pts.length;const Q=[],R=[];
+  const cr=(a,b,c,d,t)=>{const t2=t*t,t3=t2*t;return 0.5*((2*b)+(-a+c)*t+(2*a-5*b+4*c-d)*t2+(-a+3*b-3*c+d)*t3);};
+  for(let i=0;i+1<n;i++){const a=pts[Math.max(0,i-1)],b=pts[i],c=pts[i+1],d=pts[Math.min(n-1,i+2)];for(let k=0;k<porSeg;k++){const t=k/porSeg;Q.push([0,1,2].map(e=>cr(a[e],b[e],c[e],d[e],t)));R.push(rs[i]+(rs[i+1]-rs[i])*t);}}
+  Q.push(pts[n-1].slice());R.push(rs[n-1]);const m=Q.length;
+  const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]],nr=a=>{const l=Math.hypot(...a)||1;return a.map(q=>q/l);},crs=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+  let tp=nr(sub(Q[1],Q[0]));let u=Math.abs(tp[1])<0.9?[0,1,0]:[1,0,0];let b=nr(crs(tp,u));u=crs(b,tp);const F=[];
+  for(let i=0;i<m;i++){const t=nr(i===0?sub(Q[1],Q[0]):(i===m-1?sub(Q[m-1],Q[m-2]):sub(Q[i+1],Q[i-1])));const bb=nr(crs(t,u));u=nr(crs(bb,t));F.push({t,u,b:bb});}
+  for(let i=0;i<m;i++){const f=F[i],c=cor(i/(m-1));for(let k=0;k<lados;k++){const a=k/lados*Math.PI*2;const d=[f.u[0]*Math.cos(a)+f.b[0]*Math.sin(a),f.u[1]*Math.cos(a)+f.b[1]*Math.sin(a),f.u[2]*Math.cos(a)+f.b[2]*Math.sin(a)];
+      P.push(Q[i][0]+d[0]*R[i],Q[i][1]+d[1]*R[i],Q[i][2]+d[2]*R[i]);N.push(d[0],d[1],d[2]);C.push(c[0],c[1],c[2]);}}
+  for(let i=0;i+1<m;i++){const a=i*lados,b2=(i+1)*lados;for(let k=0;k<lados;k++){const k1=(k+1)%lados;I.push(a+k,b2+k,a+k1,a+k1,b2+k,b2+k1);}}
+  for(const [i,sg] of [[0,-1],[m-1,1]]){const t=F[i].t,c=cor(i/(m-1));const ci=P.length/3;P.push(Q[i][0]+t[0]*R[i]*sg*0.6,Q[i][1]+t[1]*R[i]*sg*0.6,Q[i][2]+t[2]*R[i]*sg*0.6);N.push(t[0]*sg,t[1]*sg,t[2]*sg);C.push(c[0],c[1],c[2]);
+    const a=i*lados;for(let k=0;k<lados;k++){const k1=(k+1)%lados;if(sg>0)I.push(a+k,a+k1,ci);else I.push(a+k1,a+k,ci);}}
+  /* confere a orientação do primeiro quadrado com a normal (vira tudo se precisar) */
+  {const p=k=>[P[k*3],P[k*3+1],P[k*3+2]];const A=p(I[0]),B=p(I[1]),Cc=p(I[2]);const fn=crs(sub(B,A),sub(Cc,A));const nn=[N[I[0]*3],N[I[0]*3+1],N[I[0]*3+2]];if(fn[0]*nn[0]+fn[1]*nn[1]+fn[2]*nn[2]<0)for(let i=0;i<I.length;i+=3){const t=I[i+1];I[i+1]=I[i+2];I[i+2]=t;}}
+  const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(P,3));g.setAttribute('normal',new T.Float32BufferAttribute(N,3));g.setAttribute('color',new T.Float32BufferAttribute(C,3));g.setIndex(I);g.computeBoundingBox();g.computeBoundingSphere();return g;}
+const IN917_LV={pern:[[0.0,-0.02],[1,-0.4]]};
+function in917CamposLouva(H){const {Ell,Cone,UK,Smin,Smax,Esp,S,Cad}=H;
+  const largo=(f,k)=>(x,y,z)=>f(x/k,y,z)*Math.min(1,k);                 /* alarga em x (achatado de frente) */
+  /* abdome: 7 segmentos elipsoidais ao longo do eixo, cada um sobre o seguinte */
+  const A0=[0,-0.22,-0.15],A1=[0,-0.86,-0.66];const dA=[A1[0]-A0[0],A1[1]-A0[1],A1[2]-A0[2]];const LA=Math.hypot(...dA);const uA=dA.map(q=>q/LA);
+  const segs=[];for(let i=0;i<7;i++){const t=(i+0.5)/7;const c=[A0[0]+dA[0]*t,A0[1]+dA[1]*t,A0[2]+dA[2]*t];const w=0.125+0.03*Math.sin(Math.PI*Math.min(1,t*1.4))-0.07*S(0.55,1,t);
+    segs.push({c,w,f:in917EllO(c,uA,[1,0,0],[LA/7*0.8,w,w*0.72])});}
+  const abdome=(x,y,z)=>{let d=9;for(const s of segs)d=Smin(d,s.f(x,y,z),0.02);
+    d=Smin(d,Cone([0.03,-0.85,-0.67],[0.06,-0.93,-0.74],0.018,0.006)(Math.abs(x),y,z),0.01);return d;};
+  const dorso=largo(Cad([[0,-0.24,-0.04],[0,-0.08,0.03],[0,0.1,-0.01],[0,0.2,-0.045]],[0.095,0.085,0.068,0.05],0.03),1.25);
+  const pro=largo(Cad([[0,-0.12,0.1],[0,0.12,0.235],[0,0.3,0.27],[0,0.47,0.272]],[0.062,0.06,0.04,0.036],0.02),1.28);
+  const quilha=Cad([[0,-0.08,0.06],[0,0.12,0.19],[0,0.3,0.232],[0,0.45,0.24]],[0.012,0.014,0.01,0.008]);
+  /* cabeça triangular */
+  /* placa triangular do rosto (cantos de cima nos olhos, ponta embaixo nas mandíbulas), extrudada e arredondada */
+  const tri2=(px,py)=>{const V=[[-0.118,0.626],[0.118,0.626],[0,0.47]];let d=9,sg=1;for(let i=0;i<3;i++){const a=V[i],b=V[(i+1)%3];const ex=b[0]-a[0],ey=b[1]-a[1];const wx=px-a[0],wy=py-a[1];const t=Math.max(0,Math.min(1,(wx*ex+wy*ey)/(ex*ex+ey*ey)));d=Math.min(d,Math.hypot(wx-ex*t,wy-ey*t));if(ex*wy-ey*wx>0)sg=-sg*0+sg;}
+    let dentro=true;for(let i=0;i<3;i++){const a=V[i],b=V[(i+1)%3];if((b[0]-a[0])*(py-a[1])-(b[1]-a[1])*(px-a[0])>0)dentro=false;}return dentro?-d:d;};
+  const rosto=(x,y,z)=>{const zc=0.352+0.12*(0.6-y);const a=tri2(x,y),b=Math.abs(z-zc)-0.026*(1-0.4*S(0.6,0.47,y));return Math.min(Math.max(a+0.018,b),0)+Math.hypot(Math.max(a+0.018,0),Math.max(b,0))-0.018;};
+  const cab=UK([[Ell([0,0.618,0.325],[0.125,0.05,0.062]),0],[rosto,0.02],[Ell([0,0.565,0.35],[0.072,0.075,0.05]),0.03],[Cone([0,0.6,0.352],[0,0.488,0.372],0.048,0.024),0.025],
+    [Esp(Ell([0.12,0.614,0.35],[0.04,0.052,0.04])),0.02],[Esp(Ell([0.022,0.476,0.378],[0.022,0.018,0.02])),0.008],
+    [Esp(Cad([[0.03,0.49,0.372],[0.052,0.452,0.385],[0.046,0.418,0.366]],[0.009,0.008,0.007])),0.005],
+    [Cone([0,0.5,0.3],[0,0.585,0.31],0.03,0.04),0.02],[Esf3L([0,0.643,0.372],0.009),0.004],[Esp(Esf3L([0.022,0.632,0.373],0.008)),0.004]]);
+  function Esf3L(c,r){return (x,y,z)=>Math.hypot(x-c[0],y-c[1],z-c[2])-r;}
+  const corpo=(x,y,z)=>{let d=Smin(abdome(x,y,z),dorso(x,y,z),0.05);d=Smin(d,pro(x,y,z),0.04);d=Smin(d,quilha(x,y,z),0.01);d=Smin(d,cab(x,y,z),0.025);return d;};
+  /* patas raptoriais (lado direito; o esquerdo é o espelho): coxa, fêmur achatado com espinhos, tíbia dobrada com espinhos e o gancho */
+  const C0=[0.055,0.15,0.27],C1=[0.15,0.02,0.39],JO=[0.235,0.175,0.585],TI=[0.165,0.01,0.53],GA=[0.15,-0.025,0.5];
+  const femurDir=[JO[0]-C1[0],JO[1]-C1[1],JO[2]-C1[2]];
+  const femur=in917EllO([(C1[0]+JO[0])/2,(C1[1]+JO[1])/2,(C1[2]+JO[2])/2],femurDir,[1,0,0],[Math.hypot(...femurDir)/2*1.06,0.022,0.04]);
+  const esp=[];const fl=Math.hypot(...femurDir);const fu=femurDir.map(q=>q/fl);
+  const baixo=(()=>{const t=[TI[0]-JO[0],TI[1]-JO[1],TI[2]-JO[2]];const d=t[0]*fu[0]+t[1]*fu[1]+t[2]*fu[2];const v=[t[0]-d*fu[0],t[1]-d*fu[1],t[2]-d*fu[2]];const l=Math.hypot(...v);return v.map(q=>q/l);})();   /* lado do fêmur virado para a tíbia */
+  for(let i=0;i<7;i++){const t=0.18+i*0.11;for(const lado of [-1,1]){const b=[C1[0]+femurDir[0]*t+lado*0.012,C1[1]+femurDir[1]*t,C1[2]+femurDir[2]*t];const L=0.03+0.012*(i%2);
+      const ponta=[b[0]+baixo[0]*(0.032+L)+fu[0]*0.012,b[1]+baixo[1]*(0.032+L)+fu[1]*0.012,b[2]+baixo[2]*(0.032+L)+fu[2]*0.012];esp.push({b:[b[0]+baixo[0]*0.02,b[1]+baixo[1]*0.02,b[2]+baixo[2]*0.02],p:ponta});}}
+  const tibiaDir=[TI[0]-JO[0],TI[1]-JO[1],TI[2]-JO[2]];
+  for(let i=0;i<5;i++){const t=0.22+i*0.15;const b=[JO[0]+tibiaDir[0]*t,JO[1]+tibiaDir[1]*t,JO[2]+tibiaDir[2]*t];esp.push({b,p:[b[0]-baixo[0]*0.03-fu[0]*0.008,b[1]-baixo[1]*0.03-fu[1]*0.008,b[2]-baixo[2]*0.03-fu[2]*0.008]});}
+  const espinhos=(x,y,z)=>{let d=9;for(const e of esp){if(Math.abs(x-e.b[0])>0.08||Math.abs(y-e.b[1])>0.08||Math.abs(z-e.b[2])>0.08)continue;d=Math.min(d,Cone(e.b,e.p,0.0075,0.0012)(x,y,z));}return d;};
+  const rapt=(x,y,z)=>{let d=Cad([C0,C1],[0.03,0.027])(x,y,z);d=Smin(d,femur(x,y,z),0.015);d=Smin(d,Cad([JO,TI,GA],[0.019,0.016,0.01])(x,y,z),0.01);
+    d=Smin(d,Cone(GA,[GA[0]-0.005,GA[1]+0.012,GA[2]+0.045],0.01,0.003)(x,y,z),0.006);d=Smin(d,Cad([[TI[0],TI[1],TI[2]],[TI[0]+0.01,TI[1]-0.04,TI[2]-0.02],[TI[0]+0.012,TI[1]-0.075,TI[2]-0.03]],[0.009,0.008,0.006])(x,y,z),0.006);
+    d=Math.min(d,espinhos(x,y,z));return d;};
+  const raptoriais=Esp(rapt);
+  return {corpo,abdome,segs,uA,A0,LA,cab,pro,raptoriais,espinhos:Esp(espinhos),JO,C1};}
+/* textura das asas: células de painel solar entre nervuras douradas (desenhada em código) */
+function in917TexAsaSolar(){const c=document.createElement('canvas');c.width=256;c.height=512;const x=c.getContext('2d');const W=256,Hh=512;
+  x.fillStyle='#16245e';x.fillRect(0,0,W,Hh);
+  const col=[0,0.1,0.24,0.4,0.56,0.72,0.88,1];const r=(()=>{let s=9177;return ()=>{s=(s*16807)%2147483647;return (s-1)/2147483646;};})();
+  const cx=(u,v)=>u*W+Math.sin(v*3.1+u*5)*6;   /* nervuras levemente curvas */
+  for(let i=0;i+1<col.length;i++){let v=0;while(v<1){const dv=0.045+r()*0.05;const v2=Math.min(1,v+dv);const x0=cx(col[i],v),x1=cx(col[i+1],v),x2=cx(col[i+1],v2),x3=cx(col[i],v2);const y0=(1-v)*Hh,y1=(1-v2)*Hh;
+      const g=x.createLinearGradient(x0,y0,x2,y1);const t=0.4+0.6*r();g.addColorStop(0,'rgb('+Math.round(30+20*t)+','+Math.round(60+40*t)+','+Math.round(150+60*t)+')');g.addColorStop(0.55,'rgb(28,52,140)');g.addColorStop(1,'rgb('+Math.round(50+40*t)+','+Math.round(100+60*t)+','+Math.round(200+50*t)+')');
+      x.fillStyle=g;x.beginPath();x.moveTo(x0,y0);x.lineTo(x1,y0);x.lineTo(x2,y1);x.lineTo(x3,y1);x.closePath();x.fill();
+      x.strokeStyle='rgba(200,220,255,0.45)';x.lineWidth=1;const xm=(x0+x1)/2,xm2=(x2+x3)/2;x.beginPath();x.moveTo(xm,y0);x.lineTo(xm2,y1);x.stroke();   /* barramento prateado */
+      x.strokeStyle='#d6a538';x.lineWidth=2.2;x.beginPath();x.moveTo(x3,y1);x.lineTo(x2,y1);x.stroke();v=v2;}}
+  x.strokeStyle='#e0b040';for(let i=0;i<col.length;i++){x.lineWidth=i===0?9:(i===1||i===col.length-1?5:3.2);x.beginPath();for(let k=0;k<=40;k++){const v=k/40;const px=cx(col[i],v),py=(1-v)*Hh;k?x.lineTo(px,py):x.moveTo(px,py);}x.stroke();}
+  const gb=x.createLinearGradient(0,Hh,0,Hh*0.86);gb.addColorStop(0,'rgba(90,150,60,1)');gb.addColorStop(1,'rgba(90,150,60,0)');x.fillStyle=gb;x.fillRect(0,Hh*0.86,W,Hh*0.14);   /* raiz verde */
+  const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=8;return t;}
+/* asa (no espaço do grupo da asa; s = lado): bordo de ataque LE(v) e a largura para «baixo-dentro»; camber leve */
+function in917AsaFn(s,larg,inc,dz){return (u,v)=>{
+  const lx=0.05+0.56*v,ly=0.04-0.68*v+0.05*Math.sin(Math.PI*v);                 /* bordo de ataque (lado direito): da raiz à ponta, arqueado */
+  const w=larg*(Math.sin(Math.PI*Math.pow(v,0.8))*0.9+0.12*(1-v));               /* largura: estreita na raiz, ponta redonda */
+  const qx=lx-0.3*w*u,qy=ly-0.954*w*u;                                           /* a largura cresce para baixo-dentro */
+  const c=Math.cos(inc),sn=Math.sin(inc);const X=qx*c+qy*sn,Y=-qx*sn+qy*c;        /* a posterior abre um pouco mais para baixo */
+  return [s*X,Y,dz-0.03*Math.sin(Math.PI*u)*Math.sin(Math.PI*v)];};}
+function* in917LouvaG(){const H=in917H();const t0=performance.now();const M=in917NovoM();const F=in917CamposLouva(H),{S,MX}=H;
+  const C={verde:in917L(0.36,0.64,0.26),escuro:in917L(0.2,0.44,0.17),claro:in917L(0.66,0.82,0.34),ventre:in917L(0.56,0.76,0.38),ouro:in917L(0.92,0.74,0.32),olhoE:in917L(0.06,0.1,0.05),antena:in917L(0.3,0.38,0.16)};
+  /* cor do corpo: bordas de segmento claras, dorso mais escuro, ventre claro, quilha amarelada */
+  const corCorpo=in917CorAO(H,F.corpo,(x,y,z,nx,ny,nz)=>{let c=C.verde;
+    const rel=[x-F.A0[0],y-F.A0[1],z-F.A0[2]];const t=(rel[0]*F.uA[0]+rel[1]*F.uA[1]+rel[2]*F.uA[2])/F.LA;
+    if(t>0.02&&t<1.02){const k=t*7;const fr=k-Math.floor(k);c=MX(c,C.claro,0.6*S(0.62,0.82,fr)*(1-S(0.88,0.97,fr)));c=MX(c,C.escuro,0.35*(1-S(0.0,0.2,fr)));
+      const dors=ny*0.643-nz*0.766;c=MX(c,dors>0?C.escuro:C.ventre,Math.min(1,Math.abs(dors))*0.35);}
+    if(Math.abs(x)<0.014&&z<0.25&&y>-0.1&&y<0.46)c=MX(c,C.claro,0.55);
+    if(y>0.44&&z>0.3)c=MX(c,C.claro,0.15);
+    return c;},0.02,0.55,0.06);
+  yield* in917PecaG(H,M,{nome:'louva corpo',k:'corpo',f:F.corpo,B:[-0.2,-0.96,-0.8,0.2,0.68,0.43],h:0.0098,cor:corCorpo,mat:'quitina',pivo:'corpo'});
+  yield* in917PecaG(H,M,{nome:'louva raptoriais',k:'raptoriais',f:F.raptoriais,B:[-0.29,-0.11,0.2,0.29,0.22,0.64],h:0.0052,fina:0.03,
+    cor:in917CorAO(H,F.raptoriais,(x,y,z)=>F.espinhos(x,y,z)<0.002?MX(C.ouro,C.verde,0.25):(Math.hypot(Math.abs(x)-F.JO[0],y-F.JO[1],z-F.JO[2])<0.03?C.escuro:C.verde),0.008,0.55),mat:'quitina',pivo:'corpo'});
+  /* patas finas (tubos lisos): coxa → fêmur → joelho → tíbia → tarso; contas do tarso e garras */
+  const pernas=[],pernasG=[];
+  for(const s of [1,-1])for(const [zz,ini] of [[0,[0.07,-0.2,0.02]],[-0.4,[0.07,-0.31,-0.2]]]){
+    const K=[[s*ini[0],ini[1],ini[2]],[s*0.3,-0.48,zz*0.6-0.06],[s*0.5,-0.66,zz-0.12],[s*0.47,-0.84,zz-0.04],[s*0.46,-1.0,zz+0.05],[s*0.55,-1.17,zz+0.1],[s*0.6,-1.27,zz+0.13]];
+    const R=[0.03,0.026,0.024,0.019,0.018,0.014,0.012];
+    pernas.push(in917TuboLiso(K,R,9,5,t=>MX(C.verde,C.escuro,0.35*Math.exp(-Math.pow((t-0.33)/0.05,2))+0.3*Math.exp(-Math.pow((t-0.66)/0.05,2)))));
+    pernasG.push(mo907Tubo([[K,R]],5,C.verde));
+    const jo=[];for(const p of [K[2],K[4]])jo.push(in917Globos([{c:p,n:[0,1,0]}],0.03,null,10));
+    const ta=[];for(let i=0;i<3;i++){const t=i/3;ta.push([s*(0.6+0.03*t+0.012),-1.27-0.025*t-0.012,zz+0.13+0.04*t]);}
+    pernas.push(in917TuboLiso([K[6],ta[0],ta[1],ta[2],[s*0.66,-1.335,zz+0.2]],[0.012,0.011,0.01,0.009,0.004],7,3,()=>C.escuro));
+    for(const g of jo){const c=g.attributes.position.count;const A=new Float32Array(c*3);for(let i=0;i<c;i++){A[i*3]=C.escuro[0];A[i*3+1]=C.escuro[1];A[i*3+2]=C.escuro[2];}g.setAttribute('color',new THREE.BufferAttribute(A,3));pernas.push(g);}
+    if(performance.now()>=fat8Fim)yield 'louva pernas';}
+  const pf=in917JuntaSimples(pernas),pg=in917JuntaSimples(pernasG);yield* in917PecaPronta(M,{nome:'louva pernas',k:'pernas',fino:pf,grosso:pg,mat:'quitina',pivo:'corpo'});
+  /* antenas */
+  const ant=[];for(const s of [1,-1])ant.push(in917TuboLiso([[s*0.02,0.64,0.37],[s*0.06,0.74,0.33],[s*0.16,0.88,0.22],[s*0.28,0.96,0.08],[s*0.36,0.97,-0.02]],[0.006,0.005,0.004,0.003,0.002],6,5,t=>MX(C.verde,C.antena,t)));
+  const an=in917JuntaSimples(ant);yield* in917PecaPronta(M,{nome:'louva antenas',k:'antenas',fino:an,grosso:an,mat:'quitina',pivo:'corpo'});
+  /* asas: anterior (mais estreita, na frente) e posterior (larga, atrás), cada uma no grupo animado do seu lado */
+  for(const [s,piv] of [[-1,'asaE'],[1,'asaD']]){for(const [nome,larg,inc,dz,res] of [['anterior',0.21,0.0,0.006,[14,30]],['posterior',0.3,0.16,-0.012,[16,30]]]){
+      yield* in917PecaLamina(M,{nome:'louva asa '+nome+(s>0?' D':' E'),k:'asa '+nome,fn:in917AsaFn(s,larg,inc,dz),res,resG:[5,9],t:0.0022,cor:()=>[1,1,1],mat:nome==='anterior'?'asaA':'asaP',pivo:piv});}}
+  /* olhos compostos: elipsoide grande com facetas em relevo (o olho velho); pseudopupila escura à parte */
+  const olho=sd=>{const g=new THREE.SphereGeometry(1,48,36);g.deleteAttribute('uv');const P=g.attributes.position;const n=new THREE.Vector3();
+    for(let i=0;i<P.count;i++){n.set(P.getX(i),P.getY(i),P.getZ(i)).normalize();const cel=H.celula(n.x*5+3,n.y*5+1,n.z*5+7,917);const fac=1-0.04*H.cl(1-(cel[1]-cel[0])*5,0,1);P.setXYZ(i,n.x*fac,n.y*fac,n.z*fac);}   /* facetas: sulcos nas bordas das células */
+    g.scale(0.052,0.068,0.051);g.rotateZ(sd*-0.35);g.rotateY(sd*0.5);g.translate(sd*0.13,0.617,0.358);g.computeVertexNormals();return g;};
+  M.olhoGeos=[olho(-1),olho(1)];for(const g of M.olhoGeos){M.triFino+=in917Tri(g);M.triGrosso+=in917Tri(g);}
+  const pup=[];for(const sd of [-1,1]){const n=[sd*0.55,0.05,0.83];const l=Math.hypot(...n);pup.push(in917Globos([{c:[sd*0.13+n[0]/l*0.052,0.617+n[1]/l*0.052,0.358+n[2]/l*0.052],n}],0.013,[1,1.2,0.3],10));}
+  const pp=in917JuntaSimples(pup);yield* in917PecaPronta(M,{nome:'louva pseudopupilas',k:'pupilas',fino:pp,grosso:pp,mat:'pupila',pivo:'corpo'});
+  let tex=null;try{tex=in917TexAsaSolar();}catch(e){in917Erro('textura das asas',e);}
+  M.mats={quitina:in917Mat('quitina do louva-a-deus',{roughness:0.45,metalness:0.05}),
+    asaA:in917Mat('asa anterior do louva-a-deus',{map:tex,emissive:0x2040a0,emissiveMap:tex,emissiveIntensity:0.45,roughness:0.3,metalness:0.4}),
+    asaP:in917Mat('asa posterior do louva-a-deus',{map:tex,emissive:0x2040a0,emissiveMap:tex,emissiveIntensity:0.55,roughness:0.28,metalness:0.4}),
+    pupila:in917Mat('pseudopupila do louva-a-deus',{color:0x061006,vertexColors:false,roughness:0.3})};
+  for(const k in M.mats)M.mats[k].userData.papelKeep=true;
+  M.ms=Math.round(performance.now()-t0);return M;}
+/* asas: os dois grupos filhos do corpo (lado pelo x) */
+function in917PartesLouva(g){const corpo=g.children.find(o=>o.isGroup&&o.name==='519 corpo');if(!corpo)return null;const gs=corpo.children.filter(o=>o.isGroup);if(gs.length<2)return null;
+  const asaE=gs.find(o=>o.position.x<0),asaD=gs.find(o=>o.position.x>0);if(!asaE||!asaD)return null;return {piv:{corpo,asaE,asaD},manter:[],ref:{}};}
+
+/* ---------------- 8) DRONE DE VIGILÂNCIA (espaço do `519 corpo` do `in519Drone`: y para cima, a frente para +z; paira; 4 rotores e o gimbal animados) ---------------- */
+/* COMO ERA: uma caixa arredondada de 70 × 70 cm com a textura de painel, um cilindro embaixo, braços de caixa, motores de cilindro,
+   aros de toro, hélices de duas caixinhas cruzadas, gimbal com bola e lente de cilindro, quatro bolinhas de luz, antena de cilindro.
+   AGORA: quadricóptero de casco aerodinâmico — fuselagem alongada com o nariz chanfrado, linhas de painel em baixo-relevo, tampa da bateria,
+   grelhas de ventilação, os dois sensores de obstáculo na frente; braços afilados em X com faixas laranja nos da frente e brancas nos de
+   trás; motores com aletas de refrigeração; protetores de hélice (aros com três raios); HÉLICES de duas pás com torção e ponta laranja, com
+   o cubo (nos grupos dos rotores, que giram como hoje); GIMBAL de garfo com a bola da câmera (no grupo do gimbal, que vira como hoje) e a
+   objetiva com o aro prateado na frente — a lente acesa é o olho velho; antenas de chicote (uma com a ponta vermelha), o domo do GPS e as
+   LUZES DE NAVEGAÇÃO acesas (verde e vermelha nos motores). O feixe de luz (cone animado) e o brilho ficam como hoje.
+   pivôs: corpo (0, 0, 0), rotor0..3 (±0,41; 0,13; ±0,41) e gimbal (0; −0,2; 0,16). */
+const IN917_DR={M:[[0.41,0.41],[0.41,-0.41],[-0.41,-0.41],[-0.41,0.41]]};
+function in917CamposDrone(H){const {Ell,Cone,UK,Smin,Smax,Esp,S,Cad}=H;const Cx=H.Cx;
+  const fus0=(x,y,z)=>{let d=Cx([0,-0.005,0.02],[0.15,0.045,0.27],0.055)(x,y,z);d=Smin(d,Ell([0,0.045,-0.02],[0.14,0.055,0.22])(x,y,z),0.03);
+    d=Smin(d,Ell([0,-0.06,0.03],[0.13,0.05,0.2])(x,y,z),0.03);d=Smax(d,(y*0.75+(z-0.27)*0.66),0.03);return d;};
+  const braco=(x,y,z)=>{const ax=Math.abs(x),az=Math.abs(z);return Cone([0.1,0,0.12],[0.41,0.035,0.41],0.05,0.034)(ax,y/0.62,az)*0.62;};   /* os 4 braços pela simetria em x e z */
+  const motor=(x,y,z)=>{const ax=Math.abs(x)-0.41,az=Math.abs(z)-0.41;const rr=Math.hypot(ax,az);let r=rr-0.07;if(y>0.035&&y<0.1)r+=0.0045*Math.max(0,Math.cos(Math.atan2(az,ax)*16));
+    const dy=Math.abs(y-0.055)-0.055;return Math.min(Math.max(r,dy),0)+Math.hypot(Math.max(r,0),Math.max(dy,0))-0.006;};
+  /* linhas de painel: sulcos rasos */
+  const sulco=(x,y,z)=>{let g=0;const L=(v)=>Math.exp(-(v*v)/(0.0028*0.0028));if(y>0.0){g=Math.max(L(z-0.13),L(z+0.12),L(Math.abs(x)-0.085)*(Math.abs(z)<0.13?1:0),L(z-0.21));}
+    else g=Math.max(L(z-0.1),L(z+0.1),L(Math.abs(x)-0.09));
+    if(y>0.05&&z<-0.12&&z>-0.22&&Math.abs(x)<0.08){const k=(z+0.12)/-0.02;const f=k-Math.floor(k);g=Math.max(g,f>0.35&&f<0.75?1:0);}   /* grelha de ventilação */
+    return g;};
+  const casco=(x,y,z)=>{let d=fus0(x,y,z);d=Smin(d,braco(x,y,z),0.03);d=Smin(d,motor(x,y,z),0.015);if(Math.abs(d)<0.01)d+=0.0022*sulco(x,y,z);
+    d=Smin(d,in917Cil([0,-0.1,0.16],[0,-0.135,0.16],0.035)(x,y,z),0.01);                      /* base do gimbal */
+    for(const sx of [-1,1])d=Smax(d,-Ell([sx*0.055,0.0,0.33],[0.02,0.016,0.03])(x,y,z),0.003);   /* os dois sensores de obstáculo (cavidades) */
+    return d;};
+  /* objetiva fixa no corpo, na frente da bola: tubo, aro */
+  const objetiva=(x,y,z)=>{let d=in917Cil([0,-0.22,0.215],[0,-0.22,0.285],0.045)(x,y,z)-0.003;d=Smax(d,-in917Cil([0,-0.22,0.27],[0,-0.22,0.3],0.036)(x,y,z),0.003);return d;};
+  const aroObj=in917Anel([0,-0.22,0.288],0.042,0.006,'z');
+  /* garfo do gimbal (espaço do grupo do gimbal) */
+  const garfo=(x,y,z)=>{let d=in917Cil([0,0.1,0],[0,0.05,0],0.03)(x,y,z);d=Smin(d,Esp(Cad([[0.0,0.065,0],[0.085,0.07,0],[0.122,0.03,0],[0.124,-0.02,0]],[0.016,0.015,0.014,0.014]))(x,y,z),0.01);
+    d=Smin(d,Esp(in917Cil([0.108,-0.02,0],[0.142,-0.02,0],0.026))(x,y,z),0.006);return d;};
+  return {casco,fus0,sulco,objetiva,aroObj,garfo};}
+function* in917DroneG(){const H=in917H();const t0=performance.now();const M=in917NovoM();const F=in917CamposDrone(H),{S,MX}=H;const T=THREE;
+  const C={casco:in917L(0.56,0.59,0.63),escuro:in917L(0.2,0.21,0.23),painel:in917L(0.36,0.38,0.42),laranja:in917L(0.95,0.42,0.06),branco:in917L(0.88,0.9,0.92),sulco:in917L(0.15,0.16,0.18),
+    pa:in917L(0.09,0.09,0.1),prata:in917L(0.78,0.8,0.84),lente:in917L(0.05,0.06,0.08)};
+  const corCasco=in917CorAO(H,F.casco,(x,y,z,nx,ny,nz)=>{let c=y<-0.035&&Math.hypot(Math.abs(x)-0.41,Math.abs(z)-0.41)>0.09?C.painel:C.casco;
+    const rr=Math.hypot(Math.abs(x)-0.41,Math.abs(z)-0.41);if(rr<0.085)c=MX(C.escuro,C.casco,0.25);
+    const ax=Math.abs(x),az=Math.abs(z);const t=(ax+az)/0.82;if(rr>0.085&&t>0.62&&t<0.78&&Math.abs(ax-az)<0.07&&y>-0.01)c=z>0?C.laranja:C.branco;   /* faixas nos braços */
+    if(Math.abs(F.fus0(x,y,z))<0.006&&F.sulco(x,y,z)>0.4)c=MX(c,C.sulco,0.75);
+    if(z>0.3&&Math.abs(y)<0.03&&Math.abs(Math.abs(x)-0.055)<0.025)c=C.lente;
+    if(Math.abs(y+0.12)<0.03&&Math.hypot(x,z-0.16)<0.045)c=C.escuro;return c;},0.012,0.55,0.03);
+  yield* in917PecaG(H,M,{nome:'drone casco',k:'casco',f:F.casco,B:[-0.5,-0.15,-0.5,0.5,0.13,0.5],h:0.0085,cor:corCasco,mat:'casco',pivo:'corpo'});
+  yield* in917PecaG(H,M,{nome:'drone objetiva',k:'objetiva',f:F.objetiva,B:[-0.06,-0.28,0.2,0.06,-0.16,0.31],h:0.0045,cor:()=>C.escuro,mat:'escuro',pivo:'corpo'});
+  yield* in917PecaG(H,M,{nome:'drone aro da objetiva',k:'aroObj',f:F.aroObj,B:[-0.06,-0.28,0.27,0.06,-0.16,0.3],h:0.0034,cor:()=>C.prata,mat:'prata',pivo:'corpo'});
+  /* gimbal: garfo (escultor) e a bola (esfera lisa: girando em volta do eixo vertical ela fica igual — só o garfo mostra o giro) */
+  yield* in917PecaG(H,M,{nome:'drone garfo do gimbal',k:'garfo',f:F.garfo,B:[-0.18,-0.06,-0.04,0.18,0.12,0.04],h:0.005,cor:in917CorAO(H,F.garfo,()=>C.escuro,0.006,0.6),mat:'escuro',pivo:'gimbal'});
+  const bola=(seg)=>{const g=new T.SphereGeometry(0.1,seg,Math.round(seg*0.7));g.deleteAttribute('uv');g.translate(0,-0.02,0);const n=g.attributes.position.count;const A=new Float32Array(n*3);const P=g.attributes.position;
+    for(let i=0;i<n;i++){const y=P.getY(i)+0.02;const c=Math.abs(y)<0.004?C.prata:MX(C.escuro,C.painel,0.3+0.3*(y/0.1));A[i*3]=c[0];A[i*3+1]=c[1];A[i*3+2]=c[2];}g.setAttribute('color',new T.BufferAttribute(A,3));return g;};
+  yield* in917PecaPronta(M,{nome:'drone bola da câmera',k:'bola',fino:bola(40),grosso:bola(14),mat:'escuro',pivo:'gimbal'});
+  /* protetores das hélices (aros) e os três raios até o motor; luzes de navegação; antenas e o domo do GPS (geometria explícita) */
+  const aros=[],arosG=[];const corG=(g,c)=>{const n=g.attributes.position.count;const A=new Float32Array(n*3);for(let i=0;i<n;i++){A[i*3]=c[0];A[i*3+1]=c[1];A[i*3+2]=c[2];}g.setAttribute('color',new T.BufferAttribute(A,3));if(g.attributes.uv)g.deleteAttribute('uv');return g;};
+  for(const [mx,mz] of IN917_DR.M){for(const [lista,seg,rad] of [[aros,56,10],[arosG,20,5]]){const t=new T.TorusGeometry(0.24,0.012,rad,seg);t.rotateX(Math.PI/2);t.scale(1,1.5,1);t.translate(mx,0.1,mz);lista.push(corG(t,C.escuro));
+      for(let k=0;k<3;k++){const a=k/3*Math.PI*2+Math.atan2(mz,mx)+Math.PI/3;lista.push(in917TuboLiso([[mx+Math.cos(a)*0.07,0.07,mz+Math.sin(a)*0.07],[mx+Math.cos(a)*0.235,0.1,mz+Math.sin(a)*0.235]],[0.008,0.007],lista===aros?6:4,1,()=>C.escuro));}}}
+  yield* in917PecaPronta(M,{nome:'drone protetores',k:'protetores',fino:in917JuntaSimples(aros),grosso:in917JuntaSimples(arosG),mat:'escuro',pivo:'corpo'});
+  const luzes=[];for(const [mx,mz,cor] of [[-0.41,0.41,[0.1,1,0.25]],[0.41,0.41,[1,0.12,0.1]],[-0.41,-0.41,[1,0.12,0.1]],[0.41,-0.41,[0.1,1,0.25]]]){const l=Math.hypot(mx,mz);
+    const g=new T.SphereGeometry(0.02,12,9);g.scale(1,0.8,1);g.translate(mx+mx/l*0.072,0.07,mz+mz/l*0.072);luzes.push(corG(g,cor));}
+  {const g=new T.SphereGeometry(0.016,10,8);g.translate(0,-0.03,0.33);luzes.push(corG(g,[1,0.15,0.1]));}   /* LED de gravação no queixo */
+  const lz=in917JuntaSimples(luzes);yield* in917PecaPronta(M,{nome:'drone luzes',k:'luzes',fino:lz,grosso:lz,mat:'luz',pivo:'corpo'});
+  const ext=[];ext.push(in917TuboLiso([[0.05,0.07,-0.23],[0.065,0.25,-0.27],[0.08,0.43,-0.31]],[0.007,0.005,0.003],6,4,()=>C.escuro));
+  ext.push(in917TuboLiso([[-0.05,0.07,-0.23],[-0.06,0.2,-0.26],[-0.07,0.33,-0.29]],[0.007,0.005,0.003],6,4,()=>C.escuro));
+  {const g=new T.SphereGeometry(0.016,10,8);g.translate(0.08,0.435,-0.31);ext.push(corG(g,[0.9,0.12,0.1]));}
+  {const g=new T.SphereGeometry(0.055,24,10,0,Math.PI*2,0,Math.PI/2);g.scale(1,0.55,1);g.translate(0,0.095,-0.06);ext.push(corG(g,C.branco));}
+  const ex=in917JuntaSimples(ext);yield* in917PecaPronta(M,{nome:'drone antenas',k:'antenas',fino:ex,grosso:ex,mat:'casco',pivo:'corpo'});
+  /* hélices: duas pás torcidas (ponta laranja) e o cubo, em cada grupo de rotor (eixo local y) */
+  const helice=(res)=>{const L=[];for(const k of [0,1]){const a0=k*Math.PI;L.push((in917LaminaSync((u,v)=>{const r=0.028+0.185*v;const ch=0.052*(1-0.55*v)*Math.sqrt(Math.max(0.05,1-Math.pow(Math.max(0,v-0.85)/0.15,2)));
+      const tw=(24-16*v)*Math.PI/180;const c=(u-0.5)*ch;const sw=0.012*v*v;const px=r,pz=c*Math.cos(tw)+sw,py=c*Math.sin(tw)*-1+0.004;
+      return [px*Math.cos(a0)-pz*Math.sin(a0),py,px*Math.sin(a0)+pz*Math.cos(a0)];},res[0],res[1],0.0022,(u,v)=>v>0.82?C.laranja:C.pa)));}
+    const cubo=new T.SphereGeometry(0.028,14,8,0,Math.PI*2,0,Math.PI/2);cubo.scale(1,1.1,1);cubo.translate(0,-0.01,0);L.push(corG(cubo,C.prata));return in917JuntaSimples(L);};
+  const hf=helice([5,14]),hg=helice([2,5]);
+  yield* in917PecaPronta(M,{nome:'drone hélices',k:'helice',fino:hf,grosso:hg,mat:'helice',pivo:['rotor0','rotor1','rotor2','rotor3']});
+  /* olho: a lente acesa da objetiva (o olho velho) */
+  {const g=in917Globos([{c:[0,-0.22,0.278],n:[0,0,1]}],0.035,[1,1,0.45],20);M.olhoGeos=[g];M.triFino+=in917Tri(g);M.triGrosso+=in917Tri(g);}
+  M.mats={casco:in917Mat('casco do drone',{roughness:0.38,metalness:0.4}),escuro:in917Mat('peças escuras do drone',{roughness:0.5,metalness:0.3}),prata:in917Mat('aro prateado do drone',{roughness:0.25,metalness:0.5}),
+    helice:in917Mat('hélices do drone',{roughness:0.45,metalness:0.1})};
+  {const m=new THREE.MeshBasicMaterial({vertexColors:true});m.name='v917 luzes de navegação do drone';M.mats.luz=m;}
+  for(const k in M.mats)M.mats[k].userData.papelKeep=true;
+  M.ms=Math.round(performance.now()-t0);return M;}
+/* lâmina sem fatiar (peças pequenas: hélices) */
+function in917LaminaSync(fn,nu,nv,t,cor){const it=in917LaminaG(fn,nu,nv,t,(u,v)=>cor(u,v));let r;do{r=it.next();}while(!r.done);return r.value;}
+/* rotores: os 4 grupos com 2 malhas (pela posição); gimbal: o grupo com z > 0,1 e x ≈ 0 */
+function in917PartesDrone(g){const corpo=g.children.find(o=>o.isGroup&&o.name==='519 corpo');if(!corpo)return null;const gs=corpo.children.filter(o=>o.isGroup);const piv={corpo};
+  for(let i=0;i<4;i++){const [mx,mz]=IN917_DR.M[i];const r=gs.find(o=>Math.abs(o.position.x-mx)<0.03&&Math.abs(o.position.z-mz)<0.03);if(!r)return null;piv['rotor'+i]=r;}
+  const gim=gs.find(o=>Math.abs(o.position.x)<0.02&&o.position.z>0.1&&o.position.y<-0.1);if(!gim)return null;piv.gimbal=gim;
+  const feixe=corpo.children.find(o=>o.isMesh&&o.geometry&&o.geometry.type==='ConeGeometry');return {piv,manter:feixe?[feixe]:[],ref:{}};}
+/* ---------------- 9) tipos, montagem (uma vez; em fatias) ---------------- */
+/* raio e centro (y no espaço do grupo) da esfera de cada tipo: escolha FINO/GROSSO pelo tamanho na tela; alvo das fotos (altura do rosto e do meio do corpo acima do chão) */
+const IN917_TIPOS={bug:{gera:()=>in917BugG(),partes:g=>in917PartesBug(g),raio:0.62,cy:0.13},peixe:{gera:()=>in917PeixeG(),partes:g=>in917PartesPeixe(g),raio:1.0,cy:0.05},
+  caldeira:{gera:()=>in917CaldeiraG(),partes:g=>in917PartesCaldeira(g),raio:1.15,cy:-0.17},
+  louva:{gera:()=>in917LouvaG(),partes:g=>in917PartesLouva(g),raio:1.2,cy:-0.2},
+  drone:{gera:()=>in917DroneG(),partes:g=>in917PartesDrone(g),raio:0.75,cy:0.0}};
+const IN917_ALVO={bug:[1.43,1.48],peixe:[1.5,1.4],caldeira:[1.55,1.05],louva:[1.95,1.15],drone:[1.2,1.35]};
+function* in917MontaG(quer){for(const t of Object.keys(IN917_TIPOS)){if(!quer[t]||IN917.M[t]||IN917.falhou[t])continue;
+    try{const M=yield* IN917_TIPOS[t].gera();IN917.M[t]=M;IN917.stats.montagens[t]={ms:M.ms,triFino:M.triFino,triGrosso:M.triGrosso,cores:M.cores,passos:M.passos};}catch(e){IN917.falhou[t]=true;in917Erro('montagem '+t,e);}yield t;}}
+function in917Monta(quer){if(IN917.job)return;const st=IN917.stats;IN917.estado='montando';const t0=performance.now();
+  const fim=()=>{const J=IN917.job;IN917.job=null;if(J){st.fatias+=J.passos||0;const mx=Math.round((J.max||0)*10)/10;if(mx>=st.maiorFatiaMs){st.maiorFatiaMs=mx;st.ondeMaior=J.rotMax;}st.cpuMs+=Math.round(J.ms||0);}st.relogioMs=Math.round(performance.now()-t0);
+    IN917.estado=Object.keys(IN917.falhou).length?'erro':'pronto';in917TodosTroca();};
+  const erro=e=>{IN917.job=null;IN917.estado='erro';in917Erro('montagem',e);};
+  try{if(typeof fat8Go==='function'){const J=fat8Go(in917MontaG(quer),{nome:'v917 inimigos esculpidos',urgente:()=>{try{return in917DaCena(ACTIVE).length>0;}catch(e){return false;}},fim,erro});if(IN917.estado==='montando')IN917.job=J;}
+    else{const it=in917MontaG(quer);let r;do{r=it.next();}while(!r.done);fim();}}catch(e){erro(e);}}
+
+/* ---------------- 9) a troca: malhas novas nos pivôs do inimigo velho ---------------- */
+function in917Trofeu(g){for(let p=g.parent;p;p=p.parent)if(p.userData&&p.userData.trofeu498)return true;return false;}
+// fusão do Leve: um inimigo parado (dormindo) pode ter as malhas velhas fundidas numa cópia estática — desfaz esses grupos antes de esvaziar as
+// velhas (senão a cópia mostraria o modelo velho até ele andar) e marca velhas e novas para a fusão não as pegar (como os bichos esculpidos)
+function in917SoltaFusao(g,objs){try{let sc=g;while(sc.parent)sc=sc.parent;if(!sc.isScene||typeof FUSAO==='undefined'||typeof fusaoDesfazer!=='function')return 0;const F=FUSAO.cenas.get(sc);if(!F||!F.grupos||!F.grupos.length)return 0;
+  const S=new Set(objs);let n=0;for(const gr of F.grupos.slice())if(gr.originais&&gr.originais.some(o=>S.has(o))){fusaoDesfazer(gr,F,sc);n++;}IN917.stats.fusoesDesfeitas=(IN917.stats.fusoesDesfeitas||0)+n;return n;}catch(e){in917Erro('fusão',e);return 0;}}
+/* geometria do olho i no espaço da própria malha do olho: M.olhoGeos[i] está no espaço do pivô (pai do olho) */
+function in917OlhoLocal(M,i,o){const L=M.olhoLoc||(M.olhoLoc=[]);if(L[i])return L[i];const G=M.olhoGeos&&M.olhoGeos[i];if(!G)return null;o.updateMatrix();
+  const g=G.clone();g.applyMatrix4(new THREE.Matrix4().copy(o.matrix).invert());g.computeBoundingBox();g.computeBoundingSphere();L[i]=g;return g;}
+function in917Troca(rec){if(!rec||rec.troca||rec.falhou)return !!(rec&&rec.troca);const M=IN917.M[rec.tipo];if(!M)return false;
+  let P=rec.P||null;if(!P){try{P=IN917_TIPOS[rec.tipo].partes(rec.g);}catch(e){in917Erro('esqueleto '+rec.tipo,e);}}if(!P){rec.falhou=true;in917Erro(rec.tipo,'esqueleto inesperado');return false;}
+  const trofeu=in917Trofeu(rec.g);const tr={novos:[],velhas:[],olho:null,fino:!!rec.ultFino,papel:null,trofeu,vis:false,d:1e9,px:0};const manter=new Set(P.manter||[]);
+  const olhosSet=new Set(rec.olhos||[]);for(const o of rec.velhas){if(o===rec.olho||olhosSet.has(o)||manter.has(o)||o.geometry===IN917_VAZIA)continue;tr.velhas.push({o,geo:o.geometry});}
+  const ouro=trofeu&&tr.velhas[0]?tr.velhas[0].o.material:null;   /* troféu da v498: tudo de ouro */
+  for(const p of M.partes){const pai=P.piv[p.pivo];if(!pai){in917Erro(rec.tipo,'pivô ausente '+p.pivo);continue;}
+    const m=new THREE.Mesh(p.grosso,ouro||M.mats[p.mat]);m.name='v917 '+rec.tipo+' · '+p.k+(p.esp?' (espelho)':'');m.castShadow=true;m.receiveShadow=false;if(!trofeu)m.raycast=()=>{};
+    m.userData.papelKeepGeo=true;m.userData.noCam=true;m.userData.in917=p.k;m.__p=p;m.__fusaoMoveu=9;
+    if(p.ref&&P.ref&&P.ref[p.ref]){const o=P.ref[p.ref];m.position.copy(o.position);m.quaternion.copy(o.quaternion);m.scale.copy(o.scale);}
+    pai.add(m);tr.novos.push(m);}
+  in917SoltaFusao(rec.g,tr.velhas.map(v=>v.o).concat(rec.olhos||[]));
+  for(const v of tr.velhas){v.fm=v.o.__fusaoMoveu;v.o.__fusaoMoveu=9;v.o.geometry=IN917_VAZIA;}
+  /* olhos: cada malha de olho velha (mesmo objeto, mesmo material) ganha a geometria nova do SEU olho, levada do espaço do pivô para o espaço
+     dela (a posição e a escala dos olhos da v519 são fixas: a conta é feita uma vez por tipo e guardada no modelo) */
+  tr.olhos=[];const OL=rec.olhos||[];for(let i=0;i<OL.length;i++){const o=OL[i];const geo=in917OlhoLocal(M,i,o);if(!geo)continue;tr.olhos.push({o,geo:o.geometry});o.geometry=geo;}
+  tr.olho=tr.olhos[0]||null;
+  const on=!!(typeof Q!=='undefined'&&Q.papel);if(!trofeu)for(const m of tr.novos){try{if(typeof papelUm==='function')papelUm(m,on);}catch(e){}}tr.papel=on;
+  rec.troca=tr;IN917.stats.tipos[rec.tipo].trocados++;return true;}
+function in917Destroca(rec){const tr=rec&&rec.troca;if(!tr)return;rec.ultFino=!!tr.fino;for(const m of tr.novos){if(m.parent)m.parent.remove(m);}for(const v of tr.velhas){v.o.geometry=v.geo;v.o.__fusaoMoveu=v.fm;}for(const q of (tr.olhos||[]))q.o.geometry=q.geo;
+  rec.troca=null;IN917.stats.tipos[rec.tipo].destrocados++;}
+function in917TodosTroca(){if(!IN917.ativo)return;for(const r of IN917.regs){if(IN917.M[r.tipo]&&!r.troca){try{in917Troca(r);}catch(e){in917Erro('troca '+r.tipo,e);}}}
+  if(IN917.regs.length>300){IN917.regs=IN917.regs.filter(r=>{let p=r.g;while(p.parent)p=p.parent;return p.isScene||r.troca;});}}
+function in917Dentro(o,sc){for(let p=o;p;p=p.parent)if(p===sc)return true;return false;}
+function in917DaCena(sc){const L=[];if(!sc)return L;for(const r of IN917.regs)if(r.g.parent&&in917Dentro(r.g,sc))L.push(r);return L;}
+
+/* ---------------- 10) FINO / GROSSO pelo tamanho na tela (sem corte por frustum: o frustum só escolhe os finos) ---------------- */
+const IN917_T={fr:new THREE.Frustum(),PV:new THREE.Matrix4(),esf:new THREE.Sphere(),cam:new THREE.Vector3(),c:new THREE.Vector3()};
+function in917Camera(){const W=IN917_T;let foco=800;try{camera.updateMatrixWorld();W.cam.setFromMatrixPosition(camera.matrixWorld);W.PV.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);W.fr.setFromProjectionMatrix(W.PV);foco=(innerHeight||800)/(2*Math.tan((camera.fov||60)*Math.PI/360));}catch(e){}return foco;}
+function in917AtualizaLOD(L){const W=IN917_T;const foco=in917Camera();const cand=[];const st={n:L.length,trocados:0,finos:0,grossos:0,visiveis:0,triNovos:0,triVelhos:0,chamadas:0};const on=!!(typeof Q!=='undefined'&&Q.papel);
+  for(const r of L){if(!r.troca&&IN917.M[r.tipo])in917Troca(r);const tr=r.troca;if(!tr)continue;st.trocados++;
+    if(tr.papel!==on&&!tr.trofeu){for(const m of tr.novos){try{papelUm(m,on);}catch(e){}}tr.papel=on;}
+    for(const v of tr.velhas)if(v.o.geometry!==IN917_VAZIA)v.o.geometry=IN917_VAZIA;   /* alguém devolveu a geometria velha: esvazia de novo */
+    let vis=r.g.visible;for(let p=r.g.parent;p&&vis;p=p.parent)if(!p.visible&&!p.isScene)vis=false;
+    const D=IN917_TIPOS[r.tipo];r.g.updateMatrixWorld(false);W.c.set(0,D.cy,0).applyMatrix4(r.g.matrixWorld);const s=Math.max(0.01,r.g.scale.x);W.esf.set(W.c,D.raio*s);const naTela=W.fr.intersectsSphere(W.esf),dentro=vis&&(!IN917.corte||naTela);
+    const d=Math.max(0.05,W.c.distanceTo(W.cam));tr.d=d;tr.px=D.raio*s*foco/d;tr.vis=dentro;const quer=tr.fino?tr.px>IN917.PX_GROSSO:tr.px>IN917.PX_FINO;tr.fino=false;if(quer&&dentro&&naTela)cand.push(tr);}
+  cand.sort((a,b)=>a.d-b.d);for(let i=0;i<cand.length&&i<IN917.MAX_FINOS;i++)cand[i].fino=true;
+  for(const r of L){const tr=r.troca;if(!tr)continue;const nivel=tr.fino?'fino':'grosso';for(const m of tr.novos){const geo=m.__p[nivel];if(m.geometry!==geo)m.geometry=geo;}
+    if(tr.vis){st.visiveis++;if(tr.fino)st.finos++;else st.grossos++;for(const m of tr.novos){st.triNovos+=in917Tri(m.geometry);st.chamadas++;}for(const q of tr.olhos)st.triNovos+=in917Tri(q.o.geometry);
+      for(const v of tr.velhas)st.triVelhos+=in917Tri(v.geo);for(const q of tr.olhos)st.triVelhos+=in917Tri(q.geo);}}
+  st.triAMais=st.triNovos-st.triVelhos;return st;}
+
+/* ---------------- 11) a cada quadro; pausa (congela as poses dos velhos e dos novos — também com o bloco desligado) ---------------- */
+function in917Quadro(dt){if(!IN917.on)return;const st=IN917.stats;st.quadros++;const sc=ACTIVE;if(!sc)return;const L=in917DaCena(sc);if(!L.length)return;
+  const falta={};let algum=false;for(const r of L){if(!IN917.M[r.tipo]&&!IN917.falhou[r.tipo]){falta[r.tipo]=true;algum=true;}}
+  if(algum&&!IN917.job)in917Monta(falta);
+  if(IN917.pausado)in917Congela(L);
+  if(!IN917.ativo)return;
+  try{IN917.ult=in917AtualizaLOD(L);}catch(e){in917Erro('quadro',e);}}
+function in917Congela(L){const guarda=o=>{if(!o.__in917pose)o.__in917pose={p:o.position.clone(),r:o.rotation.clone(),s:o.scale.clone()};else{o.position.copy(o.__in917pose.p);o.rotation.copy(o.__in917pose.r);o.scale.copy(o.__in917pose.s);}};
+  try{for(const r of L){guarda(r.g);r.g.traverse(o=>{if(o!==r.g&&!o.isPoints&&!o.isSprite&&!(o.userData&&o.userData.in917))guarda(o);});}}catch(e){in917Erro('pausa',e);}}   /* malhas velhas também: a toga e as fitas das máscaras, a flecha do cupido e o orbe do vilão são malhas animadas */
+function in917Descongela(){try{for(const r of IN917.regs)r.g.traverse(o=>{if(o.__in917pose)delete o.__in917pose;});}catch(e){}}
+
+/* ---------------- 12) ligar ao jogo e o gancho ---------------- */
+if(IN917.on){try{const p0=polishTick;polishTick=function(dt){const r=p0.apply(this,arguments);try{in917Quadro(Math.min(0.1,Math.max(0,dt||0)));}catch(e){in917Erro('polishTick',e);}return r;};}catch(e){in917Erro('ligar polishTick',e);}}
+// poses de foto: para cada tipo na sala, um de perto (~1,5 m) e um de corpo inteiro (~3,5 m); a câmera fica DENTRO da sala e sem parede na frente
+// (confere com um raio até o alvo e, se bater, gira em volta do inimigo até achar uma vista livre)
+function in917Fotos(filtro){const T=THREE,out=[];const sc=ACTIVE;if(!sc)return out;const a=v=>[+v.x.toFixed(3),+v.y.toFixed(3),+v.z.toFixed(3)];
+  const R=Object.values(ROOMS).find(x=>x&&x.scene===sc);const W=R&&R.world;const ray=new T.Raycaster();try{ray.camera=camera;}catch(e){}
+  const alvoDe=IN917_ALVO;   /* altura (acima do chão) do rosto e do meio do corpo */
+  const livre=(p,q)=>{try{const d=q.clone().sub(p);const L=d.length();ray.set(p,d.normalize());ray.far=L-0.35;ray.near=0.05;const hs=ray.intersectObjects(sc.children,true);for(const h of hs){if(h.object&&h.object.isMesh&&h.object.visible&&!(h.object.userData&&h.object.userData.in917))return false;}return true;}catch(e){return true;}};
+  const dentro=p=>{try{if(!W||!W.clamp)return true;const c=W.clamp(p.x,p.z,0.3);const cx=Array.isArray(c)?c[0]:c.x,cz=Array.isArray(c)?c[1]:c.z;return Math.hypot(cx-p.x,cz-p.z)<0.02;}catch(e){return true;}};
+  const vistos=new Set();
+  for(const r of in917DaCena(sc)){if(vistos.has(r.tipo)||(filtro&&filtro!==r.tipo&&IN917_TIPOS[filtro]))continue;if(!r.g.visible||in917Trofeu(r.g))continue;vistos.add(r.tipo);
+    r.g.updateMatrixWorld(true);const p=new T.Vector3(),q=new T.Quaternion(),s=new T.Vector3();r.g.matrixWorld.decompose(p,q,s);const fw=new T.Vector3(0,0,1).applyQuaternion(q).setY(0);if(fw.lengthSq()<1e-6)fw.set(0,0,1);fw.normalize();
+    const chao=p.y-1.35;const [hR,hM]=alvoDe[r.tipo];
+    for(const [id,alt,dist,fov,nota] of [['perto',hR,1.5,40,'o rosto de perto (~1,5 m, versão fina)'],['inteiro',hM,3.5,45,'o corpo inteiro (~3,5 m)']]){
+      const alvo=new T.Vector3(p.x,chao+alt,p.z);let pos=null,ok=false;
+      for(const ang of [0.45,-0.45,1.0,-1.0,0.0,1.6,-1.6,2.3,-2.3,3.1]){const dir=fw.clone().applyAxisAngle(new T.Vector3(0,1,0),ang);const c=alvo.clone().addScaledVector(dir,dist);c.y=alvo.y+(id==='perto'?0.08:0.45);if(dentro(c)&&livre(c,alvo)){pos=c;ok=true;break;}if(!pos)pos=c;}
+      out.push({id:r.tipo+'-'+id,pos:a(pos),alvo:a(alvo),fov,nota:nota+(ok?'':' — ATENÇÃO: nenhuma vista livre achada')});}}
+  return out;}
+window.__inimigos917={get estado(){return IN917.on?(IN917.ativo?IN917.estado:'desligado'):'chave=0';},stats:IN917.stats,erros:IN917.erros,S:IN917,
+  desliga(){IN917.ativo=false;for(const r of IN917.regs){try{in917Destroca(r);}catch(e){in917Erro('desliga',e);}}return this.info();},
+  liga(){IN917.ativo=true;in917TodosTroca();try{IN917.ult=in917AtualizaLOD(in917DaCena(ACTIVE));}catch(e){in917Erro('liga',e);}return this.info();},
+  // avança o jogo dt segundos com o leitor na sala (o relógio da sala e o polishTick)
+  passo(dt){dt=dt||1/60;try{if(typeof CUR!=='undefined'&&CUR==='room'&&ROOM&&ROOM.tick)ROOM.tick(dt);polishTick(dt);}catch(e){in917Erro('passo',e);}return this.info();},
+  pausa(v){IN917.pausado=v===undefined?true:!!v;if(!IN917.pausado)in917Descongela();else{try{in917Congela(in917DaCena(ACTIVE));}catch(e){}}return IN917.pausado;},
+  info(){const m=IN917.M;const mod={};for(const t in IN917_TIPOS)mod[t]=m[t]?{triFino:m[t].triFino,triGrosso:m[t].triGrosso,ms:m[t].ms}:(IN917.falhou[t]?'falhou':null);
+    let L=[];try{L=in917DaCena(ACTIVE);}catch(e){}const porTipo={};for(const r of L){const q=porTipo[r.tipo]||(porTipo[r.tipo]={n:0,trocados:0});q.n++;if(r.troca)q.trocados++;}
+    return {estado:this.estado,conj:IN917.conj,naSala:porTipo,lod:IN917.ult||null,modelos:mod,tipos:IN917.stats.tipos,erros:IN917.erros.length};},
+  fotos(sala){try{return in917Fotos(sala);}catch(e){in917Erro('fotos',e);return [];}}};
 
 window.__build434={revision:434,family:"web",edition:"en"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
