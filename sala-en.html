@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v919</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castelo de Papel · v920</title><meta name="robots" content="noindex,nofollow"><script>/* v816 · medição na máquina de verdade (?medir816=1) e telas 2D de textura no processador (?canvas816=1) — ver o bloco MD816 no fim do script do jogo */
 (function(){try{const q=location.search+location.hash;const CV=window.__canvas816={on:!/[?&#]canvas816=0/i.test(q),cpu:0,gpu:0};
 if(CV.on){const P=HTMLCanvasElement.prototype,g0=P.getContext;P.getContext=function(tipo,attrs){if(tipo==='2d'){if(!this.isConnected&&!(attrs&&attrs.willReadFrequently!==undefined)){CV.cpu++;return g0.call(this,tipo,Object.assign({},attrs||{},{willReadFrequently:true}));}CV.gpu++;}return g0.apply(this,arguments);};}
 if(/[?&#]medir816=1/i.test(q)){const M=window.__medir816={on:true,longas:[],lentas:[],fn:{},quadros:{n:0,soma:0,max:0,ac33:0,ac50:0,ac100:0,lentos:[]},linha:[],marcas:{},erros:[]};
@@ -134214,6 +134214,47 @@ window.__inimigos918={get estado(){return IN918.on?(IN918.ativo?IN918.estado:'de
    anel de pedra até 11,77 m; o teto do salão fica a 11,0 m — o alto da roda sumia dentro da laje. Agora raio 3,5 m, centro a 6,9 m (topo do vidro a
    10,4 m, do anel a 10,82 m), barras de 7,1/7,0 m e o brilho do luar na mesma altura. `?vitral919=0` volta ao de antes (lido na montagem do salão). */
 window.__vitral919={on:!/[?&#]vitral919=0/i.test(location.search+location.hash)};
+
+/* ===================== v920 · O BOTÃO «LEVE» TIRA DO PAPEL NUMA MÁQUINA QUE NUNCA FICA «ESTÁVEL» (bloco `LV920`) =====================
+   Relato do Luiz (26/11 08:36): «Só testo no papel pois nunca mais consegui ir pro Leve no navegador». COMO ERA: o jogo começa no Papel
+   (v682, pedido dele). O clique em «Leve» passa por `leve6Pedir({manual:true})`: (a) com a extensão KHR_parallel_shader_compile abre o ensaio
+   em segundo plano (v206/v417), mas o `leve6Passo` da v417 pula todo quadro que passou de 24 ms (e enquanto houver sala montando ou material
+   na fila) e a troca final (`startup344CanSwitch` + `flow417Stable`) exige 6 s seguidos de quadros perfeitos com a resolução no teto — numa
+   placa integrada, no Papel, isso não acontece (o mesmo motivo que a v670 achou para a promoção automática): o botão fica piscando
+   «Preparando o modo Leve…» para sempre; (b) sem a extensão, o clique é recusado com o aviso «O modo Papel será mantido…». Medido aqui
+   (navegador sem placa, sem a extensão): o clique deixa o ensaio em «espera», com «montagem» pendente o tempo todo, e o jogo fica no Papel.
+   AGORA, só para o clique do jogador (a promoção automática não muda): (1) com a extensão, o ensaio segue como era; se em 15 s ele não
+   trocou, a troca é feita assim mesmo, atrás da cortina da v206 (o que ainda não compilou compila no primeiro olhar — um engasgo, que é
+   aceitável quando o jogador pediu); (2) sem a extensão, a troca é feita no quadro seguinte, atrás da mesma cortina, sem o aviso de recusa;
+   (3) um clique dado enquanto uma sala monta (`PERF130.busy` sem o painel de carregamento, quando o clique não fazia nada) fica guardado e é
+   atendido quando a montagem termina. A troca forçada chama o `setQuality('leve')` de fora do «commit» da v417 (que só converteria as cenas
+   já ensaiadas) e grava a escolha como um clique normal. O Papel continua sendo o começo do jogo, e o botão «Papel» continua voltando a ele.
+   `?leve920=0` desliga; gancho `window.__leve920` (`estado`, `stats`, `erros`). */
+const LV920={on:!/[?&#]leve920=0/i.test(location.search+location.hash),teto:15000,clicouEm:0,ja:false,pendente:false,stats:{cliques:0,adiados:0,atendidos:0,semExtensao:0,forcadas:0,ensaio:0},erros:[]};
+function lv920Erro(onde,e){try{LV920.erros.push(onde+': '+(e&&e.message||e));if(LV920.erros.length>20)LV920.erros.shift();}catch(x){}}
+function lv920Forca(){let c=null;try{c=leve6Cortina();}catch(e){lv920Erro('cortina',e);}
+  try{AUTO_MANUAL=true;AQ.calibrando=false;setQuality('leve');}catch(e){lv920Erro('setQuality',e);}
+  try{LEVE6.fase=Q.papel?'ociosa':'feita';LEVE6.como='lv920';LEVE6.trocouEm=performance.now();leve6Botao();}catch(e){}
+  try{if(!Q.papel&&typeof PAPEL_AUTO!=='undefined')PAPEL_AUTO.feito=true;}catch(e){}
+  if(c){let n=0;const passo=()=>{if(++n<3){requestAnimationFrame(passo);return;}c.style.opacity='0';setTimeout(()=>{try{c.remove();}catch(e){}},900);};requestAnimationFrame(passo);}
+  if(!Q.papel)LV920.stats.forcadas++;LV920.clicouEm=0;}
+if(LV920.on){
+  try{const b=(typeof qb!=='undefined')&&qb&&qb.leve;if(b)b.addEventListener('click',()=>{try{if(!Q.papel)return;LV920.stats.cliques++;
+      if(PERF130.busy&&!(typeof fadeEl!=='undefined'&&fadeEl&&fadeEl.classList.contains('on'))){LV920.pendente=true;LV920.stats.adiados++;return;}
+      if(!LV920.clicouEm)LV920.clicouEm=performance.now();}catch(e){lv920Erro('clique',e);}});}catch(e){lv920Erro('botão',e);}
+  try{const bp=(typeof qb!=='undefined')&&qb&&qb.papel;if(bp)bp.addEventListener('click',()=>{LV920.clicouEm=0;LV920.ja=false;LV920.pendente=false;});}catch(e){lv920Erro('botão papel',e);}
+  try{const _lp=leve6Pedir;leve6Pedir=function(op){try{if(op&&op.manual&&Q.papel&&!LEVE6.desligado&&!leve6Khr()){LV920.ja=true;LV920.stats.semExtensao++;return true;}}catch(e){lv920Erro('pedir',e);}
+      return _lp.apply(this,arguments);};}catch(e){lv920Erro('pedir',e);}
+  function lv920Passo(){
+    if(!Q.papel){LV920.pendente=false;LV920.ja=false;LV920.clicouEm=0;return;}
+    if(PERF130.busy||fadeOnAt||document.hidden)return;
+    if(LV920.pendente){LV920.pendente=false;LV920.stats.atendidos++;AUTO_MANUAL=true;AQ.calibrando=false;LV920.clicouEm=performance.now();
+      let ok=false;try{ok=leve6Pedir({manual:true});}catch(e){lv920Erro('pedir',e);}if(!ok)LV920.ja=true;return;}
+    if(LV920.ja){LV920.ja=false;lv920Forca();return;}
+    if(LV920.clicouEm&&performance.now()-LV920.clicouEm>LV920.teto){if(LEVE6.fase==='preparando')LV920.stats.ensaio++;lv920Forca();}}
+  try{const _aq=autoQ;autoQ=function(dt){try{lv920Passo();}catch(e){lv920Erro('passo',e);}return _aq.apply(this,arguments);};}catch(e){lv920Erro('laço',e);}
+}
+window.__leve920={estado:LV920,stats:LV920.stats,erros:LV920.erros};
 
 window.__build434={revision:434,family:"web",edition:"en"};
 window.__ready=true;window.__renderer=renderer;window.__active=()=>ACTIVE;window.__LIBX=LIBX;window.__salas={montar:ensureRoom,fila:BUILD_Q,todas:()=>{for(const k in ROOM_BUILDERS)ensureRoom(k);},tempos:ROOM_MS,existe:roomExists,construtores:ROOM_BUILDERS,passos:(k)=>{const it=ROOM_BUILDERS[k]();const out=[];for(;;){const a=performance.now();const r=it.next();out.push(+(performance.now()-a).toFixed(1));if(r.done)break;}return out;}};window.__findPath=findPath;window.__resolveAt=resolveAt;window.__hallN=()=>HALLN;window.__GENRE_ROOM=GENRE_ROOM;window.__HALLS=HALLS;window.__P=P;window.__CH=CH;window.__reader=READER;window.__aiAssets=AI_CHARACTER_ASSETS;window.__aiMotion=AI_CHARACTER_MOTION;window.__poseReader=poseReader;window.__CAM=CAM;window.__setMode=setMode;window.__jump=jump;window.__goHall=goHall;window.__enterRoom=enterRoom;window.__doors=HALL_DOORS;window.__walkTo=walkTo;window.__loja.equipar=(slot,id)=>{LOJA.equip[slot]=id;applyGear();try{lojaSave();}catch(e){}};window.__sit=sitDown;window.__setQ=setQuality;window.__autoq={estado:()=>AQ,iniciar:autoQIniciar,tick:autoQ,fase:()=>AQ2,medida:()=>{try{return JSON.parse(localStorage.getItem('mundo.autoq')||'null');}catch(e){return null;}}};window.__Q=Q;window.__goTo=goTo;window.__goBar=renderGoBar;window.__step=()=>frame(performance.now());window.__sim=(n,dt)=>{for(let i=0;i<n;i++)tick(dt||0.05);};window.__cam=camera;window.__snapCam=()=>{camInit=false;};window.__clickAt=(px,py)=>clickTP(px,py);window.__cur=()=>CUR;window.__ROOMS=ROOMS;window.__interact=doInteract;window.__focus=()=>FOCUS;window.__travel=travel;window.__keys=keys;window.__PAD=PAD;window.__mode=()=>MODE;window.__keyE=()=>dispatchEvent(new KeyboardEvent('keydown',{key:'e'}));window.__genre=()=>CUR_GENRE;window.__toggleMap=toggleMap;window.__showCtrl=showCtrl;window.__state=()=>({readerOp,camArm,camLift,locked,lockOK,mapOpen,ctrlOpen,lojaOpen,diaryOpen,leituraOpen,toastQ:toastQ.length,toastBig});window.__sala={entrar:()=>{jump('room','minha');try{salaLembrancas();}catch(e){}},montar:()=>ensureRoom('minha'),R:()=>NR.minha,marcos:()=>SALA_MARCOS,lidos:salaLidos,setLidos:(n)=>{try{if(n===null)localStorage.removeItem('mundo.sala.lidos');else localStorage.setItem('mundo.sala.lidos',String(n));}catch(e){}salaAplicarMarcos();return salaLidos();},estante:()=>{try{return {exemplos:!!(EST.usandoExemplos&&EST.usandoExemplos()),reais:(EST.DB&&EST.DB.livros)?EST.DB.livros.length:0,naEstante:(NR.minha&&NR.minha.key?ROOMS.minha.books.length:null)};}catch(e){return 'erro';}},decorar:salaDecorar,mover:salaMover,pintar:salaPintar,pintarHex:salaPintarHex,clicar:salaClicar,pendurar:salaPendurar,teto:salaTeto,grade:()=>SALA_GRADE,superficies:()=>SALA_SUPERF,tapetes:()=>SALA_TAPETES,formas:()=>SALA_FORMAS,
